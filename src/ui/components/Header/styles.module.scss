@@ -1,0 +1,46 @@
+.header {
+  height: 100%;
+  gap: 20px;
+  padding: 0px 40px 0 28px;
+  display: flex;
+  align-items: center;
+
+  .search {
+    height: 100%;
+    flex-grow: 1;
+
+    .search__input {
+      height: 55px;
+      font-family: inherit;
+      margin-left: -10px;
+    }
+
+    .input {
+      border: none;
+      height: 100%;
+    }
+  }
+
+  .stage__trigger {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .notification {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    padding: 15px 0;
+    gap: 20px;
+  }
+
+  .profile {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    .profile__text {
+      color: var(--prune-text-gray-600);
+    }
+  }
+}

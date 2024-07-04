@@ -1,0 +1,132 @@
+.nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 10px;
+
+  .logo__container {
+    height: 56px;
+  }
+
+  .menu__container {
+    flex-grow: 1;
+
+    .container {
+      padding-top: 15px;
+
+      &:nth-child(2) {
+        margin-top: 40px;
+      }
+
+      .container__header {
+        color: var(--prune-text-gray-400);
+      }
+
+      .links {
+        margin: 20px 0;
+
+        .link {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 15px;
+          padding: 10px 10px;
+          color: var(--prune-text-gray-500);
+
+          .link__text {
+            color: var(--prune-text-gray-500);
+          }
+        }
+
+        .link__active {
+          background-color: var(--prune-primary-50);
+          color: var(--prune-primary-700);
+          padding: 10px;
+
+          .link__text {
+            font-weight: 500;
+            color: var(--prune-primary-700);
+          }
+        }
+      }
+    }
+  }
+
+  .nav__cta__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--prune-text-gray-500);
+    margin-bottom: 20px;
+
+    .nav__cta {
+      display: flex;
+      align-items: center;
+      color: var(--prune-text-gray-500);
+    }
+  }
+}
+
+.user__nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 0 10px;
+
+  .logo__container {
+    height: 56px;
+  }
+
+  .menu__container {
+    flex-grow: 1;
+
+    .container {
+      padding-top: 15px;
+
+      .container__header {
+        color: var(--prune-text-gray-400);
+      }
+
+      .links {
+        .link {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+          padding: 10px 10px;
+          color: var(--prune-text-gray-400);
+
+          .link__text {
+            color: var(--prune-text-gray-400);
+          }
+        }
+
+        .link__active {
+          background-color: var(--prune-primary-50);
+          color: var(--prune-primary-700);
+          padding: 10px;
+          border-radius: 3px;
+
+          .link__text {
+            font-weight: 500;
+            color: var(--prune-primary-700);
+          }
+        }
+      }
+    }
+  }
+
+  .nav__cta__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--prune-text-gray-400);
+    margin-bottom: 20px;
+
+    .nav__cta {
+      display: flex;
+      align-items: center;
+      color: var(--prune-text-gray-400);
+    }
+  }
+}

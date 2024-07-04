@@ -1,0 +1,145 @@
+:root {
+  --max-width: 1100px;
+  --border-radius: 12px;
+  --font-mono: ui-monospace, Menlo, Monaco, "Cascadia Mono", "Segoe UI Mono",
+    "Roboto Mono", "Oxygen Mono", "Ubuntu Monospace", "Source Code Pro",
+    "Fira Mono", "Droid Sans Mono", "Courier New", monospace;
+
+  // Colors
+  --prune-black: #000000;
+  --prune-gray-200: #eaecf0;
+
+  --prune-text-white: #ffffff;
+  --prune-text-gray: #808080;
+
+  --prune-text-gray-200: #eaecf0;
+  --prune-text-gray-300: #d0d5dd;
+  --prune-text-gray-400: #98a2b3;
+  --prune-text-gray-500: #667085;
+  --prune-text-gray-600: #475467;
+  --prune-text-gray-700: #344054;
+  --prune-text-gray-800: #1d2939;
+
+  --prune-primary-50: #fbfee6;
+  --prune-primary-500: #d4f307;
+  --prune-primary-600: #c1dd06;
+  --prune-primary-700: #97ad05;
+
+  --prune-success-50: #ecfdf3;
+  --prune-success-500: #12b76a;
+
+  --prune-divider-gray: #f0f2f5;
+}
+
+@font-face {
+  font-family: "Switzer";
+  src: url("/fonts/Switzer-Regular.woff2") format("woff2"),
+    url("/fonts/Switzer-Regular.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media (prefers-color-scheme: dark) {
+  // :root {
+  // }
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html,
+body {
+  max-width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  color: var(--prune-text-gray-700);
+  background: #f6f6f6;
+  font-family: "Switzer";
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+input {
+  font-family: "Switzer" !important;
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    color-scheme: dark;
+  }
+}
+
+.primary-500 {
+  color: var(--prune-primary-500);
+}
+
+.primary-600 {
+  color: var(--prune-primary-600);
+}
+
+.primary-700 {
+  color: var(--prune-primary-700);
+}
+
+.grey-400 {
+  color: var(--prune-text-gray-400);
+}
+
+.grey-500 {
+  color: var(--prune-text-gray-500);
+}
+
+.grey-600 {
+  color: var(--prune-text-gray-600);
+}
+
+.grey-700 {
+  color: var(--prune-text-gray-700);
+}
+
+.ag-theme-quartz {
+  --ag-font-size: 12px;
+  /* disable all borders */
+  --ag-borders: none;
+  /* then add back a border between rows */
+  --ag-row-border-style: solid;
+  --ag-row-border-width: 1px;
+  --ag-row-border-color: #eaecf0;
+  --ag-font-family: inherit;
+  --ag-header-background-color: none;
+  --ag-list-item-height: 40px;
+  --ag-row-height: 50px;
+}
+
+.ag-theme-quartz .ag-header {
+  border-bottom: 1px solid #eaecf0;
+}
+
+.ag-theme-quartz .ag-header-cell {
+  color: #475467;
+  font-size: 10px;
+}
+
+.ag-theme-quartz .ag-input-field-input {
+  border: 1px solid #d0d5dd !important;
+
+  // &:nth-child(even) {
+  //   background-color: #f9f9f9;
+  // }
+}
+
+.mantine-Menu-item {
+  &:hover {
+    color: #97ad05 !important;
+    background-color: #fbfee6;
+  }
+}

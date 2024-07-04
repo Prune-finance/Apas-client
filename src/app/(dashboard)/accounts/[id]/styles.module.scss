@@ -1,0 +1,96 @@
+.grid__container {
+  margin-top: 20px;
+
+  .card__one__container {
+    background-color: #fff;
+    padding-bottom: 15px;
+    .card__one {
+      background: #fff;
+
+      .card__one__header {
+        border-bottom: 1px solid #eaecf0;
+        padding: 20px;
+        color: var(--prune-text-gray-600);
+      }
+
+      .card__one__body {
+        padding: 20px;
+
+        .body__title {
+          font-size: 10px;
+          color: var(--prune-text-gray-500);
+        }
+
+        .body__text {
+          font-size: 13px;
+          color: var(--prune-text-gray-600);
+        }
+      }
+    }
+  }
+
+  .payout__table {
+    height: 100%;
+    padding: 15px;
+    overflow-x: hidden;
+    background-color: #fff;
+
+    .table__text {
+      text-transform: uppercase;
+      color: var(--prune-text-gray-600);
+    }
+
+    .table {
+      overflow-x: scroll;
+      margin-top: 10px;
+
+      .table__th {
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--prune-text-gray-400);
+
+        &:nth-child(3) {
+          border-right: 1px dashed var(--prune-text-gray-300);
+        }
+      }
+
+      .table__td {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--prune-text-gray-600);
+
+        &:nth-child(5) {
+          position: relative;
+          border-right: 1px dashed var(--prune-text-gray-300);
+        }
+
+        &:nth-child(4) {
+          position: relative;
+
+          .table__td__icon {
+            position: absolute;
+            left: -10px;
+          }
+        }
+
+        .table__td__status {
+          width: fit-content;
+          border-radius: 20px;
+          padding: 5px 15px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          // background-color: var(--prune-success-50);
+        }
+      }
+    }
+  }
+
+  .select__input {
+    font-size: 10px;
+    height: 24px;
+    background-color: #f4f4f4;
+    border: none;
+    color: var(--prune-text-gray-700);
+  }
+}

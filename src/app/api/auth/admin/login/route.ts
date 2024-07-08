@@ -22,7 +22,7 @@ export async function POST(request: Request) {
       ...(process.env.NODE_ENV === "production" && {
         sameSite: "none",
         secure: true,
-        domain: ".prunepayments.com",
+        domain: ".prunepayments.net",
       }),
     });
 

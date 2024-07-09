@@ -27,6 +27,8 @@ import { useState, useEffect, useMemo } from "react";
 import { AccountData } from "@/lib/hooks/accounts";
 import { CardOne } from "@/ui/components/Cards";
 import { formatNumber } from "@/lib/utils";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -38,6 +40,7 @@ export default function Accounts({
   business: BusinessData | null;
 }) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
+  const { handleError } = useNotification();
 
   const CustomButtonComponent = (props: any) => {
     return (
@@ -158,7 +161,7 @@ export default function Accounts({
 
       setAccounts(data.data);
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     }
   };
 

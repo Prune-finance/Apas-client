@@ -1,24 +1,16 @@
 "use client";
-
-import {
-  Flex,
-  Paper,
-  ThemeIcon,
-  Text,
-  Box,
-  TextInput,
-  Select,
-  Button,
-  UnstyledButton,
-} from "@mantine/core";
-import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
-import { Fragment, useState } from "react";
 import axios from "axios";
+import { Fragment, useState } from "react";
 import { useRouter } from "next/navigation";
+import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
+
+import { Flex, Paper, ThemeIcon, Text, Box } from "@mantine/core";
+import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
+import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
-import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
+
 import DropzoneComponent from "@/ui/components/Dropzone";
 import {
   directorEtShareholderSchema,
@@ -26,6 +18,7 @@ import {
   validateNewBusiness,
 } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 export default function NewBusiness() {
   const router = useRouter();
@@ -34,7 +27,7 @@ export default function NewBusiness() {
   const [directorsCount, setDirectorsCount] = useState(0);
   const [shareholderCount, setShareholderCount] = useState(0);
 
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
 
   const form = useForm({
     initialValues: newBusiness,
@@ -46,7 +39,7 @@ export default function NewBusiness() {
     try {
       const { errors, hasErrors } = form.validate();
       if (hasErrors) {
-        return console.log(errors);
+        throw new Error("Please fill all required fields");
       }
 
       const data = await axios.post(
@@ -61,7 +54,7 @@ export default function NewBusiness() {
       );
       router.push("/admin/businesses");
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -79,12 +72,14 @@ export default function NewBusiness() {
 
       <Paper className={styles.form__container}>
         <Flex gap={10} align="center">
-          <ThemeIcon color="rgba(212, 243, 7)" radius="lg">
-            <IconArrowLeft
-              color="#1D2939"
-              style={{ width: "70%", height: "70%" }}
-            />
-          </ThemeIcon>
+          <UnstyledButton onClick={() => router.back()}>
+            <ThemeIcon color="rgba(212, 243, 7)" radius="lg">
+              <IconArrowLeft
+                color="#1D2939"
+                style={{ width: "70%", height: "70%" }}
+              />
+            </ThemeIcon>
+          </UnstyledButton>
 
           <Text className={styles.form__container__hdrText}>
             Create New Business

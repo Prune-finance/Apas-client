@@ -29,6 +29,7 @@ import { UseFormReturnType, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 import DropzoneComponent from "./dropzone";
+import { parseError } from "@/lib/actions/auth";
 
 export default function Shareholders({
   business,
@@ -37,7 +38,7 @@ export default function Shareholders({
   business: BusinessData;
   revalidate: () => void;
 }) {
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
 
   const [processing, setProcessing] = useState(false);
@@ -76,7 +77,7 @@ export default function Shareholders({
       form.reset();
       close();
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -99,7 +100,7 @@ export default function Shareholders({
       form.reset();
       close();
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -123,7 +124,7 @@ export default function Shareholders({
       form.reset();
       close();
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }

@@ -9,6 +9,7 @@ import { useState } from "react";
 import { useForm } from "@mantine/form";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 export default function Business({
   business,
@@ -20,7 +21,7 @@ export default function Business({
   const [editingTop, setEditingTop] = useState(false);
   const [editingBottom, setEditingBottom] = useState(false);
 
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
 
   const initialValues = {
     name: business.name,
@@ -51,7 +52,7 @@ export default function Business({
       handleSuccess("Business Updated", "");
       revalidate();
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     }
   };
 

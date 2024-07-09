@@ -17,6 +17,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 
 import { directorEtShareholderSchema } from "@/lib/schema";
+import { parseError } from "@/lib/actions/auth";
+import useNotification from "@/lib/hooks/notification";
 
 interface DropzoneCustomProps extends Partial<DropzoneProps> {
   form?: UseFormReturnType<typeof directorEtShareholderSchema>;
@@ -25,6 +27,7 @@ interface DropzoneCustomProps extends Partial<DropzoneProps> {
 
 export default function DropzoneComponent(props: DropzoneCustomProps) {
   const [file, setFile] = useState<FileWithPath | null>(null);
+  const { handleError } = useNotification();
 
   const [uploaded, setUploaded] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -52,7 +55,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       }
       setUploaded(true);
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }

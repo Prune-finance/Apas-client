@@ -48,11 +48,14 @@ import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
 import axios from "axios";
 import { useState } from "react";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 export default function Users() {
   const router = useRouter();
   const { loading, users, revalidate } = useAdmins();
   const [opened, { open, close }] = useDisclosure(false);
+  const { handleError } = useNotification();
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [processing, setProcessing] = useState(false);
@@ -81,7 +84,7 @@ export default function Users() {
       close();
       router.push("/admin/users");
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }

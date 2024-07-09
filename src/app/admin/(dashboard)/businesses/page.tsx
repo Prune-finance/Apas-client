@@ -40,6 +40,7 @@ import styles from "@/ui/styles/business.module.scss";
 import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { AllBusinessSkeleton } from "@/lib/static";
+import { switzer } from "@/app/layout";
 
 export default function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -146,7 +147,9 @@ export default function Businesses() {
           </Link>
         </div>
 
-        <div className={styles.container__search__filter}>
+        <div
+          className={`${styles.container__search__filter} ${switzer.className}`}
+        >
           <TextInput
             placeholder="Search here..."
             leftSectionPointerEvents="none"

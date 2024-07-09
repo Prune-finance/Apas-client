@@ -11,9 +11,7 @@ export async function middleware(request: NextRequest) {
         }
       );
       if (!req.ok) {
-        return NextResponse.redirect(
-          new URL("/auth/login?rdr-action=admin", request.url)
-        );
+        return NextResponse.redirect(new URL("/auth/admin/login", request.url));
       }
 
       return;

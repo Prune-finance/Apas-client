@@ -32,6 +32,6 @@ export async function POST(request: Request) {
       const res = error.response?.data;
       return NextResponse.json({ message: res.message }, { status: res.code });
     }
-    return NextResponse.redirect(new URL("/auth/login", request.url));
+    return NextResponse.redirect(new URL("/auth/admin/login", request.url));
   }
 }

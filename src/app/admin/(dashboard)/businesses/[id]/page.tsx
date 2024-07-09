@@ -41,13 +41,14 @@ import Keys from "./(tabs)/keys";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
+import { parseError } from "@/lib/actions/auth";
 
 export default function SingleBusiness() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { loading, business, revalidate } = useSingleBusiness(params.id);
 
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
   const [processingLink, setProcessingLink] = useState(false);
   const [processingActive, setProcessingActive] = useState(false);
 
@@ -67,7 +68,7 @@ export default function SingleBusiness() {
         `This business is ${currentState ? "not trusted" : "now trusted"}`
       );
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     }
   };
 
@@ -82,7 +83,7 @@ export default function SingleBusiness() {
 
       handleSuccess("Action Completed", `Activation Link sent`);
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessingLink(false);
     }
@@ -100,6 +101,7 @@ export default function SingleBusiness() {
       handleSuccess("Action Completed", `Company status updated`);
       revalidate();
     } catch (error) {
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessingActive(false);
     }

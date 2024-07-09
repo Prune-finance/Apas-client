@@ -8,10 +8,13 @@ import { useParams } from "next/navigation";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData } from "@/lib/hooks/businesses";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 export default function Keys({ business }: { business: BusinessData | null }) {
   const [keys, setKeys] = useState<Key[]>([]);
   const params = useParams<{ id: string }>();
+  const { handleError } = useNotification();
 
   const { live, test } = useMemo(() => {
     const live = keys.find((key) => key.staging === "LIVE");
@@ -28,7 +31,7 @@ export default function Keys({ business }: { business: BusinessData | null }) {
 
       setKeys(data.data);
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     }
   };
 

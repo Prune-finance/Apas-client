@@ -21,13 +21,14 @@ import { CardOne, CardThree, CardTwo } from "./cards";
 import { loginValues, validateLogin } from "@/lib/schema";
 
 import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 function Login() {
   const searchParams = useSearchParams();
   const [processing, setProcessing] = useState(false);
   const redirect = searchParams.get("rdr-action");
 
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
 
   const form = useForm({
     initialValues: loginValues,
@@ -50,7 +51,7 @@ function Login() {
         ? window.location.replace("/admin/dashboard")
         : window.location.replace("/");
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }

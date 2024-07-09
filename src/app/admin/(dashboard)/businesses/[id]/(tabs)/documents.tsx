@@ -23,6 +23,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useForm } from "@mantine/form";
 import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 export default function Documents({
   business,
@@ -31,7 +32,7 @@ export default function Documents({
   business: BusinessData;
   revalidate: () => void;
 }) {
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
   const [editing, setEditing] = useState(false);
   const [processing, setProcessing] = useState(false);
 
@@ -59,7 +60,7 @@ export default function Documents({
       handleSuccess("Business Updated", "");
       revalidate();
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     }
   };
 
@@ -82,7 +83,7 @@ export default function Documents({
       }
       // setUploaded(true);
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }

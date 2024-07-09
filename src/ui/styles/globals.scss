@@ -68,9 +68,12 @@ a {
   text-decoration: none;
 }
 
-input {
-  font-family: "Switzer" !important;
-}
+// input {
+//   font-family: "Switzer" !important;
+//   &::placeholder {
+//     font-family: "Switzer" !important;
+//   }
+// }
 
 @media (prefers-color-scheme: dark) {
   html {

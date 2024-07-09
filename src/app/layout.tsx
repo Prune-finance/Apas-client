@@ -12,9 +12,11 @@ import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "@/ui/styles/globals.scss";
 
-const switzer = localFont({ src: "../assets/fonts/Switzer-Regular.woff2" });
+export const switzer = localFont({
+  src: "../assets/fonts/Switzer-Regular.woff2",
+});
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Prune",
   description: "Seamless payment across borders",
 };

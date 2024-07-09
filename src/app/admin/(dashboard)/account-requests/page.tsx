@@ -18,7 +18,7 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { useRequests } from "@/lib/hooks/requests";
-import { AllBusinessSkeleton, DynamicSkeleton } from "@/lib/static";
+import { DynamicSkeleton } from "@/lib/static";
 
 // UI Imports
 import Breadcrumbs from "@/ui/components/Breadcrumbs";

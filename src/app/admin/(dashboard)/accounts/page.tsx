@@ -33,6 +33,8 @@ import { formatNumber } from "@/lib/utils";
 
 import EmptyImage from "@/assets/empty.png";
 import axios from "axios";
+import { parseError } from "@/lib/actions/auth";
+import useNotification from "@/lib/hooks/notification";
 
 export default function Accounts() {
   const { loading, accounts, revalidate } = useAccounts();
@@ -40,6 +42,7 @@ export default function Accounts() {
     useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+  const { handleError } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -53,7 +56,7 @@ export default function Accounts() {
         { withCredentials: true }
       );
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -68,7 +71,7 @@ export default function Accounts() {
         { withCredentials: true }
       );
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -82,7 +85,7 @@ export default function Accounts() {
         { withCredentials: true }
       );
     } catch (error) {
-      console.log(error);
+      handleError("An error occurred", parseError(error));
     }
   };
 

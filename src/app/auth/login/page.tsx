@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import { Suspense, useState } from "react";
 import Image from "next/image";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
 

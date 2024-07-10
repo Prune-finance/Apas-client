@@ -24,7 +24,9 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 
 function Login() {
+  const searchParams = useSearchParams();
   const [processing, setProcessing] = useState(false);
+
   const { handleSuccess, handleError } = useNotification();
 
   const form = useForm({
@@ -40,11 +42,11 @@ function Login() {
         return;
       }
 
-      const authUrl = "/api/auth/login";
+      const authUrl = "/api/auth/admin/login";
       const data = await axios.post(authUrl, form.values);
 
       handleSuccess("Authentication Successful", "Welcome back Admin");
-      window.location.replace("/");
+      window.location.replace("/admin/dashboard");
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -149,12 +151,6 @@ function Login() {
         <div className={styles.rdr__link}>
           <Text fz={14} className={styles.rdr__text}>
             Forgot Password?
-          </Text>
-          <Text fz={14} mt={10} className={styles.rdr__text}>
-            New user?{" "}
-            <Text fz={14} span className={styles.register__rdr}>
-              Learn how to sign up
-            </Text>
           </Text>
         </div>
       </div>

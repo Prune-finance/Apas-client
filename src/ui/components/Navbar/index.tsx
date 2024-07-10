@@ -18,7 +18,6 @@ import axios from "axios";
 import { useState } from "react";
 
 export default function Navbar() {
-  const router = useRouter();
   const pathname = usePathname();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -31,7 +30,7 @@ export default function Navbar() {
         withCredentials: true,
       });
 
-      router.push("/auth/login?rdr-action=admin");
+      window.location.replace("/auth/admin/login");
     } catch (error) {
       console.log(error);
     } finally {
@@ -125,7 +124,6 @@ export default function Navbar() {
 }
 
 export function UserNavbar() {
-  const router = useRouter();
   const pathname = usePathname();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -138,7 +136,7 @@ export function UserNavbar() {
         withCredentials: true,
       });
 
-      router.push("/auth/login");
+      window.location.replace("/auth/login");
     } catch (error) {
       console.log(error);
     } finally {

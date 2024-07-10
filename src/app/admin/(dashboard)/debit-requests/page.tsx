@@ -1,25 +1,31 @@
 "use client";
 
 import localFont from "next/font/local";
+import Image from "next/image";
 import {
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Paper,
-  Title,
   UnstyledButton,
   rem,
   Text,
-  Pagination,
   Drawer,
   Flex,
   Box,
-  Stack,
   Divider,
   Button,
+  TextInput,
+  TableScrollContainer,
+  Table,
+  TableTh,
+  TableThead,
+  TableTr,
+  Pagination,
+  Tabs,
+  TabsList,
+  TabsTab,
 } from "@mantine/core";
-import { AgGridReact } from "ag-grid-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/accounts.module.scss";
@@ -30,34 +36,34 @@ import {
   IconTrash,
   IconX,
   IconCheck,
+  IconSearch,
+  IconListTree,
+  IconBuildingSkyscraper,
+  IconCurrencyEuro,
+  IconFiles,
+  IconKey,
+  IconUsers,
+  IconUsersGroup,
 } from "@tabler/icons-react";
+import EmptyImage from "@/assets/empty.png";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 import { formatNumber } from "@/lib/utils";
+import { AllBusinessSkeleton } from "@/lib/static";
+import { useBusiness } from "@/lib/hooks/businesses";
 
 const switzer = localFont({
   src: "../../../../assets/fonts/Switzer-Regular.woff2",
 });
 
 export default function DebitRequests() {
+  const { loading, businesses } = useBusiness();
   const [opened, { open, close }] = useDisclosure(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
     useDisclosure(false);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
-
-  const CustomButtonComponent = (props: any) => {
-    return (
-      <div className={styles.table__td__container}>
-        <div className={styles.table__td__status}>
-          <IconPointFilled size={14} color="#12B76A" />
-          <Text tt="capitalize" fz={12} c="#12B76A">
-            {props.value}
-          </Text>
-        </div>
-      </div>
-    );
-  };
+  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const MenuComponent = (props: any) => {
     return (
@@ -101,97 +107,7 @@ export default function DebitRequests() {
     );
   };
 
-  const rowData = [
-    {
-      "BUSINESS NAME": "C80 Limited",
-      AMOUNT: "24000000",
-      // "ACCOUNT BALANCE": 64950,
-      "SOURCE ACCOUNT": "Sandra Chijioke",
-      "DATE CREATED": "25th May,2024",
-      STATUS: "Active",
-      ACTION: "",
-    },
-    {
-      "BUSINESS NAME": "TechNexus",
-      AMOUNT: "54000000",
-      // "ACCOUNT BALANCE": 8377250,
-      "SOURCE ACCOUNT": "Grace Whitman",
-      "DATE CREATED": "25th May,2024",
-      STATUS: "Active",
-      ACTION: "",
-    },
-    {
-      "BUSINESS NAME": "Digital Horizons",
-      AMOUNT: "400000",
-      // "ACCOUNT BALANCE": 977250,
-      "SOURCE ACCOUNT": "Sophia Blake",
-      "DATE CREATED": "25th May,2024",
-      STATUS: "Active",
-      ACTION: "",
-    },
-    {
-      "BUSINESS NAME": "NanoSphere ",
-      AMOUNT: "22000000",
-      // "ACCOUNT BALANCE": 977250,
-      "SOURCE ACCOUNT": "Ethan Hayes",
-      "DATE CREATED": "25th May,2024",
-      STATUS: "Active",
-      ACTION: "",
-    },
-    {
-      "BUSINESS NAME": "NexGen",
-      AMOUNT: "14000000",
-      // "ACCOUNT BALANCE": 977250,
-      "SOURCE ACCOUNT": "Liam Donovan",
-      "DATE CREATED": "25th May,2024",
-      STATUS: "Active",
-      ACTION: "",
-    },
-    {
-      "BUSINESS NAME": "DataStream",
-      AMOUNT: "5000000",
-      // "ACCOUNT BALANCE": 8377250,
-      "SOURCE ACCOUNT": "Chloe Ramsey",
-      "DATE CREATED": "25th May,2024",
-      STATUS: "Active",
-      ACTION: "",
-    },
-  ];
-
-  const colDefs = [
-    {
-      field: "BUSINESS NAME",
-      filter: true,
-      floatingFilter: true,
-      checkboxSelection: true,
-      flex: 2,
-    },
-    {
-      field: "AMOUNT",
-      filter: true,
-      floatingFilter: true,
-      cellStyle: { color: "#667085" },
-    },
-    {
-      field: "SOURCE ACCOUNT",
-      filter: true,
-      floatingFilter: true,
-    },
-    {
-      field: "DATE CREATED",
-      filter: true,
-      floatingFilter: true,
-      cellStyle: { color: "#667085" },
-    },
-    {
-      field: "STATUS",
-      cellRenderer: CustomButtonComponent,
-    },
-    {
-      field: "ACTION",
-      cellRenderer: MenuComponent,
-    },
-  ];
+  const rows: any[] = [];
 
   return (
     <main className={styles.main}>
@@ -203,32 +119,114 @@ export default function DebitRequests() {
       />
 
       <div className={styles.table__container}>
-        <Paper py={24}>
-          <Title mx={28} fz={18} fw={500}>
-            Debit Requests
-          </Title>
+        <div className={styles.container__header}>
+          <Text fz={18} fw={600}>
+            All Requests
+          </Text>
+        </div>
 
-          <div
-            className={`${switzer.className} ${styles.accounts___container} ag-theme-quartz`}
-            style={{ height: 500 }}
+        <Tabs
+          defaultValue="Business"
+          variant="pills"
+          classNames={{
+            root: styles.tabs,
+            list: styles.tabs__list,
+            tab: styles.tab,
+          }}
+        >
+          <TabsList>
+            <TabsTab
+              value="Business"
+              leftSection={<IconBuildingSkyscraper size={14} />}
+            >
+              Business Information
+            </TabsTab>
+            <TabsTab value="Documents" leftSection={<IconFiles size={14} />}>
+              Documents
+            </TabsTab>
+            <TabsTab value="Directors" leftSection={<IconUsers size={14} />}>
+              Directors
+            </TabsTab>
+            <TabsTab
+              value="Shareholders"
+              leftSection={<IconUsersGroup size={14} />}
+            >
+              Key Shareholders
+            </TabsTab>
+            <TabsTab
+              value="Accounts"
+              leftSection={<IconCurrencyEuro size={14} />}
+            >
+              Accounts
+            </TabsTab>
+            <TabsTab
+              className={styles.tab}
+              value="Keys"
+              leftSection={<IconKey size={14} />}
+            >
+              API Keys
+            </TabsTab>
+          </TabsList>
+        </Tabs>
+
+        <div
+          className={`${styles.container__search__filter} ${switzer.className}`}
+        >
+          <TextInput
+            placeholder="Search here..."
+            leftSectionPointerEvents="none"
+            leftSection={searchIcon}
+            classNames={{ wrapper: styles.search, input: styles.input__search }}
+          />
+
+          <Button
+            className={styles.filter__cta}
+            rightSection={<IconListTree size={14} />}
           >
-            <AgGridReact
-              rowData={rowData}
-              // @ts-ignore
-              columnDefs={colDefs}
-            />
-          </div>
+            <Text fz={12} fw={500}>
+              Filter
+            </Text>
+          </Button>
+        </div>
 
-          <div className={styles.pagination__container}>
-            <Text fz={14}>Rows: 5</Text>
-            <Pagination
-              autoContrast
-              color="#fff"
-              total={2}
-              classNames={{ control: styles.control, root: styles.pagination }}
-            />
-          </div>
-        </Paper>
+        <TableScrollContainer minWidth={500}>
+          <Table className={styles.table} verticalSpacing="md">
+            <TableThead>
+              <TableTr>
+                <TableTh className={styles.table__th}>S/N</TableTh>
+                <TableTh className={styles.table__th}>Business Name</TableTh>
+                <TableTh className={styles.table__th}>Amount</TableTh>
+                <TableTh className={styles.table__th}>Source Account</TableTh>
+                <TableTh className={styles.table__th}>Date Created</TableTh>
+                <TableTh className={styles.table__th}>Status</TableTh>
+                <TableTh className={styles.table__th}>Action</TableTh>
+              </TableTr>
+            </TableThead>
+            {/* <TableTbody>{loading ? AllBusinessSkeleton : rows}</TableTbody> */}
+          </Table>
+        </TableScrollContainer>
+
+        {!loading && !!!rows.length && (
+          <Flex direction="column" align="center" mt={70}>
+            <Image src={EmptyImage} alt="no content" width={156} height={120} />
+            <Text mt={14} fz={14} c="#1D2939">
+              There are no debit requests.
+            </Text>
+            <Text fz={10} c="#667085">
+              When a business is created, it will appear here
+            </Text>
+          </Flex>
+        )}
+
+        <div className={styles.pagination__container}>
+          <Text fz={14}>Rows: {businesses.length}</Text>
+          <Pagination
+            autoContrast
+            color="#fff"
+            total={1}
+            classNames={{ control: styles.control, root: styles.pagination }}
+          />
+        </div>
       </div>
 
       <Drawer

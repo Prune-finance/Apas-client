@@ -11,9 +11,7 @@ export async function middleware(request: NextRequest) {
         }
       );
       if (!req.ok) {
-        return NextResponse.redirect(
-          new URL("/auth/login?rdr-action=admin", request.url)
-        );
+        return NextResponse.redirect(new URL("/auth/admin/login", request.url));
       }
 
       return;
@@ -40,6 +38,6 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|auth).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth|404).*)",
   ],
 };

@@ -91,12 +91,12 @@ export default function Users() {
   };
 
   const menuItems = [
-    {
-      text: "View",
-      icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
-      link: true,
-      href: "/admin/businesses",
-    },
+    // {
+    //   text: "View",
+    //   icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
+    //   link: true,
+    //   href: "/admin/businesses",
+    // },
     {
       text: "Delete",
       icon: <IconTrash style={{ width: rem(14), height: rem(14) }} />,
@@ -136,19 +136,19 @@ export default function Users() {
 
           <MenuDropdown>
             {menuItems.map((items, index) => {
-              if (items.link)
-                return (
-                  <Link key={index} href={`${items.href}/${element.id}`}>
-                    <MenuItem
-                      key={index}
-                      fz={10}
-                      c="#667085"
-                      leftSection={items.icon}
-                    >
-                      {items.text}
-                    </MenuItem>
-                  </Link>
-                );
+              // if (items.link)
+              //   return (
+              //     <Link key={index} href={`${items.href}/${element.id}`}>
+              //       <MenuItem
+              //         key={index}
+              //         fz={10}
+              //         c="#667085"
+              //         leftSection={items.icon}
+              //       >
+              //         {items.text}
+              //       </MenuItem>
+              //     </Link>
+              //   );
 
               return (
                 <MenuItem

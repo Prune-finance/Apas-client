@@ -16,8 +16,13 @@ const switzer = localFont({
 
 import AdminAvatar from "@/assets/avatar.png";
 import styles from "./styles.module.scss";
+import User from "@/lib/store/user";
 
 export default function Header() {
+  const { user } = User();
+
+  console.log(user);
+
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   return (
     <header className={styles.header}>
@@ -40,7 +45,7 @@ export default function Header() {
 
       <div className={styles.profile}>
         <Text fz={14} fw={600} className={styles.profile__text}>
-          Abayomi Daniella
+          {user?.firstName} {user?.lastName}
         </Text>
         <Avatar size="md" src={AdminAvatar.src} alt="admin avatar" />
       </div>

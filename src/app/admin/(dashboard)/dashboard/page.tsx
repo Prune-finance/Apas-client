@@ -8,6 +8,7 @@ import {
   Text,
   TableScrollContainer,
   Button,
+  Flex,
 } from "@mantine/core";
 import {
   Table,
@@ -32,10 +33,14 @@ import { formatNumber } from "@/lib/utils";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { useRequests } from "@/lib/hooks/requests";
 import { useAccounts } from "@/lib/hooks/accounts";
+import dayjs from "dayjs";
+
+import EmptyImage from "@/assets/empty.png";
+import Image from "next/image";
 
 export default function Home() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
-  const { loading, meta, stats } = useBusiness({
+  const { loading, meta, stats, statsMeta } = useBusiness({
     period: chartFrequency === "Monthly" ? "year" : "week",
   });
   const { loading: accountsLoading, meta: accountsMeta } = useAccounts();
@@ -168,11 +173,11 @@ export default function Home() {
                 <>
                   There is a{" "}
                   <Text bg="#ECFDF3" c="#12B76A" fz={9} span>
-                    +23%
+                    +100%
                   </Text>{" "}
                   increase this month and a total of{" "}
                   <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
-                    17
+                    {statsMeta?.weekCount}
                   </Text>{" "}
                   new businesses this week
                 </>
@@ -213,7 +218,9 @@ export default function Home() {
               stat={0}
               formatted
               colored
-              text={<>From Jan 01, 2022 to Jan 31, 2022</>}
+              text={
+                <>{`From Jul 01, 2024 to ${dayjs().format("MMM DD, YYYY")}`}</>
+              }
             />
           </GridCol>
         </Grid>
@@ -255,12 +262,12 @@ export default function Home() {
 
             <Grid mt={15}>
               <GridCol span={{ base: 12, xs: 12, sm: 12, md: 5, lg: 5 }}>
-                <CardTwo title="Debit Requests" link="/" items={cardTwoItems} />
+                <CardTwo title="Debit Requests" link="/" items={[]} />
               </GridCol>
 
               <GridCol
                 span={{ base: 12, xs: 12, sm: 12, md: 7, lg: 7 }}
-                mih={400}
+                mih={345}
               >
                 <div className={styles.payout__table}>
                   <Text
@@ -272,7 +279,7 @@ export default function Home() {
                     Payout History
                   </Text>
 
-                  <TableScrollContainer minWidth={500}>
+                  {/* <TableScrollContainer minWidth={500}>
                     <Table className={styles.table} verticalSpacing="lg">
                       <TableThead>
                         <TableTr>
@@ -297,7 +304,28 @@ export default function Home() {
                     fz={11}
                   >
                     See All Transactions
-                  </Button>
+                  </Button> */}
+
+                  <Flex
+                    style={{ flexGrow: 1 }}
+                    direction="column"
+                    align="center"
+                    justify="center"
+                    mt={24}
+                  >
+                    <Image
+                      src={EmptyImage}
+                      alt="no content"
+                      width={120}
+                      height={96}
+                    />
+                    <Text mt={14} fz={10} c="#1D2939">
+                      No payout history.
+                    </Text>
+                    {/* <Text fz={10} c="#667085">
+              When an account is created, it will appear here
+            </Text> */}
+                  </Flex>
                 </div>
               </GridCol>
             </Grid>
@@ -320,7 +348,7 @@ export default function Home() {
                   color="#12B76A"
                   minTitle="Active Accounts"
                   amount={accountsMeta?.active || 0}
-                  percentage="+23"
+                  percentage="0"
                   subTitle="Total Number of Active Accounts of All Business"
                 />
               </GridCol>
@@ -331,7 +359,7 @@ export default function Home() {
                   color="#D92D20"
                   minTitle="In-active Accounts"
                   amount={accountsMeta?.inactive || 0}
-                  percentage="-10"
+                  percentage="0"
                   subTitle="Total Number of In-active Accounts of All Business"
                 />
               </GridCol>

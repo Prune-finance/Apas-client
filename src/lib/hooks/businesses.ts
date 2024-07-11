@@ -11,6 +11,7 @@ export function useBusiness(customParams: IParams = {}) {
 
   const [businesses, setBusinesses] = useState<BusinessData[]>([]);
   const [stats, setStats] = useState<{ [x: string]: number }[]>([]);
+  const [statsMeta, setStatsMeta] = useState<StatsMeta>();
   const [meta, setMeta] = useState<BusinessMeta>();
 
   const [loading, setLoading] = useState(true);
@@ -38,6 +39,7 @@ export function useBusiness(customParams: IParams = {}) {
         { withCredentials: true }
       );
       setStats(data.data);
+      setStatsMeta(data.meta);
     } catch (error) {
       setStats([]);
     } finally {
@@ -54,7 +56,7 @@ export function useBusiness(customParams: IParams = {}) {
     };
   }, [period]);
 
-  return { loading, businesses, meta, stats };
+  return { loading, businesses, meta, stats, statsMeta };
 }
 
 export function useSingleBusiness(id: string) {
@@ -122,4 +124,9 @@ export interface BusinessData {
 
 export interface BusinessMeta {
   total: number;
+}
+
+export interface StatsMeta {
+  monthDiff: number;
+  weekCount: number;
 }

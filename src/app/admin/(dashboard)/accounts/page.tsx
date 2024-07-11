@@ -23,6 +23,7 @@ import {
   IconTrash,
   IconListTree,
   IconSearch,
+  IconCheck,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -40,9 +41,13 @@ export default function Accounts() {
   const { loading, accounts, revalidate } = useAccounts();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
+  const [unfreezeOpened, { open: unfreezeOpen, close: unfreezeClose }] =
+    useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const [activateOpened, { open: activateOpen, close: activateClose }] =
+    useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-  const { handleError } = useNotification();
+  const { handleError, handleSuccess } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -55,6 +60,10 @@ export default function Accounts() {
         {},
         { withCredentials: true }
       );
+
+      revalidate();
+      handleSuccess("Action Completed", "Account frozen");
+      freezeClose();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -70,6 +79,27 @@ export default function Accounts() {
         {},
         { withCredentials: true }
       );
+      revalidate();
+      handleSuccess("Action Completed", "Account Deactivated");
+      close();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const activateAccount = async (id: string) => {
+    setProcessing(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/activate`,
+        {},
+        { withCredentials: true }
+      );
+      revalidate();
+      handleSuccess("Action Completed", "Account Activated");
+      activateClose();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -78,14 +108,21 @@ export default function Accounts() {
   };
 
   const unfreezeAccount = async (id: string) => {
+    setProcessing(true);
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/unfreeze`,
         {},
         { withCredentials: true }
       );
+
+      revalidate();
+      handleSuccess("Action Completed", "Account unfrozen");
+      unfreezeClose();
     } catch (error) {
       handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -114,6 +151,7 @@ export default function Accounts() {
           <MenuItem
             onClick={() => {
               setRowId(id);
+              if (status === "FROZEN") return unfreezeOpen();
               freezeOpen();
             }}
             fz={10}
@@ -122,18 +160,22 @@ export default function Accounts() {
               <IconBrandLinktree style={{ width: rem(14), height: rem(14) }} />
             }
           >
-            Freeze
+            {status === "FROZEN" ? "Unfreeze" : "Freeze"}
           </MenuItem>
 
           <MenuItem
-            onClick={open}
+            onClick={() => {
+              setRowId(id);
+              if (status === "INACTIVE") return activateOpen();
+              open();
+            }}
             fz={10}
             c="#667085"
             leftSection={
               <IconTrash style={{ width: rem(14), height: rem(14) }} />
             }
           >
-            Deactivate
+            {status === "INACTIVE" ? "Activate" : "Deactivate"}
           </MenuItem>
         </MenuDropdown>
       </Menu>
@@ -294,6 +336,17 @@ export default function Accounts() {
 
         <ModalComponent
           processing={processing}
+          action={() => unfreezeAccount(rowId || "")}
+          color="#F2F4F7"
+          icon={<IconBrandLinktree color="#344054" />}
+          opened={unfreezeOpened}
+          close={unfreezeClose}
+          title="Unfreeze this Account?"
+          text="You are about to unfreeze this account.This means full activity can be carried out in the account again."
+        />
+
+        <ModalComponent
+          processing={processing}
           action={() => deactivateAccount(rowId || "")}
           color="#FEF3F2"
           icon={<IconX color="#D92D20" />}
@@ -301,6 +354,17 @@ export default function Accounts() {
           close={close}
           title="Deactivate This Account?"
           text="You are about to deactivate this account.This means the account will be inactive."
+        />
+
+        <ModalComponent
+          processing={processing}
+          action={() => activateAccount(rowId || "")}
+          color="#ECFDF3"
+          icon={<IconCheck color="#12B76A" />}
+          opened={activateOpened}
+          close={activateClose}
+          title="Activate This Account?"
+          text="You are about to activate this account.This means the account will become active."
         />
       </div>
     </main>

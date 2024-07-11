@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { Avatar, Button, Paper, Skeleton, Text, Title } from "@mantine/core";
+import {
+  Avatar,
+  Button,
+  Flex,
+  Paper,
+  Skeleton,
+  Text,
+  Title,
+} from "@mantine/core";
 import {
   IconArrowDownLeft,
   IconChevronRight,
@@ -10,6 +18,9 @@ import {
 import styles from "./styles.module.scss";
 import { formatNumber } from "@/lib/utils";
 import dayjs from "dayjs";
+
+import EmptyImage from "@/assets/empty.png";
+import Image from "next/image";
 
 interface ICardOne {
   title: string;
@@ -212,6 +223,24 @@ export function CardTwo({ title, link, items }: ICardTwo) {
             </div>
           );
         })}
+
+        {items && !!!items.length && (
+          <Flex
+            style={{ flexGrow: 1 }}
+            direction="column"
+            align="center"
+            justify="center"
+            mt={24}
+          >
+            <Image src={EmptyImage} alt="no content" width={120} height={96} />
+            <Text mt={14} fz={10} c="#1D2939">
+              There are no debit requests.
+            </Text>
+            {/* <Text fz={10} c="#667085">
+              When an account is created, it will appear here
+            </Text> */}
+          </Flex>
+        )}
       </div>
     </div>
   );
@@ -343,6 +372,18 @@ export function CardFour({ title, link, items }: ICardFour) {
             </Link>
           );
         })}
+
+        {items && !!!items.length && (
+          <Flex direction="column" align="center" mt={24}>
+            <Image src={EmptyImage} alt="no content" width={120} height={96} />
+            <Text mt={14} fz={10} c="#1D2939">
+              There are no pending account requests.
+            </Text>
+            {/* <Text fz={10} c="#667085">
+              When an account is created, it will appear here
+            </Text> */}
+          </Flex>
+        )}
       </div>
     </div>
   );

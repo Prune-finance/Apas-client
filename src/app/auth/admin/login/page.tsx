@@ -22,10 +22,12 @@ import { loginValues, validateLogin } from "@/lib/schema";
 
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import User from "@/lib/store/user";
 
 function Login() {
   const searchParams = useSearchParams();
   const [processing, setProcessing] = useState(false);
+  const { setUser } = User();
 
   const { handleSuccess, handleError } = useNotification();
 
@@ -43,9 +45,11 @@ function Login() {
       }
 
       const authUrl = "/api/auth/admin/login";
-      const data = await axios.post(authUrl, form.values);
+      const { data } = await axios.post(authUrl, form.values);
 
       handleSuccess("Authentication Successful", "Welcome back Admin");
+
+      setUser({ ...data.data });
       window.location.replace("/admin/dashboard");
     } catch (error) {
       handleError("An error occurred", parseError(error));

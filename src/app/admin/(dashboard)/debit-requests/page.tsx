@@ -124,7 +124,7 @@ export default function DebitRequests() {
             All Requests
           </Text>
         </div>
-
+        {/* 
         <Tabs
           defaultValue="Business"
           variant="pills"
@@ -167,7 +167,7 @@ export default function DebitRequests() {
               API Keys
             </TabsTab>
           </TabsList>
-        </Tabs>
+        </Tabs> */}
 
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}

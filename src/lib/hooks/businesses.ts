@@ -1,8 +1,17 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
-export function useBusiness() {
+interface IParams {
+  period?: string;
+}
+export function useBusiness(customParams: IParams = {}) {
+  const period = useMemo(() => {
+    return customParams.period;
+  }, [customParams]);
+
   const [businesses, setBusinesses] = useState<BusinessData[]>([]);
+  const [stats, setStats] = useState<{ [x: string]: number }[]>([]);
+  const [statsMeta, setStatsMeta] = useState<StatsMeta>();
   const [meta, setMeta] = useState<BusinessMeta>();
 
   const [loading, setLoading] = useState(true);
@@ -17,7 +26,22 @@ export function useBusiness() {
       setMeta(data.meta);
       setBusinesses(data.data);
     } catch (error) {
-      console.log(error);
+      setBusinesses([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function fetchBusinessRegistrationStats() {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business-stats?period=${customParams.period}`,
+        { withCredentials: true }
+      );
+      setStats(data.data);
+      setStatsMeta(data.meta);
+    } catch (error) {
+      setStats([]);
     } finally {
       setLoading(false);
     }
@@ -25,13 +49,14 @@ export function useBusiness() {
 
   useEffect(() => {
     fetchBusinesses();
+    fetchBusinessRegistrationStats();
 
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [period]);
 
-  return { loading, businesses, meta };
+  return { loading, businesses, meta, stats, statsMeta };
 }
 
 export function useSingleBusiness(id: string) {
@@ -99,4 +124,9 @@ export interface BusinessData {
 
 export interface BusinessMeta {
   total: number;
+}
+
+export interface StatsMeta {
+  monthDiff: number;
+  weekCount: number;
 }

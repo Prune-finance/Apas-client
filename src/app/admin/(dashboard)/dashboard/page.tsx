@@ -34,7 +34,10 @@ import { useRequests } from "@/lib/hooks/requests";
 import { useAccounts } from "@/lib/hooks/accounts";
 
 export default function Home() {
-  const { loading, meta } = useBusiness();
+  const [chartFrequency, setChartFrequency] = useState("Monthly");
+  const { loading, meta, stats } = useBusiness({
+    period: chartFrequency === "Monthly" ? "year" : "week",
+  });
   const { loading: accountsLoading, meta: accountsMeta } = useAccounts();
 
   const {
@@ -42,32 +45,8 @@ export default function Home() {
     meta: requestMeta,
     requests,
   } = useRequests("PENDING");
-  const [chartFrequency, setChartFrequency] = useState("Monthly");
 
-  const data = [
-    { month: "Jan", registration: 300 },
-    { month: "Feb", registration: 900 },
-    { month: "Mar", registration: 500 },
-    { month: "Apr", registration: 350 },
-    { month: "May", registration: 1000 },
-    { month: "Jun", registration: 800 },
-    { month: "Jul", registration: 200 },
-    { month: "Aug", registration: 400 },
-    { month: "Sep", registration: 500 },
-    { month: "Oct", registration: 800 },
-    { month: "Nov", registration: 900 },
-    { month: "Dec", registration: 100 },
-  ];
-
-  const weekData = [
-    { day: "Mon", registration: 280 },
-    { day: "Tue", registration: 349 },
-    { day: "Wed", registration: 936 },
-    { day: "Thu", registration: 350 },
-    { day: "Fri", registration: 2460 },
-    { day: "Sat", registration: 726 },
-    { day: "Sun", registration: 1049 },
-  ];
+  const data = stats;
 
   const cardTwoItems = [
     {
@@ -266,7 +245,7 @@ export default function Home() {
               <BarChart
                 style={{ marginLeft: "-12px" }}
                 h={230}
-                data={chartFrequency === "Monthly" ? data : weekData}
+                data={data}
                 dataKey={chartFrequency === "Monthly" ? "month" : "day"}
                 barProps={{ barSize: 20, radius: 3 }}
                 series={[{ name: "registration", color: "#97AD05" }]}

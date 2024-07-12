@@ -177,7 +177,7 @@ export default function Home() {
                   </Text>{" "}
                   increase this month and a total of{" "}
                   <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
-                    {statsMeta?.weekCount}
+                    {statsMeta?.weekCount || 0}
                   </Text>{" "}
                   new businesses this week
                 </>

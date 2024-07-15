@@ -144,7 +144,7 @@ export default function SingleBusiness() {
               <Skeleton h={10} w={100} />
             )}
 
-            {business?.companyStatus === "ACTIVE" && (
+            {business?.kycTrusted && (
               <Image
                 width={20}
                 height={20}
@@ -153,31 +153,33 @@ export default function SingleBusiness() {
               />
             )}
 
-            <div
-              className={styles.business__status}
-              style={{
-                background:
-                  business?.companyStatus === "INACTIVE"
-                    ? "#FFFAEB"
-                    : "#ECFDF3",
-              }}
-            >
-              {business?.companyStatus === "ACTIVE" ? (
-                <>
-                  <IconPointFilled size={14} color="#12B76A" />
-                  <Text tt="capitalize" fz={12} c="#12B76A">
-                    Active
-                  </Text>
-                </>
-              ) : (
-                <>
-                  <IconPointFilled size={14} color="#C6A700" />
-                  <Text tt="capitalize" fz={12} c="#C6A700">
-                    Inactive
-                  </Text>
-                </>
-              )}
-            </div>
+            {business && (
+              <div
+                className={styles.business__status}
+                style={{
+                  background:
+                    business?.companyStatus === "INACTIVE"
+                      ? "#FFFAEB"
+                      : "#ECFDF3",
+                }}
+              >
+                {business?.companyStatus === "ACTIVE" ? (
+                  <>
+                    <IconPointFilled size={14} color="#12B76A" />
+                    <Text tt="capitalize" fz={12} c="#12B76A">
+                      Active
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <IconPointFilled size={14} color="#C6A700" />
+                    <Text tt="capitalize" fz={12} c="#C6A700">
+                      Inactive
+                    </Text>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           <div className={styles.header__right}>

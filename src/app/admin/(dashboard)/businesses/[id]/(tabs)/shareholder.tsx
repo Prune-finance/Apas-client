@@ -145,6 +145,12 @@ export default function Shareholders({
         );
       })}
 
+      {business?.shareholders.length < 1 && (
+        <Text mt={24} fz={14} c="dimmed">
+          No shareholders added
+        </Text>
+      )}
+
       <UnstyledButton onClick={open} mt={20}>
         <Flex align="center">
           <div className={styles.add__new__container}>
@@ -293,6 +299,7 @@ const DirectorsForm = ({
     identityType: director.identityType,
     proofOfAddress: director.proofOfAddress,
     identityFileUrl: director.identityFileUrl,
+    identityFileUrlBack: director.identityFileUrlBack,
     proofOfAddressFileUrl: director.proofOfAddressFileUrl,
   };
 
@@ -441,6 +448,35 @@ const DirectorsForm = ({
             placeholder={director.identityType}
           />
         </GridCol>
+
+        {director.identityFileUrlBack && (
+          <GridCol span={4} className={styles.grid}>
+            <TextInput
+              readOnly
+              classNames={{
+                input: styles.input,
+                label: styles.label,
+                section: styles.section,
+              }}
+              leftSection={<IconFileInfo />}
+              leftSectionPointerEvents="none"
+              rightSection={
+                <UnstyledButton
+                  onClick={() =>
+                    window.open(director.identityFileUrlBack || "", "_blank")
+                  }
+                  className={styles.input__right__section}
+                >
+                  <Text fw={600} fz={10} c="##475467">
+                    View
+                  </Text>
+                </UnstyledButton>
+              }
+              label="Identity Type Back"
+              placeholder={`${director.identityType} Back`}
+            />
+          </GridCol>
+        )}
 
         <GridCol span={4} className={styles.grid}>
           <TextInput

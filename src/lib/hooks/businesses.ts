@@ -99,6 +99,7 @@ export interface Director {
   identityType: string;
   proofOfAddress: string;
   identityFileUrl: string;
+  identityFileUrlBack: string;
   proofOfAddressFileUrl: string;
 }
 export interface BusinessData {

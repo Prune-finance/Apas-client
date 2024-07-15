@@ -45,6 +45,7 @@ export const directorEtShareholderSchema = {
   identityType: "",
   proofOfAddress: "",
   identityFileUrl: "",
+  identityFileUrlBack: "",
   proofOfAddressFileUrl: "",
 };
 
@@ -93,5 +94,15 @@ export const validateNewAdmin = z.object({
 });
 
 export const validateNewBusiness = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Business name must be a minimum of 3 characters"),
+  country: z.string().min(1, "Country is required"),
+  legalEntity: z.string().min(1, "Legal Entity is required"),
+  contactNumber: z.string().min(1, "Contact number is required"),
+  contactEmail: z.string().email("Please provide a valid contact email"),
+  cacCertificate: z.string().url("Cac certificate is required"),
+  mermat: z.string().url("Mermat document is required"),
   domain: z.string().url("Please provide a valid url"),
 });

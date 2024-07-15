@@ -38,13 +38,25 @@ export default function NewBusiness() {
     setProcessing(true);
     try {
       const { errors, hasErrors } = form.validate();
+      const { directors, shareholders } = form.values;
+
+      const initialDir = directors[0];
+      const initialShr = shareholders[0];
+
+      const initialDirEmpty = Object.values(initialDir).every((val) => !val);
+      const initialShrEmpty = Object.values(initialShr).every((val) => !val);
+
       if (hasErrors) {
         throw new Error("Please fill all required fields");
       }
 
       const data = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company`,
-        form.values,
+        {
+          ...form.values,
+          ...(initialDirEmpty && { directors: [] }),
+          ...(initialShrEmpty && { shareholders: [] }),
+        },
         { withCredentials: true }
       );
 
@@ -342,13 +354,25 @@ const DirectorForm = ({
       <Flex mt={24} gap={20}>
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
-            Upload International Passport
+            Upload {form.values.directors[count].identityType}
           </Text>
           <DropzoneComponent
             form={form}
             formKey={`directors.${count}.identityFileUrl`}
           />
         </Box>
+
+        {form.values.directors[count].identityType !== "Passport" && (
+          <Box flex={1}>
+            <Text fz={12} c="#344054" mb={10}>
+              Upload {form.values.directors[count].identityType} back
+            </Text>
+            <DropzoneComponent
+              form={form}
+              formKey={`directors.${count}.identityFileUrlBack`}
+            />
+          </Box>
+        )}
 
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
@@ -409,13 +433,25 @@ const ShareholderForm = ({
       <Flex mt={24} gap={20}>
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
-            Upload International Passport
+            Upload {form.values.shareholders[count].identityType}
           </Text>
           <DropzoneComponent
             form={form}
             formKey={`shareholders.${count}.identityFileUrl`}
           />
         </Box>
+
+        {form.values.shareholders[count].identityType !== "Passport" && (
+          <Box flex={1}>
+            <Text fz={12} c="#344054" mb={10}>
+              Upload {form.values.shareholders[count].identityType} back
+            </Text>
+            <DropzoneComponent
+              form={form}
+              formKey={`shareholders.${count}.identityFileUrlBack`}
+            />
+          </Box>
+        )}
 
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>

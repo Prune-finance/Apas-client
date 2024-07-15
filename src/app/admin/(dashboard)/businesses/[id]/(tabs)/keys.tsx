@@ -10,10 +10,12 @@ import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import { useClipboard } from "@mantine/hooks";
 
 export default function Keys({ business }: { business: BusinessData | null }) {
   const [keys, setKeys] = useState<Key[]>([]);
   const params = useParams<{ id: string }>();
+  const clipboard = useClipboard({ timeout: 500 });
   const { handleError } = useNotification();
 
   const { live, test } = useMemo(() => {
@@ -22,6 +24,9 @@ export default function Keys({ business }: { business: BusinessData | null }) {
 
     return { live, test };
   }, [keys]);
+
+  const [viewLive, setViewLive] = useState(false);
+  const [viewTest, setViewTest] = useState(false);
 
   const fetchBusinessSecrets = async () => {
     try {
@@ -84,23 +89,31 @@ export default function Keys({ business }: { business: BusinessData | null }) {
             leftSectionPointerEvents="none"
             rightSection={
               <Flex gap={10}>
-                <UnstyledButton className={styles.input__right__section}>
+                <UnstyledButton
+                  onClick={() => setViewTest(!viewTest)}
+                  className={styles.input__right__section}
+                >
                   <Text fw={600} fz={10} c="##475467">
-                    View
+                    {!viewTest ? "View" : "Hide"}
                   </Text>
                 </UnstyledButton>
 
-                <UnstyledButton className={styles.input__right__section}>
+                <UnstyledButton
+                  onClick={() => clipboard.copy(test?.key)}
+                  className={styles.input__right__section}
+                >
                   <Text fw={600} fz={10} c="##475467">
-                    Copy
+                    {clipboard.copied ? "Copied" : "Copy"}
                   </Text>
                 </UnstyledButton>
               </Flex>
             }
             label="Test Key"
-            placeholder={`${
-              test ? test?.key.slice(0, 15) : ""
-            }****************`}
+            placeholder={
+              !viewTest
+                ? `${test ? test?.key.slice(0, 15) : ""}****************`
+                : `${test ? test?.key.slice(0, 50) : ""}....`
+            }
           />
 
           <TextInput
@@ -115,23 +128,31 @@ export default function Keys({ business }: { business: BusinessData | null }) {
             leftSectionPointerEvents="none"
             rightSection={
               <Flex gap={10}>
-                <UnstyledButton className={styles.input__right__section}>
+                <UnstyledButton
+                  onClick={() => setViewLive(!viewLive)}
+                  className={styles.input__right__section}
+                >
                   <Text fw={600} fz={10} c="##475467">
-                    View
+                    {viewLive ? "Hide" : "View"}
                   </Text>
                 </UnstyledButton>
 
-                <UnstyledButton className={styles.input__right__section}>
+                <UnstyledButton
+                  onClick={() => clipboard.copy(live?.key)}
+                  className={styles.input__right__section}
+                >
                   <Text fw={600} fz={10} c="##475467">
-                    Copy
+                    {clipboard.copied ? "Copied" : "Copy"}
                   </Text>
                 </UnstyledButton>
               </Flex>
             }
             label="Live Key"
-            placeholder={`${
-              live ? live?.key.slice(0, 15) : ""
-            }****************`}
+            placeholder={
+              !viewLive
+                ? `${live ? live?.key.slice(0, 15) : ""}****************`
+                : `${live ? live?.key.slice(0, 50) : ""}....`
+            }
           />
         </Flex>
       </Flex>

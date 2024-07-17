@@ -1,43 +1,25 @@
 "use client";
-
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
-
-import styles from "@/ui/styles/user/home.module.scss";
-import {
-  Grid,
-  GridCol,
-  NativeSelect,
-  TableTr,
-  Text,
-  TableTd,
-  Paper,
-  Flex,
-  Stack,
-  CopyButton,
-  ActionIcon,
-  Tooltip,
-  rem,
-  Button,
-  Table,
-  TableScrollContainer,
-  TableTbody,
-  TableTh,
-  TableThead,
-} from "@mantine/core";
-import {
-  IconArrowUpRight,
-  IconCheck,
-  IconCircleChevronRight,
-  IconCopy,
-  IconPointFilled,
-  IconSquareFilled,
-} from "@tabler/icons-react";
 import { useState } from "react";
-import { CardOne, CardTwo, CardThree, CardOneBtn } from "@/ui/components/Cards";
+
+import { Text, TableTd, Paper } from "@mantine/core";
+import { TableTbody, TableTh, TableThead } from "@mantine/core";
+import { Tooltip, rem, Button, Table } from "@mantine/core";
+import { Stack, CopyButton, ActionIcon } from "@mantine/core";
+import { Grid, GridCol, NativeSelect, TableTr } from "@mantine/core";
+import { Flex, TableScrollContainer } from "@mantine/core";
+import { DonutChart, LineChart } from "@mantine/charts";
+
+import { IconCheck, IconCircleChevronRight } from "@tabler/icons-react";
+import { IconArrowUpRight, IconCopy } from "@tabler/icons-react";
+import { IconPointFilled, IconSquareFilled } from "@tabler/icons-react";
+
 import { formatNumber } from "@/lib/utils";
 import { UserDashboardData } from "@/lib/static";
-import { DonutChart, LineChart } from "@mantine/charts";
 import { useUserAccounts } from "@/lib/hooks/accounts";
+
+import { CardOne, CardOneBtn } from "@/ui/components/Cards";
+import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import styles from "@/ui/styles/user/home.module.scss";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -190,6 +172,7 @@ export default function Home() {
               stat={0}
               formatted
               colored
+              btnLink="/debit-requests/new"
               text={<>From Jan 01, 2022 to Jan 31, 2022</>}
             />
 

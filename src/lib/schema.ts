@@ -85,6 +85,17 @@ export const passwordChange = {
   confirmPassword: "",
 };
 
+export const debitRequest = {
+  account: "",
+  amount: "",
+  destinationIBAN: "",
+  destinationBIC: "",
+  destinationCountry: "",
+  destinationBank: "",
+  reference: "",
+  reason: "",
+};
+
 export const validateNewAdmin = z.object({
   email: z.string().email("Please provide a valid email"),
   firstName: z.string().optional(),
@@ -105,4 +116,15 @@ export const validateNewBusiness = z.object({
   cacCertificate: z.string().url("Cac certificate is required"),
   mermat: z.string().url("Mermat document is required"),
   domain: z.string().url("Please provide a valid url"),
+});
+
+export const validateDebitRequest = z.object({
+  account: z.string().min(3, "Account is required"),
+  amount: z.number().positive("A positive amount is required"),
+  destinationIBAN: z.string().min(3, "Destination account is required"),
+  destinationBIC: z.string().min(3, "BIC is required"),
+  destinationCountry: z.string().min(2, "Country is required"),
+  destinationBank: z.string().min(2, "Bank is required"),
+  reference: z.string().min(2, "Reference number is required"),
+  reason: z.string().min(2, "Reason is required"),
 });

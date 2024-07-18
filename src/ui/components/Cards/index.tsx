@@ -34,6 +34,7 @@ interface ICardOne {
   loading?: boolean;
   currency?: string;
   flex?: number;
+  btnLink?: string;
 }
 
 const SeeAll = () => {
@@ -105,6 +106,7 @@ export function CardOneBtn({
   formatted,
   container,
   withBorder,
+  btnLink,
 }: ICardOne) {
   return (
     <Paper
@@ -135,6 +137,8 @@ export function CardOneBtn({
       </Text>
 
       <Button
+        component="a"
+        href={btnLink}
         leftSection={<IconArrowDownLeft color="#344054" size={16} />}
         className={styles.login__cta}
         variant="filled"

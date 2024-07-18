@@ -21,8 +21,6 @@ import User from "@/lib/store/user";
 export default function Header() {
   const { user } = User();
 
-  console.log(user);
-
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   return (
     <header className={styles.header}>
@@ -68,7 +66,7 @@ export function UserHeader() {
         />
       </div>
 
-      <div className={styles.stage__trigger}>
+      {/* <div className={styles.stage__trigger}>
         <Text
           fz={14}
           fw={500}
@@ -86,7 +84,7 @@ export function UserHeader() {
             setStage(event.currentTarget.checked ? "live" : "test")
           }
         />
-      </div>
+      </div> */}
 
       <div className={styles.notification}>
         <Divider orientation="vertical" h={26} />

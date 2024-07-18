@@ -4,6 +4,23 @@
     padding: 20px;
     background-color: #fff;
 
+    .tabs {
+      .tabs__list {
+        .tab {
+          font-size: 12px;
+          color: var(--prune-text-gray-500);
+          background: none;
+        }
+
+        [data-active="true"] {
+          color: var(--prune-primary-600);
+          border-bottom: 1px solid var(--prune-primary-600);
+          border-radius: 0;
+          font-weight: 600;
+        }
+      }
+    }
+
     .container__header {
       display: flex;
       align-items: center;

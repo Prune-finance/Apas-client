@@ -2,7 +2,7 @@
 import dayjs from "dayjs";
 
 import Image from "next/image";
-import { Paper, ThemeIcon } from "@mantine/core";
+import { ThemeIcon } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
@@ -23,12 +23,12 @@ import { formatNumber } from "@/lib/utils";
 import EmptyImage from "@/assets/empty.png";
 
 import { useParams, useRouter } from "next/navigation";
-import { useTransactions, useUserTransactions } from "@/lib/hooks/transactions";
+import { useTransactions } from "@/lib/hooks/transactions";
 
 export default function AccountTrx() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { loading, transactions } = useUserTransactions();
+  const { loading, transactions } = useTransactions(params.id);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const rows = transactions.map((element) => (
@@ -69,28 +69,25 @@ export default function AccountTrx() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/dashboard" },
-          {
-            title: "Transactions",
-            href: `/accounts/transactions`,
-          },
+          { title: "Dashboard", href: "/admin/dashboard" },
+          { title: "Accounts", href: "/admin/accounts" },
         ]}
       />
 
-      <Paper withBorder className={styles.table__container}>
+      <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Flex gap={10} align="center">
-            {/* <UnstyledButton onClick={() => router.back()}>
+            <UnstyledButton onClick={() => router.back()}>
               <ThemeIcon color="rgba(212, 243, 7)" radius="lg">
                 <IconArrowLeft
                   color="#1D2939"
                   style={{ width: "70%", height: "70%" }}
                 />
               </ThemeIcon>
-            </UnstyledButton> */}
+            </UnstyledButton>
 
             <Text fz={18} fw={600}>
-              Transactions
+              All Transactions
             </Text>
           </Flex>
         </div>
@@ -150,7 +147,7 @@ export default function AccountTrx() {
             classNames={{ control: styles.control, root: styles.pagination }}
           />
         </div>
-      </Paper>
+      </div>
     </main>
   );
 }

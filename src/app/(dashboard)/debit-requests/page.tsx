@@ -41,7 +41,7 @@ import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { formatNumber } from "@/lib/utils";
 
-export default function AccountRequests() {
+export default function DebitRequests() {
   const { loading, requests } = useUserDebitRequests();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null

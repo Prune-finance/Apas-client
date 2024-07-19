@@ -1,5 +1,4 @@
 import { Text, Title } from "@mantine/core";
-import { Suspense } from "react";
 import Image from "next/image";
 
 import styles from "@/ui/styles/auth.module.scss";

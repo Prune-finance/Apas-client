@@ -34,79 +34,43 @@ import { BarChart, DonutChart } from "@mantine/charts";
 import { useState } from "react";
 import { formatNumber } from "@/lib/utils";
 import { useSingleAccount } from "@/lib/hooks/accounts";
+import { useTransactions } from "@/lib/hooks/transactions";
+import dayjs from "dayjs";
+import { DynamicSkeleton } from "@/lib/static";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
   const { account, loading } = useSingleAccount(params.id);
+  const { loading: trxLoading, transactions } = useTransactions(params.id);
+
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
-  const tableData = [
-    {
-      AccName: "Matthew Philips",
-      Biz: "Wema",
-      Amount: 200000,
-      Date: "26 JUN,2024-10:00AM",
-      AccNum: "1657654367",
-      Status: "successful",
-    },
-    {
-      AccName: "Agatha Goldie",
-      Biz: "UBA",
-      Amount: 300000,
-      Date: "26 JUN,2024-10:00AM",
-      AccNum: "1657654367",
-      Status: "successful",
-    },
-    {
-      AccName: "Omar Zeeda",
-      Biz: "FCMB",
-      Amount: 250000,
-      Date: "26 JUN,2024-10:00AM",
-      AccNum: "1657654367",
-      Status: "failed",
-    },
-    {
-      AccName: "Sharon Akindele",
-      Biz: "Zenith Bank",
-      Amount: 400000,
-      Date: "26 JUN,2024-10:00AM",
-      AccNum: "1657654367",
-      Status: "successful",
-    },
-    {
-      AccName: "Bethel Teddy",
-      Biz: "FCMB",
-      Amount: 150000,
-      Date: "26 JUN,2024-10:00AM",
-      AccNum: "1657654367",
-      Status: "successful",
-    },
-  ];
-
-  const rows = tableData.map((element) => (
-    <TableTr key={element.AccName}>
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={styles.table__td}>{element.Date}</TableTd>
+  const rows = transactions.map((element) => (
+    <TableTr key={element.id}>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientBankAddress}
+      </TableTd>
+      <TableTd className={styles.table__td}>{dayjs().format()}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <IconArrowUpRight
           color="#D92D20"
           size={16}
           className={styles.table__td__icon}
         />
-        {formatNumber(element.Amount)}
+        {formatNumber(element.amount, true, "EUR")}
         {/* <Text fz={12}></Text> */}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.AccNum}</TableTd>
+      <TableTd className={styles.table__td}>{element.recipientBic}</TableTd>
       <TableTd className={styles.table__td}>
         <div className={styles.table__td__status}>
           {/* <IconPointFilled size={14} color="#12B76A" /> */}
           <Text
             tt="capitalize"
             fz={12}
-            c={element.Status === "failed" ? "#D92D20" : "#12B76A"}
+            c={element.status === "PENDING" ? "#F79009" : "#12B76A"}
           >
-            {element.Status}
+            {element.status}
           </Text>
         </div>
       </TableTd>
@@ -114,34 +78,34 @@ export default function Account() {
   ));
 
   const data = [
-    { month: "Jan", Deposits: 1200, Payouts: 900 },
-    { month: "Feb", Deposits: 1900, Payouts: 1200 },
-    { month: "Mar", Deposits: 400, Payouts: 1000 },
-    { month: "Apr", Deposits: 1000, Payouts: 200 },
-    { month: "May", Deposits: 800, Payouts: 1400 },
-    { month: "Jul", Deposits: 750, Payouts: 600 },
-    { month: "Jul", Deposits: 893, Payouts: 727 },
-    { month: "Aug", Deposits: 239, Payouts: 1629 },
-    { month: "Sep", Deposits: 837, Payouts: 697 },
-    { month: "Oct", Deposits: 1234, Payouts: 526 },
-    { month: "Nov", Deposits: 524, Payouts: 892 },
-    { month: "Dec", Deposits: 750, Payouts: 600 },
+    { month: "Jan", Deposits: 0, Payouts: 0 },
+    { month: "Feb", Deposits: 0, Payouts: 0 },
+    { month: "Mar", Deposits: 0, Payouts: 0 },
+    { month: "Apr", Deposits: 0, Payouts: 0 },
+    { month: "May", Deposits: 0, Payouts: 0 },
+    { month: "Jul", Deposits: 0, Payouts: 0 },
+    { month: "Jul", Deposits: 0, Payouts: 0 },
+    { month: "Aug", Deposits: 0, Payouts: 0 },
+    { month: "Sep", Deposits: 0, Payouts: 0 },
+    { month: "Oct", Deposits: 0, Payouts: 0 },
+    { month: "Nov", Deposits: 0, Payouts: 0 },
+    { month: "Dec", Deposits: 0, Payouts: 0 },
   ];
 
   const donutData = [
-    { name: "Completed", value: 16000, color: "#039855" },
-    { name: "Canceled", value: 5000, color: "#F79009" },
-    { name: "Failed", value: 9000, color: "#D92D20" },
+    { name: "Completed", value: 0, color: "#039855" },
+    { name: "Canceled", value: 0, color: "#F79009" },
+    { name: "Failed", value: 0, color: "#D92D20" },
   ];
 
   const weekData = [
-    { day: "Mon", Deposits: 1200, Payouts: 900 },
-    { day: "Tue", Deposits: 1900, Payouts: 1200 },
-    { day: "Wed", Deposits: 400, Payouts: 1000 },
-    { day: "Thu", Deposits: 1000, Payouts: 200 },
-    { day: "Fri", Deposits: 800, Payouts: 1400 },
-    { day: "Sat", Deposits: 239, Payouts: 1629 },
-    { day: "Sun", Deposits: 1234, Payouts: 526 },
+    { day: "Mon", Deposits: 0, Payouts: 0 },
+    { day: "Tue", Deposits: 0, Payouts: 0 },
+    { day: "Wed", Deposits: 0, Payouts: 0 },
+    { day: "Thu", Deposits: 0, Payouts: 0 },
+    { day: "Fri", Deposits: 0, Payouts: 0 },
+    { day: "Sat", Deposits: 0, Payouts: 0 },
+    { day: "Sun", Deposits: 0, Payouts: 0 },
   ];
 
   return (
@@ -219,7 +183,8 @@ export default function Account() {
                   currency="EUR"
                   text={
                     <Text fz={10} c="#90A3BF">
-                      From Jan 01, 2022 to Jan 31, 2022
+                      From {dayjs(account?.createdAt).format("MMM DD, YYYY")} to{" "}
+                      {dayjs().format("MMM DD, YYYY")}
                     </Text>
                   }
                 />
@@ -233,17 +198,24 @@ export default function Account() {
                 Recent Transactions
               </Text>
 
-              <TableScrollContainer minWidth={500}>
+              <TableScrollContainer
+                className={styles.table__container}
+                minWidth={500}
+              >
                 <Table className={styles.table} verticalSpacing="md">
-                  <TableTbody>{rows}</TableTbody>
+                  {/* <TableTbody>{rows}</TableTbody> */}
+                  <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
                 </Table>
               </TableScrollContainer>
 
               <Button
+                component="a"
+                href={`/admin/accounts/${account?.id}/transactions`}
                 leftSection={<IconCircleChevronRight size={18} />}
                 variant="transparent"
                 color="#97AD05"
                 fz={11}
+                className={styles.table__cta}
               >
                 See All Transactions
               </Button>

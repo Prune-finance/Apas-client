@@ -28,7 +28,7 @@ import { useTransactions, useUserTransactions } from "@/lib/hooks/transactions";
 export default function AccountTrx() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { loading, transactions } = useUserTransactions();
+  const { loading, transactions } = useUserTransactions(params.id);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const rows = transactions.map((element) => (
@@ -70,9 +70,11 @@ export default function AccountTrx() {
       <Breadcrumbs
         items={[
           { title: "Dashboard", href: "/dashboard" },
+          { title: "Accounts", href: "/accounts" },
+          { title: params.id, href: `/accounts/${params.id}` },
           {
             title: "Transactions",
-            href: `/accounts/transactions`,
+            href: `/accounts/${params.id}/transactions`,
           },
         ]}
       />
@@ -80,17 +82,17 @@ export default function AccountTrx() {
       <Paper withBorder className={styles.table__container}>
         <div className={styles.container__header}>
           <Flex gap={10} align="center">
-            {/* <UnstyledButton onClick={() => router.back()}>
+            <UnstyledButton onClick={() => router.back()}>
               <ThemeIcon color="rgba(212, 243, 7)" radius="lg">
                 <IconArrowLeft
                   color="#1D2939"
                   style={{ width: "70%", height: "70%" }}
                 />
               </ThemeIcon>
-            </UnstyledButton> */}
+            </UnstyledButton>
 
             <Text fz={18} fw={600}>
-              Transactions
+              Account Transactions
             </Text>
           </Flex>
         </div>

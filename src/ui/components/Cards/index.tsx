@@ -107,6 +107,7 @@ export function CardOneBtn({
   container,
   withBorder,
   btnLink,
+  loading,
 }: ICardOne) {
   return (
     <Paper
@@ -127,9 +128,13 @@ export function CardOneBtn({
       </div>
 
       <div className={styles.card__number}>
-        <Title fz={24} className={`${colored ? styles.light__green : ""}`}>
-          {formatted ? formatNumber(stat) : stat}
-        </Title>
+        {loading ? (
+          <Skeleton height={20} width={50} />
+        ) : (
+          <Title fz={24} className={`${colored ? styles.light__green : ""}`}>
+            {formatted ? formatNumber(stat, true, "EUR") : stat}
+          </Title>
+        )}
       </div>
 
       <Text fw={500} fz={10} className={styles.card__text}>

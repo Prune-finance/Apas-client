@@ -189,3 +189,20 @@ export const DynamicSkeleton = (number: number) =>
         </TableTr>
       );
     });
+
+export const DynamicSkeleton2 = (number: number) =>
+  Array(3)
+    .fill("")
+    .map((_, index) => {
+      return (
+        <TableTr key={index}>
+          {Array(number)
+            .fill("")
+            .map((_, index) => (
+              <TableTd key={index} className={businessStyles.table__td}>
+                <Skeleton h={10} w={40} />
+              </TableTd>
+            ))}
+        </TableTr>
+      );
+    });

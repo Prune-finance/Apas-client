@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { Text, TableTd, Paper } from "@mantine/core";
 import { TableTbody, TableTh, TableThead } from "@mantine/core";
@@ -14,61 +14,99 @@ import { IconArrowUpRight, IconCopy } from "@tabler/icons-react";
 import { IconPointFilled, IconSquareFilled } from "@tabler/icons-react";
 
 import { formatNumber } from "@/lib/utils";
-import { UserDashboardData } from "@/lib/static";
+import { DynamicSkeleton2, UserDashboardData } from "@/lib/static";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 
 import { CardOne, CardOneBtn } from "@/ui/components/Cards";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/user/home.module.scss";
+import { useUserDebitRequests } from "@/lib/hooks/requests";
+import { useUserBalances } from "@/lib/hooks/balance";
+import { useUserTransactions } from "@/lib/hooks/transactions";
+import User from "@/lib/store/user";
+import dayjs from "dayjs";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
+  const { loading: debitLoading, requests } = useUserDebitRequests();
+  const { loading: balanceLoading, balance } = useUserBalances();
+  const { transactions } = useUserTransactions();
+
+  const { user } = User();
+
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
-  const tableData = [
-    {
-      AccName: "Matthew Philips",
-      Biz: "C80 Limited",
-      Amount: 200000,
-      Status: "successful",
-    },
-    {
-      AccName: "Agatha Goldie",
-      Biz: "TechNexus",
-      Amount: 300000,
-      Status: "successful",
-    },
-  ];
-
-  const rows = tableData.map((element) => (
-    <TableTr key={element.AccName}>
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
+  const rows = requests.slice(0, 2).map((element) => (
+    <TableTr key={element.id}>
+      <TableTd className={styles.table__td}>
+        {element.Account.accountName}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.amount}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <IconArrowUpRight
           color="#D92D20"
           size={16}
           className={styles.table__td__icon}
         />
-        {formatNumber(element.Amount)}
+        {formatNumber(element.amount, true, "EUR")}
         {/* <Text fz={12}></Text> */}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          <IconPointFilled size={14} color="#12B76A" />
-          <Text tt="capitalize" fz={12} c="#12B76A">
-            {element.Status}
+        <div
+          className={styles.table__td__status}
+          style={{
+            background:
+              element.status === "PENDING"
+                ? "#FFFAEB"
+                : element.status === "REJECTED"
+                ? "#FCF1F2"
+                : "#ECFDF3",
+          }}
+        >
+          <IconPointFilled
+            size={14}
+            color={
+              element.status === "PENDING"
+                ? "#C6A700"
+                : element.status === "REJECTED"
+                ? "#D92D20"
+                : "#12B76A"
+            }
+          />
+          <Text
+            tt="capitalize"
+            fz={12}
+            c={
+              element.status === "PENDING"
+                ? "#C6A700"
+                : element.status === "REJECTED"
+                ? "#D92D20"
+                : "#12B76A"
+            }
+          >
+            {element.status.toLowerCase()}
           </Text>
         </div>
       </TableTd>
     </TableTr>
   ));
 
-  const donutData = [
-    { name: "Completed", value: 16000, color: "#039855" },
-    { name: "Canceled", value: 5000, color: "#F79009" },
-    { name: "Failed", value: 9000, color: "#D92D20" },
-  ];
+  const donutData = useMemo(() => {
+    let completed = 0,
+      pending = 0,
+      failed = 0;
+    transactions.map((trx) => {
+      if (trx.status === "PENDING") {
+        pending += trx.amount;
+      }
+    });
+
+    return [
+      { name: "Completed", value: completed, color: "#039855" },
+      { name: "Pending", value: pending, color: "#F79009" },
+      { name: "Failed", value: failed, color: "#D92D20" },
+    ];
+  }, [transactions]);
 
   return (
     <main className={styles.main}>
@@ -169,11 +207,17 @@ export default function Home() {
             <CardOneBtn
               withBorder
               title="Account Balance"
-              stat={0}
+              stat={balance}
+              loading={balanceLoading}
               formatted
               colored
               btnLink="/debit-requests/new"
-              text={<>From Jan 01, 2022 to Jan 31, 2022</>}
+              text={
+                <>
+                  From {dayjs(user?.createdAt).format("MMM DD, YYYY")} to{" "}
+                  {dayjs().format("MMM DD, YYYY")}
+                </>
+              }
             />
 
             <Paper withBorder p={10} mt={15}>
@@ -200,7 +244,9 @@ export default function Home() {
                 <DonutChart
                   paddingAngle={4}
                   data={donutData}
-                  chartLabel="30000"
+                  chartLabel={donutData.reduce((prv, cur) => {
+                    return cur.value + prv;
+                  }, 0)}
                   size={103}
                   thickness={15}
                 />
@@ -218,7 +264,7 @@ export default function Home() {
                       </Flex>
 
                       <Text fz={12} fw={600}>
-                        {formatNumber(item.value)}
+                        {formatNumber(item.value, true, "EUR")}
                       </Text>
                     </Flex>
                   );
@@ -230,12 +276,7 @@ export default function Home() {
 
         <Grid className={styles.grid__cards__two}>
           <GridCol span={4}>
-            <Paper
-              withBorder
-              mt={10}
-              p={20}
-              className={styles.api__keys__container}
-            >
+            <Paper withBorder mt={10} className={styles.api__keys__container}>
               <Flex>
                 <Text fz={10} fw={600}>
                   API KEYS
@@ -244,7 +285,7 @@ export default function Home() {
               </Flex>
 
               <Stack mt={15} gap={0}>
-                <Text fz={10} c="#98A2B3">
+                <Text fz={12} c="#98A2B3">
                   Public Keys
                 </Text>
 
@@ -264,7 +305,7 @@ export default function Home() {
               </Stack>
 
               <Stack mt={30} gap={0}>
-                <Text fz={10} c="#98A2B3">
+                <Text fz={12} c="#98A2B3">
                   Secret Keys
                 </Text>
 
@@ -285,7 +326,7 @@ export default function Home() {
             </Paper>
           </GridCol>
 
-          <GridCol span={8}>
+          <GridCol span={8} mih={200}>
             <Paper mt={10} withBorder className={styles.payout__table}>
               <Text className={styles.table__text} lts={0.5} fz={10} fw={600}>
                 Debit Requests
@@ -305,11 +346,15 @@ export default function Home() {
                       <TableTh className={styles.table__th}>Status</TableTh>
                     </TableTr>
                   </TableThead>
-                  <TableTbody>{rows}</TableTbody>
+                  <TableTbody>
+                    {debitLoading ? DynamicSkeleton2(4) : rows}
+                  </TableTbody>
                 </Table>
               </TableScrollContainer>
 
               <Button
+                component="a"
+                href="/debit-requests"
                 leftSection={<IconCircleChevronRight size={18} />}
                 variant="transparent"
                 color="#97AD05"

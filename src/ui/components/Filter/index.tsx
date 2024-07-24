@@ -17,7 +17,7 @@ export default function Filter<T>({
   children,
   form,
 }: Props<T>) {
-  const { push } = useRouter();
+  const { push, replace } = useRouter();
   const pathname = usePathname();
 
   const handleApply = () => {
@@ -29,7 +29,7 @@ export default function Filter<T>({
 
     const params = new URLSearchParams(filteredValues).toString();
 
-    push(`${pathname}?${params}`);
+    replace(`${pathname}?${params}`);
     toggle();
   };
 
@@ -68,7 +68,10 @@ export default function Filter<T>({
           <Button
             variant="transparent"
             color="var(--prune-text-gray-700)"
-            onClick={form.reset}
+            onClick={() => {
+              form.reset();
+              replace(pathname);
+            }}
             // w={62}
             h={36}
             fz={12}

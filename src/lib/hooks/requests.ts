@@ -1,6 +1,5 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import { string } from "zod";
 import { AccountData } from "./accounts";
 
 // query: string = "";
@@ -164,7 +163,7 @@ export function useSingleUserRequest(id: string) {
 
   return { loading, request, revalidate };
 }
-interface IDebitRequest extends Omit<IParams, "type"> {}
+interface IDebitRequest extends Omit<IParams, "type" | "query"> {}
 export function useDebitRequests(customParams: IDebitRequest = {}) {
   const [requests, setRequests] = useState<DebitRequest[]>([]);
   // const [meta, setMeta] = useState<RequestMeta>();

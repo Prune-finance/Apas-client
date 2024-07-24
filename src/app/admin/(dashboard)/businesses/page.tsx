@@ -198,23 +198,11 @@ export default function Businesses() {
           </Button>
         </div>
 
-        <Filter<BusinessFilterType> opened={opened} toggle={toggle} form={form}>
-          <DateInput
-            placeholder="Date"
-            {...form.getInputProps("createdAt")}
-            size="xs"
-            w={120}
-            h={36}
-          />
-          <Select
-            placeholder="Status"
-            {...form.getInputProps("status")}
-            data={["Active", "Inactive"]}
-            size="xs"
-            w={120}
-            h={36}
-          />
-        </Filter>
+        <Filter<BusinessFilterType>
+          opened={opened}
+          toggle={toggle}
+          form={form}
+        />
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">

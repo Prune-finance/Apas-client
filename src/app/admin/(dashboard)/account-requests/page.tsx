@@ -166,23 +166,6 @@ export default function AccountRequests() {
             w={120}
             h={36}
           />
-
-          <DateInput
-            placeholder="Date"
-            {...form.getInputProps("createdAt")}
-            size="xs"
-            w={120}
-            h={36}
-          />
-
-          <Select
-            placeholder="Status"
-            {...form.getInputProps("status")}
-            data={["Active", "Inactive"]}
-            size="xs"
-            w={120}
-            h={36}
-          />
         </Filter>
 
         <TableScrollContainer minWidth={500}>

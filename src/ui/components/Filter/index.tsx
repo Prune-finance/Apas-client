@@ -9,6 +9,7 @@ type Props<T> = {
   toggle: () => void;
   children?: ReactNode;
   form: UseFormReturnType<T>;
+  isStatus?: boolean;
 };
 
 export default function Filter<T>({
@@ -16,6 +17,7 @@ export default function Filter<T>({
   toggle,
   children,
   form,
+  isStatus,
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
@@ -53,6 +55,24 @@ export default function Filter<T>({
           h={36}
         />
         {children}
+
+        <DateInput
+          placeholder="Date"
+          {...form.getInputProps("createdAt")}
+          size="xs"
+          w={120}
+          h={36}
+        />
+        {!isStatus && (
+          <Select
+            placeholder="Status"
+            {...form.getInputProps("status")}
+            data={["Active", "Inactive"]}
+            size="xs"
+            w={120}
+            h={36}
+          />
+        )}
 
         <Flex ml="auto" gap={12}>
           <Button

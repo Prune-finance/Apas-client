@@ -237,23 +237,7 @@ export default function Debit() {
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      >
-        <DateInput
-          placeholder="Date"
-          {...form.getInputProps("createdAt")}
-          size="xs"
-          w={120}
-          h={36}
-        />
-        <Select
-          placeholder="Status"
-          {...form.getInputProps("status")}
-          data={["Active", "Inactive"]}
-          size="xs"
-          w={120}
-          h={36}
-        />
-      </Filter>
+      />
 
       <TableScrollContainer minWidth={500}>
         <Table className={styles.table} verticalSpacing="md">

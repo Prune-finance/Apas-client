@@ -131,12 +131,12 @@ export default function DebitRequests() {
             <TabsTab value="Logs" leftSection={<IconLogs size={14} />}>
               Audit Logs
             </TabsTab>
-            <TabsTab
+            {/* <TabsTab
               value="Permissions"
               leftSection={<IconAccessible size={14} />}
             >
               Permissions
-            </TabsTab>
+            </TabsTab> */}
           </TabsList>
 
           <TabsPanel value="Logs">

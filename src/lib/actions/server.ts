@@ -5,9 +5,10 @@ import { redirect } from "next/navigation";
 
 export async function checkToken(id: string) {
   try {
-    await axios.get(
+    const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/validate-token/${id}`
     );
+    return data.data;
   } catch (error) {
     redirect("/404");
     return {

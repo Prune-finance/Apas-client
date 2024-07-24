@@ -323,25 +323,27 @@ export default function Debit() {
             </Text>
           </div>
 
-          <Flex mt={40} justify="flex-end" gap={10}>
-            <Button
-              onClick={open}
-              color="#D0D5DD"
-              variant="outline"
-              className={styles.cta}
-            >
-              Deny
-            </Button>
+          {selectedRequest?.status === "PENDING" && (
+            <Flex mt={40} justify="flex-end" gap={10}>
+              <Button
+                onClick={open}
+                color="#D0D5DD"
+                variant="outline"
+                className={styles.cta}
+              >
+                Deny
+              </Button>
 
-            <Button
-              className={styles.cta}
-              onClick={openApprove}
-              variant="filled"
-              color="#D4F307"
-            >
-              Approve
-            </Button>
-          </Flex>
+              <Button
+                className={styles.cta}
+                onClick={openApprove}
+                variant="filled"
+                color="#D4F307"
+              >
+                Approve
+              </Button>
+            </Flex>
+          )}
         </Box>
       </Drawer>
 

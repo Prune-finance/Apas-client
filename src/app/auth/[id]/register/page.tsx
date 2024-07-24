@@ -18,7 +18,9 @@ type Props = {
 
 export default async function Register({ params }: Props) {
   const id = params.id;
-  await checkToken(id || "");
+  const res = await checkToken(id || "");
+
+  console.log({ res });
 
   return (
     <main className={styles.login}>
@@ -72,7 +74,7 @@ export default async function Register({ params }: Props) {
           Create your payment account now
         </Text>
 
-        <FormComponent />
+        <FormComponent email={res.email} />
 
         <div className={styles.rdr__link}>
           <Text fz={14} mt={10} className={styles.rdr__text}>

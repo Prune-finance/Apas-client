@@ -8,29 +8,24 @@ import {
   TextInput,
 } from "@mantine/core";
 import { useState } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
 
 import styles from "@/ui/styles/auth.module.scss";
-import {
-  loginValues,
-  registerValues,
-  validateLogin,
-  validateRegister,
-} from "@/lib/schema";
+import { registerValues, validateRegister } from "@/lib/schema";
 
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 
-export default function FormComponent() {
+export default function FormComponent({ email }: { email: string }) {
   const params = useParams<{ id: string }>();
   const [processing, setProcessing] = useState(false);
 
   const { handleSuccess, handleError } = useNotification();
 
   const form = useForm({
-    initialValues: registerValues,
+    initialValues: { ...registerValues, email },
     validate: zodResolver(validateRegister),
   });
 
@@ -69,8 +64,8 @@ export default function FormComponent() {
           classNames={{
             input: styles.text__input,
           }}
-          placeholder="jane.zi@prune.io"
-          {...form.getInputProps("email")}
+          value={email}
+          disabled
         />
       </div>
 

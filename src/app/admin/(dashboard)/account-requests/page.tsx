@@ -54,17 +54,6 @@ export default function AccountRequests() {
               View
             </MenuItem>
           </Link>
-
-          <MenuItem
-            onClick={open}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconTrash style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            Delete
-          </MenuItem>
         </MenuDropdown>
       </Menu>
     );

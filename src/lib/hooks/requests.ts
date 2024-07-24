@@ -264,9 +264,9 @@ export interface Shareholder {
 }
 
 export interface Director {
-  idFile: string;
+  idFileUrl: string;
   idType: string;
-  poaFile: string;
+  poaFileUrl: string;
   poaType: string;
 }
 

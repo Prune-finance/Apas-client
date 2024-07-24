@@ -166,7 +166,7 @@ export default function Documents({
                 )
               }
               label="CAC Document"
-              placeholder="File.jpg"
+              placeholder={`CAC-${business.name}`}
             />
           </GridCol>
 
@@ -212,7 +212,7 @@ export default function Documents({
                 )
               }
               label="MerMat Document"
-              placeholder="File.jpg"
+              placeholder={`Mermat-${business.name}`}
             />
           </GridCol>
         </Grid>

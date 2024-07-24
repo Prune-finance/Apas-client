@@ -104,6 +104,7 @@ export const validateNewAdmin = z.object({
   role: z.string().optional(),
 });
 
+const emailSchema = z.string().email();
 export const validateNewBusiness = z.object({
   name: z
     .string()
@@ -116,6 +117,56 @@ export const validateNewBusiness = z.object({
   cacCertificate: z.string().url("Cac certificate is required"),
   mermat: z.string().url("Mermat document is required"),
   domain: z.string().url("Please provide a valid url"),
+  directors: z
+    .object({
+      name: z.string(),
+      email: z.string().refine(
+        (val) => {
+          if (!val) return true;
+          return emailSchema.safeParse(val).success;
+        },
+        { message: "Invalid director's email" }
+      ),
+      identityType: z.string(),
+      proofOfAddress: z.string(),
+      identityFileUrl: z.string(),
+      identityFileUrlBack: z.string(),
+      proofOfAddressFileUrl: z.string(),
+    })
+    .array()
+    .optional(),
+});
+
+export const validateDirectors = z.object({
+  name: z.string().min(3, "Director name is required"),
+  email: z.string().refine(
+    (val) => {
+      if (!val) return true;
+      return emailSchema.safeParse(val).success;
+    },
+    { message: "Invalid director's email" }
+  ),
+  identityType: z.string(),
+  proofOfAddress: z.string(),
+  identityFileUrl: z.string(),
+  identityFileUrlBack: z.string(),
+  proofOfAddressFileUrl: z.string(),
+});
+
+export const validateShareholder = z.object({
+  name: z.string().min(3, "Shareholder name is required"),
+  email: z.string().refine(
+    (val) => {
+      if (!val) return true;
+      return emailSchema.safeParse(val).success;
+    },
+    { message: "Invalid shareholder's email" }
+  ),
+  identityType: z.string(),
+  proofOfAddress: z.string(),
+  identityFileUrl: z.string(),
+  identityFileUrlBack: z.string(),
+  proofOfAddressFileUrl: z.string(),
 });
 
 export const validateDebitRequest = z.object({

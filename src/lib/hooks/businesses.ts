@@ -104,6 +104,7 @@ export interface Director {
 }
 export interface BusinessData {
   id: string;
+  apiCalls: number;
   contactEmail: string;
   contactNumber: string | null;
   createdAt: Date;

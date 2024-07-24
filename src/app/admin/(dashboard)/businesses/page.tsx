@@ -54,10 +54,6 @@ export default function Businesses() {
       href: "/admin/businesses",
     },
     {
-      text: "Deactivate",
-      icon: <IconTrash style={{ width: rem(14), height: rem(14) }} />,
-    },
-    {
       text: "Download Report",
       icon: <IconDownload style={{ width: rem(14), height: rem(14) }} />,
     },
@@ -72,11 +68,28 @@ export default function Businesses() {
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          <IconPointFilled size={14} color="#12B76A" />
-          <Text tt="capitalize" fz={12} c="#12B76A">
-            Active
-          </Text>
+        <div
+          className={styles.table__td__status}
+          style={{
+            background:
+              element.companyStatus === "INACTIVE" ? "#FFFAEB" : "#ECFDF3",
+          }}
+        >
+          {element.companyStatus === "ACTIVE" ? (
+            <>
+              <IconPointFilled size={14} color="#12B76A" />
+              <Text tt="capitalize" fz={12} c="#12B76A">
+                Active
+              </Text>
+            </>
+          ) : (
+            <>
+              <IconPointFilled size={14} color="#C6A700" />
+              <Text tt="capitalize" fz={12} c="#C6A700">
+                Inactive
+              </Text>
+            </>
+          )}
         </div>
       </TableTd>
 

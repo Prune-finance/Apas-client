@@ -164,16 +164,29 @@ export function useSingleUserRequest(id: string) {
 
   return { loading, request, revalidate };
 }
-
-export function useDebitRequests() {
+interface IDebitRequest extends Omit<IParams, "type"> {}
+export function useDebitRequests(customParams: IDebitRequest = {}) {
   const [requests, setRequests] = useState<DebitRequest[]>([]);
   // const [meta, setMeta] = useState<RequestMeta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
   async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests`,
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests?${params}`,
         { withCredentials: true }
       );
 
@@ -193,7 +206,7 @@ export function useDebitRequests() {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate };
 }

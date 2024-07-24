@@ -3,11 +3,13 @@
 import {
   Button,
   Flex,
+  Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
   Pagination,
+  Select,
   Table,
   TableScrollContainer,
   TableTbody,
@@ -41,10 +43,38 @@ import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { AllBusinessSkeleton } from "@/lib/static";
 import { switzer } from "@/app/layout";
+import Filter from "@/ui/components/Filter";
+import { useDisclosure } from "@mantine/hooks";
+import { DateInput } from "@mantine/dates";
+import { useForm, zodResolver } from "@mantine/form";
+import {
+  businessFilterSchema,
+  BusinessFilterType,
+  businessFilterValues,
+} from "./schema";
+import { useSearchParams } from "next/navigation";
 
 export default function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-  const { loading, businesses } = useBusiness();
+  const searchParams = useSearchParams();
+  const limit = searchParams.get("rows")?.toLowerCase() || 10;
+  const status = searchParams.get("status")?.toLowerCase();
+  const createdAt = searchParams.get("createdAt");
+  const sort = searchParams.get("sort")?.toLowerCase();
+
+  const { loading, businesses } = useBusiness({
+    limit,
+    createdAt,
+    status,
+    sort,
+  });
+
+  const [opened, { toggle }] = useDisclosure(false);
+
+  const form = useForm<BusinessFilterType>({
+    initialValues: businessFilterValues,
+    validate: zodResolver(businessFilterSchema),
+  });
 
   const menuItems = [
     {
@@ -124,7 +154,7 @@ export default function Businesses() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
+          // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Businesses", href: "/admin/businesses" },
         ]}
       />
@@ -140,7 +170,7 @@ export default function Businesses() {
               leftSection={<IconPlus color="#344054" size={16} />}
               className={styles.login__cta}
               variant="filled"
-              color="#D4F307"
+              color="var(--prune-primary-600)"
             >
               New Business
             </Button>
@@ -160,12 +190,31 @@ export default function Businesses() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            onClick={toggle}
+            fz={12}
+            fw={500}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<BusinessFilterType> opened={opened} toggle={toggle} form={form}>
+          <DateInput
+            placeholder="Date"
+            {...form.getInputProps("createdAt")}
+            size="xs"
+            w={120}
+            h={36}
+          />
+          <Select
+            placeholder="Status"
+            {...form.getInputProps("status")}
+            data={["Active", "Inactive"]}
+            size="xs"
+            w={120}
+            h={36}
+          />
+        </Filter>
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">

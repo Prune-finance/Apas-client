@@ -3,19 +3,20 @@ import { useState, useEffect, useMemo } from "react";
 
 interface IParams {
   period?: string;
-  limit?: string | number;
+  limit?: number;
   createdAt?: string | null;
   status?: string;
   sort?: string;
 }
 export function useBusiness(customParams: IParams = {}) {
+  console.log(customParams);
   const obj = useMemo(() => {
     return {
-      period: customParams.period,
-      limit: customParams.limit,
-      status: customParams.status,
-      sort: customParams.sort,
-      createdAt: customParams.createdAt,
+      ...(customParams.period && { period: customParams.period }),
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
     };
   }, [customParams]);
 
@@ -56,9 +57,14 @@ export function useBusiness(customParams: IParams = {}) {
   }
 
   async function fetchBusinessRegistrationStats() {
+    const queryParams = {
+      ...(customParams.period && { period: customParams.period }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business-stats?period=${customParams.period}&`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business-stats?${params}`,
         { withCredentials: true }
       );
       setStats(data.data);
@@ -77,7 +83,7 @@ export function useBusiness(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.period, obj.sort, obj.status]);
 
   return { loading, businesses, meta, stats, statsMeta };
 }

@@ -21,9 +21,13 @@ export default function Filter<T>({
   const pathname = usePathname();
 
   const handleApply = () => {
-    const params = new URLSearchParams(
-      form.values as Record<string, string>
-    ).toString();
+    const filteredValues = Object.fromEntries(
+      Object.entries(form.values as Record<string, unknown>).filter(
+        ([key, value]) => value !== null
+      )
+    ) as Record<string, string>;
+
+    const params = new URLSearchParams(filteredValues).toString();
 
     push(`${pathname}?${params}`);
     toggle();

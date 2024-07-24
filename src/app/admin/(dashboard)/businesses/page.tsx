@@ -57,16 +57,16 @@ import { useSearchParams } from "next/navigation";
 export default function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const searchParams = useSearchParams();
-  const limit = searchParams.get("rows")?.toLowerCase() || 10;
+  const limit = searchParams.get("rows")?.toLowerCase() || "10";
   const status = searchParams.get("status")?.toLowerCase();
   const createdAt = searchParams.get("createdAt");
   const sort = searchParams.get("sort")?.toLowerCase();
 
   const { loading, businesses } = useBusiness({
-    limit,
-    createdAt,
-    status,
-    sort,
+    ...(limit && { limit: parseInt(limit) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status }),
+    ...(sort && { sort }),
   });
 
   const [opened, { toggle }] = useDisclosure(false);

@@ -9,7 +9,6 @@ interface IParams {
   sort?: string;
 }
 export function useBusiness(customParams: IParams = {}) {
-  console.log(customParams);
   const obj = useMemo(() => {
     return {
       ...(customParams.period && { period: customParams.period }),
@@ -19,8 +18,6 @@ export function useBusiness(customParams: IParams = {}) {
       ...(customParams.sort && { sort: customParams.sort }),
     };
   }, [customParams]);
-
-  console.log(obj);
 
   const [businesses, setBusinesses] = useState<BusinessData[]>([]);
   const [stats, setStats] = useState<{ [x: string]: number }[]>([]);

@@ -63,7 +63,7 @@ export default function Businesses() {
   const sort = searchParams.get("sort")?.toLowerCase();
 
   const { loading, businesses } = useBusiness({
-    ...(limit && { limit: parseInt(limit) }),
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status }),
     ...(sort && { sort }),

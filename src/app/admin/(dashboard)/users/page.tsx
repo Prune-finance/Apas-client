@@ -43,7 +43,7 @@ import styles from "./styles.module.scss";
 import EmptyImage from "@/assets/empty.png";
 import { AllBusinessSkeleton } from "@/lib/static";
 import { useAdmins } from "@/lib/hooks/admins";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import ModalComponent from "./modal";
 import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
@@ -57,7 +57,7 @@ import {
   businessFilterValues,
 } from "../businesses/schema";
 import Filter from "@/ui/components/Filter";
-import { DateInput } from "@mantine/dates";
+import { filteredSearch } from "@/lib/search";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -82,6 +82,8 @@ function Users() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [processing, setProcessing] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const form = useForm({
     initialValues: newAdmin,
@@ -131,7 +133,11 @@ function Users() {
     },
   ];
 
-  const rows = users.map((element, index) => (
+  const rows = filteredSearch(
+    users,
+    ["email", "firstName", "lastName", "role"],
+    debouncedSearch
+  ).map((element, index) => (
     <TableTr key={index}>
       <TableTd className={styles.table__td}>
         <Checkbox />
@@ -227,6 +233,8 @@ function Users() {
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
             classNames={{ wrapper: styles.search, input: styles.input__search }}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
           <Button

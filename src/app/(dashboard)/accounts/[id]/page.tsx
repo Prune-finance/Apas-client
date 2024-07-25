@@ -122,7 +122,7 @@ export default function Account() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/dashboard" },
+          // { title: "Dashboard", href: "/dashboard" },
           { title: "Accounts", href: "/accounts" },
           ...(!loading
             ? [

@@ -234,7 +234,7 @@ export default function Users() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/dashboard" },
+          // { title: "Dashboard", href: "/dashboard" },
           { title: "Settings", href: "/settings" },
         ]}
       />

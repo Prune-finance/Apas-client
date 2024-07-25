@@ -54,7 +54,13 @@ export default function AccountRequests() {
     type,
   } = Object.fromEntries(searchParams.entries());
 
-  const { loading, requests } = useRequests();
+  const { loading, requests } = useRequests({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+    ...(type && { type: type.toLowerCase() }),
+  });
   const [opened, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 

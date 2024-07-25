@@ -159,7 +159,7 @@ export default function Users() {
         </div>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>
@@ -196,7 +196,7 @@ export default function Users() {
             })}
           </MenuDropdown>
         </Menu>
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -316,7 +316,7 @@ export default function Users() {
                     <TableTh className={styles.table__th}>Date Added</TableTh>
                     <TableTh className={styles.table__th}>Last Log in</TableTh>
                     <TableTh className={styles.table__th}>Status</TableTh>
-                    <TableTh className={styles.table__th}>Action</TableTh>
+                    {/* <TableTh className={styles.table__th}>Action</TableTh> */}
                   </TableTr>
                 </TableThead>
                 <TableTbody>{loading ? AllBusinessSkeleton : rows}</TableTbody>

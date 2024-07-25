@@ -53,7 +53,9 @@ export default function Account() {
       <TableTd className={styles.table__td}>
         {element.recipientBankAddress}
       </TableTd>
-      <TableTd className={styles.table__td}>{dayjs().format()}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
         <IconArrowUpRight
           color="#D92D20"

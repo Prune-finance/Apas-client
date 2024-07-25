@@ -128,3 +128,19 @@ export const validateDebitRequest = z.object({
   reference: z.string().min(2, "Reference number is required"),
   reason: z.string().min(2, "Reason is required"),
 });
+
+export const filterValues = {
+  rows: null,
+  sort: null,
+  createdAt: null,
+  status: null,
+};
+
+export const filterSchema = z.object({
+  rows: z.string().nullable(),
+  sort: z.string().nullable(),
+  createdAt: z.date().nullable(),
+  status: z.string().nullable(),
+});
+
+export type FilterType = z.infer<typeof filterSchema>;

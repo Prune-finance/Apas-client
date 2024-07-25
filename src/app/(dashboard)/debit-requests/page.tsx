@@ -40,15 +40,39 @@ import { useState } from "react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { formatNumber } from "@/lib/utils";
+import { useForm, zodResolver } from "@mantine/form";
+import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import Filter from "@/ui/components/Filter";
+import { useSearchParams } from "next/navigation";
 
 export default function DebitRequests() {
-  const { loading, requests } = useUserDebitRequests();
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+  } = Object.fromEntries(searchParams.entries());
+
+  const { loading, requests } = useUserDebitRequests({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+  });
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
   );
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
+  const [openedFilter, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+
+  const form = useForm<FilterType>({
+    initialValues: filterValues,
+    validate: zodResolver(filterSchema),
+  });
 
   const MenuComponent = ({ request }: { request: DebitRequest }) => {
     return (
@@ -165,12 +189,15 @@ export default function DebitRequests() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            fz={12}
+            fw={500}
+            onClick={toggle}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">

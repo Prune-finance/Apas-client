@@ -6,7 +6,14 @@ import Image from "next/image";
 
 // Mantine Imports
 import { useDisclosure } from "@mantine/hooks";
-import { Menu, MenuDropdown, MenuItem, MenuTarget, Paper } from "@mantine/core";
+import {
+  Menu,
+  MenuDropdown,
+  MenuItem,
+  MenuTarget,
+  Paper,
+  Select,
+} from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
@@ -35,9 +42,30 @@ import { formatNumber } from "@/lib/utils";
 import EmptyImage from "@/assets/empty.png";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
+import { useForm, zodResolver } from "@mantine/form";
+import { filterValues } from "@/lib/schema";
+import { accountFilterSchema } from "@/app/admin/(dashboard)/account-requests/schema";
+import { AccountFilterType } from "@/app/admin/(dashboard)/accounts/schema";
+import { useSearchParams } from "next/navigation";
+import Filter from "@/ui/components/Filter";
 
 export default function Accounts() {
-  const { loading, accounts, revalidate } = useUserAccounts();
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+    type,
+  } = Object.fromEntries(searchParams.entries());
+  const { loading, accounts, revalidate } = useUserAccounts({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+    ...(type && { type: type.toLowerCase() }),
+  });
   const { handleSuccess } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -46,10 +74,16 @@ export default function Accounts() {
   const [opened, { open, close }] = useDisclosure(false);
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
+  const [openedFilter, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+
+  const form = useForm<AccountFilterType>({
+    initialValues: { ...filterValues, type: null },
+    validate: zodResolver(accountFilterSchema),
+  });
 
   const freezeAccount = async (id: string) => {
     setProcessing(true);
@@ -272,12 +306,24 @@ export default function Accounts() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            fz={12}
+            fw={500}
+            onClick={toggle}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter opened={openedFilter} toggle={toggle} form={form}>
+          <Select
+            placeholder="Type"
+            {...form.getInputProps("type")}
+            data={["Corporate", "User"]}
+            size="xs"
+            w={120}
+            h={36}
+          />
+        </Filter>
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">

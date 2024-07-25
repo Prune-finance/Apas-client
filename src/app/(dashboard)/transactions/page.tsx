@@ -41,7 +41,7 @@ export default function AccountTrx() {
 
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { loading, transactions } = useUserTransactions({
+  const { loading, transactions } = useUserTransactions(undefined, {
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),

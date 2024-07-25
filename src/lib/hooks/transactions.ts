@@ -45,7 +45,7 @@ interface ITrx extends IParams {
   id?: string;
 }
 
-export function useUserTransactions(customParams: ITrx = {}, id: string = "") {
+export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
   const [transactions, setTransactions] = useState<TrxData[]>([]);
   const [loading, setLoading] = useState(true);
 

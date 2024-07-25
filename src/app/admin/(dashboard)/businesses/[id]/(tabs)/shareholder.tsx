@@ -24,7 +24,7 @@ import { Fragment, useState } from "react";
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import { directorEtShareholderSchema } from "@/lib/schema";
+import { directorEtShareholderSchema, validateShareholder } from "@/lib/schema";
 import { UseFormReturnType, useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
@@ -86,6 +86,10 @@ export default function Shareholders({
   const handleBusinessUpdate = async () => {
     setProcessing(true);
     try {
+      const { error } = validateShareholder.safeParse(form.values);
+      if (error) {
+        throw new Error(error.issues[0].message);
+      }
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
         {
@@ -228,10 +232,26 @@ const DirectorForm = ({
       <Flex mt={24} gap={20}>
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
-            Upload International Passport
+            Upload{" "}
+            {form.values.identityType
+              ? form.values.identityType
+              : "Identity Card"}
           </Text>
           <DropzoneComponent form={form} formKey="identityFileUrl" />
         </Box>
+
+        {form.values.identityType !== "Passport" && (
+          <Box flex={1}>
+            <Text fz={12} c="#344054" mb={10}>
+              Upload{" "}
+              {form.values.identityType
+                ? form.values.identityType
+                : "Identity Card"}{" "}
+              back
+            </Text>
+            <DropzoneComponent form={form} formKey={`identityFileUrlBack`} />
+          </Box>
+        )}
 
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>

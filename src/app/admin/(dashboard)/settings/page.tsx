@@ -47,66 +47,16 @@ import { AllBusinessSkeleton } from "@/lib/static";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { switzer } from "@/app/layout";
 import Logs from "./(tabs)/logs";
+import { useState } from "react";
 
 export default function DebitRequests() {
-  const { loading, businesses } = useBusiness();
-  const [opened, { open, close }] = useDisclosure(false);
-  const [approveOpened, { open: openApprove, close: closeApprove }] =
-    useDisclosure(false);
-  const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
-    useDisclosure(false);
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-
-  const MenuComponent = (props: any) => {
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          <MenuItem
-            onClick={openDrawer}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            View
-          </MenuItem>
-
-          <MenuItem
-            onClick={open}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconTrash
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            Delete
-          </MenuItem>
-        </MenuDropdown>
-      </Menu>
-    );
-  };
-
-  const rows: any[] = [];
-
+  const [tab, setTab] = useState<string | null>("Logs");
   return (
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
-          { title: "Debit Requests", href: "/admin/accounts" },
+          // { title: "Dashboard", href: "/admin/dashboard" },
+          { title: `${tab}`, href: "/admin/settings" },
         ]}
       />
 
@@ -118,7 +68,9 @@ export default function DebitRequests() {
         </div>
 
         <Tabs
-          defaultValue="Logs"
+          // defaultValue="Logs"
+          value={tab}
+          onChange={setTab}
           variant="pills"
           classNames={{
             root: styles.tabs,
@@ -131,12 +83,12 @@ export default function DebitRequests() {
             <TabsTab value="Logs" leftSection={<IconLogs size={14} />}>
               Audit Logs
             </TabsTab>
-            <TabsTab
+            {/* <TabsTab
               value="Permissions"
               leftSection={<IconAccessible size={14} />}
             >
               Permissions
-            </TabsTab>
+            </TabsTab> */}
           </TabsList>
 
           <TabsPanel value="Logs">

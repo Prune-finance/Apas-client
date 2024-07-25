@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, Suspense } from "react";
 
 import dayjs from "dayjs";
 import axios from "axios";
@@ -12,6 +12,7 @@ import {
   MenuDropdown,
   MenuItem,
   MenuTarget,
+  Select,
   TableTbody,
   TableTd,
 } from "@mantine/core";
@@ -36,10 +37,32 @@ import { AllBusinessSkeleton, DynamicSkeleton } from "@/lib/static";
 import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import { useForm, zodResolver } from "@mantine/form";
+import {
+  BusinessFilterType,
+  businessFilterValues,
+  businessFilterSchema,
+} from "../../businesses/schema";
+import Filter from "@/ui/components/Filter";
+import { DateInput } from "@mantine/dates";
+import { useSearchParams } from "next/navigation";
 
-export default function Debit() {
+function Debit() {
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+  } = Object.fromEntries(searchParams.entries());
   const { handleError, handleSuccess } = useNotification();
-  const { loading, requests, revalidate } = useDebitRequests();
+  const { loading, requests, revalidate } = useDebitRequests({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+  });
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
   );
@@ -50,6 +73,8 @@ export default function Debit() {
     useDisclosure(false);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
+  const [openedFilter, { toggle }] = useDisclosure(false);
+
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const handleRejectRequest = async () => {
@@ -182,6 +207,11 @@ export default function Debit() {
     </TableTr>
   ));
 
+  const form = useForm<BusinessFilterType>({
+    initialValues: businessFilterValues,
+    validate: zodResolver(businessFilterSchema),
+  });
+
   return (
     <Fragment>
       <div className={`${styles.container__search__filter}`}>
@@ -195,12 +225,19 @@ export default function Debit() {
         <Button
           className={styles.filter__cta}
           rightSection={<IconListTree size={14} />}
+          fz={12}
+          fw={500}
+          onClick={toggle}
         >
-          <Text fz={12} fw={500}>
-            Filter
-          </Text>
+          Filter
         </Button>
       </div>
+
+      <Filter<BusinessFilterType>
+        opened={openedFilter}
+        toggle={toggle}
+        form={form}
+      />
 
       <TableScrollContainer minWidth={500}>
         <Table className={styles.table} verticalSpacing="md">
@@ -323,25 +360,27 @@ export default function Debit() {
             </Text>
           </div>
 
-          <Flex mt={40} justify="flex-end" gap={10}>
-            <Button
-              onClick={open}
-              color="#D0D5DD"
-              variant="outline"
-              className={styles.cta}
-            >
-              Deny
-            </Button>
+          {selectedRequest?.status === "PENDING" && (
+            <Flex mt={40} justify="flex-end" gap={10}>
+              <Button
+                onClick={open}
+                color="#D0D5DD"
+                variant="outline"
+                className={styles.cta}
+              >
+                Deny
+              </Button>
 
-            <Button
-              className={styles.cta}
-              onClick={openApprove}
-              variant="filled"
-              color="#D4F307"
-            >
-              Approve
-            </Button>
-          </Flex>
+              <Button
+                className={styles.cta}
+                onClick={openApprove}
+                variant="filled"
+                color="#D4F307"
+              >
+                Approve
+              </Button>
+            </Flex>
+          )}
         </Box>
       </Drawer>
 
@@ -369,5 +408,13 @@ export default function Debit() {
         customApproveMessage="Yes, Approve It"
       />
     </Fragment>
+  );
+}
+
+export default function DebitSuspense() {
+  return (
+    <Suspense>
+      <Debit />
+    </Suspense>
   );
 }

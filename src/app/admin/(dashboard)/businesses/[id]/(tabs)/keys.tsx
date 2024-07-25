@@ -53,7 +53,7 @@ export default function Keys({ business }: { business: BusinessData | null }) {
           </Text>
 
           <Text mt={16} fz={24} className="primary-700">
-            0
+            {business?.apiCalls}
           </Text>
 
           <Text mt={24} fz={10} className="grey-500">
@@ -67,14 +67,14 @@ export default function Keys({ business }: { business: BusinessData | null }) {
               API KEYS
             </Text>
 
-            <Flex gap={10}>
+            {/* <Flex gap={10}>
               <Button
                 leftSection={<IconAB2 color="#475467" size={14} />}
                 className={styles.edit}
               >
                 Reset
               </Button>
-            </Flex>
+            </Flex> */}
           </Flex>
 
           <TextInput

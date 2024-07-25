@@ -67,14 +67,22 @@ export default function Account({ request }: { request: RequestData | null }) {
                 leftSection={<IconFileInfo />}
                 leftSectionPointerEvents="none"
                 rightSection={
-                  <UnstyledButton className={styles.input__right__section}>
+                  <UnstyledButton
+                    onClick={() =>
+                      window.open(
+                        request.documentData.idFileUrl || "",
+                        "_blank"
+                      )
+                    }
+                    className={styles.input__right__section}
+                  >
                     <Text fw={600} fz={10} c="##475467">
                       View
                     </Text>
                   </UnstyledButton>
                 }
                 label="Identity Type"
-                placeholder={request.documentData.idType}
+                placeholder={`${request.documentData.idType}-${request.firstName} ${request.lastName}`}
               />
             </GridCol>
           )}
@@ -90,14 +98,22 @@ export default function Account({ request }: { request: RequestData | null }) {
                 leftSection={<IconFileInfo />}
                 leftSectionPointerEvents="none"
                 rightSection={
-                  <UnstyledButton className={styles.input__right__section}>
+                  <UnstyledButton
+                    onClick={() =>
+                      window.open(
+                        request.documentData.poaFileUrl || "",
+                        "_blank"
+                      )
+                    }
+                    className={styles.input__right__section}
+                  >
                     <Text fw={600} fz={10} c="##475467">
                       View
                     </Text>
                   </UnstyledButton>
                 }
                 label="Proof of Address Type"
-                placeholder={request.documentData.poaType}
+                placeholder={`${request.documentData.poaType}-${request.firstName} ${request.lastName}`}
               />
             </GridCol>
           )}

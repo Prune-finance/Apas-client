@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
@@ -37,6 +38,8 @@ import { useSingleAccount } from "@/lib/hooks/accounts";
 import { useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import { DynamicSkeleton } from "@/lib/static";
+
+import EmptyImage from "@/assets/empty.png";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -96,6 +99,7 @@ export default function Account() {
     { name: "Completed", value: 0, color: "#039855" },
     { name: "Canceled", value: 0, color: "#F79009" },
     { name: "Failed", value: 0, color: "#D92D20" },
+    { name: "Other", value: 100, color: "#e4e4e4" },
   ];
 
   const weekData = [
@@ -161,7 +165,7 @@ export default function Account() {
                       )}
                     </Flex>
                   </Flex>
-                  <Button
+                  {/* <Button
                     fz={11}
                     td="underline"
                     variant="transparent"
@@ -169,7 +173,7 @@ export default function Account() {
                     color="#97AD05"
                   >
                     View Documents
-                  </Button>
+                  </Button> */}
                 </div>
               </GridCol>
 
@@ -206,6 +210,23 @@ export default function Account() {
                   {/* <TableTbody>{rows}</TableTbody> */}
                   <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
                 </Table>
+
+                {!loading && !!!rows.length && (
+                  <Flex direction="column" align="center" mt={50}>
+                    <Image
+                      src={EmptyImage}
+                      alt="no content"
+                      width={126}
+                      height={96}
+                    />
+                    <Text mt={14} fz={14} c="#1D2939">
+                      There are no transactions.
+                    </Text>
+                    <Text fz={10} c="#667085">
+                      When a transaction is recorded, it will appear here
+                    </Text>
+                  </Flex>
+                )}
               </TableScrollContainer>
 
               <Button
@@ -306,7 +327,10 @@ export default function Account() {
                 <DonutChart
                   paddingAngle={4}
                   data={donutData}
-                  chartLabel="30000"
+                  chartLabel={donutData.reduce((prv, cur) => {
+                    if (cur.name === "Other") return 0 + prv;
+                    return cur.value + prv;
+                  }, 0)}
                   size={203}
                   thickness={25}
                 />
@@ -314,6 +338,7 @@ export default function Account() {
 
               <Stack px={10} gap={15}>
                 {donutData.map((item, index) => {
+                  if (item.name === "Other") return;
                   return (
                     <Flex key={index} justify="space-between">
                       <Flex align="center" gap={5}>
@@ -324,7 +349,7 @@ export default function Account() {
                       </Flex>
 
                       <Text fz={12} fw={600}>
-                        {formatNumber(item.value)}
+                        {formatNumber(item.value, true, "EUR")}
                       </Text>
                     </Flex>
                   );

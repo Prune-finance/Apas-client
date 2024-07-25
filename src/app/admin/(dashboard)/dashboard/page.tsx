@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Grid,
   GridCol,
@@ -49,7 +49,7 @@ export default function Home() {
     loading: requestsLoading,
     meta: requestMeta,
     requests,
-  } = useRequests("PENDING");
+  } = useRequests({ status: "PENDING" });
 
   const data = stats;
 
@@ -156,6 +156,26 @@ export default function Home() {
     </TableTr>
   ));
 
+  const cards = [
+    {
+      title: "Total Business",
+      stat: loading ? 0 : meta?.total || 0,
+      text: (
+        <>
+          There is a{" "}
+          <Text bg="#ECFDF3" c="#12B76A" fz={9} span>
+            +100%
+          </Text>{" "}
+          increase this month and a total of{" "}
+          <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
+            {statsMeta?.weekCount || 0}
+          </Text>{" "}
+          new businesses this week
+        </>
+      ),
+    },
+  ];
+
   return (
     <main className={styles.main}>
       <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} />
@@ -167,8 +187,8 @@ export default function Home() {
               loading={loading}
               title="Total Business"
               stat={loading ? 0 : meta?.total || 0}
-              link="/admin/businesses"
-              colored
+              // link="/admin/businesses"
+              // colored
               text={
                 <>
                   There is a{" "}
@@ -262,7 +282,11 @@ export default function Home() {
 
             <Grid mt={15}>
               <GridCol span={{ base: 12, xs: 12, sm: 12, md: 5, lg: 5 }}>
-                <CardTwo title="Debit Requests" link="/" items={[]} />
+                <CardTwo
+                  title="Debit Requests"
+                  link="/admin/requests"
+                  items={[]}
+                />
               </GridCol>
 
               <GridCol
@@ -349,7 +373,7 @@ export default function Home() {
                   minTitle="Active Accounts"
                   amount={accountsMeta?.active || 0}
                   percentage="0"
-                  subTitle="Total Number of Active Accounts of All Business"
+                  subTitle="Total Number of Active Accounts for all Business"
                 />
               </GridCol>
               <GridCol span={{ lg: 12, md: 3.5 }} className={styles.grid__card}>
@@ -360,7 +384,7 @@ export default function Home() {
                   minTitle="In-active Accounts"
                   amount={accountsMeta?.inactive || 0}
                   percentage="0"
-                  subTitle="Total Number of In-active Accounts of All Business"
+                  subTitle="Total Number of In-active Accounts for all Business"
                 />
               </GridCol>
               <GridCol span={{ lg: 12, md: 5 }} className={styles.grid__card}>

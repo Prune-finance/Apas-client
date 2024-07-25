@@ -9,6 +9,7 @@ import {
   MenuItem,
   MenuTarget,
   Pagination,
+  Select,
   Table,
   TableScrollContainer,
   TableTbody,
@@ -34,7 +35,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import dayjs from "dayjs";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
@@ -47,14 +48,36 @@ import ModalComponent from "./modal";
 import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
 import axios from "axios";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import {
+  businessFilterSchema,
+  BusinessFilterType,
+  businessFilterValues,
+} from "../businesses/schema";
+import Filter from "@/ui/components/Filter";
+import { DateInput } from "@mantine/dates";
 
-export default function Users() {
+function Users() {
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+  } = Object.fromEntries(searchParams.entries());
+
   const router = useRouter();
-  const { loading, users, revalidate } = useAdmins();
+  const { loading, users, revalidate } = useAdmins({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+  });
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedFilter, { toggle }] = useDisclosure(false);
   const { handleError } = useNotification();
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
@@ -63,6 +86,11 @@ export default function Users() {
   const form = useForm({
     initialValues: newAdmin,
     validate: zodResolver(validateNewAdmin),
+  });
+
+  const filterForm = useForm<BusinessFilterType>({
+    initialValues: businessFilterValues,
+    validate: zodResolver(businessFilterSchema),
   });
 
   const addAdmin = async () => {
@@ -171,7 +199,7 @@ export default function Users() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
+          // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Users", href: "/admin/users" },
         ]}
       />
@@ -204,12 +232,19 @@ export default function Users() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            fz={12}
+            fw={500}
+            onClick={toggle}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<BusinessFilterType>
+          opened={openedFilter}
+          toggle={toggle}
+          form={filterForm}
+        />
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">
@@ -262,5 +297,13 @@ export default function Users() {
         form={form}
       />
     </main>
+  );
+}
+
+export default function UsersSuspense() {
+  return (
+    <Suspense>
+      <Users />
+    </Suspense>
   );
 }

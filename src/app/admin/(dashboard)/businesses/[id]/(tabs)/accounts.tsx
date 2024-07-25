@@ -175,10 +175,13 @@ export default function Accounts({
         <CardOne
           flex={1}
           title="Total Balance"
-          stat={0}
+          stat={accounts.reduce((prv, curr) => {
+            return curr.accountBalance + prv;
+          }, 0)}
           formatted
           colored
           withBorder
+          currency="EUR"
           text={
             <Text fz={10}>
               This shows the total balance of all the accounts under this
@@ -190,9 +193,12 @@ export default function Accounts({
         <CardOne
           flex={1}
           title="Total Inflow"
-          stat={0}
+          stat={accounts.reduce((prv, curr) => {
+            return curr.accountBalance + prv;
+          }, 0)}
           formatted
           withBorder
+          currency="EUR"
           text={
             <Text fz={10}>
               This shows the total inflow amount of all the accounts under this
@@ -207,6 +213,7 @@ export default function Accounts({
           stat={0}
           formatted
           withBorder
+          currency="EUR"
           text={
             <Text fz={10}>
               This shows the total outflow amount of all the accounts under this

@@ -232,12 +232,7 @@ export default function Users() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
-        items={[
-          // { title: "Dashboard", href: "/dashboard" },
-          { title: "Settings", href: "/settings" },
-        ]}
-      />
+      <Breadcrumbs items={[{ title: "Settings", href: "/settings" }]} />
 
       <Paper withBorder className={styles.table__container}>
         <div className={styles.container__header}>

@@ -111,7 +111,6 @@ export default function SingleBusiness() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Businesses", href: "/admin/businesses" },
           ...(!loading
             ? [

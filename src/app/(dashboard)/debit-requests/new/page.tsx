@@ -29,6 +29,7 @@ import {
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useUserAccounts } from "@/lib/hooks/accounts";
+import { formatNumber } from "@/lib/utils";
 
 export default function DebitRequest() {
   const router = useRouter();
@@ -38,7 +39,14 @@ export default function DebitRequest() {
 
   const accountsIBAN = useMemo(() => {
     return accounts.map((account) => {
-      return { value: account.id, label: account.accountNumber };
+      return {
+        value: account.id,
+        label: `${account.accountNumber} (${formatNumber(
+          account.accountBalance,
+          true,
+          "EUR"
+        )})`,
+      };
     });
   }, [accounts]);
 

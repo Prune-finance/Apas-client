@@ -3,11 +3,13 @@
 import {
   Button,
   Flex,
+  Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
   Pagination,
+  Select,
   Table,
   TableScrollContainer,
   TableTbody,
@@ -41,10 +43,39 @@ import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { AllBusinessSkeleton } from "@/lib/static";
 import { switzer } from "@/app/layout";
+import Filter from "@/ui/components/Filter";
+import { useDisclosure } from "@mantine/hooks";
+import { DateInput } from "@mantine/dates";
+import { useForm, zodResolver } from "@mantine/form";
+import {
+  businessFilterSchema,
+  BusinessFilterType,
+  businessFilterValues,
+} from "./schema";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function Businesses() {
+function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-  const { loading, businesses } = useBusiness();
+  const searchParams = useSearchParams();
+  const limit = searchParams.get("rows")?.toLowerCase() || "10";
+  const status = searchParams.get("status")?.toLowerCase();
+  const createdAt = searchParams.get("createdAt");
+  const sort = searchParams.get("sort")?.toLowerCase();
+
+  const { loading, businesses } = useBusiness({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status }),
+    ...(sort && { sort }),
+  });
+
+  const [opened, { toggle }] = useDisclosure(false);
+
+  const form = useForm<BusinessFilterType>({
+    initialValues: businessFilterValues,
+    validate: zodResolver(businessFilterSchema),
+  });
 
   const menuItems = [
     {
@@ -52,10 +83,6 @@ export default function Businesses() {
       icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
       link: true,
       href: "/admin/businesses",
-    },
-    {
-      text: "Deactivate",
-      icon: <IconTrash style={{ width: rem(14), height: rem(14) }} />,
     },
     {
       text: "Download Report",
@@ -72,11 +99,28 @@ export default function Businesses() {
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          <IconPointFilled size={14} color="#12B76A" />
-          <Text tt="capitalize" fz={12} c="#12B76A">
-            Active
-          </Text>
+        <div
+          className={styles.table__td__status}
+          style={{
+            background:
+              element.companyStatus === "INACTIVE" ? "#FFFAEB" : "#ECFDF3",
+          }}
+        >
+          {element.companyStatus === "ACTIVE" ? (
+            <>
+              <IconPointFilled size={14} color="#12B76A" />
+              <Text tt="capitalize" fz={12} c="#12B76A">
+                Active
+              </Text>
+            </>
+          ) : (
+            <>
+              <IconPointFilled size={14} color="#C6A700" />
+              <Text tt="capitalize" fz={12} c="#C6A700">
+                Inactive
+              </Text>
+            </>
+          )}
         </div>
       </TableTd>
 
@@ -124,7 +168,7 @@ export default function Businesses() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
+          // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Businesses", href: "/admin/businesses" },
         ]}
       />
@@ -140,7 +184,7 @@ export default function Businesses() {
               leftSection={<IconPlus color="#344054" size={16} />}
               className={styles.login__cta}
               variant="filled"
-              color="#D4F307"
+              color="var(--prune-primary-600)"
             >
               New Business
             </Button>
@@ -160,12 +204,19 @@ export default function Businesses() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            onClick={toggle}
+            fz={12}
+            fw={500}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<BusinessFilterType>
+          opened={opened}
+          toggle={toggle}
+          form={form}
+        />
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">
@@ -206,5 +257,13 @@ export default function Businesses() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function BusinessesSuspense() {
+  return (
+    <Suspense>
+      <Businesses />
+    </Suspense>
   );
 }

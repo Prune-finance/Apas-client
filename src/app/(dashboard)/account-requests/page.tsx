@@ -27,12 +27,30 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
+import { useSearchParams } from "next/navigation";
+import { useForm, zodResolver } from "@mantine/form";
+import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import Filter from "@/ui/components/Filter";
 
-export default function AccountRequests() {
-  const { loading, requests, revalidate } = useUserRequests();
+function AccountRequests() {
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+  } = Object.fromEntries(searchParams.entries());
+
+  const { loading, requests, revalidate } = useUserRequests({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+  });
   const { handleSuccess } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
   const [cancelOpened, { open: cancelOpen, close: cancelClose }] =
@@ -40,6 +58,13 @@ export default function AccountRequests() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+
+  const [openedFilter, { toggle }] = useDisclosure(false);
+
+  const form = useForm<FilterType>({
+    initialValues: filterValues,
+    validate: zodResolver(filterSchema),
+  });
 
   const cancelRequest = async (id: string) => {
     setProcessing(true);
@@ -69,7 +94,7 @@ export default function AccountRequests() {
         </MenuTarget>
 
         <MenuDropdown>
-          {status === "PENDING" && (
+          {/* {status === "PENDING" && (
             <MenuItem
               onClick={() => {
                 setRowId(id);
@@ -83,9 +108,9 @@ export default function AccountRequests() {
             >
               Cancel Request
             </MenuItem>
-          )}
+          )} */}
 
-          <MenuItem
+          {/* <MenuItem
             onClick={open}
             fz={10}
             c="#667085"
@@ -94,7 +119,7 @@ export default function AccountRequests() {
             }
           >
             Delete
-          </MenuItem>
+          </MenuItem> */}
         </MenuDropdown>
       </Menu>
     );
@@ -158,10 +183,13 @@ export default function AccountRequests() {
           </Text>
         </div>
       </TableTd>
+      {/* <TableTd>
+        {element.}
+      </TableTd> */}
 
-      <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
         <MenuComponent id={element.id} status={element.status} />
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -192,12 +220,15 @@ export default function AccountRequests() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            fz={12}
+            fw={500}
+            onClick={toggle}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">
@@ -261,5 +292,13 @@ export default function AccountRequests() {
         text="You are about to delete this account request"
       />
     </main>
+  );
+}
+
+export default function AccountRequestsSus() {
+  return (
+    <Suspense>
+      <AccountRequests />
+    </Suspense>
   );
 }

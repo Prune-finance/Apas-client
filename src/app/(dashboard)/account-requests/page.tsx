@@ -195,7 +195,12 @@ export default function AccountRequests() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Account Requests", href: "/accounts" }]} />
+      <Breadcrumbs
+        items={[
+          // { title: "Dashboard", href: "/dashboard" },
+          { title: "Account Requests", href: "/accounts" },
+        ]}
+      />
 
       <Paper withBorder className={styles.table__container}>
         <div className={styles.container__header}>

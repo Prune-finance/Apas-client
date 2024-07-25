@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 // Mantine Imports
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   Menu,
   MenuDropdown,
@@ -42,7 +42,8 @@ import {
   accountFilterSchema,
 } from "./schema";
 import { DateInput } from "@mantine/dates";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { filteredSearch } from "@/lib/search";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -64,6 +65,9 @@ function AccountRequests() {
   });
   const [opened, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const MenuComponent = ({ id }: { id: string }) => {
     return (
@@ -91,7 +95,11 @@ function AccountRequests() {
     );
   };
 
-  const rows = requests.map((element, index) => (
+  const rows = filteredSearch(
+    requests,
+    ["firstName", "lastName", "Company.name"],
+    debouncedSearch
+  ).map((element, index) => (
     <TableTr key={index}>
       <TableTd className={styles.table__td}>
         <Checkbox />
@@ -177,6 +185,8 @@ function AccountRequests() {
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
             classNames={{ wrapper: styles.search, input: styles.input__search }}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
           <Button

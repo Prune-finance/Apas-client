@@ -357,7 +357,7 @@ export default function Home() {
                     {`${test ? test?.key.slice(0, 15) : ""}****************`}
                   </Text>
 
-                  <Copy value="" />
+                  <Copy value={test?.key || ""} />
                 </Flex>
               </Stack>
 
@@ -377,7 +377,7 @@ export default function Home() {
                     {`${live ? live?.key.slice(0, 15) : ""}****************`}
                   </Text>
 
-                  <Copy value="" />
+                  <Copy value={live?.key || ""} />
                 </Flex>
               </Stack>
             </Paper>
@@ -389,7 +389,10 @@ export default function Home() {
                 Debit Requests
               </Text>
 
-              <TableScrollContainer minWidth={500}>
+              <TableScrollContainer
+                className={styles.table__container}
+                minWidth={500}
+              >
                 <Table className={styles.table} verticalSpacing="xs">
                   <TableThead>
                     <TableTr>
@@ -416,6 +419,7 @@ export default function Home() {
                 variant="transparent"
                 color="#97AD05"
                 fz={11}
+                className={styles.table__cta}
               >
                 See all Debit Transactions
               </Button>

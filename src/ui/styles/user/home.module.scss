@@ -58,51 +58,61 @@
       padding: 15px;
       overflow-x: hidden;
       background-color: #fff;
+      display: flex;
+      flex-direction: column;
 
       .table__text {
         text-transform: uppercase;
         color: var(--prune-text-gray-600);
       }
 
-      .table {
-        overflow-x: scroll;
-        margin-top: 10px;
+      .table__container {
+        flex: 1;
 
-        .table__th {
-          font-size: 12px;
-          font-weight: 400;
-          color: var(--prune-text-gray-400);
+        .table {
+          overflow-x: scroll;
+          margin-top: 10px;
 
-          &:nth-child(3) {
-            border-right: 1px dashed var(--prune-text-gray-300);
-          }
-        }
+          .table__th {
+            font-size: 12px;
+            font-weight: 400;
+            color: var(--prune-text-gray-400);
 
-        .table__td {
-          font-size: 12px;
-          font-weight: 500;
-          color: var(--prune-text-gray-600);
-
-          &:nth-child(3) {
-            position: relative;
-            border-right: 1px dashed var(--prune-text-gray-300);
-
-            .table__td__icon {
-              position: absolute;
-              left: -10px;
+            &:nth-child(3) {
+              border-right: 1px dashed var(--prune-text-gray-300);
             }
           }
 
-          .table__td__status {
-            width: fit-content;
-            border-radius: 20px;
-            padding: 5px 15px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            background-color: var(--prune-success-50);
+          .table__td {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--prune-text-gray-600);
+
+            &:nth-child(3) {
+              position: relative;
+              border-right: 1px dashed var(--prune-text-gray-300);
+
+              .table__td__icon {
+                position: absolute;
+                left: -10px;
+              }
+            }
+
+            .table__td__status {
+              width: fit-content;
+              border-radius: 20px;
+              padding: 5px 15px;
+              display: flex;
+              align-items: center;
+              gap: 5px;
+              background-color: var(--prune-success-50);
+            }
           }
         }
+      }
+
+      .table__cta {
+        align-self: flex-start;
       }
     }
   }

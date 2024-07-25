@@ -5,7 +5,7 @@ import axios from "axios";
 import { useState } from "react";
 
 import Image from "next/image";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import {
   Menu,
@@ -46,6 +46,7 @@ import {
 import Filter from "@/ui/components/Filter";
 import { DateInput } from "@mantine/dates";
 import { useSearchParams } from "next/navigation";
+import { filteredSearch } from "@/lib/search";
 
 function Debit() {
   const searchParams = useSearchParams();
@@ -76,6 +77,9 @@ function Debit() {
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
@@ -150,7 +154,11 @@ function Debit() {
     );
   };
 
-  const rows = requests.map((element, index) => (
+  const rows = filteredSearch(
+    requests,
+    ["Account.Company.name", "Account.accountNumber"],
+    debouncedSearch
+  ).map((element, index) => (
     <TableTr key={index}>
       <TableTd className={styles.table__td}>{index + 1}</TableTd>
       <TableTd className={styles.table__td}>
@@ -220,6 +228,8 @@ function Debit() {
           leftSectionPointerEvents="none"
           leftSection={searchIcon}
           classNames={{ wrapper: styles.search, input: styles.input__search }}
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
         />
 
         <Button

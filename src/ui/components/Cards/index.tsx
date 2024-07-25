@@ -167,9 +167,9 @@ interface ICardTwoItems {
   status: string;
 }
 enum CardTwoStatus {
-  PENDING = "pending",
-  REJECTED = "rejected",
-  APPROVED = "approved",
+  PENDING = "PENDING",
+  REJECTED = "  REJECTED",
+  APPROVED = "APPROVED",
 }
 export function CardTwo({ title, link, items }: ICardTwo) {
   return (
@@ -180,7 +180,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
         </Text>
 
         {link && (
-          <Link href="/">
+          <Link href={link}>
             <SeeAll />
           </Link>
         )}
@@ -195,7 +195,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
                   {item.title}
                 </Text>
                 <Text fz={12} fw={600} className={styles.header__text}>
-                  {formatNumber(item.amount)}
+                  {formatNumber(item.amount, true, "EUR")}
                 </Text>
               </div>
 

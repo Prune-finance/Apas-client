@@ -44,7 +44,7 @@ import { useBusiness } from "@/lib/hooks/businesses";
 import { AllBusinessSkeleton } from "@/lib/static";
 import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { DateInput } from "@mantine/dates";
 import { useForm, zodResolver } from "@mantine/form";
 import {
@@ -53,7 +53,8 @@ import {
   businessFilterValues,
 } from "./schema";
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { filteredSearch } from "@/lib/search";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -71,6 +72,8 @@ function Businesses() {
   });
 
   const [opened, { toggle }] = useDisclosure(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const form = useForm<BusinessFilterType>({
     initialValues: businessFilterValues,
@@ -90,7 +93,11 @@ function Businesses() {
     },
   ];
 
-  const rows = businesses.map((element, index) => (
+  const rows = filteredSearch(
+    businesses,
+    ["name", "contactEmail"],
+    debouncedSearch
+  ).map((element, index) => (
     <TableTr key={index}>
       <TableTd className={styles.table__td}>{index + 1}</TableTd>
       <TableTd className={styles.table__td}>{element.name}</TableTd>
@@ -199,6 +206,8 @@ function Businesses() {
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
             classNames={{ wrapper: styles.search, input: styles.input__search }}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
           <Button

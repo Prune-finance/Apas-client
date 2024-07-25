@@ -22,14 +22,34 @@ import { formatNumber } from "@/lib/utils";
 
 import EmptyImage from "@/assets/empty.png";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useTransactions, useUserTransactions } from "@/lib/hooks/transactions";
+import { useDisclosure } from "@mantine/hooks";
+import { useForm, zodResolver } from "@mantine/form";
+import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import Filter from "@/ui/components/Filter";
 
 export default function AccountTrx() {
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+  } = Object.fromEntries(searchParams.entries());
+
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { loading, transactions } = useUserTransactions();
+  const { loading, transactions } = useUserTransactions({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+  });
+
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+  const [opened, { toggle }] = useDisclosure(false);
 
   const rows = transactions.map((element) => (
     <TableTr key={element.id}>
@@ -64,6 +84,11 @@ export default function AccountTrx() {
       </TableTd>
     </TableTr>
   ));
+
+  const form = useForm<FilterType>({
+    initialValues: filterValues,
+    validate: zodResolver(filterSchema),
+  });
 
   return (
     <main className={styles.main}>
@@ -105,12 +130,15 @@ export default function AccountTrx() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            fz={12}
+            fw={500}
+            onClick={toggle}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">

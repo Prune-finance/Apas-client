@@ -1,5 +1,12 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+
+interface IParams {
+  limit?: number;
+  createdAt?: string | null;
+  status?: string;
+  sort?: string;
+}
 
 export function useTransactions(id: string = "") {
   const [transactions, setTransactions] = useState<TrxData[]>([]);
@@ -34,15 +41,32 @@ export function useTransactions(id: string = "") {
   return { loading, transactions, revalidate };
 }
 
-export function useUserTransactions(id: string = "") {
+interface ITrx extends IParams {
+  id?: string;
+}
+
+export function useUserTransactions(customParams: ITrx = {}, id: string = "") {
   const [transactions, setTransactions] = useState<TrxData[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
   async function fetchTrx() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
     try {
       const path = id ? `${id}/transactions` : "/transactions";
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${path}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${path}?${params}`,
         { withCredentials: true }
       );
 

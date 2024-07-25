@@ -49,7 +49,7 @@ export default function Home() {
     loading: requestsLoading,
     meta: requestMeta,
     requests,
-  } = useRequests("PENDING");
+  } = useRequests({ status: "PENDING" });
 
   const data = stats;
 

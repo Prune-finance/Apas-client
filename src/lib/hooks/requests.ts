@@ -95,16 +95,29 @@ export function useSingleRequest(id: string) {
   return { loading, request, revalidate };
 }
 
-export function useUserRequests(query: string = "") {
+export function useUserRequests(customParams: IParams = {}) {
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [meta, setMeta] = useState<RequestMeta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type }),
+    };
+  }, [customParams]);
+
   async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
     try {
-      const status = query ? `?status=${query}` : "";
+      // const status = query ? `?status=${query}` : "";
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests${status}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests?${params}`,
         { withCredentials: true }
       );
 
@@ -125,7 +138,7 @@ export function useUserRequests(query: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -210,15 +223,27 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
   return { loading, requests, revalidate };
 }
 
-export function useUserDebitRequests() {
+export function useUserDebitRequests(customParams: IParams = {}) {
   const [requests, setRequests] = useState<DebitRequest[]>([]);
   // const [meta, setMeta] = useState<RequestMeta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
   async function fetchRequests() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/requests`,
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/requests?${params}`,
         { withCredentials: true }
       );
 

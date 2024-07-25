@@ -31,7 +31,7 @@ import styles from "@/ui/styles/page.module.scss";
 
 import { formatNumber } from "@/lib/utils";
 import { useBusiness } from "@/lib/hooks/businesses";
-import { useRequests } from "@/lib/hooks/requests";
+import { useDebitRequests, useRequests } from "@/lib/hooks/requests";
 import { useAccounts } from "@/lib/hooks/accounts";
 import dayjs from "dayjs";
 
@@ -43,8 +43,12 @@ export default function Home() {
   const { loading, meta, stats, statsMeta } = useBusiness({
     period: chartFrequency === "Monthly" ? "year" : "week",
   });
-  const { loading: accountsLoading, meta: accountsMeta } = useAccounts();
-
+  const {
+    loading: accountsLoading,
+    meta: accountsMeta,
+    accounts,
+  } = useAccounts();
+  const { loading: debitLoading, requests: debitRequests } = useDebitRequests();
   const {
     loading: requestsLoading,
     meta: requestMeta,
@@ -53,38 +57,38 @@ export default function Home() {
 
   const data = stats;
 
-  const cardTwoItems = [
-    {
-      title: "C80 Limited",
-      amount: 200000000,
-      subText: "Date Created: 24th May, 2024",
-      status: "pending",
-    },
-    {
-      title: "TechNexus",
-      amount: 300000000,
-      subText: "Date Created: 23rd May, 2024",
-      status: "approved",
-    },
-    {
-      title: "CyberPulse Systems",
-      amount: 25000000,
-      subText: "Date Created: 22nd May, 2024",
-      status: "rejected",
-    },
-    {
-      title: "Infinity Ventures",
-      amount: 25000000,
-      subText: "Date Created: 19th May, 2024",
-      status: "rejected",
-    },
-    {
-      title: "Digital Horizons",
-      amount: 100000000,
-      subText: "Date Created: 14th May, 2024",
-      status: "pending",
-    },
-  ];
+  // const cardTwoItems = [
+  //   {
+  //     title: "C80 Limited",
+  //     amount: 200000000,
+  //     subText: "Date Created: 24th May, 2024",
+  //     status: "pending",
+  //   },
+  //   {
+  //     title: "TechNexus",
+  //     amount: 300000000,
+  //     subText: "Date Created: 23rd May, 2024",
+  //     status: "approved",
+  //   },
+  //   {
+  //     title: "CyberPulse Systems",
+  //     amount: 25000000,
+  //     subText: "Date Created: 22nd May, 2024",
+  //     status: "rejected",
+  //   },
+  //   {
+  //     title: "Infinity Ventures",
+  //     amount: 25000000,
+  //     subText: "Date Created: 19th May, 2024",
+  //     status: "rejected",
+  //   },
+  //   {
+  //     title: "Digital Horizons",
+  //     amount: 100000000,
+  //     subText: "Date Created: 14th May, 2024",
+  //     status: "pending",
+  //   },
+  // ];
 
   const cardFourItems = useMemo(() => {
     if (loading) return [];
@@ -131,6 +135,23 @@ export default function Home() {
       Status: "successful",
     },
   ];
+
+  const cardTwoItems = useMemo(() => {
+    console.log({ debitRequests });
+    if (debitLoading) return [];
+
+    return debitRequests.map((request) => {
+      return {
+        title: request.Account.Company.name,
+        amount: request.amount,
+        subText: `Date Created: ${dayjs(request.createdAt).format(
+          "DD MMM, YYYY"
+        )}`,
+        // subText: "Date Created: 24th May, 2024",
+        status: request.status,
+      };
+    });
+  }, [debitRequests]);
 
   const rows = tableData.map((element) => (
     <TableTr key={element.AccName}>
@@ -235,9 +256,13 @@ export default function Home() {
           <GridCol span={{ lg: 3, md: 6 }}>
             <CardOne
               title="Account Balance"
-              stat={0}
+              stat={accounts.reduce((prv, curr) => {
+                return prv + curr.accountBalance;
+              }, 0)}
               formatted
               colored
+              currency="EUR"
+              loading={accountsLoading}
               text={
                 <>{`From Jul 01, 2024 to ${dayjs().format("MMM DD, YYYY")}`}</>
               }
@@ -285,7 +310,7 @@ export default function Home() {
                 <CardTwo
                   title="Debit Requests"
                   link="/admin/requests"
-                  items={[]}
+                  items={cardTwoItems}
                 />
               </GridCol>
 

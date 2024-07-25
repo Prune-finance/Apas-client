@@ -76,7 +76,6 @@ export const newUser = {
   firstName: "",
   lastName: "",
   role: "",
-  password: "",
 };
 
 export const passwordChange = {
@@ -95,6 +94,13 @@ export const debitRequest = {
   reference: "",
   reason: "",
 };
+
+export const validateNewUser = z.object({
+  email: z.string().email("Please provide a valid email"),
+  firstName: z.string().optional(),
+  lastName: z.string().optional(),
+  role: z.string().optional(),
+});
 
 export const validateNewAdmin = z.object({
   email: z.string().email("Please provide a valid email"),

@@ -65,6 +65,7 @@ import {
   newUser,
   passwordChange,
   validateNewAdmin,
+  validateNewUser,
 } from "@/lib/schema";
 import axios from "axios";
 import { useMemo, useState } from "react";
@@ -83,7 +84,7 @@ export default function Users() {
 
   const form = useForm({
     initialValues: newUser,
-    validate: zodResolver(validateNewAdmin),
+    validate: zodResolver(validateNewUser),
   });
 
   const passwordForm = useForm({
@@ -102,30 +103,30 @@ export default function Users() {
     return { is8Char, hasUpperCase, hasNumber, hasSpecialChar, hasLowerCase };
   }, [passwordForm]);
 
-  // const addAdmin = async () => {
-  //   setProcessing(true);
+  const addAdmin = async () => {
+    setProcessing(true);
 
-  //   try {
-  //     const { hasErrors, errors } = form.validate();
-  //     if (hasErrors) {
-  //       return;
-  //     }
+    try {
+      const { hasErrors, errors } = form.validate();
+      if (hasErrors) {
+        return;
+      }
 
-  //     await axios.post(
-  //       `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
-  //       form.values,
-  //       { withCredentials: true }
-  //     );
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
+        { email: form.values.email },
+        { withCredentials: true }
+      );
 
-  //     revalidate();
-  //     close();
-  //     router.push("/admin/users");
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
+      revalidate();
+      close();
+      router.push("/users");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   const menuItems = [
     {
@@ -149,7 +150,7 @@ export default function Users() {
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
-      <TableTd className={styles.table__td}></TableTd>
+      {/* <TableTd className={styles.table__td}></TableTd> */}
       <TableTd className={styles.table__td}>
         <div className={styles.table__td__status}>
           <IconPointFilled size={14} color="#12B76A" />
@@ -159,7 +160,7 @@ export default function Users() {
         </div>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>
@@ -196,7 +197,7 @@ export default function Users() {
             })}
           </MenuDropdown>
         </Menu>
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -314,9 +315,9 @@ export default function Users() {
                       Email Address
                     </TableTh>
                     <TableTh className={styles.table__th}>Date Added</TableTh>
-                    <TableTh className={styles.table__th}>Last Log in</TableTh>
+                    {/* <TableTh className={styles.table__th}>Last Log in</TableTh> */}
                     <TableTh className={styles.table__th}>Status</TableTh>
-                    <TableTh className={styles.table__th}>Action</TableTh>
+                    {/* <TableTh className={styles.table__th}>Action</TableTh> */}
                   </TableTr>
                 </TableThead>
                 <TableTbody>{loading ? AllBusinessSkeleton : rows}</TableTbody>
@@ -462,7 +463,7 @@ export default function Users() {
       </Paper>
 
       <ModalComponent
-        // action={addAdmin}
+        action={addAdmin}
         processing={processing}
         opened={opened}
         close={close}

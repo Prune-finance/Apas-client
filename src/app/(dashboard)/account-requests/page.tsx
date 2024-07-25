@@ -242,7 +242,7 @@ function AccountRequests() {
                 <TableTh className={styles.table__th}>Business</TableTh>
                 <TableTh className={styles.table__th}>Date Created</TableTh>
                 <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh>
+                {/* <TableTh className={styles.table__th}>Action</TableTh> */}
               </TableTr>
             </TableThead>
             <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>

@@ -111,7 +111,9 @@ function DebitRequests() {
       <TableTd className={styles.table__td}>
         {element.Account.Company.name}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.amount}</TableTd>
+      <TableTd className={styles.table__td}>
+        {formatNumber(element.amount, true, "EUR")}
+      </TableTd>
       <TableTd className={styles.table__td}>
         {element.Account.accountNumber}
       </TableTd>

@@ -53,7 +53,9 @@ export default function Account() {
       <TableTd className={styles.table__td}>
         {element.recipientBankAddress}
       </TableTd>
-      <TableTd className={styles.table__td}>{dayjs().format()}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
         <IconArrowUpRight
           color="#D92D20"
@@ -197,7 +199,7 @@ export default function Account() {
                       )}
                     </Flex>
                   </Flex>
-                  <Button
+                  {/* <Button
                     fz={11}
                     td="underline"
                     variant="transparent"
@@ -205,7 +207,7 @@ export default function Account() {
                     color="#97AD05"
                   >
                     View Documents
-                  </Button>
+                  </Button> */}
                 </Paper>
               </GridCol>
 

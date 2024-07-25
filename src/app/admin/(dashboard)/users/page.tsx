@@ -144,7 +144,7 @@ function Users() {
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
-      <TableTd className={styles.table__td}></TableTd>
+      {/* <TableTd className={styles.table__td}></TableTd> */}
       <TableTd className={styles.table__td}>
         <div className={styles.table__td__status}>
           <IconPointFilled size={14} color="#12B76A" />
@@ -154,7 +154,7 @@ function Users() {
         </div>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>
@@ -191,7 +191,7 @@ function Users() {
             })}
           </MenuDropdown>
         </Menu>
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -257,9 +257,9 @@ function Users() {
                 <TableTh className={styles.table__th}>Name</TableTh>
                 <TableTh className={styles.table__th}>Role</TableTh>
                 <TableTh className={styles.table__th}>Date Added</TableTh>
-                <TableTh className={styles.table__th}>Last Log in</TableTh>
+                {/* <TableTh className={styles.table__th}>Last Log in</TableTh> */}
                 <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh>
+                {/* <TableTh className={styles.table__th}>Action</TableTh> */}
               </TableTr>
             </TableThead>
             <TableTbody>{loading ? AllBusinessSkeleton : rows}</TableTbody>

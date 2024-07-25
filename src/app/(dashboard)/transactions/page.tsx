@@ -69,7 +69,9 @@ function AccountTrx() {
         {formatNumber(element.amount, true, "EUR")}
         {/* <Text fz={12}></Text> */}
       </TableTd>
-      <TableTd className={styles.table__td}>{dayjs().format()}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <div className={styles.table__td__status}>
           {/* <IconPointFilled size={14} color="#12B76A" /> */}

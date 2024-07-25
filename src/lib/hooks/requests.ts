@@ -1,18 +1,43 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
-import { string } from "zod";
+import { useState, useEffect, useMemo } from "react";
 import { AccountData } from "./accounts";
 
-export function useRequests(query: string = "") {
+// query: string = "";
+
+interface IParams {
+  period?: string;
+  limit?: number;
+  createdAt?: string | null;
+  status?: string;
+  sort?: string;
+  query?: string;
+  type?: string;
+}
+
+export function useRequests(customParams: IParams = {}) {
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [meta, setMeta] = useState<RequestMeta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type }),
+    };
+  }, [customParams]);
+
   async function fetchAccounts() {
     try {
-      const status = query ? `?status=${query}` : "";
+      // const status = query ? `?status=${query}` : "";
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests${status}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests?${params}`,
         { withCredentials: true }
       );
 
@@ -138,16 +163,29 @@ export function useSingleUserRequest(id: string) {
 
   return { loading, request, revalidate };
 }
-
-export function useDebitRequests() {
+interface IDebitRequest extends Omit<IParams, "type" | "query"> {}
+export function useDebitRequests(customParams: IDebitRequest = {}) {
   const [requests, setRequests] = useState<DebitRequest[]>([]);
   // const [meta, setMeta] = useState<RequestMeta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
   async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests`,
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests?${params}`,
         { withCredentials: true }
       );
 
@@ -167,7 +205,7 @@ export function useDebitRequests() {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate };
 }

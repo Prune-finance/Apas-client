@@ -3,10 +3,20 @@ import { useState, useEffect, useMemo } from "react";
 
 interface IParams {
   period?: string;
+  limit?: number;
+  createdAt?: string | null;
+  status?: string;
+  sort?: string;
 }
 export function useBusiness(customParams: IParams = {}) {
-  const period = useMemo(() => {
-    return customParams.period;
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.period && { period: customParams.period }),
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
   }, [customParams]);
 
   const [businesses, setBusinesses] = useState<BusinessData[]>([]);
@@ -17,9 +27,20 @@ export function useBusiness(customParams: IParams = {}) {
   const [loading, setLoading] = useState(true);
 
   async function fetchBusinesses() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses`,
+        `${
+          process.env.NEXT_PUBLIC_SERVER_URL
+        }/admin/businesses?${params.toString()}`,
         { withCredentials: true }
       );
 
@@ -33,9 +54,14 @@ export function useBusiness(customParams: IParams = {}) {
   }
 
   async function fetchBusinessRegistrationStats() {
+    const queryParams = {
+      ...(customParams.period && { period: customParams.period }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business-stats?period=${customParams.period}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business-stats?${params}`,
         { withCredentials: true }
       );
       setStats(data.data);
@@ -54,7 +80,7 @@ export function useBusiness(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [period]);
+  }, [obj.createdAt, obj.limit, obj.period, obj.sort, obj.status]);
 
   return { loading, businesses, meta, stats, statsMeta };
 }

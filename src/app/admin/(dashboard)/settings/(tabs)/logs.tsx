@@ -26,10 +26,28 @@ import { switzer } from "@/app/layout";
 import { Fragment } from "react";
 import { useLogs } from "@/lib/hooks/logs";
 import dayjs from "dayjs";
+import Filter from "@/ui/components/Filter";
+import { useForm, zodResolver } from "@mantine/form";
+import { logFilterSchema, LogFilterType, logFilterValues } from "../schema";
+import { useSearchParams } from "next/navigation";
 
 export default function Logs() {
-  const { loading, logs } = useLogs();
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    createdAt,
+    sort,
+  } = Object.fromEntries(searchParams.entries());
+
+  const { loading, logs } = useLogs({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(sort && { sort: sort.toLowerCase() }),
+  });
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+
+  const [opened, { toggle }] = useDisclosure(false);
 
   const rows = logs.map((element, index) => (
     <TableTr key={index}>
@@ -48,6 +66,11 @@ export default function Logs() {
     </TableTr>
   ));
 
+  const form = useForm<LogFilterType>({
+    initialValues: logFilterValues,
+    validate: zodResolver(logFilterSchema),
+  });
+
   return (
     <Fragment>
       <div
@@ -63,12 +86,15 @@ export default function Logs() {
         <Button
           className={styles.filter__cta}
           rightSection={<IconListTree size={14} />}
+          fz={12}
+          fw={500}
+          onClick={toggle}
         >
-          <Text fz={12} fw={500}>
-            Filter
-          </Text>
+          Filter
         </Button>
       </div>
+
+      <Filter opened={opened} toggle={toggle} form={form} isStatus />
 
       <TableScrollContainer minWidth={500}>
         <Table className={styles.table} verticalSpacing="md">

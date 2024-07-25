@@ -11,10 +11,12 @@
   "dependencies": {
     "@mantine/charts": "^7.10.1",
     "@mantine/core": "^7.10.1",
+    "@mantine/dates": "^7.11.2",
     "@mantine/dropzone": "^7.10.2",
     "@mantine/form": "^7.10.2",
     "@mantine/hooks": "^7.10.1",
     "@mantine/notifications": "^7.10.2",
+    "@netlify/plugin-nextjs": "^5.5.0",
     "@tabler/icons-react": "^3.5.0",
     "ag-grid-react": "^31.3.2",
     "axios": "^1.7.2",

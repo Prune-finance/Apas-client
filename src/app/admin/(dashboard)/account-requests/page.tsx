@@ -6,7 +6,13 @@ import Image from "next/image";
 
 // Mantine Imports
 import { useDisclosure } from "@mantine/hooks";
-import { Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
+import {
+  Menu,
+  MenuDropdown,
+  MenuItem,
+  MenuTarget,
+  Select,
+} from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
@@ -27,10 +33,29 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
+import { useSearchParams } from "next/navigation";
+import Filter from "@/ui/components/Filter";
+import { useForm, zodResolver } from "@mantine/form";
+import {
+  AccountFilterType,
+  accountFilterValues,
+  accountFilterSchema,
+} from "./schema";
+import { DateInput } from "@mantine/dates";
 
 export default function AccountRequests() {
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+    type,
+  } = Object.fromEntries(searchParams.entries());
+
   const { loading, requests } = useRequests();
-  const [opened, { open, close }] = useDisclosure(false);
+  const [opened, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const MenuComponent = ({ id }: { id: string }) => {
@@ -118,11 +143,16 @@ export default function AccountRequests() {
     </TableTr>
   ));
 
+  const form = useForm<AccountFilterType>({
+    initialValues: accountFilterValues,
+    validate: zodResolver(accountFilterSchema),
+  });
+
   return (
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
+          // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Account Requests", href: "/admin/accounts" },
         ]}
       />
@@ -145,12 +175,24 @@ export default function AccountRequests() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            fz={12}
+            onClick={toggle}
+            fw={500}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<AccountFilterType> opened={opened} form={form} toggle={toggle}>
+          <Select
+            placeholder="Type"
+            data={["Corporate", "User"]}
+            {...form.getInputProps("type")}
+            size="xs"
+            w={120}
+            h={36}
+          />
+        </Filter>
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">
@@ -193,6 +235,46 @@ export default function AccountRequests() {
           />
         </div>
       </div>
+    </main>
+  );
+}
+
+const MenuComponent = ({ id }: { id: string }) => {
+  const [opened, { open, close }] = useDisclosure(false);
+  return (
+    <>
+      <Menu shadow="md" width={150}>
+        <MenuTarget>
+          <UnstyledButton>
+            <IconDots size={17} />
+          </UnstyledButton>
+        </MenuTarget>
+
+        <MenuDropdown>
+          <Link href={`/admin/account-requests/${id}`}>
+            <MenuItem
+              fz={10}
+              c="#667085"
+              leftSection={
+                <IconEye style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              View
+            </MenuItem>
+          </Link>
+
+          <MenuItem
+            onClick={open}
+            fz={10}
+            c="#667085"
+            leftSection={
+              <IconTrash style={{ width: rem(14), height: rem(14) }} />
+            }
+          >
+            Delete
+          </MenuItem>
+        </MenuDropdown>
+      </Menu>
 
       <ModalComponent
         color="#FEF3F2"
@@ -202,6 +284,6 @@ export default function AccountRequests() {
         title="Delete Account Request?"
         text="You are about to delete this account request"
       />
-    </main>
+    </>
   );
-}
+};

@@ -1,15 +1,36 @@
 import axios from "axios";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
-export function useAccounts() {
+interface IParams {
+  limit?: number;
+  createdAt?: string | null;
+  status?: string;
+  sort?: string;
+  type?: string;
+}
+
+export function useAccounts(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [meta, setMeta] = useState<AccountMeta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type }),
+    };
+  }, [customParams]);
+
   async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts?${params}`,
         { withCredentials: true }
       );
 
@@ -30,7 +51,7 @@ export function useAccounts() {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type]);
 
   return { loading, accounts, revalidate, meta };
 }

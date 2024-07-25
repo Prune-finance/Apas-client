@@ -7,6 +7,7 @@ import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import "@mantine/charts/styles.css";
 import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";

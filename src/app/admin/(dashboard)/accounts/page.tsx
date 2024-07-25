@@ -6,7 +6,13 @@ import Image from "next/image";
 
 // Mantine Imports
 import { useDisclosure } from "@mantine/hooks";
-import { Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
+import {
+  Menu,
+  MenuDropdown,
+  MenuItem,
+  MenuTarget,
+  Select,
+} from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
@@ -36,9 +42,34 @@ import EmptyImage from "@/assets/empty.png";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
+import Filter from "@/ui/components/Filter";
+import { useForm, zodResolver } from "@mantine/form";
+import {
+  accountFilterSchema,
+  AccountFilterType,
+  accountFilterValues,
+} from "./schema";
+import { DateInput } from "@mantine/dates";
+import { useSearchParams } from "next/navigation";
 
 export default function Accounts() {
-  const { loading, accounts, revalidate } = useAccounts();
+  const searchParams = useSearchParams();
+
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+    type,
+  } = Object.fromEntries(searchParams.entries());
+
+  const { loading, accounts, revalidate } = useAccounts({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+    ...(type && { type: type.toLowerCase() }),
+  });
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
   const [unfreezeOpened, { open: unfreezeOpen, close: unfreezeClose }] =
@@ -46,6 +77,7 @@ export default function Accounts() {
   const [opened, { open, close }] = useDisclosure(false);
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
+  const [filterOpened, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const { handleError, handleSuccess } = useNotification();
 
@@ -246,11 +278,16 @@ export default function Accounts() {
     </TableTr>
   ));
 
+  const form = useForm<AccountFilterType>({
+    initialValues: accountFilterValues,
+    validate: zodResolver(accountFilterSchema),
+  });
+
   return (
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
+          // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Accounts", href: "/admin/accounts" },
         ]}
       />
@@ -273,12 +310,28 @@ export default function Accounts() {
           <Button
             className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
+            fz={12}
+            fw={500}
+            onClick={toggle}
           >
-            <Text fz={12} fw={500}>
-              Filter
-            </Text>
+            Filter
           </Button>
         </div>
+
+        <Filter<AccountFilterType>
+          opened={filterOpened}
+          toggle={toggle}
+          form={form}
+        >
+          <Select
+            placeholder="Type"
+            data={["Corporate", "User"]}
+            {...form.getInputProps("type")}
+            size="xs"
+            w={120}
+            h={36}
+          />
+        </Filter>
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">

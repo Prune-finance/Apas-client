@@ -156,6 +156,26 @@ export default function Home() {
     </TableTr>
   ));
 
+  const cards = [
+    {
+      title: "Total Business",
+      stat: loading ? 0 : meta?.total || 0,
+      text: (
+        <>
+          There is a{" "}
+          <Text bg="#ECFDF3" c="#12B76A" fz={9} span>
+            +100%
+          </Text>{" "}
+          increase this month and a total of{" "}
+          <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
+            {statsMeta?.weekCount || 0}
+          </Text>{" "}
+          new businesses this week
+        </>
+      ),
+    },
+  ];
+
   return (
     <main className={styles.main}>
       <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} />
@@ -167,8 +187,8 @@ export default function Home() {
               loading={loading}
               title="Total Business"
               stat={loading ? 0 : meta?.total || 0}
-              link="/admin/businesses"
-              colored
+              // link="/admin/businesses"
+              // colored
               text={
                 <>
                   There is a{" "}

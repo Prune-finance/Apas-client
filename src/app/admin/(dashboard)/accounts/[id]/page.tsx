@@ -32,7 +32,7 @@ import {
 } from "@tabler/icons-react";
 import { CardOne } from "@/ui/components/Cards";
 import { BarChart, DonutChart } from "@mantine/charts";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { formatNumber } from "@/lib/utils";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { useTransactions } from "@/lib/hooks/transactions";
@@ -54,7 +54,9 @@ export default function Account() {
       <TableTd className={styles.table__td}>
         {element.recipientBankAddress}
       </TableTd>
-      <TableTd className={styles.table__td}>{dayjs().format()}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
         <IconArrowUpRight
           color="#D92D20"
@@ -95,12 +97,46 @@ export default function Account() {
     { month: "Dec", Deposits: 0, Payouts: 0 },
   ];
 
-  const donutData = [
-    { name: "Completed", value: 0, color: "#039855" },
-    { name: "Canceled", value: 0, color: "#F79009" },
-    { name: "Failed", value: 0, color: "#D92D20" },
-    { name: "Other", value: 100, color: "#e4e4e4" },
-  ];
+  const lineData = useMemo(() => {
+    const arr: {
+      month: string;
+      successful: number;
+      failed: number;
+      pending: number;
+    }[] = [];
+
+    transactions.reverse().map((trx) => {
+      let successful = 0,
+        pending = 0,
+        failed = 0;
+
+      const month = dayjs(trx.createdAt).format("MMM");
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : (successful += trx.amount);
+
+      arr.push({ month, successful, pending, failed });
+    });
+
+    return arr;
+  }, [transactions]);
+
+  const donutData = useMemo(() => {
+    let completed = 0,
+      pending = 0,
+      failed = 0;
+    transactions.map((trx) => {
+      if (trx.status === "PENDING") {
+        pending += trx.amount;
+      }
+    });
+
+    return [
+      { name: "Completed", value: completed, color: "#039855" },
+      { name: "Pending", value: pending, color: "#F79009" },
+      { name: "Failed", value: failed, color: "#D92D20" },
+    ];
+  }, [transactions]);
 
   const weekData = [
     { day: "Mon", Deposits: 0, Payouts: 0 },
@@ -286,7 +322,39 @@ export default function Account() {
                 </Flex>
               </Flex>
 
-              <BarChart
+              {lineData.length > 0 ? (
+                <BarChart
+                  pr={20}
+                  mt={31}
+                  h={300}
+                  data={chartFrequency === "Monthly" ? lineData : weekData}
+                  dataKey={chartFrequency === "Monthly" ? "month" : "day"}
+                  barProps={{ barSize: 10, radius: 3 }}
+                  series={[
+                    { name: "failed", color: "#039855" },
+                    { name: "successful", color: "#D92D20" },
+                    { name: "pending", color: "#F79009" },
+                  ]}
+                  tickLine="y"
+                />
+              ) : (
+                <Flex direction="column" align="center" mt={70}>
+                  <Image
+                    src={EmptyImage}
+                    alt="no content"
+                    width={156}
+                    height={126}
+                  />
+                  <Text mt={14} fz={14} c="#1D2939">
+                    There are no transactions.
+                  </Text>
+                  <Text fz={10} c="#667085">
+                    When a transaction is recorded, it will appear here
+                  </Text>
+                </Flex>
+              )}
+
+              {/* <BarChart
                 pr={20}
                 mt={31}
                 h={300}
@@ -298,7 +366,7 @@ export default function Account() {
                   { name: "Payouts", color: "#D92D20" },
                 ]}
                 tickLine="y"
-              />
+              /> */}
             </Paper>
           </GridCol>
 

@@ -178,13 +178,13 @@ export default function Home() {
                     <>
                       There is a{" "}
                       <Text bg="#ECFDF3" c="#12B76A" fz={9} span>
-                        +23%
+                        +100%
                       </Text>{" "}
                       increase this month and a total of{" "}
                       <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
-                        17
+                        {meta?.total}
                       </Text>{" "}
-                      new businesses this week
+                      accounts this week
                     </>
                   }
                 />
@@ -197,7 +197,10 @@ export default function Home() {
                   loading={loading}
                   stat={meta?.active || 0}
                   text={
-                    <>This shows the total number of businesses in the system</>
+                    <>
+                      This shows the total number of active accounts in the
+                      system
+                    </>
                   }
                 />
               </GridCol>
@@ -209,7 +212,10 @@ export default function Home() {
                   stat={meta?.inactive || 0}
                   loading={loading}
                   text={
-                    <>This shows the total number of businesses in the system</>
+                    <>
+                      This shows the total number of inactive accounts in the
+                      system
+                    </>
                   }
                 />
               </GridCol>

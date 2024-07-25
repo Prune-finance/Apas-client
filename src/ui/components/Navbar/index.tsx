@@ -147,7 +147,7 @@ export function UserNavbar() {
   return (
     <nav className={`${styles.user__nav}`}>
       <div className={styles.logo__container}>
-        <Image src={PruneTintLogo} width={95} height={30} alt="prune logo" />
+        <Image src={PruneTintLogo} width={105} height={30} alt="prune logo" />
       </div>
 
       <div className={styles.menu__container}>

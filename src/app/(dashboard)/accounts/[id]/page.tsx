@@ -199,7 +199,7 @@ export default function Account() {
                       )}
                     </Flex>
                   </Flex>
-                  <Button
+                  {/* <Button
                     fz={11}
                     td="underline"
                     variant="transparent"
@@ -207,7 +207,7 @@ export default function Account() {
                     color="#97AD05"
                   >
                     View Documents
-                  </Button>
+                  </Button> */}
                 </Paper>
               </GridCol>
 

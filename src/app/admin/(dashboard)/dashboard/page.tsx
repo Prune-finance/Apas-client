@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Grid,
   GridCol,
@@ -282,7 +282,11 @@ export default function Home() {
 
             <Grid mt={15}>
               <GridCol span={{ base: 12, xs: 12, sm: 12, md: 5, lg: 5 }}>
-                <CardTwo title="Debit Requests" link="/" items={[]} />
+                <CardTwo
+                  title="Debit Requests"
+                  link="/admin/requests"
+                  items={[]}
+                />
               </GridCol>
 
               <GridCol

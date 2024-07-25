@@ -17,19 +17,20 @@ import {
 import styles from "@/ui/styles/settings.module.scss";
 import { IconListTree, IconPointFilled, IconSearch } from "@tabler/icons-react";
 import EmptyImage from "@/assets/empty.png";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 import { formatNumber } from "@/lib/utils";
 import { AllBusinessSkeleton } from "@/lib/static";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { switzer } from "@/app/layout";
-import { Fragment, Suspense } from "react";
+import { Fragment, Suspense, useState } from "react";
 import { useLogs } from "@/lib/hooks/logs";
 import dayjs from "dayjs";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import { logFilterSchema, LogFilterType, logFilterValues } from "../schema";
 import { useSearchParams } from "next/navigation";
+import { filteredSearch } from "@/lib/search";
 
 function Logs() {
   const searchParams = useSearchParams();
@@ -47,9 +48,16 @@ function Logs() {
   });
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
+
   const [opened, { toggle }] = useDisclosure(false);
 
-  const rows = logs.map((element, index) => (
+  const rows = filteredSearch(
+    logs,
+    ["admin.lastName", "admin.firstName", "admin.email", "activity", "ip"],
+    debouncedSearch
+  ).map((element, index) => (
     <TableTr key={index}>
       <TableTd className={styles.table__td}>
         <Checkbox />
@@ -81,6 +89,8 @@ function Logs() {
           leftSectionPointerEvents="none"
           leftSection={searchIcon}
           classNames={{ wrapper: styles.search, input: styles.input__search }}
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
         />
 
         <Button

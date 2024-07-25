@@ -48,7 +48,7 @@ import ModalComponent from "./modal";
 import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
 import axios from "axios";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import {
@@ -59,7 +59,7 @@ import {
 import Filter from "@/ui/components/Filter";
 import { DateInput } from "@mantine/dates";
 
-export default function Users() {
+function Users() {
   const searchParams = useSearchParams();
 
   const {
@@ -297,5 +297,13 @@ export default function Users() {
         form={form}
       />
     </main>
+  );
+}
+
+export default function UsersSuspense() {
+  return (
+    <Suspense>
+      <Users />
+    </Suspense>
   );
 }

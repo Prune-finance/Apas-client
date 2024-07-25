@@ -27,7 +27,7 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useSearchParams } from "next/navigation";
@@ -35,7 +35,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 
-export default function AccountRequests() {
+function AccountRequests() {
   const searchParams = useSearchParams();
 
   const {
@@ -292,5 +292,13 @@ export default function AccountRequests() {
         text="You are about to delete this account request"
       />
     </main>
+  );
+}
+
+export default function AccountRequestsSus() {
+  return (
+    <Suspense>
+      <AccountRequests />
+    </Suspense>
   );
 }

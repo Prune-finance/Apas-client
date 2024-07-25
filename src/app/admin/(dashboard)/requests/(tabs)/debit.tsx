@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, Suspense } from "react";
 
 import dayjs from "dayjs";
 import axios from "axios";
@@ -47,7 +47,7 @@ import Filter from "@/ui/components/Filter";
 import { DateInput } from "@mantine/dates";
 import { useSearchParams } from "next/navigation";
 
-export default function Debit() {
+function Debit() {
   const searchParams = useSearchParams();
 
   const {
@@ -408,5 +408,13 @@ export default function Debit() {
         customApproveMessage="Yes, Approve It"
       />
     </Fragment>
+  );
+}
+
+export default function DebitSuspense() {
+  return (
+    <Suspense>
+      <Debit />
+    </Suspense>
   );
 }

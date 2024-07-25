@@ -1,7 +1,7 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Image from "next/image";
 
 // Mantine Imports
@@ -52,7 +52,7 @@ import {
 import { DateInput } from "@mantine/dates";
 import { useSearchParams } from "next/navigation";
 
-export default function Accounts() {
+function Accounts() {
   const searchParams = useSearchParams();
 
   const {
@@ -421,5 +421,13 @@ export default function Accounts() {
         />
       </div>
     </main>
+  );
+}
+
+export default function AccountsSus() {
+  return (
+    <Suspense>
+      <Accounts />
+    </Suspense>
   );
 }

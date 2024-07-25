@@ -1,7 +1,7 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, { useState } from "react";
+import React, { Suspense, useState } from "react";
 import Image from "next/image";
 
 // Mantine Imports
@@ -49,7 +49,7 @@ import { AccountFilterType } from "@/app/admin/(dashboard)/accounts/schema";
 import { useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 
-export default function Accounts() {
+function Accounts() {
   const searchParams = useSearchParams();
 
   const {
@@ -408,5 +408,13 @@ export default function Accounts() {
         text="You are about to activate this account.This means the account will become active."
       />
     </main>
+  );
+}
+
+export default function AccountSuspense() {
+  return (
+    <Suspense>
+      <Accounts />
+    </Suspense>
   );
 }

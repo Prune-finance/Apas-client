@@ -36,7 +36,7 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { formatNumber } from "@/lib/utils";
@@ -45,7 +45,7 @@ import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { useSearchParams } from "next/navigation";
 
-export default function DebitRequests() {
+function DebitRequests() {
   const searchParams = useSearchParams();
 
   const {
@@ -323,5 +323,13 @@ export default function DebitRequests() {
         </Box>
       </Drawer>
     </main>
+  );
+}
+
+export default function DebitReqSuspense() {
+  return (
+    <Suspense>
+      <DebitRequests />
+    </Suspense>
   );
 }

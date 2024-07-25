@@ -53,39 +53,6 @@ export default function Home() {
 
   const data = stats;
 
-  const cardTwoItems = [
-    {
-      title: "C80 Limited",
-      amount: 200000000,
-      subText: "Date Created: 24th May, 2024",
-      status: "pending",
-    },
-    {
-      title: "TechNexus",
-      amount: 300000000,
-      subText: "Date Created: 23rd May, 2024",
-      status: "approved",
-    },
-    {
-      title: "CyberPulse Systems",
-      amount: 25000000,
-      subText: "Date Created: 22nd May, 2024",
-      status: "rejected",
-    },
-    {
-      title: "Infinity Ventures",
-      amount: 25000000,
-      subText: "Date Created: 19th May, 2024",
-      status: "rejected",
-    },
-    {
-      title: "Digital Horizons",
-      amount: 100000000,
-      subText: "Date Created: 14th May, 2024",
-      status: "pending",
-    },
-  ];
-
   const cardFourItems = useMemo(() => {
     if (loading) return [];
 
@@ -237,7 +204,7 @@ export default function Home() {
               title="Account Balance"
               stat={0}
               formatted
-              colored
+              // colored
               text={
                 <>{`From Jul 01, 2024 to ${dayjs().format("MMM DD, YYYY")}`}</>
               }

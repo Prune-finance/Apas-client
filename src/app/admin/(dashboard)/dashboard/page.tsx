@@ -373,7 +373,7 @@ export default function Home() {
                   minTitle="Active Accounts"
                   amount={accountsMeta?.active || 0}
                   percentage="0"
-                  subTitle="Total Number of Active Accounts of All Business"
+                  subTitle="Total Number of Active Accounts for all Business"
                 />
               </GridCol>
               <GridCol span={{ lg: 12, md: 3.5 }} className={styles.grid__card}>
@@ -384,7 +384,7 @@ export default function Home() {
                   minTitle="In-active Accounts"
                   amount={accountsMeta?.inactive || 0}
                   percentage="0"
-                  subTitle="Total Number of In-active Accounts of All Business"
+                  subTitle="Total Number of In-active Accounts for all Business"
                 />
               </GridCol>
               <GridCol span={{ lg: 12, md: 5 }} className={styles.grid__card}>

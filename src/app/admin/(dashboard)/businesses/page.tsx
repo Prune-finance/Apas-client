@@ -171,8 +171,6 @@ function Businesses() {
     </TableTr>
   ));
 
-  console.log({ search, debouncedSearch });
-
   return (
     <main className={styles.main}>
       <Breadcrumbs

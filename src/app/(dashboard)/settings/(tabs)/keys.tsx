@@ -170,7 +170,7 @@ export default function Keys() {
   );
 }
 
-interface Key {
+export interface Key {
   id: string;
   key: string;
   createdAt: Date;

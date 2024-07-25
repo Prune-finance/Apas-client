@@ -69,7 +69,7 @@ export default function AccountRequests() {
         </MenuTarget>
 
         <MenuDropdown>
-          {status === "PENDING" && (
+          {/* {status === "PENDING" && (
             <MenuItem
               onClick={() => {
                 setRowId(id);
@@ -83,9 +83,9 @@ export default function AccountRequests() {
             >
               Cancel Request
             </MenuItem>
-          )}
+          )} */}
 
-          <MenuItem
+          {/* <MenuItem
             onClick={open}
             fz={10}
             c="#667085"
@@ -94,7 +94,7 @@ export default function AccountRequests() {
             }
           >
             Delete
-          </MenuItem>
+          </MenuItem> */}
         </MenuDropdown>
       </Menu>
     );
@@ -158,21 +158,19 @@ export default function AccountRequests() {
           </Text>
         </div>
       </TableTd>
+      {/* <TableTd>
+        {element.}
+      </TableTd> */}
 
-      <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
         <MenuComponent id={element.id} status={element.status} />
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
-        items={[
-          { title: "Dashboard", href: "/dashboard" },
-          { title: "Account Requests", href: "/accounts" },
-        ]}
-      />
+      <Breadcrumbs items={[{ title: "Account Requests", href: "/accounts" }]} />
 
       <Paper withBorder className={styles.table__container}>
         <div className={styles.container__header}>

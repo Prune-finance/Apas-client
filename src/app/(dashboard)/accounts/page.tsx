@@ -147,7 +147,7 @@ export default function Accounts() {
             </MenuItem>
           </Link>
 
-          <MenuItem
+          {/* <MenuItem
             onClick={() => {
               setRowId(id);
               if (status === "FROZEN") return unfreezeOpen();
@@ -160,9 +160,9 @@ export default function Accounts() {
             }
           >
             {status === "FROZEN" ? "Unfreeze" : "Freeze"}
-          </MenuItem>
+          </MenuItem> */}
 
-          <MenuItem
+          {/* <MenuItem
             onClick={() => {
               setRowId(id);
               if (status === "INACTIVE") return activateOpen();
@@ -175,7 +175,7 @@ export default function Accounts() {
             }
           >
             {status === "INACTIVE" ? "Activate" : "Deactivate"}
-          </MenuItem>
+          </MenuItem> */}
         </MenuDropdown>
       </Menu>
     );
@@ -247,12 +247,7 @@ export default function Accounts() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
-        items={[
-          { title: "Dashboard", href: "/dashboard" },
-          { title: "Accounts", href: "/accounts" },
-        ]}
-      />
+      <Breadcrumbs items={[{ title: "Accounts", href: "/accounts" }]} />
 
       <Paper withBorder className={styles.table__container}>
         <div className={styles.container__header}>

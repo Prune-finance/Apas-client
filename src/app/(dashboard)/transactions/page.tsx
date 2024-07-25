@@ -69,7 +69,6 @@ export default function AccountTrx() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/dashboard" },
           {
             title: "Transactions",
             href: `/accounts/transactions`,

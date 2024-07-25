@@ -1,5 +1,5 @@
 "use client";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Text, TableTd, Paper } from "@mantine/core";
 import { TableTbody, TableTh, TableThead } from "@mantine/core";
@@ -25,6 +25,8 @@ import { useUserBalances } from "@/lib/hooks/balance";
 import { useUserTransactions } from "@/lib/hooks/transactions";
 import User from "@/lib/store/user";
 import dayjs from "dayjs";
+import axios from "axios";
+import { Key } from "./settings/(tabs)/keys";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -32,9 +34,33 @@ export default function Home() {
   const { loading: balanceLoading, balance } = useUserBalances();
   const { transactions } = useUserTransactions();
 
+  const [keys, setKeys] = useState<Key[]>([]);
   const { user } = User();
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
+  const { live, test } = useMemo(() => {
+    const live = keys.find((key) => key.staging === "LIVE");
+    const test = keys.find((key) => key.staging === "TEST");
+
+    return { live, test };
+  }, [keys]);
+
+  const fetchBusinessSecrets = async () => {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets`,
+        { withCredentials: true }
+      );
+
+      setKeys(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBusinessSecrets();
+  }, []);
 
   const rows = requests.slice(0, 2).map((element) => (
     <TableTr key={element.id}>
@@ -90,6 +116,30 @@ export default function Home() {
       </TableTd>
     </TableTr>
   ));
+
+  const lineData = useMemo(() => {
+    const arr: {
+      date: string;
+      successful: number;
+      failed: number;
+      pending: number;
+    }[] = [];
+
+    transactions.reverse().map((trx) => {
+      let successful = 0,
+        pending = 0,
+        failed = 0;
+
+      const date = dayjs(trx.createdAt).format("MMM DD");
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : (successful += trx.amount);
+
+      arr.push({ date, successful, pending, failed });
+    });
+
+    return arr;
+  }, [transactions]);
 
   const donutData = useMemo(() => {
     let completed = 0,
@@ -184,18 +234,19 @@ export default function Home() {
                       onChange={(event) =>
                         setChartFrequency(event.currentTarget.value)
                       }
-                      data={["Monthly", "Weekly"]}
+                      data={["Monthly"]}
                     />
                   </div>
 
                   <LineChart
                     h={250}
                     curveType="bump"
-                    data={UserDashboardData}
+                    data={lineData}
                     dataKey="date"
                     series={[
-                      { name: "Completed", color: "#22C55E" },
-                      { name: "Failed", color: "#D92D20" },
+                      { name: "successful", color: "#22C55E" },
+                      { name: "failed", color: "#D92D20" },
+                      { name: "pending", color: "#F79009" },
                     ]}
                   />
                 </Paper>
@@ -286,7 +337,7 @@ export default function Home() {
 
               <Stack mt={15} gap={0}>
                 <Text fz={12} c="#98A2B3">
-                  Public Keys
+                  Test Key
                 </Text>
 
                 <Flex
@@ -297,7 +348,7 @@ export default function Home() {
                   px={10}
                 >
                   <Text className={styles.key__container__text}>
-                    Test.pk****************
+                    {`${test ? test?.key.slice(0, 15) : ""}****************`}
                   </Text>
 
                   <Copy value="" />
@@ -306,7 +357,7 @@ export default function Home() {
 
               <Stack mt={30} gap={0}>
                 <Text fz={12} c="#98A2B3">
-                  Secret Keys
+                  Live Key
                 </Text>
 
                 <Flex
@@ -317,7 +368,7 @@ export default function Home() {
                   px={10}
                 >
                   <Text className={styles.key__container__text}>
-                    Test.pk****************
+                    {`${live ? live?.key.slice(0, 15) : ""}****************`}
                   </Text>
 
                   <Copy value="" />

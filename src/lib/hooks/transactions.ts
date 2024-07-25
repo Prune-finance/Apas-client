@@ -78,4 +78,5 @@ export interface TrxData {
   reference: string;
   centrolinkRef: string;
   status: "PENDING";
+  createdAt: Date;
 }

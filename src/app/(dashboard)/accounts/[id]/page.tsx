@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
+import Image from "next/image";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
@@ -37,6 +38,8 @@ import { useSingleUserAccount } from "@/lib/hooks/accounts";
 import { useUserTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import { DynamicSkeleton } from "@/lib/static";
+
+import EmptyImage from "@/assets/empty.png";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -91,6 +94,30 @@ export default function Account() {
     { month: "Dec", Deposits: 0, Payouts: 0 },
   ];
 
+  const lineData = useMemo(() => {
+    const arr: {
+      month: string;
+      successful: number;
+      failed: number;
+      pending: number;
+    }[] = [];
+
+    transactions.reverse().map((trx) => {
+      let successful = 0,
+        pending = 0,
+        failed = 0;
+
+      const month = dayjs(trx.createdAt).format("MMM");
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : (successful += trx.amount);
+
+      arr.push({ month, successful, pending, failed });
+    });
+
+    return arr;
+  }, [transactions]);
+
   const donutData = useMemo(() => {
     let completed = 0,
       pending = 0,
@@ -122,7 +149,6 @@ export default function Account() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/dashboard" },
           { title: "Accounts", href: "/accounts" },
           ...(!loading
             ? [
@@ -217,6 +243,23 @@ export default function Account() {
                   {/* <TableTbody>{rows}</TableTbody> */}
                   <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
                 </Table>
+
+                {!loading && !!!rows.length && (
+                  <Flex direction="column" align="center" mt={50}>
+                    <Image
+                      src={EmptyImage}
+                      alt="no content"
+                      width={126}
+                      height={96}
+                    />
+                    <Text mt={14} fz={14} c="#1D2939">
+                      There are no transactions.
+                    </Text>
+                    <Text fz={10} c="#667085">
+                      When a transaction is recorded, it will appear here
+                    </Text>
+                  </Flex>
+                )}
               </TableScrollContainer>
 
               <Button
@@ -249,7 +292,18 @@ export default function Account() {
                     style={{ border: "1px solid #F2F4F7", borderRadius: "4px" }}
                   >
                     <IconSquareFilled color="#D92D20" size={14} />
-                    <Text fz={12}>Deposits</Text>
+                    <Text fz={12}>Failed</Text>
+                  </Flex>
+
+                  <Flex
+                    align="center"
+                    gap={5}
+                    p={5}
+                    px={8}
+                    style={{ border: "1px solid #F2F4F7", borderRadius: "4px" }}
+                  >
+                    <IconSquareFilled color="#F79009" size={14} />
+                    <Text fz={12}>Pending</Text>
                   </Flex>
 
                   <Flex
@@ -260,7 +314,7 @@ export default function Account() {
                     style={{ border: "1px solid #F2F4F7", borderRadius: "4px" }}
                   >
                     <IconSquareFilled color="#039855" size={14} />
-                    <Text fz={12}>Payouts</Text>
+                    <Text fz={12}>Successful</Text>
                   </Flex>
 
                   <NativeSelect
@@ -271,24 +325,42 @@ export default function Account() {
                     onChange={(event) =>
                       setChartFrequency(event.currentTarget.value)
                     }
-                    data={["Monthly", "Weekly"]}
+                    data={["Monthly"]}
                   />
                 </Flex>
               </Flex>
 
-              <BarChart
-                pr={20}
-                mt={31}
-                h={300}
-                data={chartFrequency === "Monthly" ? data : weekData}
-                dataKey={chartFrequency === "Monthly" ? "month" : "day"}
-                barProps={{ barSize: 10, radius: 3 }}
-                series={[
-                  { name: "Deposits", color: "#039855" },
-                  { name: "Payouts", color: "#D92D20" },
-                ]}
-                tickLine="y"
-              />
+              {lineData.length > 0 ? (
+                <BarChart
+                  pr={20}
+                  mt={31}
+                  h={300}
+                  data={chartFrequency === "Monthly" ? lineData : weekData}
+                  dataKey={chartFrequency === "Monthly" ? "month" : "day"}
+                  barProps={{ barSize: 10, radius: 3 }}
+                  series={[
+                    { name: "failed", color: "#039855" },
+                    { name: "successful", color: "#D92D20" },
+                    { name: "pending", color: "#F79009" },
+                  ]}
+                  tickLine="y"
+                />
+              ) : (
+                <Flex direction="column" align="center" mt={70}>
+                  <Image
+                    src={EmptyImage}
+                    alt="no content"
+                    width={156}
+                    height={126}
+                  />
+                  <Text mt={14} fz={14} c="#1D2939">
+                    There are no transactions.
+                  </Text>
+                  <Text fz={10} c="#667085">
+                    When a transaction is recorded, it will appear here
+                  </Text>
+                </Flex>
+              )}
             </Paper>
           </GridCol>
 

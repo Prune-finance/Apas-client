@@ -53,6 +53,7 @@ export default function Header() {
 
 export function UserHeader() {
   const { user } = User();
+
   const [stage, setStage] = useState("live");
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;

@@ -65,6 +65,7 @@ import {
   newUser,
   passwordChange,
   validateNewAdmin,
+  validateNewUser,
 } from "@/lib/schema";
 import axios from "axios";
 import { useMemo, useState } from "react";
@@ -83,7 +84,7 @@ export default function Users() {
 
   const form = useForm({
     initialValues: newUser,
-    validate: zodResolver(validateNewAdmin),
+    validate: zodResolver(validateNewUser),
   });
 
   const passwordForm = useForm({
@@ -102,30 +103,30 @@ export default function Users() {
     return { is8Char, hasUpperCase, hasNumber, hasSpecialChar, hasLowerCase };
   }, [passwordForm]);
 
-  // const addAdmin = async () => {
-  //   setProcessing(true);
+  const addAdmin = async () => {
+    setProcessing(true);
 
-  //   try {
-  //     const { hasErrors, errors } = form.validate();
-  //     if (hasErrors) {
-  //       return;
-  //     }
+    try {
+      const { hasErrors, errors } = form.validate();
+      if (hasErrors) {
+        return;
+      }
 
-  //     await axios.post(
-  //       `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
-  //       form.values,
-  //       { withCredentials: true }
-  //     );
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
+        { email: form.values.email },
+        { withCredentials: true }
+      );
 
-  //     revalidate();
-  //     close();
-  //     router.push("/admin/users");
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
+      revalidate();
+      close();
+      router.push("/users");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   const menuItems = [
     {
@@ -462,7 +463,7 @@ export default function Users() {
       </Paper>
 
       <ModalComponent
-        // action={addAdmin}
+        action={addAdmin}
         processing={processing}
         opened={opened}
         close={close}

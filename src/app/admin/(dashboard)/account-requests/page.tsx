@@ -42,8 +42,9 @@ import {
   accountFilterSchema,
 } from "./schema";
 import { DateInput } from "@mantine/dates";
+import { Suspense } from "react";
 
-export default function AccountRequests() {
+function AccountRequests() {
   const searchParams = useSearchParams();
 
   const {
@@ -293,3 +294,11 @@ const MenuComponent = ({ id }: { id: string }) => {
     </>
   );
 };
+
+export default function AccountRequestsSus() {
+  return (
+    <Suspense>
+      <AccountRequests />
+    </Suspense>
+  );
+}

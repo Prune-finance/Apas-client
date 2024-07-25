@@ -23,7 +23,7 @@ import { formatNumber } from "@/lib/utils";
 import { AllBusinessSkeleton } from "@/lib/static";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { switzer } from "@/app/layout";
-import { Fragment } from "react";
+import { Fragment, Suspense } from "react";
 import { useLogs } from "@/lib/hooks/logs";
 import dayjs from "dayjs";
 import Filter from "@/ui/components/Filter";
@@ -31,7 +31,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { logFilterSchema, LogFilterType, logFilterValues } from "../schema";
 import { useSearchParams } from "next/navigation";
 
-export default function Logs() {
+function Logs() {
   const searchParams = useSearchParams();
 
   const {
@@ -136,5 +136,13 @@ export default function Logs() {
         />
       </div>
     </Fragment>
+  );
+}
+
+export default function LogsSuspense() {
+  return (
+    <Suspense>
+      <Logs />
+    </Suspense>
   );
 }

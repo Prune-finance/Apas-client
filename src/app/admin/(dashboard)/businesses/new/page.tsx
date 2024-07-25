@@ -163,6 +163,7 @@ export default function NewBusiness() {
               flex={1}
               label="Business Address"
               placeholder="Enter business address"
+              {...form.getInputProps("address")}
             />
             <Select
               placeholder="Enter Pricing Plan"

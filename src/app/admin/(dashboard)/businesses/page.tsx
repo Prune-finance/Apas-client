@@ -53,8 +53,9 @@ import {
   businessFilterValues,
 } from "./schema";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function Businesses() {
+function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const searchParams = useSearchParams();
   const limit = searchParams.get("rows")?.toLowerCase() || "10";
@@ -256,5 +257,13 @@ export default function Businesses() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function BusinessesSuspense() {
+  return (
+    <Suspense>
+      <Businesses />
+    </Suspense>
   );
 }

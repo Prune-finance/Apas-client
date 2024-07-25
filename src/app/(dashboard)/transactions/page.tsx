@@ -28,8 +28,9 @@ import { useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
+import { Suspense } from "react";
 
-export default function AccountTrx() {
+function AccountTrx() {
   const searchParams = useSearchParams();
 
   const {
@@ -41,7 +42,7 @@ export default function AccountTrx() {
 
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { loading, transactions } = useUserTransactions({
+  const { loading, transactions } = useUserTransactions(undefined, {
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
@@ -179,5 +180,13 @@ export default function AccountTrx() {
         </div>
       </Paper>
     </main>
+  );
+}
+
+export default function AccountTrxSuspense() {
+  return (
+    <Suspense>
+      <AccountTrx />
+    </Suspense>
   );
 }

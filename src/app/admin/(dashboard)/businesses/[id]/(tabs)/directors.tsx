@@ -85,7 +85,10 @@ export default function Directors({
         { withCredentials: true }
       );
 
-      handleSuccess("Business Updated", "");
+      handleSuccess(
+        "Business Updated",
+        "You have successfully removed a director."
+      );
       revalidate();
       form.reset();
       close();
@@ -401,6 +404,16 @@ const DirectorsForm = ({
           </Flex>
         ) : (
           <Flex gap={10}>
+            <Button
+              variant="outline"
+              color="var(--prune-text-gray-300"
+              c="var(--prune-text-gray-800"
+              fz={12}
+              fw={500}
+              onClick={() => setEditing(false)}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={() => {
                 updateDirector(index, form.values);

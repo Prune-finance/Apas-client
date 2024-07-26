@@ -245,12 +245,12 @@ const DirectorForm = ({
       <Select
         mt="md"
         comboboxProps={{ withinPortal: true }}
+        classNames={classes}
         placeholder="Select Identity Type"
+        label="Identity Type"
         flex={1}
         data={["ID Card", "Passport", "Residence Permit"]}
         {...form.getInputProps("identityType")}
-        label="Identity Type"
-        classNames={classes}
       />
 
       {form.values.identityType && (
@@ -284,12 +284,12 @@ const DirectorForm = ({
       <Select
         mt="md"
         comboboxProps={{ withinPortal: true }}
+        classNames={classes}
         label="Proof of Address"
         placeholder="Select Proof of Address"
         flex={1}
         data={["Utility Bill"]}
         {...form.getInputProps("proofOfAddress")}
-        classNames={classes}
       />
 
       {form.values.proofOfAddress && (

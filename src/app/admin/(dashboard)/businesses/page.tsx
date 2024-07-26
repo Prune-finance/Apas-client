@@ -62,6 +62,7 @@ import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 import InfoCards from "./InfoCards";
 import ActiveBadge from "@/assets/active-badge.svg";
+import { activeBadgeColor } from "@/lib/utils";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -110,11 +111,6 @@ function Businesses() {
     push(`/admin/businesses/${id}`);
   };
 
-  const badgeColor = (status: string) => {
-    if (status === "ACTIVE") return "#12B76A";
-    return "#C6A700";
-  };
-
   const rows = filteredSearch(
     businesses,
     ["name", "contactEmail"],
@@ -149,7 +145,7 @@ function Businesses() {
         <Badge
           tt="capitalize"
           variant="light"
-          color={badgeColor(element.companyStatus)}
+          color={activeBadgeColor(element.companyStatus)}
           w={82}
           h={24}
           fw={400}

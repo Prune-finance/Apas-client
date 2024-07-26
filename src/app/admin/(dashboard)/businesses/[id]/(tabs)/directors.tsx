@@ -8,9 +8,14 @@ import {
   Flex,
   Grid,
   GridCol,
+  Group,
+  Modal,
   Select,
+  Stack,
   Text,
+  Textarea,
   TextInput,
+  ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
 import {
@@ -18,6 +23,7 @@ import {
   IconPencilMinus,
   IconPlus,
   IconTrash,
+  IconX,
 } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
@@ -25,12 +31,18 @@ import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
 import DropzoneComponent from "./dropzone";
 import { useDisclosure } from "@mantine/hooks";
-import { UseFormReturnType, useForm } from "@mantine/form";
-import { directorEtShareholderSchema, validateDirectors } from "@/lib/schema";
+import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
+import {
+  directorEtShareholderSchema,
+  removeDirectorSchema,
+  removeDirectorValues,
+  validateDirectors,
+} from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import { log } from "console";
+import { z } from "zod";
 
 export default function Directors({
   business,
@@ -156,16 +168,21 @@ export default function Directors({
         </Text>
       )}
 
-      <UnstyledButton onClick={open} mt={20}>
-        <Flex align="center">
-          <div className={styles.add__new__container}>
+      <Button
+        mt={20}
+        variant="transparent"
+        fz={12}
+        fw={400}
+        c="#000"
+        onClick={open}
+        leftSection={
+          <ThemeIcon radius="xl" color="var(--prune-primary-500)">
             <IconPlus color="#344054" size={14} />
-          </div>
-          <Text ml={8} fz={12}>
-            Add New
-          </Text>
-        </Flex>
-      </UnstyledButton>
+          </ThemeIcon>
+        }
+      >
+        Add New
+      </Button>
 
       <Drawer
         position="right"
@@ -313,6 +330,7 @@ const DirectorsForm = ({
 }) => {
   const [editing, setEditing] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const initialValues = {
     name: director.name,
@@ -369,12 +387,16 @@ const DirectorsForm = ({
             >
               Edit
             </Button>
+
             <Button
-              onClick={() => deleteDirector(index)}
+              onClick={() => {
+                open();
+                // deleteDirector(index);
+              }}
               leftSection={<IconTrash color="#475467" size={14} />}
               className={styles.edit}
             >
-              Delete
+              Remove
             </Button>
           </Flex>
         ) : (
@@ -549,6 +571,102 @@ const DirectorsForm = ({
           />
         </GridCol>
       </Grid>
+
+      <RemoveDirectorModal
+        opened={opened}
+        close={close}
+        index={index}
+        deleteDirector={deleteDirector}
+      />
     </div>
+  );
+};
+
+const RemoveDirectorModal = ({
+  opened,
+  close,
+  index,
+  deleteDirector,
+}: {
+  opened: boolean;
+  close: () => void;
+  index: number;
+  deleteDirector: (index: number) => void;
+}) => {
+  const form = useForm({
+    initialValues: removeDirectorValues,
+    validate: zodResolver(removeDirectorSchema),
+  });
+
+  console.log(form.values);
+
+  return (
+    <Modal opened={opened} onClose={close} centered w={400} padding={20}>
+      <Stack align="center" gap={30}>
+        <ThemeIcon radius="xl" color="#D92D20" size={64} variant="light">
+          <IconX size={32} />
+        </ThemeIcon>
+
+        <Text fz={18} fw={600}>
+          Remove This Director?
+        </Text>
+
+        <Text
+          fz={12}
+          fw={400}
+          ta="center"
+          c="var(--prune-text-gray-500)"
+          w="45ch"
+        >
+          You are about to remove this director from the system. Please know
+          that you cannot undo this action.
+        </Text>
+
+        <Textarea
+          placeholder="Give reason here..."
+          minRows={5}
+          w="100%"
+          {...form.getInputProps("reason")}
+        />
+
+        <Select
+          placeholder="Select Supporting Document (optional)"
+          data={["ID Card", "Passport", "Residence Permit"]}
+          w="100%"
+          {...form.getInputProps("supportingDoc")}
+        />
+
+        <Box w="100%">
+          <DropzoneComponent
+            removeDirectorForm={form}
+            formKey={`supportingDocUrl`}
+          />
+        </Box>
+
+        <Flex w="100%" gap={20}>
+          <Button
+            variant="outline"
+            color="var(--prune-text-gray-300"
+            c="var(--prune-text-gray-800"
+            fz={12}
+            fw={500}
+            flex={1}
+            onClick={close}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="var(--prune-primary-600)"
+            fz={12}
+            fw={500}
+            c="var(--prune-text-gray-800"
+            flex={1}
+            onClick={() => deleteDirector(index)}
+          >
+            Proceed
+          </Button>
+        </Flex>
+      </Stack>
+    </Modal>
   );
 };

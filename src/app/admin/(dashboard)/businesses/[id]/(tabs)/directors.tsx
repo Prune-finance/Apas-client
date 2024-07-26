@@ -41,8 +41,7 @@ import {
 import useNotification from "@/lib/hooks/notification";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
-import { log } from "console";
-import { z } from "zod";
+import classes from "@/ui/styles/containedInput.module.css";
 
 export default function Directors({
   business,
@@ -187,21 +186,27 @@ export default function Directors({
         Add New
       </Button>
 
-      <Drawer
-        position="right"
+      <Modal
+        // position="right"
         opened={opened}
         onClose={close}
-        title="Add a Director"
+        title={
+          <Text fz={24} fw={600}>
+            Add a Director
+          </Text>
+        }
         size="43%"
+        centered
       >
-        <Box mt={40}>
+        <Box>
           <DirectorForm
             form={form}
             handleBusinessUpdate={handleBusinessUpdate}
             processing={processing}
+            close={close}
           />
         </Box>
-      </Drawer>
+      </Modal>
     </div>
   );
 }
@@ -210,53 +215,52 @@ const DirectorForm = ({
   form,
   handleBusinessUpdate,
   processing,
+  close,
 }: {
   form: UseFormReturnType<typeof directorEtShareholderSchema>;
   handleBusinessUpdate: () => void;
+  close: () => void;
   processing: boolean;
 }) => {
   return (
     <>
-      <Flex mt={26} gap={20}>
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          placeholder="Enter Director's name"
-          {...form.getInputProps("name")}
-        />
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          placeholder="Enter Director's Email"
-          {...form.getInputProps("email")}
-        />
-      </Flex>
+      <TextInput
+        classNames={classes}
+        label="Name"
+        flex={1}
+        placeholder="Enter Director's name"
+        {...form.getInputProps("name")}
+      />
 
-      <Flex mt={24} gap={20}>
-        <Select
-          placeholder="Select Identity Type"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["ID Card", "Passport", "Residence Permit"]}
-          {...form.getInputProps("identityType")}
-        />
+      <TextInput
+        mt="md"
+        classNames={classes}
+        label="Email"
+        flex={1}
+        placeholder="Enter Director's Email"
+        {...form.getInputProps("email")}
+      />
+      {/* </Flex> */}
 
-        <Select
-          placeholder="Select Proof of Address"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["Utility Bill"]}
-          {...form.getInputProps("proofOfAddress")}
-        />
-      </Flex>
+      <Select
+        mt="md"
+        comboboxProps={{ withinPortal: true }}
+        placeholder="Select Identity Type"
+        flex={1}
+        data={["ID Card", "Passport", "Residence Permit"]}
+        {...form.getInputProps("identityType")}
+        label="Identity Type"
+        classNames={classes}
+      />
 
       <Flex mt={24} gap={20}>
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
-            Upload{" "}
-            {form.values.identityType
-              ? form.values.identityType
-              : "Identity Card"}
+            {`Upload ${
+              form.values.identityType
+                ? form.values.identityType
+                : "Identity Card"
+            } ${form.values.identityType !== "Passport" ? "(Front)" : ""}`}
           </Text>
           <DropzoneComponent form={form} formKey="identityFileUrl" />
         </Box>
@@ -264,23 +268,34 @@ const DirectorForm = ({
         {form.values.identityType !== "Passport" && (
           <Box flex={1}>
             <Text fz={12} c="#344054" mb={10}>
-              Upload{" "}
-              {form.values.identityType
-                ? form.values.identityType
-                : "Identity Card"}{" "}
-              back
+              {`Upload ${
+                form.values.identityType
+                  ? form.values.identityType
+                  : "Identity Card"
+              } (Back)`}
             </Text>
             <DropzoneComponent form={form} formKey={`identityFileUrlBack`} />
           </Box>
         )}
-
-        <Box flex={1}>
-          <Text fz={12} c="#344054" mb={10}>
-            Upload utility Bill
-          </Text>
-          <DropzoneComponent form={form} formKey="proofOfAddressFileUrl" />
-        </Box>
       </Flex>
+
+      <Select
+        mt="md"
+        comboboxProps={{ withinPortal: true }}
+        label="Proof of Address"
+        placeholder="Select Proof of Address"
+        flex={1}
+        data={["Utility Bill"]}
+        {...form.getInputProps("proofOfAddress")}
+        classNames={classes}
+      />
+
+      <Box flex={1} mt="md">
+        <Text fz={12} c="#344054" mb={10}>
+          Upload utility Bill
+        </Text>
+        <DropzoneComponent form={form} formKey="proofOfAddressFileUrl" />
+      </Box>
 
       <Flex mt={24} justify="flex-end" gap={15}>
         <Button
@@ -292,6 +307,7 @@ const DirectorForm = ({
           }}
           onClick={() => {
             form.reset();
+            close();
           }}
           color="#D0D5DD"
           variant="outline"
@@ -311,7 +327,7 @@ const DirectorForm = ({
           loading={processing}
           className={styles.cta}
           variant="filled"
-          color="#D4F307"
+          color="var(--prune-primary-600)"
         >
           Submit
         </Button>
@@ -610,8 +626,6 @@ const RemoveDirectorModal = ({
     initialValues: removeDirectorValues,
     validate: zodResolver(removeDirectorSchema),
   });
-
-  console.log(form.values);
 
   return (
     <Modal opened={opened} onClose={close} centered w={400} padding={20}>

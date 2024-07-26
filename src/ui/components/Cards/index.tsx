@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   Avatar,
+  Badge,
   Button,
   Flex,
   Paper,
@@ -171,6 +172,17 @@ enum CardTwoStatus {
   REJECTED = "  REJECTED",
   APPROVED = "APPROVED",
 }
+
+const badgeColor = (status: string) => {
+  switch (status) {
+    case CardTwoStatus.APPROVED:
+      return "#12B76A";
+    case CardTwoStatus.REJECTED:
+      return "#D92D20";
+    default:
+      return "#C6A700";
+  }
+};
 export function CardTwo({ title, link, items }: ICardTwo) {
   return (
     <div className={styles.card__two}>
@@ -203,7 +215,17 @@ export function CardTwo({ title, link, items }: ICardTwo) {
                 <Text className={styles.sub__text} fz={10}>
                   {item.subText}
                 </Text>
-                <div className={styles.status__container}>
+
+                <Badge
+                  color={badgeColor(item.status)}
+                  tt="capitalize"
+                  fz={10}
+                  fw={400}
+                  variant="light"
+                >
+                  {item.status.toLowerCase()}
+                </Badge>
+                {/* <div className={styles.status__container}>
                   <IconPointFilled
                     size={12}
                     color={
@@ -227,7 +249,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
                   >
                     {item.status}
                   </Text>
-                </div>
+                </div> */}
               </div>
             </div>
           );

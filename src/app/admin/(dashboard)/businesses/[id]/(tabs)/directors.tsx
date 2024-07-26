@@ -253,31 +253,33 @@ const DirectorForm = ({
         classNames={classes}
       />
 
-      <Flex mt={24} gap={20}>
-        <Box flex={1}>
-          <Text fz={12} c="#344054" mb={10}>
-            {`Upload ${
-              form.values.identityType
-                ? form.values.identityType
-                : "Identity Card"
-            } ${form.values.identityType !== "Passport" ? "(Front)" : ""}`}
-          </Text>
-          <DropzoneComponent form={form} formKey="identityFileUrl" />
-        </Box>
-
-        {form.values.identityType !== "Passport" && (
+      {form.values.identityType && (
+        <Flex mt={24} gap={20}>
           <Box flex={1}>
             <Text fz={12} c="#344054" mb={10}>
               {`Upload ${
                 form.values.identityType
                   ? form.values.identityType
                   : "Identity Card"
-              } (Back)`}
+              } ${form.values.identityType !== "Passport" ? "(Front)" : ""}`}
             </Text>
-            <DropzoneComponent form={form} formKey={`identityFileUrlBack`} />
+            <DropzoneComponent form={form} formKey="identityFileUrl" />
           </Box>
-        )}
-      </Flex>
+
+          {form.values.identityType !== "Passport" && (
+            <Box flex={1}>
+              <Text fz={12} c="#344054" mb={10}>
+                {`Upload ${
+                  form.values.identityType
+                    ? form.values.identityType
+                    : "Identity Card"
+                } (Back)`}
+              </Text>
+              <DropzoneComponent form={form} formKey={`identityFileUrlBack`} />
+            </Box>
+          )}
+        </Flex>
+      )}
 
       <Select
         mt="md"
@@ -290,12 +292,14 @@ const DirectorForm = ({
         classNames={classes}
       />
 
-      <Box flex={1} mt="md">
-        <Text fz={12} c="#344054" mb={10}>
-          Upload utility Bill
-        </Text>
-        <DropzoneComponent form={form} formKey="proofOfAddressFileUrl" />
-      </Box>
+      {form.values.proofOfAddress && (
+        <Box flex={1} mt="md">
+          <Text fz={12} c="#344054" mb={10}>
+            Upload utility Bill
+          </Text>
+          <DropzoneComponent form={form} formKey="proofOfAddressFileUrl" />
+        </Box>
+      )}
 
       <Flex mt={24} justify="flex-end" gap={15}>
         <Button

@@ -419,3 +419,57 @@ export function CardFour({ title, link, items }: ICardFour) {
     </div>
   );
 }
+
+interface ICardFive extends Omit<ICardOne, "text"> {
+  borderRight?: boolean;
+}
+
+export function CardFive({
+  title,
+  stat,
+  link,
+  colored,
+  formatted,
+  container,
+  withBorder,
+  loading,
+  currency,
+  flex,
+  borderRight,
+}: ICardFive) {
+  return (
+    <Paper
+      flex={flex}
+      withBorder={!!withBorder}
+      className={styles.card__one}
+      radius={0}
+      style={{
+        height: container ? "100%" : "130px",
+        gap: "16px",
+        borderRight: borderRight ? "1px solid #E5E5E5" : "none",
+      }}
+    >
+      <div className={styles.card__title}>
+        <Text fz={14} tt="capitalize" fw={400}>
+          {title}
+        </Text>
+
+        {link && (
+          <Link href={link}>
+            <SeeAll />
+          </Link>
+        )}
+      </div>
+
+      <div className={styles.card__number}>
+        {loading ? (
+          <Skeleton w={30} h={10} color="red" />
+        ) : (
+          <Title fz={24} className={`${colored ? styles.light__green : ""}`}>
+            {formatted ? formatNumber(stat, true, currency) : stat}
+          </Title>
+        )}
+      </div>
+    </Paper>
+  );
+}

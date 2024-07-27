@@ -1,6 +1,5 @@
 import { AgGridReact } from "ag-grid-react";
 
-// import styles from "@/ui/styles/singlebusiness.module.scss";
 import {
   Text,
   Menu,
@@ -59,6 +58,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 import { useRouter } from "next/navigation";
+// import styles from "@/ui/styles/singlebusiness.module.scss";
 import styles from "@/ui/styles/business.module.scss";
 import { AllBusinessSkeleton } from "@/lib/static";
 import EmptyImage from "@/assets/empty.png";
@@ -228,7 +228,7 @@ export default function Accounts({
   ];
 
   const handleRowClick = (id: string) => {
-    push(`/admin/businesses/${id}`);
+    push(`/admin/businesses/accounts/${id}`);
   };
 
   const rows = filteredSearch(

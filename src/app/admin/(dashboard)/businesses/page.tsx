@@ -90,6 +90,27 @@ function Businesses() {
     validate: zodResolver(businessFilterSchema),
   });
 
+  const infoDetails = [
+    {
+      title: "Total Business",
+      value: 0,
+    },
+    {
+      title: "Money In",
+      value: 0,
+      formatted: true,
+    },
+    {
+      title: "Money Out",
+      value: 0,
+      formatted: true,
+    },
+    {
+      title: "Total Transactions",
+      value: 0,
+    },
+  ];
+
   const menuItems = [
     // {
     //   text: "View",
@@ -214,7 +235,23 @@ function Businesses() {
           </Text>
         </div>
 
-        <InfoCards />
+        <InfoCards title="Overview" details={infoDetails}>
+          <Select
+            data={["Last Week", "Last Month"]}
+            variant="filled"
+            placeholder="Last Week"
+            defaultValue={"Last Week"}
+            w={150}
+            // h={22}
+            color="var(--prune-text-gray-500)"
+            styles={{
+              input: {
+                outline: "none",
+                border: "none",
+              },
+            }}
+          />
+        </InfoCards>
 
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}

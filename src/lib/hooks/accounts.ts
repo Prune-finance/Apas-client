@@ -57,7 +57,7 @@ export function useAccounts(customParams: IParams = {}) {
 }
 
 export function useSingleAccount(id: string) {
-  const [account, setAccount] = useState<AccountData | null>(null);
+  const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
@@ -202,4 +202,21 @@ export interface AccountDocuments {
   poaType: string;
   idFileURL: string;
   poaFileURL: string;
+}
+
+export interface Account {
+  id: string;
+  firstName: string;
+  lastName: string;
+  accountId: number;
+  accountName: string;
+  accountNumber: string;
+  accountDocuments: AccountDocuments;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  accountBalance: number;
+  companyId: string;
+  type: string;
+  status: "ACTIVE" | "INACTIVE" | "FROZEN";
 }

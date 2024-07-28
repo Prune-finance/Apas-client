@@ -4,8 +4,12 @@ import {
   CardSection,
   Divider,
   Flex,
+  Group,
   NativeSelect,
   Select,
+  Skeleton,
+  Stack,
+  Text,
   Title,
 } from "@mantine/core";
 import styles from "@/ui/styles/page.module.scss";
@@ -13,17 +17,26 @@ import { ReactNode } from "react";
 
 type Details = {
   title: string;
-  value: number;
+  value: number | string | undefined;
   formatted?: boolean;
+  currency?: string;
 };
 
 type InfoCardProps = {
   details: Details[];
   title: string;
   children?: ReactNode;
+  flexedGroup?: boolean;
+  loading?: boolean;
 };
 
-export default function InfoCards({ title, details, children }: InfoCardProps) {
+export default function InfoCards({
+  title,
+  details,
+  children,
+  flexedGroup,
+  loading,
+}: InfoCardProps) {
   return (
     <Card withBorder mt={24}>
       <CardSection>
@@ -37,19 +50,41 @@ export default function InfoCards({ title, details, children }: InfoCardProps) {
         <Divider my={13} />
       </CardSection>
 
-      <Flex justify="space-between">
-        {details.map((info, index) => (
-          <CardFive
-            key={index}
-            title={info.title}
-            stat={info.value}
-            formatted={info.formatted}
-            container
-            borderRight={index !== details.length - 1}
-            flex={1}
-          />
-        ))}
-      </Flex>
+      {flexedGroup ? (
+        <Stack gap={18} pb={2}>
+          {details.map((info, index) => (
+            <Group key={index} justify="space-between">
+              <Text c="var(--prune-text-gray-500)" fz={12} fw={400}>
+                {info.title}:
+              </Text>
+
+              {!loading ? (
+                <Text c="var(--prune-text-gray-600)" fz={12} fw={600}>
+                  {info.value}
+                </Text>
+              ) : (
+                <Skeleton w={100} h={20} />
+              )}
+            </Group>
+          ))}
+        </Stack>
+      ) : (
+        <Flex justify="space-between">
+          {details.map((info, index) => (
+            <CardFive
+              key={index}
+              title={info.title}
+              stat={typeof info.value === "number" ? info.value : 0}
+              formatted={info.formatted}
+              currency={info.currency}
+              container
+              borderRight={index !== details.length - 1}
+              flex={1}
+              loading={loading}
+            />
+          ))}
+        </Flex>
+      )}
     </Card>
   );
 }

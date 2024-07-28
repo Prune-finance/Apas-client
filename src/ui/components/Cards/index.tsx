@@ -463,7 +463,7 @@ export function CardFive({
 
       <div className={styles.card__number}>
         {loading ? (
-          <Skeleton w={30} h={10} color="red" />
+          <Skeleton w={100} h={35} color="red" />
         ) : (
           <Title fz={24} className={`${colored ? styles.light__green : ""}`}>
             {formatted ? formatNumber(stat, true, currency) : stat}

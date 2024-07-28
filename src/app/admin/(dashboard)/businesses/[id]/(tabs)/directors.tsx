@@ -441,7 +441,7 @@ const DirectorsForm = ({
               }}
               // className={styles.edit}
               variant="filled"
-              color="#D4F307"
+              color="var(--prune-primary-600)"
               style={{ fontSize: "10px", color: "#475467" }}
             >
               Save Changes

@@ -49,9 +49,9 @@
         font-weight: 400;
         color: var(--prune-text-gray-400);
 
-        &:nth-child(3) {
-          border-right: 1px dashed var(--prune-text-gray-300);
-        }
+        // &:nth-child(3) {
+        //   border-right: 1px dashed var(--prune-text-gray-300);
+        // }
       }
 
       .table__td {
@@ -59,10 +59,10 @@
         font-weight: 500;
         color: var(--prune-text-gray-600);
 
-        &:nth-child(5) {
-          position: relative;
-          border-right: 1px dashed var(--prune-text-gray-300);
-        }
+        // &:nth-child(5) {
+        //   position: relative;
+        //   border-right: 1px dashed var(--prune-text-gray-300);
+        // }
 
         &:nth-child(4) {
           position: relative;

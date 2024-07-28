@@ -15,7 +15,7 @@ import {
   ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import {
   IconArrowLeft,
@@ -50,6 +50,9 @@ export default function SingleBusiness() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { loading, business, revalidate } = useSingleBusiness(params.id);
+
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab")?.toLowerCase() || "business";
 
   const { handleSuccess, handleError } = useNotification();
   const [processingLink, setProcessingLink] = useState(false);
@@ -232,7 +235,7 @@ export default function SingleBusiness() {
 
         <div className={styles.container__body}>
           <Tabs
-            defaultValue="Business"
+            defaultValue={tab}
             variant="pills"
             classNames={{
               root: styles.tabs,
@@ -246,41 +249,42 @@ export default function SingleBusiness() {
                   key={tab.value}
                   value={tab.value}
                   leftSection={<tab.icon size={14} />}
+                  tt="capitalize"
                 >
                   {tab.title || tab.value}
                 </TabsTab>
               ))}
             </TabsList>
 
-            <TabsPanel value="Business">
+            <TabsPanel value="business">
               {business && (
                 <Business business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Documents">
+            <TabsPanel value="documents">
               {business && (
                 <Documents business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Directors">
+            <TabsPanel value="directors">
               {business && (
                 <Directors business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Shareholders">
+            <TabsPanel value="shareholders">
               {business && (
                 <Shareholders business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Accounts">
+            <TabsPanel value="accounts">
               <Accounts business={business} />
             </TabsPanel>
 
-            <TabsPanel value="Keys">
+            <TabsPanel value="keys">
               <Keys business={business} />
             </TabsPanel>
           </Tabs>
@@ -293,12 +297,12 @@ export default function SingleBusiness() {
 const tabs = [
   {
     title: "Business Information",
-    value: "Business",
+    value: "business",
     icon: IconBuildingSkyscraper,
   },
-  { value: "Documents", icon: IconFiles },
-  { value: "Directors", icon: IconUsers },
-  { title: "Key Shareholders", value: "Shareholders", icon: IconUsersGroup },
-  { value: "Accounts", icon: IconCurrencyEuro },
-  { title: "API Keys", value: "Keys", icon: IconKey },
+  { value: "documents", icon: IconFiles },
+  { value: "directors", icon: IconUsers },
+  { title: "Key Shareholders", value: "shareholders", icon: IconUsersGroup },
+  { value: "accounts", icon: IconCurrencyEuro },
+  { title: "API Keys", value: "keys", icon: IconKey },
 ];

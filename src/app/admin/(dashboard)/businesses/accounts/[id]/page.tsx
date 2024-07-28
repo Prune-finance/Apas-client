@@ -7,10 +7,8 @@ import styles from "./styles.module.scss";
 import {
   ActionIcon,
   Badge,
-  Box,
   Button,
   CopyButton,
-  Divider,
   Flex,
   Grid,
   GridCol,
@@ -27,22 +25,15 @@ import {
   TableThead,
   TableTr,
   Text,
-  ThemeIcon,
   Tooltip,
 } from "@mantine/core";
 import {
-  IconArrowRight,
   IconArrowUpRight,
-  IconPointFilled,
-  IconSquareFilled,
-  IconCircleChevronRight,
   IconArrowLeft,
   IconCheck,
   IconCopy,
-  IconCircleFilled,
 } from "@tabler/icons-react";
-import { CardOne } from "@/ui/components/Cards";
-import { AreaChart, BarChart, DonutChart } from "@mantine/charts";
+
 import { useState } from "react";
 import { formatNumber } from "@/lib/utils";
 import { useSingleAccount } from "@/lib/hooks/accounts";
@@ -50,10 +41,7 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import InfoCards from "../../InfoCards";
-import {
-  AreaChartComponent,
-  DonutChartComponent,
-} from "@/ui/components/Charts";
+import { DonutChartComponent } from "@/ui/components/Charts";
 import TransactionStatistics from "./TransactionStats";
 
 dayjs.extend(advancedFormat);
@@ -299,7 +287,10 @@ export default function Account() {
                       </TableTr>
                     </TableThead>
                     <TableTbody>
-                      <RowComponent data={tableData.slice(0, 3)} />
+                      <RowComponent
+                        data={tableData.slice(0, 3)}
+                        id={params.id}
+                      />
                     </TableTbody>
                   </Table>
                 </TableScrollContainer>
@@ -321,9 +312,17 @@ const tableHeaders = [
   "Status",
 ];
 
-const RowComponent = ({ data }: { data: TableData[] }) => {
+const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
+  const { push } = useRouter();
+  const handleRowClick = (id: string) => {
+    push(`/admin/businesses/accounts/${id}/transactions`);
+  };
   return data.map((element) => (
-    <TableTr key={element.AccName}>
+    <TableTr
+      key={element.AccName}
+      onClick={() => handleRowClick(id)}
+      style={{ cursor: "pointer" }}
+    >
       <TableTd className={styles.table__td}>{element.AccName}</TableTd>
       <TableTd className={styles.table__td}>{element.Biz}</TableTd>
       <TableTd className={styles.table__td}>{element.AccNum}</TableTd>

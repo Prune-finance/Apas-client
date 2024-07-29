@@ -32,7 +32,7 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { useRequests } from "@/lib/hooks/requests";
-import { DynamicSkeleton } from "@/lib/static";
+import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 
 // UI Imports
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -237,7 +237,7 @@ function AccountRequests() {
                 <TableTh className={styles.table__th}>Action</TableTh> */}
               </TableTr>
             </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
+            <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>
           </Table>
         </TableScrollContainer>
 

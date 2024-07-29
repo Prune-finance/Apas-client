@@ -44,10 +44,11 @@ import Filter from "@/ui/components/Filter";
 import { useRequests } from "@/lib/hooks/requests";
 import { Suspense, useState } from "react";
 import dayjs from "dayjs";
-import { DynamicSkeleton } from "@/lib/static";
+import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { filteredSearch } from "@/lib/search";
 import { approvedBadgeColor } from "@/lib/utils";
 import EmptyImage from "@/assets/empty.png";
+import { TableComponent } from "@/ui/components/Table";
 
 function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
@@ -193,28 +194,11 @@ function BusinessAccountRequests() {
 
         <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
 
-        <TableScrollContainer minWidth={500} mt={20}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr tt="capitalize">
-                {tableHeaders.map((header, index) => (
-                  <TableTh
-                    key={index}
-                    className={styles.table__th}
-                    tt="capitalize"
-                  >
-                    {header}
-                  </TableTh>
-                ))}
-              </TableTr>
-            </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
         {!loading && !!!rows.length && (
           <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
+            <Image src={EmptyImage.src} alt="no content" w={156} h={120} />
             <Text mt={14} fz={14} c="#1D2939">
               There are no account requests.
             </Text>

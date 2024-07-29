@@ -35,7 +35,7 @@ export default function Business({ request }: { request: RequestData | null }) {
                 input: styles.input,
                 label: styles.label,
               }}
-              label="Country of Origin"
+              label="Country of Operation"
               placeholder={request?.Company.country}
             />
           </GridCol>
@@ -47,7 +47,7 @@ export default function Business({ request }: { request: RequestData | null }) {
                 input: styles.input,
                 label: styles.label,
               }}
-              label="Legal Entity"
+              label="Legal Entity Type"
               placeholder={request?.Company.legalEntity}
             />
           </GridCol>

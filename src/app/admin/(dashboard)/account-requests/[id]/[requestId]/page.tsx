@@ -8,8 +8,9 @@ import {
   TabsTab,
   Text,
 } from "@mantine/core";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
+  IconArrowLeft,
   IconBuildingSkyscraper,
   IconCheck,
   IconPointFilled,
@@ -36,6 +37,7 @@ export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
   const { revalidate, request } = useSingleRequest(params.requestId);
   const { handleSuccess } = useNotification();
+  const { back } = useRouter();
 
   const [opened, { open, close }] = useDisclosure(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
@@ -93,7 +95,7 @@ export default function SingleRequest() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
+          // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Account Requests", href: "/admin/account-requests" },
           {
             title: params.requestId,
@@ -103,6 +105,23 @@ export default function SingleRequest() {
       />
 
       <div className={styles.page__container}>
+        <Button
+          fz={14}
+          c="var(--prune-text-gray-500)"
+          fw={400}
+          px={0}
+          variant="transparent"
+          onClick={back}
+          leftSection={
+            <IconArrowLeft
+              color="#1D2939"
+              style={{ width: "70%", height: "70%" }}
+            />
+          }
+          //   style={{ pointerEvents: !account ? "none" : "auto" }}
+        >
+          Back
+        </Button>
         <div className={styles.container__header}>
           <div className={styles.header__left}>
             {request ? (
@@ -112,64 +131,32 @@ export default function SingleRequest() {
             ) : (
               <Skeleton h={10} w={100} />
             )}
-
-            {request && (
-              <div
-                className={styles.business__status}
-                style={{
-                  background:
-                    request.status === "APPROVED"
-                      ? "#ECFDF3"
-                      : request.status === "REJECTED"
-                      ? "#FCF1F2"
-                      : "#F9F6E6",
-                }}
-              >
-                <IconPointFilled
-                  size={14}
-                  color={
-                    request.status === "APPROVED"
-                      ? "#12B76A"
-                      : request.status === "REJECTED"
-                      ? "#D92D20"
-                      : "#C6A700"
-                  }
-                />
-                <Text
-                  tt="capitalize"
-                  fz={12}
-                  c={
-                    request.status === "APPROVED"
-                      ? "#12B76A"
-                      : request.status === "REJECTED"
-                      ? "#D92D20"
-                      : "#C6A700"
-                  }
-                >
-                  {request.status.toLowerCase()}
-                </Text>
-              </div>
-            )}
           </div>
 
           {request && request.status === "PENDING" && (
             <div className={styles.header__right}>
               <Button
                 onClick={open}
-                className={styles.header__cta}
+                // className={styles.header__cta}
                 variant="outline"
-                color="#D0D5DD"
-                w={90}
+                color="var(--prune-text-gray-300)"
+                c="var(--prune-text-gray-800)"
+                // w={90}
+                fz={12}
+                fw={500}
               >
-                Reject
+                Deny
               </Button>
 
               <Button
                 onClick={openApprove}
-                className={styles.header__cta}
+                // className={styles.header__cta}
                 variant="filled"
-                color="#D4F307"
-                w={90}
+                color="var(--prune-primary-600)"
+                c="var(--prune-text-gray-800)"
+                // w={90}
+                fz={12}
+                fw={500}
               >
                 Approve
               </Button>
@@ -240,9 +227,10 @@ export default function SingleRequest() {
           opened={opened}
           close={close}
           color="#FEF3F2"
-          icon={<IconX color="##D92D20" />}
+          icon={<IconX color="#D92D20" />}
           title="Reject This Account  Request?"
           text="This means you are rejecting the debit request of this business."
+          customApproveMessage="Yes, Deny"
         />
 
         <ModalComponent
@@ -254,8 +242,49 @@ export default function SingleRequest() {
           icon={<IconCheck color="#12B76A" />}
           title="Approve This Account Request?"
           text="This means you are accepting the debit request of this business."
+          customApproveMessage="Yes, Approve"
         />
       </div>
     </main>
   );
 }
+
+//  {
+//    request && (
+//      <div
+//        className={styles.business__status}
+//        style={{
+//          background:
+//            request.status === "APPROVED"
+//              ? "#ECFDF3"
+//              : request.status === "REJECTED"
+//              ? "#FCF1F2"
+//              : "#F9F6E6",
+//        }}
+//      >
+//        <IconPointFilled
+//          size={14}
+//          color={
+//            request.status === "APPROVED"
+//              ? "#12B76A"
+//              : request.status === "REJECTED"
+//              ? "#D92D20"
+//              : "#C6A700"
+//          }
+//        />
+//        <Text
+//          tt="capitalize"
+//          fz={12}
+//          c={
+//            request.status === "APPROVED"
+//              ? "#12B76A"
+//              : request.status === "REJECTED"
+//              ? "#D92D20"
+//              : "#C6A700"
+//          }
+//        >
+//          {request.status.toLowerCase()}
+//        </Text>
+//      </div>
+//    );
+//  }

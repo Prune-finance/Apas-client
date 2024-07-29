@@ -18,11 +18,10 @@ import {
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
+import { Flex, TableTh, TableThead } from "@mantine/core";
 
 // Tabler Imports
 import {
-  IconPointFilled,
   IconDots,
   IconEye,
   IconDotsVertical,
@@ -50,10 +49,9 @@ import {
   accountFilterValues,
   accountFilterSchema,
 } from "./schema";
-import { DateInput } from "@mantine/dates";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
-import { activeBadgeColor, approvedBadgeColor } from "@/lib/utils";
+import { approvedBadgeColor } from "@/lib/utils";
 
 function AccountRequests() {
   const searchParams = useSearchParams();

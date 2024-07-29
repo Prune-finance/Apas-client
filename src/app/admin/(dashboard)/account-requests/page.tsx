@@ -26,6 +26,8 @@ import {
   IconDots,
   IconEye,
   IconDotsVertical,
+  IconUserCheck,
+  IconX,
 } from "@tabler/icons-react";
 import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
@@ -88,17 +90,23 @@ function AccountRequests() {
         </MenuTarget>
 
         <MenuDropdown>
-          <Link href={`/admin/account-requests/${id}`}>
-            <MenuItem
-              fz={10}
-              c="#667085"
-              leftSection={
-                <IconEye style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              View
-            </MenuItem>
-          </Link>
+          <MenuItem
+            fz={10}
+            c="#667085"
+            leftSection={
+              <IconUserCheck style={{ width: rem(14), height: rem(14) }} />
+            }
+          >
+            Approve
+          </MenuItem>
+
+          <MenuItem
+            fz={10}
+            c="#667085"
+            leftSection={<IconX style={{ width: rem(14), height: rem(14) }} />}
+          >
+            Deny
+          </MenuItem>
         </MenuDropdown>
       </Menu>
     );

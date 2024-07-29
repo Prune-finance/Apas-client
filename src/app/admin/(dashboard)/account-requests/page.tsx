@@ -7,6 +7,8 @@ import Image from "next/image";
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
+  Badge,
+  Group,
   Menu,
   MenuDropdown,
   MenuItem,
@@ -19,7 +21,12 @@ import { TableTr, TableTd, TableTbody } from "@mantine/core";
 import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
 
 // Tabler Imports
-import { IconPointFilled, IconDots, IconEye } from "@tabler/icons-react";
+import {
+  IconPointFilled,
+  IconDots,
+  IconEye,
+  IconDotsVertical,
+} from "@tabler/icons-react";
 import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
@@ -33,7 +40,7 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import {
@@ -44,6 +51,7 @@ import {
 import { DateInput } from "@mantine/dates";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
+import { activeBadgeColor, approvedBadgeColor } from "@/lib/utils";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -65,6 +73,7 @@ function AccountRequests() {
   });
   const [opened, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+  const { push } = useRouter();
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -73,8 +82,8 @@ function AccountRequests() {
     return (
       <Menu shadow="md" width={150}>
         <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
+          <UnstyledButton onClick={(e) => e.stopPropagation()}>
+            <IconDotsVertical size={17} />
           </UnstyledButton>
         </MenuTarget>
 
@@ -95,61 +104,43 @@ function AccountRequests() {
     );
   };
 
+  const handleRowClick = (id: string) => {
+    push(`/admin/account-requests/${id}`);
+  };
+
   const rows = filteredSearch(
     requests,
     ["firstName", "lastName", "Company.name"],
     debouncedSearch
   ).map((element, index) => (
-    <TableTr key={index}>
-      <TableTd className={styles.table__td}>
-        <Checkbox />
-      </TableTd>
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
+      <TableTd className={styles.table__td}>{20}</TableTd>
       <TableTd
         className={styles.table__td}
       >{`${element.firstName} ${element.lastName}`}</TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
+      {/* <TableTd className={styles.table__td} tt="capitalize">
         {element.accountType.toLowerCase()}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-      </TableTd>
+      </TableTd> */}
       <TableTd className={styles.table__td}>
-        <div
-          className={styles.table__td__status}
-          style={{
-            background:
-              element.status === "PENDING"
-                ? "#FFFAEB"
-                : element.status === "REJECTED"
-                ? "#FCF1F2"
-                : "#ECFDF3",
-          }}
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={approvedBadgeColor(element.status)}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
         >
-          <IconPointFilled
-            size={14}
-            color={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          />
-          <Text
-            tt="capitalize"
-            fz={12}
-            c={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          >
-            {element.status.toLowerCase()}
-          </Text>
-        </div>
+          {element.status.toLowerCase()}
+        </Badge>
       </TableTd>
 
       <TableTd className={`${styles.table__td}`}>
@@ -179,26 +170,34 @@ function AccountRequests() {
           </Text>
         </div>
 
-        <div className={styles.container__search__filter}>
+        <Group
+          justify="space-between"
+          align="center"
+          mt={24}
+          // className={styles.container__search__filter}
+        >
           <TextInput
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
-            classNames={{ wrapper: styles.search, input: styles.input__search }}
+            // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
-          <Button
-            className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            fz={12}
-            onClick={toggle}
-            fw={500}
-          >
-            Filter
-          </Button>
-        </div>
+          <Group gap={12}>
+            <Button
+              variant="default"
+              color="var(--prune-text-gray-500)"
+              leftSection={<IconListTree size={14} />}
+              fz={12}
+              fw={500}
+              onClick={toggle}
+            >
+              Filter
+            </Button>
+          </Group>
+        </Group>
 
         <Filter<AccountFilterType> opened={opened} form={form} toggle={toggle}>
           <Select
@@ -214,16 +213,22 @@ function AccountRequests() {
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">
             <TableThead>
-              <TableTr>
-                <TableTh className={styles.table__th}>
-                  <Checkbox />
-                </TableTh>
-                <TableTh className={styles.table__th}>Account Name</TableTh>
+              <TableTr tt="capitalize">
+                {tableHeaders.map((header, index) => (
+                  <TableTh
+                    key={index}
+                    className={styles.table__th}
+                    tt="capitalize"
+                  >
+                    {header}
+                  </TableTh>
+                ))}
+                {/* <TableTh className={styles.table__th}>Account Name</TableTh>
                 <TableTh className={styles.table__th}>Type</TableTh>
                 <TableTh className={styles.table__th}>Business</TableTh>
                 <TableTh className={styles.table__th}>Date Created</TableTh>
                 <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh>
+                <TableTh className={styles.table__th}>Action</TableTh> */}
               </TableTr>
             </TableThead>
             <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
@@ -243,7 +248,18 @@ function AccountRequests() {
         )}
 
         <div className={styles.pagination__container}>
-          <Text fz={14}>Rows: {rows.length}</Text>
+          <Group gap={9}>
+            <Text fz={14}>Showing:</Text>
+
+            <Select
+              data={["10", "20", "50", "100"]}
+              defaultValue={"10"}
+              w={60}
+              // h={24}
+              size="xs"
+              withCheckIcon={false}
+            />
+          </Group>
           <Pagination
             autoContrast
             color="#fff"
@@ -255,6 +271,14 @@ function AccountRequests() {
     </main>
   );
 }
+
+const tableHeaders = [
+  "Business Name",
+  "Number of Requests",
+  "Contact Email",
+  "Status",
+  "Action",
+];
 
 const MenuComponent = ({ id }: { id: string }) => {
   const [opened, { open, close }] = useDisclosure(false);

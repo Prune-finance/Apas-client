@@ -252,14 +252,6 @@ function Accounts() {
                     {header}
                   </TableTh>
                 ))}
-                {/* <TableTh className={styles.table__th}>Account Name</TableTh>
-                <TableTh className={styles.table__th}>Account Number</TableTh>
-                <TableTh className={styles.table__th}>Account Balance</TableTh>
-                <TableTh className={styles.table__th}>Type</TableTh>
-                <TableTh className={styles.table__th}>Business</TableTh>
-                <TableTh className={styles.table__th}>Date Created</TableTh>
-                <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh> */}
               </TableTr>
             </TableThead>
             <TableTbody>
@@ -320,7 +312,7 @@ function Accounts() {
           opened={freezeOpened}
           close={freezeClose}
           title="Freeze this Account?"
-          text="You are about to freeze this account.This means no activity can be carried out in the account anymore."
+          text="You are about to freeze this account. This means no activity can be carried out on this account anymore."
         />
 
         <ModalComponent
@@ -331,7 +323,7 @@ function Accounts() {
           opened={unfreezeOpened}
           close={unfreezeClose}
           title="Unfreeze this Account?"
-          text="You are about to unfreeze this account.This means full activity can be carried out in the account again."
+          text="You are about to unfreeze this account. This means full activity can be carried out in the account again."
         />
 
         <ModalComponent
@@ -342,7 +334,7 @@ function Accounts() {
           opened={opened}
           close={close}
           title="Deactivate This Account?"
-          text="You are about to deactivate this account.This means the account will be inactive."
+          text="You are about to deactivate this account. This means the account will be inactive."
         />
 
         <ModalComponent
@@ -353,7 +345,7 @@ function Accounts() {
           opened={activateOpened}
           close={activateClose}
           title="Activate This Account?"
-          text="You are about to activate this account.This means the account will become active."
+          text="You are about to activate this account. This means the account will become active."
         />
       </div>
     </main>

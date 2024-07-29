@@ -229,12 +229,6 @@ function AccountRequests() {
                     {header}
                   </TableTh>
                 ))}
-                {/* <TableTh className={styles.table__th}>Account Name</TableTh>
-                <TableTh className={styles.table__th}>Type</TableTh>
-                <TableTh className={styles.table__th}>Business</TableTh>
-                <TableTh className={styles.table__th}>Date Created</TableTh>
-                <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh> */}
               </TableTr>
             </TableThead>
             <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>

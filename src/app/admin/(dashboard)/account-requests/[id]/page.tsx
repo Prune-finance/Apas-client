@@ -1,261 +1,299 @@
 "use client";
-import {
-  Button,
-  Skeleton,
-  Tabs,
-  TabsList,
-  TabsPanel,
-  TabsTab,
-  Text,
-} from "@mantine/core";
-import { useParams } from "next/navigation";
-import {
-  IconBuildingSkyscraper,
-  IconCheck,
-  IconPointFilled,
-  IconUsers,
-  IconUsersGroup,
-  IconX,
-} from "@tabler/icons-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import styles from "@/ui/styles/singlebusiness.module.scss";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import styles from "./styles.module.scss";
+import {
+  Button,
+  Flex,
+  Group,
+  Pagination,
+  Paper,
+  Select,
+  Skeleton,
+  Table,
+  TableScrollContainer,
+  TableTbody,
+  TableTh,
+  TableThead,
+  TableTr,
+  Text,
+  TextInput,
+  Image,
+  Badge,
+  TableTd,
+  Menu,
+  MenuDropdown,
+  MenuItem,
+  MenuTarget,
+  rem,
+  UnstyledButton,
+} from "@mantine/core";
+import {
+  IconArrowLeft,
+  IconDotsVertical,
+  IconListTree,
+  IconSearch,
+  IconUserCheck,
+  IconX,
+} from "@tabler/icons-react";
+import { useForm, zodResolver } from "@mantine/form";
+import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import Filter from "@/ui/components/Filter";
+import { useRequests } from "@/lib/hooks/requests";
+import { Suspense, useState } from "react";
+import dayjs from "dayjs";
+import { DynamicSkeleton } from "@/lib/static";
+import { filteredSearch } from "@/lib/search";
+import { approvedBadgeColor } from "@/lib/utils";
+import EmptyImage from "@/assets/empty.png";
 
-import Business from "./(tabs)/business";
-import Directors from "./(tabs)/directors";
-import Account from "./(tabs)/accounts";
-import ModalComponent from "@/ui/components/Modal";
-import { useDisclosure } from "@mantine/hooks";
-import { useSingleRequest } from "@/lib/hooks/requests";
-import Shareholders from "./(tabs)/shareholder";
-import axios from "axios";
-import useNotification from "@/lib/hooks/notification";
-import { useState } from "react";
-
-export default function SingleRequest() {
+function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
-  const { revalidate, request } = useSingleRequest(params.id);
-  const { handleSuccess } = useNotification();
 
-  const [opened, { open, close }] = useDisclosure(false);
-  const [approveOpened, { open: openApprove, close: closeApprove }] =
-    useDisclosure(false);
+  const searchParams = useSearchParams();
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+    type,
+  } = Object.fromEntries(searchParams.entries());
 
-  const [processing, setProcessing] = useState(false);
+  const { loading, requests } = useRequests({
+    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+    ...(type && { type: type.toLowerCase() }),
+  });
 
-  const handleApproval = async () => {
-    if (processing) return;
-    setProcessing(true);
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/approve/${params.id}`,
-        {},
-        { withCredentials: true }
-      );
+  const { back, push } = useRouter();
 
-      closeApprove();
-      handleSuccess(
-        "Request Approved",
-        "You have approved this account request"
-      );
-      revalidate();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setProcessing(false);
-    }
+  const [opened, { toggle }] = useDisclosure(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const form = useForm<FilterType>({
+    initialValues: filterValues,
+    validate: zodResolver(filterSchema),
+  });
+
+  const handleRowClick = (id: string) => {
+    push(`/admin/account-requests/${params.id}/${id}`);
   };
 
-  const handleRejection = async () => {
-    if (processing) return;
-    setProcessing(true);
-    try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${params.id}`,
-        {},
-        { withCredentials: true }
-      );
+  const rows = filteredSearch(
+    requests,
+    ["firstName", "lastName", "Company.name"],
+    debouncedSearch
+  ).map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd
+        className={styles.table__td}
+      >{`${element.firstName} ${element.lastName}`}</TableTd>
+      <TableTd className={styles.table__td} tt="capitalize">
+        {element.accountType.toLowerCase()}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.Company.country}</TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={approvedBadgeColor(element.status)}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
+        >
+          {element.status.toLowerCase()}
+        </Badge>
+      </TableTd>
 
-      close();
-      handleSuccess(
-        "Request Rejected",
-        "You have rejected this account request"
-      );
-      revalidate();
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setProcessing(false);
-    }
-  };
+      <TableTd className={`${styles.table__td}`}>
+        <MenuComponent id={element.id} />
+      </TableTd>
+    </TableTr>
+  ));
 
   return (
-    <main className={styles.main}>
+    <main>
       <Breadcrumbs
         items={[
-          { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Account Requests", href: "/admin/account-requests" },
           {
-            title: params.id,
-            href: `/admin/account-requests/businesses/${params.id}`,
+            title: "Business Name",
+            href: `/admin/account-requests/${params.id}`,
           },
         ]}
       />
 
-      <div className={styles.page__container}>
-        <div className={styles.container__header}>
-          <div className={styles.header__left}>
-            {request ? (
-              <Text fz={18} fw={600}>
-                {request.firstName} {request.lastName}
-              </Text>
-            ) : (
-              <Skeleton h={10} w={100} />
-            )}
+      <Paper p={28} className={styles.grid__container}>
+        <Button
+          fz={14}
+          c="var(--prune-text-gray-500)"
+          fw={400}
+          px={0}
+          variant="transparent"
+          onClick={back}
+          leftSection={
+            <IconArrowLeft
+              color="#1D2939"
+              style={{ width: "70%", height: "70%" }}
+            />
+          }
+          //   style={{ pointerEvents: !account ? "none" : "auto" }}
+        >
+          Back
+        </Button>
 
-            {request && (
-              <div
-                className={styles.business__status}
-                style={{
-                  background:
-                    request.status === "APPROVED"
-                      ? "#ECFDF3"
-                      : request.status === "REJECTED"
-                      ? "#FCF1F2"
-                      : "#F9F6E6",
-                }}
-              >
-                <IconPointFilled
-                  size={14}
-                  color={
-                    request.status === "APPROVED"
-                      ? "#12B76A"
-                      : request.status === "REJECTED"
-                      ? "#D92D20"
-                      : "#C6A700"
-                  }
-                />
-                <Text
-                  tt="capitalize"
-                  fz={12}
-                  c={
-                    request.status === "APPROVED"
-                      ? "#12B76A"
-                      : request.status === "REJECTED"
-                      ? "#D92D20"
-                      : "#C6A700"
-                  }
-                >
-                  {request.status.toLowerCase()}
-                </Text>
-              </div>
-            )}
-          </div>
+        {/* {account?.accountName ? ( */}
+        <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
+          Tech Nova
+          {/* {account?.accountName} */}
+        </Text>
+        {/* ) : (
+          <Skeleton h={10} w={100} />
+        )} */}
 
-          {request && request.status === "PENDING" && (
-            <div className={styles.header__right}>
-              <Button
-                onClick={open}
-                className={styles.header__cta}
-                variant="outline"
-                color="#D0D5DD"
-                w={90}
-              >
-                Reject
-              </Button>
+        <Group
+          justify="space-between"
+          align="center"
+          mt={24}
+          // className={styles.container__search__filter}
+        >
+          <TextInput
+            placeholder="Search here..."
+            leftSectionPointerEvents="none"
+            leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
+            // classNames={{ wrapper: styles.search, input: styles.input__search }}
+            // value={search}
+            // onChange={(e) => setSearch(e.currentTarget.value)}
+          />
 
-              <Button
-                onClick={openApprove}
-                className={styles.header__cta}
-                variant="filled"
-                color="#D4F307"
-                w={90}
-              >
-                Approve
-              </Button>
-            </div>
-          )}
-        </div>
-
-        <div className={styles.container__body}>
-          <Tabs
-            defaultValue="Account"
-            variant="pills"
-            classNames={{
-              root: styles.tabs,
-              list: styles.tabs__list,
-              tab: styles.tab,
-            }}
+          <Button
+            variant="default"
+            color="var(--prune-text-gray-500)"
+            leftSection={<IconListTree size={14} />}
+            fz={12}
+            fw={500}
+            onClick={toggle}
           >
-            <TabsList>
-              <TabsTab value="Account" leftSection={<IconUsers size={14} />}>
-                Account Information
-              </TabsTab>
-              <TabsTab
-                value="Business"
-                leftSection={<IconBuildingSkyscraper size={14} />}
-              >
-                Business Information
-              </TabsTab>
-              {request && request.accountType === "CORPORATE" && (
-                <>
-                  {" "}
-                  <TabsTab
-                    value="Directors"
-                    leftSection={<IconUsers size={14} />}
+            Filter
+          </Button>
+        </Group>
+
+        <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
+
+        <TableScrollContainer minWidth={500} mt={20}>
+          <Table className={styles.table} verticalSpacing="md">
+            <TableThead>
+              <TableTr tt="capitalize">
+                {tableHeaders.map((header, index) => (
+                  <TableTh
+                    key={index}
+                    className={styles.table__th}
+                    tt="capitalize"
                   >
-                    Directors
-                  </TabsTab>
-                  <TabsTab
-                    value="Shareholders"
-                    leftSection={<IconUsersGroup size={14} />}
-                  >
-                    Key Shareholders
-                  </TabsTab>{" "}
-                </>
-              )}
-            </TabsList>
+                    {header}
+                  </TableTh>
+                ))}
+              </TableTr>
+            </TableThead>
+            <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
+          </Table>
+        </TableScrollContainer>
 
-            <TabsPanel value="Business">
-              <Business request={request} />
-            </TabsPanel>
+        {!loading && !!!rows.length && (
+          <Flex direction="column" align="center" mt={70}>
+            <Image src={EmptyImage} alt="no content" width={156} height={120} />
+            <Text mt={14} fz={14} c="#1D2939">
+              There are no account requests.
+            </Text>
+            <Text fz={10} c="#667085">
+              When a request is created, it will appear here
+            </Text>
+          </Flex>
+        )}
 
-            <TabsPanel value="Account">
-              <Account request={request} />
-            </TabsPanel>
+        <div className={styles.pagination__container}>
+          <Group gap={9}>
+            <Text fz={14}>Showing:</Text>
 
-            <TabsPanel value="Directors">
-              <Directors request={request} />
-            </TabsPanel>
-
-            <TabsPanel value="Shareholders">
-              <Shareholders request={request} />
-            </TabsPanel>
-          </Tabs>
+            <Select
+              data={["10", "20", "50", "100"]}
+              defaultValue={"10"}
+              w={60}
+              // h={24}
+              size="xs"
+              withCheckIcon={false}
+            />
+          </Group>
+          <Pagination
+            autoContrast
+            color="#fff"
+            total={1}
+            classNames={{ control: styles.control, root: styles.pagination }}
+          />
         </div>
-
-        <ModalComponent
-          action={handleRejection}
-          processing={processing}
-          opened={opened}
-          close={close}
-          color="#FEF3F2"
-          icon={<IconX color="##D92D20" />}
-          title="Reject This Account  Request?"
-          text="This means you are rejecting the debit request of this business."
-        />
-
-        <ModalComponent
-          action={handleApproval}
-          opened={approveOpened}
-          processing={processing}
-          close={closeApprove}
-          color="#ECFDF3"
-          icon={<IconCheck color="#12B76A" />}
-          title="Approve This Account Request?"
-          text="This means you are accepting the debit request of this business."
-        />
-      </div>
+      </Paper>
     </main>
   );
 }
+
+const tableHeaders = [
+  "Account Name",
+  "Type",
+  "Country",
+  "Date Created",
+  "Status",
+  "Action",
+];
+
+export default function BusinessAccountRequestsSuspense() {
+  return (
+    <Suspense>
+      <BusinessAccountRequests />
+    </Suspense>
+  );
+}
+
+const MenuComponent = ({ id }: { id: string }) => {
+  return (
+    <Menu shadow="md" width={150}>
+      <MenuTarget>
+        <UnstyledButton onClick={(e) => e.stopPropagation()}>
+          <IconDotsVertical size={17} />
+        </UnstyledButton>
+      </MenuTarget>
+
+      <MenuDropdown>
+        <MenuItem
+          fz={10}
+          c="#667085"
+          leftSection={
+            <IconUserCheck style={{ width: rem(14), height: rem(14) }} />
+          }
+        >
+          Approve
+        </MenuItem>
+
+        <MenuItem
+          fz={10}
+          c="#667085"
+          leftSection={<IconX style={{ width: rem(14), height: rem(14) }} />}
+        >
+          Deny
+        </MenuItem>
+      </MenuDropdown>
+    </Menu>
+  );
+};

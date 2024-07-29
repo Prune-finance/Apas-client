@@ -49,13 +49,15 @@ import {
   businessFilterSchema,
 } from "../../businesses/schema";
 import Filter from "@/ui/components/Filter";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 
 function BusinessDebit() {
   const searchParams = useSearchParams();
+  const params = useParams<{ slug?: string[] }>();
+  const [id, tab] = params.slug ?? [];
 
   const {
     rows: limit = "10",

@@ -2,7 +2,9 @@
 
 import Image from "next/image";
 import {
+  Badge,
   Button,
+  Group,
   Skeleton,
   Switch,
   Tabs,
@@ -13,7 +15,7 @@ import {
   ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import {
   IconArrowLeft,
@@ -42,11 +44,15 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
+import { activeBadgeColor } from "@/lib/utils";
 
 export default function SingleBusiness() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { loading, business, revalidate } = useSingleBusiness(params.id);
+
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab")?.toLowerCase() || "business";
 
   const { handleSuccess, handleError } = useNotification();
   const [processingLink, setProcessingLink] = useState(false);
@@ -124,17 +130,22 @@ export default function SingleBusiness() {
       />
 
       <div className={styles.page__container}>
+        <Group gap={8} mb={24}>
+          <UnstyledButton onClick={router.back}>
+            <ThemeIcon variant="transparent" radius="lg">
+              <IconArrowLeft
+                color="#1D2939"
+                style={{ width: "70%", height: "70%" }}
+              />
+            </ThemeIcon>
+          </UnstyledButton>
+
+          <Text fz={14} c="var(--prune-text-gray-500)" fw={400}>
+            Business
+          </Text>
+        </Group>
         <div className={styles.container__header}>
           <div className={styles.header__left}>
-            <UnstyledButton onClick={router.back}>
-              <ThemeIcon color="rgba(212, 243, 7)" radius="lg">
-                <IconArrowLeft
-                  color="#1D2939"
-                  style={{ width: "70%", height: "70%" }}
-                />
-              </ThemeIcon>
-            </UnstyledButton>
-
             {business ? (
               <Text fz={18} fw={600}>
                 {business.name}
@@ -153,52 +164,43 @@ export default function SingleBusiness() {
             )}
 
             {business && (
-              <div
-                className={styles.business__status}
-                style={{
-                  background:
-                    business?.companyStatus === "INACTIVE"
-                      ? "#FFFAEB"
-                      : "#ECFDF3",
-                }}
+              <Badge
+                tt="capitalize"
+                variant="light"
+                color={activeBadgeColor(business.companyStatus)}
+                w={82}
+                h={24}
+                fw={400}
+                fz={12}
               >
-                {business?.companyStatus === "ACTIVE" ? (
-                  <>
-                    <IconPointFilled size={14} color="#12B76A" />
-                    <Text tt="capitalize" fz={12} c="#12B76A">
-                      Active
-                    </Text>
-                  </>
-                ) : (
-                  <>
-                    <IconPointFilled size={14} color="#C6A700" />
-                    <Text tt="capitalize" fz={12} c="#C6A700">
-                      Inactive
-                    </Text>
-                  </>
-                )}
-              </div>
+                {business.companyStatus.toLowerCase()}
+              </Badge>
             )}
           </div>
 
           <div className={styles.header__right}>
+            <Button size="xs" className={styles.header__right__cta}>
+              <IconDownload color="#344054" stroke={2} size={16} />
+            </Button>
+
             {business?.companyStatus && (
               <Button
-                className={styles.header__cta}
-                variant="outline"
-                color="#D0D5DD"
+                // className={styles.header__cta}
+                radius={4}
+                variant="filled"
+                color="#f6f6f6"
+                c="var(--prune-text-gray-700)"
+                fz={12}
+                h={32}
                 onClick={toggleBusinessActivation}
                 loading={processingActive}
+                style={{ border: "1px solid var(--prune-text-gray-200)" }}
               >
                 {business?.companyStatus === "ACTIVE"
                   ? "Deactivate"
                   : "Activate"}
               </Button>
             )}
-
-            <Button size="xs" className={styles.header__right__cta}>
-              <IconDownload color="#344054" stroke={2} size={16} />
-            </Button>
 
             <div className={styles.biz_trust}>
               <Text fw={600} fz={12} className={styles.biz__trust__text}>
@@ -208,18 +210,23 @@ export default function SingleBusiness() {
                 <Switch
                   defaultChecked={business?.kycTrusted}
                   onChange={handleBusinessTrust}
-                  color="rgba(212, 243, 7)"
+                  // color="rgba(212, 243, 7)"
+                  color="var(--prune-success-500)"
                   size="xs"
                 />
               )}
             </div>
 
             <Button
-              className={styles.header__cta}
+              // className={styles.header__cta}
               variant="filled"
-              color="#D4F307"
+              color="var(--prune-primary-600)"
               onClick={sendActivationLink}
               loading={processingLink}
+              radius={4}
+              fz={12}
+              h={32}
+              c="var(--prune-text-gray-700)"
             >
               Send Activation Link
             </Button>
@@ -228,7 +235,7 @@ export default function SingleBusiness() {
 
         <div className={styles.container__body}>
           <Tabs
-            defaultValue="Business"
+            defaultValue={tab}
             variant="pills"
             classNames={{
               root: styles.tabs,
@@ -237,68 +244,47 @@ export default function SingleBusiness() {
             }}
           >
             <TabsList>
-              <TabsTab
-                value="Business"
-                leftSection={<IconBuildingSkyscraper size={14} />}
-              >
-                Business Information
-              </TabsTab>
-              <TabsTab value="Documents" leftSection={<IconFiles size={14} />}>
-                Documents
-              </TabsTab>
-              <TabsTab value="Directors" leftSection={<IconUsers size={14} />}>
-                Directors
-              </TabsTab>
-              <TabsTab
-                value="Shareholders"
-                leftSection={<IconUsersGroup size={14} />}
-              >
-                Key Shareholders
-              </TabsTab>
-              <TabsTab
-                value="Accounts"
-                leftSection={<IconCurrencyEuro size={14} />}
-              >
-                Accounts
-              </TabsTab>
-              <TabsTab
-                className={styles.tab}
-                value="Keys"
-                leftSection={<IconKey size={14} />}
-              >
-                API Keys
-              </TabsTab>
+              {tabs.map((tab) => (
+                <TabsTab
+                  key={tab.value}
+                  value={tab.value}
+                  leftSection={<tab.icon size={14} />}
+                  tt="capitalize"
+                >
+                  {tab.title || tab.value}
+                </TabsTab>
+              ))}
             </TabsList>
 
-            <TabsPanel value="Business">
+            <TabsPanel value="business">
               {business && (
                 <Business business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Documents">
+            <TabsPanel value="documents">
               {business && (
                 <Documents business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Directors">
+            <TabsPanel value="directors">
               {business && (
                 <Directors business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Shareholders">
+            <TabsPanel value="shareholders">
               {business && (
                 <Shareholders business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
-            <TabsPanel value="Accounts">
+            <TabsPanel value="accounts">
               <Accounts business={business} />
             </TabsPanel>
 
-            <TabsPanel value="Keys">
+            <TabsPanel value="keys">
               <Keys business={business} />
             </TabsPanel>
           </Tabs>
@@ -307,3 +293,16 @@ export default function SingleBusiness() {
     </main>
   );
 }
+
+const tabs = [
+  {
+    title: "Business Information",
+    value: "business",
+    icon: IconBuildingSkyscraper,
+  },
+  { value: "documents", icon: IconFiles },
+  { value: "directors", icon: IconUsers },
+  { title: "Key Shareholders", value: "shareholders", icon: IconUsersGroup },
+  { value: "accounts", icon: IconCurrencyEuro },
+  { title: "API Keys", value: "keys", icon: IconKey },
+];

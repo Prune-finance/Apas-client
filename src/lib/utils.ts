@@ -11,3 +11,8 @@ export const formatNumber = (
     currency: type,
   }).format(number);
 };
+
+export const activeBadgeColor = (status: string) => {
+  if (status === "ACTIVE") return "#12B76A";
+  return "#C6A700";
+};

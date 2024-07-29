@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Badge,
   Button,
   Flex,
   Group,
@@ -24,7 +25,9 @@ import {
 } from "@mantine/core";
 import {
   IconDots,
+  IconDotsVertical,
   IconDownload,
+  IconEdit,
   IconEye,
   IconListTree,
   IconPlus,
@@ -35,6 +38,9 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/business.module.scss";
@@ -45,16 +51,18 @@ import { AllBusinessSkeleton } from "@/lib/static";
 import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { DateInput } from "@mantine/dates";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   businessFilterSchema,
   BusinessFilterType,
   businessFilterValues,
 } from "./schema";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
+import InfoCards from "./InfoCards";
+import ActiveBadge from "@/assets/active-badge.svg";
+import { activeBadgeColor } from "@/lib/utils";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -75,17 +83,44 @@ function Businesses() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
+  const { push } = useRouter();
+
   const form = useForm<BusinessFilterType>({
     initialValues: businessFilterValues,
     validate: zodResolver(businessFilterSchema),
   });
 
-  const menuItems = [
+  const infoDetails = [
     {
-      text: "View",
-      icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
-      link: true,
-      href: "/admin/businesses",
+      title: "Total Business",
+      value: 0,
+    },
+    {
+      title: "Money In",
+      value: 0,
+      formatted: true,
+    },
+    {
+      title: "Money Out",
+      value: 0,
+      formatted: true,
+    },
+    {
+      title: "Total Transactions",
+      value: 0,
+    },
+  ];
+
+  const menuItems = [
+    // {
+    //   text: "View",
+    //   icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
+    //   link: true,
+    //   href: "/admin/businesses",
+    // },
+    {
+      text: "Deactivate",
+      icon: <IconEdit style={{ width: rem(14), height: rem(14) }} />,
     },
     {
       text: "Download Report",
@@ -93,67 +128,80 @@ function Businesses() {
     },
   ];
 
+  const handleRowClick = (id: string) => {
+    push(`/admin/businesses/${id}`);
+  };
+
   const rows = filteredSearch(
     businesses,
     ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
-    <TableTr key={index}>
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
       <TableTd className={styles.table__td}>{index + 1}</TableTd>
-      <TableTd className={styles.table__td}>{element.name}</TableTd>
+      <TableTd className={styles.table__td}>
+        <Group gap={9}>
+          {element.name}
+
+          {element.kycTrusted && (
+            <Image
+              width={20}
+              height={20}
+              src={ActiveBadge}
+              alt="active badge"
+            />
+          )}
+        </Group>
+      </TableTd>
       <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
+      <TableTd className={styles.table__td}>{50}</TableTd>
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div
-          className={styles.table__td__status}
-          style={{
-            background:
-              element.companyStatus === "INACTIVE" ? "#FFFAEB" : "#ECFDF3",
-          }}
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={activeBadgeColor(element.companyStatus)}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
         >
-          {element.companyStatus === "ACTIVE" ? (
-            <>
-              <IconPointFilled size={14} color="#12B76A" />
-              <Text tt="capitalize" fz={12} c="#12B76A">
-                Active
-              </Text>
-            </>
-          ) : (
-            <>
-              <IconPointFilled size={14} color="#C6A700" />
-              <Text tt="capitalize" fz={12} c="#C6A700">
-                Inactive
-              </Text>
-            </>
-          )}
-        </div>
+          {element.companyStatus.toLowerCase()}
+        </Badge>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      <TableTd
+        className={`${styles.table__td}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>
-              <IconDots size={17} />
+              <IconDotsVertical size={17} />
             </UnstyledButton>
           </MenuTarget>
 
           <MenuDropdown>
             {menuItems.map((items, index) => {
-              if (items.link)
-                return (
-                  <Link key={index} href={`${items.href}/${element.id}`}>
-                    <MenuItem
-                      key={index}
-                      fz={10}
-                      c="#667085"
-                      leftSection={items.icon}
-                    >
-                      {items.text}
-                    </MenuItem>
-                  </Link>
-                );
+              // if (items.link)
+              //   return (
+              //     <Link key={index} href={`${items.href}/${element.id}`}>
+              //       <MenuItem
+              //         key={index}
+              //         fz={10}
+              //         c="#667085"
+              //         leftSection={items.icon}
+              //       >
+              //         {items.text}
+              //       </MenuItem>
+              //     </Link>
+              //   );
               return (
                 <MenuItem
                   key={index}
@@ -185,18 +233,25 @@ function Businesses() {
           <Text fz={18} fw={600}>
             Businesses
           </Text>
-
-          <Link href="/admin/businesses/new">
-            <Button
-              leftSection={<IconPlus color="#344054" size={16} />}
-              className={styles.login__cta}
-              variant="filled"
-              color="var(--prune-primary-600)"
-            >
-              New Business
-            </Button>
-          </Link>
         </div>
+
+        <InfoCards title="Overview" details={infoDetails}>
+          <Select
+            data={["Last Week", "Last Month"]}
+            variant="filled"
+            placeholder="Last Week"
+            defaultValue={"Last Week"}
+            w={150}
+            // h={22}
+            color="var(--prune-text-gray-500)"
+            styles={{
+              input: {
+                outline: "none",
+                border: "none",
+              },
+            }}
+          />
+        </InfoCards>
 
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}
@@ -205,20 +260,43 @@ function Businesses() {
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
-            classNames={{ wrapper: styles.search, input: styles.input__search }}
+            // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
+            color="var(--prune-text-gray-200)"
             onChange={(e) => setSearch(e.currentTarget.value)}
+            c="#000"
           />
 
-          <Button
-            className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            onClick={toggle}
-            fz={12}
-            fw={500}
-          >
-            Filter
-          </Button>
+          <Flex gap={12}>
+            <Button
+              // className={styles.filter__cta}
+              leftSection={<IconListTree size={14} />}
+              onClick={toggle}
+              fz={12}
+              fw={500}
+              radius={4}
+              variant="outline"
+              color="var(--prune-text-gray-200)"
+              c="#000"
+              pl={0}
+            >
+              Filter
+            </Button>
+
+            <Button
+              component={Link}
+              href="/admin/businesses/new"
+              leftSection={<IconPlus size={16} />}
+              variant="filled"
+              radius={4}
+              fz={12}
+              c="#000"
+              color="var(--prune-primary-600)"
+              pl={0}
+            >
+              New Business
+            </Button>
+          </Flex>
         </div>
 
         <Filter<BusinessFilterType>
@@ -232,8 +310,9 @@ function Businesses() {
             <TableThead>
               <TableTr>
                 <TableTh className={styles.table__th}>S/N</TableTh>
-                <TableTh className={styles.table__th}>Business Name</TableTh>
+                <TableTh className={styles.table__th}>Business</TableTh>
                 <TableTh className={styles.table__th}>Contact Email</TableTh>
+                <TableTh className={styles.table__th}>Transactions</TableTh>
                 <TableTh className={styles.table__th}>Date Created</TableTh>
                 <TableTh className={styles.table__th}>Status</TableTh>
                 <TableTh className={styles.table__th}>Action</TableTh>
@@ -256,7 +335,18 @@ function Businesses() {
         )}
 
         <div className={styles.pagination__container}>
-          <Text fz={14}>Rows: {businesses.length}</Text>
+          <Group gap={9}>
+            <Text fz={14}>Showing:</Text>
+
+            <Select
+              data={["10", "20", "50", "100"]}
+              defaultValue={"10"}
+              w={60}
+              // h={24}
+              size="xs"
+              withCheckIcon={false}
+            />
+          </Group>
           <Pagination
             autoContrast
             color="#fff"

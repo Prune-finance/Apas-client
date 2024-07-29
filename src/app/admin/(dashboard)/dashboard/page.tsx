@@ -60,7 +60,7 @@ export default function Home() {
   const cardFourItems = useMemo(() => {
     if (loading) return [];
 
-    return requests.map((request) => {
+    return requests.slice(0, 3).map((request) => {
       return {
         title: request.Company.name,
         date: request.createdAt,
@@ -227,7 +227,7 @@ export default function Home() {
                 return prv + curr.accountBalance;
               }, 0)}
               formatted
-              colored
+              // colored
               currency="EUR"
               loading={accountsLoading}
               text={

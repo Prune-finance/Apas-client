@@ -201,3 +201,17 @@ export const filterSchema = z.object({
 });
 
 export type FilterType = z.infer<typeof filterSchema>;
+
+export const removeDirectorValues = {
+  reason: "",
+  supportingDoc: "",
+  supportingDocUrl: "",
+};
+
+export const removeDirectorSchema = z.object({
+  reason: z.string(),
+  supportingDoc: z.string(),
+  supportingDocUrl: z.string(),
+});
+
+export type RemoveDirectorType = z.infer<typeof removeDirectorSchema>;

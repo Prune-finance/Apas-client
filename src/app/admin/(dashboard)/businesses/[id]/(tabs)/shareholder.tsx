@@ -8,9 +8,13 @@ import {
   Flex,
   Grid,
   GridCol,
+  Modal,
   Select,
+  Stack,
   Text,
+  Textarea,
   TextInput,
+  ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
 import {
@@ -18,18 +22,25 @@ import {
   IconPencilMinus,
   IconPlus,
   IconTrash,
+  IconX,
 } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import { directorEtShareholderSchema, validateShareholder } from "@/lib/schema";
-import { UseFormReturnType, useForm } from "@mantine/form";
+import {
+  directorEtShareholderSchema,
+  removeDirectorSchema,
+  removeDirectorValues,
+  validateShareholder,
+} from "@/lib/schema";
+import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 import DropzoneComponent from "./dropzone";
 import { parseError } from "@/lib/actions/auth";
+import classes from "@/ui/styles/containedInput.module.css";
 
 export default function Shareholders({
   business,
@@ -155,32 +166,43 @@ export default function Shareholders({
         </Text>
       )}
 
-      <UnstyledButton onClick={open} mt={20}>
-        <Flex align="center">
-          <div className={styles.add__new__container}>
+      <Button
+        mt={20}
+        variant="transparent"
+        fz={12}
+        fw={400}
+        c="#000"
+        onClick={open}
+        leftSection={
+          <ThemeIcon radius="xl" color="var(--prune-primary-500)">
             <IconPlus color="#344054" size={14} />
-          </div>
-          <Text ml={8} fz={12}>
-            Add New
-          </Text>
-        </Flex>
-      </UnstyledButton>
+          </ThemeIcon>
+        }
+      >
+        Add New
+      </Button>
 
-      <Drawer
-        position="right"
+      <Modal
+        // position="right"
         opened={opened}
         onClose={close}
-        title="Add a Shareholder"
+        title={
+          <Text fz={24} fw={600}>
+            Add a Shareholder
+          </Text>
+        }
         size="40%"
+        centered
       >
-        <Box mt={40}>
+        <Box>
           <DirectorForm
             form={form}
             handleBusinessUpdate={handleBusinessUpdate}
             processing={processing}
+            close={close}
           />
         </Box>
-      </Drawer>
+      </Modal>
     </div>
   );
 }
@@ -189,77 +211,90 @@ const DirectorForm = ({
   form,
   handleBusinessUpdate,
   processing,
+  close,
 }: {
   form: UseFormReturnType<typeof directorEtShareholderSchema>;
   handleBusinessUpdate: () => void;
+  close: () => void;
   processing: boolean;
 }) => {
   return (
     <>
-      <Flex mt={26} gap={20}>
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          placeholder="Enter Shareholder's name"
-          {...form.getInputProps("name")}
-        />
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          placeholder="Enter Shareholder's Email"
-          {...form.getInputProps("email")}
-        />
-      </Flex>
+      <TextInput
+        classNames={classes}
+        label="Name"
+        flex={1}
+        placeholder="Enter Shareholder's name"
+        {...form.getInputProps("name")}
+      />
+      <TextInput
+        mt="md"
+        classNames={classes}
+        label="Email"
+        flex={1}
+        placeholder="Enter Shareholder's Email"
+        {...form.getInputProps("email")}
+      />
 
-      <Flex mt={24} gap={20}>
-        <Select
-          placeholder="Select Identity Type"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["ID Card", "Passport", "Residence Permit"]}
-          {...form.getInputProps("identityType")}
-        />
+      <Select
+        mt="md"
+        comboboxProps={{ withinPortal: true }}
+        classNames={classes}
+        placeholder="Select Identity Type"
+        label="Identity Type"
+        flex={1}
+        data={["ID Card", "Passport", "Residence Permit"]}
+        {...form.getInputProps("identityType")}
+      />
 
-        <Select
-          placeholder="Select Proof of Address"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["Utility Bill"]}
-          {...form.getInputProps("proofOfAddress")}
-        />
-      </Flex>
-
-      <Flex mt={24} gap={20}>
-        <Box flex={1}>
-          <Text fz={12} c="#344054" mb={10}>
-            Upload{" "}
-            {form.values.identityType
-              ? form.values.identityType
-              : "Identity Card"}
-          </Text>
-          <DropzoneComponent form={form} formKey="identityFileUrl" />
-        </Box>
-
-        {form.values.identityType !== "Passport" && (
+      {form.values.identityType && (
+        <Flex mt={24} gap={20}>
           <Box flex={1}>
             <Text fz={12} c="#344054" mb={10}>
-              Upload{" "}
-              {form.values.identityType
-                ? form.values.identityType
-                : "Identity Card"}{" "}
-              back
+              {`Upload ${
+                form.values.identityType
+                  ? form.values.identityType
+                  : "Identity Card"
+              } ${form.values.identityType !== "Passport" ? "(Front)" : ""}`}
             </Text>
-            <DropzoneComponent form={form} formKey={`identityFileUrlBack`} />
+            <DropzoneComponent form={form} formKey="identityFileUrl" />
           </Box>
-        )}
 
-        <Box flex={1}>
+          {form.values.identityType !== "Passport" && (
+            <Box flex={1}>
+              <Text fz={12} c="#344054" mb={10}>
+                {`Upload ${
+                  form.values.identityType
+                    ? form.values.identityType
+                    : "Identity Card"
+                } (Back)`}
+              </Text>
+              <DropzoneComponent form={form} formKey={`identityFileUrlBack`} />
+            </Box>
+          )}
+        </Flex>
+      )}
+
+      <Select
+        mt="md"
+        comboboxProps={{ withinPortal: true }}
+        classNames={classes}
+        label="Proof of Address"
+        placeholder="Select Proof of Address"
+        // classNames={{ input: styles.input }}
+        flex={1}
+        data={["Utility Bill"]}
+        {...form.getInputProps("proofOfAddress")}
+      />
+
+      {form.values.proofOfAddress && (
+        <Box flex={1} mt="md">
           <Text fz={12} c="#344054" mb={10}>
             Upload utility Bill
           </Text>
           <DropzoneComponent form={form} formKey="proofOfAddressFileUrl" />
         </Box>
-      </Flex>
+      )}
 
       <Flex mt={24} justify="flex-end" gap={15}>
         <Button
@@ -271,6 +306,7 @@ const DirectorForm = ({
           }}
           onClick={() => {
             form.reset();
+            close();
           }}
           color="#D0D5DD"
           variant="outline"
@@ -290,7 +326,7 @@ const DirectorForm = ({
           loading={processing}
           className={styles.cta}
           variant="filled"
-          color="#D4F307"
+          color="var(--prune-primary-600)"
         >
           Submit
         </Button>
@@ -312,6 +348,7 @@ const DirectorsForm = ({
 }) => {
   const [editing, setEditing] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const initialValues = {
     name: director.name,
@@ -369,15 +406,26 @@ const DirectorsForm = ({
               Edit
             </Button>
             <Button
-              onClick={() => deleteDirector(index)}
+              onClick={open}
               leftSection={<IconTrash color="#475467" size={14} />}
               className={styles.edit}
             >
-              Delete
+              Remove
             </Button>
           </Flex>
         ) : (
           <Flex gap={10}>
+            <Button
+              variant="outline"
+              color="var(--prune-text-gray-300"
+              c="var(--prune-text-gray-800"
+              fz={12}
+              fw={500}
+              flex={1}
+              onClick={() => setEditing(false)}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={() => {
                 updateDirector(index, form.values);
@@ -548,6 +596,100 @@ const DirectorsForm = ({
           />
         </GridCol>
       </Grid>
+
+      <RemoveDirectorModal
+        opened={opened}
+        close={close}
+        index={index}
+        deleteDirector={deleteDirector}
+      />
     </div>
+  );
+};
+
+const RemoveDirectorModal = ({
+  opened,
+  close,
+  index,
+  deleteDirector,
+}: {
+  opened: boolean;
+  close: () => void;
+  index: number;
+  deleteDirector: (index: number) => void;
+}) => {
+  const form = useForm({
+    initialValues: removeDirectorValues,
+    validate: zodResolver(removeDirectorSchema),
+  });
+
+  return (
+    <Modal opened={opened} onClose={close} centered w={400} padding={20}>
+      <Stack align="center" gap={30}>
+        <ThemeIcon radius="xl" color="#D92D20" size={64} variant="light">
+          <IconX size={32} />
+        </ThemeIcon>
+
+        <Text fz={18} fw={600}>
+          Remove This Shareholder?
+        </Text>
+
+        <Text
+          fz={12}
+          fw={400}
+          ta="center"
+          c="var(--prune-text-gray-500)"
+          w="45ch"
+        >
+          You are about to remove this shareholder from the system. Please know
+          that you cannot undo this action.
+        </Text>
+
+        <Textarea
+          placeholder="Give reason here..."
+          minRows={5}
+          w="100%"
+          {...form.getInputProps("reason")}
+        />
+
+        <Select
+          placeholder="Select Supporting Document (optional)"
+          data={["ID Card", "Passport", "Residence Permit"]}
+          w="100%"
+          {...form.getInputProps("supportingDoc")}
+        />
+
+        <Box w="100%">
+          <DropzoneComponent
+            removeDirectorForm={form}
+            formKey={`supportingDocUrl`}
+          />
+        </Box>
+
+        <Flex w="100%" gap={20}>
+          <Button
+            variant="outline"
+            color="var(--prune-text-gray-300"
+            c="var(--prune-text-gray-800"
+            fz={12}
+            fw={500}
+            flex={1}
+            onClick={close}
+          >
+            Cancel
+          </Button>
+          <Button
+            color="var(--prune-primary-600)"
+            fz={12}
+            fw={500}
+            c="var(--prune-text-gray-800"
+            flex={1}
+            onClick={() => deleteDirector(index)}
+          >
+            Proceed
+          </Button>
+        </Flex>
+      </Stack>
+    </Modal>
   );
 };

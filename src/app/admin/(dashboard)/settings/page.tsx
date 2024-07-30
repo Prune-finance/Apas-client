@@ -49,6 +49,7 @@ import { useBusiness } from "@/lib/hooks/businesses";
 import { switzer } from "@/app/layout";
 import Logs from "./(tabs)/logs";
 import { useState } from "react";
+import Notifications from "./(tabs)/notifications";
 
 export default function DebitRequests() {
   const [tab, setTab] = useState<string | null>("Logs");
@@ -94,6 +95,9 @@ export default function DebitRequests() {
 
           <TabsPanel value="Logs">
             <Logs />
+          </TabsPanel>
+          <TabsPanel value="Notifications">
+            <Notifications />
           </TabsPanel>
         </Tabs>
       </div>

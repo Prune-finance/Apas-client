@@ -8,6 +8,7 @@ import {
   Select,
   Box,
   PasswordInput,
+  ActionIcon,
 } from "@mantine/core";
 import { IconMail, IconTrash, IconX } from "@tabler/icons-react";
 
@@ -28,19 +29,21 @@ export default function ModalComponent({
       opened={opened}
       onClose={close}
       centered
-      withCloseButton={false}
-      size="lg"
-    >
-      <Flex className={styles.modal} direction="column">
-        <Flex justify="flex-end">
-          <div
-            className={styles.close__icon}
-            onClick={!processing ? close : () => {}}
+      // withCloseButton={false}
+      closeButtonProps={{
+        icon: (
+          <ActionIcon
+            variant="light"
+            color="var(--prune-text-gray-400)"
+            radius="xl"
           >
-            <IconX color="#667085" />
-          </div>
-        </Flex>
-
+            <IconX color="var(--prune-text-gray-600)" size={20} />
+          </ActionIcon>
+        ),
+      }}
+      size="lg"
+      padding={40}
+      title={
         <Flex direction="column">
           <Text fz={24} fw={600}>
             Invite a New User
@@ -49,7 +52,9 @@ export default function ModalComponent({
             Invite a user to collaborate with you.
           </Text>
         </Flex>
-
+      }
+    >
+      <Flex className={styles.modal} direction="column">
         <Box className={styles.form__container}>
           <Flex gap={20}>
             <TextInput
@@ -105,8 +110,8 @@ export default function ModalComponent({
             <Button
               onClick={close}
               color="#D0D5DD"
-              variant="outline"
-              className={styles.cta}
+              variant="default"
+              // className={styles.cta}
             >
               Cancel
             </Button>
@@ -114,9 +119,10 @@ export default function ModalComponent({
             <Button
               onClick={action}
               loading={processing}
-              className={styles.cta}
+              // className={styles.cta}
               variant="filled"
-              color="#D4F307"
+              color="var(--prune-primary-600)"
+              c="var(--prune-text-gray-800)"
             >
               Send Invite
             </Button>

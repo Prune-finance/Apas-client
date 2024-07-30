@@ -38,6 +38,7 @@ import {
   IconListTree,
   IconLogs,
   IconAccessible,
+  IconNotification,
 } from "@tabler/icons-react";
 import EmptyImage from "@/assets/empty.png";
 import { useDisclosure } from "@mantine/hooks";
@@ -80,15 +81,15 @@ export default function DebitRequests() {
           mt={24}
         >
           <TabsList>
-            <TabsTab value="Logs" leftSection={<IconLogs size={14} />}>
-              Audit Logs
-            </TabsTab>
-            {/* <TabsTab
-              value="Permissions"
-              leftSection={<IconAccessible size={14} />}
-            >
-              Permissions
-            </TabsTab> */}
+            {tabs.map((tab) => (
+              <TabsTab
+                key={tab.title}
+                value={tab.value || tab.title}
+                leftSection={tab.icon}
+              >
+                {tab.title}
+              </TabsTab>
+            ))}
           </TabsList>
 
           <TabsPanel value="Logs">
@@ -99,3 +100,8 @@ export default function DebitRequests() {
     </main>
   );
 }
+
+const tabs = [
+  { title: "Audit Logs", value: "Logs", icon: <IconLogs size={14} /> },
+  { title: "Notifications", icon: <IconNotification size={14} /> },
+];

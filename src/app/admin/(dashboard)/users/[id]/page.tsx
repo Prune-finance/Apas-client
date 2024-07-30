@@ -56,7 +56,7 @@ export default function SingleUser() {
         ]}
       />
 
-      <Paper className={styles.table__container}>
+      <Paper className={styles.table__container} mih="calc(100vh - 150px)">
         <Button
           fz={14}
           c="var(--prune-text-gray-500)"

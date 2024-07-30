@@ -68,6 +68,7 @@ import { activeBadgeColor } from "@/lib/utils";
 
 function Users() {
   const searchParams = useSearchParams();
+  const { push } = useRouter();
 
   const {
     rows: limit = "10",
@@ -144,12 +145,20 @@ function Users() {
     },
   ];
 
+  const handleRowClick = (id: string) => {
+    push(`/admin/users/${id}`);
+  };
+
   const rows = filteredSearch(
     users,
     ["email", "firstName", "lastName", "role"],
     debouncedSearch
   ).map((element, index) => (
-    <TableTr key={index}>
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
       <TableTd className={styles.table__td}>{element.email}</TableTd>
       <TableTd
         className={styles.table__td}

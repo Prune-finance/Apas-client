@@ -185,7 +185,10 @@ function Users() {
         </Badge>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      <TableTd
+        className={`${styles.table__td}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>

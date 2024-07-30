@@ -53,10 +53,9 @@ import {
   AccountFilterType,
   accountFilterValues,
 } from "./schema";
-import { DateInput } from "@mantine/dates";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
-import { table } from "console";
 import { TableComponent } from "@/ui/components/Table";
 
 function Accounts() {

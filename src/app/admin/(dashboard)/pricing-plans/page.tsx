@@ -184,7 +184,7 @@ const RowComponent = ({ plans }: { plans: typeof _plans }) => {
       <TableTd>{plan.cycle}</TableTd>
       <TableTd>{formatNumber(plan.amount)}</TableTd>
       <TableTd>{plan.description}</TableTd>
-      <TableTd>
+      <TableTd onClick={(e) => e.stopPropagation()}>
         <MenuComponent id={plan.id.toString()} />
       </TableTd>
     </TableTr>

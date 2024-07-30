@@ -254,7 +254,7 @@ function Users() {
             <Button
               // className={styles.filter__cta}
               variant="default"
-              rightSection={<IconListTree size={14} />}
+              leftSection={<IconListTree size={14} />}
               fz={12}
               fw={500}
               onClick={toggle}

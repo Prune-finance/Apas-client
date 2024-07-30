@@ -47,7 +47,7 @@ import styles from "@/ui/styles/business.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
-import { AllBusinessSkeleton } from "@/lib/static";
+import { AllBusinessSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -63,6 +63,7 @@ import { filteredSearch } from "@/lib/search";
 import InfoCards from "./InfoCards";
 import ActiveBadge from "@/assets/active-badge.svg";
 import { activeBadgeColor } from "@/lib/utils";
+import { table } from "console";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -234,7 +235,6 @@ function Businesses() {
             Businesses
           </Text>
         </div>
-
         <InfoCards title="Overview" details={infoDetails}>
           <Select
             data={["Last Week", "Last Month"]}
@@ -252,7 +252,6 @@ function Businesses() {
             }}
           />
         </InfoCards>
-
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}
         >
@@ -298,27 +297,25 @@ function Businesses() {
             </Button>
           </Flex>
         </div>
-
         <Filter<BusinessFilterType>
           opened={opened}
           toggle={toggle}
           form={form}
         />
-
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">
             <TableThead>
               <TableTr>
-                <TableTh className={styles.table__th}>S/N</TableTh>
-                <TableTh className={styles.table__th}>Business</TableTh>
-                <TableTh className={styles.table__th}>Contact Email</TableTh>
-                <TableTh className={styles.table__th}>Transactions</TableTh>
-                <TableTh className={styles.table__th}>Date Created</TableTh>
-                <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh>
+                {tableHeaders.map((header, index) => (
+                  <TableTh key={index} className={styles.table__th}>
+                    {header}
+                  </TableTh>
+                ))}
               </TableTr>
             </TableThead>
-            <TableTbody>{loading ? AllBusinessSkeleton : rows}</TableTbody>
+            <TableTbody>
+              {loading ? DynamicSkeleton2(tableHeaders.length) : rows}
+            </TableTbody>
           </Table>
         </TableScrollContainer>
 
@@ -333,7 +330,6 @@ function Businesses() {
             </Text>
           </Flex>
         )}
-
         <div className={styles.pagination__container}>
           <Group gap={9}>
             <Text fz={14}>Showing:</Text>
@@ -366,3 +362,13 @@ export default function BusinessesSuspense() {
     </Suspense>
   );
 }
+
+const tableHeaders = [
+  "S/N",
+  "Business",
+  "Contact Email",
+  "Transactions",
+  "Date Created",
+  "Status",
+  "Action",
+];

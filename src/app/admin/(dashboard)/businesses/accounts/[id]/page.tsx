@@ -35,7 +35,7 @@ import {
 } from "@tabler/icons-react";
 
 import { useState } from "react";
-import { formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import Link from "next/link";
 import dayjs from "dayjs";
@@ -43,6 +43,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import InfoCards from "../../InfoCards";
 import { DonutChartComponent } from "@/ui/components/Charts";
 import TransactionStatistics from "./TransactionStats";
+import { TableComponent } from "@/ui/components/Table";
 
 dayjs.extend(advancedFormat);
 
@@ -272,28 +273,13 @@ export default function Account() {
                   </Button>
                 </Group>
 
-                <TableScrollContainer minWidth={500}>
-                  <Table className={styles.table} verticalSpacing="md">
-                    <TableThead>
-                      <TableTr>
-                        {tableHeaders.map((header) => (
-                          <TableTd
-                            key={header}
-                            className={`${styles.table__th}`}
-                          >
-                            {header}
-                          </TableTd>
-                        ))}
-                      </TableTr>
-                    </TableThead>
-                    <TableTbody>
-                      <RowComponent
-                        data={tableData.slice(0, 3)}
-                        id={params.id}
-                      />
-                    </TableTbody>
-                  </Table>
-                </TableScrollContainer>
+                <TableComponent
+                  head={tableHeaders}
+                  rows={
+                    <RowComponent data={tableData.slice(0, 3)} id={params.id} />
+                  }
+                  loading={false}
+                />
               </div>
             </Paper>
           </GridCol>
@@ -327,22 +313,26 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
       <TableTd className={styles.table__td}>{element.Biz}</TableTd>
       <TableTd className={styles.table__td}>{element.AccNum}</TableTd>
       <TableTd className={`${styles.table__td}`}>
-        <IconArrowUpRight
-          color="#D92D20"
-          size={16}
-          className={styles.table__td__icon}
-        />
-        {formatNumber(element.Amount)}
-        {/* <Text fz={12}></Text> */}
+        <Group gap={3}>
+          <IconArrowUpRight
+            color="#D92D20"
+            size={16}
+            className={styles.table__td__icon}
+          />
+          {formatNumber(element.Amount)}
+          {/* <Text fz={12}></Text> */}
+        </Group>
       </TableTd>
       <TableTd className={styles.table__td}>{element.Date}</TableTd>
       <TableTd className={styles.table__td}>
         <Badge
-          w={90}
-          size="xs"
-          variant="light"
           tt="capitalize"
-          color={element.Status === "successful" ? "green" : "red"}
+          variant="light"
+          color={approvedBadgeColor(element.Status.toUpperCase())}
+          w={90}
+          h={24}
+          fw={400}
+          fz={12}
         >
           {element.Status}
         </Badge>

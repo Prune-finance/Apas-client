@@ -7,21 +7,22 @@ import {
   TableTh,
   Checkbox,
   TableTbody,
+  TableProps,
 } from "@mantine/core";
 import styles from "./table.module.scss";
 
-type Props = {
+interface Props extends TableProps {
   loading: boolean;
   //   head: JSX.Element;
   head: string[];
   rows: JSX.Element[] | JSX.Element;
-};
+}
 
-export function TableComponent({ loading, rows, head }: Props) {
+export function TableComponent({ loading, rows, head, ...props }: Props) {
   return (
-    <TableScrollContainer minWidth={500}>
+    <TableScrollContainer minWidth={500} mt={props.mt}>
       <Table className={styles.table} verticalSpacing="md">
-        <TableThead>
+        <TableThead bg="#F9F9F9">
           <TableTr>
             {head.map((header, index) => (
               <TableTh key={index} className={styles.table__th}>

@@ -64,6 +64,7 @@ import InfoCards from "./InfoCards";
 import ActiveBadge from "@/assets/active-badge.svg";
 import { activeBadgeColor } from "@/lib/utils";
 import { table } from "console";
+import { TableComponent } from "@/ui/components/Table";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -302,22 +303,8 @@ function Businesses() {
           toggle={toggle}
           form={form}
         />
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                {tableHeaders.map((header, index) => (
-                  <TableTh key={index} className={styles.table__th}>
-                    {header}
-                  </TableTh>
-                ))}
-              </TableTr>
-            </TableThead>
-            <TableTbody>
-              {loading ? DynamicSkeleton2(tableHeaders.length) : rows}
-            </TableTbody>
-          </Table>
-        </TableScrollContainer>
+
+        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
         {!loading && !!!rows.length && (
           <Flex direction="column" align="center" mt={70}>

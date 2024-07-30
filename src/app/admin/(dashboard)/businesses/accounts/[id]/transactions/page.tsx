@@ -41,8 +41,9 @@ import { BusinessFilterType } from "../../../schema";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
-import { formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
+import { TableComponent } from "@/ui/components/Table";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -191,22 +192,11 @@ export default function TransactionForAccount() {
           form={form}
         />
 
-        <TableScrollContainer minWidth={500} mt={20}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                {tableHeaders.map((header) => (
-                  <TableTd key={header} className={`${styles.table__th}`}>
-                    {header}
-                  </TableTd>
-                ))}
-              </TableTr>
-            </TableThead>
-            <TableTbody>
-              <RowComponent data={tableData.slice(0, 3)} id={params.id} />
-            </TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent
+          head={tableHeaders}
+          rows={<RowComponent data={tableData.slice(0, 3)} id={params.id} />}
+          loading={false}
+        />
 
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
       </Paper>
@@ -260,11 +250,13 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
       <TableTd className={styles.table__td}>{element.Date}</TableTd>
       <TableTd className={styles.table__td}>
         <Badge
-          w={90}
-          size="xs"
-          variant="light"
           tt="capitalize"
-          color={element.Status === "successful" ? "green" : "red"}
+          variant="light"
+          color={approvedBadgeColor(element.Status.toUpperCase())}
+          w={90}
+          h={24}
+          fw={400}
+          fz={12}
         >
           {element.Status}
         </Badge>

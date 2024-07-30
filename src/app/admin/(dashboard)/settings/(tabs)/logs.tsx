@@ -14,6 +14,7 @@ import {
   Checkbox,
   TableTd,
   Group,
+  Select,
 } from "@mantine/core";
 import styles from "@/ui/styles/settings.module.scss";
 import {
@@ -140,7 +141,18 @@ function Logs() {
       )}
 
       <div className={styles.pagination__container}>
-        <Text fz={14}>Rows: {logs.length}</Text>
+        <Group gap={9}>
+          <Text fz={14}>Showing:</Text>
+
+          <Select
+            data={["10", "20", "50", "100"]}
+            defaultValue={"10"}
+            w={60}
+            // h={24}
+            size="xs"
+            withCheckIcon={false}
+          />
+        </Group>
         <Pagination
           autoContrast
           color="#fff"

@@ -52,6 +52,7 @@ import {
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 import { approvedBadgeColor } from "@/lib/utils";
+import { TableComponent } from "@/ui/components/Table";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -127,8 +128,9 @@ function AccountRequests() {
       <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
       <TableTd className={styles.table__td}>{20}</TableTd>
       <TableTd
-        className={styles.table__td}
-      >{`${element.firstName} ${element.lastName}`}</TableTd>
+        tt="lowercase"
+        // className={styles.table__td}
+      >{`${element.firstName}${element.lastName}.example.com`}</TableTd>
       {/* <TableTd className={styles.table__td} tt="capitalize">
         {element.accountType.toLowerCase()}
       </TableTd>
@@ -216,24 +218,12 @@ function AccountRequests() {
           />
         </Filter>
 
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr tt="capitalize">
-                {tableHeaders.map((header, index) => (
-                  <TableTh
-                    key={index}
-                    className={styles.table__th}
-                    tt="capitalize"
-                  >
-                    {header}
-                  </TableTh>
-                ))}
-              </TableTr>
-            </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent
+          head={tableHeaders}
+          rows={rows}
+          loading={loading}
+          // mt={30}
+        />
 
         {!loading && !!!rows.length && (
           <Flex direction="column" align="center" mt={70}>

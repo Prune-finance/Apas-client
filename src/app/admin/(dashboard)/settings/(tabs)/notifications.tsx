@@ -89,7 +89,10 @@ export default function Notifications() {
                   label={item.label}
                   description={item.description}
                   fz={12}
-                  fw={600}
+                  //   fw={600}
+                  styles={{
+                    label: { fontWeight: 600 },
+                  }}
                 />
               ))}
             </SimpleGrid>

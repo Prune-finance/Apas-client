@@ -1,7 +1,16 @@
 "use client";
 
-import { Button, Flex, Text, TextInput, UnstyledButton } from "@mantine/core";
-import { IconAB2 } from "@tabler/icons-react";
+import {
+  Alert,
+  Badge,
+  Button,
+  Flex,
+  Group,
+  Text,
+  TextInput,
+  UnstyledButton,
+} from "@mantine/core";
+import { IconAB2, IconInfoCircle } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -54,28 +63,28 @@ export default function Keys() {
     fetchBusinessSecrets();
   }, []);
 
+  const icon = <IconInfoCircle />;
+
   return (
     <div className={styles.business__tab}>
-      <Flex className={styles.api__container} gap={20}>
-        <Flex h="fit-content" className={styles.api__calls} direction="column">
-          <Text tt="uppercase" fz={10} className="grey-600">
-            Total Api Calls
-          </Text>
-
-          <Text mt={16} fz={24} className="primary-700">
-            0
-          </Text>
-
-          <Text mt={24} fz={10} className="grey-500">
-            Total API calls made in the system
-          </Text>
-        </Flex>
-
+      <Flex className={styles.api__container} gap={40}>
         <Flex flex={1} className={styles.api__key} direction="column">
           <Flex justify="space-between" align="center">
-            <Text fz={12} fw={600} tt="uppercase">
+            {/* <Text fz={12} fw={600} tt="uppercase">
               API KEYS
-            </Text>
+            </Text> */}
+
+            <Badge
+              leftSection={icon}
+              tt="inherit"
+              color="#D92D20"
+              variant="light"
+              radius={0}
+              h={32}
+            >
+              Please do not use your test keys for production. They are only for
+              test.
+            </Badge>
 
             <Flex gap={10}>
               <Button
@@ -87,83 +96,158 @@ export default function Keys() {
             </Flex>
           </Flex>
 
-          <TextInput
-            readOnly
-            mt={30}
-            classNames={{
-              root: styles.root,
-              input: styles.input,
-              label: styles.label,
-              section: styles.section,
-            }}
-            leftSectionPointerEvents="none"
-            rightSection={
-              <Flex gap={10}>
-                <UnstyledButton
-                  onClick={() => setViewTest(!viewTest)}
-                  className={styles.input__right__section}
-                >
-                  <Text fw={600} fz={10} c="##475467">
-                    {!viewTest ? "View" : "Hide"}
-                  </Text>
-                </UnstyledButton>
+          <Group gap={28}>
+            <Text fz={12} fw={400} c="var(--prune-text-gray-500)" w="20ch">
+              Test Key
+            </Text>
+            <TextInput
+              flex={1}
+              readOnly
+              mt={30}
+              classNames={{
+                root: styles.root,
+                input: styles.input,
+                label: styles.label,
+                section: styles.section,
+              }}
+              leftSectionPointerEvents="none"
+              rightSection={
+                <Flex gap={10}>
+                  <UnstyledButton
+                    onClick={() => setViewTest(!viewTest)}
+                    className={styles.input__right__section}
+                  >
+                    <Text fw={600} fz={10} c="##475467">
+                      {!viewTest ? "View" : "Hide"}
+                    </Text>
+                  </UnstyledButton>
 
-                <UnstyledButton
-                  onClick={() => clipboard.copy(test?.key)}
-                  className={styles.input__right__section}
-                >
-                  <Text fw={600} fz={10} c="##475467">
-                    {clipboard.copied ? "Copied" : "Copy"}
-                  </Text>
-                </UnstyledButton>
-              </Flex>
-            }
-            label="Test Key"
-            placeholder={
-              !viewTest
-                ? `${test ? test?.key.slice(0, 15) : ""}****************`
-                : `${test ? test?.key.slice(0, 50) : ""}....`
-            }
-          />
+                  <UnstyledButton
+                    onClick={() => clipboard.copy(test?.key)}
+                    className={styles.input__right__section}
+                  >
+                    <Text fw={600} fz={10} c="##475467">
+                      {clipboard.copied ? "Copied" : "Copy"}
+                    </Text>
+                  </UnstyledButton>
+                </Flex>
+              }
+              // label="Test Key"
+              placeholder={
+                !viewTest
+                  ? `${test ? test?.key.slice(0, 15) : ""}****************`
+                  : `${test ? test?.key.slice(0, 50) : ""}....`
+              }
+            />
+          </Group>
 
-          <TextInput
-            readOnly
-            mt={30}
-            classNames={{
-              root: styles.root,
-              input: styles.input,
-              label: styles.label,
-              section: styles.section,
-            }}
-            leftSectionPointerEvents="none"
-            rightSection={
-              <Flex gap={10}>
-                <UnstyledButton
-                  onClick={() => setViewLive(!viewLive)}
-                  className={styles.input__right__section}
-                >
-                  <Text fw={600} fz={10} c="##475467">
-                    {viewLive ? "Hide" : "View"}
-                  </Text>
-                </UnstyledButton>
+          <Group gap={28}>
+            <Text fz={12} fw={400} c="var(--prune-text-gray-500)" w="20ch">
+              Live Key
+            </Text>
+            <TextInput
+              flex={1}
+              readOnly
+              mt={30}
+              classNames={{
+                root: styles.root,
+                input: styles.input,
+                label: styles.label,
+                section: styles.section,
+              }}
+              leftSectionPointerEvents="none"
+              rightSection={
+                <Flex gap={10}>
+                  <UnstyledButton
+                    onClick={() => setViewLive(!viewLive)}
+                    className={styles.input__right__section}
+                  >
+                    <Text fw={600} fz={10} c="##475467">
+                      {viewLive ? "Hide" : "View"}
+                    </Text>
+                  </UnstyledButton>
 
-                <UnstyledButton
-                  onClick={() => clipboard.copy(live?.key)}
-                  className={styles.input__right__section}
-                >
-                  <Text fw={600} fz={10} c="##475467">
-                    {clipboard.copied ? "Copied" : "Copy"}
-                  </Text>
-                </UnstyledButton>
-              </Flex>
-            }
-            label="Live Key"
-            placeholder={
-              !viewLive
-                ? `${live ? live?.key.slice(0, 15) : ""}****************`
-                : `${live ? live?.key.slice(0, 50) : ""}....`
-            }
-          />
+                  <UnstyledButton
+                    onClick={() => clipboard.copy(live?.key)}
+                    className={styles.input__right__section}
+                  >
+                    <Text fw={600} fz={10} c="##475467">
+                      {clipboard.copied ? "Copied" : "Copy"}
+                    </Text>
+                  </UnstyledButton>
+                </Flex>
+              }
+              // label="Live Key"
+              placeholder={
+                !viewLive
+                  ? `${live ? live?.key.slice(0, 15) : ""}****************`
+                  : `${live ? live?.key.slice(0, 50) : ""}....`
+              }
+            />
+          </Group>
+
+          <Group gap={28}>
+            <Text fz={12} fw={400} c="var(--prune-text-gray-500)" w="20ch">
+              Test Webhook URL:
+            </Text>
+            <TextInput
+              flex={1}
+              readOnly
+              mt={30}
+              classNames={{
+                root: styles.root,
+                input: styles.input,
+                label: styles.label,
+                section: styles.section,
+              }}
+              leftSectionPointerEvents="none"
+              rightSection={
+                <Flex gap={10}>
+                  <UnstyledButton
+                    onClick={() => setViewLive(!viewLive)}
+                    className={styles.input__right__section}
+                  >
+                    <Text fw={600} fz={10} c="##475467">
+                      {viewLive ? "Hide" : "View"}
+                    </Text>
+                  </UnstyledButton>
+
+                  <UnstyledButton
+                    onClick={() => clipboard.copy(live?.key)}
+                    className={styles.input__right__section}
+                  >
+                    <Text fw={600} fz={10} c="##475467">
+                      {clipboard.copied ? "Copied" : "Copy"}
+                    </Text>
+                  </UnstyledButton>
+                </Flex>
+              }
+              // label="Live Key"
+              placeholder={
+                !viewLive
+                  ? `${live ? live?.key.slice(0, 15) : ""}****************`
+                  : `${live ? live?.key.slice(0, 50) : ""}....`
+              }
+            />
+          </Group>
+        </Flex>
+
+        <Flex
+          // h="fit-content"
+          className={styles.api__calls}
+          direction="column"
+        >
+          <Text tt="uppercase" fz={10} className="grey-600">
+            Total Api Calls
+          </Text>
+
+          <Text mt={16} fz={24} className="primary-700">
+            0
+          </Text>
+
+          <Text mt={24} fz={10} className="grey-500">
+            Total API calls made in the system
+          </Text>
         </Flex>
       </Flex>
     </div>

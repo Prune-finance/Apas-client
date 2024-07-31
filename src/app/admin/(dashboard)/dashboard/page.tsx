@@ -60,11 +60,25 @@ export default function Home() {
   const cardFourItems = useMemo(() => {
     if (loading) return [];
 
-    return requests.map((request) => {
+    return requests.slice(0, 3).map((request) => {
       return {
         title: request.Company.name,
         date: request.createdAt,
         type: request.accountType,
+        status: request.status,
+        subText: (
+          <Text fz={10} c="var(--prune-text-gray-400)">
+            Number of Request:{" "}
+            <Text
+              inherit
+              fw={600}
+              component="span"
+              c="var(--prune-text-gray-700)"
+            >
+              {100}
+            </Text>
+          </Text>
+        ),
         link: `/admin/account-requests/${request.id}`,
       };
     });
@@ -104,16 +118,28 @@ export default function Home() {
   ];
 
   const cardTwoItems = useMemo(() => {
-    console.log({ debitRequests });
     if (debitLoading) return [];
 
-    return debitRequests.map((request) => {
+    return debitRequests.concat(debitRequests.slice(0, 1)).map((request) => {
       return {
         title: request.Account.Company.name,
         amount: request.amount,
-        subText: `Date Created: ${dayjs(request.createdAt).format(
-          "DD MMM, YYYY"
-        )}`,
+        // subText: `Date Created: ${dayjs(request.createdAt).format(
+        //   "DD MMM, YYYY"
+        // )}`,
+        subText: (
+          <Text fz={10} c="var(--prune-text-gray-400)">
+            Number of Request:{" "}
+            <Text
+              inherit
+              fw={600}
+              component="span"
+              c="var(--prune-text-gray-700)"
+            >
+              {100}
+            </Text>
+          </Text>
+        ),
         // subText: "Date Created: 24th May, 2024",
         status: request.status,
       };
@@ -227,7 +253,7 @@ export default function Home() {
                 return prv + curr.accountBalance;
               }, 0)}
               formatted
-              colored
+              // colored
               currency="EUR"
               loading={accountsLoading}
               text={

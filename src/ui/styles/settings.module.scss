@@ -13,8 +13,8 @@
         }
 
         [data-active="true"] {
-          color: var(--prune-primary-600);
-          border-bottom: 1px solid var(--prune-primary-600);
+          color: var(--prune-primary-700);
+          border-bottom: 1px solid var(--prune-primary-700);
           border-radius: 0;
           font-weight: 600;
         }
@@ -261,9 +261,9 @@
         font-weight: 500;
         color: var(--prune-text-gray-800);
 
-        &:nth-child(1) {
-          width: 30px;
-        }
+        // &:nth-child(1) {
+        //   width: 30px;
+        // }
 
         &:nth-child(3),
         &:nth-child(5),

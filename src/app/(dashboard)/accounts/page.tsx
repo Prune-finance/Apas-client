@@ -5,7 +5,7 @@ import React, { Suspense, useState } from "react";
 import Image from "next/image";
 
 // Mantine Imports
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   Menu,
   MenuDropdown,
@@ -47,6 +47,7 @@ import { accountFilterSchema } from "@/app/admin/(dashboard)/account-requests/sc
 import { AccountFilterType } from "@/app/admin/(dashboard)/accounts/schema";
 import { useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
+import { filteredSearch } from "@/lib/search";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -78,6 +79,9 @@ function Accounts() {
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const form = useForm<AccountFilterType>({
     initialValues: { ...filterValues, type: null },
@@ -214,7 +218,11 @@ function Accounts() {
     );
   };
 
-  const rows = accounts.map((element, index) => (
+  const rows = filteredSearch(
+    accounts,
+    ["accountName", "accountNumber", "Company.name"],
+    debouncedSearch
+  ).map((element, index) => (
     <TableTr key={index}>
       <TableTd className={styles.table__td} tt="capitalize">
         {element.accountName}
@@ -292,6 +300,8 @@ function Accounts() {
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
             classNames={{ wrapper: styles.search, input: styles.input__search }}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
           <Button

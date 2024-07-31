@@ -49,19 +49,21 @@ export default function ModalComponent({
         <Flex className={styles.bottom__flex} justify="center" gap={15}>
           <Button
             onClick={processing ? () => {} : close}
-            color="#D0D5DD"
-            variant="outline"
-            className={styles.cta}
+            variant="default"
+            color="var(--prune-text-gray-500)"
+            fullWidth
           >
             Cancel
           </Button>
 
           <Button
             onClick={action}
-            className={styles.cta}
+            // className={styles.cta}
             variant="filled"
-            color="#D4F307"
+            color="var(--prune-primary-600)"
+            c="var(--prune-text-gray-800)"
             loading={processing}
+            fullWidth
           >
             {customApproveMessage || "Proceed"}
           </Button>

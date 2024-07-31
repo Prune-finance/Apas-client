@@ -41,7 +41,7 @@
           align-items: center;
           background-color: #f6f6f6;
           padding: 8px 15px;
-          border-radius: 20px;
+          border-radius: 4px;
           gap: 5px;
 
           .biz__trust__text {
@@ -70,8 +70,8 @@
           }
 
           [data-active="true"] {
-            color: var(--prune-primary-600);
-            border-bottom: 1px solid var(--prune-primary-600);
+            color: var(--prune-primary-700);
+            border-bottom: 1px solid var(--prune-primary-700);
             border-radius: 0;
             font-weight: 600;
           }

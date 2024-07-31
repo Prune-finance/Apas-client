@@ -168,7 +168,7 @@ export default function Home() {
       >
         <Flex direction="column">
           <Text fz={24} className={styles.main__header__text}>
-            Welcome, Gabriella
+            Welcome
           </Text>
           <Text fz={14} className={styles.main__header__subtext}>
             Here's an overview of your financial activities
@@ -305,7 +305,7 @@ export default function Home() {
                 pb={14}
               >
                 <Text fz={16} fw={600}>
-                  API KEYS
+                  API Keys
                 </Text>
                 {/* <Text>Test</Text> */}
               </Flex>

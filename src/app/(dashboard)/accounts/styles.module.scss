@@ -1,7 +1,10 @@
 .main {
+  height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+
   .table__container {
-    margin-top: 20px;
-    padding: 20px;
+    flex-grow: 1;
     background-color: #fff;
 
     .tabs {
@@ -117,37 +120,37 @@
         }
       }
     }
+  }
 
-    .pagination__container {
-      margin-top: 20px;
-      padding-inline: 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      color: var(--prune-text-gray-700);
+  .pagination__container {
+    margin-top: 20px;
+    padding-inline: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--prune-text-gray-700);
+  }
+
+  .pagination {
+    height: 28;
+    & > div {
+      gap: 0;
     }
 
-    .pagination {
-      height: 28;
-      & > div {
-        gap: 0;
-      }
+    .control {
+      border-radius: 0;
+      border: 1px solid var(--prune-text-gray-200);
+      color: var(--prune-text-gray-400);
+      border-right: none;
 
-      .control {
-        border-radius: 0;
-        border: 1px solid var(--prune-text-gray-200);
-        color: var(--prune-text-gray-400);
-        border-right: none;
-
-        &:last-child {
-          border-right: 1px solid var(--prune-text-gray-200);
-        }
+      &:last-child {
+        border-right: 1px solid var(--prune-text-gray-200);
       }
+    }
 
-      [data-active="true"] {
-        /* Your CSS styles here */
-        color: var(--prune-primary-600);
-      }
+    [data-active="true"] {
+      /* Your CSS styles here */
+      color: var(--prune-primary-600);
     }
   }
 }

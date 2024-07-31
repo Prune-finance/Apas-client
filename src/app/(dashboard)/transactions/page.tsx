@@ -34,6 +34,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { Suspense, useState } from "react";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 
 function AccountTrx() {
   const searchParams = useSearchParams();
@@ -111,6 +112,31 @@ function AccountTrx() {
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
   });
+
+  const infoDetails = [
+    {
+      title: "Total Balance",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money In",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money Out",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Total Transactions",
+      value: 0,
+    },
+  ];
 
   return (
     <main className={styles.main}>
@@ -200,6 +226,8 @@ function AccountTrx() {
             </Flex>
           </Flex>
         </Flex>
+
+        {/* <InfoCards details={infoDetails} title="Overview" /> */}
 
         <Group justify="space-between" mt={30}>
           <TextInput

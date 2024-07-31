@@ -27,7 +27,7 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { DebitRequest, useUserDebitRequests } from "@/lib/hooks/requests";
-import { DynamicSkeleton } from "@/lib/static";
+import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 
 // UI Imports
 import styles from "./styles.module.scss";
@@ -184,7 +184,7 @@ function DebitRequests() {
                 <TableTh className={styles.table__th}>Status</TableTh>
               </TableTr>
             </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
+            <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>
           </Table>
         </TableScrollContainer>
 

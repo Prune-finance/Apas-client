@@ -1,9 +1,11 @@
 "use client";
 
 import {
+  Badge,
   Button,
   Checkbox,
   Flex,
+  Group,
   Menu,
   MenuDropdown,
   MenuItem,
@@ -24,6 +26,7 @@ import {
 } from "@mantine/core";
 import {
   IconDots,
+  IconDotsVertical,
   IconDownload,
   IconEye,
   IconListTree,
@@ -31,6 +34,8 @@ import {
   IconPointFilled,
   IconSearch,
   IconTrash,
+  IconUserEdit,
+  IconUserX,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -58,9 +63,12 @@ import {
 } from "../businesses/schema";
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
+import { TableComponent } from "@/ui/components/Table";
+import { activeBadgeColor } from "@/lib/utils";
 
 function Users() {
   const searchParams = useSearchParams();
+  const { push } = useRouter();
 
   const {
     rows: limit = "10",
@@ -128,20 +136,29 @@ function Users() {
     //   href: "/admin/businesses",
     // },
     {
-      text: "Delete",
-      icon: <IconTrash style={{ width: rem(14), height: rem(14) }} />,
+      text: "Edit User",
+      icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
+    },
+    {
+      text: "Deactivate",
+      icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
     },
   ];
+
+  const handleRowClick = (id: string) => {
+    push(`/admin/users/${id}`);
+  };
 
   const rows = filteredSearch(
     users,
     ["email", "firstName", "lastName", "role"],
     debouncedSearch
   ).map((element, index) => (
-    <TableTr key={index}>
-      <TableTd className={styles.table__td}>
-        <Checkbox />
-      </TableTd>
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
       <TableTd className={styles.table__td}>{element.email}</TableTd>
       <TableTd
         className={styles.table__td}
@@ -150,21 +167,32 @@ function Users() {
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.updatedAt).format("ddd DD MMM YYYY")}
+      </TableTd>
       {/* <TableTd className={styles.table__td}></TableTd> */}
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          <IconPointFilled size={14} color="#12B76A" />
-          <Text tt="capitalize" fz={12} c="#12B76A">
-            Active
-          </Text>
-        </div>
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={activeBadgeColor("ACTIVE")}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
+        >
+          Active
+        </Badge>
       </TableTd>
 
-      {/* <TableTd className={`${styles.table__td}`}>
+      <TableTd
+        className={`${styles.table__td}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>
-              <IconDots size={17} />
+              <IconDotsVertical size={17} />
             </UnstyledButton>
           </MenuTarget>
 
@@ -197,56 +225,57 @@ function Users() {
             })}
           </MenuDropdown>
         </Menu>
-      </TableTd> */}
+      </TableTd>
     </TableTr>
   ));
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
-        items={[
-          // { title: "Dashboard", href: "/admin/dashboard" },
-          { title: "Users", href: "/admin/users" },
-        ]}
-      />
+      <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} />
 
       <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
             All Users
           </Text>
-
-          <Button
-            onClick={open}
-            leftSection={<IconPlus color="#344054" size={16} />}
-            className={styles.login__cta}
-            variant="filled"
-            color="#D4F307"
-          >
-            Add New User
-          </Button>
         </div>
 
-        <div className={styles.container__search__filter}>
+        <Group justify="space-between" mt={28}>
           <TextInput
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
-            classNames={{ wrapper: styles.search, input: styles.input__search }}
+            // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
-          <Button
-            className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            fz={12}
-            fw={500}
-            onClick={toggle}
-          >
-            Filter
-          </Button>
-        </div>
+          <Group gap={12}>
+            <Button
+              // className={styles.filter__cta}
+              variant="default"
+              leftSection={<IconListTree size={14} />}
+              fz={12}
+              fw={500}
+              onClick={toggle}
+            >
+              Filter
+            </Button>
+
+            <Button
+              onClick={open}
+              leftSection={<IconPlus color="#344054" size={16} />}
+              // className={styles.login__cta}
+              variant="filled"
+              color="var(--prune-primary-600)"
+              c="var(--prune-text-gray-800)"
+              fw={500}
+              fz={12}
+            >
+              Invite New User
+            </Button>
+          </Group>
+        </Group>
 
         <Filter<BusinessFilterType>
           opened={openedFilter}
@@ -254,25 +283,7 @@ function Users() {
           form={filterForm}
         />
 
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                <TableTh className={styles.table__th}>
-                  <Checkbox />
-                </TableTh>
-                <TableTh className={styles.table__th}>Email Address</TableTh>
-                <TableTh className={styles.table__th}>Name</TableTh>
-                <TableTh className={styles.table__th}>Role</TableTh>
-                <TableTh className={styles.table__th}>Date Added</TableTh>
-                {/* <TableTh className={styles.table__th}>Last Log in</TableTh> */}
-                <TableTh className={styles.table__th}>Status</TableTh>
-                {/* <TableTh className={styles.table__th}>Action</TableTh> */}
-              </TableTr>
-            </TableThead>
-            <TableTbody>{loading ? AllBusinessSkeleton : rows}</TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
         {!loading && !!!rows.length && (
           <Flex direction="column" align="center" mt={70}>
@@ -287,7 +298,18 @@ function Users() {
         )}
 
         <div className={styles.pagination__container}>
-          <Text fz={14}>Rows: {rows.length}</Text>
+          <Group gap={9}>
+            <Text fz={14}>Showing:</Text>
+
+            <Select
+              data={["10", "20", "50", "100"]}
+              defaultValue={"10"}
+              w={60}
+              // h={24}
+              size="xs"
+              withCheckIcon={false}
+            />
+          </Group>
           <Pagination
             autoContrast
             color="#fff"
@@ -315,3 +337,13 @@ export default function UsersSuspense() {
     </Suspense>
   );
 }
+
+const tableHeaders = [
+  "Email",
+  "Name",
+  "Role",
+  "Date Created",
+  "Last Active",
+  "Status",
+  "Action",
+];

@@ -38,6 +38,7 @@ import {
   IconListTree,
   IconLogs,
   IconAccessible,
+  IconNotification,
 } from "@tabler/icons-react";
 import EmptyImage from "@/assets/empty.png";
 import { useDisclosure } from "@mantine/hooks";
@@ -48,6 +49,7 @@ import { useBusiness } from "@/lib/hooks/businesses";
 import { switzer } from "@/app/layout";
 import Logs from "./(tabs)/logs";
 import { useState } from "react";
+import Notifications from "./(tabs)/notifications";
 
 export default function DebitRequests() {
   const [tab, setTab] = useState<string | null>("Logs");
@@ -80,22 +82,30 @@ export default function DebitRequests() {
           mt={24}
         >
           <TabsList>
-            <TabsTab value="Logs" leftSection={<IconLogs size={14} />}>
-              Audit Logs
-            </TabsTab>
-            {/* <TabsTab
-              value="Permissions"
-              leftSection={<IconAccessible size={14} />}
-            >
-              Permissions
-            </TabsTab> */}
+            {tabs.map((tab) => (
+              <TabsTab
+                key={tab.title}
+                value={tab.value || tab.title}
+                leftSection={tab.icon}
+              >
+                {tab.title}
+              </TabsTab>
+            ))}
           </TabsList>
 
           <TabsPanel value="Logs">
             <Logs />
+          </TabsPanel>
+          <TabsPanel value="Notifications">
+            <Notifications />
           </TabsPanel>
         </Tabs>
       </div>
     </main>
   );
 }
+
+const tabs = [
+  { title: "Audit Logs", value: "Logs", icon: <IconLogs size={14} /> },
+  { title: "Notifications", icon: <IconNotification size={14} /> },
+];

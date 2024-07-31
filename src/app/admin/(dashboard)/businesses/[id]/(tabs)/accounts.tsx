@@ -62,6 +62,7 @@ import { useRouter } from "next/navigation";
 import styles from "@/ui/styles/business.module.scss";
 import { AllBusinessSkeleton } from "@/lib/static";
 import EmptyImage from "@/assets/empty.png";
+import { TableComponent } from "@/ui/components/Table";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -196,21 +197,7 @@ export default function Accounts({
 
       <Filter<BusinessFilterType> opened={opened} toggle={toggle} form={form} />
 
-      <TableScrollContainer minWidth={500}>
-        <Table className={styles.table} verticalSpacing="md">
-          <TableThead>
-            <TableTr>
-              {tableHead.map((head) => (
-                <TableTh key={head} className={styles.table__th}>
-                  {head}
-                </TableTh>
-              ))}
-            </TableTr>
-          </TableThead>
-
-          <TableTbody>{loading ? AllBusinessSkeleton : rows}</TableTbody>
-        </Table>
-      </TableScrollContainer>
+      <TableComponent head={tableHead} rows={rows} loading={loading} />
 
       {!loading && !!!rows.length && (
         <Flex direction="column" align="center" mt={70}>

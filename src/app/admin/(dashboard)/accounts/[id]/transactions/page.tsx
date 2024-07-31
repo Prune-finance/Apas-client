@@ -43,6 +43,7 @@ import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
+import { TableComponent } from "@/ui/components/Table";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -195,22 +196,11 @@ export default function TransactionForAccount() {
 
         <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
-        <TableScrollContainer minWidth={500} mt={20}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                {tableHeaders.map((header) => (
-                  <TableTd key={header} className={`${styles.table__th}`}>
-                    {header}
-                  </TableTd>
-                ))}
-              </TableTr>
-            </TableThead>
-            <TableTbody>
-              <RowComponent data={tableData.slice(0, 3)} id={params.id} />
-            </TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent
+          head={tableHeaders}
+          rows={<RowComponent data={tableData} id={params.id} />}
+          loading={false}
+        />
 
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
       </Paper>

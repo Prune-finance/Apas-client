@@ -18,6 +18,8 @@ import {
   IconArrowsUpDown,
   IconDots,
   IconPointFilled,
+  IconArrowsSort,
+  IconPremiumRights,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -49,6 +51,11 @@ export const AdminMainLinks = [
     link: "/admin/requests",
     icon: <IconCreditCardPay size={16} />,
   },
+  {
+    text: "Transactions",
+    link: "/admin/transactions",
+    icon: <IconArrowsSort size={16} />,
+  },
 ];
 
 export const AdminOtherLinks = [
@@ -56,6 +63,11 @@ export const AdminOtherLinks = [
     text: "Users",
     link: "/admin/users",
     icon: <IconUsers size={16} />,
+  },
+  {
+    text: "Pricing Plans",
+    link: "/admin/pricing-plans",
+    icon: <IconPremiumRights size={16} />,
   },
   {
     text: "Settings",

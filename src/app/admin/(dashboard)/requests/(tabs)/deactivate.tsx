@@ -45,7 +45,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 
-function Debit() {
+function Deactivate() {
   const searchParams = useSearchParams();
 
   const {
@@ -153,7 +153,7 @@ function Debit() {
   };
 
   const handleRowClick = (id: string) => {
-    push(`/admin/requests/${id}/debit`);
+    push(`/admin/requests/${id}/deactivate`);
   };
 
   const rows = filteredSearch(
@@ -405,10 +405,10 @@ const tableHeaders = [
   // "Action",
 ];
 
-export default function DebitSuspense() {
+export default function DeactivateSuspense() {
   return (
     <Suspense>
-      <Debit />
+      <Deactivate />
     </Suspense>
   );
 }

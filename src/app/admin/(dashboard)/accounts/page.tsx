@@ -53,10 +53,10 @@ import {
   AccountFilterType,
   accountFilterValues,
 } from "./schema";
-import { DateInput } from "@mantine/dates";
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
-import { table } from "console";
+import { TableComponent } from "@/ui/components/Table";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -243,33 +243,20 @@ function Accounts() {
           />
         </Filter>
 
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                {tableHeaders.map((header, index) => (
-                  <TableTh key={index} className={styles.table__th}>
-                    {header}
-                  </TableTh>
-                ))}
-              </TableTr>
-            </TableThead>
-            <TableTbody>
-              {loading ? (
-                DynamicSkeleton(3)
-              ) : (
-                <RowComponent
-                  accounts={accounts}
-                  activateOpen={activateOpen}
-                  unfreezeOpen={unfreezeOpen}
-                  freezeOpen={freezeOpen}
-                  debouncedSearch={debouncedSearch}
-                  setRowId={setRowId}
-                />
-              )}
-            </TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent
+          head={tableHeaders}
+          rows={
+            <RowComponent
+              accounts={accounts}
+              activateOpen={activateOpen}
+              unfreezeOpen={unfreezeOpen}
+              freezeOpen={freezeOpen}
+              debouncedSearch={debouncedSearch}
+              setRowId={setRowId}
+            />
+          }
+          loading={false}
+        />
 
         {!loading && !!!accounts.length && (
           <Flex direction="column" align="center" mt={70}>

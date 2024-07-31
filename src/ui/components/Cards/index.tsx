@@ -164,7 +164,7 @@ interface ICardTwo {
 interface ICardTwoItems {
   title: string;
   amount: number;
-  subText: string;
+  subText: string | JSX.Element;
   status: string;
 }
 enum CardTwoStatus {
@@ -225,31 +225,6 @@ export function CardTwo({ title, link, items }: ICardTwo) {
                 >
                   {item.status.toLowerCase()}
                 </Badge>
-                {/* <div className={styles.status__container}>
-                  <IconPointFilled
-                    size={12}
-                    color={
-                      item.status === CardTwoStatus.APPROVED
-                        ? "#12B76A"
-                        : item.status === CardTwoStatus.REJECTED
-                        ? "#D92D20"
-                        : "#C6A700"
-                    }
-                  />
-                  <Text
-                    tt="capitalize"
-                    fz={10}
-                    c={
-                      item.status === CardTwoStatus.APPROVED
-                        ? "#12B76A"
-                        : item.status === CardTwoStatus.REJECTED
-                        ? "#D92D20"
-                        : "#C6A700"
-                    }
-                  >
-                    {item.status}
-                  </Text>
-                </div> */}
               </div>
             </div>
           );
@@ -345,6 +320,8 @@ interface ICardFourItems {
   date: Date;
   type: "USER" | "CORPORATE";
   link: string;
+  subText: string | JSX.Element;
+  status: string;
 }
 
 export function CardFour({ title, link, items }: ICardFour) {
@@ -391,13 +368,24 @@ export function CardFour({ title, link, items }: ICardFour) {
                       {item.title}
                     </Text>
                     <Text tt="capitalize" className={styles.sub__text} fz={10}>
-                      {item.type} Account
+                      {/* {item.type} Account */}
+                      {item.subText}
                     </Text>
                   </div>
 
-                  <Text fz={10} fw={500} className={styles.header__text}>
+                  {/* <Text fz={10} fw={500} className={styles.header__text}>
                     {dayjs(item.date).format("DD MMM, YYYY")}
-                  </Text>
+                  </Text> */}
+
+                  <Badge
+                    color={badgeColor(item.status)}
+                    tt="capitalize"
+                    fz={10}
+                    fw={400}
+                    variant="light"
+                  >
+                    {item.status.toLowerCase()}
+                  </Badge>
                 </div>
               </div>
             </Link>

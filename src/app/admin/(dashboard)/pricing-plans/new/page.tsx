@@ -64,6 +64,7 @@ export default function CreateNewPlan() {
 
             <Select
               data={["Monthly", "Annually"]}
+              flex={1}
               label="Cycle"
               placeholder="Select cycle"
             />

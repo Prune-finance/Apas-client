@@ -3,6 +3,10 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   try {
+    if (request.nextUrl.pathname.startsWith("/_next/")) {
+      return NextResponse.next();
+    }
+
     if (request.nextUrl.pathname.startsWith("/admin")) {
       const req = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/me`,

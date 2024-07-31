@@ -16,7 +16,7 @@ export const formatNumber = (
 
 export const activeBadgeColor = (status: string) => {
   if (status === "ACTIVE") return "#12B76A";
-  return "#C6A700";
+  return "#D92D20";
 };
 
 export const formatTime = (time: string) => {

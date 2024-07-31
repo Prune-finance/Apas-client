@@ -209,6 +209,8 @@ function Debit() {
           // classNames={{ wrapper: styles.search, input: styles.input__search }}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
+          w={324}
+          styles={{ input: { border: "1px solid #F5F5F5" } }}
         />
 
         <Button
@@ -216,7 +218,9 @@ function Debit() {
           rightSection={<IconListTree size={14} />}
           fz={12}
           fw={500}
-          variant="default"
+          variant="outline"
+          color="var(--prune-text-gray-200)"
+          c="var(--prune-text-gray-800)"
           onClick={toggle}
         >
           Filter

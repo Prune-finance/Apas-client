@@ -21,7 +21,11 @@ interface Props extends TableProps {
 export function TableComponent({ loading, rows, head, ...props }: Props) {
   return (
     <TableScrollContainer minWidth={500} mt={props.mt}>
-      <Table className={styles.table} verticalSpacing="md">
+      <Table
+        className={styles.table}
+        verticalSpacing="md"
+        borderColor="#F5F5F5"
+      >
         <TableThead bg="#F9F9F9">
           <TableTr>
             {head.map((header, index) => (

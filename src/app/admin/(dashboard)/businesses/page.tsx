@@ -101,11 +101,13 @@ function Businesses() {
       title: "Money In",
       value: 0,
       formatted: true,
+      currency: "EUR",
     },
     {
       title: "Money Out",
       value: 0,
       formatted: true,
+      currency: "EUR",
     },
     {
       title: "Total Transactions",
@@ -242,7 +244,7 @@ function Businesses() {
             variant="filled"
             placeholder="Last Week"
             defaultValue={"Last Week"}
-            w={150}
+            w={130}
             // h={22}
             color="var(--prune-text-gray-500)"
             styles={{
@@ -265,6 +267,8 @@ function Businesses() {
             color="var(--prune-text-gray-200)"
             onChange={(e) => setSearch(e.currentTarget.value)}
             c="#000"
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Flex gap={12}>

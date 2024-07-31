@@ -6,7 +6,14 @@ import Image from "next/image";
 
 // Mantine Imports
 import { useDisclosure } from "@mantine/hooks";
-import { Menu, MenuDropdown, MenuItem, MenuTarget, Paper } from "@mantine/core";
+import {
+  Group,
+  Menu,
+  MenuDropdown,
+  MenuItem,
+  MenuTarget,
+  Paper,
+} from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
@@ -169,24 +176,29 @@ function AccountRequests() {
           </Text>
         </div>
 
-        <div className={styles.container__search__filter}>
+        <Group justify="space-between" mt={30}>
           <TextInput
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
-            classNames={{ wrapper: styles.search, input: styles.input__search }}
+            // classNames={{ wrapper: styles.search, input: styles.input__search }}
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Button
-            className={styles.filter__cta}
+            // className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
             fz={12}
             fw={500}
             onClick={toggle}
+            variant="outline"
+            c="var(--prune-text-gray-800)"
+            color="var(--prune-text-gray-200)"
           >
             Filter
           </Button>
-        </div>
+        </Group>
 
         <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
 

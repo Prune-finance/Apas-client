@@ -120,7 +120,7 @@ export default function Home() {
   const cardTwoItems = useMemo(() => {
     if (debitLoading) return [];
 
-    return debitRequests.map((request) => {
+    return debitRequests.concat(debitRequests.slice(0, 1)).map((request) => {
       return {
         title: request.Account.Company.name,
         amount: request.amount,

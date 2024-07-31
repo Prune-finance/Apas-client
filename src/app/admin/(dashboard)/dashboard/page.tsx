@@ -65,6 +65,20 @@ export default function Home() {
         title: request.Company.name,
         date: request.createdAt,
         type: request.accountType,
+        status: request.status,
+        subText: (
+          <Text fz={10} c="var(--prune-text-gray-400)">
+            Number of Request:{" "}
+            <Text
+              inherit
+              fw={600}
+              component="span"
+              c="var(--prune-text-gray-700)"
+            >
+              {100}
+            </Text>
+          </Text>
+        ),
         link: `/admin/account-requests/${request.id}`,
       };
     });
@@ -104,16 +118,28 @@ export default function Home() {
   ];
 
   const cardTwoItems = useMemo(() => {
-    console.log({ debitRequests });
     if (debitLoading) return [];
 
-    return debitRequests.map((request) => {
+    return debitRequests.concat(debitRequests.slice(0, 1)).map((request) => {
       return {
         title: request.Account.Company.name,
         amount: request.amount,
-        subText: `Date Created: ${dayjs(request.createdAt).format(
-          "DD MMM, YYYY"
-        )}`,
+        // subText: `Date Created: ${dayjs(request.createdAt).format(
+        //   "DD MMM, YYYY"
+        // )}`,
+        subText: (
+          <Text fz={10} c="var(--prune-text-gray-400)">
+            Number of Request:{" "}
+            <Text
+              inherit
+              fw={600}
+              component="span"
+              c="var(--prune-text-gray-700)"
+            >
+              {100}
+            </Text>
+          </Text>
+        ),
         // subText: "Date Created: 24th May, 2024",
         status: request.status,
       };

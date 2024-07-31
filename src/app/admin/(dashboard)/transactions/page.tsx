@@ -29,9 +29,10 @@ import {
   IconArrowUpRight,
   IconCircleArrowDown,
   IconListTree,
+  IconSearch,
   IconX,
 } from "@tabler/icons-react";
-import styles from "../styles.module.scss";
+import styles from "./styles.module.scss";
 
 import { useParams, useRouter } from "next/navigation";
 
@@ -56,8 +57,9 @@ export default function TransactionForAccount() {
 
   const infoDetails = [
     {
-      title: "Total Business",
+      title: "Total Balance",
       value: 0,
+      formatted: true,
     },
     {
       title: "Money In",
@@ -100,7 +102,7 @@ export default function TransactionForAccount() {
       />
 
       <Paper p={20} mt={16}>
-        <Button
+        {/* <Button
           fz={14}
           c="var(--prune-text-gray-500)"
           fw={400}
@@ -115,7 +117,7 @@ export default function TransactionForAccount() {
           }
         >
           Back
-        </Button>
+        </Button> */}
 
         <Title c="var(--prune-text-gray-700)" fz={24} fw={600} my={28}>
           Transactions
@@ -144,6 +146,7 @@ export default function TransactionForAccount() {
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             // leftSection={searchIcon}
+            leftSection={<IconSearch size={20} />}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             // value={search}
             color="var(--prune-text-gray-200)"

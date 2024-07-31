@@ -16,12 +16,13 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-import { directorEtShareholderSchema } from "@/lib/schema";
+import { directorEtShareholderSchema, RemoveDirectorType } from "@/lib/schema";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 
 interface DropzoneCustomProps extends Partial<DropzoneProps> {
   form?: UseFormReturnType<typeof directorEtShareholderSchema>;
+  removeDirectorForm?: UseFormReturnType<RemoveDirectorType>;
   formKey?: string;
 }
 
@@ -34,6 +35,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
 
   const form = props.form;
   const formKey = props.formKey;
+  const removeDirectorForm = props.removeDirectorForm;
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -52,6 +54,10 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       if (form) {
         if (!formKey) return;
         form.setFieldValue(formKey, data.data.url);
+      }
+      if (removeDirectorForm) {
+        if (!formKey) return;
+        removeDirectorForm.setFieldValue(formKey, data.data.url);
       }
       setUploaded(true);
     } catch (error) {

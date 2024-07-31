@@ -5,35 +5,32 @@ import axios from "axios";
 import { useState } from "react";
 
 import Image from "next/image";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import {
+  Badge,
+  Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
   Select,
-  TableTbody,
   TableTd,
 } from "@mantine/core";
 import { Flex, Box, Divider, Button, TextInput } from "@mantine/core";
 import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
-import { Table, TableTh, TableThead } from "@mantine/core";
-import { TableTr, Pagination, TableScrollContainer } from "@mantine/core";
+import { TableTr, Pagination } from "@mantine/core";
 
 import { IconDots, IconEye } from "@tabler/icons-react";
 import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
-import { IconPointFilled } from "@tabler/icons-react";
 import { IconListTree } from "@tabler/icons-react";
 
 import ModalComponent from "@/ui/components/Modal";
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/accounts.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 
-import { formatNumber } from "@/lib/utils";
-import { AllBusinessSkeleton, DynamicSkeleton } from "@/lib/static";
+import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -44,8 +41,9 @@ import {
   businessFilterSchema,
 } from "../../businesses/schema";
 import Filter from "@/ui/components/Filter";
-import { DateInput } from "@mantine/dates";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { filteredSearch } from "@/lib/search";
+import { TableComponent } from "@/ui/components/Table";
 
 function Debit() {
   const searchParams = useSearchParams();
@@ -63,6 +61,7 @@ function Debit() {
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
   });
+  const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
   );
@@ -76,6 +75,9 @@ function Debit() {
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
@@ -150,60 +152,45 @@ function Debit() {
     );
   };
 
-  const rows = requests.map((element, index) => (
-    <TableTr key={index}>
-      <TableTd className={styles.table__td}>{index + 1}</TableTd>
-      <TableTd className={styles.table__td}>
-        {element.Account.Company.name}
-      </TableTd>
+  const handleRowClick = (id: string) => {
+    push(`/admin/requests/${id}/debit`);
+  };
+
+  const rows = filteredSearch(
+    requests,
+    ["Account.Company.name", "Account.accountNumber"],
+    debouncedSearch
+  ).map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd>{element.Account.Company.name}</TableTd>
       <TableTd className={styles.table__td}>{element.amount}</TableTd>
       <TableTd className={styles.table__td}>
-        {element.Account.accountNumber}
+        {`${element.Account.Company.name
+          .toLowerCase()
+          .split(" ")
+          .join("")}@example.com`}
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <div
-          className={styles.table__td__status}
-          style={{
-            background:
-              element.status === "PENDING"
-                ? "#FFFAEB"
-                : element.status === "REJECTED"
-                ? "#FCF1F2"
-                : "#ECFDF3",
-          }}
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={approvedBadgeColor(element.status)}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
         >
-          <IconPointFilled
-            size={14}
-            color={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          />
-          <Text
-            tt="capitalize"
-            fz={12}
-            c={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          >
-            {element.status.toLowerCase()}
-          </Text>
-        </div>
+          {element.status.toLowerCase()}
+        </Badge>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
         <MenuComponent request={element} />
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -219,14 +206,17 @@ function Debit() {
           placeholder="Search here..."
           leftSectionPointerEvents="none"
           leftSection={searchIcon}
-          classNames={{ wrapper: styles.search, input: styles.input__search }}
+          // classNames={{ wrapper: styles.search, input: styles.input__search }}
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
         />
 
         <Button
-          className={styles.filter__cta}
+          // className={styles.filter__cta}
           rightSection={<IconListTree size={14} />}
           fz={12}
           fw={500}
+          variant="default"
           onClick={toggle}
         >
           Filter
@@ -239,22 +229,7 @@ function Debit() {
         form={form}
       />
 
-      <TableScrollContainer minWidth={500}>
-        <Table className={styles.table} verticalSpacing="md">
-          <TableThead>
-            <TableTr>
-              <TableTh className={styles.table__th}>S/N</TableTh>
-              <TableTh className={styles.table__th}>Business Name</TableTh>
-              <TableTh className={styles.table__th}>Amount</TableTh>
-              <TableTh className={styles.table__th}>Source Account</TableTh>
-              <TableTh className={styles.table__th}>Date Created</TableTh>
-              <TableTh className={styles.table__th}>Status</TableTh>
-              <TableTh className={styles.table__th}>Action</TableTh>
-            </TableTr>
-          </TableThead>
-          <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
-        </Table>
-      </TableScrollContainer>
+      <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
       {!loading && !!!rows.length && (
         <Flex direction="column" align="center" mt={70}>
@@ -269,7 +244,18 @@ function Debit() {
       )}
 
       <div className={styles.pagination__container}>
-        <Text fz={14}>Rows: {requests.length}</Text>
+        <Group gap={9}>
+          <Text fz={14}>Showing:</Text>
+
+          <Select
+            data={["10", "20", "50", "100"]}
+            defaultValue={"10"}
+            w={60}
+            // h={24}
+            size="xs"
+            withCheckIcon={false}
+          />
+        </Group>
         <Pagination
           autoContrast
           color="#fff"
@@ -410,6 +396,14 @@ function Debit() {
     </Fragment>
   );
 }
+
+const tableHeaders = [
+  "Business Name",
+  "Number of Requests",
+  "Contact Email",
+  "Status",
+  // "Action",
+];
 
 export default function DebitSuspense() {
   return (

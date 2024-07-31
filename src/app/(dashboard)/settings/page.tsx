@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Checkbox,
+  Divider,
   Flex,
   Menu,
   MenuDropdown,
@@ -31,6 +32,7 @@ import {
 } from "@mantine/core";
 import {
   IconBuildingSkyscraper,
+  IconCheck,
   IconCurrencyEuro,
   IconDots,
   IconDownload,
@@ -42,6 +44,7 @@ import {
   IconPlus,
   IconPointFilled,
   IconSearch,
+  IconTags,
   IconTrash,
   IconUsers,
   IconUsersGroup,
@@ -231,11 +234,19 @@ export default function Users() {
     }
   };
 
+  const tabs = [
+    { title: "Change Password", value: "Password", icon: IconLock },
+    { title: "API Keys & Webhooks", value: "Keys", icon: IconKey },
+    { title: "Pricing Plan", value: "Pricing", icon: IconTags },
+  ];
+
+  const CheckIcon = <IconCheck size={14} color="var(--prune-text-gray-800)" />;
+
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Settings", href: "/settings" }]} />
+      {/* <Breadcrumbs items={[{ title: "Settings", href: "/settings" }]} /> */}
 
-      <Paper withBorder className={styles.table__container}>
+      <Paper className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
             Settings
@@ -254,7 +265,7 @@ export default function Users() {
 
         <Tabs
           mt={32}
-          defaultValue="Users"
+          defaultValue={tabs[0].value}
           variant="pills"
           classNames={{
             root: styles.tabs,
@@ -263,21 +274,15 @@ export default function Users() {
           }}
         >
           <TabsList mb={20}>
-            <TabsTab value="Users" leftSection={<IconUsers size={14} />}>
-              Users
-            </TabsTab>
-
-            <TabsTab value="Password" leftSection={<IconLock size={14} />}>
-              Change Password
-            </TabsTab>
-
-            <TabsTab value="Keys" leftSection={<IconKey size={14} />}>
-              API Keys and Webhooks
-            </TabsTab>
-
-            <TabsTab value="Pricing" leftSection={<IconUsersGroup size={14} />}>
-              Pricing Plan
-            </TabsTab>
+            {tabs.map((tab, index) => (
+              <TabsTab
+                key={index}
+                value={tab.value}
+                leftSection={<tab.icon size={14} />}
+              >
+                {tab.title}
+              </TabsTab>
+            ))}
           </TabsList>
 
           <TabsPanel value="Users">
@@ -378,8 +383,10 @@ export default function Users() {
                   <Button
                     onClick={() => passwordForm.reset()}
                     color="#D0D5DD"
-                    variant="outline"
-                    className={styles.cta}
+                    variant="default"
+                    fz={12}
+                    fw={500}
+                    // className={styles.cta}
                   >
                     Cancel
                   </Button>
@@ -387,9 +394,12 @@ export default function Users() {
                   <Button
                     onClick={handlePasswordChange}
                     loading={processing}
-                    className={styles.cta}
+                    // className={styles.cta}
+                    fz={12}
+                    fw={500}
                     variant="filled"
-                    color="#D4F307"
+                    color="var(--prune-primary-600)"
+                    c="var(--prune-text-gray-800)"
                   >
                     Save Changes
                   </Button>
@@ -398,7 +408,7 @@ export default function Users() {
 
               <Stack flex={1}>
                 <Box>
-                  <Text fz={18} fw={600} c="#97AD05" mb={0}>
+                  <Text fz={18} fw={600} c="var(--prune-text-gray-800)" mb={0}>
                     Please Note
                   </Text>
                   <Text fz={12} className="grey-400">
@@ -409,27 +419,27 @@ export default function Users() {
                 <Checkbox
                   checked={checks.is8Char}
                   label="8 characters"
-                  color="lime"
+                  color="var(--prune-primary-700)"
                 />
                 <Checkbox
                   checked={checks.hasSpecialChar}
                   label="1 special character"
-                  color="lime"
+                  color="var(--prune-primary-700)"
                 />
                 <Checkbox
                   checked={checks.hasNumber}
                   label="1 digit"
-                  color="lime"
+                  color="var(--prune-primary-700)"
                 />
                 <Checkbox
                   checked={checks.hasUpperCase}
                   label="1 uppercase letter"
-                  color="lime"
+                  color="var(--prune-primary-700)"
                 />
                 <Checkbox
                   checked={checks.hasLowerCase}
                   label="1 lowercase letter"
-                  color="lime"
+                  color="var(--prune-primary-700)"
                 />
               </Stack>
             </Flex>

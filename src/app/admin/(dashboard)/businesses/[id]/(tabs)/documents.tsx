@@ -8,6 +8,7 @@ import {
   GridCol,
   Text,
   TextInput,
+  ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
 import {
@@ -217,6 +218,21 @@ export default function Documents({
           </GridCol>
         </Grid>
       </div>
+      <Button
+        // mt={20}
+        variant="transparent"
+        fz={12}
+        fw={400}
+        c="#000"
+        // onClick={open}
+        leftSection={
+          <ThemeIcon radius="xl" color="var(--prune-primary-500)">
+            <IconPlus color="#344054" size={14} />
+          </ThemeIcon>
+        }
+      >
+        Add New
+      </Button>
     </div>
   );
 }

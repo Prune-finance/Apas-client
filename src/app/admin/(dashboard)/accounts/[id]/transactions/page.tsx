@@ -40,7 +40,7 @@ import Filter from "@/ui/components/Filter";
 import { useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
-import { formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
@@ -254,13 +254,14 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
       <TableTd className={styles.table__td}>{element.Date}</TableTd>
       <TableTd className={styles.table__td}>
         <Badge
-          w={90}
-          size="xs"
-          variant="light"
+          color={approvedBadgeColor(element.Status.toUpperCase())}
           tt="capitalize"
-          color={element.Status === "successful" ? "green" : "red"}
+          fz={10}
+          fw={400}
+          w={90}
+          variant="light"
         >
-          {element.Status}
+          {element.Status.toLowerCase()}
         </Badge>
       </TableTd>
     </TableTr>
@@ -395,13 +396,14 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
               </Text>
               {detail.title === "Status" ? (
                 <Badge
-                  w={90}
-                  size="xs"
-                  variant="light"
+                  color={approvedBadgeColor(detail.value.toUpperCase())}
                   tt="capitalize"
-                  color={detail.value === "successful" ? "green" : "red"}
+                  fz={10}
+                  fw={400}
+                  w={90}
+                  variant="light"
                 >
-                  {detail.value}
+                  {detail.value.toLowerCase()}
                 </Badge>
               ) : (
                 <Group gap={0}>

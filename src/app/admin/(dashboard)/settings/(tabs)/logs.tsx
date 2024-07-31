@@ -101,6 +101,8 @@ function Logs() {
           // classNames={{ wrapper: styles.search, input: styles.input__search }}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
+          w={324}
+          styles={{ input: { border: "1px solid #F5F5F5" } }}
         />
 
         <Group>
@@ -109,6 +111,8 @@ function Logs() {
             rightSection={<IconCalendar size={14} />}
             {...form.getInputProps("createdAt")}
             clearable
+            // w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Button
@@ -116,7 +120,9 @@ function Logs() {
             fw={500}
             // w={99}
             onClick={toggle}
-            variant="default"
+            variant="outline"
+            color="var(--prune-text-gray-200)"
+            c="var(--prune-text-gray-800)"
             leftSection={<IconCircleArrowDown size={14} />}
           >
             Download Log

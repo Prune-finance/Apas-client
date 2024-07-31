@@ -23,9 +23,6 @@ import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/accounts.module.scss";
 import {
-  IconPointFilled,
-  IconDots,
-  IconEye,
   IconBrandLinktree,
   IconX,
   IconTrash,
@@ -35,11 +32,9 @@ import {
   IconArrowUpRight,
   IconDotsVertical,
 } from "@tabler/icons-react";
-import Link from "next/link";
 
 import ModalComponent from "@/ui/components/Modal";
 import { AccountData, useAccounts } from "@/lib/hooks/accounts";
-import { DynamicSkeleton } from "@/lib/static";
 import { activeBadgeColor, formatNumber } from "@/lib/utils";
 
 import EmptyImage from "@/assets/empty.png";

@@ -11,6 +11,7 @@ import {
   MenuDropdown,
   MenuItem,
   MenuTarget,
+  Modal,
   Paper,
   Select,
 } from "@mantine/core";
@@ -30,6 +31,7 @@ import {
   IconListTree,
   IconSearch,
   IconCheck,
+  IconArrowDownLeft,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -45,12 +47,14 @@ import { useForm, zodResolver } from "@mantine/form";
 import { filterValues } from "@/lib/schema";
 import { accountFilterSchema } from "@/app/admin/(dashboard)/account-requests/schema";
 import { AccountFilterType } from "@/app/admin/(dashboard)/accounts/schema";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
+import DebitRequestModal from "../debit-requests/new/modal";
 
 function Accounts() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const {
     rows: limit = "10",
@@ -73,6 +77,8 @@ function Accounts() {
     useDisclosure(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [activateOpened, { open: activateOpen, close: activateClose }] =
+    useDisclosure(false);
+  const [debitOpened, { open: debitOpen, close: debitClose }] =
     useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -172,7 +178,7 @@ function Accounts() {
         </MenuTarget>
 
         <MenuDropdown>
-          <Link href={`/accounts/${id}`}>
+          {/* <Link href={`/accounts/${id}`}>
             <MenuItem
               fz={10}
               c="#667085"
@@ -182,7 +188,21 @@ function Accounts() {
             >
               View
             </MenuItem>
-          </Link>
+          </Link> */}
+
+          <MenuItem
+            onClick={() => {
+              setRowId(id);
+              debitOpen();
+            }}
+            fz={10}
+            c="#667085"
+            leftSection={
+              <IconArrowDownLeft style={{ width: rem(14), height: rem(14) }} />
+            }
+          >
+            Debit Account
+          </MenuItem>
 
           {/* <MenuItem
             onClick={() => {
@@ -223,22 +243,49 @@ function Accounts() {
     ["accountName", "accountNumber", "Company.name"],
     debouncedSearch
   ).map((element, index) => (
-    <TableTr key={index}>
-      <TableTd className={styles.table__td} tt="capitalize">
+    <TableTr key={index} style={{ cursor: "pointer" }}>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
         {element.accountName}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
-      <TableTd className={styles.table__td}>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+      >
+        {element.accountNumber}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+      >
         {formatNumber(element.accountBalance, true, "EUR")}
       </TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
         {element.type.toLowerCase()}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+      >
+        {element.Company.name}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={`${styles.table__td}`}
+      >
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
-      <TableTd className={styles.table__td}>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+      >
         <div
           className={styles.table__td__status}
           style={{
@@ -355,6 +402,16 @@ function Accounts() {
             </Text>
           </Flex>
         )}
+
+        <Modal
+          size="xl"
+          opened={debitOpened}
+          onClose={debitClose}
+          centered
+          withCloseButton={false}
+        >
+          <DebitRequestModal close={debitClose} selectedId={rowId || ""} />
+        </Modal>
 
         <ModalComponent
           processing={processing}

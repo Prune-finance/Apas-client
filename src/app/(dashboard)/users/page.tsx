@@ -47,24 +47,29 @@ import styles from "./styles.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { AllBusinessSkeleton } from "@/lib/static";
-import { useAdmins } from "@/lib/hooks/admins";
+import { AdminData, useAdmins } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import ModalComponent from "./modal";
+
 import { useForm, zodResolver } from "@mantine/form";
-import { newAdmin, validateNewAdmin } from "@/lib/schema";
+import {
+  filterSchema,
+  FilterType,
+  filterValues,
+  newAdmin,
+  validateNewAdmin,
+} from "@/lib/schema";
 import axios from "axios";
 import { Suspense, useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import {
-  businessFilterSchema,
-  BusinessFilterType,
-  businessFilterValues,
-} from "../businesses/schema";
+
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { activeBadgeColor } from "@/lib/utils";
+import ModalComponent from "./modal";
+import UserDrawer from "./drawer";
+import User from "@/lib/store/user";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -86,21 +91,28 @@ function Users() {
   });
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
+  const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
+    useDisclosure(false);
   const { handleError } = useNotification();
+
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
+  const [isEdit, setIsEdit] = useState(false);
+  const [user, setUser] = useState<AdminData | null>(null);
   const [processing, setProcessing] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  // const {} = Tr
 
   const form = useForm({
     initialValues: newAdmin,
     validate: zodResolver(validateNewAdmin),
   });
 
-  const filterForm = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const filterForm = useForm<FilterType>({
+    initialValues: filterValues,
+    validate: zodResolver(filterSchema),
   });
 
   const addAdmin = async () => {
@@ -128,6 +140,12 @@ function Users() {
     }
   };
 
+  const handleEdit = (data: typeof newAdmin) => {
+    form.setValues(data);
+    open();
+    setIsEdit(true);
+  };
+
   const menuItems = [
     // {
     //   text: "View",
@@ -145,8 +163,9 @@ function Users() {
     },
   ];
 
-  const handleRowClick = (id: string) => {
-    push(`/admin/users/${id}`);
+  const handleRowClick = (user: AdminData) => {
+    setUser(user);
+    openDrawer();
   };
 
   const rows = filteredSearch(
@@ -156,7 +175,7 @@ function Users() {
   ).map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id)}
+      onClick={() => handleRowClick(element)}
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>{element.email}</TableTd>
@@ -211,6 +230,8 @@ function Users() {
               //       </MenuItem>
               //     </Link>
               //   );
+              {
+              }
 
               return (
                 <MenuItem
@@ -218,6 +239,16 @@ function Users() {
                   fz={10}
                   c="#667085"
                   leftSection={items.icon}
+                  onClick={() => {
+                    if (items.text === "Edit User")
+                      return handleEdit({
+                        email: element.email,
+                        firstName: element.firstName,
+                        lastName: element.lastName,
+                        role: element.role,
+                        password: "",
+                      });
+                  }}
                 >
                   {items.text}
                 </MenuItem>
@@ -231,12 +262,12 @@ function Users() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} />
+      {/* <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} /> */}
 
       <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
-            All Users
+            Users
           </Text>
         </div>
 
@@ -277,7 +308,7 @@ function Users() {
           </Group>
         </Group>
 
-        <Filter<BusinessFilterType>
+        <Filter<FilterType>
           opened={openedFilter}
           toggle={toggle}
           form={filterForm}
@@ -325,7 +356,10 @@ function Users() {
         opened={opened}
         close={close}
         form={form}
+        isEdit={isEdit}
       />
+
+      <UserDrawer opened={openedDrawer} close={closeDrawer} user={user} />
     </main>
   );
 }

@@ -7,7 +7,12 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { IconLogout } from "@tabler/icons-react";
 
-import { AdminMainLinks, AdminOtherLinks, UserMainLinks } from "@/lib/static";
+import {
+  AdminMainLinks,
+  AdminOtherLinks,
+  UserMainLinks,
+  UserOtherLinks,
+} from "@/lib/static";
 
 import PruneLogo from "@/assets/logo.png";
 import PruneTintLogo from "@/assets/logo-tint.png";
@@ -152,6 +157,10 @@ export function UserNavbar() {
 
       <div className={styles.menu__container}>
         <div className={styles.container}>
+          <Text fz={10} className={styles.container__header} pl={10}>
+            MAIN MENU
+          </Text>
+
           <div className={styles.links}>
             {UserMainLinks.map((item, index) => {
               return (
@@ -165,6 +174,33 @@ export function UserNavbar() {
                       pathname.startsWith(item.link) && item.link !== "/"
                         ? styles.link__active
                         : ""
+                    }`}
+                  >
+                    <div>
+                      <Text fz={12} className={styles.link__text}>
+                        {item.text}
+                      </Text>
+                    </div>
+                    {item.icon}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className={styles.container}>
+          <Text fz={10} className={styles.container__header} pl={10}>
+            OTHERS
+          </Text>
+
+          <div className={styles.links}>
+            {UserOtherLinks.map((item, index) => {
+              return (
+                <Link key={index} href={item.link}>
+                  <div
+                    className={`${styles.link} ${
+                      pathname.startsWith(item.link) ? styles.link__active : ""
                     }`}
                   >
                     <div>

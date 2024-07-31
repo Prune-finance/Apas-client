@@ -102,6 +102,19 @@ export const UserMainLinks = [
     link: "/transactions",
     icon: <IconArrowsUpDown size={16} />,
   },
+];
+
+export const UserOtherLinks = [
+  // {
+  //   text: "Roles & Permissions",
+  //   link: "/roles",
+  //   icon: <IconSettings size={16} />,
+  // },
+  {
+    text: "Users",
+    link: "/users",
+    icon: <IconUsers size={16} />,
+  },
   {
     text: "Settings",
     link: "/settings",

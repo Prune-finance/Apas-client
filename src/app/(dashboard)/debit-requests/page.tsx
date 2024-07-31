@@ -1,7 +1,6 @@
 "use client";
 import dayjs from "dayjs";
 
-import Link from "next/link";
 import Image from "next/image";
 
 // Mantine Imports
@@ -27,18 +26,14 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { DebitRequest, useUserDebitRequests } from "@/lib/hooks/requests";
-import { AllBusinessSkeleton, DynamicSkeleton } from "@/lib/static";
+import { DynamicSkeleton } from "@/lib/static";
 
 // UI Imports
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import ModalComponent from "@/ui/components/Modal";
-import styles from "@/ui/styles/accounts.module.scss";
+import styles from "./styles.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
 import { Suspense, useState } from "react";
-import axios from "axios";
-import useNotification from "@/lib/hooks/notification";
 import { formatNumber } from "@/lib/utils";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
@@ -74,40 +69,15 @@ function DebitRequests() {
     validate: zodResolver(filterSchema),
   });
 
-  const MenuComponent = ({ request }: { request: DebitRequest }) => {
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          <MenuItem
-            onClick={() => {
-              setSelectedRequest(request);
-              openDrawer();
-            }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            View
-          </MenuItem>
-        </MenuDropdown>
-      </Menu>
-    );
-  };
-
   const rows = requests.map((element, index) => (
-    <TableTr key={index}>
-      <TableTd className={styles.table__td}>{index + 1}</TableTd>
+    <TableTr
+      style={{ cursor: "pointer" }}
+      key={index}
+      onClick={() => {
+        setSelectedRequest(element);
+        openDrawer();
+      }}
+    >
       <TableTd className={styles.table__td}>
         {element.Account.Company.name}
       </TableTd>
@@ -157,23 +127,19 @@ function DebitRequests() {
           </Text>
         </div>
       </TableTd>
-
-      <TableTd className={`${styles.table__td}`}>
-        <MenuComponent request={element} />
-      </TableTd>
     </TableTr>
   ));
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/dashboard" },
           { title: "Debit Requests", href: "/debit-requests" },
         ]}
-      />
+      /> */}
 
-      <Paper withBorder className={styles.table__container}>
+      <Paper className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
             Debit Requests
@@ -205,13 +171,11 @@ function DebitRequests() {
           <Table className={styles.table} verticalSpacing="md">
             <TableThead>
               <TableTr>
-                <TableTh className={styles.table__th}>S/N</TableTh>
                 <TableTh className={styles.table__th}>Business Name</TableTh>
                 <TableTh className={styles.table__th}>Amount</TableTh>
                 <TableTh className={styles.table__th}>Source Account</TableTh>
                 <TableTh className={styles.table__th}>Date Created</TableTh>
                 <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh>
               </TableTr>
             </TableThead>
             <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
@@ -229,17 +193,17 @@ function DebitRequests() {
             </Text>
           </Flex>
         )}
-
-        <div className={styles.pagination__container}>
-          <Text fz={14}>Rows: {rows.length}</Text>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
       </Paper>
+
+      <div className={styles.pagination__container}>
+        <Text fz={14}>Showing: {rows.length}</Text>
+        <Pagination
+          autoContrast
+          color="#fff"
+          total={1}
+          classNames={{ control: styles.control, root: styles.pagination }}
+        />
+      </div>
 
       <Drawer
         opened={drawerOpened}
@@ -250,7 +214,7 @@ function DebitRequests() {
       >
         <Flex justify="space-between" pb={28}>
           <Text fz={18} fw={600} c="#1D2939">
-            Request Details
+            Debit Request Details
           </Text>
 
           <IconX onClick={closeDrawer} />
@@ -267,16 +231,20 @@ function DebitRequests() {
             </Text>
           </Flex>
 
-          <Divider my={30} />
+          <Divider mt={30} mb={20} />
+
+          <Text fz={16} mb={24}>
+            Account Details
+          </Text>
 
           <Flex direction="column" gap={30}>
-            <Flex justify="space-between">
+            {/* <Flex justify="space-between">
               <Text fz={14} c="#8B8B8B">
                 Business Name:
               </Text>
 
               <Text fz={14}>{selectedRequest?.Account.Company.name}</Text>
-            </Flex>
+            </Flex> */}
 
             <Flex justify="space-between">
               <Text fz={14} c="#8B8B8B">
@@ -301,14 +269,73 @@ function DebitRequests() {
                 Status:
               </Text>
 
-              <Text fz={14}>{selectedRequest?.status}</Text>
+              <Text
+                fz={14}
+                c={
+                  selectedRequest?.status === "PENDING"
+                    ? "#C6A700"
+                    : selectedRequest?.status === "REJECTED"
+                    ? "#D92D20"
+                    : "#12B76A"
+                }
+              >
+                {selectedRequest?.status}
+              </Text>
             </Flex>
           </Flex>
 
           <Divider my={30} />
 
-          <Text fz={12} c="#1D2939" fw={600}>
-            REASON FOR DEBIT
+          <Text fz={16} mb={24}>
+            Destination Details
+          </Text>
+
+          <Flex direction="column" gap={30}>
+            <Flex justify="space-between">
+              <Text fz={14} c="#8B8B8B">
+                IBAN
+              </Text>
+
+              <Text fz={14}>{selectedRequest?.destinationIBAN}</Text>
+            </Flex>
+
+            <Flex justify="space-between">
+              <Text fz={14} c="#8B8B8B">
+                BIC
+              </Text>
+
+              <Text fz={14}>{selectedRequest?.destinationBIC}</Text>
+            </Flex>
+
+            <Flex justify="space-between">
+              <Text fz={14} c="#8B8B8B">
+                Country
+              </Text>
+
+              <Text fz={14}>{selectedRequest?.destinationCountry}</Text>
+            </Flex>
+
+            <Flex justify="space-between">
+              <Text fz={14} c="#8B8B8B">
+                Bank
+              </Text>
+
+              <Text fz={14}>{selectedRequest?.destinationBank}</Text>
+            </Flex>
+
+            <Flex justify="space-between">
+              <Text fz={14} c="#8B8B8B">
+                Reference:
+              </Text>
+
+              <Text fz={14}>{selectedRequest?.reference}</Text>
+            </Flex>
+          </Flex>
+
+          <Divider my={30} />
+
+          <Text fz={16} c="#1D2939" fw={600}>
+            Reason
           </Text>
 
           <div
@@ -318,7 +345,7 @@ function DebitRequests() {
               padding: "12px 16px",
             }}
           >
-            <Text fz={12} c="#667085">
+            <Text fz={14} c="#667085">
               {selectedRequest?.reason || ""}
             </Text>
           </div>

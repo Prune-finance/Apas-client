@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 
-import { Text, TableTd, Paper } from "@mantine/core";
+import { Text, TableTd, Paper, Box } from "@mantine/core";
 import { TableTbody, TableTh, TableThead } from "@mantine/core";
 import { Tooltip, rem, Button, Table } from "@mantine/core";
 import { Stack, CopyButton, ActionIcon } from "@mantine/core";
 import { Grid, GridCol, NativeSelect, TableTr } from "@mantine/core";
 import { Flex, TableScrollContainer } from "@mantine/core";
-import { DonutChart, LineChart } from "@mantine/charts";
+import { DonutChart, LineChart, AreaChart } from "@mantine/charts";
 
 import { IconCheck, IconCircleChevronRight } from "@tabler/icons-react";
 import { IconArrowUpRight, IconCopy } from "@tabler/icons-react";
@@ -160,234 +160,116 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} />
+      {/* <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} /> */}
+      <Flex
+        justify="space-between"
+        align="center"
+        className={styles.main__header}
+      >
+        <Flex direction="column">
+          <Text fz={24} className={styles.main__header__text}>
+            Welcome
+          </Text>
+          <Text fz={14} className={styles.main__header__subtext}>
+            Here's an overview of your financial activities
+          </Text>
+        </Flex>
+
+        <Button
+          fz={12}
+          className={styles.main__cta}
+          variant="filled"
+          color="#C1DD06"
+        >
+          Account Statement
+        </Button>
+      </Flex>
+
+      <Flex className={styles.overview__container} direction="column">
+        <Flex className={styles.container__header}>
+          <Text fz={16} c="#1A1B20">
+            Overview
+          </Text>
+        </Flex>
+
+        <Flex className={styles.container__body} gap={30}>
+          <Flex flex={1.5} direction="column" gap={10}>
+            <Flex gap={10} align="center">
+              <Text className={styles.body__text__header}>Total Balance</Text>
+              <Button
+                className={styles.debit__btn}
+                variant="filled"
+                color="#F9FCE6"
+                fz={10}
+              >
+                Debit Request
+              </Button>
+            </Flex>
+
+            <Text className={styles.body__text} fz={24} fw={600}>
+              {formatNumber(balance, true, "EUR")}
+            </Text>
+          </Flex>
+
+          <Flex flex={1} direction="column" gap={10}>
+            <Flex gap={10} align="center">
+              <Text className={styles.body__text__header}>Total Accounts</Text>
+            </Flex>
+
+            <Text className={styles.body__text} fz={24} fw={600}>
+              {meta?.total}
+            </Text>
+          </Flex>
+
+          <Flex flex={1} direction="column" gap={10}>
+            <Flex gap={10} align="center">
+              <Text className={styles.body__text__header}>Active Accounts</Text>
+            </Flex>
+
+            <Text className={styles.body__text} fz={24} fw={600}>
+              {meta?.active}
+            </Text>
+          </Flex>
+
+          <Flex flex={1} direction="column" gap={10}>
+            <Flex gap={10} align="center">
+              <Text className={styles.body__text__header}>
+                Inactive Accounts
+              </Text>
+            </Flex>
+
+            <Text className={styles.body__text} fz={24} fw={600}>
+              {meta?.inactive}
+            </Text>
+          </Flex>
+        </Flex>
+      </Flex>
 
       <div className={styles.grid__cards}>
-        <Grid>
-          <GridCol span={9}>
-            <Grid>
-              <GridCol span={{ lg: 4, md: 6 }}>
-                <CardOne
-                  withBorder
-                  title="Total Accounts"
-                  stat={meta?.total || 0}
-                  link="/accounts"
-                  colored
-                  loading={loading}
-                  text={
-                    <>
-                      There is a{" "}
-                      <Text bg="#ECFDF3" c="#12B76A" fz={9} span>
-                        +100%
-                      </Text>{" "}
-                      increase this month and a total of{" "}
-                      <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
-                        {meta?.total}
-                      </Text>{" "}
-                      accounts this week
-                    </>
-                  }
-                />
-              </GridCol>
-
-              <GridCol span={{ lg: 4, md: 6 }}>
-                <CardOne
-                  withBorder
-                  title="Active Accounts"
-                  loading={loading}
-                  stat={meta?.active || 0}
-                  text={
-                    <>
-                      This shows the total number of active accounts in the
-                      system
-                    </>
-                  }
-                />
-              </GridCol>
-
-              <GridCol span={{ lg: 4, md: 6 }}>
-                <CardOne
-                  withBorder
-                  title="Inactive Accounts"
-                  stat={meta?.inactive || 0}
-                  loading={loading}
-                  text={
-                    <>
-                      This shows the total number of inactive accounts in the
-                      system
-                    </>
-                  }
-                />
-              </GridCol>
-
-              <GridCol span={12}>
-                <Paper withBorder className={styles.chart__container}>
-                  <div className={styles.container__text}>
-                    <Text
-                      tt="uppercase"
-                      fz={10}
-                      fw={600}
-                      className={styles.text}
-                    >
-                      Transaction Statistics
-                    </Text>
-
-                    <NativeSelect
-                      classNames={{
-                        wrapper: styles.select__wrapper,
-                        input: styles.select__input,
-                      }}
-                      onChange={(event) =>
-                        setChartFrequency(event.currentTarget.value)
-                      }
-                      data={["Monthly"]}
-                    />
-                  </div>
-
-                  <LineChart
-                    h={250}
-                    curveType="bump"
-                    data={lineData}
-                    dataKey="date"
-                    series={[
-                      { name: "successful", color: "#22C55E" },
-                      { name: "failed", color: "#D92D20" },
-                      { name: "pending", color: "#F79009" },
-                    ]}
-                  />
-                </Paper>
-              </GridCol>
-            </Grid>
-          </GridCol>
-
-          <GridCol span={3}>
-            <CardOneBtn
-              withBorder
-              title="Account Balance"
-              stat={balance}
-              loading={balanceLoading}
-              formatted
-              colored
-              btnLink="/debit-requests/new"
-              text={
-                <>
-                  From {dayjs(user?.createdAt).format("MMM DD, YYYY")} to{" "}
-                  {dayjs().format("MMM DD, YYYY")}
-                </>
-              }
-            />
-
-            <Paper withBorder p={10} mt={15}>
-              <Flex px={10} justify="space-between" align="center">
-                <Text fz={10} fw={600} tt="uppercase">
-                  Transaction Volume
-                </Text>
-
-                <Flex>
-                  <NativeSelect
-                    classNames={{
-                      wrapper: styles.select__wrapper,
-                      input: styles.select__input,
-                    }}
-                    onChange={(event) =>
-                      setChartFrequency(event.currentTarget.value)
-                    }
-                    data={["Monthly", "Weekly"]}
-                  />
-                </Flex>
-              </Flex>
-
-              <Flex justify="center" my={37}>
-                <DonutChart
-                  paddingAngle={4}
-                  data={donutData}
-                  chartLabel={donutData.reduce((prv, cur) => {
-                    return cur.value + prv;
-                  }, 0)}
-                  size={103}
-                  thickness={15}
-                />
-              </Flex>
-
-              <Stack px={10} gap={15}>
-                {donutData.map((item, index) => {
-                  return (
-                    <Flex key={index} justify="space-between">
-                      <Flex align="center" gap={5}>
-                        <IconSquareFilled color={item.color} size={14} />
-                        <Text fz={12} c="#98A2B3">
-                          {item.name}
-                        </Text>
-                      </Flex>
-
-                      <Text fz={12} fw={600}>
-                        {formatNumber(item.value, true, "EUR")}
-                      </Text>
-                    </Flex>
-                  );
-                })}
-              </Stack>
-            </Paper>
-          </GridCol>
-        </Grid>
-
         <Grid className={styles.grid__cards__two}>
-          <GridCol span={4}>
-            <Paper withBorder mt={10} className={styles.api__keys__container}>
-              <Flex>
-                <Text fz={10} fw={600}>
-                  API KEYS
+          <GridCol span={8} mih={100}>
+            <Paper mt={10} className={styles.payout__table}>
+              <Flex
+                style={{ borderBottom: "1px solid #f5f5f5" }}
+                justify="space-between"
+                align="center"
+                pb={14}
+              >
+                <Text className={styles.table__text} lts={0.5} fz={16} fw={600}>
+                  Debit Requests
                 </Text>
-                {/* <Text>Test</Text> */}
+
+                <Button
+                  component="a"
+                  href="/debit-requests"
+                  variant="transparent"
+                  color="#97AD05"
+                  fz={11}
+                  className={styles.table__cta}
+                >
+                  See all Debit Requests
+                </Button>
               </Flex>
-
-              <Stack mt={15} gap={0}>
-                <Text fz={12} c="#98A2B3">
-                  Test Key
-                </Text>
-
-                <Flex
-                  mt={7}
-                  className={styles.key__container}
-                  justify="space-between"
-                  align="center"
-                  px={10}
-                >
-                  <Text className={styles.key__container__text}>
-                    {`${test ? test?.key.slice(0, 15) : ""}****************`}
-                  </Text>
-
-                  <Copy value={test?.key || ""} />
-                </Flex>
-              </Stack>
-
-              <Stack mt={30} gap={0}>
-                <Text fz={12} c="#98A2B3">
-                  Live Key
-                </Text>
-
-                <Flex
-                  mt={7}
-                  className={styles.key__container}
-                  justify="space-between"
-                  align="center"
-                  px={10}
-                >
-                  <Text className={styles.key__container__text}>
-                    {`${live ? live?.key.slice(0, 15) : ""}****************`}
-                  </Text>
-
-                  <Copy value={live?.key || ""} />
-                </Flex>
-              </Stack>
-            </Paper>
-          </GridCol>
-
-          <GridCol span={8} mih={200}>
-            <Paper mt={10} withBorder className={styles.payout__table}>
-              <Text className={styles.table__text} lts={0.5} fz={10} fw={600}>
-                Debit Requests
-              </Text>
 
               <TableScrollContainer
                 className={styles.table__container}
@@ -411,18 +293,160 @@ export default function Home() {
                   </TableTbody>
                 </Table>
               </TableScrollContainer>
+            </Paper>
+          </GridCol>
 
-              <Button
-                component="a"
-                href="/debit-requests"
-                leftSection={<IconCircleChevronRight size={18} />}
-                variant="transparent"
-                color="#97AD05"
-                fz={11}
-                className={styles.table__cta}
+          <GridCol span={4}>
+            <Paper mt={10} className={styles.api__keys__container}>
+              <Flex
+                style={{ borderBottom: "1px solid #f5f5f5" }}
+                justify="space-between"
+                align="center"
+                pb={14}
               >
-                See all Debit Transactions
-              </Button>
+                <Text fz={16} fw={600}>
+                  API Keys
+                </Text>
+                {/* <Text>Test</Text> */}
+              </Flex>
+
+              <Stack mt={10} gap={0}>
+                <Text fz={12} c="#98A2B3">
+                  Test Key
+                </Text>
+
+                <Flex
+                  className={styles.key__container}
+                  justify="space-between"
+                  align="center"
+                  // px={10}
+                >
+                  <Text className={styles.key__container__text}>
+                    {`${test ? test?.key.slice(0, 20) : ""}****************`}
+                  </Text>
+
+                  <Copy value={test?.key || ""} />
+                </Flex>
+              </Stack>
+
+              <Stack mt={30} gap={0}>
+                <Text fz={12} c="#98A2B3">
+                  Live Key
+                </Text>
+
+                <Flex
+                  className={styles.key__container}
+                  justify="space-between"
+                  align="center"
+                  // px={10}
+                >
+                  <Text className={styles.key__container__text}>
+                    {`${live ? live?.key.slice(0, 20) : ""}****************`}
+                  </Text>
+
+                  <Copy value={live?.key || ""} />
+                </Flex>
+              </Stack>
+            </Paper>
+          </GridCol>
+        </Grid>
+
+        <Grid>
+          <GridCol span={8} mih={300}>
+            <Paper className={styles.chart__container}>
+              <div className={styles.container__text}>
+                <Text fz={16} fw={600}>
+                  Transaction Statistics
+                </Text>
+
+                <NativeSelect
+                  classNames={{
+                    wrapper: styles.select__wrapper,
+                    input: styles.select__input,
+                  }}
+                  onChange={(event) =>
+                    setChartFrequency(event.currentTarget.value)
+                  }
+                  data={["Monthly"]}
+                />
+              </div>
+
+              <AreaChart
+                h={250}
+                curveType="bump"
+                data={lineData}
+                dataKey="date"
+                series={[
+                  { name: "successful", color: "#22C55E" },
+                  { name: "failed", color: "#D92D20" },
+                  { name: "pending", color: "#F79009" },
+                ]}
+              />
+            </Paper>
+          </GridCol>
+
+          <GridCol span={4}>
+            <Paper
+              style={{ border: "1px solid #f5f5f5", height: "100%" }}
+              p={10}
+            >
+              <Flex px={10} justify="space-between" align="center">
+                <Text fz={16} fw={600}>
+                  Transaction Volume
+                </Text>
+
+                <Flex>
+                  <NativeSelect
+                    classNames={{
+                      wrapper: styles.select__wrapper,
+                      input: styles.select__input,
+                    }}
+                    onChange={(event) =>
+                      setChartFrequency(event.currentTarget.value)
+                    }
+                    data={["Monthly", "Weekly"]}
+                  />
+                </Flex>
+              </Flex>
+
+              <Flex justify="center" mt={37}>
+                <DonutChart
+                  startAngle={180}
+                  endAngle={0}
+                  // paddingAngle={4}
+                  data={donutData}
+                  chartLabel={donutData.reduce((prv, cur) => {
+                    return cur.value + prv;
+                  }, 0)}
+                  size={200}
+                  thickness={20}
+                />
+              </Flex>
+
+              <Flex px={10} gap={15} mt={-30}>
+                {donutData.map((item, index) => {
+                  return (
+                    <Flex
+                      style={{ borderLeft: `3px solid ${item.color}` }}
+                      flex={1}
+                      key={index}
+                      direction="column"
+                      pl={10}
+                    >
+                      <Flex align="center" gap={5}>
+                        {/* <IconSquareFilled color={item.color} size={14} /> */}
+                        <Text fz={12} c="#98A2B3">
+                          {item.name}
+                        </Text>
+                      </Flex>
+
+                      <Text fz={12} fw={600}>
+                        {formatNumber(item.value, true, "EUR")}
+                      </Text>
+                    </Flex>
+                  );
+                })}
+              </Flex>
             </Paper>
           </GridCol>
         </Grid>

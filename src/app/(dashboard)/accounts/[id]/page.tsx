@@ -31,7 +31,7 @@ import {
   IconCircleChevronRight,
 } from "@tabler/icons-react";
 import { CardOne } from "@/ui/components/Cards";
-import { BarChart, DonutChart } from "@mantine/charts";
+import { AreaChart, BarChart, DonutChart } from "@mantine/charts";
 import { useMemo, useState } from "react";
 import { formatNumber } from "@/lib/utils";
 import { useSingleUserAccount } from "@/lib/hooks/accounts";
@@ -99,9 +99,8 @@ export default function Account() {
   const lineData = useMemo(() => {
     const arr: {
       month: string;
-      successful: number;
-      failed: number;
-      pending: number;
+      inflow: number;
+      outflow: number;
     }[] = [];
 
     transactions.reverse().map((trx) => {
@@ -114,7 +113,7 @@ export default function Account() {
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
-      arr.push({ month, successful, pending, failed });
+      arr.push({ month, inflow: successful, outflow: pending });
     });
 
     return arr;
@@ -148,7 +147,7 @@ export default function Account() {
   ];
 
   return (
-    <main>
+    <main className={styles.main}>
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
@@ -163,40 +162,131 @@ export default function Account() {
         ]}
       />
 
+      <Flex
+        justify="space-between"
+        align="center"
+        className={styles.main__header}
+      >
+        <Flex direction="column">
+          <Text fz={24} className={styles.main__header__text}>
+            {account?.accountName}
+          </Text>
+        </Flex>
+
+        <Flex gap={10}>
+          {/* <Button
+            fz={12}
+            className={styles.main__cta}
+            variant="filled"
+            color="#C1DD06"
+          >
+            Freeze Account
+          </Button> */}
+
+          <Button
+            component="a"
+            href="/debit-requests/new"
+            fz={12}
+            className={styles.main__cta}
+            variant="filled"
+            color="#C1DD06"
+          >
+            Debit Account
+          </Button>
+        </Flex>
+      </Flex>
+
       <div className={styles.grid__container}>
         <Grid>
+          <GridCol span={9}>
+            <Flex className={styles.overview__container} direction="column">
+              <Flex className={styles.container__header}>
+                <Text fz={16} c="#1A1B20">
+                  Account Overview
+                </Text>
+              </Flex>
+
+              <Flex className={styles.container__body} gap={30}>
+                <Flex flex={1} direction="column" gap={10}>
+                  <Flex gap={10} align="center">
+                    <Text className={styles.body__text__header}>
+                      Euro Account
+                    </Text>
+                  </Flex>
+
+                  <Text className={styles.body__text} fz={24} fw={600}>
+                    {formatNumber(account?.accountBalance || 0, true, "EUR")}
+                  </Text>
+                </Flex>
+
+                <Flex flex={1} direction="column" gap={10}>
+                  <Flex gap={10} align="center">
+                    <Text className={styles.body__text__header}>
+                      Dollar Accounts
+                    </Text>
+                  </Flex>
+
+                  <Text className={styles.body__text} fz={24} fw={600}>
+                    {formatNumber(0, true, "EUR")}
+                  </Text>
+                </Flex>
+
+                <Flex flex={1} direction="column" gap={10}>
+                  <Flex gap={10} align="center">
+                    <Text className={styles.body__text__header}>
+                      Pound Accounts
+                    </Text>
+                  </Flex>
+
+                  <Text className={styles.body__text} fz={24} fw={600}>
+                    {formatNumber(0, true, "EUR")}
+                  </Text>
+                </Flex>
+              </Flex>
+            </Flex>
+          </GridCol>
+
           <GridCol span={3}>
             <Grid>
               <GridCol span={12}>
-                <Paper withBorder className={styles.card__one__container}>
+                <Paper className={styles.card__one__container}>
                   <Flex direction="column" className={styles.card__one}>
                     <Flex className={styles.card__one__header} align="center">
-                      <Text fw={600} fz={10} tt="uppercase">
-                        Account Details
+                      <Text fw={600} fz={16}>
+                        Bank Details
                       </Text>
-                      <IconPointFilled />
                     </Flex>
 
-                    <Flex className={styles.card__one__body} direction="column">
-                      <Text className={styles.body__title}>Account Name</Text>
-                      {loading ? (
-                        <Skeleton h={10} w={100} />
-                      ) : (
-                        <Text className={styles.body__text}>
-                          {account?.accountName || ""}
-                        </Text>
-                      )}
+                    <Flex
+                      className={styles.card__one__body}
+                      direction="column"
+                      gap={20}
+                    >
+                      <Flex justify="space-between">
+                        <Text className={styles.body__title}>Account Name</Text>
+                        {loading ? (
+                          <Skeleton h={10} w={100} />
+                        ) : (
+                          <Text className={styles.body__text}>
+                            {account?.accountName || ""}
+                          </Text>
+                        )}
+                      </Flex>
 
-                      <Divider my="sm" />
+                      {/* <Divider my="sm" /> */}
 
-                      <Text className={styles.body__title}>Account Number</Text>
-                      {loading ? (
-                        <Skeleton h={10} w={100} />
-                      ) : (
-                        <Text className={styles.body__text}>
-                          {account?.accountNumber || ""}
+                      <Flex justify="space-between">
+                        <Text className={styles.body__title}>
+                          Account Number
                         </Text>
-                      )}
+                        {loading ? (
+                          <Skeleton h={10} w={100} />
+                        ) : (
+                          <Text className={styles.body__text}>
+                            {account?.accountNumber || ""}
+                          </Text>
+                        )}
+                      </Flex>
                     </Flex>
                   </Flex>
                   {/* <Button
@@ -210,30 +300,164 @@ export default function Account() {
                   </Button> */}
                 </Paper>
               </GridCol>
-
-              <GridCol span={12} mih={170}>
-                <CardOne
-                  withBorder
-                  container
-                  title="Account Balance"
-                  stat={account?.accountBalance || 0}
-                  colored
-                  formatted
-                  currency="EUR"
-                  text={
-                    <Text fz={10} c="#90A3BF">
-                      From {dayjs(account?.createdAt).format("MMM DD, YYYY")} to{" "}
-                      {dayjs().format("MMM DD, YYYY")}
-                    </Text>
-                  }
-                />
-              </GridCol>
             </Grid>
           </GridCol>
 
-          <GridCol span={9}>
-            <Paper withBorder className={styles.payout__table}>
-              <Text className={styles.table__text} lts={0.5} fz={10} fw={600}>
+          <GridCol span={8} mih={300}>
+            <Paper
+              style={{ border: "1px solid #f5f5f5" }}
+              py={20}
+              h="100%"
+              px={14}
+            >
+              <Flex px={10} justify="space-between" align="center">
+                <Text fz={16} fw={600}>
+                  Transaction Statistics
+                </Text>
+
+                <Flex gap={22}>
+                  <Flex align="center" gap={5} p={5} px={8}>
+                    <IconSquareFilled color="#D92D20" size={14} />
+                    <Text fz={12}>Outflow</Text>
+                  </Flex>
+
+                  <Flex align="center" gap={5} p={5} px={8}>
+                    <IconSquareFilled color="#D5E855" size={14} />
+                    <Text fz={12}>Inflow</Text>
+                  </Flex>
+
+                  <NativeSelect
+                    classNames={{
+                      wrapper: styles.select__wrapper,
+                      input: styles.select__input,
+                    }}
+                    onChange={(event) =>
+                      setChartFrequency(event.currentTarget.value)
+                    }
+                    data={["Monthly"]}
+                  />
+                </Flex>
+              </Flex>
+
+              {lineData.length > 0 ? (
+                // <BarChart
+                //   pr={20}
+                //   mt={31}
+                //   h={300}
+                //   data={chartFrequency === "Monthly" ? lineData : weekData}
+                //   dataKey={chartFrequency === "Monthly" ? "month" : "day"}
+                //   barProps={{ barSize: 10, radius: 3 }}
+                //   series={[
+                //     { name: "failed", color: "#039855" },
+                //     { name: "successful", color: "#D92D20" },
+                //     { name: "pending", color: "#F79009" },
+                //   ]}
+                //   tickLine="y"
+                // />
+
+                <AreaChart
+                  h={250}
+                  mt={30}
+                  curveType="bump"
+                  data={lineData}
+                  dataKey="date"
+                  series={[
+                    { name: "inflow", color: "#D5E855" },
+                    { name: "outflow", color: "#D92D20" },
+                  ]}
+                />
+              ) : (
+                <Flex direction="column" align="center" mt={70}>
+                  <Image
+                    src={EmptyImage}
+                    alt="no content"
+                    width={156}
+                    height={126}
+                  />
+                  <Text mt={14} fz={14} c="#1D2939">
+                    There are no transactions.
+                  </Text>
+                  <Text fz={10} c="#667085">
+                    When a transaction is recorded, it will appear here
+                  </Text>
+                </Flex>
+              )}
+            </Paper>
+          </GridCol>
+
+          <GridCol span={4}>
+            <Paper
+              style={{ border: "1px solid #f5f5f5" }}
+              py={20}
+              h="100%"
+              px={16}
+            >
+              <Flex px={10} justify="space-between" align="center">
+                <Text fz={16} fw={600}>
+                  Transaction Volume
+                </Text>
+
+                <Flex>
+                  <NativeSelect
+                    classNames={{
+                      wrapper: styles.select__wrapper,
+                      input: styles.select__input,
+                    }}
+                    onChange={(event) =>
+                      setChartFrequency(event.currentTarget.value)
+                    }
+                    data={["Monthly", "Weekly"]}
+                  />
+                </Flex>
+              </Flex>
+
+              <Flex justify="center" my={37}>
+                <DonutChart
+                  startAngle={180}
+                  endAngle={0}
+                  // paddingAngle={4}
+                  data={donutData}
+                  chartLabel={donutData.reduce((prv, cur) => {
+                    return cur.value + prv;
+                  }, 0)}
+                  size={200}
+                  thickness={20}
+                />
+              </Flex>
+
+              <Flex px={10} gap={15} mt={-50}>
+                {donutData.map((item, index) => {
+                  return (
+                    <Flex
+                      style={{ borderLeft: `3px solid ${item.color}` }}
+                      flex={1}
+                      key={index}
+                      direction="column"
+                      pl={10}
+                    >
+                      <Flex align="center" gap={5}>
+                        {/* <IconSquareFilled color={item.color} size={14} /> */}
+                        <Text fz={12} c="#98A2B3">
+                          {item.name}
+                        </Text>
+                      </Flex>
+
+                      <Text fz={12} fw={600}>
+                        {formatNumber(item.value, true, "EUR")}
+                      </Text>
+                    </Flex>
+                  );
+                })}
+              </Flex>
+            </Paper>
+          </GridCol>
+
+          <GridCol span={12}>
+            <Paper
+              style={{ border: "1px solid #f5f5f5" }}
+              className={styles.payout__table}
+            >
+              <Text className={styles.table__text} fz={16} fw={600}>
                 Recent Transactions
               </Text>
 
@@ -275,148 +499,6 @@ export default function Account() {
               >
                 See All Transactions
               </Button>
-            </Paper>
-          </GridCol>
-
-          <GridCol span={8} mih={500}>
-            <Paper withBorder py={20} h="100%" px={14}>
-              <Flex px={10} justify="space-between" align="center">
-                <Text fz={10} fw={600} tt="uppercase">
-                  Transaction Statistics
-                </Text>
-
-                <Flex gap={22}>
-                  <Flex
-                    align="center"
-                    gap={5}
-                    p={3}
-                    px={8}
-                    style={{ border: "1px solid #F2F4F7", borderRadius: "4px" }}
-                  >
-                    <IconSquareFilled color="#D92D20" size={14} />
-                    <Text fz={12}>Failed</Text>
-                  </Flex>
-
-                  <Flex
-                    align="center"
-                    gap={5}
-                    p={5}
-                    px={8}
-                    style={{ border: "1px solid #F2F4F7", borderRadius: "4px" }}
-                  >
-                    <IconSquareFilled color="#F79009" size={14} />
-                    <Text fz={12}>Pending</Text>
-                  </Flex>
-
-                  <Flex
-                    align="center"
-                    gap={5}
-                    p={5}
-                    px={8}
-                    style={{ border: "1px solid #F2F4F7", borderRadius: "4px" }}
-                  >
-                    <IconSquareFilled color="#039855" size={14} />
-                    <Text fz={12}>Successful</Text>
-                  </Flex>
-
-                  <NativeSelect
-                    classNames={{
-                      wrapper: styles.select__wrapper,
-                      input: styles.select__input,
-                    }}
-                    onChange={(event) =>
-                      setChartFrequency(event.currentTarget.value)
-                    }
-                    data={["Monthly"]}
-                  />
-                </Flex>
-              </Flex>
-
-              {lineData.length > 0 ? (
-                <BarChart
-                  pr={20}
-                  mt={31}
-                  h={300}
-                  data={chartFrequency === "Monthly" ? lineData : weekData}
-                  dataKey={chartFrequency === "Monthly" ? "month" : "day"}
-                  barProps={{ barSize: 10, radius: 3 }}
-                  series={[
-                    { name: "failed", color: "#039855" },
-                    { name: "successful", color: "#D92D20" },
-                    { name: "pending", color: "#F79009" },
-                  ]}
-                  tickLine="y"
-                />
-              ) : (
-                <Flex direction="column" align="center" mt={70}>
-                  <Image
-                    src={EmptyImage}
-                    alt="no content"
-                    width={156}
-                    height={126}
-                  />
-                  <Text mt={14} fz={14} c="#1D2939">
-                    There are no transactions.
-                  </Text>
-                  <Text fz={10} c="#667085">
-                    When a transaction is recorded, it will appear here
-                  </Text>
-                </Flex>
-              )}
-            </Paper>
-          </GridCol>
-
-          <GridCol span={4}>
-            <Paper withBorder py={20} h="100%" px={16}>
-              <Flex px={10} justify="space-between" align="center">
-                <Text fz={10} fw={600} tt="uppercase">
-                  Transaction Volume
-                </Text>
-
-                <Flex>
-                  <NativeSelect
-                    classNames={{
-                      wrapper: styles.select__wrapper,
-                      input: styles.select__input,
-                    }}
-                    onChange={(event) =>
-                      setChartFrequency(event.currentTarget.value)
-                    }
-                    data={["Monthly", "Weekly"]}
-                  />
-                </Flex>
-              </Flex>
-
-              <Flex justify="center" my={37}>
-                <DonutChart
-                  paddingAngle={4}
-                  data={donutData}
-                  chartLabel={donutData.reduce((prv, cur) => {
-                    return cur.value + prv;
-                  }, 0)}
-                  size={203}
-                  thickness={25}
-                />
-              </Flex>
-
-              <Stack px={10} gap={15}>
-                {donutData.map((item, index) => {
-                  return (
-                    <Flex key={index} justify="space-between">
-                      <Flex align="center" gap={5}>
-                        <IconSquareFilled color={item.color} size={14} />
-                        <Text fz={12} c="#98A2B3">
-                          {item.name}
-                        </Text>
-                      </Flex>
-
-                      <Text fz={12} fw={600}>
-                        {formatNumber(item.value, true, "EUR")}
-                      </Text>
-                    </Flex>
-                  );
-                })}
-              </Stack>
             </Paper>
           </GridCol>
         </Grid>

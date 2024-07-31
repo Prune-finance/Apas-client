@@ -18,12 +18,16 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { useRequests, useUserRequests } from "@/lib/hooks/requests";
-import { AllBusinessSkeleton, DynamicSkeleton } from "@/lib/static";
+import {
+  AllBusinessSkeleton,
+  DynamicSkeleton,
+  DynamicSkeleton2,
+} from "@/lib/static";
 
 // UI Imports
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import ModalComponent from "@/ui/components/Modal";
-import styles from "@/ui/styles/accounts.module.scss";
+import styles from "./styles.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
@@ -84,52 +88,8 @@ function AccountRequests() {
     }
   };
 
-  const MenuComponent = ({ id, status }: { id: string; status: string }) => {
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          {/* {status === "PENDING" && (
-            <MenuItem
-              onClick={() => {
-                setRowId(id);
-                cancelOpen();
-              }}
-              fz={10}
-              c="#667085"
-              leftSection={
-                <IconEye style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              Cancel Request
-            </MenuItem>
-          )} */}
-
-          {/* <MenuItem
-            onClick={open}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconTrash style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            Delete
-          </MenuItem> */}
-        </MenuDropdown>
-      </Menu>
-    );
-  };
-
   const rows = requests.map((element, index) => (
     <TableTr key={index}>
-      <TableTd className={styles.table__td}>
-        <Checkbox />
-      </TableTd>
       <TableTd
         className={styles.table__td}
       >{`${element.firstName} ${element.lastName}`}</TableTd>
@@ -195,14 +155,14 @@ function AccountRequests() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/dashboard" },
           { title: "Account Requests", href: "/accounts" },
         ]}
-      />
+      /> */}
 
-      <Paper withBorder className={styles.table__container}>
+      <Paper className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
             Account Requests
@@ -234,9 +194,6 @@ function AccountRequests() {
           <Table className={styles.table} verticalSpacing="md">
             <TableThead>
               <TableTr>
-                <TableTh className={styles.table__th}>
-                  <Checkbox />
-                </TableTh>
                 <TableTh className={styles.table__th}>Account Name</TableTh>
                 <TableTh className={styles.table__th}>Type</TableTh>
                 <TableTh className={styles.table__th}>Business</TableTh>
@@ -245,7 +202,7 @@ function AccountRequests() {
                 {/* <TableTh className={styles.table__th}>Action</TableTh> */}
               </TableTr>
             </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
+            <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>
           </Table>
         </TableScrollContainer>
 
@@ -260,17 +217,17 @@ function AccountRequests() {
             </Text>
           </Flex>
         )}
-
-        <div className={styles.pagination__container}>
-          <Text fz={14}>Rows: {rows.length}</Text>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
       </Paper>
+
+      <div className={styles.pagination__container}>
+        <Text fz={14}>Showing: {rows.length}</Text>
+        <Pagination
+          autoContrast
+          color="#fff"
+          total={1}
+          classNames={{ control: styles.control, root: styles.pagination }}
+        />
+      </div>
 
       <ModalComponent
         processing={processing}

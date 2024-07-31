@@ -17,17 +17,16 @@ import {
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
+import { Flex, TableTh, TableThead } from "@mantine/core";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import styles from "@/ui/styles/accounts.module.scss";
+import styles from "./styles.module.scss";
 import {
   IconPointFilled,
   IconDots,
   IconEye,
   IconBrandLinktree,
   IconX,
-  IconTrash,
   IconListTree,
   IconSearch,
   IconCheck,
@@ -225,9 +224,6 @@ function Accounts() {
     debouncedSearch
   ).map((element, index) => (
     <TableTr key={index}>
-      <TableTd className={styles.table__td}>
-        <Checkbox />
-      </TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
         {element.accountName}
       </TableTd>
@@ -289,9 +285,9 @@ function Accounts() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Accounts", href: "/accounts" }]} />
+      {/* <Breadcrumbs items={[{ title: "Accounts", href: "/accounts" }]} /> */}
 
-      <Paper withBorder className={styles.table__container}>
+      <Paper className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
             Accounts
@@ -334,9 +330,6 @@ function Accounts() {
           <Table className={styles.table} verticalSpacing="md">
             <TableThead>
               <TableTr>
-                <TableTh className={styles.table__th}>
-                  <Checkbox />
-                </TableTh>
                 <TableTh className={styles.table__th}>Account Name</TableTh>
                 <TableTh className={styles.table__th}>Account Number</TableTh>
                 <TableTh className={styles.table__th}>Account Balance</TableTh>
@@ -362,16 +355,6 @@ function Accounts() {
             </Text>
           </Flex>
         )}
-
-        <div className={styles.pagination__container}>
-          <Text fz={14}>Rows: {rows.length}</Text>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
 
         <ModalComponent
           processing={processing}
@@ -406,6 +389,16 @@ function Accounts() {
           text="You are about to deactivate this account.This means the account will be inactive."
         />
       </Paper>
+
+      <div className={styles.pagination__container}>
+        <Text fz={14}>Showing: {rows.length}</Text>
+        <Pagination
+          autoContrast
+          color="#fff"
+          total={1}
+          classNames={{ control: styles.control, root: styles.pagination }}
+        />
+      </div>
 
       <ModalComponent
         processing={processing}

@@ -7,6 +7,10 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
 
+    // if (request.nextUrl.pathname.startsWith("/auth")) {
+    //   return NextResponse.next();
+    // }
+
     if (request.nextUrl.pathname.startsWith("/admin")) {
       const req = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/me`,

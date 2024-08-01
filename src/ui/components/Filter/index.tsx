@@ -1,6 +1,7 @@
 import { Button, Collapse, Flex, Select } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { UseFormReturnType } from "@mantine/form";
+import { IconCalendarMonth } from "@tabler/icons-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ReactNode } from "react";
 
@@ -38,30 +39,31 @@ export default function Filter<T>({
   return (
     <Collapse in={opened}>
       <Flex mt={24} gap={12}>
-        <Select
+        {/* <Select
           placeholder="Sort"
           data={["Asc", "Desc"]}
           {...form.getInputProps("sort")}
           size="xs"
           w={120}
           h={36}
-        />
-        <Select
+        /> */}
+        {/* <Select
           placeholder="Rows"
           data={["10", "20", "50"]}
           {...form.getInputProps("rows")}
           size="xs"
           w={120}
           h={36}
-        />
+        /> */}
         {children}
 
         <DateInput
-          placeholder="Date"
+          placeholder="Date Created"
           {...form.getInputProps("createdAt")}
           size="xs"
           w={120}
           h={36}
+          rightSection={<IconCalendarMonth size={14} />}
         />
         {!isStatus && (
           <Select

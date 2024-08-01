@@ -9,6 +9,7 @@ import {
   Box,
   Divider,
   Drawer,
+  Group,
   Menu,
   MenuDropdown,
   MenuItem,
@@ -26,7 +27,7 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { DebitRequest, useUserDebitRequests } from "@/lib/hooks/requests";
-import { DynamicSkeleton } from "@/lib/static";
+import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 
 // UI Imports
 import styles from "./styles.module.scss";
@@ -146,24 +147,29 @@ function DebitRequests() {
           </Text>
         </div>
 
-        <div className={styles.container__search__filter}>
+        <Group justify="space-between" mt={30}>
           <TextInput
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
-            classNames={{ wrapper: styles.search, input: styles.input__search }}
+            // classNames={{ wrapper: styles.search, input: styles.input__search }}
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Button
-            className={styles.filter__cta}
+            // className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
             fz={12}
             fw={500}
             onClick={toggle}
+            variant="outline"
+            c="var(--prune-text-gray-800)"
+            color="var(--prune-text-gray-200)"
           >
             Filter
           </Button>
-        </div>
+        </Group>
 
         <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
 
@@ -178,7 +184,7 @@ function DebitRequests() {
                 <TableTh className={styles.table__th}>Status</TableTh>
               </TableTr>
             </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
+            <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>
           </Table>
         </TableScrollContainer>
 

@@ -2,7 +2,7 @@
 import dayjs from "dayjs";
 
 import Image from "next/image";
-import { Box, Divider, Drawer, Paper, ThemeIcon } from "@mantine/core";
+import { Box, Divider, Drawer, Group, Paper, ThemeIcon } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
@@ -34,6 +34,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { Suspense, useState } from "react";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 
 function AccountTrx() {
   const searchParams = useSearchParams();
@@ -111,6 +112,31 @@ function AccountTrx() {
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
   });
+
+  const infoDetails = [
+    {
+      title: "Total Balance",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money In",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money Out",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Total Transactions",
+      value: 0,
+    },
+  ];
 
   return (
     <main className={styles.main}>
@@ -201,24 +227,31 @@ function AccountTrx() {
           </Flex>
         </Flex>
 
-        <div className={styles.container__search__filter}>
+        {/* <InfoCards details={infoDetails} title="Overview" /> */}
+
+        <Group justify="space-between" mt={30}>
           <TextInput
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
-            classNames={{ wrapper: styles.search, input: styles.input__search }}
+            // classNames={{ wrapper: styles.search, input: styles.input__search }}
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Button
-            className={styles.filter__cta}
+            // className={styles.filter__cta}
             rightSection={<IconListTree size={14} />}
             fz={12}
             fw={500}
             onClick={toggle}
+            variant="outline"
+            c="var(--prune-text-gray-800)"
+            color="var(--prune-text-gray-200)"
           >
             Filter
           </Button>
-        </div>
+        </Group>
 
         <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 

@@ -53,6 +53,8 @@ import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 import { approvedBadgeColor } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
+import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
+import useNotification from "@/lib/hooks/notification";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -80,6 +82,23 @@ function AccountRequests() {
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const MenuComponent = ({ id }: { id: string }) => {
+    const { handleError, handleSuccess } = useNotification();
+
+    const handleApproval = async () => {
+      const { success, message } = await approveRequest(id);
+
+      if (success)
+        return handleSuccess("Successful! Request Approved", message);
+      return handleError("Error! Request Approval Failed", message);
+    };
+
+    const handleRejection = async () => {
+      const { success, message } = await rejectRequest(id);
+
+      if (success) return handleSuccess("Successful! Request Denied", message);
+      return handleError("Error! Request Denials Failed", message);
+    };
+
     return (
       <Menu shadow="md" width={150}>
         <MenuTarget>
@@ -95,6 +114,7 @@ function AccountRequests() {
             leftSection={
               <IconUserCheck style={{ width: rem(14), height: rem(14) }} />
             }
+            onClick={handleApproval}
           >
             Approve
           </MenuItem>
@@ -103,6 +123,7 @@ function AccountRequests() {
             fz={10}
             c="#667085"
             leftSection={<IconX style={{ width: rem(14), height: rem(14) }} />}
+            onClick={handleRejection}
           >
             Deny
           </MenuItem>
@@ -111,8 +132,57 @@ function AccountRequests() {
     );
   };
 
+  // const handleRowClick = (id: string) => {
+  //   push(`/admin/account-requests/${id}`);
+  // };
+
+  // const rows = filteredSearch(
+  //   requests,
+  //   ["firstName", "lastName", "Company.name"],
+  //   debouncedSearch
+  // ).map((element, index) => (
+  //   <TableTr
+  //     key={index}
+  //     onClick={() => handleRowClick(element.id)}
+  //     style={{ cursor: "pointer" }}
+  //   >
+  //     <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
+  //     <TableTd className={styles.table__td}>{20}</TableTd>
+  //     <TableTd
+  //       tt="lowercase"
+  //       // className={styles.table__td}
+  //     >{`${element.firstName}${element.lastName}.example.com`}</TableTd>
+  //     {/* <TableTd className={styles.table__td} tt="capitalize">
+  //       {element.accountType.toLowerCase()}
+  //     </TableTd>
+  //     <TableTd className={`${styles.table__td}`}>
+  //       {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+  //     </TableTd> */}
+  //     <TableTd className={styles.table__td}>
+  //       <Badge
+  //         tt="capitalize"
+  //         variant="light"
+  //         color={approvedBadgeColor(element.status)}
+  //         w={82}
+  //         h={24}
+  //         fw={400}
+  //         fz={12}
+  //       >
+  //         {element.status.toLowerCase()}
+  //       </Badge>
+  //     </TableTd>
+
+  //     {/* <TableTd
+  //       className={`${styles.table__td}`}
+  //       onClick={(e) => e.stopPropagation()}
+  //     >
+  //       <MenuComponent id={element.id} />
+  //     </TableTd> */}
+  //   </TableTr>
+  // ));
+
   const handleRowClick = (id: string) => {
-    push(`/admin/account-requests/${id}`);
+    push(`/admin/account-requests/${id}/${id}`);
   };
 
   const rows = filteredSearch(
@@ -125,18 +195,16 @@ function AccountRequests() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
-      <TableTd className={styles.table__td}>{20}</TableTd>
       <TableTd
-        tt="lowercase"
-        // className={styles.table__td}
-      >{`${element.firstName}${element.lastName}.example.com`}</TableTd>
-      {/* <TableTd className={styles.table__td} tt="capitalize">
+        className={styles.table__td}
+      >{`${element.firstName} ${element.lastName}`}</TableTd>
+      <TableTd className={styles.table__td} tt="capitalize">
         {element.accountType.toLowerCase()}
       </TableTd>
+      {/* <TableTd className={styles.table__td}>{element.Company.country}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-      </TableTd> */}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
@@ -151,7 +219,10 @@ function AccountRequests() {
         </Badge>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      <TableTd
+        className={`${styles.table__td}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <MenuComponent id={element.id} />
       </TableTd>
     </TableTr>
@@ -262,10 +333,19 @@ function AccountRequests() {
   );
 }
 
+// const tableHeaders = [
+//   "Business Name",
+//   "Number of Requests",
+//   "Contact Email",
+//   "Status",
+//   // "Action",
+// ];
+
 const tableHeaders = [
-  "Business Name",
-  "Number of Requests",
-  "Contact Email",
+  "Account Name",
+  "Type",
+  // "Country",
+  "Date Created",
   "Status",
   "Action",
 ];

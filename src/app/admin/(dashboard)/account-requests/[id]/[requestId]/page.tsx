@@ -32,11 +32,12 @@ import Shareholders from "./(tabs)/shareholder";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
+import { parseError } from "@/lib/actions/auth";
 
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
   const { revalidate, request } = useSingleRequest(params.requestId);
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
   const { back } = useRouter();
 
   const [opened, { open, close }] = useDisclosure(false);
@@ -62,7 +63,7 @@ export default function SingleRequest() {
       );
       revalidate();
     } catch (error) {
-      console.log(error);
+      return handleError("Request Approval Failed", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -85,7 +86,7 @@ export default function SingleRequest() {
       );
       revalidate();
     } catch (error) {
-      console.log(error);
+      return handleError("Request Approval Failed", parseError(error));
     } finally {
       setProcessing(false);
     }

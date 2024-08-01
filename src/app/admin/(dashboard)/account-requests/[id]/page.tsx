@@ -49,6 +49,8 @@ import { filteredSearch } from "@/lib/search";
 import { approvedBadgeColor } from "@/lib/utils";
 import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
+import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
+import useNotification from "@/lib/hooks/notification";
 
 function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
@@ -101,7 +103,7 @@ function BusinessAccountRequests() {
       <TableTd className={styles.table__td} tt="capitalize">
         {element.accountType.toLowerCase()}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Company.country}</TableTd>
+      {/* <TableTd className={styles.table__td}>{element.Company.country}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
@@ -119,7 +121,10 @@ function BusinessAccountRequests() {
         </Badge>
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      <TableTd
+        className={`${styles.table__td}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <MenuComponent id={element.id} />
       </TableTd>
     </TableTr>
@@ -236,7 +241,7 @@ function BusinessAccountRequests() {
 const tableHeaders = [
   "Account Name",
   "Type",
-  "Country",
+  // "Country",
   "Date Created",
   "Status",
   "Action",
@@ -251,6 +256,22 @@ export default function BusinessAccountRequestsSuspense() {
 }
 
 const MenuComponent = ({ id }: { id: string }) => {
+  const { handleError, handleSuccess } = useNotification();
+
+  const handleApproval = async () => {
+    const { success, message } = await approveRequest(id);
+
+    if (success) return handleSuccess("Successful! Request Approved", message);
+    return handleError("Error! Request Approval Failed", message);
+  };
+
+  const handleRejection = async () => {
+    const { success, message } = await rejectRequest(id);
+
+    if (success) return handleSuccess("Successful! Request Denied", message);
+    return handleError("Error! Request Denials Failed", message);
+  };
+
   return (
     <Menu shadow="md" width={150}>
       <MenuTarget>
@@ -266,6 +287,7 @@ const MenuComponent = ({ id }: { id: string }) => {
           leftSection={
             <IconUserCheck style={{ width: rem(14), height: rem(14) }} />
           }
+          onClick={handleApproval}
         >
           Approve
         </MenuItem>
@@ -274,6 +296,7 @@ const MenuComponent = ({ id }: { id: string }) => {
           fz={10}
           c="#667085"
           leftSection={<IconX style={{ width: rem(14), height: rem(14) }} />}
+          onClick={handleRejection}
         >
           Deny
         </MenuItem>

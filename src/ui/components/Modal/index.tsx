@@ -49,8 +49,9 @@ export default function ModalComponent({
         <Flex className={styles.bottom__flex} justify="center" gap={15}>
           <Button
             onClick={processing ? () => {} : close}
-            variant="default"
-            color="var(--prune-text-gray-500)"
+            variant="outline"
+            color="var(--prune-text-gray-200)"
+            c="var(--prune-text-gray-800)"
             fullWidth
           >
             Cancel

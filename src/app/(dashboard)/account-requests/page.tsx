@@ -195,7 +195,9 @@ function AccountRequests() {
   const accountDetails = [
     {
       label: "Account Name",
-      value: `${selectedRequest?.firstName} ${selectedRequest?.lastName}`,
+      value: `${selectedRequest?.firstName ?? ""} ${
+        selectedRequest?.lastName ?? ""
+      }`,
     },
     {
       label: "Country",
@@ -311,7 +313,7 @@ function AccountRequests() {
       />
 
       <Drawer
-        opened={true || drawerOpened}
+        opened={drawerOpened}
         onClose={closeDrawer}
         position="right"
         withCloseButton={false}
@@ -326,17 +328,7 @@ function AccountRequests() {
         </Flex>
 
         <Box>
-          {/* <Flex direction="column">
-            <Text c="#8B8B8B" fz={12} tt="uppercase">
-              Amount
-            </Text>
-
-            <Text c="#97AD05" fz={32} fw={600}>
-              {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-            </Text>
-          </Flex> */}
-
-          <Divider mt={30} mb={20} />
+          <Divider mb={20} />
 
           <Text fz={16} mb={24}>
             Account Details
@@ -344,7 +336,7 @@ function AccountRequests() {
 
           <Stack gap={28}>
             {accountDetails.map((item, index) => (
-              <Group justify="space-between">
+              <Group justify="space-between" key={index}>
                 <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
                   {item.label}
                 </Text>
@@ -436,71 +428,6 @@ function AccountRequests() {
               />
             </Stack>
           )}
-
-          {/* <Divider my={30} />
-
-          <Text fz={16} mb={24}>
-            Destination Details
-          </Text>
-          <Flex direction="column" gap={30}>
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                IBAN
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationIBAN}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                BIC
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationBIC}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Country
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationCountry}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Bank
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationBank}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Reference:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.reference}</Text>
-            </Flex>
-          </Flex>
-
-          <Divider my={30} />
-
-          <Text fz={16} c="#1D2939" fw={600}>
-            Reason
-          </Text>
-
-          <div
-            style={{
-              marginTop: "15px",
-              background: "#F9F9F9",
-              padding: "12px 16px",
-            }}
-          >
-            <Text fz={14} c="#667085">
-              {selectedRequest?.reason || ""}
-            </Text>
-          </div> */}
         </Box>
       </Drawer>
     </main>

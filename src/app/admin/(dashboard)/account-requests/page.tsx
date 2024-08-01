@@ -41,7 +41,7 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import {
@@ -58,6 +58,7 @@ import useNotification from "@/lib/hooks/notification";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const {
     rows: limit = "10",
@@ -67,7 +68,7 @@ function AccountRequests() {
     type,
   } = Object.fromEntries(searchParams.entries());
 
-  const { loading, requests } = useRequests({
+  const { loading, requests, revalidate } = useRequests({
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
@@ -87,15 +88,21 @@ function AccountRequests() {
     const handleApproval = async () => {
       const { success, message } = await approveRequest(id);
 
-      if (success)
+      if (success) {
+        revalidate();
         return handleSuccess("Successful! Request Approved", message);
+      }
       return handleError("Error! Request Approval Failed", message);
     };
 
     const handleRejection = async () => {
       const { success, message } = await rejectRequest(id);
 
-      if (success) return handleSuccess("Successful! Request Denied", message);
+      if (success) {
+        revalidate();
+        return handleSuccess("Successful! Request Denied", message);
+      }
+
       return handleError("Error! Request Denials Failed", message);
     };
 

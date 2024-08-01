@@ -50,6 +50,10 @@ export function useRequests(customParams: IParams = {}) {
     }
   }
 
+  function revalidate() {
+    fetchAccounts();
+  }
+
   useEffect(() => {
     fetchAccounts();
 
@@ -58,7 +62,7 @@ export function useRequests(customParams: IParams = {}) {
     };
   }, []);
 
-  return { loading, requests, meta };
+  return { loading, requests, meta, revalidate };
 }
 
 export function useSingleRequest(id: string) {

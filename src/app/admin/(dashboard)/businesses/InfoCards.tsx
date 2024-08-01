@@ -38,7 +38,7 @@ export default function InfoCards({
   loading,
 }: InfoCardProps) {
   return (
-    <Card withBorder mt={24}>
+    <Card mt={24} style={{ border: "1px solid #F5F5F5" }}>
       <CardSection>
         <Flex justify="space-between" align="center" px={24} pt={24}>
           <Title order={3} fz={16}>
@@ -47,7 +47,7 @@ export default function InfoCards({
 
           {children}
         </Flex>
-        <Divider my={13} />
+        <Divider my={13} size="xs" color="#F5F5F5" />
       </CardSection>
 
       {flexedGroup ? (

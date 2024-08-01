@@ -103,9 +103,9 @@ export default function Account() {
         </Button>
 
         <Flex justify="space-between" align="flex-start" mt={20}>
-          <Stack gap={0}>
+          <Stack gap={8}>
             {account?.accountName ? (
-              <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
+              <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
                 {account?.accountName}
               </Text>
             ) : (
@@ -129,7 +129,7 @@ export default function Account() {
             >
               Freeze Account
             </Button>
-            <Button
+            {/* <Button
               // onClick={() => {
               //   updateDirector(index, form.values);
               //   setEditing(false);
@@ -142,7 +142,7 @@ export default function Account() {
               c="var(--prune-text-gray-800)"
             >
               Debit Account
-            </Button>
+            </Button> */}
           </Flex>
         </Flex>
 
@@ -192,9 +192,15 @@ export default function Account() {
           </GridCol>
 
           <GridCol span={3.7}>
-            <Paper px="auto" withBorder w="100%" h="100%" pt={20}>
+            <Paper
+              px="auto"
+              style={{ border: "1px solid #f5f5f5" }}
+              w="100%"
+              h="100%"
+              pt={20}
+            >
               <Flex px={10} justify="space-between" align="center">
-                <Text fz={10} fw={600} tt="uppercase">
+                <Text fz={16} fw={600} tt="capitalize">
                   Transaction Volume
                 </Text>
 
@@ -236,7 +242,7 @@ export default function Account() {
                   return (
                     <Stack
                       key={index}
-                      gap={15}
+                      gap={6}
                       pl={9}
                       style={{ borderLeft: `3px solid ${item.color}` }}
                     >
@@ -244,7 +250,7 @@ export default function Account() {
                         {item.name}
                       </Text>
 
-                      <Text fz={14} fw={700} c="var(--prune-text-gray-800)">
+                      <Text fz={16} fw={700} c="var(--prune-text-gray-800)">
                         {formatNumber(item.value)}
                       </Text>
                     </Stack>
@@ -255,14 +261,15 @@ export default function Account() {
           </GridCol>
 
           <GridCol span={12}>
-            <Paper withBorder>
+            <Paper style={{ border: "1px solid #f5f5f5" }}>
               <div className={styles.payout__table}>
                 <Group justify="space-between">
                   <Text
-                    className={styles.table__text}
+                    // className={styles.table__text}
                     lts={0.5}
                     fz={16}
                     fw={600}
+                    tt="capitalize"
                   >
                     Transaction History
                   </Text>
@@ -271,7 +278,7 @@ export default function Account() {
                     // leftSection={<IconCircleChevronRight size={18} />}
                     variant="transparent"
                     fz={12}
-                    c="var(--prune-primary-600)"
+                    c="var(--prune-primary-800)"
                     td="underline"
                   >
                     See All Transactions

@@ -109,13 +109,13 @@ export default function Accounts({
   }, [business]);
 
   const volumeDetails = [
-    { title: "Sandra Damasus", value: 0, formatted: true },
+    { title: "Sandra Damasus", value: 0, formatted: true, currency: "EUR" },
   ];
 
   const overviewDetails = [
-    { title: "Total Balance", value: 0, formatted: true },
-    { title: "Money In", value: 0, formatted: true },
-    { title: "Money Out", value: 0, formatted: true },
+    { title: "Total Balance", value: 0, formatted: true, currency: "EUR" },
+    { title: "Money In", value: 0, formatted: true, currency: "EUR" },
+    { title: "Money Out", value: 0, formatted: true, currency: "EUR" },
     { title: "Total Transactions", value: 0 },
   ];
 

@@ -152,6 +152,8 @@ export default function TransactionForAccount() {
             color="var(--prune-text-gray-200)"
             // onChange={(e) => setSearch(e.currentTarget.value)}
             c="#000"
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Flex gap={12}>
@@ -164,7 +166,7 @@ export default function TransactionForAccount() {
               radius={4}
               variant="outline"
               color="var(--prune-text-gray-200)"
-              c="#000"
+              c="var(--prune-text-gray-800)"
             >
               Filter
             </Button>
@@ -177,7 +179,7 @@ export default function TransactionForAccount() {
               radius={4}
               variant="outline"
               color="var(--prune-text-gray-200)"
-              c="#000"
+              c="var(--prune-text-gray-800)"
             >
               Export CSV
             </Button>
@@ -190,7 +192,7 @@ export default function TransactionForAccount() {
               radius={4}
               variant="outline"
               color="var(--prune-text-gray-200)"
-              c="#000"
+              c="var(--prune-text-gray-800)"
             >
               Download Statement
             </Button>

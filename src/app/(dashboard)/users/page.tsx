@@ -3,6 +3,7 @@
 import {
   Badge,
   Button,
+  Checkbox,
   Flex,
   Group,
   Menu,
@@ -27,93 +28,123 @@ import {
   IconDots,
   IconDotsVertical,
   IconDownload,
-  IconEdit,
   IconEye,
   IconListTree,
   IconPlus,
   IconPointFilled,
   IconSearch,
   IconTrash,
+  IconUserEdit,
+  IconUserX,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
 import dayjs from "dayjs";
-import advancedFormat from "dayjs/plugin/advancedFormat";
-
-dayjs.extend(advancedFormat);
+import { useRouter, useSearchParams } from "next/navigation";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import styles from "@/ui/styles/business.module.scss";
+import styles from "./styles.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
-import { useBusiness } from "@/lib/hooks/businesses";
-import { AllBusinessSkeleton, DynamicSkeleton2 } from "@/lib/static";
-import { switzer } from "@/app/layout";
-import Filter from "@/ui/components/Filter";
+import { AllBusinessSkeleton } from "@/lib/static";
+import { AdminData, useAdmins } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+
 import { useForm, zodResolver } from "@mantine/form";
 import {
-  businessFilterSchema,
-  BusinessFilterType,
-  businessFilterValues,
-} from "./schema";
-import { useRouter, useSearchParams } from "next/navigation";
+  filterSchema,
+  FilterType,
+  filterValues,
+  newAdmin,
+  validateNewAdmin,
+} from "@/lib/schema";
+import axios from "axios";
 import { Suspense, useState } from "react";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+
+import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
-import InfoCards from "./InfoCards";
-import ActiveBadge from "@/assets/active-badge.svg";
-import { activeBadgeColor } from "@/lib/utils";
-import { table } from "console";
 import { TableComponent } from "@/ui/components/Table";
+import { activeBadgeColor } from "@/lib/utils";
+import ModalComponent from "./modal";
+import UserDrawer from "./drawer";
+import User from "@/lib/store/user";
 
-function Businesses() {
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+function Users() {
   const searchParams = useSearchParams();
-  const limit = searchParams.get("rows")?.toLowerCase() || "10";
-  const status = searchParams.get("status")?.toLowerCase();
-  const createdAt = searchParams.get("createdAt");
-  const sort = searchParams.get("sort")?.toLowerCase();
+  const { push } = useRouter();
 
-  const { loading, businesses } = useBusiness({
+  const {
+    rows: limit = "10",
+    status,
+    createdAt,
+    sort,
+  } = Object.fromEntries(searchParams.entries());
+
+  const router = useRouter();
+  const { loading, users, revalidate } = useAdmins({
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status }),
-    ...(sort && { sort }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
   });
+  const [opened, { open, close }] = useDisclosure(false);
+  const [openedFilter, { toggle }] = useDisclosure(false);
+  const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
+    useDisclosure(false);
+  const { handleError } = useNotification();
 
-  const [opened, { toggle }] = useDisclosure(false);
+  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+
+  const [isEdit, setIsEdit] = useState(false);
+  const [user, setUser] = useState<AdminData | null>(null);
+  const [processing, setProcessing] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const { push } = useRouter();
+  // const {} = Tr
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm({
+    initialValues: newAdmin,
+    validate: zodResolver(validateNewAdmin),
   });
 
-  const infoDetails = [
-    {
-      title: "Total Business",
-      value: 0,
-    },
-    {
-      title: "Money In",
-      value: 0,
-      formatted: true,
-      currency: "EUR",
-    },
-    {
-      title: "Money Out",
-      value: 0,
-      formatted: true,
-      currency: "EUR",
-    },
-    {
-      title: "Total Transactions",
-      value: 0,
-    },
-  ];
+  const filterForm = useForm<FilterType>({
+    initialValues: filterValues,
+    validate: zodResolver(filterSchema),
+  });
+
+  const addAdmin = async () => {
+    setProcessing(true);
+
+    try {
+      const { hasErrors, errors } = form.validate();
+      if (hasErrors) {
+        return;
+      }
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
+        form.values,
+        { withCredentials: true }
+      );
+
+      revalidate();
+      close();
+      router.push("/admin/users");
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleEdit = (data: typeof newAdmin) => {
+    form.setValues(data);
+    open();
+    setIsEdit(true);
+  };
 
   const menuItems = [
     // {
@@ -123,60 +154,53 @@ function Businesses() {
     //   href: "/admin/businesses",
     // },
     {
-      text: "Deactivate",
-      icon: <IconEdit style={{ width: rem(14), height: rem(14) }} />,
+      text: "Edit User",
+      icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
     },
     {
-      text: "Download Report",
-      icon: <IconDownload style={{ width: rem(14), height: rem(14) }} />,
+      text: "Deactivate",
+      icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
     },
   ];
 
-  const handleRowClick = (id: string) => {
-    push(`/admin/businesses/${id}`);
+  const handleRowClick = (user: AdminData) => {
+    setUser(user);
+    openDrawer();
   };
 
   const rows = filteredSearch(
-    businesses,
-    ["name", "contactEmail"],
+    users,
+    ["email", "firstName", "lastName", "role"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id)}
+      onClick={() => handleRowClick(element)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{index + 1}</TableTd>
-      <TableTd className={styles.table__td}>
-        <Group gap={9}>
-          {element.name}
-
-          {element.kycTrusted && (
-            <Image
-              width={20}
-              height={20}
-              src={ActiveBadge}
-              alt="active badge"
-            />
-          )}
-        </Group>
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
-      <TableTd className={styles.table__td}>{50}</TableTd>
+      <TableTd className={styles.table__td}>{element.email}</TableTd>
+      <TableTd
+        className={styles.table__td}
+      >{`${element.firstName} ${element.lastName}`}</TableTd>
+      <TableTd className={styles.table__td}>{element.role}</TableTd>
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.updatedAt).format("ddd DD MMM YYYY")}
+      </TableTd>
+      {/* <TableTd className={styles.table__td}></TableTd> */}
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
           variant="light"
-          color={activeBadgeColor(element.companyStatus)}
+          color={activeBadgeColor("ACTIVE")}
           w={82}
           h={24}
           fw={400}
           fz={12}
         >
-          {element.companyStatus.toLowerCase()}
+          Active
         </Badge>
       </TableTd>
 
@@ -206,12 +230,25 @@ function Businesses() {
               //       </MenuItem>
               //     </Link>
               //   );
+              {
+              }
+
               return (
                 <MenuItem
                   key={index}
                   fz={10}
                   c="#667085"
                   leftSection={items.icon}
+                  onClick={() => {
+                    if (items.text === "Edit User")
+                      return handleEdit({
+                        email: element.email,
+                        firstName: element.firstName,
+                        lastName: element.lastName,
+                        role: element.role,
+                        password: "",
+                      });
+                  }}
                 >
                   {items.text}
                 </MenuItem>
@@ -225,87 +262,60 @@ function Businesses() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
-        items={[
-          // { title: "Dashboard", href: "/admin/dashboard" },
-          { title: "Businesses", href: "/admin/businesses" },
-        ]}
-      />
+      {/* <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} /> */}
 
       <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
-            Businesses
+            Users
           </Text>
         </div>
-        <InfoCards title="Overview" details={infoDetails}>
-          <Select
-            data={["Last Week", "Last Month"]}
-            variant="filled"
-            placeholder="Last Week"
-            defaultValue={"Last Week"}
-            w={130}
-            // h={22}
-            color="var(--prune-text-gray-500)"
-            styles={{
-              input: {
-                outline: "none",
-                border: "none",
-              },
-            }}
-          />
-        </InfoCards>
-        <div
-          className={`${styles.container__search__filter} ${switzer.className}`}
-        >
+
+        <Group justify="space-between" mt={28}>
           <TextInput
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
-            color="var(--prune-text-gray-200)"
             onChange={(e) => setSearch(e.currentTarget.value)}
-            c="#000"
             w={324}
             styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
-          <Flex gap={12}>
+          <Group gap={12}>
             <Button
               // className={styles.filter__cta}
-              leftSection={<IconListTree size={14} />}
-              onClick={toggle}
-              fz={12}
-              fw={500}
-              radius={4}
               variant="outline"
               color="var(--prune-text-gray-200)"
-              c="#000"
-              pl={0}
+              c="var(--prune-text-gray-800)"
+              leftSection={<IconListTree size={14} />}
+              fz={12}
+              fw={500}
+              onClick={toggle}
             >
               Filter
             </Button>
 
             <Button
-              component={Link}
-              href="/admin/businesses/new"
-              leftSection={<IconPlus size={16} />}
+              onClick={open}
+              leftSection={<IconPlus color="#344054" size={16} />}
+              // className={styles.login__cta}
               variant="filled"
-              radius={4}
-              fz={12}
-              c="#000"
               color="var(--prune-primary-600)"
-              pl={0}
+              c="var(--prune-text-gray-800)"
+              fw={500}
+              fz={12}
             >
-              New Business
+              Invite New User
             </Button>
-          </Flex>
-        </div>
-        <Filter<BusinessFilterType>
-          opened={opened}
+          </Group>
+        </Group>
+
+        <Filter<FilterType>
+          opened={openedFilter}
           toggle={toggle}
-          form={form}
+          form={filterForm}
         />
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
@@ -314,13 +324,14 @@ function Businesses() {
           <Flex direction="column" align="center" mt={70}>
             <Image src={EmptyImage} alt="no content" width={156} height={120} />
             <Text mt={14} fz={14} c="#1D2939">
-              There are no businesses.
+              There are no users.
             </Text>
             <Text fz={10} c="#667085">
-              When a business is created, it will appear here
+              When a user is added, they will appear here
             </Text>
           </Flex>
         )}
+
         <div className={styles.pagination__container}>
           <Group gap={9}>
             <Text fz={14}>Showing:</Text>
@@ -342,24 +353,35 @@ function Businesses() {
           />
         </div>
       </div>
+
+      <ModalComponent
+        action={addAdmin}
+        processing={processing}
+        opened={opened}
+        close={close}
+        form={form}
+        isEdit={isEdit}
+      />
+
+      <UserDrawer opened={openedDrawer} close={closeDrawer} user={user} />
     </main>
   );
 }
 
-export default function BusinessesSuspense() {
+export default function UsersSuspense() {
   return (
     <Suspense>
-      <Businesses />
+      <Users />
     </Suspense>
   );
 }
 
 const tableHeaders = [
-  "S/N",
-  "Business",
-  "Contact Email",
-  "Transactions",
+  "Email",
+  "Name",
+  "Role",
   "Date Created",
+  "Last Active",
   "Status",
   "Action",
 ];

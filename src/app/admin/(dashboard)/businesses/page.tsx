@@ -75,7 +75,7 @@ function Businesses() {
   const createdAt = searchParams.get("createdAt");
   const sort = searchParams.get("sort")?.toLowerCase();
 
-  const { loading, businesses } = useBusiness({
+  const { loading, businesses, meta } = useBusiness({
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status }),
@@ -96,17 +96,19 @@ function Businesses() {
   const infoDetails = [
     {
       title: "Total Business",
-      value: 0,
+      value: meta?.total || 0,
     },
     {
       title: "Money In",
       value: 0,
       formatted: true,
+      currency: "EUR",
     },
     {
       title: "Money Out",
       value: 0,
       formatted: true,
+      currency: "EUR",
     },
     {
       title: "Total Transactions",

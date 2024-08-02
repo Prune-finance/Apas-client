@@ -213,7 +213,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
 
               <div className={styles.item__subs}>
                 <Text className={styles.sub__text} fz={10}>
-                  {item.subText}
+                  {/* {item.subText} */}
                 </Text>
 
                 <Badge
@@ -369,7 +369,7 @@ export function CardFour({ title, link, items }: ICardFour) {
                     </Text>
                     <Text tt="capitalize" className={styles.sub__text} fz={10}>
                       {/* {item.type} Account */}
-                      {item.subText}
+                      {/* {item.subText} */}
                     </Text>
                   </div>
 

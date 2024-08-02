@@ -109,13 +109,13 @@ export default function Accounts({
   }, [business]);
 
   const volumeDetails = [
-    { title: "Sandra Damasus", value: 0, formatted: true },
+    { title: "Sandra Damasus", value: 0, formatted: true, currency: "EUR" },
   ];
 
   const overviewDetails = [
-    { title: "Total Balance", value: 0, formatted: true },
-    { title: "Money In", value: 0, formatted: true },
-    { title: "Money Out", value: 0, formatted: true },
+    { title: "Total Balance", value: 0, formatted: true, currency: "EUR" },
+    { title: "Money In", value: 0, formatted: true, currency: "EUR" },
+    { title: "Money Out", value: 0, formatted: true, currency: "EUR" },
     { title: "Total Transactions", value: 0 },
   ];
 
@@ -140,7 +140,7 @@ export default function Accounts({
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
-      <TableTd>{element.accountBalance}</TableTd>
+      {/* <TableTd>{element.accountBalance}</TableTd> */}
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
@@ -241,7 +241,7 @@ const tableHead = [
   "Account Number",
   "Type",
   "Date Created",
-  "Transactions",
+  // "Transactions",
   "Status",
 ];
 

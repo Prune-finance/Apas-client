@@ -61,11 +61,15 @@ export default function TransactionForAccount() {
       title: "Money In",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Money Out",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Total Transactions",
@@ -243,7 +247,7 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount)}
+          {formatNumber(element.Amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
@@ -357,7 +361,7 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
             Amount Received
           </Text>
           <Text c="var(--prune-primary-700)" fw={600} fz={32}>
-            {formatNumber(data.Amount)}
+            {formatNumber(data.Amount, true, "EUR")}
           </Text>
         </Stack>
 

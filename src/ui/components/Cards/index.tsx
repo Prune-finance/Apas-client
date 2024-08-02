@@ -410,6 +410,7 @@ export function CardFour({ title, link, items }: ICardFour) {
 
 interface ICardFive extends Omit<ICardOne, "text"> {
   borderRight?: boolean;
+  locale?: string;
 }
 
 export function CardFive({
@@ -424,6 +425,7 @@ export function CardFive({
   currency,
   flex,
   borderRight,
+  locale,
 }: ICardFive) {
   return (
     <Paper
@@ -454,7 +456,7 @@ export function CardFive({
           <Skeleton w={100} h={35} color="red" />
         ) : (
           <Title fz={24} className={`${colored ? styles.light__green : ""}`}>
-            {formatted ? formatNumber(stat, true, currency) : stat}
+            {formatted ? formatNumber(stat, true, currency, locale) : stat}
           </Title>
         )}
       </div>

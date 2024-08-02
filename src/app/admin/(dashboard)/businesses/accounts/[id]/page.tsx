@@ -54,13 +54,31 @@ export default function Account() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
   const accountDetails = [
-    { title: "Naira Account", value: 0, formatted: true, currency: "NGN" },
-    { title: "Dollar Account", value: 0, formatted: true, currency: "USD" },
-    { title: "Pound Account", value: 0, formatted: true, currency: "GBP" },
+    {
+      title: "Euro Account",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Dollar Account",
+      value: 0,
+      formatted: true,
+      currency: "USD",
+      locale: "en-US",
+    },
+    {
+      title: "Pound Account",
+      value: 0,
+      formatted: true,
+      currency: "GBP",
+      locale: "en-GB",
+    },
   ];
 
   const flexedGroupDetails = [
-    { title: "Bank", value: "Wema" },
+    // { title: "Bank", value: "Wema" },
     { title: "Account Name", value: account?.accountName },
     { title: "Account No", value: account?.accountNumber },
   ];
@@ -156,6 +174,7 @@ export default function Account() {
               details={flexedGroupDetails}
               flexedGroup
               loading={loading}
+              h="190px"
             >
               <CopyButton value={account?.accountNumber || ""} timeout={2000}>
                 {({ copied, copy }) => (
@@ -222,7 +241,7 @@ export default function Account() {
                   }
                   startAngle={180}
                   endAngle={0}
-                  withLabels={formatNumber(totalTrxVolume)}
+                  withLabels={formatNumber(totalTrxVolume, true, "EUR")}
                 />
               </Flex>
 
@@ -240,7 +259,7 @@ export default function Account() {
                       </Text>
 
                       <Text fz={14} fw={700} c="var(--prune-text-gray-800)">
-                        {formatNumber(item.value)}
+                        {formatNumber(item.value, true, "EUR")}
                       </Text>
                     </Stack>
                   );
@@ -319,7 +338,7 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount)}
+          {formatNumber(element.Amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>

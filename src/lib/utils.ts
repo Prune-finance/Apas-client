@@ -3,12 +3,13 @@ import dayjs from "dayjs";
 export const formatNumber = (
   number: number,
   currency: boolean = true,
-  type: string = "NGN"
+  type: string = "NGN",
+  locale: string = "en-NG"
 ) => {
   if (!currency) {
-    return new Intl.NumberFormat("en-NG", {}).format(number);
+    return new Intl.NumberFormat(locale, {}).format(number);
   }
-  return new Intl.NumberFormat("en-NG", {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency: type,
   }).format(number);

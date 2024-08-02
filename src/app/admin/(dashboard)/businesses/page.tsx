@@ -11,12 +11,7 @@ import {
   MenuTarget,
   Pagination,
   Select,
-  Table,
-  TableScrollContainer,
-  TableTbody,
   TableTd,
-  TableTh,
-  TableThead,
   TableTr,
   Text,
   TextInput,
@@ -48,7 +43,6 @@ import styles from "@/ui/styles/business.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
-import { AllBusinessSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -64,7 +58,6 @@ import { filteredSearch } from "@/lib/search";
 
 import ActiveBadge from "@/assets/active-badge.svg";
 import { activeBadgeColor } from "@/lib/utils";
-import { table } from "console";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 

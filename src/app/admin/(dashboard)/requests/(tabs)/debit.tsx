@@ -167,13 +167,13 @@ function Debit() {
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element.Account.Company.name}</TableTd>
-      <TableTd className={styles.table__td}>{element.amount}</TableTd>
-      <TableTd className={styles.table__td}>
+      {/* <TableTd className={styles.table__td}>{element.amount}</TableTd> */}
+      {/* <TableTd className={styles.table__td}>
         {`${element.Account.Company.name
           .toLowerCase()
           .split(" ")
           .join("")}@example.com`}
-      </TableTd>
+      </TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         <Badge
           tt="capitalize"
@@ -399,8 +399,8 @@ function Debit() {
 
 const tableHeaders = [
   "Business Name",
-  "Number of Requests",
-  "Contact Email",
+  // "Number of Requests",
+  // "Contact Email",
   "Status",
   // "Action",
 ];

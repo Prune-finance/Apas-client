@@ -45,6 +45,7 @@ import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -60,16 +61,22 @@ export default function TransactionForAccount() {
       title: "Total Balance",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Money In",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Money Out",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Total Transactions",
@@ -201,8 +208,15 @@ export default function TransactionForAccount() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent data={tableData} id={params.id} />}
+          rows={<RowComponent data={[]} id={params.id} />}
           loading={false}
+        />
+
+        <EmptyTable
+          rows={[]}
+          loading={loading}
+          text="Transactions will be shown here"
+          title="There are no transactions"
         />
 
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
@@ -250,7 +264,7 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount)}
+          {formatNumber(element.Amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
@@ -363,7 +377,7 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
             Amount Received
           </Text>
           <Text c="var(--prune-primary-700)" fw={600} fz={32}>
-            {formatNumber(data.Amount)}
+            {formatNumber(data.Amount, true, "EUR")}
           </Text>
         </Stack>
 

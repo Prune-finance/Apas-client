@@ -163,7 +163,7 @@ function Businesses() {
         </Group>
       </TableTd>
       <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
-      <TableTd className={styles.table__td}>{50}</TableTd>
+      {/* <TableTd className={styles.table__td}>{50}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
@@ -239,7 +239,7 @@ function Businesses() {
             Businesses
           </Text>
         </div>
-        <InfoCards title="Overview" details={infoDetails}>
+        <InfoCards title="Overview" details={infoDetails} loading={loading}>
           <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
@@ -358,7 +358,7 @@ const tableHeaders = [
   "S/N",
   "Business",
   "Contact Email",
-  "Transactions",
+  // "Transactions",
   "Date Created",
   "Status",
   "Action",

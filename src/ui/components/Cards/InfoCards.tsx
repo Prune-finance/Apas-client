@@ -1,6 +1,7 @@
 import { CardFive } from "@/ui/components/Cards";
 import {
   Card,
+  CardProps,
   CardSection,
   Divider,
   Flex,
@@ -20,15 +21,16 @@ type Details = {
   value: number | string | undefined;
   formatted?: boolean;
   currency?: string;
+  locale?: string;
 };
 
-type InfoCardProps = {
+interface InfoCardProps extends CardProps {
   details: Details[];
   title: string;
   children?: ReactNode;
   flexedGroup?: boolean;
   loading?: boolean;
-};
+}
 
 export default function InfoCards({
   title,
@@ -36,9 +38,10 @@ export default function InfoCards({
   children,
   flexedGroup,
   loading,
+  ...props
 }: InfoCardProps) {
   return (
-    <Card mt={24} style={{ border: "1px solid #f5f5f5" }}>
+    <Card mt={24} style={{ border: "1px solid #f5f5f5" }} {...props}>
       <CardSection>
         <Flex justify="space-between" align="center" px={24} pt={24}>
           <Title order={3} fz={16}>
@@ -77,6 +80,7 @@ export default function InfoCards({
               stat={typeof info.value === "number" ? info.value : 0}
               formatted={info.formatted}
               currency={info.currency}
+              locale={info.locale}
               container
               borderRight={index !== details.length - 1}
               flex={1}

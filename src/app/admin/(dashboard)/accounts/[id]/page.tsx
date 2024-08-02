@@ -44,6 +44,7 @@ import InfoCards from "@/ui/components/Cards/InfoCards";
 import { DonutChartComponent } from "@/ui/components/Charts";
 import TransactionStatistics from "./TransactionStats";
 import { TableComponent } from "@/ui/components/Table";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 dayjs.extend(advancedFormat);
 
@@ -54,13 +55,19 @@ export default function Account() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const { back } = useRouter();
   const accountDetails = [
-    { title: "Naira Account", value: 0, formatted: true, currency: "NGN" },
-    { title: "Dollar Account", value: 0, formatted: true, currency: "USD" },
+    { title: "Euro Account", value: 0, formatted: true, currency: "EUR" },
+    {
+      title: "Dollar Account",
+      value: 0,
+      formatted: true,
+      currency: "USD",
+      locale: "en-US",
+    },
     { title: "Pound Account", value: 0, formatted: true, currency: "GBP" },
   ];
 
   const flexedGroupDetails = [
-    { title: "Bank", value: "Wema" },
+    // { title: "Bank", value: "Wema" },
     { title: "Account Name", value: account?.accountName },
     { title: "Account No", value: account?.accountNumber },
   ];
@@ -161,6 +168,7 @@ export default function Account() {
               details={flexedGroupDetails}
               flexedGroup
               loading={loading}
+              h={190}
             >
               <CopyButton value={account?.accountNumber || ""} timeout={2000}>
                 {({ copied, copy }) => (
@@ -233,7 +241,7 @@ export default function Account() {
                   }
                   startAngle={180}
                   endAngle={0}
-                  withLabels={formatNumber(totalTrxVolume)}
+                  withLabels={formatNumber(totalTrxVolume, true, "EUR")}
                 />
               </Flex>
 
@@ -251,7 +259,7 @@ export default function Account() {
                       </Text>
 
                       <Text fz={16} fw={700} c="var(--prune-text-gray-800)">
-                        {formatNumber(item.value)}
+                        {formatNumber(item.value, true, "EUR")}
                       </Text>
                     </Stack>
                   );
@@ -287,10 +295,15 @@ export default function Account() {
 
                 <TableComponent
                   head={tableHeaders}
-                  rows={
-                    <RowComponent data={tableData.slice(0, 3)} id={params.id} />
-                  }
+                  rows={<RowComponent data={[]} id={params.id} />}
                   loading={false}
+                />
+
+                <EmptyTable
+                  rows={[]}
+                  loading={false}
+                  title="There are no recent transactions"
+                  text="When transactions are created, recent transactions will appear here."
                 />
               </div>
             </Paper>
@@ -331,7 +344,7 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount)}
+          {formatNumber(element.Amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>

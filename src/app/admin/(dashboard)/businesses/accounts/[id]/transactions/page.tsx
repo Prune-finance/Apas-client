@@ -34,8 +34,6 @@ import {
 import styles from "../styles.module.scss";
 
 import { useParams, useRouter } from "next/navigation";
-
-import InfoCards from "../../../InfoCards";
 import Filter from "@/ui/components/Filter";
 import { BusinessFilterType } from "../../../schema";
 import { useDisclosure } from "@mantine/hooks";
@@ -44,6 +42,8 @@ import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -61,11 +61,15 @@ export default function TransactionForAccount() {
       title: "Money In",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Money Out",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Total Transactions",
@@ -194,8 +198,15 @@ export default function TransactionForAccount() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent data={tableData.slice(0, 3)} id={params.id} />}
+          rows={<RowComponent data={[]} id={params.id} />}
           loading={false}
+        />
+
+        <EmptyTable
+          rows={[]}
+          loading={false}
+          title="There are no transactions"
+          text="When transactions are created, they will appear here."
         />
 
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
@@ -243,7 +254,7 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount)}
+          {formatNumber(element.Amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
@@ -357,7 +368,7 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
             Amount Received
           </Text>
           <Text c="var(--prune-primary-700)" fw={600} fz={32}>
-            {formatNumber(data.Amount)}
+            {formatNumber(data.Amount, true, "EUR")}
           </Text>
         </Stack>
 

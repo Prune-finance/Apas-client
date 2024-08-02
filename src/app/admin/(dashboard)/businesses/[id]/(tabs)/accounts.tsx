@@ -46,7 +46,6 @@ import { CardOne } from "@/ui/components/Cards";
 import { activeBadgeColor, formatNumber } from "@/lib/utils";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import InfoCards from "../../InfoCards";
 import Filter from "@/ui/components/Filter";
 import { BusinessFilterType } from "../../schema";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -63,6 +62,7 @@ import styles from "@/ui/styles/business.module.scss";
 import { AllBusinessSkeleton } from "@/lib/static";
 import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -140,7 +140,7 @@ export default function Accounts({
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
-      <TableTd>{element.accountBalance}</TableTd>
+      {/* <TableTd>{element.accountBalance}</TableTd> */}
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
@@ -241,7 +241,7 @@ const tableHead = [
   "Account Number",
   "Type",
   "Date Created",
-  "Transactions",
+  // "Transactions",
   "Status",
 ];
 

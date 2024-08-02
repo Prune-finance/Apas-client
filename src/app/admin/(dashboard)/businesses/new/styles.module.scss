@@ -42,3 +42,32 @@
     }
   }
 }
+
+.separator {
+  display: none;
+}
+
+.steps {
+  gap: 48px;
+  margin-bottom: 36px;
+}
+
+.stepBody {
+  margin-left: 12px;
+}
+
+.stepIcon {
+  width: 28px;
+  height: 28px;
+}
+
+.stepLabel {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--prune-text-gray-500);
+}
+
+.stepIcon:not([data-completed]):not([data-progress]) {
+  border: 1px solid var(--prune-text-gray-500);
+  background-color: transparent;
+}

@@ -56,9 +56,14 @@ export const newBusiness = {
   legalEntity: "",
   contactNumber: "",
   contactEmail: "",
+  businessBio: "",
   cacCertificate: "",
   address: "",
   mermat: "",
+  AMLCompliance: "",
+  operationalLicense: "",
+  shareholderParticular: "",
+  directorParticular: "",
   directors: [directorEtShareholderSchema],
   shareholders: [directorEtShareholderSchema],
 };
@@ -119,11 +124,44 @@ export const validateNewBusiness = z.object({
   country: z.string().min(1, "Country is required"),
   legalEntity: z.string().min(1, "Legal Entity is required"),
   contactNumber: z.string().min(1, "Contact number is required"),
+  address: z.string().min(1, "Business Address is required"),
+  businessBio: z.string(),
   contactEmail: z.string().email("Please provide a valid contact email"),
   cacCertificate: z.string().url("Cac certificate is required"),
-  mermat: z.string().url("Mermat document is required"),
+  mermat: z.string().url("Memart document is required"),
+  directorParticular: z
+    .string()
+    .url("Particular of Director document is required"),
+  shareholderParticular: z
+    .string()
+    .url("Particular of Shareholder document is required"),
+  operationalLicense: z
+    .string()
+    .url("Operational License document is required"),
+  AMLCompliance: z
+    .string()
+    .url("AML Compliance Framework document is required"),
   domain: z.string().url("Please provide a valid url"),
   directors: z
+    .array(
+      z.object({
+        name: z.string().min(1, "Director's name is required"),
+        email: z.string().refine(
+          (val) => {
+            if (!val) return true;
+            return emailSchema.safeParse(val).success;
+          },
+          { message: "Invalid director's email" }
+        ),
+        identityType: z.string(),
+        proofOfAddress: z.string(),
+        identityFileUrl: z.string(),
+        identityFileUrlBack: z.string(),
+        proofOfAddressFileUrl: z.string(),
+      })
+    )
+    .optional(),
+  shareholders: z
     .object({
       name: z.string(),
       email: z.string().refine(
@@ -131,7 +169,7 @@ export const validateNewBusiness = z.object({
           if (!val) return true;
           return emailSchema.safeParse(val).success;
         },
-        { message: "Invalid director's email" }
+        { message: "Invalid shareholder's email" }
       ),
       identityType: z.string(),
       proofOfAddress: z.string(),
@@ -142,6 +180,8 @@ export const validateNewBusiness = z.object({
     .array()
     .optional(),
 });
+
+export type NewBusinessType = z.infer<typeof validateNewBusiness>;
 
 export const validateDirectors = z.object({
   name: z.string().min(3, "Director name is required"),

@@ -67,6 +67,8 @@ export default function PricingPlans() {
             leftSection={<IconSearch size={20} />}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
             onChange={(e) => setSearch(e.currentTarget.value)}
           />
 

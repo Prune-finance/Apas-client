@@ -269,12 +269,15 @@ function AccountRequests() {
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Group gap={12}>
             <Button
-              variant="default"
-              color="var(--prune-text-gray-500)"
+              variant="outline"
+              color="var(--prune-text-gray-200)"
+              c="var(--prune-text-gray-800)"
               leftSection={<IconListTree size={14} />}
               fz={12}
               fw={500}

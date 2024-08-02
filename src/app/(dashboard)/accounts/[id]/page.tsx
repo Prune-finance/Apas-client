@@ -12,6 +12,7 @@ import {
   Flex,
   Grid,
   GridCol,
+  Modal,
   NativeSelect,
   Paper,
   Skeleton,
@@ -20,6 +21,8 @@ import {
   TableScrollContainer,
   TableTbody,
   TableTd,
+  TableTh,
+  TableThead,
   TableTr,
   Text,
 } from "@mantine/core";
@@ -40,12 +43,17 @@ import dayjs from "dayjs";
 import { DynamicSkeleton } from "@/lib/static";
 
 import EmptyImage from "@/assets/empty.png";
+import { useDisclosure } from "@mantine/hooks";
+import DebitRequestModal from "../../debit-requests/new/modal";
+import Link from "next/link";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
   const { account, loading } = useSingleUserAccount(params.id);
   const { loading: trxLoading, transactions } = useUserTransactions(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
+
+  const [opened, { open, close }] = useDisclosure(false);
 
   const rows = transactions.map((element) => (
     <TableTr key={element.id}>
@@ -184,8 +192,9 @@ export default function Account() {
           </Button> */}
 
           <Button
-            component="a"
-            href="/debit-requests/new"
+            // component="a"
+            // href="/debit-requests/new"
+            onClick={open}
             fz={12}
             className={styles.main__cta}
             variant="filled"
@@ -457,9 +466,17 @@ export default function Account() {
               style={{ border: "1px solid #f5f5f5" }}
               className={styles.payout__table}
             >
-              <Text className={styles.table__text} fz={16} fw={600}>
-                Recent Transactions
-              </Text>
+              <Flex justify="space-between" align="center">
+                <Text className={styles.table__text} fz={16} fw={600}>
+                  Recent Transactions
+                </Text>
+
+                <Link href={`/accounts/${account?.id}/transactions`}>
+                  <Text td="underline" c="#758604" fz={12} fw={600}>
+                    See All Transactions
+                  </Text>
+                </Link>
+              </Flex>
 
               <TableScrollContainer
                 className={styles.table__container}
@@ -467,6 +484,20 @@ export default function Account() {
               >
                 <Table className={styles.table} verticalSpacing="md">
                   {/* <TableTbody>{rows}</TableTbody> */}
+                  <TableThead>
+                    <TableTr>
+                      <TableTh className={styles.table__th}>
+                        Recipient IBAN
+                      </TableTh>
+                      <TableTh className={styles.table__th}>Bank</TableTh>
+                      <TableTh className={styles.table__th}>
+                        Date Created
+                      </TableTh>
+                      <TableTh className={styles.table__th}>Amount</TableTh>
+                      <TableTh className={styles.table__th}>Reference</TableTh>
+                      <TableTh className={styles.table__th}>Status</TableTh>
+                    </TableTr>
+                  </TableThead>
                   <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
                 </Table>
 
@@ -487,22 +518,20 @@ export default function Account() {
                   </Flex>
                 )}
               </TableScrollContainer>
-
-              <Button
-                component="a"
-                href={`/accounts/${params.id}/transactions`}
-                leftSection={<IconCircleChevronRight size={18} />}
-                variant="transparent"
-                color="#97AD05"
-                fz={11}
-                className={styles.table__cta}
-              >
-                See All Transactions
-              </Button>
             </Paper>
           </GridCol>
         </Grid>
       </div>
+
+      <Modal
+        size="xl"
+        opened={opened}
+        onClose={close}
+        centered
+        withCloseButton={false}
+      >
+        <DebitRequestModal close={close} selectedId={account?.id || ""} />
+      </Modal>
     </main>
   );
 }

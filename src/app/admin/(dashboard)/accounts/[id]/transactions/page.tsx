@@ -29,6 +29,7 @@ import {
   IconArrowUpRight,
   IconCircleArrowDown,
   IconListTree,
+  IconSearch,
   IconX,
 } from "@tabler/icons-react";
 import styles from "../styles.module.scss";
@@ -132,7 +133,7 @@ export default function TransactionForAccount() {
             variant="filled"
             placeholder="Last Week"
             defaultValue={"Last Week"}
-            w={150}
+            w={120}
             // h={22}
             color="var(--prune-text-gray-500)"
             styles={{
@@ -140,6 +141,7 @@ export default function TransactionForAccount() {
                 outline: "none",
                 border: "none",
               },
+              option: { fontSize: "12px" },
             }}
           />
         </InfoCards>
@@ -149,11 +151,14 @@ export default function TransactionForAccount() {
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             // leftSection={searchIcon}
+            leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             // value={search}
             color="var(--prune-text-gray-200)"
             // onChange={(e) => setSearch(e.currentTarget.value)}
             c="#000"
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Flex gap={12}>
@@ -166,7 +171,7 @@ export default function TransactionForAccount() {
               radius={4}
               variant="outline"
               color="var(--prune-text-gray-200)"
-              c="#000"
+              c="var(--prune-text-gray-800)"
             >
               Filter
             </Button>
@@ -179,7 +184,7 @@ export default function TransactionForAccount() {
               radius={4}
               variant="outline"
               color="var(--prune-text-gray-200)"
-              c="#000"
+              c="var(--prune-text-gray-800)"
             >
               Export CSV
             </Button>
@@ -192,7 +197,7 @@ export default function TransactionForAccount() {
               radius={4}
               variant="outline"
               color="var(--prune-text-gray-200)"
-              c="#000"
+              c="var(--prune-text-gray-800)"
             >
               Download Statement
             </Button>

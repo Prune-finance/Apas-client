@@ -23,9 +23,6 @@ import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/accounts.module.scss";
 import {
-  IconPointFilled,
-  IconDots,
-  IconEye,
   IconBrandLinktree,
   IconX,
   IconTrash,
@@ -35,11 +32,9 @@ import {
   IconArrowUpRight,
   IconDotsVertical,
 } from "@tabler/icons-react";
-import Link from "next/link";
 
 import ModalComponent from "@/ui/components/Modal";
 import { AccountData, useAccounts } from "@/lib/hooks/accounts";
-import { DynamicSkeleton } from "@/lib/static";
 import { activeBadgeColor, formatNumber } from "@/lib/utils";
 
 import EmptyImage from "@/assets/empty.png";
@@ -198,6 +193,8 @@ function Accounts() {
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
@@ -205,22 +202,26 @@ function Accounts() {
 
           <Group gap={12}>
             <Button
-              variant="default"
-              color="var(--prune-text-gray-500)"
+              variant="outline"
+              color="var(--prune-text-gray-200)"
+              c="var(--prune-text-gray-800)"
               leftSection={<IconArrowUpRight size={14} />}
               fz={12}
               fw={500}
+              // style={{ border: "1px solid #F5F5F5" }}
               // onClick={toggle}
             >
               Export CSV
             </Button>
 
             <Button
-              variant="default"
-              color="var(--prune-text-gray-500)"
+              variant="outline"
+              color="var(--prune-text-gray-200)"
+              c="var(--prune-text-gray-800)"
               leftSection={<IconListTree size={14} />}
               fz={12}
               fw={500}
+              // style={{ border: "1px solid #F5F5F5" }}
               onClick={toggle}
             >
               Filter

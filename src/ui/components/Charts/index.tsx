@@ -50,6 +50,7 @@ export function DonutChartComponent({
       endAngle={endAngle}
       chartLabel={String(withLabels)}
       tooltipDataSource="segment"
+      // size={300}
       styles={{
         label: {
           fontSize: 20,

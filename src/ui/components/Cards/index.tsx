@@ -41,7 +41,7 @@ interface ICardOne {
 const SeeAll = () => {
   return (
     <div className={styles.card__link}>
-      <Text fz={9} td="underline">
+      <Text fz={12} td="underline">
         See All
       </Text>
       <IconChevronRight size={11} />
@@ -436,7 +436,7 @@ export function CardFive({
       style={{
         height: container ? "100%" : "130px",
         gap: "16px",
-        borderRight: borderRight ? "1px solid #E5E5E5" : "none",
+        borderRight: borderRight ? "1px solid #F5F5F5" : "none",
       }}
     >
       <div className={styles.card__title}>

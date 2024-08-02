@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 
-import { Text, TableTd, Paper, Box } from "@mantine/core";
+import { Text, TableTd, Paper, Box, Modal } from "@mantine/core";
 import { TableTbody, TableTh, TableThead } from "@mantine/core";
 import { Tooltip, rem, Button, Table } from "@mantine/core";
 import { Stack, CopyButton, ActionIcon } from "@mantine/core";
@@ -27,12 +27,16 @@ import User from "@/lib/store/user";
 import dayjs from "dayjs";
 import axios from "axios";
 import { Key } from "./settings/(tabs)/keys";
+import { useDisclosure } from "@mantine/hooks";
+import DebitRequestModal from "./debit-requests/new/modal";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
   const { loading: debitLoading, requests } = useUserDebitRequests();
   const { loading: balanceLoading, balance } = useUserBalances();
   const { transactions } = useUserTransactions();
+
+  const [opened, { open, close }] = useDisclosure(false);
 
   const [keys, setKeys] = useState<Key[]>([]);
   const { user } = User();
@@ -69,12 +73,14 @@ export default function Home() {
       </TableTd>
       <TableTd className={styles.table__td}>{element.amount}</TableTd>
       <TableTd className={`${styles.table__td}`}>
-        <IconArrowUpRight
-          color="#D92D20"
-          size={16}
-          className={styles.table__td__icon}
-        />
-        {formatNumber(element.amount, true, "EUR")}
+        <Flex align="center">
+          <IconArrowUpRight
+            color="#D92D20"
+            size={16}
+            className={styles.table__td__icon}
+          />
+          {formatNumber(element.amount, true, "EUR")}
+        </Flex>
         {/* <Text fz={12}></Text> */}
       </TableTd>
       <TableTd className={styles.table__td}>
@@ -197,10 +203,19 @@ export default function Home() {
             <Flex gap={10} align="center">
               <Text className={styles.body__text__header}>Total Balance</Text>
               <Button
+                onClick={open}
                 className={styles.debit__btn}
                 variant="filled"
                 color="#F9FCE6"
                 fz={10}
+                fw={600}
+                rightSection={
+                  <IconArrowUpRight
+                    color="#758604"
+                    size={13}
+                    className={styles.table__td__icon}
+                  />
+                }
               >
                 Debit Request
               </Button>
@@ -451,6 +466,16 @@ export default function Home() {
           </GridCol>
         </Grid>
       </div>
+
+      <Modal
+        size="xl"
+        opened={opened}
+        onClose={close}
+        centered
+        withCloseButton={false}
+      >
+        <DebitRequestModal close={close} />
+      </Modal>
     </main>
   );
 }

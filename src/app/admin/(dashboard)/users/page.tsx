@@ -12,12 +12,7 @@ import {
   MenuTarget,
   Pagination,
   Select,
-  Table,
-  TableScrollContainer,
-  TableTbody,
   TableTd,
-  TableTh,
-  TableThead,
   TableTr,
   Text,
   TextInput,
@@ -25,19 +20,13 @@ import {
   rem,
 } from "@mantine/core";
 import {
-  IconDots,
   IconDotsVertical,
-  IconDownload,
-  IconEye,
   IconListTree,
   IconPlus,
-  IconPointFilled,
   IconSearch,
-  IconTrash,
   IconUserEdit,
   IconUserX,
 } from "@tabler/icons-react";
-import Link from "next/link";
 import Image from "next/image";
 import dayjs from "dayjs";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -46,7 +35,6 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
-import { AllBusinessSkeleton } from "@/lib/static";
 import { useAdmins } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import ModalComponent from "./modal";
@@ -245,6 +233,8 @@ function Users() {
             placeholder="Search here..."
             leftSectionPointerEvents="none"
             leftSection={searchIcon}
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             value={search}
             onChange={(e) => setSearch(e.currentTarget.value)}
@@ -253,7 +243,9 @@ function Users() {
           <Group gap={12}>
             <Button
               // className={styles.filter__cta}
-              variant="default"
+              variant="outline"
+              color="var(--prune-text-gray-200)"
+              c="var(--prune-text-gray-800)"
               leftSection={<IconListTree size={14} />}
               fz={12}
               fw={500}

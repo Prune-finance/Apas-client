@@ -38,13 +38,14 @@ import Plan from "@/lib/store/plan";
 import styles from "@/ui/styles/accounts.module.scss";
 import PaginationComponent from "@/ui/components/Pagination";
 import PlanDrawer from "./drawer";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 export type Plan = (typeof _plans)[0];
 export default function PricingPlans() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const [plans, setPlans] = useState<Plan[]>(_plans);
+  const [plans, setPlans] = useState<Plan[]>([]);
 
   const { opened, data, close } = Plan();
 
@@ -88,6 +89,13 @@ export default function PricingPlans() {
           loading={loading}
         />
 
+        <EmptyTable
+          rows={plans}
+          loading={loading}
+          title="There are no pricing plans"
+          text="When a pricing plan is created, it will appear here."
+        />
+        {/* 
         {!loading && !!!plans.length && (
           <Flex direction="column" align="center" mt={70}>
             <Image src={EmptyImage} alt="no content" width={156} height={120} />
@@ -98,7 +106,7 @@ export default function PricingPlans() {
               When an account is created, it will appear here
             </Text>
           </Flex>
-        )}
+        )} */}
 
         <PaginationComponent />
       </Paper>

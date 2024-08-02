@@ -44,6 +44,7 @@ import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -63,11 +64,15 @@ export default function TransactionForAccount() {
       title: "Money In",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Money Out",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Total Transactions",
@@ -198,8 +203,15 @@ export default function TransactionForAccount() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent data={tableData} id={params.id} />}
+          rows={<RowComponent data={[]} id={params.id} />}
           loading={false}
+        />
+
+        <EmptyTable
+          rows={[]}
+          loading={false}
+          title="There are no transactions"
+          text="When transactions are created, it will appear here."
         />
 
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}

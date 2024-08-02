@@ -44,6 +44,7 @@ import InfoCards from "@/ui/components/Cards/InfoCards";
 import { DonutChartComponent } from "@/ui/components/Charts";
 import TransactionStatistics from "./TransactionStats";
 import { TableComponent } from "@/ui/components/Table";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 dayjs.extend(advancedFormat);
 
@@ -287,10 +288,15 @@ export default function Account() {
 
                 <TableComponent
                   head={tableHeaders}
-                  rows={
-                    <RowComponent data={tableData.slice(0, 3)} id={params.id} />
-                  }
+                  rows={<RowComponent data={[]} id={params.id} />}
                   loading={false}
+                />
+
+                <EmptyTable
+                  rows={[]}
+                  loading={false}
+                  title="There are no recent transactions"
+                  text="When transactions are created, recent transactions will appear here."
                 />
               </div>
             </Paper>

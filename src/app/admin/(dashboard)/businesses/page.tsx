@@ -34,6 +34,7 @@ import {
   IconPointFilled,
   IconSearch,
   IconTrash,
+  IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -122,7 +123,7 @@ function Businesses() {
     // },
     {
       text: "Deactivate",
-      icon: <IconEdit style={{ width: rem(14), height: rem(14) }} />,
+      icon: <IconX style={{ width: rem(14), height: rem(14) }} />,
     },
     {
       text: "Download Report",
@@ -328,6 +329,7 @@ function Businesses() {
               // h={24}
               size="xs"
               withCheckIcon={false}
+              {...form.getInputProps("rows")}
             />
           </Group>
           <Pagination

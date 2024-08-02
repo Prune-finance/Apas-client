@@ -16,10 +16,11 @@ import {
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-import { newBusiness } from "@/lib/schema";
+import { newBusiness, NewBusinessType } from "@/lib/schema";
 
 interface DropzoneCustomProps extends Partial<DropzoneProps> {
-  form?: UseFormReturnType<typeof newBusiness>;
+  form?: UseFormReturnType<NewBusinessType>;
+  // form?: UseFormReturnType<typeof newBusiness>;
   formKey?: string;
 }
 

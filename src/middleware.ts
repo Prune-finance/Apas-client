@@ -3,9 +3,9 @@ import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
   try {
-    if (request.nextUrl.pathname.startsWith("/_next/")) {
-      return NextResponse.next();
-    }
+    // if (request.nextUrl.pathname.startsWith("/_next/")) {
+    //   return NextResponse.next();
+    // }
 
     if (request.nextUrl.pathname.startsWith("/admin")) {
       const req = await fetch(
@@ -29,6 +29,8 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
   } catch (error) {
+    if (request.nextUrl.pathname.startsWith("/admin"))
+      return NextResponse.redirect(new URL("/auth/admin/login", request.url));
     return NextResponse.redirect(new URL("/auth/login", request.url));
   }
 }

@@ -126,3 +126,9 @@
     color: var(--prune-primary-600);
   }
 }
+
+.stepIcon [data-progress] {
+  // color: var(--prune-primary-600);
+  border: none;
+  background: transparent;
+}

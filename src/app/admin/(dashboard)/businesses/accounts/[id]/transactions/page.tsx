@@ -34,8 +34,6 @@ import {
 import styles from "../styles.module.scss";
 
 import { useParams, useRouter } from "next/navigation";
-
-import InfoCards from "../../../InfoCards";
 import Filter from "@/ui/components/Filter";
 import { BusinessFilterType } from "../../../schema";
 import { useDisclosure } from "@mantine/hooks";
@@ -44,6 +42,7 @@ import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();

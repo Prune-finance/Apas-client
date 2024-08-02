@@ -61,11 +61,12 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
-import InfoCards from "./InfoCards";
+
 import ActiveBadge from "@/assets/active-badge.svg";
 import { activeBadgeColor } from "@/lib/utils";
 import { table } from "console";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;

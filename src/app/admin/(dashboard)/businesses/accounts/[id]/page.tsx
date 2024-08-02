@@ -40,10 +40,10 @@ import { useSingleAccount } from "@/lib/hooks/accounts";
 import Link from "next/link";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import InfoCards from "../../InfoCards";
 import { DonutChartComponent } from "@/ui/components/Charts";
 import TransactionStatistics from "./TransactionStats";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 
 dayjs.extend(advancedFormat);
 

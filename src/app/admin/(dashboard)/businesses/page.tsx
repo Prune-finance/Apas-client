@@ -15,6 +15,7 @@ import {
   TableTr,
   Text,
   TextInput,
+  ThemeIcon,
   UnstyledButton,
   rem,
 } from "@mantine/core";
@@ -27,6 +28,7 @@ import {
   IconListTree,
   IconPlus,
   IconPointFilled,
+  IconRosetteDiscountCheckFilled,
   IconSearch,
   IconTrash,
   IconUserCancel,
@@ -58,24 +60,32 @@ import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 
 import ActiveBadge from "@/assets/active-badge.svg";
-import { activeBadgeColor } from "@/lib/utils";
+import { activeBadgeColor, serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import { useTransactions } from "@/lib/hooks/transactions";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const searchParams = useSearchParams();
-  const limit = searchParams.get("rows")?.toLowerCase() || "10";
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  // const limit = searchParams.get("rows")?.toLowerCase() || "10";
   const status = searchParams.get("status")?.toLowerCase();
   const createdAt = searchParams.get("createdAt");
   const sort = searchParams.get("sort")?.toLowerCase();
 
   const { loading, businesses, meta } = useBusiness({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(!limit || isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status }),
     ...(sort && { sort }),
+    page: active,
   });
 
   const {
@@ -143,17 +153,17 @@ function Businesses() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{index + 1}</TableTd>
+      <TableTd className={styles.table__td}>
+        {serialNumber(active, index, parseInt(limit ?? "10", 10))}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Group gap={9}>
           {element.name}
 
           {element.kycTrusted && (
-            <Image
-              width={20}
-              height={20}
-              src={ActiveBadge}
-              alt="active badge"
+            <IconRosetteDiscountCheckFilled
+              size={25}
+              color="var(--prune-primary-700)"
             />
           )}
         </Group>
@@ -322,27 +332,13 @@ function Businesses() {
             </Text>
           </Flex>
         )}
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-              {...form.getInputProps("rows")}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        />
       </div>
     </main>
   );

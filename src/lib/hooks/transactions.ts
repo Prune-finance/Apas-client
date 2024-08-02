@@ -6,18 +6,28 @@ interface IParams {
   createdAt?: string | null;
   status?: string;
   sort?: string;
+  page?: number;
 }
 
-export function useTransactions(id: string = "") {
+export function useTransactions(id: string = "", customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
       const path = id ? `${id}/transactions` : "transactions";
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${path}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${path}?${params}`,
         { withCredentials: true }
       );
 
@@ -38,7 +48,13 @@ export function useTransactions(id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [
+    customParams.createdAt,
+    customParams.limit,
+    customParams.status,
+    customParams.sort,
+    customParams.page,
+  ]);
 
   return { loading, transactions, meta, revalidate };
 }

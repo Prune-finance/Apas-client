@@ -23,14 +23,18 @@ export default function PaginationComponent({
         <Text fz={14}>Showing:</Text>
 
         <Select
-          data={["10", "20", "50", "100"]}
+          data={["2", "10", "20", "50", "100"]}
           defaultValue={"10"}
+          allowDeselect={false}
           w={60}
           // h={24}
           size="xs"
           withCheckIcon={false}
           value={limit}
-          onChange={(value) => setLimit(value)}
+          onChange={(value) => {
+            setActive(1);
+            setLimit(value);
+          }}
         />
       </Group>
       <Pagination

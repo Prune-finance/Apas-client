@@ -46,3 +46,9 @@ export const approvedBadgeColor = (status: string) => {
       return "#FFA940";
   }
 };
+
+export const serialNumber = (
+  pageNumber: number,
+  index: number,
+  perPage: number
+) => (pageNumber - 1) * perPage + index + 1;

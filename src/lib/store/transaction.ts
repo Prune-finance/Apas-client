@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { TransactionType } from "../hooks/transactions";
 
 type TableData = {
   AccName: string;
@@ -19,8 +20,8 @@ const Transaction = create<TransactionState>((set) => ({
 }));
 
 interface TransactionState {
-  data: TableData | null;
-  setData: (data: TableData) => void;
+  data: TransactionType | null;
+  setData: (data: TransactionType) => void;
   opened: boolean;
   open: () => void;
   close: () => void;

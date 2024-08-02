@@ -9,18 +9,20 @@ interface IParams {
 }
 
 export function useTransactions(id: string = "") {
-  const [transactions, setTransactions] = useState<TrxData[]>([]);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchTrx() {
     try {
-      const path = id ? `${id}/transactions` : "/transactions";
+      const path = id ? `${id}/transactions` : "transactions";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${path}`,
         { withCredentials: true }
       );
 
       setTransactions(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -38,7 +40,7 @@ export function useTransactions(id: string = "") {
     };
   }, []);
 
-  return { loading, transactions, revalidate };
+  return { loading, transactions, meta, revalidate };
 }
 
 interface ITrx extends IParams {
@@ -47,6 +49,7 @@ interface ITrx extends IParams {
 
 export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
   const [transactions, setTransactions] = useState<TrxData[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -71,6 +74,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
       );
 
       setTransactions(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -88,7 +92,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
     };
   }, []);
 
-  return { loading, transactions, revalidate };
+  return { loading, transactions, meta, revalidate };
 }
 
 export interface TrxData {
@@ -103,4 +107,30 @@ export interface TrxData {
   centrolinkRef: string;
   status: "PENDING";
   createdAt: Date;
+}
+
+export interface Untitled1 {
+  transactions: TransactionType[];
+  meta: Meta;
+}
+
+export interface Meta {
+  out: number;
+  total: number;
+  in: number;
+}
+
+export interface TransactionType {
+  id: string;
+  senderIban: string;
+  recipientIban: string;
+  recipientBic: string;
+  recipientBankAddress: string;
+  recipientBankCountry: string;
+  amount: number;
+  reference: string;
+  centrolinkRef: string;
+  status: "PENDING" | "COMPLETED" | "REJECTED";
+  createdAt: Date;
+  updatedAt: Date;
 }

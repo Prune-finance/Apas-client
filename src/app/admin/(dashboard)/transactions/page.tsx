@@ -46,11 +46,14 @@ import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
+import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
+import dayjs from "dayjs";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
 
-  const { loading, account } = useSingleAccount(params.id);
+  const { account } = useSingleAccount(params.id);
+  const { loading, transactions, meta } = useTransactions();
   const { back } = useRouter();
 
   const [opened, { toggle }] = useDisclosure(false);
@@ -59,28 +62,28 @@ export default function TransactionForAccount() {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: 0,
+      value: meta?.total || 0,
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
     },
     {
       title: "Money In",
-      value: 0,
+      value: meta?.in || 0,
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
     },
     {
       title: "Money Out",
-      value: 0,
+      value: meta?.out || 0,
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
     },
     {
       title: "Total Transactions",
-      value: 0,
+      value: transactions.length,
     },
   ];
 
@@ -130,7 +133,7 @@ export default function TransactionForAccount() {
           Transactions
         </Title>
 
-        <InfoCards title="Overview" details={infoDetails}>
+        <InfoCards title="Overview" details={infoDetails} loading={loading}>
           <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
@@ -210,12 +213,12 @@ export default function TransactionForAccount() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent data={[]} id={params.id} />}
-          loading={false}
+          rows={<RowComponent data={transactions} id={params.id} />}
+          loading={loading}
         />
 
         <EmptyTable
-          rows={[]}
+          rows={transactions}
           loading={loading}
           text="Transactions will be shown here"
           title="There are no transactions"
@@ -245,20 +248,28 @@ type TableData = {
   Status: string;
 };
 
-const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
+const RowComponent = ({
+  data,
+  id,
+}: {
+  data: TransactionType[];
+  id: string;
+}) => {
   const { open, setData } = Transaction();
   return data.map((element) => (
     <TableTr
-      key={element.AccName}
+      key={element.id}
       onClick={() => {
         open();
         setData(element);
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={styles.table__td}>{element.AccNum}</TableTd>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientBankAddress}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Group gap={3}>
           <IconArrowUpRight
@@ -266,86 +277,52 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount, true, "EUR")}
+          {formatNumber(element.amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Date}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY-hh:mmA")}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Badge
-          color={approvedBadgeColor(element.Status.toUpperCase())}
+          color={approvedBadgeColor(element.status.toUpperCase())}
           tt="capitalize"
           fz={10}
           fw={400}
           w={90}
           variant="light"
         >
-          {element.Status.toLowerCase()}
+          {element.status.toLowerCase()}
         </Badge>
       </TableTd>
     </TableTr>
   ));
 };
 
-const tableData = [
-  {
-    AccName: "Matthew Philips",
-    Biz: "Wema",
-    Amount: 200000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Agatha Goldie",
-    Biz: "UBA",
-    Amount: 300000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Omar Zeeda",
-    Biz: "FCMB",
-    Amount: 250000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "failed",
-  },
-  {
-    AccName: "Sharon Akindele",
-    Biz: "Zenith Bank",
-    Amount: 400000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Bethel Teddy",
-    Biz: "FCMB",
-    Amount: 150000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-];
-
-type TRXDrawerProps = { opened: boolean; close: () => void; data: TableData };
+type TRXDrawerProps = {
+  opened: boolean;
+  close: () => void;
+  data: TransactionType;
+};
 
 const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
   const { clearData } = Transaction();
 
   const senderDetails = [
-    { title: "Account Name", value: data.AccName },
-    { title: "Bank", value: data.Biz },
-    { title: "Account Number", value: data.AccNum },
+    { title: "Account Name", value: data.senderIban },
+    { title: "Bank", value: data.recipientBankAddress },
+    { title: "Account Number", value: data.recipientIban },
   ];
 
   const otherDetails = [
-    { title: "Alert Type", value: "Credit" },
-    { title: "Date & Time", value: data.Date },
-    { title: "Transaction ID", value: "1234567890" },
-    { title: "Status", value: data.Status },
+    { title: "Alert Type", value: "Debit" },
+    {
+      title: "Date & Time",
+      value: dayjs(data.createdAt).format("DD MMM, YYYY-hh:mmA"),
+    },
+    { title: "Transaction ID", value: data.id },
+    { title: "Status", value: data.status },
   ];
   return (
     <Drawer
@@ -379,7 +356,7 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
             Amount Received
           </Text>
           <Text c="var(--prune-primary-700)" fw={600} fz={32}>
-            {formatNumber(data.Amount, true, "EUR")}
+            {formatNumber(data.amount, true, "EUR")}
           </Text>
         </Stack>
 
@@ -428,14 +405,14 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
                 <Group gap={0}>
                   {detail.title === "Alert Type" && (
                     <ActionIcon variant="transparent">
-                      <IconArrowDownLeft size={14} />
+                      <IconArrowUpRight size={14} color="#D92D20" />
                     </ActionIcon>
                   )}
                   <Text
                     c={
-                      detail.title === "Alert Type"
-                        ? "#0065FF"
-                        : "var(--prune-text-gray-600)"
+                      // detail.title === "Alert Type"
+                      //   ? "#D92D20"
+                      "var(--prune-text-gray-600)"
                     }
                     fz={14}
                     fw={600}

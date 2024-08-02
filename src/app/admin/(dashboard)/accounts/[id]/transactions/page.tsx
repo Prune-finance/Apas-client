@@ -46,11 +46,14 @@ import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
+import { useTransactions } from "@/lib/hooks/transactions";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
 
   const { loading, account } = useSingleAccount(params.id);
+  const { loading: loadingTrx, transactions } = useTransactions(params.id);
+  console.log(transactions);
   const { back } = useRouter();
 
   const [opened, { toggle }] = useDisclosure(false);

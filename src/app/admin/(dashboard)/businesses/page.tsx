@@ -29,6 +29,7 @@ import {
   IconPointFilled,
   IconSearch,
   IconTrash,
+  IconUserCancel,
   IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
@@ -60,6 +61,7 @@ import ActiveBadge from "@/assets/active-badge.svg";
 import { activeBadgeColor } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
+import { useTransactions } from "@/lib/hooks/transactions";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -75,6 +77,12 @@ function Businesses() {
     ...(status && { status }),
     ...(sort && { sort }),
   });
+
+  const {
+    loading: loadingTrx,
+    meta: trxMeta,
+    transactions,
+  } = useTransactions();
 
   const [opened, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
@@ -94,32 +102,26 @@ function Businesses() {
     },
     {
       title: "Money In",
-      value: 0,
+      value: trxMeta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value: 0,
+      value: trxMeta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: 0,
+      value: transactions.length,
     },
   ];
 
   const menuItems = [
-    // {
-    //   text: "View",
-    //   icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
-    //   link: true,
-    //   href: "/admin/businesses",
-    // },
     {
       text: "Deactivate",
-      icon: <IconX style={{ width: rem(14), height: rem(14) }} />,
+      icon: <IconUserCancel style={{ width: rem(14), height: rem(14) }} />,
     },
     {
       text: "Download Report",
@@ -233,7 +235,11 @@ function Businesses() {
             Businesses
           </Text>
         </div>
-        <InfoCards title="Overview" details={infoDetails} loading={loading}>
+        <InfoCards
+          title="Overview"
+          details={infoDetails}
+          loading={loading || loadingTrx}
+        >
           <Select
             data={["Last Week", "Last Month"]}
             variant="filled"

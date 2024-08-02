@@ -34,7 +34,7 @@ import {
   IconCopy,
 } from "@tabler/icons-react";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import Link from "next/link";
@@ -45,11 +45,18 @@ import { DonutChartComponent } from "@/ui/components/Charts";
 import TransactionStatistics from "./TransactionStats";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
+import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 
 dayjs.extend(advancedFormat);
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+  const {
+    loading: trxLoading,
+    transactions,
+    meta,
+  } = useTransactions(params.id);
+  console.log({ transactions, meta });
 
   const { loading, account } = useSingleAccount(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
@@ -71,6 +78,61 @@ export default function Account() {
     { title: "Account Name", value: account?.accountName },
     { title: "Account No", value: account?.accountNumber },
   ];
+
+  // const donutData = [
+  //   {
+  //     name: "Completed",
+  //     value: 0,
+  //     color: "var(--prune-primary-600)",
+  //   },
+  //   { name: "Failed", value: 0, color: "#D92D20" },
+  //   {
+  //     name: "Cancelled",
+  //     value: 0,
+  //     color: "var(--prune-text-gray-800)",
+  //   },
+  // ];
+
+  const lineData = useMemo(() => {
+    const arr: {
+      month: string;
+      successful: number;
+      failed: number;
+      pending: number;
+    }[] = [];
+
+    transactions.reverse().map((trx) => {
+      let successful = 0,
+        pending = 0,
+        failed = 0;
+
+      const month = dayjs(trx.createdAt).format("MMM");
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : (successful += trx.amount);
+
+      arr.push({ month, successful, pending, failed });
+    });
+
+    return arr;
+  }, [transactions]);
+
+  const donutData = useMemo(() => {
+    let completed = 0,
+      pending = 0,
+      failed = 0;
+    transactions.map((trx) => {
+      if (trx.status === "PENDING") {
+        pending += trx.amount;
+      }
+    });
+
+    return [
+      { name: "Completed", value: completed, color: "#039855" },
+      { name: "Pending", value: pending, color: "#F79009" },
+      { name: "Failed", value: failed, color: "#D92D20" },
+    ];
+  }, [transactions]);
 
   const totalTrxVolume = donutData.reduce((acc, cur) => acc + cur.value, 0);
 
@@ -288,6 +350,8 @@ export default function Account() {
                     fz={12}
                     c="var(--prune-primary-800)"
                     td="underline"
+                    component={Link}
+                    href={`/admin/accounts/${params.id}/transactions`}
                   >
                     See All Transactions
                   </Button>
@@ -295,7 +359,7 @@ export default function Account() {
 
                 <TableComponent
                   head={tableHeaders}
-                  rows={<RowComponent data={[]} id={params.id} />}
+                  rows={<RowComponent data={transactions} id={params.id} />}
                   loading={false}
                 />
 
@@ -323,20 +387,28 @@ const tableHeaders = [
   "Status",
 ];
 
-const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
+const RowComponent = ({
+  data,
+  id,
+}: {
+  data: TransactionType[];
+  id: string;
+}) => {
   const { push } = useRouter();
   const handleRowClick = (id: string) => {
     push(`/admin/accounts/${id}/transactions`);
   };
   return data.map((element) => (
     <TableTr
-      key={element.AccName}
+      key={element.id}
       onClick={() => handleRowClick(id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={styles.table__td}>{element.AccNum}</TableTd>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientBankAddress}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Group gap={3}>
           <IconArrowUpRight
@@ -344,22 +416,24 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount, true, "EUR")}
+          {formatNumber(element.amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Date}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
           variant="light"
-          color={approvedBadgeColor(element.Status.toUpperCase())}
+          color={approvedBadgeColor(element.status.toUpperCase())}
           w={90}
           h={24}
           fw={400}
           fz={12}
         >
-          {element.Status}
+          {element.status.toLowerCase()}
         </Badge>
       </TableTd>
     </TableTr>
@@ -555,58 +629,6 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
 </Grid> */
 }
 
-const tableData = [
-  {
-    AccName: "Matthew Philips",
-    Biz: "Wema",
-    Amount: 200000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Agatha Goldie",
-    Biz: "UBA",
-    Amount: 300000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Omar Zeeda",
-    Biz: "FCMB",
-    Amount: 250000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "failed",
-  },
-  {
-    AccName: "Sharon Akindele",
-    Biz: "Zenith Bank",
-    Amount: 400000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Bethel Teddy",
-    Biz: "FCMB",
-    Amount: 150000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-];
-
-type TableData = {
-  AccName: string;
-  Biz: string;
-  Amount: number;
-  Date: string;
-  AccNum: string;
-  Status: string;
-};
-
 const data = [
   { month: "Jan", Deposits: 1200, Payouts: 900 },
   { month: "Feb", Deposits: 1900, Payouts: 1200 },
@@ -620,20 +642,6 @@ const data = [
   { month: "Oct", Deposits: 1234, Payouts: 526 },
   { month: "Nov", Deposits: 524, Payouts: 892 },
   { month: "Dec", Deposits: 750, Payouts: 600 },
-];
-
-const donutData = [
-  {
-    name: "Completed",
-    value: 0,
-    color: "var(--prune-primary-600)",
-  },
-  { name: "Failed", value: 0, color: "#D92D20" },
-  {
-    name: "Cancelled",
-    value: 0,
-    color: "var(--prune-text-gray-800)",
-  },
 ];
 
 const weekData = [

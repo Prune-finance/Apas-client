@@ -52,20 +52,27 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Accounts() {
   const searchParams = useSearchParams();
 
   const {
-    rows: limit = "10",
+    rows = "10",
     status,
     createdAt,
     sort,
     type,
   } = Object.fromEntries(searchParams.entries());
 
+  const [limit, setLimit] = useState<string | null>("10");
+  const [activePage, setActivePage] = useState(1);
+  console.log(activePage);
+
   const { loading, accounts, revalidate } = useAccounts({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(!limit || isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
@@ -256,7 +263,7 @@ function Accounts() {
               setRowId={setRowId}
             />
           }
-          loading={false}
+          loading={loading}
         />
 
         {!loading && !!!accounts.length && (
@@ -271,26 +278,13 @@ function Accounts() {
           </Flex>
         )}
 
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
+        <PaginationComponent
+          active={activePage}
+          setActive={setActivePage}
+          setLimit={setLimit}
+          limit={limit}
+          total={1}
+        />
 
         <ModalComponent
           processing={processing}

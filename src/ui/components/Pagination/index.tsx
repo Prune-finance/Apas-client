@@ -1,7 +1,22 @@
 import { Group, Text, Pagination, Select } from "@mantine/core";
 import styles from "./pagination.module.scss";
+import { Dispatch, SetStateAction } from "react";
 
-export default function PaginationComponent() {
+type Props = {
+  total: number;
+  active: number;
+  setActive: Dispatch<SetStateAction<number>>;
+  setLimit: Dispatch<SetStateAction<string | null>>;
+  limit: string | null;
+};
+
+export default function PaginationComponent({
+  total,
+  limit,
+  setActive,
+  setLimit,
+  active,
+}: Props) {
   return (
     <div className={styles.pagination__container}>
       <Group gap={9}>
@@ -14,13 +29,17 @@ export default function PaginationComponent() {
           // h={24}
           size="xs"
           withCheckIcon={false}
+          value={limit}
+          onChange={(value) => setLimit(value)}
         />
       </Group>
       <Pagination
         autoContrast
         color="#fff"
-        total={1}
+        total={total}
         classNames={{ control: styles.control, root: styles.pagination }}
+        value={active}
+        onChange={(value) => setActive(value)}
       />
     </div>
   );

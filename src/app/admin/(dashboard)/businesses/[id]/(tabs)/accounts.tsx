@@ -56,13 +56,14 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 // import styles from "@/ui/styles/singlebusiness.module.scss";
 import styles from "@/ui/styles/business.module.scss";
 import { AllBusinessSkeleton } from "@/lib/static";
 import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
+import { useTransactions } from "@/lib/hooks/transactions";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -81,6 +82,13 @@ export default function Accounts({
   const [loading, setLoading] = useState(false);
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const { push } = useRouter();
+  const params = useParams<{ id: string }>();
+  const {
+    loading: loadingTrx,
+    meta,
+    transactions,
+  } = useTransactions(params.id);
+  console.log({ object: { loadingTrx, meta, transactions, id: params.id } });
 
   const form = useForm<FilterType>({
     initialValues: filterValues,

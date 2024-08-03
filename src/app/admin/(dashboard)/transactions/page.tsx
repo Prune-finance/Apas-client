@@ -41,7 +41,11 @@ import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import {
+  approvedBadgeColor,
+  formatNumber,
+  frontendPagination,
+} from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
@@ -50,6 +54,7 @@ import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import { useState } from "react";
 import { filteredSearch } from "@/lib/search";
+import PaginationComponent from "@/ui/components/Pagination";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -214,6 +219,8 @@ export default function TransactionForAccount() {
               data={transactions}
               id={params.id}
               search={debouncedSearch}
+              active={active}
+              limit={limit}
             />
           }
           loading={loading}
@@ -226,11 +233,24 @@ export default function TransactionForAccount() {
           title="There are no transactions"
         />
 
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil(
+            filteredSearch(transactions, searchProps, search).length /
+              parseInt(limit ?? "10", 10)
+          )}
+        />
+
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
       </Paper>
     </main>
   );
 }
+
+const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];
 
 const tableHeaders = [
   "Name",
@@ -241,29 +261,24 @@ const tableHeaders = [
   "Status",
 ];
 
-type TableData = {
-  AccName: string;
-  Biz: string;
-  Amount: number;
-  Date: string;
-  AccNum: string;
-  Status: string;
-};
-
 const RowComponent = ({
   data,
   id,
   search,
+  active,
+  limit,
 }: {
   data: TransactionType[];
   id: string;
   search: string;
+  active: number;
+  limit: string | null;
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(
-    data,
-    ["senderIban", "recipientIban", "recipientBankAddress"],
-    search
+  return frontendPagination(
+    filteredSearch(data, searchProps, search),
+    active,
+    parseInt(limit ?? "10", 10)
   ).map((element) => (
     <TableTr
       key={element.id}

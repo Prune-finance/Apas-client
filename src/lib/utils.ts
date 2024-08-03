@@ -52,3 +52,9 @@ export const serialNumber = (
   index: number,
   perPage: number
 ) => (pageNumber - 1) * perPage + index + 1;
+
+export const frontendPagination = (
+  data: any[],
+  page: number,
+  perPage: number
+) => data.slice((page - 1) * perPage, page * perPage);

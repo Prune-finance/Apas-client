@@ -51,32 +51,49 @@ import {
 } from "./schema";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
-import { approvedBadgeColor } from "@/lib/utils";
+import { activeBadgeColor, approvedBadgeColor } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
 import { useBusiness } from "@/lib/hooks/businesses";
+import EmptyTable from "@/ui/components/EmptyTable";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   const {
-    rows: limit = "10",
+    rows: _limit = "10",
     status,
     createdAt,
     sort,
     type,
   } = Object.fromEntries(searchParams.entries());
 
-  const { loading: loadingBiz, meta, businesses } = useBusiness({}, true);
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, requests, revalidate } = useRequests({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const queryParams = {
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toLowerCase() }),
+  };
+
+  const { loading, meta, businesses } = useBusiness(queryParams, true);
+
+  const { requests, revalidate } = useRequests({
+    ...(isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit ?? "10", 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+    ...(type && { type: type.toLowerCase() }),
+    // page: active,
   });
   const [opened, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -192,12 +209,12 @@ function AccountRequests() {
   // ));
 
   const handleRowClick = (id: string) => {
-    push(`/admin/account-requests/${id}/${id}`);
+    push(`/admin/account-requests/${id}`);
   };
 
   const rows = filteredSearch(
-    requests,
-    ["firstName", "lastName", "Company.name"],
+    businesses,
+    ["name", "legalEntity"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -205,11 +222,12 @@ function AccountRequests() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd
-        className={styles.table__td}
-      >{`${element.firstName} ${element.lastName}`}</TableTd>
+      <TableTd className={styles.table__td}>{`${element.name}`}</TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
-        {element.accountType.toLowerCase()}
+        {element._count.AccountRequests}
+      </TableTd>
+      <TableTd className={styles.table__td} tt="capitalize">
+        {(element.legalEntity ?? "").toLowerCase()}
       </TableTd>
       {/* <TableTd className={styles.table__td}>{element.Company.country}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
@@ -219,22 +237,22 @@ function AccountRequests() {
         <Badge
           tt="capitalize"
           variant="light"
-          color={approvedBadgeColor(element.status)}
+          color={activeBadgeColor(element.companyStatus)}
           w={82}
           h={24}
           fw={400}
           fz={12}
         >
-          {element.status.toLowerCase()}
+          {element.companyStatus.toLowerCase()}
         </Badge>
       </TableTd>
 
-      <TableTd
+      {/* <TableTd
         className={`${styles.table__td}`}
         onClick={(e) => e.stopPropagation()}
       >
         <MenuComponent id={element.id} />
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -309,59 +327,42 @@ function AccountRequests() {
           // mt={30}
         />
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no account requests.
-            </Text>
-            <Text fz={10} c="#667085">
-              When a request is created, it will appear here
-            </Text>
-          </Flex>
-        )}
+        <EmptyTable
+          rows={rows}
+          loading={loading}
+          title="There are no account requests"
+          text="When a request is created, it will appear here."
+        />
 
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+        />
       </div>
     </main>
   );
 }
 
-// const tableHeaders = [
-//   "Business Name",
-//   "Number of Requests",
-//   "Contact Email",
-//   "Status",
-//   // "Action",
-// ];
-
 const tableHeaders = [
-  "Account Name",
+  "Business Name",
+  "Number of Requests",
   "Type",
-  // "Country",
-  "Date Created",
+  "Contact Email",
   "Status",
-  "Action",
+  // "Action",
 ];
+
+// const tableHeaders = [
+//   "Account Name",
+//   "Type",
+//   // "Country",
+//   "Date Created",
+//   "Status",
+//   "Action",
+// ];
 
 const MenuComponent = ({ id }: { id: string }) => {
   const [opened, { open, close }] = useDisclosure(false);

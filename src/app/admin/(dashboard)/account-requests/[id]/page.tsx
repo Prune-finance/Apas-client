@@ -51,26 +51,37 @@ import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
+import EmptyTable from "@/ui/components/EmptyTable";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
 
   const searchParams = useSearchParams();
   const {
-    rows: limit = "10",
+    rows: _limit = "10",
     status,
     createdAt,
     sort,
     type,
   } = Object.fromEntries(searchParams.entries());
 
-  const { loading, requests } = useRequests({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-    ...(type && { type: type.toLowerCase() }),
-  });
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  const { loading, requests, meta, revalidate } = useRequests(
+    {
+      ...(isNaN(Number(limit))
+        ? { limit: 10 }
+        : { limit: parseInt(limit ?? "10", 10) }),
+      ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+      ...(status && { status: status.toLowerCase() }),
+      ...(sort && { sort: sort.toLowerCase() }),
+      ...(type && { type: type.toLowerCase() }),
+      page: active,
+    },
+    params.id
+  );
 
   const { back, push } = useRouter();
 
@@ -82,6 +93,62 @@ function BusinessAccountRequests() {
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
   });
+
+  const MenuComponent = ({ id }: { id: string }) => {
+    const { handleError, handleSuccess } = useNotification();
+
+    const handleApproval = async () => {
+      const { success, message } = await approveRequest(id);
+
+      if (success) {
+        revalidate();
+        return handleSuccess("Successful! Request Approved", message);
+      }
+      return handleError("Error! Request Approval Failed", message);
+    };
+
+    const handleRejection = async () => {
+      const { success, message } = await rejectRequest(id);
+
+      if (success) {
+        revalidate();
+        return handleSuccess("Successful! Request Denied", message);
+      }
+      return handleError("Error! Request Denials Failed", message);
+    };
+
+    return (
+      <Menu shadow="md" width={150}>
+        <MenuTarget>
+          <UnstyledButton onClick={(e) => e.stopPropagation()}>
+            <IconDotsVertical size={17} />
+          </UnstyledButton>
+        </MenuTarget>
+
+        <MenuDropdown>
+          <MenuItem
+            fz={10}
+            c="#667085"
+            leftSection={
+              <IconUserCheck style={{ width: rem(14), height: rem(14) }} />
+            }
+            onClick={handleApproval}
+          >
+            Approve
+          </MenuItem>
+
+          <MenuItem
+            fz={10}
+            c="#667085"
+            leftSection={<IconX style={{ width: rem(14), height: rem(14) }} />}
+            onClick={handleRejection}
+          >
+            Deny
+          </MenuItem>
+        </MenuDropdown>
+      </Menu>
+    );
+  };
 
   const handleRowClick = (id: string) => {
     push(`/admin/account-requests/${params.id}/${id}`);
@@ -136,8 +203,9 @@ function BusinessAccountRequests() {
         items={[
           { title: "Account Requests", href: "/admin/account-requests" },
           {
-            title: "Business Name",
+            title: requests[0]?.Company.name,
             href: `/admin/account-requests/${params.id}`,
+            loading: loading,
           },
         ]}
       />
@@ -161,14 +229,13 @@ function BusinessAccountRequests() {
           Back
         </Button>
 
-        {/* {account?.accountName ? ( */}
-        <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
-          Tech Nova
-          {/* {account?.accountName} */}
-        </Text>
-        {/* ) : (
+        {!loading ? (
+          <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
+            {requests[0]?.Company.name}
+          </Text>
+        ) : (
           <Skeleton h={10} w={100} />
-        )} */}
+        )}
 
         <Group
           justify="space-between"
@@ -181,13 +248,17 @@ function BusinessAccountRequests() {
             leftSectionPointerEvents="none"
             leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            // value={search}
-            // onChange={(e) => setSearch(e.currentTarget.value)}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            color="var(--prune-text-gray-200)"
+            styles={{ input: { border: "1px solid #f5f5f5" } }}
+            w={324}
           />
 
           <Button
-            variant="default"
-            color="var(--prune-text-gray-500)"
+            variant="outline"
+            color="var(--prune-text-gray-200)"
+            c="var(--prune-text-gray-800)"
             leftSection={<IconListTree size={14} />}
             fz={12}
             fw={500}
@@ -201,38 +272,20 @@ function BusinessAccountRequests() {
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage.src} alt="no content" w={156} h={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no account requests.
-            </Text>
-            <Text fz={10} c="#667085">
-              When a request is created, it will appear here
-            </Text>
-          </Flex>
-        )}
+        <EmptyTable
+          rows={rows}
+          loading={loading}
+          title="There are no account requests"
+          text="When a request is created, it will appear here."
+        />
 
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+        />
       </Paper>
     </main>
   );
@@ -254,53 +307,3 @@ export default function BusinessAccountRequestsSuspense() {
     </Suspense>
   );
 }
-
-const MenuComponent = ({ id }: { id: string }) => {
-  const { handleError, handleSuccess } = useNotification();
-
-  const handleApproval = async () => {
-    const { success, message } = await approveRequest(id);
-
-    if (success) return handleSuccess("Successful! Request Approved", message);
-    return handleError("Error! Request Approval Failed", message);
-  };
-
-  const handleRejection = async () => {
-    const { success, message } = await rejectRequest(id);
-
-    if (success) return handleSuccess("Successful! Request Denied", message);
-    return handleError("Error! Request Denials Failed", message);
-  };
-
-  return (
-    <Menu shadow="md" width={150}>
-      <MenuTarget>
-        <UnstyledButton onClick={(e) => e.stopPropagation()}>
-          <IconDotsVertical size={17} />
-        </UnstyledButton>
-      </MenuTarget>
-
-      <MenuDropdown>
-        <MenuItem
-          fz={10}
-          c="#667085"
-          leftSection={
-            <IconUserCheck style={{ width: rem(14), height: rem(14) }} />
-          }
-          onClick={handleApproval}
-        >
-          Approve
-        </MenuItem>
-
-        <MenuItem
-          fz={10}
-          c="#667085"
-          leftSection={<IconX style={{ width: rem(14), height: rem(14) }} />}
-          onClick={handleRejection}
-        >
-          Deny
-        </MenuItem>
-      </MenuDropdown>
-    </Menu>
-  );
-};

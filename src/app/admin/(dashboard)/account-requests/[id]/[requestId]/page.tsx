@@ -36,9 +36,11 @@ import { parseError } from "@/lib/actions/auth";
 
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
-  const { revalidate, request } = useSingleRequest(params.requestId);
+  const { revalidate, request, loading } = useSingleRequest(params.requestId);
   const { handleSuccess, handleError } = useNotification();
   const { back } = useRouter();
+
+  console.log(request);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
@@ -99,8 +101,14 @@ export default function SingleRequest() {
           // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Account Requests", href: "/admin/account-requests" },
           {
-            title: params.requestId,
-            href: `/admin/account-requests/businesses/${params.requestId}`,
+            title: request?.Company.name || "",
+            href: `/admin/account-requests/${request?.Company.id}`,
+            loading: loading,
+          },
+          {
+            title: `${request?.firstName || ""} ${request?.lastName || ""}`,
+            href: `/admin/account-requests/${request?.Company.id}/${params.requestId}`,
+            loading: loading,
           },
         ]}
       />

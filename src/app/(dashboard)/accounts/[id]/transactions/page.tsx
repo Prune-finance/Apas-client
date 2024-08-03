@@ -26,6 +26,7 @@ import EmptyImage from "@/assets/empty.png";
 
 import { useParams, useRouter } from "next/navigation";
 import {
+  TransactionType,
   TrxData,
   useTransactions,
   useUserTransactions,

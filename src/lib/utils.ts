@@ -32,6 +32,8 @@ export const approvedBadgeColor = (status: string) => {
   switch (true) {
     case status === "APPROVED":
       return "#12B76A";
+    case status === "COMPLETED":
+      return "#12B76A";
     case status === "SUCCESSFUL":
       return "#12B76A";
     case status === "REJECTED":
@@ -44,3 +46,9 @@ export const approvedBadgeColor = (status: string) => {
       return "#FFA940";
   }
 };
+
+export const serialNumber = (
+  pageNumber: number,
+  index: number,
+  perPage: number
+) => (pageNumber - 1) * perPage + index + 1;

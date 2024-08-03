@@ -46,6 +46,8 @@ export default function PricingPlans() {
   const [loading, setLoading] = useState(false);
 
   const [plans, setPlans] = useState<Plan[]>([]);
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const { opened, data, close } = Plan();
 
@@ -110,7 +112,13 @@ export default function PricingPlans() {
           </Flex>
         )} */}
 
-        <PaginationComponent />
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={1}
+        />
       </Paper>
 
       <Drawer

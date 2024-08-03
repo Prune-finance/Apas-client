@@ -7,6 +7,7 @@ interface IParams {
   status?: string;
   sort?: string;
   type?: string;
+  page?: number;
 }
 
 export function useAccounts(customParams: IParams = {}) {
@@ -21,6 +22,7 @@ export function useAccounts(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
@@ -51,7 +53,7 @@ export function useAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type]);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, accounts, revalidate, meta };
 }

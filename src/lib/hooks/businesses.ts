@@ -7,8 +7,12 @@ interface IParams {
   createdAt?: string | null;
   status?: string;
   sort?: string;
+  page?: number;
 }
-export function useBusiness(customParams: IParams = {}) {
+export function useBusiness(
+  customParams: IParams = {},
+  reqCount: boolean = false
+) {
   const obj = useMemo(() => {
     return {
       ...(customParams.period && { period: customParams.period }),
@@ -16,6 +20,7 @@ export function useBusiness(customParams: IParams = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
@@ -32,6 +37,8 @@ export function useBusiness(customParams: IParams = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(reqCount && { reqCount: "true" }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -80,7 +87,7 @@ export function useBusiness(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.period, obj.sort, obj.status]);
+  }, [obj.createdAt, obj.limit, obj.period, obj.sort, obj.status, obj.page]);
 
   return { loading, businesses, meta, stats, statsMeta };
 }

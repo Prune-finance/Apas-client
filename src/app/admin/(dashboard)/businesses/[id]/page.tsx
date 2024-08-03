@@ -118,14 +118,12 @@ export default function SingleBusiness() {
       <Breadcrumbs
         items={[
           { title: "Businesses", href: "/admin/businesses" },
-          ...(!loading
-            ? [
-                {
-                  title: `${business?.name}`,
-                  href: `/admin/businesses/${params.id}`,
-                },
-              ]
-            : []),
+
+          {
+            title: `${business?.name}`,
+            href: `/admin/businesses/${params.id}`,
+            loading: loading,
+          },
         ]}
       />
 

@@ -44,23 +44,48 @@ import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
+import { useBusiness } from "@/lib/hooks/businesses";
 
 function Unfreeze() {
   const searchParams = useSearchParams();
 
   const {
-    rows: limit = "10",
+    rows: _limit = "10",
     status,
     createdAt,
     sort,
+    type,
   } = Object.fromEntries(searchParams.entries());
   const { handleError, handleSuccess } = useNotification();
-  const { loading, requests, revalidate } = useDebitRequests({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const { requests, revalidate } = useDebitRequests({
+    ...(isNaN(Number(_limit))
+      ? { limit: 10 }
+      : { limit: parseInt(_limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
   });
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  const queryParams = {
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+    // ...(type && { type: type.toLowerCase() }),
+    type: "UNFREEZE",
+  };
+
+  const { loading, meta, businesses } = useBusiness(
+    queryParams,
+    undefined,
+    true
+  );
+  console.log({ meta, businesses });
+
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null

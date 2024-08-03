@@ -102,6 +102,10 @@ export const validateNewUser = z.object({
   role: z.string().optional(),
 });
 
+export const validateRequest = z.object({
+  reason: z.string().min(1, "Reason is required"),
+});
+
 export const validateNewAdmin = z.object({
   email: z.string().email("Please provide a valid email"),
   firstName: z.string().optional(),

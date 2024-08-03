@@ -45,11 +45,19 @@ import TransactionStatistics from "./TransactionStats";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
+import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 
 dayjs.extend(advancedFormat);
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+
+  const {
+    loading: loadingTrx,
+    transactions,
+    meta,
+  } = useTransactions(params.id);
+  console.log({ transactions, meta });
 
   const { loading, account } = useSingleAccount(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
@@ -288,19 +296,26 @@ export default function Account() {
                     fz={12}
                     c="var(--prune-primary-600)"
                     td="underline"
+                    component={Link}
+                    href={`/admin/businesses/accounts/${params.id}/transactions`}
                   >
                     See All Transactions
                   </Button>
                 </Group>
 
                 <TableComponent
-                  head={[]}
-                  rows={<RowComponent data={[]} id={params.id} />}
+                  head={tableHeaders}
+                  rows={
+                    <RowComponent
+                      data={transactions.slice(0, 3)}
+                      id={params.id}
+                    />
+                  }
                   loading={loading}
                 />
 
                 <EmptyTable
-                  rows={[]}
+                  rows={transactions}
                   loading={loading}
                   title="There are no recent transactions"
                   text="When transactions are created, they will appear."
@@ -323,20 +338,28 @@ const tableHeaders = [
   "Status",
 ];
 
-const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
+const RowComponent = ({
+  data,
+  id,
+}: {
+  data: TransactionType[];
+  id: string;
+}) => {
   const { push } = useRouter();
   const handleRowClick = (id: string) => {
     push(`/admin/businesses/accounts/${id}/transactions`);
   };
   return data.map((element) => (
     <TableTr
-      key={element.AccName}
+      key={element.id}
       onClick={() => handleRowClick(id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={styles.table__td}>{element.AccNum}</TableTd>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientBankAddress}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Group gap={3}>
           <IconArrowUpRight
@@ -344,22 +367,24 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount, true, "EUR")}
+          {formatNumber(element.amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Date}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY - hh:mm A")}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
           variant="light"
-          color={approvedBadgeColor(element.Status.toUpperCase())}
+          color={approvedBadgeColor(element.status.toUpperCase())}
           w={90}
           h={24}
           fw={400}
           fz={12}
         >
-          {element.Status}
+          {element.status.toLowerCase()}
         </Badge>
       </TableTd>
     </TableTr>

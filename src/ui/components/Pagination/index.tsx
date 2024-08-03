@@ -23,7 +23,7 @@ export default function PaginationComponent({
         <Text fz={14}>Showing:</Text>
 
         <Select
-          data={["2", "10", "20", "50", "100"]}
+          data={["1", "2", "10", "20", "50", "100"]}
           defaultValue={"10"}
           allowDeselect={false}
           w={60}

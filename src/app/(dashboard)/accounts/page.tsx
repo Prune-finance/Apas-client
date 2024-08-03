@@ -33,25 +33,27 @@ import {
   IconSearch,
   IconCheck,
   IconArrowDownLeft,
+  IconTrash,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
-import ModalComponent from "@/ui/components/Modal";
+import ModalComponent from "./modal";
 import { useAccounts, useUserAccounts } from "@/lib/hooks/accounts";
-import { DynamicSkeleton } from "@/lib/static";
+import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { formatNumber } from "@/lib/utils";
 
 import EmptyImage from "@/assets/empty.png";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useForm, zodResolver } from "@mantine/form";
-import { filterValues } from "@/lib/schema";
+import { filterValues, validateRequest } from "@/lib/schema";
 import { accountFilterSchema } from "@/app/admin/(dashboard)/account-requests/schema";
 import { AccountFilterType } from "@/app/admin/(dashboard)/accounts/schema";
 import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import DebitRequestModal from "../debit-requests/new/modal";
+import { z } from "zod";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -71,6 +73,7 @@ function Accounts() {
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toLowerCase() }),
   });
+
   const { handleSuccess } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -95,18 +98,36 @@ function Accounts() {
     validate: zodResolver(accountFilterSchema),
   });
 
+  const requestForm = useForm({
+    initialValues: {
+      reason: "",
+      supportingDocumentName: "",
+      supportingDocumentUrl: "",
+    },
+    validate: zodResolver(validateRequest),
+  });
+
   const freezeAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+      const { hasErrors } = requestForm.validate();
+      if (hasErrors) return;
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/freeze`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { withCredentials: true }
       );
 
       revalidate();
-      handleSuccess("Action Completed", "Account frozen");
+      handleSuccess("Action Completed", "Freeze request submitted");
       freezeClose();
+      requestForm.reset();
     } catch (error) {
       console.log(error);
     } finally {
@@ -117,13 +138,27 @@ function Accounts() {
   const deactivateAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+      const { hasErrors } = requestForm.validate();
+      if (hasErrors) return;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/deactivate`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { withCredentials: true }
       );
+
+      requestForm.reset();
       revalidate();
-      handleSuccess("Action Completed", "Account Deactivated");
+      handleSuccess(
+        "Action Completed",
+        "Account Deactivation request submitted"
+      );
       close();
     } catch (error) {
       console.log(error);
@@ -135,13 +170,24 @@ function Accounts() {
   const activateAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+      const { hasErrors } = requestForm.validate();
+      if (hasErrors) return;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/activate`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { withCredentials: true }
       );
+
+      requestForm.reset();
       revalidate();
-      handleSuccess("Action Completed", "Account Activated");
+      handleSuccess("Action Completed", "Account Activation request submitted");
       activateClose();
     } catch (error) {
       console.log(error);
@@ -153,14 +199,24 @@ function Accounts() {
   const unfreezeAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+      const { hasErrors } = requestForm.validate();
+      if (hasErrors) return;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/unfreeze`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { withCredentials: true }
       );
 
+      requestForm.reset();
       revalidate();
-      handleSuccess("Action Completed", "Account unfrozen");
+      handleSuccess("Action Completed", "Account Unfreeze request submitted");
       unfreezeClose();
     } catch (error) {
       console.log(error);
@@ -205,7 +261,7 @@ function Accounts() {
             Debit Account
           </MenuItem>
 
-          {/* <MenuItem
+          <MenuItem
             onClick={() => {
               setRowId(id);
               if (status === "FROZEN") return unfreezeOpen();
@@ -218,9 +274,9 @@ function Accounts() {
             }
           >
             {status === "FROZEN" ? "Unfreeze" : "Freeze"}
-          </MenuItem> */}
+          </MenuItem>
 
-          {/* <MenuItem
+          <MenuItem
             onClick={() => {
               setRowId(id);
               if (status === "INACTIVE") return activateOpen();
@@ -233,7 +289,7 @@ function Accounts() {
             }
           >
             {status === "INACTIVE" ? "Activate" : "Deactivate"}
-          </MenuItem> */}
+          </MenuItem>
         </MenuDropdown>
       </Menu>
     );
@@ -393,7 +449,7 @@ function Accounts() {
                 <TableTh className={styles.table__th}>Action</TableTh>
               </TableTr>
             </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton(3) : rows}</TableTbody>
+            <TableTbody>{loading ? DynamicSkeleton2(8) : rows}</TableTbody>
           </Table>
         </TableScrollContainer>
 
@@ -427,7 +483,8 @@ function Accounts() {
           opened={freezeOpened}
           close={freezeClose}
           title="Freeze this Account?"
-          text="You are about to freeze this account.This means no activity can be carried out in the account anymore."
+          form={requestForm}
+          text="You are about to request for this account to be frozen. This means no activity can be carried out in the account anymore. Please state your reason below"
         />
 
         <ModalComponent
@@ -437,8 +494,9 @@ function Accounts() {
           icon={<IconBrandLinktree color="#344054" />}
           opened={unfreezeOpened}
           close={unfreezeClose}
+          form={requestForm}
           title="Unfreeze this Account?"
-          text="You are about to unfreeze this account.This means full activity can be carried out in the account again."
+          text="You are about to request for this account to be unfrozen. This means full activity can be carried out in the account again. Please state your reason below"
         />
 
         <ModalComponent
@@ -448,8 +506,21 @@ function Accounts() {
           icon={<IconX color="#D92D20" />}
           opened={opened}
           close={close}
+          form={requestForm}
           title="Deactivate This Account?"
-          text="You are about to deactivate this account.This means the account will be inactive."
+          text="You are about to request for this account to be deactivated. This means the account will be inactive. Please state your reason below"
+        />
+
+        <ModalComponent
+          processing={processing}
+          action={() => activateAccount(rowId || "")}
+          color="#ECFDF3"
+          icon={<IconCheck color="#12B76A" />}
+          opened={activateOpened}
+          close={activateClose}
+          form={requestForm}
+          title="Activate This Account?"
+          text="You are about to request for this account to be activated. This means the account will become active. Please state your reason below"
         />
       </Paper>
 
@@ -462,17 +533,6 @@ function Accounts() {
           classNames={{ control: styles.control, root: styles.pagination }}
         />
       </div>
-
-      <ModalComponent
-        processing={processing}
-        action={() => activateAccount(rowId || "")}
-        color="#ECFDF3"
-        icon={<IconCheck color="#12B76A" />}
-        opened={activateOpened}
-        close={activateClose}
-        title="Activate This Account?"
-        text="You are about to activate this account.This means the account will become active."
-      />
     </main>
   );
 }

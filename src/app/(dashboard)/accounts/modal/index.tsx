@@ -23,6 +23,7 @@ export default function ModalComponent({
   customApproveMessage,
   processing,
   action,
+  form,
 }: ModalProps) {
   return (
     <Modal
@@ -59,6 +60,24 @@ export default function ModalComponent({
           <Text ta="center" className={styles.sub__text} fz={12} fw={500}>
             {text}
           </Text>
+
+          <Textarea
+            mt={20}
+            placeholder="Give reason here..."
+            {...form.getInputProps("reason")}
+          />
+
+          <Select
+            mt={20}
+            mb={20}
+            placeholder="Select Supporting Document (Optional)"
+            flex={1}
+            data={["Utility Bill"]}
+            classNames={{ input: styles.input }}
+            {...form.getInputProps("supportingDocumentName")}
+          />
+
+          <DropzoneComponent form={form} formKey="supportingDocumentUrl" />
         </Flex>
 
         <Flex className={styles.bottom__flex} justify="center" gap={15}>
@@ -105,4 +124,5 @@ interface ModalProps {
   customApproveMessage?: string;
   action?: () => void;
   processing?: boolean;
+  form: UseFormReturnType<typeof reqValues>;
 }

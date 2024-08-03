@@ -40,27 +40,54 @@ import { useSingleAccount } from "@/lib/hooks/accounts";
 import Link from "next/link";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import InfoCards from "../../InfoCards";
 import { DonutChartComponent } from "@/ui/components/Charts";
 import TransactionStatistics from "./TransactionStats";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
+import EmptyTable from "@/ui/components/EmptyTable";
+import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 
 dayjs.extend(advancedFormat);
 
 export default function Account() {
   const params = useParams<{ id: string }>();
 
+  const {
+    loading: loadingTrx,
+    transactions,
+    meta,
+  } = useTransactions(params.id);
+  console.log({ transactions, meta });
+
   const { loading, account } = useSingleAccount(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
   const accountDetails = [
-    { title: "Naira Account", value: 0, formatted: true, currency: "NGN" },
-    { title: "Dollar Account", value: 0, formatted: true, currency: "USD" },
-    { title: "Pound Account", value: 0, formatted: true, currency: "GBP" },
+    {
+      title: "Euro Account",
+      value: 0,
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Dollar Account",
+      value: 0,
+      formatted: true,
+      currency: "USD",
+      locale: "en-US",
+    },
+    {
+      title: "Pound Account",
+      value: 0,
+      formatted: true,
+      currency: "GBP",
+      locale: "en-GB",
+    },
   ];
 
   const flexedGroupDetails = [
-    { title: "Bank", value: "Wema" },
+    // { title: "Bank", value: "Wema" },
     { title: "Account Name", value: account?.accountName },
     { title: "Account No", value: account?.accountNumber },
   ];
@@ -156,6 +183,7 @@ export default function Account() {
               details={flexedGroupDetails}
               flexedGroup
               loading={loading}
+              h="190px"
             >
               <CopyButton value={account?.accountNumber || ""} timeout={2000}>
                 {({ copied, copy }) => (
@@ -222,7 +250,7 @@ export default function Account() {
                   }
                   startAngle={180}
                   endAngle={0}
-                  withLabels={formatNumber(totalTrxVolume)}
+                  withLabels={formatNumber(totalTrxVolume, true, "EUR")}
                 />
               </Flex>
 
@@ -240,7 +268,7 @@ export default function Account() {
                       </Text>
 
                       <Text fz={14} fw={700} c="var(--prune-text-gray-800)">
-                        {formatNumber(item.value)}
+                        {formatNumber(item.value, true, "EUR")}
                       </Text>
                     </Stack>
                   );
@@ -268,6 +296,8 @@ export default function Account() {
                     fz={12}
                     c="var(--prune-primary-600)"
                     td="underline"
+                    component={Link}
+                    href={`/admin/businesses/accounts/${params.id}/transactions`}
                   >
                     See All Transactions
                   </Button>
@@ -276,9 +306,19 @@ export default function Account() {
                 <TableComponent
                   head={tableHeaders}
                   rows={
-                    <RowComponent data={tableData.slice(0, 3)} id={params.id} />
+                    <RowComponent
+                      data={transactions.slice(0, 3)}
+                      id={params.id}
+                    />
                   }
-                  loading={false}
+                  loading={loading}
+                />
+
+                <EmptyTable
+                  rows={transactions}
+                  loading={loading}
+                  title="There are no recent transactions"
+                  text="When transactions are created, they will appear."
                 />
               </div>
             </Paper>
@@ -298,20 +338,28 @@ const tableHeaders = [
   "Status",
 ];
 
-const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
+const RowComponent = ({
+  data,
+  id,
+}: {
+  data: TransactionType[];
+  id: string;
+}) => {
   const { push } = useRouter();
   const handleRowClick = (id: string) => {
     push(`/admin/businesses/accounts/${id}/transactions`);
   };
   return data.map((element) => (
     <TableTr
-      key={element.AccName}
+      key={element.id}
       onClick={() => handleRowClick(id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={styles.table__td}>{element.AccNum}</TableTd>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientBankAddress}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Group gap={3}>
           <IconArrowUpRight
@@ -319,22 +367,24 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount)}
+          {formatNumber(element.amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Date}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY - hh:mm A")}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
           variant="light"
-          color={approvedBadgeColor(element.Status.toUpperCase())}
+          color={approvedBadgeColor(element.status.toUpperCase())}
           w={90}
           h={24}
           fw={400}
           fz={12}
         >
-          {element.Status}
+          {element.status.toLowerCase()}
         </Badge>
       </TableTd>
     </TableTr>

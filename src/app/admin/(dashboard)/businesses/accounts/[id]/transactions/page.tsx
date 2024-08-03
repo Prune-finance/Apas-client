@@ -34,8 +34,6 @@ import {
 import styles from "../styles.module.scss";
 
 import { useParams, useRouter } from "next/navigation";
-
-import InfoCards from "../../../InfoCards";
 import Filter from "@/ui/components/Filter";
 import { BusinessFilterType } from "../../../schema";
 import { useDisclosure } from "@mantine/hooks";
@@ -44,10 +42,28 @@ import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
+import EmptyTable from "@/ui/components/EmptyTable";
+import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
+import dayjs from "dayjs";
+import PaginationComponent from "@/ui/components/Pagination";
+import { useState } from "react";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
   const { back } = useRouter();
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  const customParams = {
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
+
+  const { loading, transactions, meta } = useTransactions(
+    params.id,
+    customParams
+  );
 
   const [opened, { toggle }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();
@@ -61,11 +77,15 @@ export default function TransactionForAccount() {
       title: "Money In",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Money Out",
       value: 0,
       formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
     },
     {
       title: "Total Transactions",
@@ -113,7 +133,7 @@ export default function TransactionForAccount() {
           Transactions
         </Title>
 
-        <InfoCards title="Overview" details={infoDetails}>
+        <InfoCards title="Overview" details={infoDetails} loading={loading}>
           <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
@@ -140,7 +160,8 @@ export default function TransactionForAccount() {
             // value={search}
             color="var(--prune-text-gray-200)"
             // onChange={(e) => setSearch(e.currentTarget.value)}
-            c="#000"
+            w={324}
+            styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
           <Flex gap={12}>
@@ -194,8 +215,23 @@ export default function TransactionForAccount() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent data={tableData.slice(0, 3)} id={params.id} />}
-          loading={false}
+          rows={<RowComponent data={transactions} id={params.id} />}
+          loading={loading}
+        />
+
+        <EmptyTable
+          rows={transactions}
+          loading={loading}
+          title="There are no transactions"
+          text="When transactions are created, they will appear here."
+        />
+
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 1) / customParams.limit)}
         />
 
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
@@ -222,20 +258,28 @@ type TableData = {
   Status: string;
 };
 
-const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
+const RowComponent = ({
+  data,
+  id,
+}: {
+  data: TransactionType[];
+  id: string;
+}) => {
   const { open, setData } = Transaction();
   return data.map((element) => (
     <TableTr
-      key={element.AccName}
+      key={element.id}
       onClick={() => {
         open();
         setData(element);
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={styles.table__td}>{element.AccNum}</TableTd>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientBankAddress}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Group gap={3}>
           <IconArrowUpRight
@@ -243,87 +287,53 @@ const RowComponent = ({ data, id }: { data: TableData[]; id: string }) => {
             size={16}
             className={styles.table__td__icon}
           />
-          {formatNumber(element.Amount)}
+          {formatNumber(element.amount, true, "EUR")}
           {/* <Text fz={12}></Text> */}
         </Group>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Date}</TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY - hh:mm A")}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
           variant="light"
-          color={approvedBadgeColor(element.Status.toUpperCase())}
+          color={approvedBadgeColor(element.status.toUpperCase())}
           w={90}
           h={24}
           fw={400}
           fz={12}
         >
-          {element.Status}
+          {element.status.toLowerCase()}
         </Badge>
       </TableTd>
     </TableTr>
   ));
 };
 
-const tableData = [
-  {
-    AccName: "Matthew Philips",
-    Biz: "Wema",
-    Amount: 200000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Agatha Goldie",
-    Biz: "UBA",
-    Amount: 300000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Omar Zeeda",
-    Biz: "FCMB",
-    Amount: 250000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "failed",
-  },
-  {
-    AccName: "Sharon Akindele",
-    Biz: "Zenith Bank",
-    Amount: 400000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Bethel Teddy",
-    Biz: "FCMB",
-    Amount: 150000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-];
-
-type TRXDrawerProps = { opened: boolean; close: () => void; data: TableData };
+type TRXDrawerProps = {
+  opened: boolean;
+  close: () => void;
+  data: TransactionType;
+};
 
 const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
   const { clearData } = Transaction();
 
   const senderDetails = [
-    { title: "Account Name", value: data.AccName },
-    { title: "Bank", value: data.Biz },
-    { title: "Account Number", value: data.AccNum },
+    { title: "Account Name", value: data.senderIban },
+    { title: "Bank", value: data.recipientBankAddress },
+    { title: "Account Number", value: data.recipientIban },
   ];
 
   const otherDetails = [
-    { title: "Alert Type", value: "Credit" },
-    { title: "Date & Time", value: data.Date },
+    { title: "Alert Type", value: "Debit" },
+    {
+      title: "Date & Time",
+      value: dayjs(data.createdAt).format("DD MMM, YYYY - hh:mm A"),
+    },
     { title: "Transaction ID", value: "1234567890" },
-    { title: "Status", value: data.Status },
+    { title: "Status", value: data.status },
   ];
   return (
     <Drawer
@@ -357,7 +367,7 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
             Amount Received
           </Text>
           <Text c="var(--prune-primary-700)" fw={600} fz={32}>
-            {formatNumber(data.Amount)}
+            {formatNumber(data.amount, true, "EUR")}
           </Text>
         </Stack>
 
@@ -393,30 +403,27 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
               </Text>
               {detail.title === "Status" ? (
                 <Badge
-                  w={90}
-                  size="xs"
-                  variant="light"
                   tt="capitalize"
-                  color={detail.value === "successful" ? "green" : "red"}
+                  variant="light"
+                  color={approvedBadgeColor(detail.value.toUpperCase())}
+                  w={90}
+                  h={24}
+                  fw={400}
+                  fz={12}
                 >
-                  {detail.value}
+                  {detail.value.toLowerCase()}
                 </Badge>
               ) : (
                 <Group gap={0}>
                   {detail.title === "Alert Type" && (
                     <ActionIcon variant="transparent">
-                      <IconArrowDownLeft size={14} />
+                      <IconArrowUpRight
+                        size={14}
+                        color="var(--prune-warning)"
+                      />
                     </ActionIcon>
                   )}
-                  <Text
-                    c={
-                      detail.title === "Alert Type"
-                        ? "#0065FF"
-                        : "var(--prune-text-gray-600)"
-                    }
-                    fz={14}
-                    fw={600}
-                  >
+                  <Text c="var(--prune-text-gray-600)" fz={14} fw={600}>
                     {detail.value}
                   </Text>
                 </Group>

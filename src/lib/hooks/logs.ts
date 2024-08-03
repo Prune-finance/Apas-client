@@ -8,12 +8,14 @@ interface IParams {
   status?: string;
   sort?: string;
   type?: string;
+  page?: number;
 }
 
 interface ILogs extends Omit<IParams, "type" | "status"> {}
 
 export function useLogs(customParams: ILogs = {}) {
   const [logs, setLogs] = useState<LogData[]>([]);
+  const [meta, setMeta] = useState<{total: number}>();
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -21,6 +23,7 @@ export function useLogs(customParams: ILogs = {}) {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
@@ -35,6 +38,7 @@ export function useLogs(customParams: ILogs = {}) {
         { withCredentials: true }
       );
       setLogs(data.data);
+      setMeta(data.meta);
     } catch (error) {
       setLogs([]);
     } finally {
@@ -50,9 +54,9 @@ export function useLogs(customParams: ILogs = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.limit, obj.createdAt, obj.sort, obj.page]);
 
-  return { loading, logs, revalidate };
+  return { loading, logs, revalidate,  meta };
 }
 
 export interface LogData {

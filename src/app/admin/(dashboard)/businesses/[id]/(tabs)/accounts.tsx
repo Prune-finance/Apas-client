@@ -43,10 +43,9 @@ import { BusinessData } from "@/lib/hooks/businesses";
 import { useState, useEffect, useMemo } from "react";
 import { AccountData } from "@/lib/hooks/accounts";
 import { CardOne } from "@/ui/components/Cards";
-import { activeBadgeColor, formatNumber } from "@/lib/utils";
+import { activeBadgeColor, formatNumber, serialNumber } from "@/lib/utils";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import InfoCards from "../../InfoCards";
 import Filter from "@/ui/components/Filter";
 import { BusinessFilterType } from "../../schema";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -57,12 +56,15 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 // import styles from "@/ui/styles/singlebusiness.module.scss";
 import styles from "@/ui/styles/business.module.scss";
 import { AllBusinessSkeleton } from "@/lib/static";
 import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
+import { useTransactions } from "@/lib/hooks/transactions";
+import PaginationComponent from "@/ui/components/Pagination";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -74,13 +76,29 @@ export default function Accounts({
   business: BusinessData | null;
 }) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
+  const [meta, setMeta] = useState<{ total: number } | null>(null);
   const { handleError } = useNotification();
 
   const [opened, { toggle }] = useDisclosure(false);
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const { push } = useRouter();
+  const params = useParams<{ id: string }>();
+  const customParams = {
+    page: active,
+    limit: isNaN(Number(limit)) ? 10 : parseInt(limit ?? "10", 10),
+  };
+  const {
+    loading: loadingTrx,
+
+    transactions,
+  } = useTransactions(params.id, customParams);
+  console.log({ object: { loadingTrx, meta, transactions, id: params.id } });
 
   const form = useForm<FilterType>({
     initialValues: filterValues,
@@ -89,14 +107,18 @@ export default function Accounts({
 
   const fetchCompanyAccounts = async () => {
     if (!business) return;
+    const params = new URLSearchParams(
+      customParams as unknown as Record<string, string>
+    );
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${business?.id}/accounts`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${business?.id}/accounts?${params}`,
         { withCredentials: true }
       );
 
       setAccounts(data.data);
+      setMeta(data.meta);
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -106,7 +128,7 @@ export default function Accounts({
 
   useEffect(() => {
     fetchCompanyAccounts();
-  }, [business]);
+  }, [business, customParams.limit, customParams.page]);
 
   const volumeDetails = [
     { title: "Sandra Damasus", value: 0, formatted: true, currency: "EUR" },
@@ -133,14 +155,16 @@ export default function Accounts({
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{index + 1}</TableTd>
+      <TableTd className={styles.table__td}>
+        {serialNumber(active, index, customParams.limit)}
+      </TableTd>
       <TableTd className={styles.table__td}>{element.accountName}</TableTd>
       <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
       <TableTd className={styles.table__td}>{element.type}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
-      <TableTd>{element.accountBalance}</TableTd>
+      {/* <TableTd>{element.accountBalance}</TableTd> */}
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
@@ -211,26 +235,15 @@ export default function Accounts({
         </Flex>
       )}
 
-      <div className={styles.pagination__container}>
-        <Group gap={9}>
-          <Text fz={14}>Showing:</Text>
-
-          <Select
-            data={["10", "20", "50", "100"]}
-            defaultValue={"10"}
-            w={60}
-            // h={24}
-            size="xs"
-            withCheckIcon={false}
-          />
-        </Group>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
-        />
-      </div>
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={Math.ceil(
+          (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+        )}
+      />
     </Box>
   );
 }
@@ -241,7 +254,7 @@ const tableHead = [
   "Account Number",
   "Type",
   "Date Created",
-  "Transactions",
+  // "Transactions",
   "Status",
 ];
 

@@ -11,15 +11,11 @@ import {
   MenuTarget,
   Pagination,
   Select,
-  Table,
-  TableScrollContainer,
-  TableTbody,
   TableTd,
-  TableTh,
-  TableThead,
   TableTr,
   Text,
   TextInput,
+  ThemeIcon,
   UnstyledButton,
   rem,
 } from "@mantine/core";
@@ -32,8 +28,11 @@ import {
   IconListTree,
   IconPlus,
   IconPointFilled,
+  IconRosetteDiscountCheckFilled,
   IconSearch,
   IconTrash,
+  IconUserCancel,
+  IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -47,7 +46,6 @@ import styles from "@/ui/styles/business.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
-import { AllBusinessSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -60,26 +58,41 @@ import {
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
-import InfoCards from "./InfoCards";
+
 import ActiveBadge from "@/assets/active-badge.svg";
-import { activeBadgeColor } from "@/lib/utils";
-import { table } from "console";
+import { activeBadgeColor, serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
+import InfoCards from "@/ui/components/Cards/InfoCards";
+import { useTransactions } from "@/lib/hooks/transactions";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const searchParams = useSearchParams();
-  const limit = searchParams.get("rows")?.toLowerCase() || "10";
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  // const limit = searchParams.get("rows")?.toLowerCase() || "10";
   const status = searchParams.get("status")?.toLowerCase();
   const createdAt = searchParams.get("createdAt");
   const sort = searchParams.get("sort")?.toLowerCase();
 
-  const { loading, businesses } = useBusiness({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const { loading, businesses, meta } = useBusiness({
+    ...(!limit || isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status }),
     ...(sort && { sort }),
+    page: active,
   });
+
+  const {
+    loading: loadingTrx,
+    meta: trxMeta,
+    transactions,
+  } = useTransactions();
 
   const [opened, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
@@ -95,36 +108,30 @@ function Businesses() {
   const infoDetails = [
     {
       title: "Total Business",
-      value: 0,
+      value: meta?.total || 0,
     },
     {
       title: "Money In",
-      value: 0,
+      value: trxMeta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value: 0,
+      value: trxMeta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: 0,
+      value: transactions.length,
     },
   ];
 
   const menuItems = [
-    // {
-    //   text: "View",
-    //   icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
-    //   link: true,
-    //   href: "/admin/businesses",
-    // },
     {
       text: "Deactivate",
-      icon: <IconEdit style={{ width: rem(14), height: rem(14) }} />,
+      icon: <IconUserCancel style={{ width: rem(14), height: rem(14) }} />,
     },
     {
       text: "Download Report",
@@ -146,23 +153,23 @@ function Businesses() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{index + 1}</TableTd>
+      <TableTd className={styles.table__td}>
+        {serialNumber(active, index, parseInt(limit ?? "10", 10))}
+      </TableTd>
       <TableTd className={styles.table__td}>
         <Group gap={9}>
           {element.name}
 
           {element.kycTrusted && (
-            <Image
-              width={20}
-              height={20}
-              src={ActiveBadge}
-              alt="active badge"
+            <IconRosetteDiscountCheckFilled
+              size={25}
+              color="var(--prune-primary-700)"
             />
           )}
         </Group>
       </TableTd>
       <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
-      <TableTd className={styles.table__td}>{50}</TableTd>
+      {/* <TableTd className={styles.table__td}>{50}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
@@ -238,7 +245,11 @@ function Businesses() {
             Businesses
           </Text>
         </div>
-        <InfoCards title="Overview" details={infoDetails}>
+        <InfoCards
+          title="Overview"
+          details={infoDetails}
+          loading={loading || loadingTrx}
+        >
           <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
@@ -321,26 +332,13 @@ function Businesses() {
             </Text>
           </Flex>
         )}
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        />
       </div>
     </main>
   );
@@ -358,7 +356,7 @@ const tableHeaders = [
   "S/N",
   "Business",
   "Contact Email",
-  "Transactions",
+  // "Transactions",
   "Date Created",
   "Status",
   "Action",

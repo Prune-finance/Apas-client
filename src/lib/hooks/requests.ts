@@ -12,9 +12,10 @@ interface IParams {
   sort?: string;
   query?: string;
   type?: string;
+  page?: number;
 }
 
-export function useRequests(customParams: IParams = {}) {
+export function useRequests(customParams: IParams = {}, id: string = "") {
   const [requests, setRequests] = useState<RequestData[]>([]);
   const [meta, setMeta] = useState<RequestMeta>();
   const [loading, setLoading] = useState(true);
@@ -26,18 +27,21 @@ export function useRequests(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
   async function fetchAccounts() {
+    //  `${id}/requests`;: fetch all requests for a specific business
     try {
+      const path = id ? `business/${id}/requests` : "requests";
       // const status = query ? `?status=${query}` : "";
       const params = new URLSearchParams(
         obj as Record<string, string>
       ).toString();
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests?${params}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/${path}?${params}`,
         { withCredentials: true }
       );
 
@@ -60,7 +64,7 @@ export function useRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -340,4 +344,5 @@ export interface Director {
 export interface RequestMeta {
   approvedRequests: number;
   pendingRequests: number;
+  total: number;
 }

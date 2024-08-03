@@ -7,8 +7,13 @@ interface IParams {
   createdAt?: string | null;
   status?: string;
   sort?: string;
+  page?: number;
+  type?: string;
 }
-export function useBusiness(customParams: IParams = {}) {
+export function useBusiness(
+  customParams: IParams = {},
+  reqCount: boolean = false
+) {
   const obj = useMemo(() => {
     return {
       ...(customParams.period && { period: customParams.period }),
@@ -16,6 +21,8 @@ export function useBusiness(customParams: IParams = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
     };
   }, [customParams]);
 
@@ -32,6 +39,9 @@ export function useBusiness(customParams: IParams = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(reqCount && { reqCount: "true" }),
+      ...(customParams.type && { type: customParams.type }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -80,7 +90,15 @@ export function useBusiness(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.period, obj.sort, obj.status]);
+  }, [
+    obj.createdAt,
+    obj.limit,
+    obj.period,
+    obj.sort,
+    obj.status,
+    obj.page,
+    obj.type,
+  ]);
 
   return { loading, businesses, meta, stats, statsMeta };
 }
@@ -128,27 +146,27 @@ export interface Director {
   identityFileUrlBack: string;
   proofOfAddressFileUrl: string;
 }
-export interface BusinessData {
-  id: string;
-  apiCalls: number;
-  contactEmail: string;
-  contactNumber: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: null;
-  domain: string;
-  name: string;
-  staging: string;
-  kycTrusted: boolean;
-  country: string | null;
-  address: string | null;
-  legalEntity: string | null;
-  mermat: string | null;
-  cacCertificate: string | null;
-  directors: Director[];
-  shareholders: Director[];
-  companyStatus: "ACTIVE" | "INACTIVE";
-}
+// export interface BusinessData {
+//   id: string;
+//   apiCalls: number;
+//   contactEmail: string;
+//   contactNumber: string | null;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   deletedAt: null;
+//   domain: string;
+//   name: string;
+//   staging: string;
+//   kycTrusted: boolean;
+//   country: string | null;
+//   address: string | null;
+//   legalEntity: string | null;
+//   mermat: string | null;
+//   cacCertificate: string | null;
+//   directors: Director[];
+//   shareholders: Director[];
+//   companyStatus: "ACTIVE" | "INACTIVE";
+// }
 
 export interface BusinessMeta {
   total: number;
@@ -157,4 +175,46 @@ export interface BusinessMeta {
 export interface StatsMeta {
   monthDiff: number;
   weekCount: number;
+}
+
+export interface BusinessData {
+  id: string;
+  contactEmail: string;
+  contactNumber: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  domain: string;
+  name: string;
+  staging: string;
+  kycTrusted: boolean;
+  address: string;
+  country: string;
+  legalEntity: string;
+  cacCertificate: string;
+  mermat: string;
+  businessBio: null | string;
+  directorParticular: null | string;
+  operationalLicense: null | string;
+  shareholderParticular: null | string;
+  amlCompliance: null | string;
+  directors: Director[];
+  shareholders: Director[];
+  companyStatus: "ACTIVE" | "INACTIVE";
+  apiCalls: number;
+  _count: Count;
+}
+
+export interface Count {
+  AccountRequests: number;
+}
+
+export interface Director {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  identityFileUrlBack: string;
+  proofOfAddressFileUrl: string;
 }

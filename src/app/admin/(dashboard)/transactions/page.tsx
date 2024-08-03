@@ -38,7 +38,7 @@ import { useParams, useRouter } from "next/navigation";
 
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import Filter from "@/ui/components/Filter";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
@@ -48,13 +48,18 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
+import { useState } from "react";
+import { filteredSearch } from "@/lib/search";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
 
-  const { account } = useSingleAccount(params.id);
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
+
   const { loading, transactions, meta } = useTransactions();
-  const { back } = useRouter();
 
   const [opened, { toggle }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();
@@ -95,18 +100,9 @@ export default function TransactionForAccount() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Accounts", href: "/admin/accounts" },
-          ...(account?.accountName
-            ? [
-                {
-                  title: account?.accountName,
-                  href: `/admin/accounts/${params.id}`,
-                },
-              ]
-            : []),
           {
             title: "Transactions",
-            href: `/admin/accounts/${params.id}/transactions`,
+            href: `/admin/transactions`,
           },
         ]}
       />
@@ -158,9 +154,9 @@ export default function TransactionForAccount() {
             // leftSection={searchIcon}
             leftSection={<IconSearch size={20} />}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            // value={search}
+            value={search}
             color="var(--prune-text-gray-200)"
-            // onChange={(e) => setSearch(e.currentTarget.value)}
+            onChange={(e) => setSearch(e.currentTarget.value)}
             c="#000"
             w={324}
             styles={{ input: { border: "1px solid #F5F5F5" } }}
@@ -213,7 +209,13 @@ export default function TransactionForAccount() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent data={transactions} id={params.id} />}
+          rows={
+            <RowComponent
+              data={transactions}
+              id={params.id}
+              search={debouncedSearch}
+            />
+          }
           loading={loading}
         />
 
@@ -251,12 +253,18 @@ type TableData = {
 const RowComponent = ({
   data,
   id,
+  search,
 }: {
   data: TransactionType[];
   id: string;
+  search: string;
 }) => {
   const { open, setData } = Transaction();
-  return data.map((element) => (
+  return filteredSearch(
+    data,
+    ["senderIban", "recipientIban", "recipientBankAddress"],
+    search
+  ).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {

@@ -42,20 +42,28 @@ import { filteredSearch } from "@/lib/search";
 import { table } from "console";
 import { TableComponent } from "@/ui/components/Table";
 import { DateInput } from "@mantine/dates";
+import PaginationComponent from "@/ui/components/Pagination";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 function Logs() {
   const searchParams = useSearchParams();
 
   const {
-    rows: limit = "10",
+    rows: _limit = "10",
     createdAt,
     sort,
   } = Object.fromEntries(searchParams.entries());
 
-  const { loading, logs } = useLogs({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  const { loading, logs, meta } = useLogs({
+    ...(isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit ?? "10", 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(sort && { sort: sort.toLowerCase() }),
+    page: active,
   });
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
@@ -134,38 +142,20 @@ function Logs() {
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-      {!loading && !!!rows.length && (
-        <Flex direction="column" align="center" mt={70}>
-          <Image src={EmptyImage} alt="no content" width={156} height={120} />
-          <Text mt={14} fz={14} c="#1D2939">
-            There are no audit logs.
-          </Text>
-          <Text fz={10} c="#667085">
-            When an entry is recorded, it will appear here
-          </Text>
-        </Flex>
-      )}
+      <EmptyTable
+        rows={rows}
+        loading={loading}
+        title="There are no audit logs"
+        text="When an entry is recorded, it will appear here."
+      />
 
-      <div className={styles.pagination__container}>
-        <Group gap={9}>
-          <Text fz={14}>Showing:</Text>
-
-          <Select
-            data={["10", "20", "50", "100"]}
-            defaultValue={"10"}
-            w={60}
-            // h={24}
-            size="xs"
-            withCheckIcon={false}
-          />
-        </Group>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
-        />
-      </div>
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+      />
     </Fragment>
   );
 }

@@ -94,14 +94,13 @@ export default function TransactionForAccount() {
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/admin/accounts" },
-          ...(account?.accountName
-            ? [
-                {
-                  title: account?.accountName,
-                  href: `/admin/accounts/${params.id}`,
-                },
-              ]
-            : []),
+
+          {
+            title: account?.accountName || "",
+            href: `/admin/accounts/${params.id}`,
+            loading: loading,
+          },
+
           {
             title: "Transactions",
             href: `/admin/accounts/${params.id}/transactions`,

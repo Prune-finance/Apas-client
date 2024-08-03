@@ -67,9 +67,8 @@ function Accounts() {
 
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
-  console.log(activePage);
 
-  const { loading, accounts, revalidate } = useAccounts({
+  const { loading, accounts, revalidate, meta } = useAccounts({
     ...(!limit || isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
@@ -77,6 +76,7 @@ function Accounts() {
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toLowerCase() }),
+    page: activePage,
   });
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -283,7 +283,7 @@ function Accounts() {
           setActive={setActivePage}
           setLimit={setLimit}
           limit={limit}
-          total={1}
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
 
         <ModalComponent

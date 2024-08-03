@@ -56,7 +56,6 @@ export default function Account() {
     transactions,
     meta,
   } = useTransactions(params.id);
-  console.log({ transactions, meta });
 
   const { loading, account } = useSingleAccount(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
@@ -359,13 +358,18 @@ export default function Account() {
 
                 <TableComponent
                   head={tableHeaders}
-                  rows={<RowComponent data={transactions} id={params.id} />}
-                  loading={false}
+                  rows={
+                    <RowComponent
+                      data={transactions.slice(0, 3)}
+                      id={params.id}
+                    />
+                  }
+                  loading={trxLoading}
                 />
 
                 <EmptyTable
-                  rows={[]}
-                  loading={false}
+                  rows={transactions}
+                  loading={trxLoading}
                   title="There are no recent transactions"
                   text="When transactions are created, recent transactions will appear here."
                 />

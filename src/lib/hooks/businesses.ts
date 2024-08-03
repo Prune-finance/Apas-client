@@ -9,7 +9,10 @@ interface IParams {
   sort?: string;
   page?: number;
 }
-export function useBusiness(customParams: IParams = {}) {
+export function useBusiness(
+  customParams: IParams = {},
+  reqCount: boolean = false
+) {
   const obj = useMemo(() => {
     return {
       ...(customParams.period && { period: customParams.period }),
@@ -35,6 +38,7 @@ export function useBusiness(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
+      ...(reqCount && { reqCount: "true" }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);

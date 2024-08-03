@@ -53,31 +53,41 @@ import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { activeBadgeColor } from "@/lib/utils";
+import EmptyTable from "@/ui/components/EmptyTable";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
 
   const {
-    rows: limit = "10",
+    rows: _rows,
     status,
     createdAt,
     sort,
   } = Object.fromEntries(searchParams.entries());
 
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
   const router = useRouter();
-  const { loading, users, revalidate } = useAdmins({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const { loading, users, revalidate, meta } = useAdmins({
+    ...(isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit ?? "10", 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
+    page: active,
   });
+
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const { handleError } = useNotification();
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [processing, setProcessing] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
@@ -135,6 +145,12 @@ function Users() {
 
   const handleRowClick = (id: string) => {
     push(`/admin/users/${id}`);
+  };
+
+  const handleEdit = (data: typeof newAdmin) => {
+    form.setValues(data);
+    open();
+    setIsEdit(true);
   };
 
   const rows = filteredSearch(
@@ -206,6 +222,16 @@ function Users() {
                   fz={10}
                   c="#667085"
                   leftSection={items.icon}
+                  onClick={() => {
+                    if (items.text === "Edit User")
+                      return handleEdit({
+                        email: element.email,
+                        firstName: element.firstName,
+                        lastName: element.lastName,
+                        role: element.role,
+                        password: "",
+                      });
+                  }}
                 >
                   {items.text}
                 </MenuItem>
@@ -277,38 +303,20 @@ function Users() {
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no users.
-            </Text>
-            <Text fz={10} c="#667085">
-              When a user is added, they will appear here
-            </Text>
-          </Flex>
-        )}
+        <EmptyTable
+          loading={loading}
+          rows={rows}
+          title="There are no users"
+          text="When a user is added, they will appear here."
+        />
 
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+        />
       </div>
 
       <ModalComponent
@@ -317,6 +325,7 @@ function Users() {
         opened={opened}
         close={close}
         form={form}
+        isEdit={isEdit}
       />
     </main>
   );

@@ -8,13 +8,14 @@ interface IParams {
   status?: string;
   sort?: string;
   type?: string;
+  page?: number;
 }
 
 interface IAdmins extends Omit<IParams, "type"> {}
 
 export function useAdmins(customParams: IAdmins = {}) {
   const [users, setUsers] = useState<AdminData[]>([]);
-  // const [meta, setMeta] = useState<BusinessMeta>();
+  const [meta, setMeta] = useState<{ total: number }>();
 
   const [loading, setLoading] = useState(true);
 
@@ -24,6 +25,7 @@ export function useAdmins(customParams: IAdmins = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
@@ -54,9 +56,9 @@ export function useAdmins(customParams: IAdmins = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.page, obj.sort, obj.status]);
 
-  return { loading, users, revalidate };
+  return { loading, users, revalidate, meta };
 }
 
 export function useUsers() {

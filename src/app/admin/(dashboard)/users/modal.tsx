@@ -22,6 +22,7 @@ export default function ModalComponent({
   action,
   processing,
   form,
+  isEdit,
 }: ModalProps) {
   return (
     <Modal
@@ -46,10 +47,12 @@ export default function ModalComponent({
       title={
         <Flex direction="column">
           <Text fz={24} fw={600}>
-            Invite a New User
+            {isEdit ? "Edit User" : "Invite a New User"}
           </Text>
           <Text fz={14} className="grey-400">
-            Invite a user to collaborate with you.
+            {isEdit
+              ? "Update User Details"
+              : "Invite a user to collaborate with you."}
           </Text>
         </Flex>
       }
@@ -124,7 +127,7 @@ export default function ModalComponent({
               color="var(--prune-primary-600)"
               c="var(--prune-text-gray-800)"
             >
-              Send Invite
+              {isEdit ? "Save Changes" : "Send Invite"}
             </Button>
           </Flex>
         </Box>
@@ -139,4 +142,5 @@ interface ModalProps {
   action?: () => void;
   processing?: boolean;
   form: UseFormReturnType<typeof newAdmin>;
+  isEdit: boolean;
 }

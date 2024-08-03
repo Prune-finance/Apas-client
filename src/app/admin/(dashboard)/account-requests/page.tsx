@@ -55,6 +55,7 @@ import { approvedBadgeColor } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
+import { useBusiness } from "@/lib/hooks/businesses";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -67,6 +68,8 @@ function AccountRequests() {
     sort,
     type,
   } = Object.fromEntries(searchParams.entries());
+
+  const { loading: loadingBiz, meta, businesses } = useBusiness({}, true);
 
   const { loading, requests, revalidate } = useRequests({
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),

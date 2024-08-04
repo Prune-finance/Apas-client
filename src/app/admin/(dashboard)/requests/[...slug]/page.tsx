@@ -18,6 +18,7 @@ import {
   MenuTarget,
   Paper,
   Select,
+  Skeleton,
   TableTd,
 } from "@mantine/core";
 import { Flex, Box, Divider, Button, TextInput } from "@mantine/core";
@@ -39,7 +40,13 @@ import styles from "@/ui/styles/accounts.module.scss";
 import EmptyImage from "@/assets/empty.png";
 
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
-import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
+import {
+  DebitRequest,
+  IUserRequest,
+  RequestData,
+  useCompanyRequests,
+  useDebitRequests,
+} from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -53,27 +60,38 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import PaginationComponent from "@/ui/components/Pagination";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 function BusinessDebit() {
   const searchParams = useSearchParams();
   const params = useParams<{ slug?: string[] }>();
   const [id, tab] = params.slug ?? [];
 
-  const {
-    rows: limit = "10",
-    status,
-    createdAt,
-    sort,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, sort } = Object.fromEntries(
+    searchParams.entries()
+  );
   const { handleError, handleSuccess } = useNotification();
-  const { loading, requests, revalidate } = useDebitRequests({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-  });
+
+  const [limit, setLimit] = useState<string | null>("10");
+  const [active, setActive] = useState(1);
+
+  const { loading, requests, revalidate, meta } = useCompanyRequests(
+    {
+      ...(isNaN(Number(limit))
+        ? { limit: 10 }
+        : { limit: parseInt(limit ?? "10", 10) }),
+      ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+      ...(status && { status: status.toLowerCase() }),
+      ...(sort && { sort: sort.toLowerCase() }),
+      type: tab.toUpperCase(),
+      page: active,
+    },
+    id,
+    tab.toLowerCase() !== "debit"
+  );
   const { push, back } = useRouter();
-  const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
+  const [selectedRequest, setSelectedRequest] = useState<IUserRequest | null>(
     null
   );
   const [processing, setProcessing] = useState(false);
@@ -132,7 +150,7 @@ function BusinessDebit() {
     }
   };
 
-  const MenuComponent = ({ request }: { request: DebitRequest }) => {
+  const MenuComponent = ({ request }: { request: IUserRequest }) => {
     return (
       <Menu shadow="md" width={150}>
         <MenuTarget>
@@ -185,7 +203,7 @@ function BusinessDebit() {
 
   const rows = filteredSearch(
     requests,
-    ["Account.Company.name", "Account.accountNumber"],
+    ["Company.name", "firstName", "lastName"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -197,7 +215,7 @@ function BusinessDebit() {
       // onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{element.Account.Company.name}</TableTd>
+      <TableTd>{element.Company.name}</TableTd>
       {/* <TableTd className={styles.table__td}>{element.amount}</TableTd>
       <TableTd className={styles.table__td}>
         {`${element.Account.Company.name
@@ -219,14 +237,12 @@ function BusinessDebit() {
         </Badge>
       </TableTd>
 
-      {element.status === "PENDING" && (
-        <TableTd
-          className={`${styles.table__td}`}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <MenuComponent request={element} />
-        </TableTd>
-      )}
+      <TableTd
+        className={`${styles.table__td}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <MenuComponent request={element} />
+      </TableTd>
     </TableTr>
   ));
 
@@ -240,7 +256,8 @@ function BusinessDebit() {
       <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/admin/dashboard" },
-          { title: "Requests", href: "/admin/requests" },
+          { title: "All Requests", href: "/admin/requests" },
+          { title: tab, href: `/admin/requests/${id}/${tab}` },
         ]}
       />
       <div className={styles.table__container}>
@@ -262,14 +279,14 @@ function BusinessDebit() {
           Back
         </Button>
 
-        {/* {account?.accountName ? ( */}
-        {/* <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
-          Tech Nova */}
-        {/* {account?.accountName} */}
-        {/* </Text> */}
-        {/* ) : (
+        {!loading ? (
+          <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
+            {requests[0].Company.name}
+          </Text>
+        ) : (
           <Skeleton h={10} w={100} />
-        )} */}
+        )}
+
         <div className={`${styles.container__search__filter}`}>
           <TextInput
             placeholder="Search here..."
@@ -300,38 +317,20 @@ function BusinessDebit() {
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no debit requests.
-            </Text>
-            <Text fz={10} c="#667085">
-              When a business is created, it will appear here
-            </Text>
-          </Flex>
-        )}
+        <EmptyTable
+          loading={loading}
+          rows={rows}
+          title="There are no request"
+          text="When a request is created, it will appear here"
+        />
 
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        />
 
         <Drawer
           opened={drawerOpened}
@@ -354,9 +353,9 @@ function BusinessDebit() {
                 Amount
               </Text>
 
-              <Text c="#97AD05" fz={32} fw={600}>
+              {/* <Text c="#97AD05" fz={32} fw={600}>
                 {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-              </Text>
+              </Text> */}
             </Flex>
 
             <Divider my={30} />
@@ -367,7 +366,7 @@ function BusinessDebit() {
                   Business Name:
                 </Text>
 
-                <Text fz={14}>{selectedRequest?.Account.Company.name}</Text>
+                <Text fz={14}>{selectedRequest?.Company.name}</Text>
               </Flex>
 
               <Flex justify="space-between">
@@ -375,7 +374,7 @@ function BusinessDebit() {
                   Source Account:
                 </Text>
 
-                <Text fz={14}>{selectedRequest?.Account.accountName}</Text>
+                {/* <Text fz={14}>{selectedRequest?.accountName}</Text> */}
               </Flex>
 
               <Flex justify="space-between">

@@ -115,6 +115,7 @@ export function useUserRequests(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
@@ -122,6 +123,7 @@ export function useUserRequests(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
     try {
       // const status = query ? `?status=${query}` : "";
       const { data } = await axios.get(
@@ -146,7 +148,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type]);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -233,7 +235,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
 
 export function useUserDebitRequests(customParams: IParams = {}) {
   const [requests, setRequests] = useState<DebitRequest[]>([]);
-  // const [meta, setMeta] = useState<RequestMeta>();
+  const [meta, setMeta] = useState<RequestMeta>();
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -242,6 +244,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
@@ -249,6 +252,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/requests?${params}`,
@@ -256,6 +260,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
       );
 
       setRequests(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -271,9 +276,9 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.page]);
 
-  return { loading, requests, revalidate };
+  return { loading, requests, revalidate, meta };
 }
 
 interface BaseData {

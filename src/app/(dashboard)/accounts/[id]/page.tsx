@@ -46,6 +46,7 @@ import EmptyImage from "@/assets/empty.png";
 import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "../../debit-requests/new/modal";
 import Link from "next/link";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -75,16 +76,7 @@ export default function Account() {
       </TableTd>
       <TableTd className={styles.table__td}>{element.recipientBic}</TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          {/* <IconPointFilled size={14} color="#12B76A" /> */}
-          <Text
-            tt="capitalize"
-            fz={12}
-            c={element.status === "PENDING" ? "#F79009" : "#12B76A"}
-          >
-            {element.status}
-          </Text>
-        </div>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));

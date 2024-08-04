@@ -40,23 +40,39 @@ import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { useSearchParams } from "next/navigation";
+import { BadgeComponent } from "@/ui/components/Badge";
+import EmptyTable from "@/ui/components/EmptyTable";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function DebitRequests() {
   const searchParams = useSearchParams();
 
-  const {
-    rows: limit = "10",
-    status,
-    createdAt,
-    sort,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, sort } = Object.fromEntries(
+    searchParams.entries()
+  );
 
-  const { loading, requests } = useUserDebitRequests({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  const queryParams = {
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
+    // ...(type && { type: type.toLowerCase() }),
+  };
+
+  const { loading, requests, meta } = useUserDebitRequests({
+    ...(isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit ?? "10", 10) }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    ...(sort && { sort: sort.toLowerCase() }),
+    page: active,
   });
+
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
   );
@@ -92,41 +108,7 @@ function DebitRequests() {
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div
-          className={styles.table__td__status}
-          style={{
-            background:
-              element.status === "PENDING"
-                ? "#FFFAEB"
-                : element.status === "REJECTED"
-                ? "#FCF1F2"
-                : "#ECFDF3",
-          }}
-        >
-          <IconPointFilled
-            size={14}
-            color={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          />
-          <Text
-            tt="capitalize"
-            fz={12}
-            c={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          >
-            {element.status.toLowerCase()}
-          </Text>
-        </div>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));
@@ -188,28 +170,21 @@ function DebitRequests() {
           </Table>
         </TableScrollContainer>
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no account requests.
-            </Text>
-            <Text fz={10} c="#667085">
-              When a request is created, it will appear here
-            </Text>
-          </Flex>
-        )}
-      </Paper>
-
-      <div className={styles.pagination__container}>
-        <Text fz={14}>Showing: {rows.length}</Text>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
+        <EmptyTable
+          rows={rows}
+          loading={loading}
+          title="There are no debit requests"
+          text="When a request is created, it will appear here"
         />
-      </div>
+
+        <PaginationComponent
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+          active={active}
+          setActive={setActive}
+          limit={limit}
+          setLimit={setLimit}
+        />
+      </Paper>
 
       <Drawer
         opened={drawerOpened}
@@ -275,18 +250,7 @@ function DebitRequests() {
                 Status:
               </Text>
 
-              <Text
-                fz={14}
-                c={
-                  selectedRequest?.status === "PENDING"
-                    ? "#C6A700"
-                    : selectedRequest?.status === "REJECTED"
-                    ? "#D92D20"
-                    : "#12B76A"
-                }
-              >
-                {selectedRequest?.status}
-              </Text>
+              <BadgeComponent status={selectedRequest?.status as string} />
             </Flex>
           </Flex>
 

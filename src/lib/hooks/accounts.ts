@@ -104,6 +104,7 @@ export function useUserAccounts(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
@@ -111,6 +112,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard?${params}`,
@@ -134,7 +136,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type]);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, accounts, revalidate, meta };
 }

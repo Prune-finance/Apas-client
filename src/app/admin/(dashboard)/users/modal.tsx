@@ -88,15 +88,17 @@ export default function ModalComponent({
             />
           </Flex>
 
-          <Flex mt={24}>
-            <PasswordInput
-              classNames={{ input: styles.input, label: styles.label }}
-              label="Password"
-              placeholder="Enter password"
-              flex={1}
-              {...form.getInputProps("password")}
-            />
-          </Flex>
+          {!isEdit && (
+            <Flex mt={24}>
+              <PasswordInput
+                classNames={{ input: styles.input, label: styles.label }}
+                label="Password"
+                placeholder="Enter password"
+                flex={1}
+                {...form.getInputProps("password")}
+              />
+            </Flex>
+          )}
 
           <Flex mt={24}>
             <Select

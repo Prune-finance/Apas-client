@@ -134,11 +134,11 @@ function Users() {
       if (hasErrors) {
         return;
       }
-      // {{auth-srv}}/v1/admin/admin/204640f2-51f3-4004-a1f9-24b0cfa61e02
+      const { password, ...rest } = form.values;
 
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admin/${id}`,
-        form.values,
+        { ...rest },
         { withCredentials: true }
       );
 

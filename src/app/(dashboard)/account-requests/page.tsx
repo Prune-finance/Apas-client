@@ -64,22 +64,29 @@ import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { activeBadgeColor } from "@/lib/utils";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
 
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
   const {
-    rows: limit = "10",
+    rows: srchRows = "10",
     status,
     createdAt,
     sort,
   } = Object.fromEntries(searchParams.entries());
 
-  const { loading, requests, revalidate } = useUserRequests({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const { loading, requests, revalidate, meta } = useUserRequests({
+    ...(!limit || isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
+    page: active,
   });
   const { handleSuccess } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
@@ -282,15 +289,13 @@ function AccountRequests() {
         )}
       </Paper>
 
-      <div className={styles.pagination__container}>
-        <Text fz={14}>Showing: {rows.length}</Text>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
-        />
-      </div>
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+      />
 
       <ModalComponent
         processing={processing}

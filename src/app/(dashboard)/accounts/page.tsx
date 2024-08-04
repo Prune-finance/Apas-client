@@ -54,24 +54,32 @@ import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import DebitRequestModal from "../debit-requests/new/modal";
 import { z } from "zod";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Accounts() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
   const {
-    rows: limit = "10",
+    rows: srchRows = "10",
     status,
     createdAt,
     sort,
     type,
   } = Object.fromEntries(searchParams.entries());
-  const { loading, accounts, revalidate } = useUserAccounts({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+
+  const { loading, accounts, revalidate, meta } = useUserAccounts({
+    ...(!limit || isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toLowerCase() }),
+    page: active,
   });
 
   const { handleSuccess } = useNotification();
@@ -524,15 +532,15 @@ function Accounts() {
         />
       </Paper>
 
-      <div className={styles.pagination__container}>
-        <Text fz={14}>Showing: {rows.length}</Text>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
-        />
-      </div>
+      {/* <div className={styles.pagination__container}> */}
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+      />
+      {/* </div> */}
     </main>
   );
 }

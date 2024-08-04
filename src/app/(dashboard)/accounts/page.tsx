@@ -54,24 +54,30 @@ import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import DebitRequestModal from "../debit-requests/new/modal";
 import { z } from "zod";
+import { BadgeComponent } from "@/ui/components/Badge";
+import EmptyTable from "@/ui/components/EmptyTable";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Accounts() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const {
-    rows: limit = "10",
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
-  const { loading, accounts, revalidate } = useUserAccounts({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const { status, createdAt, sort, type } = Object.fromEntries(
+    searchParams.entries()
+  );
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
+  const { loading, accounts, revalidate, meta } = useUserAccounts({
+    ...(isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit ?? "10", 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toLowerCase() }),
+    page: active,
   });
 
   const { handleSuccess } = useNotification();
@@ -343,42 +349,7 @@ function Accounts() {
         onClick={() => router.push(`/accounts/${element.id}`)}
         className={styles.table__td}
       >
-        <div
-          className={styles.table__td__status}
-          style={{
-            // background: "#ECFDF3",
-            background:
-              element.status === "ACTIVE"
-                ? "#ECFDF3"
-                : element.status === "FROZEN"
-                ? "#F2F4F7"
-                : "#FEF3F2",
-          }}
-        >
-          <IconPointFilled
-            size={14}
-            color={
-              element.status === "ACTIVE"
-                ? "#12B76A"
-                : element.status === "FROZEN"
-                ? "#344054"
-                : "#D92D20"
-            }
-          />
-          <Text
-            tt="capitalize"
-            fz={12}
-            c={
-              element.status === "ACTIVE"
-                ? "#12B76A"
-                : element.status === "FROZEN"
-                ? "#344054"
-                : "#D92D20"
-            }
-          >
-            {element.status.toLowerCase()}
-          </Text>
-        </div>
+        <BadgeComponent status={element.status} active />
       </TableTd>
 
       <TableTd className={`${styles.table__td}`}>
@@ -453,17 +424,20 @@ function Accounts() {
           </Table>
         </TableScrollContainer>
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no accounts.
-            </Text>
-            <Text fz={10} c="#667085">
-              When an account is created, it will appear here
-            </Text>
-          </Flex>
-        )}
+        <EmptyTable
+          rows={rows}
+          loading={loading}
+          title="There are no accounts"
+          text="When an account is created, it will appear here"
+        />
+
+        <PaginationComponent
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+          active={active}
+          setActive={setActive}
+          limit={limit}
+          setLimit={setLimit}
+        />
 
         <Modal
           size="xl"
@@ -523,16 +497,6 @@ function Accounts() {
           text="You are about to request for this account to be activated. This means the account will become active. Please state your reason below"
         />
       </Paper>
-
-      <div className={styles.pagination__container}>
-        <Text fz={14}>Showing: {rows.length}</Text>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
-        />
-      </div>
     </main>
   );
 }

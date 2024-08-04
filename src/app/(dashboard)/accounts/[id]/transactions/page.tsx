@@ -33,6 +33,7 @@ import {
 } from "@/lib/hooks/transactions";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 export default function AccountTrx() {
   const router = useRouter();
@@ -74,17 +75,7 @@ export default function AccountTrx() {
         {dayjs(element.createdAt).format("DD MMM, YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          {/* <IconPointFilled size={14} color="#12B76A" /> */}
-          <Text
-            tt="capitalize"
-            fz={10}
-            fw={700}
-            c={element.status === "PENDING" ? "#F79009" : "#12B76A"}
-          >
-            {element.status}
-          </Text>
-        </div>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));

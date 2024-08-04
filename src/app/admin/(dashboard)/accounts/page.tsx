@@ -53,6 +53,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -259,6 +260,7 @@ function Accounts() {
               activateOpen={activateOpen}
               unfreezeOpen={unfreezeOpen}
               freezeOpen={freezeOpen}
+              open={open}
               debouncedSearch={debouncedSearch}
               setRowId={setRowId}
             />
@@ -266,17 +268,12 @@ function Accounts() {
           loading={loading}
         />
 
-        {!loading && !!!accounts.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no accounts.
-            </Text>
-            <Text fz={10} c="#667085">
-              When an account is created, it will appear here
-            </Text>
-          </Flex>
-        )}
+        <EmptyTable
+          rows={accounts}
+          loading={loading}
+          title="There are no accounts"
+          text="When an account is created, it will appear here."
+        />
 
         <PaginationComponent
           active={activePage}
@@ -359,6 +356,7 @@ type RowProps = {
   activateOpen: () => void;
   freezeOpen: () => void;
   unfreezeOpen: () => void;
+  open: () => void;
 };
 
 const RowComponent = ({
@@ -368,6 +366,7 @@ const RowComponent = ({
   activateOpen,
   freezeOpen,
   unfreezeOpen,
+  open,
 }: RowProps) => {
   const { push } = useRouter();
 
@@ -423,6 +422,7 @@ const RowComponent = ({
           activateOpen={activateOpen}
           freezeOpen={freezeOpen}
           unfreezeOpen={unfreezeOpen}
+          open={open}
         />
       </TableTd>
     </TableTr>
@@ -436,6 +436,7 @@ type MenuProps = {
   activateOpen: () => void;
   freezeOpen: () => void;
   unfreezeOpen: () => void;
+  open: () => void;
 };
 
 const MenuComponent = ({
@@ -445,6 +446,7 @@ const MenuComponent = ({
   activateOpen,
   freezeOpen,
   unfreezeOpen,
+  open,
 }: MenuProps) => {
   return (
     <Menu shadow="md" width={150}>

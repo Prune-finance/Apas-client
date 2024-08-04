@@ -126,6 +126,32 @@ function Users() {
     }
   };
 
+  const editAdmin = async (id: string) => {
+    setProcessing(true);
+
+    try {
+      const { hasErrors, errors } = form.validate();
+      if (hasErrors) {
+        return;
+      }
+      // {{auth-srv}}/v1/admin/admin/204640f2-51f3-4004-a1f9-24b0cfa61e02
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admin/${id}`,
+        form.values,
+        { withCredentials: true }
+      );
+
+      revalidate();
+      close();
+      router.push("/admin/users");
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const menuItems = [
     // {
     //   text: "View",
@@ -238,6 +264,15 @@ function Users() {
               );
             })}
           </MenuDropdown>
+
+          <ModalComponent
+            action={isEdit ? () => editAdmin(element.id) : addAdmin}
+            processing={processing}
+            opened={opened}
+            close={close}
+            form={form}
+            isEdit={isEdit}
+          />
         </Menu>
       </TableTd>
     </TableTr>
@@ -319,14 +354,14 @@ function Users() {
         />
       </div>
 
-      <ModalComponent
-        action={addAdmin}
+      {/* <ModalComponent
+        action={isEdit ? editAdmin : addAdmin}
         processing={processing}
         opened={opened}
         close={close}
         form={form}
         isEdit={isEdit}
-      />
+      /> */}
     </main>
   );
 }

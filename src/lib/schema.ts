@@ -60,7 +60,7 @@ export const newBusiness = {
   cacCertificate: "",
   address: "",
   mermat: "",
-  AMLCompliance: "",
+  amlCompliance: "",
   operationalLicense: "",
   shareholderParticular: "",
   directorParticular: "",
@@ -142,7 +142,7 @@ export const validateNewBusiness = z.object({
   operationalLicense: z
     .string()
     .url("Operational License document is required"),
-  AMLCompliance: z
+  amlCompliance: z
     .string()
     .url("AML Compliance Framework document is required"),
   domain: z.string().url("Please provide a valid url"),

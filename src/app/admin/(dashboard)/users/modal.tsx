@@ -120,7 +120,11 @@ export default function ModalComponent({
             </Button>
 
             <Button
-              onClick={action}
+              onClick={() => {
+                if (action) {
+                  action();
+                }
+              }}
               loading={processing}
               // className={styles.cta}
               variant="filled"

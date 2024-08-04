@@ -131,7 +131,7 @@ export default function Home() {
       pending: number;
     }[] = [];
 
-    transactions.reverse().map((trx) => {
+    transactions.map((trx) => {
       let successful = 0,
         pending = 0,
         failed = 0;
@@ -139,6 +139,8 @@ export default function Home() {
       const date = dayjs(trx.createdAt).format("MMM DD");
       trx.status === "PENDING"
         ? (pending += trx.amount)
+        : trx.status === "REJECTED"
+        ? (failed += trx.amount)
         : (successful += trx.amount);
 
       arr.push({ date, successful, pending, failed });

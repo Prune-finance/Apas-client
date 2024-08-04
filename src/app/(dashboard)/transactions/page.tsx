@@ -18,8 +18,8 @@ import {
   IconPointFilled,
 } from "@tabler/icons-react";
 
-import { DynamicSkeleton } from "@/lib/static";
-import { formatNumber } from "@/lib/utils";
+import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
+import { formatNumber, frontendPagination } from "@/lib/utils";
 
 import EmptyImage from "@/assets/empty.png";
 
@@ -29,12 +29,16 @@ import {
   useTransactions,
   useUserTransactions,
 } from "@/lib/hooks/transactions";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { Suspense, useState } from "react";
 import InfoCards from "@/ui/components/Cards/InfoCards";
+import { BadgeComponent } from "@/ui/components/Badge";
+import EmptyTable from "@/ui/components/EmptyTable";
+import PaginationComponent from "@/ui/components/Pagination";
+import { filteredSearch } from "@/lib/search";
 
 function AccountTrx() {
   const searchParams = useSearchParams();
@@ -42,27 +46,38 @@ function AccountTrx() {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
 
-  const {
-    rows: limit = "10",
-    status,
-    createdAt,
-    sort,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, sort } = Object.fromEntries(
+    searchParams.entries()
+  );
 
   const router = useRouter();
   const params = useParams<{ id: string }>();
 
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
   const { loading, transactions } = useUserTransactions(undefined, {
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+    ...(isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit ?? "10", 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
+    page: active,
   });
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const [opened, { toggle }] = useDisclosure(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
 
-  const rows = transactions.map((element) => (
+  const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
+
+  const rows = frontendPagination(
+    filteredSearch(transactions, searchProps, debouncedSearch),
+    active,
+    parseInt(limit ?? "10", 10)
+  ).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -93,17 +108,7 @@ function AccountTrx() {
         {dayjs(element.createdAt).format("DD MMM, YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          {/* <IconPointFilled size={14} color="#12B76A" /> */}
-          <Text
-            tt="capitalize"
-            fz={10}
-            fw={700}
-            c={element.status === "PENDING" ? "#F79009" : "#12B76A"}
-          >
-            {element.status}
-          </Text>
-        </div>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));
@@ -116,7 +121,7 @@ function AccountTrx() {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: 0,
+      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
     },
@@ -128,13 +133,13 @@ function AccountTrx() {
     },
     {
       title: "Money Out",
-      value: 0,
+      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: 0,
+      value: transactions.length,
     },
   ];
 
@@ -237,6 +242,8 @@ function AccountTrx() {
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
             w={324}
             styles={{ input: { border: "1px solid #F5F5F5" } }}
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
           <Button
@@ -267,32 +274,25 @@ function AccountTrx() {
                 <TableTh className={styles.table__th}>Status</TableTh>
               </TableTr>
             </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton(0) : rows}</TableTbody>
+            <TableTbody>{loading ? DynamicSkeleton2(6) : rows}</TableTbody>
           </Table>
         </TableScrollContainer>
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no transactions.
-            </Text>
-            <Text fz={10} c="#667085">
-              When a transaction is recorded, it will appear here
-            </Text>
-          </Flex>
-        )}
-      </Paper>
-
-      <div className={styles.pagination__container}>
-        <Text fz={14}>Rows: {rows.length}</Text>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
+        <EmptyTable
+          rows={rows}
+          loading={loading}
+          title="There are no transactions"
+          text="When a transaction is recorded, it will appear here"
         />
-      </div>
+
+        <PaginationComponent
+          total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
+          active={active}
+          setActive={setActive}
+          limit={limit}
+          setLimit={setLimit}
+        />
+      </Paper>
 
       <Drawer
         opened={drawerOpened}

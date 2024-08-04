@@ -29,6 +29,7 @@ import axios from "axios";
 import { Key } from "./settings/(tabs)/keys";
 import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "./debit-requests/new/modal";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -71,8 +72,7 @@ export default function Home() {
       <TableTd className={styles.table__td}>
         {element.Account.accountName}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.amount}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
+      <TableTd className={styles.table__td}>
         <Flex align="center">
           <IconArrowUpRight
             color="#D92D20"
@@ -81,10 +81,12 @@ export default function Home() {
           />
           {formatNumber(element.amount, true, "EUR")}
         </Flex>
-        {/* <Text fz={12}></Text> */}
+      </TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div
+        {/* <div
           className={styles.table__td__status}
           style={{
             background:
@@ -118,7 +120,8 @@ export default function Home() {
           >
             {element.status.toLowerCase()}
           </Text>
-        </div>
+        </div> */}
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));
@@ -131,14 +134,20 @@ export default function Home() {
       pending: number;
     }[] = [];
 
-    transactions.reverse().map((trx) => {
+    transactions.map((trx) => {
       let successful = 0,
         pending = 0,
         failed = 0;
 
       const date = dayjs(trx.createdAt).format("MMM DD");
+      // trx.status === "PENDING"
+      //   ? (pending += trx.amount)
+      //   : (successful += trx.amount);
+
       trx.status === "PENDING"
         ? (pending += trx.amount)
+        : trx.status === "REJECTED"
+        ? (failed += trx.amount)
         : (successful += trx.amount);
 
       arr.push({ date, successful, pending, failed });
@@ -430,9 +439,13 @@ export default function Home() {
                   endAngle={0}
                   // paddingAngle={4}
                   data={donutData}
-                  chartLabel={donutData.reduce((prv, cur) => {
-                    return cur.value + prv;
-                  }, 0)}
+                  chartLabel={formatNumber(
+                    donutData.reduce((prv, cur) => {
+                      return cur.value + prv;
+                    }, 0),
+                    true,
+                    "EUR"
+                  )}
                   size={200}
                   thickness={20}
                 />

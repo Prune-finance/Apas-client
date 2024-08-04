@@ -17,7 +17,7 @@ import {
 } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
-import { formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import dayjs from "dayjs";
 
 import EmptyImage from "@/assets/empty.png";
@@ -217,7 +217,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
                 </Text>
 
                 <Badge
-                  color={badgeColor(item.status)}
+                  color={approvedBadgeColor(item.status)}
                   tt="capitalize"
                   fz={10}
                   fw={400}

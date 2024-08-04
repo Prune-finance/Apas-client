@@ -2,7 +2,6 @@
 import dayjs from "dayjs";
 
 import React, { Dispatch, SetStateAction, Suspense, useState } from "react";
-import Image from "next/image";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -18,7 +17,6 @@ import {
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/accounts.module.scss";
@@ -33,7 +31,7 @@ import {
   IconDotsVertical,
 } from "@tabler/icons-react";
 
-import ModalComponent from "@/ui/components/Modal";
+// import ModalComponent from "@/ui/components/Modal";
 import { AccountData, useAccounts } from "@/lib/hooks/accounts";
 import { activeBadgeColor, formatNumber } from "@/lib/utils";
 
@@ -54,6 +52,8 @@ import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
+import ModalComponent from "./modal";
+import { validateRequest } from "@/lib/schema";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -99,9 +99,15 @@ function Accounts() {
   const freezeAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/freeze`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { withCredentials: true }
       );
 
@@ -118,9 +124,16 @@ function Accounts() {
   const deactivateAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/deactivate`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { withCredentials: true }
       );
       revalidate();
@@ -136,9 +149,16 @@ function Accounts() {
   const activateAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/activate`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { withCredentials: true }
       );
       revalidate();
@@ -154,9 +174,16 @@ function Accounts() {
   const unfreezeAccount = async (id: string) => {
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/unfreeze`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+          ...(supportingDocumentName && { supportingDocumentName }),
+        },
         { withCredentials: true }
       );
 
@@ -173,6 +200,15 @@ function Accounts() {
   const form = useForm<AccountFilterType>({
     initialValues: accountFilterValues,
     validate: zodResolver(accountFilterSchema),
+  });
+
+  const requestForm = useForm({
+    initialValues: {
+      reason: "",
+      supportingDocumentName: "",
+      supportingDocumentUrl: "",
+    },
+    validate: zodResolver(validateRequest),
   });
 
   return (
@@ -286,6 +322,7 @@ function Accounts() {
         <ModalComponent
           processing={processing}
           action={() => freezeAccount(rowId || "")}
+          form={requestForm}
           color="#F2F4F7"
           icon={<IconBrandLinktree color="#344054" />}
           opened={freezeOpened}
@@ -297,6 +334,7 @@ function Accounts() {
         <ModalComponent
           processing={processing}
           action={() => unfreezeAccount(rowId || "")}
+          form={requestForm}
           color="#F2F4F7"
           icon={<IconBrandLinktree color="#344054" />}
           opened={unfreezeOpened}
@@ -308,6 +346,7 @@ function Accounts() {
         <ModalComponent
           processing={processing}
           action={() => deactivateAccount(rowId || "")}
+          form={requestForm}
           color="#FEF3F2"
           icon={<IconX color="#D92D20" />}
           opened={opened}
@@ -319,6 +358,7 @@ function Accounts() {
         <ModalComponent
           processing={processing}
           action={() => activateAccount(rowId || "")}
+          form={requestForm}
           color="#ECFDF3"
           icon={<IconCheck color="#12B76A" />}
           opened={activateOpened}

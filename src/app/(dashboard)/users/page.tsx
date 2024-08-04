@@ -47,7 +47,7 @@ import styles from "./styles.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { AllBusinessSkeleton } from "@/lib/static";
-import { AdminData, useAdmins } from "@/lib/hooks/admins";
+import { AdminData, useAdmins, useUsers } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import { useForm, zodResolver } from "@mantine/form";
@@ -79,21 +79,19 @@ function Users() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const {
-    rows: srchRows = "10",
-    status,
-    createdAt,
-    sort,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, sort } = Object.fromEntries(
+    searchParams.entries()
+  );
 
   const router = useRouter();
-  const { loading, users, revalidate, meta } = useAdmins({
+  const { loading, users, revalidate, meta } = useUsers({
     ...(!limit || isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
+    page: active,
   });
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
@@ -125,14 +123,14 @@ function Users() {
     setProcessing(true);
 
     try {
-      const { hasErrors } = form.validate();
+      const { hasErrors, errors } = form.validate();
       if (hasErrors) {
         return;
       }
 
       await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/users/add`,
-        form.values,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
+        { email: form.values.email },
         { withCredentials: true }
       );
 
@@ -140,7 +138,7 @@ function Users() {
       close();
       router.push("/users");
     } catch (error) {
-      handleError("An error occurred", parseError(error));
+      console.log(error);
     } finally {
       setProcessing(false);
     }
@@ -185,9 +183,9 @@ function Users() {
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>{element.email}</TableTd>
-      <TableTd
-        className={styles.table__td}
-      >{`${element.firstName} ${element.lastName}`}</TableTd>
+      <TableTd className={styles.table__td}>{`${element.firstName ?? ""} ${
+        element.lastName ?? ""
+      }`}</TableTd>
       <TableTd className={styles.table__td}>{element.role}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}

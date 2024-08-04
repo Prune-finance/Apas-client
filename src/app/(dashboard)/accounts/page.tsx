@@ -62,9 +62,6 @@ function Accounts() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
-
   const { status, createdAt, sort, type } = Object.fromEntries(
     searchParams.entries()
   );

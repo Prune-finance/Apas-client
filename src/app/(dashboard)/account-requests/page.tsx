@@ -78,9 +78,6 @@ function AccountRequests() {
     searchParams.entries()
   );
 
-  const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
-
   const { loading, requests, revalidate, meta } = useUserRequests({
     ...(isNaN(Number(limit))
       ? { limit: 10 }

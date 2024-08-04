@@ -123,6 +123,7 @@ export function useUserRequests(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
     try {
       // const status = query ? `?status=${query}` : "";
       const { data } = await axios.get(
@@ -251,6 +252,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/requests?${params}`,

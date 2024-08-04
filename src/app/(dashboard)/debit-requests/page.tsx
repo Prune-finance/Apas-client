@@ -47,6 +47,9 @@ import PaginationComponent from "@/ui/components/Pagination";
 function DebitRequests() {
   const searchParams = useSearchParams();
 
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
   const { status, createdAt, sort } = Object.fromEntries(
     searchParams.entries()
   );
@@ -72,6 +75,7 @@ function DebitRequests() {
     ...(sort && { sort: sort.toLowerCase() }),
     page: active,
   });
+
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
   );

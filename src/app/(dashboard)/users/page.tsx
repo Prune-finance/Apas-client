@@ -70,21 +70,27 @@ import { activeBadgeColor } from "@/lib/utils";
 import ModalComponent from "./modal";
 import UserDrawer from "./drawer";
 import User from "@/lib/store/user";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
 
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+
   const {
-    rows: limit = "10",
+    rows: srchRows = "10",
     status,
     createdAt,
     sort,
   } = Object.fromEntries(searchParams.entries());
 
   const router = useRouter();
-  const { loading, users, revalidate } = useAdmins({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
+  const { loading, users, revalidate, meta } = useAdmins({
+    ...(!limit || isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
@@ -119,20 +125,20 @@ function Users() {
     setProcessing(true);
 
     try {
-      const { hasErrors, errors } = form.validate();
+      const { hasErrors } = form.validate();
       if (hasErrors) {
         return;
       }
 
       await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/users/add`,
         form.values,
         { withCredentials: true }
       );
 
       revalidate();
       close();
-      router.push("/admin/users");
+      router.push("/users");
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -331,28 +337,15 @@ function Users() {
             </Text>
           </Flex>
         )}
-
-        <div className={styles.pagination__container}>
-          <Group gap={9}>
-            <Text fz={14}>Showing:</Text>
-
-            <Select
-              data={["10", "20", "50", "100"]}
-              defaultValue={"10"}
-              w={60}
-              // h={24}
-              size="xs"
-              withCheckIcon={false}
-            />
-          </Group>
-          <Pagination
-            autoContrast
-            color="#fff"
-            total={1}
-            classNames={{ control: styles.control, root: styles.pagination }}
-          />
-        </div>
       </div>
+
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+      />
 
       <ModalComponent
         action={addAdmin}

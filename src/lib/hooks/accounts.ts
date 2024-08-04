@@ -112,6 +112,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard?${params}`,

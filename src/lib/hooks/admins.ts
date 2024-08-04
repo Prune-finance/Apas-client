@@ -41,6 +41,7 @@ export function useAdmins(customParams: IAdmins = {}) {
       );
 
       setUsers(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -59,6 +60,39 @@ export function useAdmins(customParams: IAdmins = {}) {
   }, [obj.createdAt, obj.limit, obj.page, obj.sort, obj.status]);
 
   return { loading, users, revalidate, meta };
+}
+
+export function useSingleAdmin(id: string) {
+  const [user, setUser] = useState<AdminData>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchUsers() {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins/${id}`,
+        { withCredentials: true }
+      );
+
+      setUser(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchUsers();
+
+  useEffect(() => {
+    fetchUsers();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, user, revalidate };
 }
 
 export function useUsers() {
@@ -98,10 +132,11 @@ export function useUsers() {
 export interface AdminData {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
+  firstName: string;
+  lastName: string;
+  role: string;
+  lastLogIn: Date | null;
 }

@@ -74,6 +74,8 @@ export default function NewBusiness() {
         (val) => !val
       );
 
+      console.log({ errors, values: form.values });
+
       if (hasErrors) {
         throw new Error("Please fill all required fields");
       }

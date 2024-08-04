@@ -12,7 +12,8 @@ interface IParams {
 }
 export function useBusiness(
   customParams: IParams = {},
-  reqCount: boolean = false
+  reqCount: boolean = false,
+  otherReq: boolean = false
 ) {
   const obj = useMemo(() => {
     return {
@@ -41,6 +42,7 @@ export function useBusiness(
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
       ...(reqCount && { reqCount: "true" }),
+      ...(otherReq && { otherReq: "true" }),
       ...(customParams.type && { type: customParams.type }),
     };
 

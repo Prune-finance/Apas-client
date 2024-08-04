@@ -38,16 +38,23 @@ import { useParams, useRouter } from "next/navigation";
 
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import Filter from "@/ui/components/Filter";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import {
+  approvedBadgeColor,
+  formatNumber,
+  frontendPagination,
+} from "@/lib/utils";
 import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
+import { useState } from "react";
+import PaginationComponent from "@/ui/components/Pagination";
+import { filteredSearch } from "@/lib/search";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -56,6 +63,11 @@ export default function TransactionForAccount() {
   const { loading: loadingTrx, transactions } = useTransactions(params.id);
   console.log(transactions);
   const { back } = useRouter();
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();
@@ -74,14 +86,14 @@ export default function TransactionForAccount() {
     },
     {
       title: "Money Out",
-      value: 0,
+      value: transactions.reduce((acc, curr) => acc + curr.amount, 0),
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
     },
     {
       title: "Total Transactions",
-      value: 0,
+      value: transactions.length,
     },
   ];
 
@@ -94,14 +106,13 @@ export default function TransactionForAccount() {
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/admin/accounts" },
-          ...(account?.accountName
-            ? [
-                {
-                  title: account?.accountName,
-                  href: `/admin/accounts/${params.id}`,
-                },
-              ]
-            : []),
+
+          {
+            title: account?.accountName || "",
+            href: `/admin/accounts/${params.id}`,
+            loading: loading,
+          },
+
           {
             title: "Transactions",
             href: `/admin/accounts/${params.id}/transactions`,
@@ -157,9 +168,9 @@ export default function TransactionForAccount() {
             // leftSection={searchIcon}
             leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
             // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            // value={search}
+            value={search}
             color="var(--prune-text-gray-200)"
-            // onChange={(e) => setSearch(e.currentTarget.value)}
+            onChange={(e) => setSearch(e.currentTarget.value)}
             c="#000"
             w={324}
             styles={{ input: { border: "1px solid #F5F5F5" } }}
@@ -212,15 +223,34 @@ export default function TransactionForAccount() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent data={transactions} id={params.id} />}
-          loading={false}
+          rows={
+            <RowComponent
+              data={transactions}
+              id={params.id}
+              search={debouncedSearch}
+              active={active}
+              limit={limit}
+            />
+          }
+          loading={loadingTrx}
         />
 
         <EmptyTable
           rows={transactions}
-          loading={false}
+          loading={loadingTrx}
           title="There are no transactions"
           text="When transactions are created, it will appear here."
+        />
+
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil(
+            filteredSearch(transactions, searchProps, search).length /
+              parseInt(limit ?? "10", 10)
+          )}
         />
 
         {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
@@ -238,15 +268,27 @@ const tableHeaders = [
   "Status",
 ];
 
+const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];
+
 const RowComponent = ({
   data,
   id,
+  search,
+  active,
+  limit,
 }: {
   data: TransactionType[];
   id: string;
+  search: string;
+  active: number;
+  limit: string | null;
 }) => {
   const { open, setData } = Transaction();
-  return data.map((element) => (
+  return frontendPagination(
+    filteredSearch(data, searchProps, search),
+    active,
+    parseInt(limit ?? "10", 10)
+  ).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -289,49 +331,6 @@ const RowComponent = ({
     </TableTr>
   ));
 };
-
-const tableData = [
-  {
-    AccName: "Matthew Philips",
-    Biz: "Wema",
-    Amount: 200000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Agatha Goldie",
-    Biz: "UBA",
-    Amount: 300000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Omar Zeeda",
-    Biz: "FCMB",
-    Amount: 250000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "failed",
-  },
-  {
-    AccName: "Sharon Akindele",
-    Biz: "Zenith Bank",
-    Amount: 400000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-  {
-    AccName: "Bethel Teddy",
-    Biz: "FCMB",
-    Amount: 150000,
-    Date: "26 JUN,2024-10:00AM",
-    AccNum: "1657654367",
-    Status: "successful",
-  },
-];
 
 type TRXDrawerProps = {
   opened: boolean;

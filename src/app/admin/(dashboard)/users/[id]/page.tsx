@@ -13,6 +13,7 @@ import {
   Group,
   Paper,
   SimpleGrid,
+  Skeleton,
   Stack,
   Text,
   TextInput,
@@ -22,17 +23,23 @@ import Link from "next/link";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { activeBadgeColor } from "@/lib/utils";
+import { useSingleAdmin } from "@/lib/hooks/admins";
 
 dayjs.extend(advancedFormat);
 
 export default function SingleUser() {
-  const params = useParams<{ id?: string }>();
+  const params = useParams<{ id: string }>();
   const { back } = useRouter();
-  const CheckIcon = <IconCheck />;
+
+  const { user, loading, revalidate } = useSingleAdmin(params.id);
+
   const details = [
-    { label: "Email", placeholder: "janedoe@example.com" },
-    { label: "Role", placeholder: "Admin" },
-    { label: "Date Added", placeholder: dayjs().format("Do, MMMM YYYY") },
+    { label: "Email", placeholder: user?.email },
+    { label: "Role", placeholder: user?.role },
+    {
+      label: "Date Added",
+      placeholder: dayjs(user?.createdAt).format("Do, MMMM YYYY"),
+    },
   ];
 
   const permissions = [
@@ -48,8 +55,9 @@ export default function SingleUser() {
         items={[
           { title: "Users", href: "/admin/users" },
           {
-            title: "User Name",
+            title: `${user?.firstName ?? ""} ${user?.lastName ?? ""}`,
             href: `/admin/users/${params.id}`,
+            loading: loading,
           },
         ]}
       />
@@ -74,13 +82,13 @@ export default function SingleUser() {
 
         <Stack gap={0}>
           <Group>
-            {/* {account?.accountName ? ( */}
-            <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
-              Omega Chioma
-            </Text>
-            {/* ) : (
-            <Skeleton h={10} w={100} />
-          )} */}
+            {!loading ? (
+              <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
+                {`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={100} />
+            )}
 
             <Badge
               tt="capitalize"
@@ -95,7 +103,11 @@ export default function SingleUser() {
             </Badge>
           </Group>
           <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
-            {`Last Seen: ${dayjs().format("Do, MMMM YYYY")}`}
+            {`Last Seen: ${
+              user?.lastLogIn
+                ? dayjs(user?.lastLogIn).format("Do, MMMM YYYY")
+                : "Nil"
+            }`}
           </Text>
         </Stack>
 
@@ -121,7 +133,7 @@ export default function SingleUser() {
           ))}
         </Grid>
 
-        <Text fz={16} fw={500} mb={20} mt={40}>
+        {/* <Text fz={16} fw={500} mb={20} mt={40}>
           Permissions:
         </Text>
 
@@ -139,7 +151,7 @@ export default function SingleUser() {
               radius="xl"
             />
           ))}
-        </SimpleGrid>
+        </SimpleGrid> */}
       </Paper>
     </main>
   );

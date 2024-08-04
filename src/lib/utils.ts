@@ -17,6 +17,7 @@ export const formatNumber = (
 
 export const activeBadgeColor = (status: string) => {
   if (status === "ACTIVE") return "#12B76A";
+  if (status === "FROZEN") return "#344054";
   return "#D92D20";
 };
 
@@ -42,6 +43,8 @@ export const approvedBadgeColor = (status: string) => {
       return "#FF4D4F";
     case status === "PENDING":
       return "#C6A700";
+    case status === "FROZEN":
+      return "#344054";
     default:
       return "#FFA940";
   }
@@ -52,3 +55,9 @@ export const serialNumber = (
   index: number,
   perPage: number
 ) => (pageNumber - 1) * perPage + index + 1;
+
+export const frontendPagination = (
+  data: any[],
+  page: number,
+  perPage: number
+) => data.slice((page - 1) * perPage, page * perPage);

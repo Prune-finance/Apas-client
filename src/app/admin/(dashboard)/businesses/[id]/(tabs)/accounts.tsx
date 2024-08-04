@@ -63,7 +63,10 @@ import { AllBusinessSkeleton } from "@/lib/static";
 import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
-import { useTransactions } from "@/lib/hooks/transactions";
+import {
+  useBusinessTransactions,
+  useTransactions,
+} from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
 
 const switzer = localFont({
@@ -89,16 +92,16 @@ export default function Accounts({
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const { push } = useRouter();
   const params = useParams<{ id: string }>();
+
   const customParams = {
     page: active,
     limit: isNaN(Number(limit)) ? 10 : parseInt(limit ?? "10", 10),
   };
   const {
     loading: loadingTrx,
-
     transactions,
-  } = useTransactions(params.id, customParams);
-  console.log({ object: { loadingTrx, meta, transactions, id: params.id } });
+    meta: bizTrxMeta,
+  } = useBusinessTransactions(params.id, customParams);
 
   const form = useForm<FilterType>({
     initialValues: filterValues,
@@ -131,14 +134,39 @@ export default function Accounts({
   }, [business, customParams.limit, customParams.page]);
 
   const volumeDetails = [
-    { title: "Sandra Damasus", value: 0, formatted: true, currency: "EUR" },
+    ...(Object.keys(bizTrxMeta?.hva ?? {}).length > 0
+      ? [
+          {
+            title: bizTrxMeta?.hva.accountName || "",
+            value: bizTrxMeta?.hva.amount,
+            formatted: true,
+            currency: "EUR",
+            flexedGroup: true,
+          },
+        ]
+      : []),
   ];
 
   const overviewDetails = [
-    { title: "Total Balance", value: 0, formatted: true, currency: "EUR" },
-    { title: "Money In", value: 0, formatted: true, currency: "EUR" },
-    { title: "Money Out", value: 0, formatted: true, currency: "EUR" },
-    { title: "Total Transactions", value: 0 },
+    {
+      title: "Total Balance",
+      value: bizTrxMeta?.total,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money In",
+      value: bizTrxMeta?.in,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money Out",
+      value: bizTrxMeta?.out,
+      formatted: true,
+      currency: "EUR",
+    },
+    { title: "Total Transactions", value: transactions.length },
   ];
 
   const handleRowClick = (id: string) => {
@@ -184,10 +212,18 @@ export default function Accounts({
   return (
     <Box>
       <Flex gap={20} my={24}>
-        <InfoCards title="Highest Volume Account" details={volumeDetails} />
+        <InfoCards
+          title="Highest Volume Account"
+          details={volumeDetails}
+          loading={loadingTrx}
+        />
 
         <Box flex={1}>
-          <InfoCards title="Overview" details={overviewDetails} />
+          <InfoCards
+            title="Overview"
+            details={overviewDetails}
+            loading={loadingTrx}
+          />
         </Box>
       </Flex>
 

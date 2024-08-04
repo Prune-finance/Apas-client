@@ -58,7 +58,7 @@ export default function Documents({ form }: Props) {
           <Text fz={12} c="#344054" mb={10}>
             AML Compliance Framework
           </Text>
-          <DropzoneComponent form={form} formKey="AMLCompliance" />
+          <DropzoneComponent form={form} formKey="amlCompliance" />
         </Box>
       </Flex>
 

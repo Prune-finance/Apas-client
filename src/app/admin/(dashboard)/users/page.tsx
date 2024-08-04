@@ -272,6 +272,7 @@ function Users() {
             close={close}
             form={form}
             isEdit={isEdit}
+            setIsEdit={setIsEdit}
           />
         </Menu>
       </TableTd>

@@ -15,6 +15,7 @@ import { IconMail, IconTrash, IconX } from "@tabler/icons-react";
 import styles from "./modal.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { newAdmin } from "@/lib/schema";
+import { Dispatch, SetStateAction } from "react";
 
 export default function ModalComponent({
   opened,
@@ -23,12 +24,16 @@ export default function ModalComponent({
   processing,
   form,
   isEdit,
+  setIsEdit,
 }: ModalProps) {
   return (
     <Modal
       closeOnClickOutside={!processing}
       opened={opened}
-      onClose={close}
+      onClose={() => {
+        close();
+        setIsEdit(false);
+      }}
       centered
       // withCloseButton={false}
       closeButtonProps={{
@@ -149,4 +154,5 @@ interface ModalProps {
   processing?: boolean;
   form: UseFormReturnType<typeof newAdmin>;
   isEdit: boolean;
+  setIsEdit: Dispatch<SetStateAction<boolean>>;
 }

@@ -352,6 +352,7 @@ function Users() {
         close={close}
         form={form}
         isEdit={isEdit}
+        setIsEdit={setIsEdit}
       />
 
       <UserDrawer opened={openedDrawer} close={closeDrawer} user={user} />

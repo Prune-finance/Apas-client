@@ -30,7 +30,11 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import {
+  activeBadgeColor,
+  approvedBadgeColor,
+  formatNumber,
+} from "@/lib/utils";
 import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -45,6 +49,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { useBusiness } from "@/lib/hooks/businesses";
+import EmptyTable from "@/ui/components/EmptyTable";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Unfreeze() {
   const searchParams = useSearchParams();
@@ -76,7 +82,6 @@ function Unfreeze() {
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     // ...(type && { type: type.toLowerCase() }),
-    type: "UNFREEZE",
   };
 
   const { loading, meta, businesses } = useBusiness(
@@ -84,7 +89,6 @@ function Unfreeze() {
     undefined,
     true
   );
-  console.log({ meta, businesses });
 
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
@@ -182,8 +186,8 @@ function Unfreeze() {
   };
 
   const rows = filteredSearch(
-    requests,
-    ["Account.Company.name", "Account.accountNumber"],
+    businesses,
+    ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -191,25 +195,20 @@ function Unfreeze() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{element.Account.Company.name}</TableTd>
-      {/* <TableTd className={styles.table__td}>{element.amount}</TableTd>
-      <TableTd className={styles.table__td}>
-        {`${element.Account.Company.name
-          .toLowerCase()
-          .split(" ")
-          .join("")}@example.com`}
-      </TableTd> */}
+      <TableTd>{element.name}</TableTd>
+      {/* <TableTd className={styles.table__td}>{element.amount}</TableTd> */}
+      <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Badge
           tt="capitalize"
           variant="light"
-          color={approvedBadgeColor(element.status)}
+          color={activeBadgeColor(element.companyStatus)}
           w={82}
           h={24}
           fw={400}
           fz={12}
         >
-          {element.status.toLowerCase()}
+          {element.companyStatus.toLowerCase()}
         </Badge>
       </TableTd>
 
@@ -234,6 +233,8 @@ function Unfreeze() {
           // classNames={{ wrapper: styles.search, input: styles.input__search }}
           value={search}
           onChange={(e) => setSearch(e.currentTarget.value)}
+          w={324}
+          styles={{ input: { border: "1px solid #f5f5f5" } }}
         />
 
         <Button
@@ -241,7 +242,9 @@ function Unfreeze() {
           rightSection={<IconListTree size={14} />}
           fz={12}
           fw={500}
-          variant="default"
+          variant="outline"
+          color="var(--prune-text-gray-200)"
+          c="var(--prune-text-gray-800)"
           onClick={toggle}
         >
           Filter
@@ -256,38 +259,20 @@ function Unfreeze() {
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-      {!loading && !!!rows.length && (
-        <Flex direction="column" align="center" mt={70}>
-          <Image src={EmptyImage} alt="no content" width={156} height={120} />
-          <Text mt={14} fz={14} c="#1D2939">
-            There are no debit requests.
-          </Text>
-          <Text fz={10} c="#667085">
-            When a business is created, it will appear here
-          </Text>
-        </Flex>
-      )}
+      <EmptyTable
+        rows={rows}
+        loading={loading}
+        title="There are no requests"
+        text="When an account is unfrozen, it will appear here"
+      />
 
-      <div className={styles.pagination__container}>
-        <Group gap={9}>
-          <Text fz={14}>Showing:</Text>
-
-          <Select
-            data={["10", "20", "50", "100"]}
-            defaultValue={"10"}
-            w={60}
-            // h={24}
-            size="xs"
-            withCheckIcon={false}
-          />
-        </Group>
-        <Pagination
-          autoContrast
-          color="#fff"
-          total={1}
-          classNames={{ control: styles.control, root: styles.pagination }}
-        />
-      </div>
+      <PaginationComponent
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        active={active}
+        setActive={setActive}
+        limit={limit}
+        setLimit={setLimit}
+      />
 
       <Drawer
         opened={drawerOpened}
@@ -425,7 +410,7 @@ function Unfreeze() {
 const tableHeaders = [
   "Business Name",
   // "Number of Requests",
-  // "Contact Email",
+  "Contact Email",
   "Status",
   // "Action",
 ];

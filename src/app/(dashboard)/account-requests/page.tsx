@@ -63,7 +63,7 @@ import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
-import { activeBadgeColor } from "@/lib/utils";
+import { activeBadgeColor, approvedBadgeColor } from "@/lib/utils";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -348,7 +348,7 @@ function AccountRequests() {
                   <Badge
                     tt="capitalize"
                     variant="light"
-                    color={activeBadgeColor(item.value || "")}
+                    color={approvedBadgeColor(item.value || "")}
                     w={90}
                     h={24}
                     fw={400}

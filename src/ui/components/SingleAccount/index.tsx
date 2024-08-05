@@ -12,13 +12,120 @@ import {
   NativeSelect,
   Tooltip,
   Group,
+  rem,
+  Badge,
+  TableTd,
+  TableTr,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import { IconArrowLeft, IconCheck } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconArrowUpRight,
+  IconCheck,
+  IconCopy,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
+import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
+import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import Link from "next/link";
+import InfoCards from "../Cards/InfoCards";
+import { DonutChartComponent } from "../Charts";
+import EmptyTable from "../EmptyTable";
+import { TableComponent } from "../Table";
+import { Account } from "@/lib/hooks/accounts";
+import styles from "./styles.module.scss";
+import { TransactionType } from "@/lib/hooks/transactions";
+import { Dispatch, SetStateAction, useMemo } from "react";
+import { BadgeComponent } from "../Badge";
 
-export default function SingleAccount() {
+type Param = { id: string };
+interface Props {
+  account: Account | null;
+  setChartFrequency: Dispatch<SetStateAction<string>>;
+  transactions: TransactionType[];
+  params: Param;
+  loading: boolean;
+  trxLoading: boolean;
+}
+
+export default function SingleAccount({
+  account,
+  setChartFrequency,
+  transactions,
+  params,
+  loading,
+  trxLoading,
+}: Props) {
   const { back } = useRouter();
+
+  const accountDetails = [
+    {
+      title: "Euro Account",
+      value: transactions.reduce((acc, cur) => acc + cur.amount, 0),
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Dollar Account",
+      value: 0,
+      formatted: true,
+      currency: "USD",
+      locale: "en-US",
+    },
+    { title: "Pound Account", value: 0, formatted: true, currency: "GBP" },
+  ];
+
+  const flexedGroupDetails = [
+    // { title: "Bank", value: "Wema" },
+    { title: "Account Name", value: account?.accountName },
+    { title: "Account No", value: account?.accountNumber },
+  ];
+
+  const lineData = useMemo(() => {
+    const arr: {
+      month: string;
+      Inflow: number;
+      Outflow: number;
+    }[] = [];
+
+    transactions.map((trx) => {
+      let successful = 0,
+        pending = 0,
+        failed = 0;
+
+      const month = dayjs(trx.createdAt).format("MMM DD");
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : (successful += trx.amount);
+
+      // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
+      arr.push({ month, Inflow: 0, Outflow: trx.amount });
+    });
+
+    return arr;
+  }, [transactions]);
+
+  const donutData = useMemo(() => {
+    let completed = 0,
+      pending = 0,
+      failed = 0;
+    transactions.map((trx) => {
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : trx.status === "REJECTED"
+        ? (failed += trx.amount)
+        : (completed += trx.amount);
+    });
+
+    return [
+      { name: "Completed", value: completed, color: "#039855" },
+      { name: "Pending", value: pending, color: "#F79009" },
+      { name: "Failed", value: failed, color: "#D92D20" },
+    ];
+  }, [transactions]);
+
+  const totalTrxVolume = donutData.reduce((acc, cur) => acc + cur.value, 0);
+
   return (
     <Paper p={28} className={styles.grid__container}>
       <Button
@@ -250,3 +357,55 @@ export default function SingleAccount() {
     </Paper>
   );
 }
+
+const tableHeaders = [
+  "Name",
+  "Bank",
+  "Account Number",
+  "Amount",
+  "Date",
+  "Status",
+];
+
+const RowComponent = ({
+  data,
+  id,
+}: {
+  data: TransactionType[];
+  id: string;
+}) => {
+  const { push } = useRouter();
+  const handleRowClick = (id: string) => {
+    push(`/admin/accounts/${id}/transactions`);
+  };
+  return data.map((element) => (
+    <TableTr
+      key={element.id}
+      onClick={() => handleRowClick(id)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientBankAddress}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        <Group gap={3}>
+          <IconArrowUpRight
+            color="#D92D20"
+            size={16}
+            className={styles.table__td__icon}
+          />
+          {formatNumber(element.amount, true, "EUR")}
+          {/* <Text fz={12}></Text> */}
+        </Group>
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+};

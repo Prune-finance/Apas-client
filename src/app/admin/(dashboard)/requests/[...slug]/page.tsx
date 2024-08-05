@@ -223,6 +223,9 @@ function BusinessDebit() {
           .split(" ")
           .join("")}@example.com`}
       </TableTd> */}
+      <TableTd>
+        {dayjs(element.createdAt).format("DD, MMM, YYYY - hh:mm A")}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Badge
           tt="capitalize"
@@ -470,6 +473,7 @@ const tableHeaders = [
   "Business Name",
   // "Number of Requests",
   // "Contact Email",
+  "Date Created",
   "Status",
   "Action",
 ];

@@ -92,25 +92,66 @@ export default function Account() {
   //   },
   // ];
 
+  // const lineData = useMemo(() => {
+  //   const arr: {
+  //     month: string;
+  //     successful: number;
+  //     failed: number;
+  //     pending: number;
+  //   }[] = [];
+
+  //   transactions.reverse().map((trx) => {
+  //     let successful = 0,
+  //       pending = 0,
+  //       failed = 0;
+
+  //     const month = dayjs(trx.createdAt).format("MMM");
+  //     trx.status === "PENDING"
+  //       ? (pending += trx.amount)
+  //       : (successful += trx.amount);
+
+  //     arr.push({ month, successful, pending, failed });
+  //   });
+
+  //   return arr;
+  // }, [transactions]);
+
+  // const donutData = useMemo(() => {
+  //   let completed = 0,
+  //     pending = 0,
+  //     failed = 0;
+  //   transactions.map((trx) => {
+  //     if (trx.status === "PENDING") {
+  //       pending += trx.amount;
+  //     }
+  //   });
+
+  //   return [
+  //     { name: "Completed", value: completed, color: "#039855" },
+  //     { name: "Pending", value: pending, color: "#F79009" },
+  //     { name: "Failed", value: failed, color: "#D92D20" },
+  //   ];
+  // }, [transactions]);
+
   const lineData = useMemo(() => {
     const arr: {
       month: string;
-      successful: number;
-      failed: number;
-      pending: number;
+      Inflow: number;
+      Outflow: number;
     }[] = [];
 
-    transactions.reverse().map((trx) => {
+    transactions.map((trx) => {
       let successful = 0,
         pending = 0,
         failed = 0;
 
-      const month = dayjs(trx.createdAt).format("MMM");
+      const month = dayjs(trx.createdAt).format("MMM DD");
       trx.status === "PENDING"
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
-      arr.push({ month, successful, pending, failed });
+      // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
+      arr.push({ month, Inflow: 0, Outflow: trx.amount });
     });
 
     return arr;
@@ -121,9 +162,11 @@ export default function Account() {
       pending = 0,
       failed = 0;
     transactions.map((trx) => {
-      if (trx.status === "PENDING") {
-        pending += trx.amount;
-      }
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : trx.status === "REJECTED"
+        ? (failed += trx.amount)
+        : (completed += trx.amount);
     });
 
     return [
@@ -255,7 +298,10 @@ export default function Account() {
           </GridCol>
 
           <GridCol span={8.3}>
-            <TransactionStatistics setChartFrequency={setChartFrequency} />
+            <TransactionStatistics
+              setChartFrequency={setChartFrequency}
+              lineData={lineData}
+            />
           </GridCol>
 
           <GridCol span={3.7}>

@@ -34,7 +34,7 @@ import {
   IconCopy,
 } from "@tabler/icons-react";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import Link from "next/link";
@@ -91,6 +91,49 @@ export default function Account() {
     { title: "Account Name", value: account?.accountName },
     { title: "Account No", value: account?.accountNumber },
   ];
+
+  const lineData = useMemo(() => {
+    const arr: {
+      month: string;
+      Inflow: number;
+      Outflow: number;
+    }[] = [];
+
+    transactions.map((trx) => {
+      let successful = 0,
+        pending = 0,
+        failed = 0;
+
+      const month = dayjs(trx.createdAt).format("MMM DD");
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : (successful += trx.amount);
+
+      // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
+      arr.push({ month, Inflow: 0, Outflow: trx.amount });
+    });
+
+    return arr;
+  }, [transactions]);
+
+  const donutData = useMemo(() => {
+    let completed = 0,
+      pending = 0,
+      failed = 0;
+    transactions.map((trx) => {
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : trx.status === "REJECTED"
+        ? (failed += trx.amount)
+        : (completed += trx.amount);
+    });
+
+    return [
+      { name: "Completed", value: completed, color: "#039855" },
+      { name: "Pending", value: pending, color: "#F79009" },
+      { name: "Failed", value: failed, color: "#D92D20" },
+    ];
+  }, [transactions]);
 
   const totalTrxVolume = donutData.reduce((acc, cur) => acc + cur.value, 0);
 
@@ -217,7 +260,7 @@ export default function Account() {
           <GridCol span={3.7}>
             <Paper px="auto" withBorder w="100%" h="100%" pt={20}>
               <Flex px={10} justify="space-between" align="center">
-                <Text fz={10} fw={600} tt="uppercase">
+                <Text fz={16} fw={600} tt="capitalize">
                   Transaction Volume
                 </Text>
 

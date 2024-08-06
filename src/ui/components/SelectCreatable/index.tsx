@@ -51,8 +51,6 @@ export function MultiSelectCreatable() {
     }
   };
 
-  console.log(selectedValues);
-
   const handleValueRemove = (val: string) =>
     setValue((current) => current.filter((v) => v !== val));
 

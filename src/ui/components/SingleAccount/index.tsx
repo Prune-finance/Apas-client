@@ -17,7 +17,7 @@ import {
   TableTd,
   TableTr,
 } from "@mantine/core";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   IconArrowLeft,
   IconArrowUpRight,
@@ -25,6 +25,10 @@ import {
   IconCopy,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
+
 import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import Link from "next/link";
@@ -57,6 +61,7 @@ export default function SingleAccount({
   trxLoading,
 }: Props) {
   const { back } = useRouter();
+  const pathname = usePathname();
 
   const accountDetails = [
     {
@@ -155,9 +160,20 @@ export default function SingleAccount({
           ) : (
             <Skeleton h={10} w={100} />
           )}
-          <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
-            {`Last Seen: ${dayjs(account?.createdAt).format("Do, MMMM YYYY")}`}
-          </Text>
+
+          <Group gap={3}>
+            <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
+              Last Seen:
+            </Text>
+
+            {account?.createdAt ? (
+              <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
+                {dayjs(account?.createdAt).format("Do, MMMM YYYY")}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={50} />
+            )}
+          </Group>
         </Stack>
 
         <Flex gap={10}>
@@ -327,7 +343,7 @@ export default function SingleAccount({
                   c="var(--prune-primary-800)"
                   td="underline"
                   component={Link}
-                  href={`/admin/accounts/${params.id}/transactions`}
+                  href={`${pathname}/transactions`}
                 >
                   See All Transactions
                 </Button>

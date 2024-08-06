@@ -18,7 +18,7 @@ export default function Account() {
     meta,
   } = useTransactions(params.id);
 
-  const { loading, account } = useSingleAccount(params.id);
+  const { loading, account, revalidate } = useSingleAccount(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
   return (
@@ -42,6 +42,7 @@ export default function Account() {
         trxLoading={trxLoading}
         loading={loading}
         params={params}
+        revalidate={revalidate}
       />
     </main>
   );

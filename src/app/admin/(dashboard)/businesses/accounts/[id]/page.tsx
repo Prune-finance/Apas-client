@@ -21,7 +21,11 @@ export default function Account() {
     meta,
   } = useTransactions(params.id);
 
-  const { loading, account } = useSingleAccount(params.id);
+  const {
+    loading,
+    account,
+    revalidate: revalidateAcct,
+  } = useSingleAccount(params.id);
 
   const {
     loading: loadingBiz,
@@ -56,6 +60,7 @@ export default function Account() {
         trxLoading={loadingTrx}
         loading={loading}
         params={params}
+        revalidate={revalidateAcct}
       />
     </main>
   );

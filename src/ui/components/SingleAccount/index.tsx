@@ -21,6 +21,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   IconArrowLeft,
   IconArrowUpRight,
+  IconBrandLinktree,
   IconCheck,
   IconCopy,
 } from "@tabler/icons-react";
@@ -36,11 +37,18 @@ import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
 import EmptyTable from "../EmptyTable";
 import { TableComponent } from "../Table";
-import { Account } from "@/lib/hooks/accounts";
+import { Account, useSingleAccount } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType } from "@/lib/hooks/transactions";
-import { Dispatch, SetStateAction, useMemo } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
+import { useDisclosure } from "@mantine/hooks";
+import axios from "axios";
+import { useForm, zodResolver } from "@mantine/form";
+import { validateRequest } from "@/lib/schema";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
 
 type Param = { id: string };
 interface Props {
@@ -50,6 +58,7 @@ interface Props {
   params: Param;
   loading: boolean;
   trxLoading: boolean;
+  revalidate?: () => void;
 }
 
 export default function SingleAccount({
@@ -59,9 +68,16 @@ export default function SingleAccount({
   params,
   loading,
   trxLoading,
+  revalidate,
 }: Props) {
   const { back } = useRouter();
   const pathname = usePathname();
+  const { handleError, handleSuccess } = useNotification();
+
+  const [opened, { open, close }] = useDisclosure(false);
+  const [openedFreeze, { open: openFreeze, close: closeFreeze }] =
+    useDisclosure(false);
+  const [processing, setProcessing] = useState(false);
 
   const accountDetails = [
     {
@@ -131,6 +147,66 @@ export default function SingleAccount({
 
   const totalTrxVolume = donutData.reduce((acc, cur) => acc + cur.value, 0);
 
+  const requestForm = useForm({
+    initialValues: {
+      reason: "",
+      supportingDocumentName: "",
+      supportingDocumentUrl: "",
+    },
+    validate: zodResolver(validateRequest),
+  });
+
+  const unfreezeAccount = async (id: string) => {
+    setProcessing(true);
+    try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/unfreeze`,
+        {
+          reason,
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+          ...(supportingDocumentName && { supportingDocumentName }),
+        },
+        { withCredentials: true }
+      );
+
+      revalidate && revalidate();
+      handleSuccess("Action Completed", "Account unfrozen");
+      close();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const freezeAccount = async (id: string) => {
+    setProcessing(true);
+    try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/freeze`,
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
+        { withCredentials: true }
+      );
+
+      revalidate && revalidate();
+      handleSuccess("Action Completed", "Account frozen");
+      closeFreeze();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <Paper p={28} className={styles.grid__container}>
       <Button
@@ -183,9 +259,16 @@ export default function SingleAccount({
             c="var(--prune-text-gray-800)"
             fz={12}
             fw={500}
-            // onClick={() => setEditing(false)}
+            onClick={() => {
+              if (account?.status === "FROZEN") return open();
+              openFreeze();
+            }}
+            loading={loading}
+            loaderProps={{ type: "dots" }}
           >
-            Freeze Account
+            {account?.status === "FROZEN"
+              ? "Unfreeze Account"
+              : "Freeze Account"}
           </Button>
           {/* <Button
               // onClick={() => {
@@ -370,6 +453,30 @@ export default function SingleAccount({
           </Paper>
         </GridCol>
       </Grid>
+
+      <ModalComponent
+        processing={processing}
+        action={() => unfreezeAccount(account?.id || "")}
+        form={requestForm}
+        color="#F2F4F7"
+        icon={<IconBrandLinktree color="#344054" />}
+        opened={opened}
+        close={close}
+        title="Unfreeze this Account?"
+        text="You are about to unfreeze this account. This means full activity can be carried out in the account again."
+      />
+
+      <ModalComponent
+        processing={processing}
+        action={() => freezeAccount(account?.id || "")}
+        form={requestForm}
+        color="#F2F4F7"
+        icon={<IconBrandLinktree color="#344054" />}
+        opened={openedFreeze}
+        close={closeFreeze}
+        title="Freeze this Account?"
+        text="You are about to freeze this account. This means no activity can be carried out on this account anymore."
+      />
     </Paper>
   );
 }

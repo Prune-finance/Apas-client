@@ -161,7 +161,7 @@ export default function SingleAccount({
             <Skeleton h={10} w={100} />
           )}
 
-          <Group gap={3}>
+          {/* <Group gap={3}>
             <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
               Last Seen:
             </Text>
@@ -173,7 +173,7 @@ export default function SingleAccount({
             ) : (
               <Skeleton h={10} w={50} />
             )}
-          </Group>
+          </Group> */}
         </Stack>
 
         <Flex gap={10}>

@@ -1,6 +1,7 @@
 "use client";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import { MultiSelectCreatable } from "@/ui/components/SelectCreatable";
 import {
   Paper,
   Button,
@@ -9,6 +10,9 @@ import {
   Group,
   TextInput,
   Select,
+  NumberInput,
+  Textarea,
+  Text,
 } from "@mantine/core";
 import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
@@ -56,8 +60,8 @@ export default function CreateNewPlan() {
             <TextInput
               required
               flex={1}
-              label="Plan Name"
-              placeholder="Enter plan name"
+              // label="Plan Name"
+              placeholder="Plan name"
               // value={planName}
               // onChange={(e) => setPlanName(e.currentTarget.value)}
             />
@@ -65,10 +69,28 @@ export default function CreateNewPlan() {
             <Select
               data={["Monthly", "Annually"]}
               flex={1}
-              label="Cycle"
-              placeholder="Select cycle"
+              // label="Cycle"
+              placeholder="Billing Cycle"
             />
           </Group>
+
+          <NumberInput placeholder="Amount" required mt={24} />
+
+          <Textarea
+            placeholder="Describe what business can use this plan here..."
+            autosize
+            minRows={5}
+            maxRows={5}
+            mt={24}
+            h={88}
+            mb={60}
+          />
+
+          <Text mb={21} fz={16} fw={500}>
+            Features:
+          </Text>
+
+          <MultiSelectCreatable />
         </Box>
       </Paper>
     </main>

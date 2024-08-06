@@ -36,7 +36,7 @@ export default function TransactionStatistics({
   ];
 
   return (
-    <Paper style={{ border: "1px solid #f5f5f5" }} p={20}>
+    <Paper style={{ border: "1px solid #f5f5f5" }} p={20} pl={40}>
       <Flex justify="space-between" align="center" mb={15}>
         <Text fz={16} fw={600} c="var(--prune-text-gray-800)">
           Transaction Statistics

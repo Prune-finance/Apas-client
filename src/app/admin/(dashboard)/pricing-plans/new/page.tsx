@@ -1,5 +1,6 @@
 "use client";
 
+import { BackBtn } from "@/ui/components/Buttons";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { MultiSelectCreatable } from "@/ui/components/SelectCreatable";
 import {
@@ -14,7 +15,6 @@ import {
   Textarea,
   Text,
 } from "@mantine/core";
-import { IconArrowLeft } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 
 export default function CreateNewPlan() {
@@ -32,7 +32,7 @@ export default function CreateNewPlan() {
       />
 
       <Paper mih="calc(100vh - 150px)" px={28} py={32} mt={16} radius="xs">
-        <Button
+        {/* <Button
           fz={14}
           c="var(--prune-text-gray-500)"
           fw={400}
@@ -47,7 +47,8 @@ export default function CreateNewPlan() {
           }
         >
           Pricing Plans
-        </Button>
+        </Button> */}
+        <BackBtn text="Pricing Plans" />
 
         <Title order={1} fz={24} fw={500} mt={28} mb={32}>
           Create New Plan

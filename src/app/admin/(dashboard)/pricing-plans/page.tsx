@@ -39,6 +39,7 @@ import styles from "@/ui/styles/accounts.module.scss";
 import PaginationComponent from "@/ui/components/Pagination";
 import PlanDrawer from "./drawer";
 import EmptyTable from "@/ui/components/EmptyTable";
+import { PrimaryBtn } from "@/ui/components/Buttons";
 
 export type Plan = (typeof _plans)[0];
 export default function PricingPlans() {
@@ -74,17 +75,11 @@ export default function PricingPlans() {
             onChange={(e) => setSearch(e.currentTarget.value)}
           />
 
-          <Button
-            color="var(--prune-primary-600)"
-            c="var(--prune-text-gray-800)"
-            fz={12}
-            fw={500}
-            leftSection={<IconPlus size={14} />}
-            component={Link}
-            href={`/admin/pricing-plans/new`}
-          >
-            Create New Plan
-          </Button>
+          <PrimaryBtn
+            text="Create New Plan"
+            icon={IconPlus}
+            link="/admin/pricing-plans/new"
+          />
         </Group>
 
         <TableComponent

@@ -134,7 +134,7 @@ export function useSingleBusiness(id: string) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [id]);
 
   return { loading, business, revalidate };
 }

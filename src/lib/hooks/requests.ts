@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { all } from "axios";
 import { useState, useEffect, useMemo } from "react";
 import { AccountData } from "./accounts";
 
@@ -231,6 +231,83 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
   }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate };
+}
+
+interface ICompanyRequest extends Omit<IParams, "query"> {}
+export function useCompanyRequests(
+  customParams: ICompanyRequest = {},
+  id: string = "",
+  all: boolean = false
+) {
+  const [requests, setRequests] = useState<IUserRequest[]>([]);
+  const [meta, setMeta] = useState<{ total: number }>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+    };
+  }, [customParams]);
+
+  async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
+    try {
+      const path = all ? "/all" : "";
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${id}/requests${path}?${params}`,
+        { withCredentials: true }
+      );
+
+      setRequests(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+
+  return { loading, requests, revalidate, meta };
+}
+
+export interface IUserRequest {
+  id: string;
+  type: string;
+  status: string;
+  reason: string;
+  supportingDocumentName: null | string;
+  supportingDocumentUrl: null;
+  adminSupportingDocumentName: null;
+  adminSupportingDocumentUrl: null;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  companyId: string;
+  accountId: string;
+  Company: Company;
+}
+
+export interface Company {
+  name: string;
+  id: string;
 }
 
 export function useUserDebitRequests(customParams: IParams = {}) {

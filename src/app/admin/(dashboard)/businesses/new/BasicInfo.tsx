@@ -79,6 +79,7 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           //   label="Pricing plan"
           data={["Free", "Basic", "Premium"]}
+          {...form.getInputProps("pricingPlan")}
         />
       </Flex>
 

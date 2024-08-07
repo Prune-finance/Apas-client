@@ -54,13 +54,14 @@ export const newBusiness = {
   domain: "",
   country: "",
   legalEntity: "",
+  pricingPlan: "",
   contactNumber: "",
   contactEmail: "",
   businessBio: "",
   cacCertificate: "",
   address: "",
   mermat: "",
-  amlCompliance: "",
+  amlCompliance: null,
   operationalLicense: "",
   shareholderParticular: "",
   directorParticular: "",
@@ -120,6 +121,81 @@ export const validateNewAdmin = z.object({
 });
 
 const emailSchema = z.string().email();
+
+export const basicInfoSchema = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(3, "Business name must be a minimum of 3 characters"),
+  country: z.string().min(1, "Country is required"),
+  legalEntity: z.string().min(1, "Legal Entity is required"),
+  contactNumber: z.string().min(1, "Contact number is required"),
+  address: z.string().min(1, "Business Address is required"),
+  businessBio: z.string(),
+  contactEmail: z.string().email("Please provide a valid contact email"),
+  domain: z.string().url("Please provide a valid url"),
+  pricingPlan: z.string().min(1, "Pricing Plan is required"),
+});
+
+export const documentSchema = z.object({
+  cacCertificate: z.string().url("Cac certificate is required"),
+  mermat: z.string().url("Memart document is required"),
+  directorParticular: z
+    .string()
+    .url("Particular of Director document is required"),
+  shareholderParticular: z
+    .string()
+    .url("Particular of Shareholder document is required"),
+  operationalLicense: z
+    .string()
+    .url("Operational License document is required"),
+  amlCompliance: z
+    .string()
+    .url("AML Compliance Framework document is required")
+    .nullable()
+    .optional(),
+});
+
+export const directorsSchema = z
+  .array(
+    z.object({
+      name: z.string().min(1, "Director's name is required"),
+      email: z.string().refine(
+        (val) => {
+          if (!val) return true;
+          return emailSchema.safeParse(val).success;
+        },
+        { message: "Invalid director's email" }
+      ),
+      identityType: z.string(),
+      proofOfAddress: z.string(),
+      identityFileUrl: z.string(),
+      identityFileUrlBack: z.string(),
+      proofOfAddressFileUrl: z.string(),
+    })
+  )
+  .optional();
+
+export const shareholdersSchema = z
+  .array(
+    z.object({
+      name: z.string(),
+      email: z.string().refine(
+        (val) => {
+          if (!val) return true;
+          return emailSchema.safeParse(val).success;
+        },
+        { message: "Invalid shareholder's email" }
+      ),
+      identityType: z.string(),
+      proofOfAddress: z.string(),
+      identityFileUrl: z.string(),
+      identityFileUrlBack: z.string(),
+      proofOfAddressFileUrl: z.string(),
+    })
+  )
+  .optional();
+
 export const validateNewBusiness = z.object({
   name: z
     .string()
@@ -130,6 +206,7 @@ export const validateNewBusiness = z.object({
   contactNumber: z.string().min(1, "Contact number is required"),
   address: z.string().min(1, "Business Address is required"),
   businessBio: z.string(),
+  pricingPlan: z.string().min(1, "Pricing Plan is required"),
   contactEmail: z.string().email("Please provide a valid contact email"),
   cacCertificate: z.string().url("Cac certificate is required"),
   mermat: z.string().url("Memart document is required"),
@@ -144,7 +221,9 @@ export const validateNewBusiness = z.object({
     .url("Operational License document is required"),
   amlCompliance: z
     .string()
-    .url("AML Compliance Framework document is required"),
+    .url("AML Compliance Framework is required")
+    .nullable()
+    .optional(),
   domain: z.string().url("Please provide a valid url"),
   directors: z
     .array(

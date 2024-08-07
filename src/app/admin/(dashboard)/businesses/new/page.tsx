@@ -32,11 +32,16 @@ import {
   NewBusinessType,
   newBusiness,
   validateNewBusiness,
+  basicInfoSchema,
+  documentSchema,
+  directorsSchema,
+  shareholdersSchema,
 } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import BasicInfo from "./BasicInfo";
 import Documents from "./Documents";
+import { BackBtn } from "@/ui/components/Buttons";
 
 export default function NewBusiness() {
   const router = useRouter();
@@ -48,15 +53,66 @@ export default function NewBusiness() {
   const { handleSuccess, handleError } = useNotification();
 
   const [active, setActive] = useState(0);
-  const nextStep = () =>
-    setActive((current) => (current < 3 ? current + 1 : current));
+  // const nextStep = () =>
+  //   setActive((current) => (current < 3 ? current + 1 : current));
+
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
 
   const form = useForm<NewBusinessType>({
     initialValues: newBusiness,
-    validate: zodResolver(validateNewBusiness),
+    // validate: zodResolver(validateNewBusiness),
+    validate: (values) => {
+      if (active === 0) return zodResolver(basicInfoSchema)(values);
+      if (active === 1) return zodResolver(documentSchema)(values);
+      if (active === 2) return zodResolver(directorsSchema)(values);
+      if (active === 3) return zodResolver(shareholdersSchema)(values);
+      return {};
+    },
   });
+
+  const nextStep = () => {
+    const { hasErrors, errors } = form.validate();
+    if (hasErrors) return;
+    console.log({ hasErrors, errors });
+
+    setActive((current) => {
+      // if (form.validate().hasErrors) return current;
+      const { hasErrors } = form.validate();
+      if (hasErrors) return current;
+
+      return current < 3 ? current + 1 : current;
+    });
+  };
+
+  console.log(form.errors);
+
+  const validateForm = () => {
+    if (active === 0) {
+      form.validateField("name");
+      form.validateField("country");
+      form.validateField("legalEntity");
+      form.validateField("domain");
+      form.validateField("address");
+      form.validateField("contactEmail");
+      form.validateField("contactNumber");
+      form.validateField("businessBio");
+    }
+
+    if (active === 1) {
+      form.validateField("amlCompliance").hasError;
+      form.validateField("cacCertificate");
+      form.validateField("directorParticular");
+      form.validateField("operationalLicense");
+      form.validateField("mermat");
+      form.validateField("shareholderParticular");
+    }
+
+    // if (Object.keys(form.errors).length > 0) return;
+    if (form.isValid()) return;
+
+    nextStep();
+  };
 
   const handleCreate = async () => {
     setProcessing(true);
@@ -112,23 +168,7 @@ export default function NewBusiness() {
       />
 
       <Paper py={32} px={28} mt={20}>
-        <Button
-          fz={14}
-          c="var(--prune-text-gray-500)"
-          fw={400}
-          px={0}
-          variant="transparent"
-          onClick={router.back}
-          leftSection={
-            <IconArrowLeft
-              color="#1D2939"
-              style={{ width: "70%", height: "70%" }}
-            />
-          }
-          //   style={{ pointerEvents: !account ? "none" : "auto" }}
-        >
-          Back
-        </Button>
+        <BackBtn />
 
         <Text fz={24} fw={600} c="var(--prune-text-gray-700)" mt={28}>
           Create New Business
@@ -137,8 +177,7 @@ export default function NewBusiness() {
         <Stepper
           active={active}
           onStepClick={setActive}
-          // allowNextStepsSelect={false}
-
+          allowNextStepsSelect={form.errors ? false : true}
           color="var(--prune-primary-700)"
           classNames={{
             stepWrapper: styles.stepWrapper,

@@ -56,12 +56,14 @@ export const BackBtn = ({ link, text = "Back", ...props }: Props) => {
 interface PrimaryBtnProps extends Props {
   icon?: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
   action?: () => void;
+  showIcon?: boolean;
 }
 export const PrimaryBtn = ({
   link,
   text,
-  icon = IconPlus,
+  icon,
   action,
+  showIcon,
   ...props
 }: PrimaryBtnProps) => {
   const Icon = icon;
@@ -71,9 +73,10 @@ export const PrimaryBtn = ({
       c="var(--prune-text-gray-800)"
       fz={12}
       fw={500}
-      leftSection={<Icon size={14} />}
+      leftSection={Icon && <Icon size={14} />}
       component={Link}
       href={link}
+      {...props}
     >
       {text}
     </Button>
@@ -83,8 +86,53 @@ export const PrimaryBtn = ({
       c="var(--prune-text-gray-800)"
       fz={12}
       fw={500}
-      leftSection={<Icon size={14} />}
+      leftSection={Icon && <Icon size={14} />}
       onClick={action}
+      {...props}
+    >
+      {text}
+    </Button>
+  );
+};
+
+interface PrimaryBtnProps extends Props {
+  icon?: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
+  action?: () => void;
+  showIcon?: boolean;
+}
+export const SecondaryBtn = ({
+  link,
+  text,
+  icon,
+  action,
+  showIcon,
+  ...props
+}: PrimaryBtnProps) => {
+  const Icon = icon;
+  return link ? (
+    <Button
+      color="var(--prune-text-gray-200)"
+      c="var(--prune-text-gray-800)"
+      variant="outline"
+      fz={12}
+      fw={500}
+      leftSection={Icon && <Icon size={14} />}
+      component={Link}
+      href={link}
+      {...props}
+    >
+      {text}
+    </Button>
+  ) : (
+    <Button
+      color="var(--prune-text-gray-200)"
+      c="var(--prune-text-gray-800)"
+      variant="outline"
+      fz={12}
+      fw={500}
+      leftSection={Icon && <Icon size={14} />}
+      onClick={action}
+      {...props}
     >
       {text}
     </Button>

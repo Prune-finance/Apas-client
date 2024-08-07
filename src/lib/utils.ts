@@ -37,6 +37,8 @@ export const approvedBadgeColor = (status: string) => {
       return "#12B76A";
     case status === "SUCCESSFUL":
       return "#12B76A";
+    case status === "CONFIRMED":
+      return "#12B76A";
     case status === "REJECTED":
       return "#FF4D4F";
     case status === "FAILED":

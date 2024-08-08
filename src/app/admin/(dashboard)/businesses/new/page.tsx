@@ -41,7 +41,7 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import BasicInfo from "./BasicInfo";
 import Documents from "./Documents";
-import { BackBtn } from "@/ui/components/Buttons";
+import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function NewBusiness() {
   const router = useRouter();
@@ -74,7 +74,6 @@ export default function NewBusiness() {
   const nextStep = () => {
     const { hasErrors, errors } = form.validate();
     if (hasErrors) return;
-    console.log({ hasErrors, errors });
 
     setActive((current) => {
       // if (form.validate().hasErrors) return current;
@@ -129,7 +128,7 @@ export default function NewBusiness() {
     }
   };
 
-  console.log({ values: form.values });
+  console.log(form.errors, form.values);
 
   return (
     <main className={styles.main}>
@@ -328,7 +327,7 @@ export default function NewBusiness() {
         <Divider my={20} />
 
         <Group justify="flex-end">
-          <Button
+          {/* <Button
             fz={12}
             fw={500}
             c="var(--prune-text-gray-800)"
@@ -338,20 +337,28 @@ export default function NewBusiness() {
             onClick={() => form.reset()}
           >
             Cancel
-          </Button>
-          <Button
+          </Button> */}
+          <SecondaryBtn text="Cancel" action={form.reset} w={126} />
+          <PrimaryBtn
+            text={active < 3 ? "Next" : "Submit"}
+            w={126}
+            action={active < 3 ? nextStep : handleCreate}
+            loading={processing}
+          />
+          {/* <Button
             fz={12}
             fw={500}
             c="var(--prune-text-gray-800)"
             color="var(--prune-primary-600)"
             w={126}
+            loading={processing}
             // onClick={() => setActive((prev) => (prev <= 3 ? prev + 1 : prev))}
             onClick={() => {
               active < 3 ? nextStep() : handleCreate();
             }}
           >
             {`${active < 3 ? "Next" : "Submit"}`}
-          </Button>
+          </Button> */}
         </Group>
       </Paper>
     </main>
@@ -365,12 +372,6 @@ const DirectorForm = ({
   count: number;
   form: UseFormReturnType<NewBusinessType>;
 }) => {
-  console.log({
-    errors: form.errors,
-  });
-  function getNestedValue(obj: any, path: string) {
-    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
-  }
   return (
     <>
       <Flex
@@ -522,6 +523,9 @@ const ShareholderForm = ({
               <DropzoneComponent
                 form={form}
                 formKey={`shareholders.${count}.identityFileUrl`}
+                uploadedFileUrl={
+                  form.values.shareholders[count].identityFileUrl
+                }
               />
             </Box>
 
@@ -539,6 +543,9 @@ const ShareholderForm = ({
                   <DropzoneComponent
                     form={form}
                     formKey={`shareholders.${count}.identityFileUrlBack`}
+                    uploadedFileUrl={
+                      form.values.shareholders[count].identityFileUrlBack
+                    }
                   />
                 </Box>
               )}
@@ -550,6 +557,9 @@ const ShareholderForm = ({
               <DropzoneComponent
                 form={form}
                 formKey={`shareholders.${count}.proofOfAddressFileUrl`}
+                uploadedFileUrl={
+                  form.values.shareholders[count].proofOfAddressFileUrl
+                }
               />
             </Box>
           </Flex>

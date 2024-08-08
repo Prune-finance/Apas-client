@@ -41,7 +41,6 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
     !!form?.values[formKey as keyof NewBusinessType] || !!uploadedFileUrl
   );
 
-  console.log({ uploadedFileUrl, uploaded });
   const [processing, setProcessing] = useState(false);
 
   const handleUpload = async () => {
@@ -151,13 +150,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
 
         <Flex direction="column" align="center">
           {uploaded && (
-            <Group
-              gap={2}
-              justify="center"
-              align="center"
-              w="30ch"
-              style={{ border: "1px solid red" }}
-            >
+            <Group gap={2} justify="center" align="center" w="30ch">
               <Text
                 fz={10}
                 // lineClamp={1}

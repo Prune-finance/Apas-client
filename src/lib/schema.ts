@@ -12,7 +12,10 @@ export const registerValues = {
 
 export const validateLogin = z.object({
   email: z.string().email("Please provide a valid email"),
+  password: z.string().min(1, "Password is required"),
 });
+
+export type LoginType = z.infer<typeof validateLogin>;
 
 export const validateRegister = z
   .object({
@@ -173,6 +176,7 @@ export const directorsSchema = z
       proofOfAddress: z.string(),
       identityFileUrl: z.string(),
       identityFileUrlBack: z.string(),
+
       proofOfAddressFileUrl: z.string(),
     })
   )

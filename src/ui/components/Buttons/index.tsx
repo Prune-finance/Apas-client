@@ -99,6 +99,7 @@ interface PrimaryBtnProps extends Props {
   icon?: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
   action?: () => void;
   showIcon?: boolean;
+  type?: "button" | "reset" | "submit";
 }
 export const SecondaryBtn = ({
   link,
@@ -106,6 +107,7 @@ export const SecondaryBtn = ({
   icon,
   action,
   showIcon,
+  type = "button",
   ...props
 }: PrimaryBtnProps) => {
   const Icon = icon;
@@ -119,6 +121,7 @@ export const SecondaryBtn = ({
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       href={link}
+      type={type}
       {...props}
     >
       {text}
@@ -132,6 +135,7 @@ export const SecondaryBtn = ({
       fw={500}
       leftSection={Icon && <Icon size={14} />}
       onClick={action}
+      type={type}
       {...props}
     >
       {text}

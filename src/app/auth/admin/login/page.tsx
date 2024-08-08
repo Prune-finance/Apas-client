@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  Box,
   Button,
   Checkbox,
   PasswordInput,
@@ -11,18 +12,20 @@ import {
 import { Suspense, useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import axios from "axios";
 
 import styles from "@/ui/styles/auth.module.scss";
 import PruneIcon from "@/assets/icon.png";
 import { inter, pjs } from "@/ui/fonts";
 import { CardOne, CardThree, CardTwo } from "./cards";
-import { loginValues, validateLogin } from "@/lib/schema";
+import { LoginType, loginValues, validateLogin } from "@/lib/schema";
 
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import User from "@/lib/store/user";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { LoginInput } from "@/ui/components/Inputs";
 
 function Login() {
   const searchParams = useSearchParams();
@@ -31,7 +34,7 @@ function Login() {
 
   const { handleSuccess, handleError } = useNotification();
 
-  const form = useForm({
+  const form = useForm<LoginType>({
     initialValues: loginValues,
     validate: zodResolver(validateLogin),
   });
@@ -110,53 +113,36 @@ function Login() {
           Enter your details below to have access to your account
         </Text>
 
-        <div className={styles.text__input__container}>
-          <Text fz={12} px={10} className={styles.container__label}>
-            Email
-          </Text>
-          <TextInput
-            size="xs"
-            classNames={{
-              input: styles.text__input,
-            }}
-            placeholder="jane.zi@prune.io"
-            {...form.getInputProps("email")}
-          />
-        </div>
+        <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
+          <LoginInput form={form} label="email" />
+          <LoginInput form={form} label="password" />
 
-        <div className={styles.text__input__container}>
-          <Text fz={12} px={10} className={styles.container__label}>
-            Password
-          </Text>
-          <PasswordInput
-            size="xs"
-            classNames={{
-              input: styles.text__input,
-            }}
-            placeholder="******************"
-            {...form.getInputProps("password")}
-          />
-        </div>
+          <div className={styles.login__actions}>
+            <Checkbox label="Remember me" size="xs" color="#C1DD06" />
+          </div>
 
-        <div className={styles.login__actions}>
-          <Checkbox label="Remember me" size="xs" color="#C1DD06" />
-
-          <Button
-            className={styles.login__cta}
-            variant="filled"
-            color="#C1DD06"
-            onClick={handleLogin}
+          <PrimaryBtn
+            // action={handleLogin}
             loading={processing}
-          >
-            Log In
-          </Button>
-        </div>
+            fullWidth
+            text="Log In"
+            type="submit"
+            fz={14}
+            fw={600}
+            mt={32}
+          />
 
-        <div className={styles.rdr__link}>
-          <Text fz={14} className={styles.rdr__text}>
-            Forgot Password?
-          </Text>
-        </div>
+          <PrimaryBtn
+            text="Forgot Password?"
+            variant="transparent"
+            fz={14}
+            fw={600}
+            mt={32}
+            w="15ch"
+            p={0}
+            c="var(--prune-primary-800)"
+          />
+        </Box>
       </div>
     </main>
   );

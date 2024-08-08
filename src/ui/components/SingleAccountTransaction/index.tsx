@@ -196,7 +196,12 @@ export default function SingleAccountTransaction({
         </Flex>
       </Flex>
 
-      <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+      <Filter<FilterType>
+        opened={opened}
+        toggle={toggle}
+        form={form}
+        approvalStatus
+      />
 
       <TableComponent
         head={tableHeaders}

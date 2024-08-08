@@ -40,8 +40,6 @@ export default function SingleRequest() {
   const { handleSuccess, handleError } = useNotification();
   const { back } = useRouter();
 
-  console.log(request);
-
   const [opened, { open, close }] = useDisclosure(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
     useDisclosure(false);

@@ -34,7 +34,7 @@ import {
 } from "@tabler/icons-react";
 import styles from "./styles.module.scss";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import Filter from "@/ui/components/Filter";
@@ -63,8 +63,15 @@ export default function TransactionForAccount() {
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
+  const searchParams = useSearchParams();
 
-  const { loading, transactions, meta } = useTransactions();
+  const status = searchParams.get("status")?.toUpperCase();
+  const createdAt = searchParams.get("createdAt");
+
+  const { loading, transactions, meta } = useTransactions(undefined, {
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status }),
+  });
 
   const [opened, { toggle }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();

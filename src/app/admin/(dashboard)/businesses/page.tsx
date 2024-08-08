@@ -74,9 +74,9 @@ function Businesses() {
   const [limit, setLimit] = useState<string | null>("10");
 
   // const limit = searchParams.get("rows")?.toLowerCase() || "10";
-  const status = searchParams.get("status")?.toLowerCase();
+  const status = searchParams.get("status")?.toUpperCase();
   const createdAt = searchParams.get("createdAt");
-  const sort = searchParams.get("sort")?.toLowerCase();
+  const sort = searchParams.get("sort")?.toUpperCase();
 
   const { loading, businesses, meta } = useBusiness({
     ...(!limit || isNaN(Number(limit))

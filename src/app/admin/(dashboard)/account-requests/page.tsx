@@ -78,9 +78,9 @@ function AccountRequests() {
     page: active,
     limit: parseInt(limit ?? "10", 10),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
+    ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
-    ...(type && { type: type.toLowerCase() }),
+    ...(type && { type: type.toUpperCase() }),
   };
 
   const { loading, meta, businesses } = useBusiness(queryParams, true);

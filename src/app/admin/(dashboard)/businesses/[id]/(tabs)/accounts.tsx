@@ -56,7 +56,7 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 // import styles from "@/ui/styles/singlebusiness.module.scss";
 import styles from "@/ui/styles/business.module.scss";
 import { AllBusinessSkeleton } from "@/lib/static";
@@ -92,10 +92,16 @@ export default function Accounts({
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const { push } = useRouter();
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+
+  const status = searchParams.get("status")?.toUpperCase();
+  const createdAt = searchParams.get("createdAt");
 
   const customParams = {
     page: active,
     limit: isNaN(Number(limit)) ? 10 : parseInt(limit ?? "10", 10),
+    ...(status && { status }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
   };
   const {
     loading: loadingTrx,
@@ -131,7 +137,13 @@ export default function Accounts({
 
   useEffect(() => {
     fetchCompanyAccounts();
-  }, [business, customParams.limit, customParams.page]);
+  }, [
+    business,
+    customParams.limit,
+    customParams.page,
+    customParams.createdAt,
+    customParams.status,
+  ]);
 
   const volumeDetails = [
     ...(Object.keys(bizTrxMeta?.hva ?? {}).length > 0

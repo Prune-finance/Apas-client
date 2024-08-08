@@ -62,7 +62,7 @@ export const newBusiness = {
   address: "",
   mermat: "",
   amlCompliance: null,
-  operationalLicense: "",
+  operationalLicense: null,
   shareholderParticular: "",
   directorParticular: "",
   directors: [directorEtShareholderSchema],
@@ -148,7 +148,9 @@ export const documentSchema = z.object({
     .url("Particular of Shareholder document is required"),
   operationalLicense: z
     .string()
-    .url("Operational License document is required"),
+    .url("Operational License document is required")
+    .nullable()
+    .optional(),
   amlCompliance: z
     .string()
     .url("AML Compliance Framework document is required")
@@ -218,7 +220,9 @@ export const validateNewBusiness = z.object({
     .url("Particular of Shareholder document is required"),
   operationalLicense: z
     .string()
-    .url("Operational License document is required"),
+    .url("Operational License document is required")
+    .nullable()
+    .optional(),
   amlCompliance: z
     .string()
     .url("AML Compliance Framework is required")

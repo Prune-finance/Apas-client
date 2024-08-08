@@ -13,7 +13,7 @@ import {
 import styles from "./styles.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { NewBusinessType } from "@/lib/schema";
-import { IconMail } from "@tabler/icons-react";
+import { IconMail, IconPhone, IconWorldWww } from "@tabler/icons-react";
 
 type Props = {
   form: UseFormReturnType<NewBusinessType>;
@@ -62,6 +62,7 @@ export default function BasicInfo({ form }: Props) {
           //   label="Business domain"
           placeholder="Enter Domain"
           {...form.getInputProps("domain")}
+          rightSection={<IconWorldWww size={14} />}
         />
       </Flex>
 
@@ -100,6 +101,7 @@ export default function BasicInfo({ form }: Props) {
           //   label="Contact phone number"
           placeholder="Enter Contact Phone Number"
           {...form.getInputProps("contactNumber")}
+          rightSection={<IconPhone size={14} />}
           //   rightSection={
           //     <Group>
           //       <Avatar />

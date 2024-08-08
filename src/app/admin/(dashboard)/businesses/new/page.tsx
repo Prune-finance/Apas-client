@@ -85,35 +85,6 @@ export default function NewBusiness() {
     });
   };
 
-  console.log(form.errors);
-
-  const validateForm = () => {
-    if (active === 0) {
-      form.validateField("name");
-      form.validateField("country");
-      form.validateField("legalEntity");
-      form.validateField("domain");
-      form.validateField("address");
-      form.validateField("contactEmail");
-      form.validateField("contactNumber");
-      form.validateField("businessBio");
-    }
-
-    if (active === 1) {
-      form.validateField("amlCompliance").hasError;
-      form.validateField("cacCertificate");
-      form.validateField("directorParticular");
-      form.validateField("operationalLicense");
-      form.validateField("mermat");
-      form.validateField("shareholderParticular");
-    }
-
-    // if (Object.keys(form.errors).length > 0) return;
-    if (form.isValid()) return;
-
-    nextStep();
-  };
-
   const handleCreate = async () => {
     setProcessing(true);
     try {
@@ -157,6 +128,8 @@ export default function NewBusiness() {
       setProcessing(false);
     }
   };
+
+  console.log({ values: form.values });
 
   return (
     <main className={styles.main}>
@@ -392,6 +365,12 @@ const DirectorForm = ({
   count: number;
   form: UseFormReturnType<NewBusinessType>;
 }) => {
+  console.log({
+    errors: form.errors,
+  });
+  function getNestedValue(obj: any, path: string) {
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+  }
   return (
     <>
       <Flex
@@ -444,6 +423,7 @@ const DirectorForm = ({
             <DropzoneComponent
               form={form}
               formKey={`directors.${count}.identityFileUrl`}
+              uploadedFileUrl={form.values.directors[count].identityFileUrl}
             />
           </Box>
 
@@ -456,6 +436,9 @@ const DirectorForm = ({
               <DropzoneComponent
                 form={form}
                 formKey={`directors.${count}.identityFileUrlBack`}
+                uploadedFileUrl={
+                  form.values.directors[count].identityFileUrlBack
+                }
               />
             </Box>
           )}
@@ -467,6 +450,9 @@ const DirectorForm = ({
             <DropzoneComponent
               form={form}
               formKey={`directors.${count}.proofOfAddressFileUrl`}
+              uploadedFileUrl={
+                form.values.directors[count].proofOfAddressFileUrl
+              }
             />
           </Box>
         </Flex>

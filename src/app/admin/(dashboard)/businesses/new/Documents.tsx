@@ -21,21 +21,33 @@ export default function Documents({ form }: Props) {
           <Text fz={12} c="#344054" mb={10}>
             Upload CAC Certificate
           </Text>
-          <DropzoneComponent form={form} formKey="cacCertificate" />
+          <DropzoneComponent
+            form={form}
+            formKey="cacCertificate"
+            uploadedFileUrl={form.values.cacCertificate}
+          />
         </Box>
 
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
             Upload MEMART
           </Text>
-          <DropzoneComponent form={form} formKey="mermat" />
+          <DropzoneComponent
+            form={form}
+            formKey="mermat"
+            uploadedFileUrl={form.values.mermat}
+          />
         </Box>
 
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
             POS(Particulars of Shareholders)
           </Text>
-          <DropzoneComponent form={form} formKey="shareholderParticular" />
+          <DropzoneComponent
+            form={form}
+            formKey="shareholderParticular"
+            uploadedFileUrl={form.values.shareholderParticular}
+          />
         </Box>
       </Flex>
 
@@ -44,21 +56,33 @@ export default function Documents({ form }: Props) {
           <Text fz={12} c="#344054" mb={10}>
             POS(Particulars of Directors)
           </Text>
-          <DropzoneComponent form={form} formKey="directorParticular" />
+          <DropzoneComponent
+            form={form}
+            formKey="directorParticular"
+            uploadedFileUrl={form.values.directorParticular}
+          />
         </Box>
 
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
-            Operational License( Optional)
+            Operational License( Optional )
           </Text>
-          <DropzoneComponent form={form} formKey="operationalLicense" />
+          <DropzoneComponent
+            form={form}
+            formKey="operationalLicense"
+            uploadedFileUrl={form.values.operationalLicense ?? ""}
+          />
         </Box>
 
         <Box flex={1}>
           <Text fz={12} c="#344054" mb={10}>
-            AML Compliance Framework
+            AML Compliance Framework( Optional )
           </Text>
-          <DropzoneComponent form={form} formKey="amlCompliance" />
+          <DropzoneComponent
+            form={form}
+            formKey="amlCompliance"
+            uploadedFileUrl={form.values.amlCompliance ?? ""}
+          />
         </Box>
       </Flex>
 

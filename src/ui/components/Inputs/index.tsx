@@ -2,6 +2,8 @@ import { LoginType, loginValues } from "@/lib/schema";
 import { TextInput, PasswordInput, Text } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
 import styles from "@/ui/styles/auth.module.scss";
+import { IconSearch } from "@tabler/icons-react";
+import { Dispatch, SetStateAction } from "react";
 
 type InputProps = {
   form: UseFormReturnType<LoginType>;
@@ -67,5 +69,22 @@ export const LoginInput = ({ form, label }: InputProps) => {
         {form.errors && form.errors[label]}
       </Text>
     </>
+  );
+};
+type SearchInputProps = {
+  search?: string;
+  setSearch?: Dispatch<SetStateAction<string>>;
+};
+export const SearchInput = ({ search, setSearch }: SearchInputProps) => {
+  return (
+    <TextInput
+      placeholder="Search here..."
+      leftSectionPointerEvents="none"
+      leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
+      w={324}
+      styles={{ input: { border: "1px solid #F5F5F5" } }}
+      value={search}
+      onChange={(e) => setSearch && setSearch(e.currentTarget.value)}
+    />
   );
 };

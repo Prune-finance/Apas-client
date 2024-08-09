@@ -1,33 +1,21 @@
 "use client";
 import dayjs from "dayjs";
 
-import Image from "next/image";
-
 // Mantine Imports
 import { useDisclosure } from "@mantine/hooks";
-import {
-  Box,
-  Divider,
-  Drawer,
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  Paper,
-} from "@mantine/core";
+import { Box, Divider, Drawer, Group, Paper } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
-import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
+import { Flex, TableTh, TableThead } from "@mantine/core";
 
 // Tabler Imports
-import { IconPointFilled, IconDots, IconEye, IconX } from "@tabler/icons-react";
-import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
+import { IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { DebitRequest, useUserDebitRequests } from "@/lib/hooks/requests";
-import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
+import { DynamicSkeleton2 } from "@/lib/static";
 
 // UI Imports
 import styles from "./styles.module.scss";
@@ -57,8 +45,8 @@ function DebitRequests() {
   const queryParams = {
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     // ...(type && { type: type.toLowerCase() }),
   };

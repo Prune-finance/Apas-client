@@ -93,6 +93,30 @@ export const passwordChange = {
   confirmPassword: "",
 };
 
+export const validatePasswordChange = z
+  .object({
+    oldPassword: z.string().min(1, "Old Password is required"),
+    newPassword: z
+      .string()
+      .min(1, "New Password is required")
+      .refine(
+        (value) =>
+          /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/.test(
+            value
+          ),
+        `Password must contain at least 8 characters, 
+          include at least one uppercase letter, 
+          one lowercase letter, a number, and one special character`
+      ),
+    confirmPassword: z.string().min(1, "Confirm the password provided above"),
+  })
+  .refine((data) => data.newPassword !== data.confirmPassword, {
+    message: "Confirm the password. Ensure it matches with your new password",
+    path: ["confirmPassword"],
+  });
+
+export type PasswordChangeType = z.infer<typeof validatePasswordChange>;
+
 export const debitRequest = {
   account: "",
   amount: "",

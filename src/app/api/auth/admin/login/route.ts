@@ -11,6 +11,8 @@ export async function POST(request: Request) {
       { email, password }
     );
 
+    cookies().delete("session");
+
     const responseCookies = response.headers["set-cookie"];
     if (!responseCookies) {
       return;

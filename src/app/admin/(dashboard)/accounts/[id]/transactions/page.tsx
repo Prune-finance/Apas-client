@@ -1,18 +1,26 @@
 "use client";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { useTransactions } from "@/lib/hooks/transactions";
 
 import SingleAccountTransaction from "@/ui/components/SingleAccountTransaction";
+import dayjs from "dayjs";
 
 export default function TransactionForAccount() {
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams();
+
+  const status = searchParams.get("status")?.toUpperCase();
+  const createdAt = searchParams.get("createdAt");
 
   const { loading, account } = useSingleAccount(params.id);
-  const { loading: loadingTrx, transactions } = useTransactions(params.id);
+  const { loading: loadingTrx, transactions } = useTransactions(params.id, {
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status }),
+  });
 
   return (
     <main>

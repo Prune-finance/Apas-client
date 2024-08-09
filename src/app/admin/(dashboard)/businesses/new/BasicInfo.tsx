@@ -13,7 +13,7 @@ import {
 import styles from "./styles.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { NewBusinessType } from "@/lib/schema";
-import { IconMail } from "@tabler/icons-react";
+import { IconMail, IconPhone, IconWorldWww } from "@tabler/icons-react";
 
 type Props = {
   form: UseFormReturnType<NewBusinessType>;
@@ -30,7 +30,7 @@ export default function BasicInfo({ form }: Props) {
         <TextInput
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
-          //   label="Business Name"
+          label="Business Name"
           placeholder="Enter Legal Business Name"
           {...form.getInputProps("name")}
           withAsterisk
@@ -39,7 +39,8 @@ export default function BasicInfo({ form }: Props) {
           placeholder="Select Country"
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
-          //   label="Country"
+          label="Country"
+          withAsterisk
           data={["Nigeria", "Ghana", "Kenya"]}
           {...form.getInputProps("country")}
         />
@@ -50,7 +51,8 @@ export default function BasicInfo({ form }: Props) {
           placeholder="Select Business Type"
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
-          //   label="Legal Entity"
+          label="Legal Entity"
+          withAsterisk
           data={["Corporate"]}
           {...form.getInputProps("legalEntity")}
         />
@@ -59,9 +61,10 @@ export default function BasicInfo({ form }: Props) {
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           withAsterisk
-          //   label="Business domain"
+          label="Business domain"
           placeholder="Enter Domain"
           {...form.getInputProps("domain")}
+          rightSection={<IconWorldWww size={14} />}
         />
       </Flex>
 
@@ -69,7 +72,8 @@ export default function BasicInfo({ form }: Props) {
         <TextInput
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
-          //   label="Business Address"
+          label="Business Address"
+          withAsterisk
           placeholder="Enter Business Address"
           {...form.getInputProps("address")}
         />
@@ -77,8 +81,10 @@ export default function BasicInfo({ form }: Props) {
           placeholder="Enter Pricing Plan"
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
-          //   label="Pricing plan"
+          withAsterisk
+          label="Pricing plan"
           data={["Free", "Basic", "Premium"]}
+          {...form.getInputProps("pricingPlan")}
         />
       </Flex>
 
@@ -87,7 +93,7 @@ export default function BasicInfo({ form }: Props) {
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           withAsterisk
-          // label="Contact email"
+          label="Contact email"
           placeholder="Enter Contact Email"
           {...form.getInputProps("contactEmail")}
           rightSection={<IconMail size={14} />}
@@ -96,9 +102,10 @@ export default function BasicInfo({ form }: Props) {
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           withAsterisk
-          //   label="Contact phone number"
+          label="Contact phone number"
           placeholder="Enter Contact Phone Number"
           {...form.getInputProps("contactNumber")}
+          rightSection={<IconPhone size={14} />}
           //   rightSection={
           //     <Group>
           //       <Avatar />
@@ -111,6 +118,7 @@ export default function BasicInfo({ form }: Props) {
 
       <Textarea
         mt={24}
+        label="Business Bio"
         placeholder="Business Bio"
         classNames={{ input: styles.input, label: styles.label }}
         {...form.getInputProps("businessBio")}

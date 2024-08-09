@@ -46,6 +46,7 @@ import {
   RequestData,
   useCompanyRequests,
   useDebitRequests,
+  useRequests,
 } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -62,8 +63,10 @@ import { TableComponent } from "@/ui/components/Table";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
+import { BadgeComponent } from "@/ui/components/Badge";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
-function BusinessDebit() {
+function CompanyRequestType() {
   const searchParams = useSearchParams();
   const params = useParams<{ slug?: string[] }>();
   const [id, tab] = params.slug ?? [];
@@ -90,6 +93,20 @@ function BusinessDebit() {
     id,
     tab.toLowerCase() !== "debit"
   );
+
+  const {
+    requests: debitRequests,
+    revalidate: revalidateDebit,
+    loading: loadingDebit,
+    meta: debitMeta,
+  } = useRequests(
+    {
+      limit: parseInt(limit ?? "10", 10),
+      page: active,
+    },
+    id
+  );
+
   const { push, back } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<IUserRequest | null>(
     null
@@ -254,6 +271,8 @@ function BusinessDebit() {
     validate: zodResolver(businessFilterSchema),
   });
 
+  console.log({ debitRequests, debitMeta });
+
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -284,7 +303,7 @@ function BusinessDebit() {
 
         {!loading ? (
           <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
-            {requests[0].Company.name}
+            {requests.length > 1 ? requests[0].Company.name : ""}
           </Text>
         ) : (
           <Skeleton h={10} w={100} />
@@ -312,20 +331,39 @@ function BusinessDebit() {
           </Button>
         </div>
 
-        <Filter<BusinessFilterType>
-          opened={openedFilter}
-          toggle={toggle}
-          form={form}
-        />
+        {tab.toLowerCase() !== "debit" ? (
+          <>
+            <Filter<BusinessFilterType>
+              opened={openedFilter}
+              toggle={toggle}
+              form={form}
+            />
 
-        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+            <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-        <EmptyTable
-          loading={loading}
-          rows={rows}
-          title="There are no request"
-          text="When a request is created, it will appear here"
-        />
+            <EmptyTable
+              loading={loading}
+              rows={rows}
+              title="There are no request"
+              text="When a request is made, it will appear here"
+            />
+          </>
+        ) : (
+          <>
+            <TableComponent
+              head={debitTableHeaders}
+              rows={[]}
+              loading={false}
+            />
+
+            <EmptyTable
+              rows={[]}
+              loading={false}
+              title="There are no debit requests"
+              text="When a debit request is made, it will appear here"
+            />
+          </>
+        )}
 
         <PaginationComponent
           active={active}
@@ -395,7 +433,9 @@ function BusinessDebit() {
                   Status:
                 </Text>
 
-                <Text fz={14}>{selectedRequest?.status}</Text>
+                <BadgeComponent status={selectedRequest?.status || ""} />
+
+                {/* <Text fz={14}>{selectedRequest?.status}</Text> */}
               </Flex>
             </Flex>
 
@@ -419,23 +459,27 @@ function BusinessDebit() {
 
             {selectedRequest?.status === "PENDING" && (
               <Flex mt={40} justify="flex-end" gap={10}>
-                <Button
+                {/* <Button
                   onClick={open}
                   color="#D0D5DD"
                   variant="outline"
                   className={styles.cta}
                 >
                   Deny
-                </Button>
+                </Button> */}
 
-                <Button
+                <SecondaryBtn action={open} text="Deny" w={100} />
+
+                <PrimaryBtn action={openApprove} text="Approve" w={100} />
+
+                {/* <Button
                   className={styles.cta}
                   onClick={openApprove}
                   variant="filled"
                   color="#D4F307"
                 >
                   Approve
-                </Button>
+                </Button> */}
               </Flex>
             )}
           </Box>
@@ -478,10 +522,18 @@ const tableHeaders = [
   "Action",
 ];
 
+const debitTableHeaders = [
+  "Source Account",
+  "Amount",
+  "Date Created",
+  "Status",
+  "Action",
+];
+
 export default function BusinessDebitSuspense() {
   return (
     <Suspense>
-      <BusinessDebit />
+      <CompanyRequestType />
     </Suspense>
   );
 }

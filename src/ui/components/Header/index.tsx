@@ -8,7 +8,7 @@ import {
 } from "@mantine/core";
 import { IconSearch, IconBell } from "@tabler/icons-react";
 import localFont from "next/font/local";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const switzer = localFont({
   src: "../../../assets/fonts/Switzer-Regular.woff2",
@@ -17,9 +17,24 @@ const switzer = localFont({
 import AdminAvatar from "@/assets/avatar.png";
 import styles from "./styles.module.scss";
 import User from "@/lib/store/user";
+import { checkToken, clearSession } from "@/lib/actions/checkToken";
+import axios from "axios";
 
 export default function Header() {
-  const { user } = User();
+  const { user, setUser } = User();
+
+  const handleSetUser = async () => {
+    const { user, success } = await checkToken(true);
+    if (success) {
+      setUser(user);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) {
+      handleSetUser();
+    }
+  }, [user]);
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   return (
@@ -52,7 +67,20 @@ export default function Header() {
 }
 
 export function UserHeader() {
-  const { user } = User();
+  const { user, setUser } = User();
+
+  const handleSetUser = async () => {
+    const { user, success } = await checkToken();
+    if (success) {
+      setUser(user);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) {
+      handleSetUser();
+    }
+  }, [user]);
 
   const [stage, setStage] = useState("live");
 

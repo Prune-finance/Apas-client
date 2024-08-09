@@ -59,6 +59,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
+  const { handleError, handleSuccess } = useNotification();
 
   const {
     rows: _rows,
@@ -83,7 +84,7 @@ function Users() {
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
-  const { handleError } = useNotification();
+
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [processing, setProcessing] = useState(false);
@@ -118,6 +119,7 @@ function Users() {
 
       revalidate();
       close();
+      handleSuccess("Successful! Admin Added", "Admin added successfully");
       router.push("/admin/users");
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -144,6 +146,11 @@ function Users() {
 
       revalidate();
       close();
+      handleSuccess(
+        "Successful! Admin Updated",
+        "Admin details updated successfully"
+      );
+
       router.push("/admin/users");
     } catch (error) {
       handleError("An error occurred", parseError(error));

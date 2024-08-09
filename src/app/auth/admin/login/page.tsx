@@ -1,62 +1,19 @@
-"use client";
-
-import {
-  Button,
-  Checkbox,
-  PasswordInput,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import { Suspense, useState } from "react";
+import { Text, Title } from "@mantine/core";
+import { Suspense } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useForm, zodResolver } from "@mantine/form";
-import axios from "axios";
+import { redirect } from "next/navigation";
 
 import styles from "@/ui/styles/auth.module.scss";
 import PruneIcon from "@/assets/icon.png";
 import { inter, pjs } from "@/ui/fonts";
 import { CardOne, CardThree, CardTwo } from "./cards";
-import { loginValues, validateLogin } from "@/lib/schema";
+import { checkToken } from "@/lib/actions/checkToken";
+import LoginForm from "./form";
 
-import useNotification from "@/lib/hooks/notification";
-import { parseError } from "@/lib/actions/auth";
-import User from "@/lib/store/user";
+async function Login() {
+  const { success } = await checkToken(true);
 
-function Login() {
-  const searchParams = useSearchParams();
-  const [processing, setProcessing] = useState(false);
-  const { setUser } = User();
-
-  const { handleSuccess, handleError } = useNotification();
-
-  const form = useForm({
-    initialValues: loginValues,
-    validate: zodResolver(validateLogin),
-  });
-
-  const handleLogin = async () => {
-    setProcessing(true);
-    try {
-      const { errors, hasErrors } = form.validate();
-      if (hasErrors) {
-        return;
-      }
-
-      const authUrl = "/api/auth/admin/login";
-      const { data } = await axios.post(authUrl, form.values);
-
-      handleSuccess("Authentication Successful", "Welcome back Admin");
-
-      setUser({ ...data.data });
-      window.location.replace("/admin/dashboard");
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
+  if (success) return redirect("/admin/dashboard");
 
   return (
     <main className={styles.login}>
@@ -110,53 +67,7 @@ function Login() {
           Enter your details below to have access to your account
         </Text>
 
-        <div className={styles.text__input__container}>
-          <Text fz={12} px={10} className={styles.container__label}>
-            Email
-          </Text>
-          <TextInput
-            size="xs"
-            classNames={{
-              input: styles.text__input,
-            }}
-            placeholder="jane.zi@prune.io"
-            {...form.getInputProps("email")}
-          />
-        </div>
-
-        <div className={styles.text__input__container}>
-          <Text fz={12} px={10} className={styles.container__label}>
-            Password
-          </Text>
-          <PasswordInput
-            size="xs"
-            classNames={{
-              input: styles.text__input,
-            }}
-            placeholder="******************"
-            {...form.getInputProps("password")}
-          />
-        </div>
-
-        <div className={styles.login__actions}>
-          <Checkbox label="Remember me" size="xs" color="#C1DD06" />
-
-          <Button
-            className={styles.login__cta}
-            variant="filled"
-            color="#C1DD06"
-            onClick={handleLogin}
-            loading={processing}
-          >
-            Log In
-          </Button>
-        </div>
-
-        <div className={styles.rdr__link}>
-          <Text fz={14} className={styles.rdr__text}>
-            Forgot Password?
-          </Text>
-        </div>
+        <LoginForm />
       </div>
     </main>
   );

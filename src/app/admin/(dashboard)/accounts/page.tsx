@@ -74,7 +74,7 @@ function Accounts() {
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
+    ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toLowerCase() }),
     page: activePage,

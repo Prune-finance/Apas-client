@@ -67,7 +67,7 @@ function Unfreeze() {
     ...(isNaN(Number(_limit))
       ? { limit: 10 }
       : { limit: parseInt(_limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
   });

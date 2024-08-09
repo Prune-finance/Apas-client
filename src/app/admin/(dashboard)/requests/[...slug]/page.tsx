@@ -37,8 +37,6 @@ import { IconListTree } from "@tabler/icons-react";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import EmptyImage from "@/assets/empty.png";
-
 import { approvedBadgeColor, formatNumber } from "@/lib/utils";
 import {
   DebitRequest,
@@ -84,7 +82,7 @@ function CompanyRequestType() {
       ...(isNaN(Number(limit))
         ? { limit: 10 }
         : { limit: parseInt(limit ?? "10", 10) }),
-      ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+      ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
       ...(status && { status: status.toLowerCase() }),
       ...(sort && { sort: sort.toLowerCase() }),
       type: tab.toUpperCase(),

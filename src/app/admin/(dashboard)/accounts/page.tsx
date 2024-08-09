@@ -73,10 +73,10 @@ function Accounts() {
     ...(!limit || isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
-    ...(type && { type: type.toLowerCase() }),
+    ...(type && { type: type.toUpperCase() }),
     page: activePage,
   });
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =

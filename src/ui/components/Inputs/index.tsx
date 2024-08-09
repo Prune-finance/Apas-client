@@ -23,14 +23,17 @@ export const LoginInput = ({ form, label }: InputProps) => {
       >
         {label === "email" ? (
           <TextInput
-            size="xs"
+            // size="lg"
             label={label}
             labelProps={{
               fz: 12,
               c: "var(--prune-text-gray-400)",
               tt: "capitalize",
+              my: 0,
+              py: 0,
             }}
-            variant="unstyled"
+            // variant="unstyled"
+
             classNames={{
               input: styles.input,
               label: styles.label,

@@ -15,7 +15,7 @@ interface ILogs extends Omit<IParams, "type" | "status"> {}
 
 export function useLogs(customParams: ILogs = {}) {
   const [logs, setLogs] = useState<LogData[]>([]);
-  const [meta, setMeta] = useState<{total: number}>();
+  const [meta, setMeta] = useState<{ total: number }>();
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -32,6 +32,7 @@ export function useLogs(customParams: ILogs = {}) {
       obj as Record<string, string>
     ).toString();
 
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/logs/all?${params}`,
@@ -56,7 +57,7 @@ export function useLogs(customParams: ILogs = {}) {
     };
   }, [obj.limit, obj.createdAt, obj.sort, obj.page]);
 
-  return { loading, logs, revalidate,  meta };
+  return { loading, logs, revalidate, meta };
 }
 
 export interface LogData {

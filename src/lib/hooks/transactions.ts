@@ -25,6 +25,7 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
+      setLoading(true);
       const path = id ? `${id}/transactions` : "transactions";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${path}?${params}`,
@@ -78,6 +79,7 @@ export function useBusinessTransactions(
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
+      setLoading(true);
       const path = id ? `` : "transactions";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/business/${id}/transactions?${params}`,
@@ -143,6 +145,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
   }, [customParams]);
 
   async function fetchTrx() {
+    setLoading(true);
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();

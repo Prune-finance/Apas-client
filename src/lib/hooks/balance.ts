@@ -6,6 +6,7 @@ export function useUserBalances(id: string = "") {
   const [loading, setLoading] = useState(true);
 
   async function fetchBalance() {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/balances`,

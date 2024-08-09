@@ -54,7 +54,7 @@ export const LoginInput = ({ form, label }: InputProps) => {
               label: styles.label,
               innerInput: styles.innerInput,
             }}
-            placeholder="jane.zi@prune.io"
+            placeholder="******************"
             {...form.getInputProps(`${label}`)}
             error={false}
           />

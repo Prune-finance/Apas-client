@@ -1,65 +1,19 @@
-"use client";
-
-import {
-  Box,
-  Button,
-  Checkbox,
-  PasswordInput,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import { Suspense, useState } from "react";
+import { Text, Title } from "@mantine/core";
+import { Suspense } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
-import axios from "axios";
+import { redirect } from "next/navigation";
 
 import styles from "@/ui/styles/auth.module.scss";
 import PruneIcon from "@/assets/icon.png";
 import { inter, pjs } from "@/ui/fonts";
 import { CardOne, CardThree, CardTwo } from "./cards";
-import { LoginType, loginValues, validateLogin } from "@/lib/schema";
+import { checkToken } from "@/lib/actions/checkToken";
+import LoginForm from "./form";
 
-import useNotification from "@/lib/hooks/notification";
-import { parseError } from "@/lib/actions/auth";
-import User from "@/lib/store/user";
-import { PrimaryBtn } from "@/ui/components/Buttons";
-import { LoginInput } from "@/ui/components/Inputs";
+async function Login() {
+  const { success } = await checkToken(true);
 
-function Login() {
-  const searchParams = useSearchParams();
-  const [processing, setProcessing] = useState(false);
-  const { setUser } = User();
-
-  const { handleSuccess, handleError } = useNotification();
-
-  const form = useForm<LoginType>({
-    initialValues: loginValues,
-    validate: zodResolver(validateLogin),
-  });
-
-  const handleLogin = async () => {
-    setProcessing(true);
-    try {
-      const { errors, hasErrors } = form.validate();
-      if (hasErrors) {
-        return;
-      }
-
-      const authUrl = "/api/auth/admin/login";
-      const { data } = await axios.post(authUrl, form.values);
-
-      handleSuccess("Authentication Successful", "Welcome back Admin");
-
-      setUser({ ...data.data });
-      window.location.replace("/admin/dashboard");
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
+  if (success) return redirect("/admin/dashboard");
 
   return (
     <main className={styles.login}>
@@ -113,36 +67,7 @@ function Login() {
           Enter your details below to have access to your account
         </Text>
 
-        <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
-          <LoginInput form={form} label="email" />
-          <LoginInput form={form} label="password" />
-
-          <div className={styles.login__actions}>
-            <Checkbox label="Remember me" size="xs" color="#C1DD06" />
-          </div>
-
-          <PrimaryBtn
-            // action={handleLogin}
-            loading={processing}
-            fullWidth
-            text="Log In"
-            type="submit"
-            fz={14}
-            fw={600}
-            mt={32}
-          />
-
-          <PrimaryBtn
-            text="Forgot Password?"
-            variant="transparent"
-            fz={14}
-            fw={600}
-            mt={32}
-            w="15ch"
-            p={0}
-            c="var(--prune-primary-800)"
-          />
-        </Box>
+        <LoginForm />
       </div>
     </main>
   );

@@ -21,6 +21,7 @@ import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "../Modal";
 import axios from "axios";
 import { useState } from "react";
+import { clearSession } from "@/lib/actions/checkToken";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -34,6 +35,8 @@ export default function Navbar() {
       await axios.get(`/api/auth/admin/logout`, {
         withCredentials: true,
       });
+
+      await clearSession();
 
       window.location.replace("/auth/admin/login");
     } catch (error) {
@@ -140,6 +143,8 @@ export function UserNavbar() {
       await axios.get(`/api/auth/logout`, {
         withCredentials: true,
       });
+
+      await clearSession();
 
       window.location.replace("/auth/login");
     } catch (error) {

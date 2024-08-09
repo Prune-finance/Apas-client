@@ -1,3 +1,5 @@
+"use client";
+
 import { Divider, Skeleton, Text } from "@mantine/core";
 import { motion } from "framer-motion";
 import Image from "next/image";

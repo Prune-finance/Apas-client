@@ -18,8 +18,11 @@ export default function Documents({ form }: Props) {
 
       <Flex mt={24} gap={20}>
         <Box flex={1}>
-          <Text fz={12} c="#344054" mb={10}>
+          <Text fz={12} c="#344054" mb={10} inline>
             Upload CAC Certificate
+            <Text span c="var(--prune-warning)">
+              *
+            </Text>
           </Text>
           <DropzoneComponent
             form={form}
@@ -29,8 +32,11 @@ export default function Documents({ form }: Props) {
         </Box>
 
         <Box flex={1}>
-          <Text fz={12} c="#344054" mb={10}>
+          <Text fz={12} c="#344054" inline mb={10}>
             Upload MEMART
+            <Text span c="var(--prune-warning)">
+              *
+            </Text>
           </Text>
           <DropzoneComponent
             form={form}
@@ -40,8 +46,11 @@ export default function Documents({ form }: Props) {
         </Box>
 
         <Box flex={1}>
-          <Text fz={12} c="#344054" mb={10}>
+          <Text fz={12} c="#344054" mb={10} inline>
             POS(Particulars of Shareholders)
+            <Text span c="var(--prune-warning)">
+              *
+            </Text>
           </Text>
           <DropzoneComponent
             form={form}
@@ -53,8 +62,11 @@ export default function Documents({ form }: Props) {
 
       <Flex mt={24} gap={20}>
         <Box flex={1}>
-          <Text fz={12} c="#344054" mb={10}>
+          <Text fz={12} c="#344054" mb={10} inline>
             POS(Particulars of Directors)
+            <Text span c="var(--prune-warning)">
+              *
+            </Text>
           </Text>
           <DropzoneComponent
             form={form}

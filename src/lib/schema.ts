@@ -135,7 +135,10 @@ export const basicInfoSchema = z.object({
   contactNumber: z.string().min(1, "Contact number is required"),
   address: z.string().min(1, "Business Address is required"),
   businessBio: z.string(),
-  contactEmail: z.string().email("Please provide a valid contact email"),
+  contactEmail: z
+    .string()
+    .email("Please provide a valid contact email")
+    .min(1, "Contact Email is required"),
   domain: z.string().url("Please provide a valid url"),
   pricingPlan: z.string().min(1, "Pricing Plan is required"),
 });
@@ -161,9 +164,9 @@ export const documentSchema = z.object({
     .optional(),
 });
 
-export const directorsSchema = z
-  .array(
-    z.object({
+export const directorsSchema = z.object({
+  directors: z
+    .object({
       name: z.string().min(1, "Director's name is required"),
       email: z.string().refine(
         (val) => {
@@ -179,28 +182,51 @@ export const directorsSchema = z
 
       proofOfAddressFileUrl: z.string(),
     })
-  )
-  .optional();
+    .array()
+    .optional(),
+});
 
-export const shareholdersSchema = z
-  .array(
-    z.object({
-      name: z.string(),
-      email: z.string().refine(
-        (val) => {
-          if (!val) return true;
-          return emailSchema.safeParse(val).success;
-        },
-        { message: "Invalid shareholder's email" }
-      ),
-      identityType: z.string(),
-      proofOfAddress: z.string(),
-      identityFileUrl: z.string(),
-      identityFileUrlBack: z.string(),
-      proofOfAddressFileUrl: z.string(),
-    })
-  )
-  .optional();
+// export const directorsSchema = z
+//   .object({
+//     name: z.string().min(1, "Director's name is required"),
+//     email: z.string().refine(
+//       (val) => {
+//         if (!val) return true;
+//         return emailSchema.safeParse(val).success;
+//       },
+//       { message: "Invalid director's email" }
+//     ),
+//     identityType: z.string(),
+//     proofOfAddress: z.string(),
+//     identityFileUrl: z.string(),
+//     identityFileUrlBack: z.string(),
+
+//     proofOfAddressFileUrl: z.string(),
+//   })
+//   .array()
+//   .optional();
+
+export const shareholdersSchema = z.object({
+  shareholders: z
+    .array(
+      z.object({
+        name: z.string(),
+        email: z.string().refine(
+          (val) => {
+            if (!val) return true;
+            return emailSchema.safeParse(val).success;
+          },
+          { message: "Invalid shareholder's email" }
+        ),
+        identityType: z.string(),
+        proofOfAddress: z.string(),
+        identityFileUrl: z.string(),
+        identityFileUrlBack: z.string(),
+        proofOfAddressFileUrl: z.string(),
+      })
+    )
+    .optional(),
+});
 
 export const validateNewBusiness = z.object({
   name: z

@@ -1,13 +1,8 @@
 "use client";
 import axios from "axios";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  IconArrowLeft,
-  IconMail,
-  IconPlus,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconMail, IconPlus, IconTrash } from "@tabler/icons-react";
 
 import {
   Flex,
@@ -20,7 +15,7 @@ import {
   Divider,
   Checkbox,
 } from "@mantine/core";
-import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
+import { TextInput, Select, Button } from "@mantine/core";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -47,14 +42,9 @@ export default function NewBusiness() {
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
 
-  const [directorsCount, setDirectorsCount] = useState(0);
-  const [shareholderCount, setShareholderCount] = useState(0);
-
   const { handleSuccess, handleError } = useNotification();
 
   const [active, setActive] = useState(0);
-  // const nextStep = () =>
-  //   setActive((current) => (current < 3 ? current + 1 : current));
 
   const prevStep = () =>
     setActive((current) => (current > 0 ? current - 1 : current));
@@ -88,7 +78,7 @@ export default function NewBusiness() {
     setProcessing(true);
     try {
       const { errors, hasErrors } = form.validate();
-      const { directors, shareholders } = form.values;
+      const { directors, shareholders, pricingPlan, ...rest } = form.values;
 
       const initialDir = directors && directors[0];
       const initialShr = shareholders && shareholders[0];
@@ -100,16 +90,16 @@ export default function NewBusiness() {
         (val) => !val
       );
 
-      console.log({ errors, values: form.values });
-
       if (hasErrors) {
         throw new Error("Please fill all required fields");
       }
 
+      // For pricing plan, the key will be "pricingPlanId"
+
       const data = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company`,
         {
-          ...form.values,
+          ...rest,
           ...(initialDirEmpty && { directors: [] }),
           ...(initialShrEmpty && { shareholders: [] }),
         },
@@ -128,7 +118,29 @@ export default function NewBusiness() {
     }
   };
 
-  console.log(form.errors, form.values);
+  function isEmpty(value: any): boolean {
+    if (value === null || value === undefined) return true;
+    if (typeof value === "string" && value.trim() === "") return true;
+    if (typeof value === "number" && value === 0) return true;
+    if (typeof value === "boolean" && value === false) return true;
+    if (Array.isArray(value) && value.length === 0) return true;
+    if (typeof value === "object" && Object.keys(value).length === 0)
+      return true;
+    return false;
+  }
+
+  const makeDirectorAShareholder = (
+    director: typeof directorEtShareholderSchema
+  ) => {
+    form.values.shareholders &&
+      form.values.shareholders.map((item, index) => {
+        const data = Object.values(item).every(isEmpty);
+
+        if (data) form.removeListItem("shareholders", index);
+      });
+
+    form.insertListItem("shareholders", director);
+  };
 
   return (
     <main className={styles.main}>
@@ -233,7 +245,7 @@ export default function NewBusiness() {
                       color="var(--prune-primary-600)"
                       onChange={(e) => {
                         e.target.checked
-                          ? form.insertListItem("shareholders", director)
+                          ? makeDirectorAShareholder(director)
                           : {};
                       }}
                     />
@@ -302,7 +314,7 @@ export default function NewBusiness() {
                     </Group>
 
                     <ShareholderForm count={index} form={form} />
-                    <Checkbox
+                    {/* <Checkbox
                       label="Make this shareholder a director"
                       mt={20}
                       fz={8}
@@ -313,7 +325,7 @@ export default function NewBusiness() {
                       }}
                       styles={{ label: { fontSize: "12px", fontWeight: 500 } }}
                       color="var(--prune-primary-600)"
-                    />
+                    /> */}
                     {arr.length !== index + 1 && <Divider my={20} />}
                   </Box>
                 ))}
@@ -327,17 +339,6 @@ export default function NewBusiness() {
         <Divider my={20} />
 
         <Group justify="flex-end">
-          {/* <Button
-            fz={12}
-            fw={500}
-            c="var(--prune-text-gray-800)"
-            color="var(--prune-text-gray-200)"
-            variant="outline"
-            w={126}
-            onClick={() => form.reset()}
-          >
-            Cancel
-          </Button> */}
           <SecondaryBtn text="Cancel" action={form.reset} w={126} />
           <PrimaryBtn
             text={active < 3 ? "Next" : "Submit"}
@@ -345,20 +346,6 @@ export default function NewBusiness() {
             action={active < 3 ? nextStep : handleCreate}
             loading={processing}
           />
-          {/* <Button
-            fz={12}
-            fw={500}
-            c="var(--prune-text-gray-800)"
-            color="var(--prune-primary-600)"
-            w={126}
-            loading={processing}
-            // onClick={() => setActive((prev) => (prev <= 3 ? prev + 1 : prev))}
-            onClick={() => {
-              active < 3 ? nextStep() : handleCreate();
-            }}
-          >
-            {`${active < 3 ? "Next" : "Submit"}`}
-          </Button> */}
         </Group>
       </Paper>
     </main>
@@ -411,53 +398,60 @@ const DirectorForm = ({
         />
       </Flex>
 
-      {form.values.directors && form.values.directors[count].identityType && (
-        <Flex mt={24} gap={20}>
-          <Box flex={1}>
-            <Text fz={12} c="#344054" mb={10}>
-              {`Upload ${form.values.directors[count].identityType} ${
-                form.values.directors[count].identityType !== "Passport"
-                  ? "(Front)"
-                  : ""
-              }`}
-            </Text>
-            <DropzoneComponent
-              form={form}
-              formKey={`directors.${count}.identityFileUrl`}
-              uploadedFileUrl={form.values.directors[count].identityFileUrl}
-            />
-          </Box>
-
-          {form.values.directors[count].identityType !== "Passport" && (
+      <Flex mt={24} gap={20}>
+        {form.values.directors && form.values.directors[count].identityType && (
+          <>
             <Box flex={1}>
               <Text fz={12} c="#344054" mb={10}>
-                {`Upload
-                ${form.values.directors[count].identityType}  (Back)`}
+                {`Upload ${form.values.directors[count].identityType} ${
+                  form.values.directors[count].identityType !== "Passport"
+                    ? "(Front)"
+                    : ""
+                }`}
               </Text>
               <DropzoneComponent
                 form={form}
-                formKey={`directors.${count}.identityFileUrlBack`}
+                formKey={`directors.${count}.identityFileUrl`}
+                uploadedFileUrl={form.values.directors[count].identityFileUrl}
+              />
+            </Box>
+
+            <>
+              {form.values.directors[count].identityType !== "Passport" && (
+                <Box flex={1}>
+                  <Text fz={12} c="#344054" mb={10}>
+                    {`Upload
+                ${form.values.directors[count].identityType}  (Back)`}
+                  </Text>
+                  <DropzoneComponent
+                    form={form}
+                    formKey={`directors.${count}.identityFileUrlBack`}
+                    uploadedFileUrl={
+                      form.values.directors[count].identityFileUrlBack
+                    }
+                  />
+                </Box>
+              )}
+            </>
+          </>
+        )}
+
+        {form.values.directors &&
+          form.values.directors[count].proofOfAddress && (
+            <Box flex={1}>
+              <Text fz={12} c="#344054" mb={10}>
+                Upload Utility Bill
+              </Text>
+              <DropzoneComponent
+                form={form}
+                formKey={`directors.${count}.proofOfAddressFileUrl`}
                 uploadedFileUrl={
-                  form.values.directors[count].identityFileUrlBack
+                  form.values.directors[count].proofOfAddressFileUrl
                 }
               />
             </Box>
           )}
-
-          <Box flex={1}>
-            <Text fz={12} c="#344054" mb={10}>
-              Upload Utility Bill
-            </Text>
-            <DropzoneComponent
-              form={form}
-              formKey={`directors.${count}.proofOfAddressFileUrl`}
-              uploadedFileUrl={
-                form.values.directors[count].proofOfAddressFileUrl
-              }
-            />
-          </Box>
-        </Flex>
-      )}
+      </Flex>
     </>
   );
 };

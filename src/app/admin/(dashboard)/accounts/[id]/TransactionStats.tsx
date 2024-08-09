@@ -6,10 +6,20 @@ import styles from "./styles.module.scss";
 import { AreaChartComponent } from "@/ui/components/Charts";
 import { Dispatch, SetStateAction } from "react";
 
+interface LineData {
+  month: string;
+  Inflow: number;
+  Outflow: number;
+}
+
 type Props = {
   setChartFrequency: Dispatch<SetStateAction<string>>;
+  lineData: LineData[];
 };
-export default function TransactionStatistics({ setChartFrequency }: Props) {
+export default function TransactionStatistics({
+  setChartFrequency,
+  lineData,
+}: Props) {
   const trxStatsData = [
     { name: "Jan", Inflow: undefined, Outflow: undefined },
     { name: "Feb", Inflow: undefined, Outflow: undefined },
@@ -26,7 +36,7 @@ export default function TransactionStatistics({ setChartFrequency }: Props) {
   ];
 
   return (
-    <Paper style={{ border: "1px solid #f5f5f5" }} p={20}>
+    <Paper style={{ border: "1px solid #f5f5f5" }} p={20} pl={40}>
       <Flex justify="space-between" align="center" mb={15}>
         <Text fz={16} fw={600} c="var(--prune-text-gray-800)">
           Transaction Statistics
@@ -53,9 +63,13 @@ export default function TransactionStatistics({ setChartFrequency }: Props) {
         </Group>
       </Flex>
       <AreaChartComponent
-        data={trxStatsData}
+        h={250}
+        mt={30}
+        curveType="bump"
+        data={lineData}
+        dataKey="month"
         series={[
-          { name: "Inflow", color: "var(--prune-primary-700)" },
+          { name: "Inflow", color: "#D5E855" },
           { name: "Outflow", color: "#D92D20" },
         ]}
       />

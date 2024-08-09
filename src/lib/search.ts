@@ -1,7 +1,16 @@
+// const getNestedValue = <T>(obj: T, path: string): any => {
+//   return path
+//     .split(".")
+//     .reduce((acc, part) => (acc ? acc[part] : undefined), obj as any);
+// };
+
 const getNestedValue = <T>(obj: T, path: string): any => {
-  return path
-    .split(".")
-    .reduce((acc, part) => (acc ? acc[part] : undefined), obj as any);
+  return path.split(".").reduce((acc, part) => {
+    if (acc && typeof acc === "object") {
+      return acc[part];
+    }
+    return undefined;
+  }, obj as any);
 };
 
 export const filteredSearch = <T>(
@@ -10,6 +19,7 @@ export const filteredSearch = <T>(
   searchValue: string
 ): T[] => {
   if (properties.length === 0) return arr;
+  if (arr.length === 0) return arr;
 
   return arr.filter((item) => {
     return properties.some((key) => {

@@ -89,7 +89,7 @@ function Users() {
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
     ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
+    ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     page: active,
   });
@@ -97,7 +97,7 @@ function Users() {
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
-  const { handleError } = useNotification();
+  const { handleError, handleSuccess } = useNotification();
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
@@ -136,6 +136,7 @@ function Users() {
 
       revalidate();
       close();
+      handleSuccess("Successful! User Invite", "User invite sent successfully");
       router.push("/users");
     } catch (error) {
       console.log(error);
@@ -157,10 +158,10 @@ function Users() {
     //   link: true,
     //   href: "/admin/businesses",
     // },
-    {
-      text: "Edit User",
-      icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
-    },
+    // {
+    //   text: "Edit User",
+    //   icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
+    // },
     {
       text: "Deactivate",
       icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
@@ -183,10 +184,10 @@ function Users() {
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>{element.email}</TableTd>
-      <TableTd className={styles.table__td}>{`${element.firstName ?? ""} ${
+      {/* <TableTd className={styles.table__td}>{`${element.firstName ?? ""} ${
         element.lastName ?? ""
-      }`}</TableTd>
-      <TableTd className={styles.table__td}>{element.role}</TableTd>
+      }`}</TableTd> */}
+      {/* <TableTd className={styles.table__td}>{element.role}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
@@ -370,8 +371,8 @@ export default function UsersSuspense() {
 
 const tableHeaders = [
   "Email",
-  "Name",
-  "Role",
+  // "Name",
+  // "Role",
   "Date Created",
   "Last Active",
   "Status",

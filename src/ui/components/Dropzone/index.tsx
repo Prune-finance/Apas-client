@@ -4,6 +4,7 @@ import {
   DropzoneProps,
   FileWithPath,
   IMAGE_MIME_TYPE,
+  MIME_TYPES,
 } from "@mantine/dropzone";
 import { UseFormReturnType } from "@mantine/form";
 import {
@@ -21,17 +22,26 @@ import { newBusiness, NewBusinessType } from "@/lib/schema";
 interface DropzoneCustomProps extends Partial<DropzoneProps> {
   form?: UseFormReturnType<NewBusinessType>;
   // form?: UseFormReturnType<typeof newBusiness>;
+  // formKey?: "mermat" | "operationalLicense" | "amlCompliance" | "shareholderParticular" | "directorParticular" | "cacCertificate";
   formKey?: string;
+  uploadedFileUrl?: string;
 }
 
 export default function DropzoneComponent(props: DropzoneCustomProps) {
   const [file, setFile] = useState<FileWithPath | null>(null);
-
-  const [uploaded, setUploaded] = useState(false);
-  const [processing, setProcessing] = useState(false);
-
   const form = props.form;
   const formKey = props.formKey;
+  const uploadedFileUrl = props.uploadedFileUrl;
+
+  function getNestedValue(obj: any, path: string) {
+    return path.split(".").reduce((acc, part) => acc && acc[part], obj);
+  }
+
+  const [uploaded, setUploaded] = useState(
+    !!form?.values[formKey as keyof NewBusinessType] || !!uploadedFileUrl
+  );
+
+  const [processing, setProcessing] = useState(false);
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -68,7 +78,14 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       onDrop={(files) => setFile(files[0])}
       onReject={(files) => console.log("rejected files", files[0])}
       maxSize={5 * 1024 ** 2}
-      accept={IMAGE_MIME_TYPE}
+      // accept={IMAGE_MIME_TYPE}
+      accept={[
+        MIME_TYPES.png,
+        MIME_TYPES.jpeg,
+        MIME_TYPES.svg,
+        MIME_TYPES.gif,
+        MIME_TYPES.pdf,
+      ]}
       {...props}
       h={140}
       bg="#FCFCFD"
@@ -119,7 +136,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
             />
           )}
 
-          {!file && !processing && (
+          {!uploaded && !processing && (
             <IconCloudUpload
               style={{
                 width: rem(52),
@@ -132,15 +149,23 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
         </Dropzone.Idle>
 
         <Flex direction="column" align="center">
-          {file && (
-            <Text fz={10} inline>
-              {file.name}{" "}
-              <Text fz={10} td="underline" span c="#97AD05">
+          {uploaded && (
+            <Group gap={2} justify="center" align="center" w="30ch">
+              <Text
+                fz={10}
+                // lineClamp={1}
+                truncate="start"
+                // w="25ch"
+                // flex={1}
+              >
+                {(uploadedFileUrl ?? "").split("/").pop()}
+              </Text>
+              <Text fz={10} td="underline" c="#97AD05">
                 Re-upload
               </Text>
-            </Text>
+            </Group>
           )}
-          {!file && (
+          {!uploaded && (
             <Text fz={10} inline>
               Drag and drop file to Upload or{" "}
               <Text fz={10} td="underline" span c="#97AD05">
@@ -148,7 +173,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
               </Text>
             </Text>
           )}
-          {!file && (
+          {!uploaded && (
             <Text fz={9} c="dimmed" inline mt={5}>
               Supported formats: JPEG, PNG, PDF
             </Text>

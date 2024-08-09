@@ -180,7 +180,7 @@ function Reactivate() {
   };
 
   const handleRowClick = (id: string) => {
-    push(`/admin/requests/${id}/reactivate`);
+    push(`/admin/requests/${id}/activate`);
   };
 
   const rows = filteredSearch(

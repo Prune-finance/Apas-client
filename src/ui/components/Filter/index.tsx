@@ -11,6 +11,7 @@ type Props<T> = {
   children?: ReactNode;
   form: UseFormReturnType<T>;
   isStatus?: boolean;
+  approvalStatus?: boolean;
 };
 
 export default function Filter<T>({
@@ -19,6 +20,7 @@ export default function Filter<T>({
   children,
   form,
   isStatus,
+  approvalStatus,
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
@@ -69,7 +71,7 @@ export default function Filter<T>({
           <Select
             placeholder="Status"
             {...form.getInputProps("status")}
-            data={["Active", "Inactive"]}
+            data={!approvalStatus ? ["Active", "Inactive"] : approvalOptions}
             size="xs"
             w={120}
             h={36}
@@ -107,3 +109,11 @@ export default function Filter<T>({
     </Collapse>
   );
 }
+
+const approvalOptions = [
+  "Approved",
+  "Pending",
+  "Rejected",
+  "Confirmed",
+  "Failed",
+];

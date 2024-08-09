@@ -1,59 +1,18 @@
-"use client";
-
-import {
-  Button,
-  Checkbox,
-  PasswordInput,
-  Text,
-  TextInput,
-  Title,
-} from "@mantine/core";
-import { Suspense, useState } from "react";
+import { Text, Title } from "@mantine/core";
+import { Suspense } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { useForm, zodResolver } from "@mantine/form";
-import axios from "axios";
 
 import styles from "@/ui/styles/auth.module.scss";
 import PruneIcon from "@/assets/icon.png";
 import { inter, pjs } from "@/ui/fonts";
 import { CardOne, CardThree, CardTwo } from "./cards";
-import { loginValues, validateLogin } from "@/lib/schema";
+import LoginForm from "./form";
+import { checkToken } from "@/lib/actions/checkToken";
+import { redirect } from "next/navigation";
 
-import useNotification from "@/lib/hooks/notification";
-import { parseError } from "@/lib/actions/auth";
-import User from "@/lib/store/user";
-
-function Login() {
-  const [processing, setProcessing] = useState(false);
-  const { handleSuccess, handleError } = useNotification();
-
-  const { setUser } = User();
-
-  const form = useForm({
-    initialValues: loginValues,
-    validate: zodResolver(validateLogin),
-  });
-
-  const handleLogin = async () => {
-    setProcessing(true);
-    try {
-      const { errors, hasErrors } = form.validate();
-      if (hasErrors) {
-        return;
-      }
-
-      const authUrl = "/api/auth/login";
-      const data = await axios.post(authUrl, form.values);
-
-      handleSuccess("Authentication Successful", "Welcome back");
-      window.location.replace("/");
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
+async function Login() {
+  const { success } = await checkToken();
+  if (success) return redirect("/");
 
   return (
     <main className={styles.login}>
@@ -107,7 +66,9 @@ function Login() {
           Enter your details below to have access to your account
         </Text>
 
-        <div className={styles.text__input__container}>
+        <LoginForm />
+
+        {/* <div className={styles.text__input__container}>
           <Text fz={12} px={10} className={styles.container__label}>
             Email
           </Text>
@@ -159,7 +120,7 @@ function Login() {
               Learn how to sign up
             </Text>
           </Text>
-        </div>
+        </div> */}
       </div>
     </main>
   );

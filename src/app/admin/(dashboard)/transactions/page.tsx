@@ -34,7 +34,7 @@ import {
 } from "@tabler/icons-react";
 import styles from "./styles.module.scss";
 
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import Filter from "@/ui/components/Filter";
@@ -52,19 +52,26 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "@/ui/components/Pagination";
 
-export default function TransactionForAccount() {
+function TransactionForAccount() {
   const params = useParams<{ id: string }>();
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
+  const searchParams = useSearchParams();
 
-  const { loading, transactions, meta } = useTransactions();
+  const status = searchParams.get("status")?.toUpperCase();
+  const createdAt = searchParams.get("createdAt");
+
+  const { loading, transactions, meta } = useTransactions(undefined, {
+    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status }),
+  });
 
   const [opened, { toggle }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();
@@ -322,6 +329,14 @@ const RowComponent = ({
     </TableTr>
   ));
 };
+
+export default function TransactionForAccountSuspense() {
+  return (
+    <Suspense>
+      <TransactionForAccount />
+    </Suspense>
+  );
+}
 
 type TRXDrawerProps = {
   opened: boolean;

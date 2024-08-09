@@ -52,11 +52,11 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "@/ui/components/Pagination";
 
-export default function TransactionForAccount() {
+function TransactionForAccount() {
   const params = useParams<{ id: string }>();
 
   const [active, setActive] = useState(1);
@@ -329,6 +329,14 @@ const RowComponent = ({
     </TableTr>
   ));
 };
+
+export default function TransactionForAccountSuspense() {
+  return (
+    <Suspense>
+      <TransactionForAccount />
+    </Suspense>
+  );
+}
 
 type TRXDrawerProps = {
   opened: boolean;

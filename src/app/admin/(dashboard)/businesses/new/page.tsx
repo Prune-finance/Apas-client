@@ -111,6 +111,7 @@ export default function NewBusiness() {
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company`,
         {
           ...rest,
+          pricingPlanId: pricingPlan,
           ...(initialDirEmpty && { directors: [] }),
           ...(initialShrEmpty && { shareholders: [] }),
         },

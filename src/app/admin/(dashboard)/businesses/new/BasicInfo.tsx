@@ -27,7 +27,6 @@ export default function BasicInfo({ form }: Props) {
     label: plan.name,
     value: plan.id,
   }));
-  console.log({ pricingPlan, pricingPlanOptions });
 
   return (
     <Box>

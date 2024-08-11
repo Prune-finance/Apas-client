@@ -5,6 +5,7 @@ import {
   Divider,
   Flex,
   Group,
+  Loader,
   Select,
   Text,
   Textarea,
@@ -14,12 +15,20 @@ import styles from "./styles.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { NewBusinessType } from "@/lib/schema";
 import { IconMail, IconPhone, IconWorldWww } from "@tabler/icons-react";
+import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 
 type Props = {
   form: UseFormReturnType<NewBusinessType>;
 };
 
 export default function BasicInfo({ form }: Props) {
+  const { loading, pricingPlan } = usePricingPlan();
+  const pricingPlanOptions = pricingPlan.map((plan) => ({
+    label: plan.name,
+    value: plan.id,
+  }));
+  console.log({ pricingPlan, pricingPlanOptions });
+
   return (
     <Box>
       <Text fz={18} fw={600} c="var(--prune-text-gray-700)" mb={24}>
@@ -84,7 +93,13 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           withAsterisk
           label="Pricing plan"
-          data={["Free", "Basic", "Premium"]}
+          rightSection={
+            loading && (
+              <Loader type="oval" size={14} color="var(--prune-primary-800)" />
+            )
+          }
+          data={pricingPlanOptions}
+          // data={["Free", "Basic", "Premium"]}
           {...form.getInputProps("pricingPlan")}
         />
       </Flex>

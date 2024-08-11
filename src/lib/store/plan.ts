@@ -1,12 +1,5 @@
 import { create } from "zustand";
-
-type TableData = {
-  name: string;
-  cycle: string;
-  amount: number;
-  description: string;
-  id: number;
-};
+import { PricingPlan } from "../hooks/pricing-plan";
 
 const Plan = create<PlanState>((set) => ({
   data: null,
@@ -18,8 +11,8 @@ const Plan = create<PlanState>((set) => ({
 }));
 
 interface PlanState {
-  data: TableData | null;
-  setData: (data: TableData) => void;
+  data: PricingPlan | null;
+  setData: (data: PricingPlan) => void;
   opened: boolean;
   open: () => void;
   close: () => void;

@@ -2,13 +2,10 @@
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import {
-  Button,
   Group,
   Paper,
-  TextInput,
   Title,
   Text,
-  Flex,
   TableTr,
   TableTd,
   Menu,
@@ -17,8 +14,6 @@ import {
   MenuDropdown,
   MenuItem,
   rem,
-  Select,
-  Pagination,
   Drawer,
 } from "@mantine/core";
 import {
@@ -26,29 +21,32 @@ import {
   IconDotsVertical,
   IconEdit,
   IconPlus,
-  IconSearch,
 } from "@tabler/icons-react";
-import Link from "next/link";
 import { useState } from "react";
-import EmptyImage from "@/assets/empty.png";
-import Image from "next/image";
 import { TableComponent } from "@/ui/components/Table";
 import { formatNumber } from "@/lib/utils";
 import Plan from "@/lib/store/plan";
-import styles from "@/ui/styles/accounts.module.scss";
 import PaginationComponent from "@/ui/components/Pagination";
 import PlanDrawer from "./drawer";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import { PricingPlan, usePricingPlan } from "@/lib/hooks/pricing-plan";
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
 
-export type Plan = (typeof _plans)[0];
+dayjs.extend(advancedFormat);
+
+import { SearchInput } from "@/ui/components/Inputs";
+import { useDebouncedValue } from "@mantine/hooks";
+import { filteredSearch } from "@/lib/search";
+
 export default function PricingPlans() {
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  const [plans, setPlans] = useState<Plan[]>([]);
+  const [debouncedSearch] = useDebouncedValue(search, 500);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+
+  const { pricingPlan, loading, meta } = usePricingPlan();
 
   const { opened, data, close } = Plan();
 
@@ -64,16 +62,7 @@ export default function PricingPlans() {
         </Title>
 
         <Group justify="space-between" mt={32} mb={28}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={<IconSearch size={20} />}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <PrimaryBtn
             text="Create New Plan"
@@ -84,35 +73,25 @@ export default function PricingPlans() {
 
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent plans={plans} />}
+          rows={
+            <RowComponent plans={pricingPlan} searchValue={debouncedSearch} />
+          }
           loading={loading}
         />
 
         <EmptyTable
-          rows={plans}
+          rows={pricingPlan}
           loading={loading}
           title="There are no pricing plans"
           text="When a pricing plan is created, it will appear here."
         />
-        {/* 
-        {!loading && !!!plans.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no accounts.
-            </Text>
-            <Text fz={10} c="#667085">
-              When an account is created, it will appear here
-            </Text>
-          </Flex>
-        )} */}
 
         <PaginationComponent
           active={active}
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={1}
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
       </Paper>
 
@@ -134,74 +113,37 @@ export default function PricingPlans() {
   );
 }
 
-const tableHeaders = ["Plan Name", "Cycle", "Amount", "Description", "Action"];
+const tableHeaders = ["Plan Name", "Cycle", "Amount", "Date Created", "Action"];
 
-const _plans = [
-  {
-    name: "Basic",
-    cycle: "Monthly",
-    amount: 5000,
-    description: "This is the basic plan",
-    id: 1,
-  },
-  {
-    name: "Pro",
-    cycle: "Monthly",
-    amount: 10000,
-    description: "This is the pro plan",
-    id: 2,
-  },
-  {
-    name: "Enterprise",
-    cycle: "Monthly",
-    amount: 20000,
-    description: "This is the enterprise plan",
-    id: 3,
-  },
-  {
-    name: "Basic",
-    cycle: "Yearly",
-    amount: 50000,
-    description: "This is the basic plan",
-    id: 4,
-  },
-  {
-    name: "Pro",
-    cycle: "Yearly",
-    amount: 100000,
-    description: "This is the pro plan",
-    id: 5,
-  },
-  {
-    name: "Enterprise",
-    cycle: "Yearly",
-    amount: 200000,
-    description: "This is the enterprise plan",
-    id: 6,
-  },
-];
-
-const RowComponent = ({ plans }: { plans: typeof _plans }) => {
+const RowComponent = ({
+  plans,
+  searchValue,
+}: {
+  plans: PricingPlan[];
+  searchValue: string;
+}) => {
   const { open, setData } = Plan();
 
-  return plans.map((plan) => (
-    <TableTr
-      key={plan.id}
-      onClick={() => {
-        setData(plan);
-        open();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd>{plan.name}</TableTd>
-      <TableTd>{plan.cycle}</TableTd>
-      <TableTd>{formatNumber(plan.amount)}</TableTd>
-      <TableTd>{plan.description}</TableTd>
-      <TableTd onClick={(e) => e.stopPropagation()}>
-        <MenuComponent id={plan.id.toString()} />
-      </TableTd>
-    </TableTr>
-  ));
+  return filteredSearch(plans, ["name", "cost", "cycle"], searchValue).map(
+    (plan) => (
+      <TableTr
+        key={plan.id}
+        onClick={() => {
+          setData(plan);
+          open();
+        }}
+        style={{ cursor: "pointer" }}
+      >
+        <TableTd>{plan.name}</TableTd>
+        <TableTd>{plan.cycle}</TableTd>
+        <TableTd>{formatNumber(plan.cost)}</TableTd>
+        <TableTd>{dayjs(plan.createdAt).format("Do MMM, YYYY")}</TableTd>
+        <TableTd onClick={(e) => e.stopPropagation()}>
+          <MenuComponent id={plan.id.toString()} />
+        </TableTd>
+      </TableTr>
+    )
+  );
 };
 
 const MenuComponent = ({ id }: { id: string }) => {

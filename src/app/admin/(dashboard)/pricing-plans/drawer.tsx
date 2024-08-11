@@ -1,18 +1,22 @@
 import { Box, Divider, Group, List, Stack, Text } from "@mantine/core";
 import React from "react";
-import { Plan } from "./page";
+
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { formatNumber } from "@/lib/utils";
+import { PricingPlan } from "@/lib/hooks/pricing-plan";
 
 dayjs.extend(advancedFormat);
 
-export default function PlanDrawer({ data }: { data: Plan | null }) {
+export default function PlanDrawer({ data }: { data: PricingPlan | null }) {
   const senderDetails = [
     { title: "Plan Name", value: data?.name },
     { title: "Cycle", value: data?.cycle },
-    { title: "Description", value: data?.description },
-    { title: "Date Created", value: dayjs().format("Do MMM YYYY") },
+    // { title: "Description", value: data?.description },
+    {
+      title: "Date Created",
+      value: dayjs(data?.createdAt).format("Do MMM YYYY"),
+    },
   ];
 
   return (
@@ -24,7 +28,7 @@ export default function PlanDrawer({ data }: { data: Plan | null }) {
           Amount
         </Text>
         <Text fz={32} fw={600} c="var(--prune-primary-700)">
-          {formatNumber(data?.amount ?? 0)}
+          {formatNumber(data?.cost ?? 0)}
         </Text>
       </Stack>
 

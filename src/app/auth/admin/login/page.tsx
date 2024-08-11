@@ -1,4 +1,4 @@
-import { Text, Title } from "@mantine/core";
+import { Box, Text, Title } from "@mantine/core";
 import { Suspense } from "react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -16,7 +16,7 @@ async function Login() {
   if (success) return redirect("/admin/dashboard");
 
   return (
-    <main className={styles.login}>
+    <main className={styles.admin__login}>
       <div className={styles.login__frame}>
         <div className={styles.cards}>
           <CardThree />
@@ -57,6 +57,7 @@ async function Login() {
       </div>
 
       <div className={styles.login__paper}>
+        {/* <Box w={394}> */}
         <Image width={29} height={29} src={PruneIcon} alt="prune icon" />
 
         <Title order={2} className={styles.paper__header}>
@@ -68,6 +69,7 @@ async function Login() {
         </Text>
 
         <LoginForm />
+        {/* </Box> */}
       </div>
     </main>
   );

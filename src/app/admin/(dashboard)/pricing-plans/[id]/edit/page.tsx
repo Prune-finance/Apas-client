@@ -15,7 +15,7 @@ import {
   Textarea,
   Text,
 } from "@mantine/core";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   newPricingPlan,
@@ -26,21 +26,35 @@ import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 import { IconX } from "@tabler/icons-react";
 import useNotification from "@/lib/hooks/notification";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
+import { useSinglePricingPlan } from "@/lib/hooks/pricing-plan";
 
-export default function CreateNewPlan() {
+export default function EditPlan() {
+  const params = useParams<{ id: string }>();
   const [opened, { open, close }] = useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
   const { push } = useRouter();
+  const { loading, pricingPlan } = useSinglePricingPlan(params.id);
 
   const [processing, setProcessing] = useState(false);
 
+  const initialPlan: PricingPlanType = {
+    cycle: pricingPlan?.cycle || "",
+    cost: pricingPlan?.cost,
+    name: pricingPlan?.name || "",
+    description: "",
+  };
+
   const form = useForm<PricingPlanType>({
-    initialValues: newPricingPlan,
+    initialValues: initialPlan,
     validate: zodResolver(pricingPlanSchema),
   });
+
+  useEffect(() => {
+    if (!loading && pricingPlan) return form.initialize(pricingPlan);
+  }, [pricingPlan]);
 
   const handleSubmit = async () => {
     setProcessing(true);
@@ -70,8 +84,9 @@ export default function CreateNewPlan() {
         items={[
           { title: "Pricing Plan", href: "/admin/pricing-plans" },
           {
-            title: "New Plan",
-            href: `/admin/pricing-plans/new`,
+            title: `Edit "${pricingPlan?.name}" plan`,
+            href: `/admin/pricing-plans/${params.id}/edit`,
+            loading: loading,
           },
         ]}
       />
@@ -80,11 +95,11 @@ export default function CreateNewPlan() {
         <BackBtn text="Pricing Plans" />
 
         <Title order={1} fz={24} fw={500} mt={28} mb={32}>
-          Create New Plan
+          Edit Plan
         </Title>
 
         {/* Form goes here */}
-        <Box component="form" onSubmit={form.onSubmit(() => handleSubmit())}>
+        <Box component="form" onSubmit={form.onSubmit(() => {})}>
           <Group>
             {/* Plan Name */}
             <TextInput

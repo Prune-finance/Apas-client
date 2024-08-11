@@ -39,6 +39,7 @@ dayjs.extend(advancedFormat);
 import { SearchInput } from "@/ui/components/Inputs";
 import { useDebouncedValue } from "@mantine/hooks";
 import { filteredSearch } from "@/lib/search";
+import Link from "next/link";
 
 export default function PricingPlans() {
   const [search, setSearch] = useState("");
@@ -136,7 +137,7 @@ const RowComponent = ({
       >
         <TableTd>{plan.name}</TableTd>
         <TableTd>{plan.cycle}</TableTd>
-        <TableTd>{formatNumber(plan.cost)}</TableTd>
+        <TableTd>{formatNumber(plan.cost, true, "EUR")}</TableTd>
         <TableTd>{dayjs(plan.createdAt).format("Do MMM, YYYY")}</TableTd>
         <TableTd onClick={(e) => e.stopPropagation()}>
           <MenuComponent id={plan.id.toString()} />
@@ -169,11 +170,8 @@ const MenuComponent = ({ id }: { id: string }) => {
         </Link> */}
 
         <MenuItem
-          //   onClick={() => {
-          //     setRowId(id);
-          //     if (status === "FROZEN") return unfreezeOpen();
-          //     freezeOpen();
-          //   }}
+          component={Link}
+          href={`/admin/pricing-plans/${id}/edit`}
           fz={10}
           c="#667085"
           leftSection={<IconEdit style={{ width: rem(14), height: rem(14) }} />}

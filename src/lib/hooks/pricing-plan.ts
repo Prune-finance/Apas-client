@@ -10,11 +10,7 @@ interface IParams {
   page?: number;
   type?: string;
 }
-export function usePricingPlan(
-  customParams: IParams = {},
-  reqCount: boolean = false,
-  otherReq: boolean = false
-) {
+export function usePricingPlan(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
@@ -31,7 +27,7 @@ export function usePricingPlan(
 
   const [loading, setLoading] = useState(true);
 
-  async function fetchBusinesses() {
+  async function fetchPricingPlans() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
@@ -62,7 +58,7 @@ export function usePricingPlan(
   }
 
   useEffect(() => {
-    fetchBusinesses();
+    fetchPricingPlans();
 
     return () => {
       // Any cleanup code can go here
@@ -70,6 +66,39 @@ export function usePricingPlan(
   }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.page, obj.type]);
 
   return { loading, pricingPlan, meta };
+}
+
+export function useSinglePricingPlan(id: string) {
+  const [pricingPlan, setPricingPlan] = useState<PricingPlan | null>(null);
+  //   const [meta, setMeta] = useState<Meta>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchPlan() {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plans/${id}`,
+        { withCredentials: true }
+      );
+
+      setPricingPlan(data.data);
+    } catch (error) {
+      setPricingPlan(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchPlan();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, pricingPlan };
 }
 
 export interface PricingPlan {

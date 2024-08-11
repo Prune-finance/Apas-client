@@ -5,6 +5,7 @@ import {
   Indicator,
   Avatar,
   Switch,
+  Stack,
 } from "@mantine/core";
 import { IconSearch, IconBell } from "@tabler/icons-react";
 import localFont from "next/font/local";
@@ -125,10 +126,24 @@ export function UserHeader() {
       </div>
 
       <div className={styles.profile}>
-        <Text fz={14} fw={600} className={styles.profile__text}>
-          {user?.email}
-        </Text>
-        <Avatar size="md" src={AdminAvatar.src} alt="admin avatar" />
+        <Avatar
+          size="md"
+          // src={AdminAvatar.src}
+          alt="admin avatar"
+        >
+          {user?.company?.name
+            .split(" ")
+            .map((item) => item.charAt(0).toUpperCase())
+            .join("")}
+        </Avatar>
+        <Stack gap={0}>
+          <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
+            {user?.company?.name}
+          </Text>
+          <Text fz={10} fw={400} c="var(--prune-text-gray-600)">
+            {user?.email}
+          </Text>
+        </Stack>
       </div>
     </header>
   );

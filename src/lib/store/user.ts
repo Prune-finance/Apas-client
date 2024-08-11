@@ -31,6 +31,7 @@ interface User {
   lastName: string;
   email: string;
   createdAt: Date;
+  company?: { name: string };
 }
 
 export default User;

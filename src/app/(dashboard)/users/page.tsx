@@ -71,6 +71,10 @@ import ModalComponent from "./modal";
 import UserDrawer from "./drawer";
 import User from "@/lib/store/user";
 import PaginationComponent from "@/ui/components/Pagination";
+import { SearchInput } from "@/ui/components/Inputs";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import EmptyTable from "@/ui/components/EmptyTable";
+import { title } from "process";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -88,7 +92,7 @@ function Users() {
     ...(!limit || isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     page: active,
@@ -146,10 +150,13 @@ function Users() {
   };
 
   const handleEdit = (data: typeof newAdmin) => {
+    console.log(data);
     form.setValues(data);
     open();
     setIsEdit(true);
   };
+
+  console.log(users);
 
   const menuItems = [
     // {
@@ -158,10 +165,10 @@ function Users() {
     //   link: true,
     //   href: "/admin/businesses",
     // },
-    // {
-    //   text: "Edit User",
-    //   icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
-    // },
+    {
+      text: "Edit User",
+      icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
+    },
     {
       text: "Deactivate",
       icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
@@ -277,43 +284,19 @@ function Users() {
         </div>
 
         <Group justify="space-between" mt={28}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <Group gap={12}>
-            <Button
-              // className={styles.filter__cta}
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-              leftSection={<IconListTree size={14} />}
-              fz={12}
-              fw={500}
-              onClick={toggle}
-            >
-              Filter
-            </Button>
+            <SecondaryBtn text="Filter" icon={IconListTree} action={toggle} />
 
-            <Button
-              onClick={open}
-              leftSection={<IconPlus color="#344054" size={16} />}
-              // className={styles.login__cta}
-              variant="filled"
-              color="var(--prune-primary-600)"
-              c="var(--prune-text-gray-800)"
-              fw={500}
-              fz={12}
-            >
-              Invite New User
-            </Button>
+            <PrimaryBtn
+              text="Invite New User"
+              action={() => {
+                setIsEdit(false);
+                open();
+              }}
+              icon={IconPlus}
+            />
           </Group>
         </Group>
 
@@ -325,17 +308,12 @@ function Users() {
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-        {!loading && !!!rows.length && (
-          <Flex direction="column" align="center" mt={70}>
-            <Image src={EmptyImage} alt="no content" width={156} height={120} />
-            <Text mt={14} fz={14} c="#1D2939">
-              There are no users.
-            </Text>
-            <Text fz={10} c="#667085">
-              When a user is added, they will appear here
-            </Text>
-          </Flex>
-        )}
+        <EmptyTable
+          rows={rows}
+          loading={loading}
+          title="There are no users"
+          text="When a user is added, they will appear here."
+        />
       </div>
 
       <PaginationComponent

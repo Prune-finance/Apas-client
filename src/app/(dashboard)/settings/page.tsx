@@ -208,9 +208,18 @@ export default function Users() {
                 />
 
                 <Flex mb={20} mt={40} justify="flex-end" gap={15}>
-                  <SecondaryBtn text="Cancel" action={passwordForm.reset} />
+                  <SecondaryBtn
+                    text="Cancel"
+                    action={passwordForm.reset}
+                    size="sm"
+                  />
 
-                  <PrimaryBtn text="Save Changes" type="submit" />
+                  <PrimaryBtn
+                    text="Save Changes"
+                    type="submit"
+                    size="sm"
+                    loading={processing}
+                  />
                 </Flex>
               </Box>
 

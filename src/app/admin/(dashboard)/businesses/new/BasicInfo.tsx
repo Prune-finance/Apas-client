@@ -62,6 +62,7 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           withAsterisk
           label="Business domain"
+          type="url"
           placeholder="Enter Domain"
           {...form.getInputProps("domain")}
           rightSection={<IconWorldWww size={14} />}
@@ -94,6 +95,7 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           withAsterisk
           label="Contact email"
+          type="email"
           placeholder="Enter Contact Email"
           {...form.getInputProps("contactEmail")}
           rightSection={<IconMail size={14} />}
@@ -102,6 +104,7 @@ export default function BasicInfo({ form }: Props) {
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           withAsterisk
+          type="tel"
           label="Contact phone number"
           placeholder="Enter Contact Phone Number"
           {...form.getInputProps("contactNumber")}

@@ -45,7 +45,7 @@ export default function InfoCards({
     <Card mt={24} style={{ border: "1px solid #f5f5f5" }} {...props}>
       <CardSection>
         <Flex justify="space-between" align="center" px={24} pt={24}>
-          <Title order={3} fz={16}>
+          <Title order={4} fz={16}>
             {title}
           </Title>
 

@@ -16,6 +16,7 @@ import styles from "./modal.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { newAdmin } from "@/lib/schema";
 import { Dispatch, SetStateAction } from "react";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function ModalComponent({
   opened,
@@ -33,6 +34,7 @@ export default function ModalComponent({
       onClose={() => {
         close();
         setIsEdit(false);
+        form.reset();
       }}
       centered
       // withCloseButton={false}
@@ -117,29 +119,25 @@ export default function ModalComponent({
           </Flex>
 
           <Flex mb={20} mt={40} justify="flex-end" gap={15}>
-            <Button
-              onClick={close}
-              color="#D0D5DD"
-              variant="default"
-              // className={styles.cta}
-            >
-              Cancel
-            </Button>
+            <SecondaryBtn
+              text="cancel"
+              fw={600}
+              action={() => {
+                close();
+                form.reset();
+              }}
+            />
 
-            <Button
-              onClick={() => {
+            <PrimaryBtn
+              text={isEdit ? "save Changes" : "send Invite"}
+              action={() => {
                 if (action) {
                   action();
                 }
               }}
               loading={processing}
-              // className={styles.cta}
-              variant="filled"
-              color="var(--prune-primary-600)"
-              c="var(--prune-text-gray-800)"
-            >
-              {isEdit ? "Save Changes" : "Send Invite"}
-            </Button>
+              fw={600}
+            />
           </Flex>
         </Box>
       </Flex>

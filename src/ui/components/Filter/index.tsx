@@ -71,7 +71,11 @@ export default function Filter<T>({
           <Select
             placeholder="Status"
             {...form.getInputProps("status")}
-            data={!approvalStatus ? ["Active", "Inactive"] : approvalOptions}
+            data={
+              !approvalStatus
+                ? ["Active", "Inactive", "Frozen"]
+                : approvalOptions
+            }
             size="xs"
             w={120}
             h={36}

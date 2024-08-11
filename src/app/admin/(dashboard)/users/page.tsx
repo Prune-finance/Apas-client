@@ -55,6 +55,7 @@ import { TableComponent } from "@/ui/components/Table";
 import { activeBadgeColor } from "@/lib/utils";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -76,7 +77,7 @@ function Users() {
     ...(isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     page: active,
@@ -121,6 +122,7 @@ function Users() {
       close();
       handleSuccess("Successful! Admin Added", "Admin added successfully");
       router.push("/admin/users");
+      form.reset();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -152,6 +154,7 @@ function Users() {
       );
 
       router.push("/admin/users");
+      form.reset();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -310,31 +313,15 @@ function Users() {
           />
 
           <Group gap={12}>
-            <Button
-              // className={styles.filter__cta}
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-              leftSection={<IconListTree size={14} />}
-              fz={12}
-              fw={500}
-              onClick={toggle}
-            >
-              Filter
-            </Button>
-
-            <Button
-              onClick={open}
-              leftSection={<IconPlus color="#344054" size={16} />}
-              // className={styles.login__cta}
-              variant="filled"
-              color="var(--prune-primary-600)"
-              c="var(--prune-text-gray-800)"
-              fw={500}
-              fz={12}
-            >
-              Invite New User
-            </Button>
+            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+            <PrimaryBtn
+              text="Invite New User"
+              action={() => {
+                open();
+                setIsEdit(false);
+              }}
+              icon={IconPlus}
+            />
           </Group>
         </Group>
 

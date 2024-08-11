@@ -89,7 +89,7 @@ export default function LoginForm() {
           fw={600}
           p={0}
           c="var(--prune-primary-800)"
-          // link="/auth"
+          link="https://prune-payments.gitbook.io/prune-api-services/"
         />
       </Group>
     </Box>

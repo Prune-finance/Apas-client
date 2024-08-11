@@ -1,27 +1,23 @@
 "use client";
 import dayjs from "dayjs";
 
-import Image from "next/image";
-import { Box, Divider, Drawer, Group, Paper, ThemeIcon } from "@mantine/core";
+import { Box, Divider, Drawer, Group, Paper } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
-import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
+import { Flex, TableTh, TableThead } from "@mantine/core";
 
 import styles from "./styles.module.scss";
 import {
   IconArrowUpRight,
-  IconArrowLeft,
   IconSearch,
   IconListTree,
   IconX,
   IconPointFilled,
 } from "@tabler/icons-react";
 
-import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
+import { DynamicSkeleton2 } from "@/lib/static";
 import { formatNumber, frontendPagination } from "@/lib/utils";
-
-import EmptyImage from "@/assets/empty.png";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
@@ -34,11 +30,14 @@ import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { Suspense, useState } from "react";
-import InfoCards from "@/ui/components/Cards/InfoCards";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { filteredSearch } from "@/lib/search";
+import { SecondaryBtn } from "@/ui/components/Buttons";
+import { TableComponent } from "@/ui/components/Table";
+import { SearchInput } from "@/ui/components/Inputs";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 
 function AccountTrx() {
   const searchParams = useSearchParams();
@@ -172,111 +171,15 @@ function AccountTrx() {
           </Flex>
         </div>
 
-        <Flex className={styles.overview__container} direction="column">
-          <Flex className={styles.container__header}>
-            <Text fz={16} c="#1A1B20">
-              Overview
-            </Text>
-          </Flex>
-
-          <Flex className={styles.container__body} gap={30}>
-            <Flex flex={1} direction="column" gap={10}>
-              <Flex gap={10} align="center">
-                <Text className={styles.body__text__header}>Total Balance</Text>
-              </Flex>
-
-              <Text className={styles.body__text} fz={24} fw={600}>
-                {formatNumber(
-                  transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
-                  true,
-                  "EUR"
-                )}
-              </Text>
-            </Flex>
-
-            <Flex flex={1} direction="column" gap={10}>
-              <Flex gap={10} align="center">
-                <Text className={styles.body__text__header}>Money In</Text>
-              </Flex>
-
-              <Text className={styles.body__text} fz={24} fw={600}>
-                {formatNumber(0, true, "EUR")}
-              </Text>
-            </Flex>
-
-            <Flex flex={1} direction="column" gap={10}>
-              <Flex gap={10} align="center">
-                <Text className={styles.body__text__header}>Money Out</Text>
-              </Flex>
-
-              <Text className={styles.body__text} fz={24} fw={600}>
-                {formatNumber(
-                  transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
-                  true,
-                  "EUR"
-                )}
-              </Text>
-            </Flex>
-
-            <Flex flex={1} direction="column" gap={10}>
-              <Flex gap={10} align="center">
-                <Text className={styles.body__text__header}>
-                  Total Transactions
-                </Text>
-              </Flex>
-
-              <Text className={styles.body__text} fz={24} fw={600}>
-                {transactions.length}
-              </Text>
-            </Flex>
-          </Flex>
-        </Flex>
-
-        {/* <InfoCards details={infoDetails} title="Overview" /> */}
-
+        <InfoCards details={infoDetails} title="Overview" />
         <Group justify="space-between" mt={30}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
-          <Button
-            // className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            fz={12}
-            fw={500}
-            onClick={toggle}
-            variant="outline"
-            c="var(--prune-text-gray-800)"
-            color="var(--prune-text-gray-200)"
-          >
-            Filter
-          </Button>
+          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
         </Group>
-
         <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                <TableTh className={styles.table__th}>Recipient IBAN</TableTh>
-                <TableTh className={styles.table__th}>Bank</TableTh>
-                <TableTh className={styles.table__th}>Reference</TableTh>
-                <TableTh className={styles.table__th}>Amount</TableTh>
-                <TableTh className={styles.table__th}>Date Created</TableTh>
-                <TableTh className={styles.table__th}>Status</TableTh>
-              </TableTr>
-            </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton2(6) : rows}</TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent rows={rows} loading={loading} head={tableHeaders} />
 
         <EmptyTable
           rows={rows}
@@ -284,7 +187,6 @@ function AccountTrx() {
           title="There are no transactions"
           text="When a transaction is recorded, it will appear here"
         />
-
         <PaginationComponent
           total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
           active={active}
@@ -426,3 +328,12 @@ export default function AccountTrxSuspense() {
     </Suspense>
   );
 }
+
+const tableHeaders = [
+  "Recipient IBAN",
+  "Bank",
+  "Reference",
+  "Amount",
+  "Date Created",
+  "Status",
+];

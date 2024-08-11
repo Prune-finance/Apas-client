@@ -151,14 +151,11 @@ export default function Account() {
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
-          ...(!loading
-            ? [
-                {
-                  title: `${account?.accountName}`,
-                  href: `/accounts/${params.id}`,
-                },
-              ]
-            : []),
+          {
+            title: account?.accountName || "",
+            href: `/accounts/${params.id}`,
+            loading: loading,
+          },
         ]}
       />
 

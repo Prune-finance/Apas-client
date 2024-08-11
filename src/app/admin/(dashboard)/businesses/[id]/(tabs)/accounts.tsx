@@ -68,6 +68,9 @@ import {
   useTransactions,
 } from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
+import EmptyTable from "@/ui/components/EmptyTable";
+import { SecondaryBtn } from "@/ui/components/Buttons";
+import { SearchInput } from "@/ui/components/Inputs";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -101,7 +104,7 @@ export default function Accounts({
     page: active,
     limit: isNaN(Number(limit)) ? 10 : parseInt(limit ?? "10", 10),
     ...(status && { status }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
   };
   const {
     loading: loadingTrx,
@@ -240,48 +243,21 @@ export default function Accounts({
       </Flex>
 
       <Flex justify="space-between" align="center" mt={28} mb={24}>
-        <TextInput
-          placeholder="Search here..."
-          leftSectionPointerEvents="none"
-          leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
-          // classNames={{ wrapper: styles.search, input: styles.input__search }}
-          value={search}
-          color="var(--prune-text-gray-200)"
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          c="#000"
-        />
+        <SearchInput search={search} setSearch={setSearch} />
 
-        <Button
-          // className={styles.filter__cta}
-          leftSection={<IconListTree size={14} />}
-          onClick={toggle}
-          fz={12}
-          fw={500}
-          radius={4}
-          variant="outline"
-          color="var(--prune-text-gray-200)"
-          c="#000"
-          pl={0}
-        >
-          Filter
-        </Button>
+        <SecondaryBtn action={toggle} text="Filter" icon={IconListTree} />
       </Flex>
 
       <Filter<BusinessFilterType> opened={opened} toggle={toggle} form={form} />
 
       <TableComponent head={tableHead} rows={rows} loading={loading} />
 
-      {!loading && !!!rows.length && (
-        <Flex direction="column" align="center" mt={70}>
-          <Image src={EmptyImage.src} alt="no content" w={156} h={120} />
-          <Text mt={14} fz={14} c="#1D2939">
-            There are no accounts.
-          </Text>
-          <Text fz={10} c="#667085">
-            When an account is created, it will appear here
-          </Text>
-        </Flex>
-      )}
+      <EmptyTable
+        rows={rows}
+        loading={loading}
+        title="There are no accounts"
+        text="When an account is created, it will appear here"
+      />
 
       <PaginationComponent
         active={active}

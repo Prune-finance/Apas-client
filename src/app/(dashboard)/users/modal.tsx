@@ -33,6 +33,7 @@ export default function ModalComponent({
       onClose={() => {
         close();
         setIsEdit(false);
+        form.reset();
       }}
       centered
       // withCloseButton={false}
@@ -116,7 +117,11 @@ export default function ModalComponent({
 
           <Flex mb={20} mt={40} justify="flex-end" gap={15}>
             <Button
-              onClick={close}
+              onClick={() => {
+                close();
+                setIsEdit(false);
+                form.reset();
+              }}
               color="#D0D5DD"
               variant="default"
               // className={styles.cta}

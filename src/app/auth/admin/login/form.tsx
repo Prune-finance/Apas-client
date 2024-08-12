@@ -75,6 +75,7 @@ export default function LoginForm() {
         w="15ch"
         p={0}
         c="var(--prune-primary-800)"
+        td="underline"
       />
     </Box>
   );

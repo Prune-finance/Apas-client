@@ -73,25 +73,54 @@ export const passwordChange = {
   confirmPassword: "",
 };
 
+// export const validatePasswordChange = z
+//   .object({
+//     oldPassword: z.string().min(1, "Old Password is required"),
+//     newPassword: z
+//       .string()
+//       .min(1, "New Password is required")
+//       .refine(
+//         (value) =>
+//           /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/.test(
+//             value
+//           ),
+//         `Password must contain at least 8 characters,
+//           include at least one uppercase letter,
+//           one lowercase letter, a number, and one special character`
+//       ),
+//     confirmPassword: z.string().min(1, "Confirm the password provided above"),
+//   })
+//   .refine(
+//     (data) => data.newPassword && data.newPassword === data.confirmPassword,
+//     {
+//       message: "Confirm the password. Ensure it matches with your new password",
+//       path: ["confirmPassword"],
+//     }
+//   );
+
 export const validatePasswordChange = z
   .object({
     oldPassword: z.string().min(1, "Old Password is required"),
     newPassword: z
       .string()
-      .min(1, "New Password is required")
-      .refine(
-        (value) =>
-          /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/.test(
-            value
-          ),
-        `Password must contain at least 8 characters, 
-          include at least one uppercase letter, 
-          one lowercase letter, a number, and one special character`
+      .min(8, "Password must be at least 8 characters long")
+      .regex(
+        /(?=.*[a-z])/,
+        "Password must contain at least one lowercase letter"
+      )
+      .regex(
+        /(?=.*[A-Z])/,
+        "Password must contain at least one uppercase letter"
+      )
+      .regex(/(?=.*[0-9])/, "Password must contain at least one number")
+      .regex(
+        /(?=.*[^A-Za-z0-9])/,
+        "Password must contain at least one special character"
       ),
-    confirmPassword: z.string().min(1, "Confirm the password provided above"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
   })
-  .refine((data) => data.newPassword !== data.confirmPassword, {
-    message: "Confirm the password. Ensure it matches with your new password",
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Passwords do not match",
     path: ["confirmPassword"],
   });
 
@@ -424,3 +453,41 @@ export const removeDirectorSchema = z.object({
 });
 
 export type RemoveDirectorType = z.infer<typeof removeDirectorSchema>;
+
+export const newPricingPlan = {
+  name: "",
+  cost: "",
+  cycle: null,
+  description: "",
+};
+
+export const pricingPlanSchema = z
+  .object({
+    name: z
+      .string()
+      .min(3, "Pricing Plan name must be a minimum of 3 characters"),
+    cost: z.union([z.number(), z.string()]).nullish(),
+    cycle: z.string().nullable(),
+    description: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.cost) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Cost is required",
+        path: ["cost"],
+      });
+    }
+
+    if (!data.cycle) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Cycle is required",
+        path: ["cycle"],
+      });
+    }
+
+    return data;
+  });
+
+export type PricingPlanType = z.infer<typeof pricingPlanSchema>;

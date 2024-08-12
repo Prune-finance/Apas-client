@@ -36,7 +36,7 @@ export default function Navbar() {
         withCredentials: true,
       });
 
-      await clearSession();
+      // await clearSession();
 
       window.location.replace("/auth/admin/login");
     } catch (error) {
@@ -144,7 +144,7 @@ export function UserNavbar() {
         withCredentials: true,
       });
 
-      await clearSession();
+      // await clearSession();
 
       window.location.replace("/auth/login");
     } catch (error) {

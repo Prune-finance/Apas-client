@@ -6,12 +6,12 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
+    console.log({ email, password });
+
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/login`,
       { email, password }
     );
-
-    cookies().delete("session");
 
     const responseCookies = response.headers["set-cookie"];
     if (!responseCookies) {
@@ -33,6 +33,7 @@ export async function POST(request: Request) {
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const res = error.response?.data;
+
       return NextResponse.json({ message: res.message }, { status: res.code });
     }
     return NextResponse.redirect(new URL("/auth/login", request.url));

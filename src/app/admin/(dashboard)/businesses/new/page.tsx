@@ -60,9 +60,6 @@ export default function NewBusiness() {
 
   const [active, setActive] = useState(0);
 
-  const prevStep = () =>
-    setActive((current) => (current > 0 ? current - 1 : current));
-
   const form = useForm<NewBusinessType>({
     initialValues: newBusiness,
     // validate: zodResolver(validateNewBusiness),
@@ -114,6 +111,7 @@ export default function NewBusiness() {
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company`,
         {
           ...rest,
+          pricingPlanId: pricingPlan,
           ...(initialDirEmpty && { directors: [] }),
           ...(initialShrEmpty && { shareholders: [] }),
         },

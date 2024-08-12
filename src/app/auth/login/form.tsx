@@ -78,7 +78,7 @@ export default function LoginForm() {
         c="var(--prune-primary-800)"
       />
 
-      <Group gap={2}>
+      {/* <Group gap={2}>
         <Text fz={14} className={styles.rdr__text}>
           New user?{" "}
         </Text>
@@ -91,7 +91,7 @@ export default function LoginForm() {
           c="var(--prune-primary-800)"
           link="https://prune-payments.gitbook.io/prune-api-services/"
         />
-      </Group>
+      </Group> */}
     </Box>
   );
 }

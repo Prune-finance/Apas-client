@@ -1,4 +1,4 @@
-import { Text, Title } from "@mantine/core";
+import { Box, Group, Text, Title } from "@mantine/core";
 import { Suspense } from "react";
 import Image from "next/image";
 
@@ -9,6 +9,7 @@ import { CardOne, CardThree, CardTwo } from "./cards";
 import LoginForm from "./form";
 import { checkToken } from "@/lib/actions/checkToken";
 import { redirect } from "next/navigation";
+import { PrimaryBtn } from "@/ui/components/Buttons";
 
 async function Login() {
   const { success } = await checkToken();
@@ -31,7 +32,7 @@ async function Login() {
               fw={500}
               className={`${styles.text__title} ${inter.className}`}
             >
-              Seamlessly issue accounts with Prune
+              Prune makes your API generation easy, fast and reliable
             </Title>
             <Text fz={14} className={`${styles.text__sub} ${pjs.className}`}>
               The API's robust features and seamless integration capabilities
@@ -39,7 +40,7 @@ async function Login() {
               accounts, and process payments..
             </Text>
           </div>
-          <div className={styles.notifications}>
+          {/* <div className={styles.notifications}>
             <div className={styles.notifications__card}>
               <Image width={66} height={66} src={PruneIcon} alt="prune icon" />
               <div className={styles.card__text}>
@@ -51,76 +52,49 @@ async function Login() {
                 </Text>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
       <div className={styles.login__paper}>
-        <Image width={29} height={29} src={PruneIcon} alt="prune icon" />
-
-        <Title order={2} className={styles.paper__header}>
-          LOG IN
-        </Title>
-
-        <Text className={styles.paper__text}>
-          Enter your details below to have access to your account
-        </Text>
-
-        <LoginForm />
-
-        {/* <div className={styles.text__input__container}>
-          <Text fz={12} px={10} className={styles.container__label}>
-            Email
-          </Text>
-          <TextInput
-            size="xs"
-            classNames={{
-              input: styles.text__input,
-            }}
-            placeholder="jane.zi@prune.io"
-            {...form.getInputProps("email")}
-          />
-        </div>
-
-        <div className={styles.text__input__container}>
-          <Text fz={12} px={10} className={styles.container__label}>
-            Password
-          </Text>
-          <PasswordInput
-            size="xs"
-            classNames={{
-              input: styles.text__input,
-            }}
-            placeholder="******************"
-            {...form.getInputProps("password")}
-          />
-        </div>
-
-        <div className={styles.login__actions}>
-          <Checkbox label="Remember me" size="xs" color="#C1DD06" />
-
-          <Button
-            className={styles.login__cta}
-            variant="filled"
-            color="#C1DD06"
-            onClick={handleLogin}
-            loading={processing}
-          >
-            Log In
-          </Button>
-        </div>
-
-        <div className={styles.rdr__link}>
+        <Group
+          gap={2}
+          style={{
+            // border: "1px solid red",
+            alignSelf: "flex-end",
+            justifySelf: "flex-start",
+          }}
+          justify="flex-end"
+          pos="absolute"
+          top={36}
+          right={43}
+        >
           <Text fz={14} className={styles.rdr__text}>
-            Forgot Password?
+            Having Issues?{" "}
           </Text>
-          <Text fz={14} mt={10} className={styles.rdr__text}>
-            New user?{" "}
-            <Text fz={14} span className={styles.register__rdr}>
-              Learn how to sign up
-            </Text>
+          <PrimaryBtn
+            text="Contact Us"
+            variant="transparent"
+            fz={14}
+            fw={600}
+            p={0}
+            c="var(--prune-primary-800)"
+            link="https://prune-payments.gitbook.io/prune-api-services/"
+          />
+        </Group>
+        <Box w={{ base: "90vw", sm: 394 }}>
+          <Image width={29} height={29} src={PruneIcon} alt="prune icon" />
+
+          <Title order={2} className={styles.paper__header}>
+            LOG IN
+          </Title>
+
+          <Text className={styles.paper__text}>
+            Enter your details below to have access to your account
           </Text>
-        </div> */}
+
+          <LoginForm />
+        </Box>
       </div>
     </main>
   );

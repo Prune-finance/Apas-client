@@ -219,7 +219,6 @@
 
 .account__card {
   height: 196px;
-  padding: 13px 19px;
   background-image: url("../../../assets/account-card.png");
   background-repeat: no-repeat;
   background-size: contain;
@@ -227,6 +226,7 @@
   border: 0.773px solid #ededed;
 
   .account__card__section {
+    padding: 13px 19px;
     // background: linear-gradient(270deg, #262b03 0%, #2c2c2c 100%);
 
     background: linear-gradient(270deg, #262b03 0%, #2c2c2c 100%);

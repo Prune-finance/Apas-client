@@ -31,6 +31,7 @@ import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "./debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
+import Link from "next/link";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -175,9 +176,9 @@ export default function Home() {
   }, [transactions]);
 
   const cardDetails = [
-    { title: "Total Account", value: 0 },
-    { title: "Active Account", value: 0 },
-    { title: "Inactive Account", value: 0 },
+    { title: "Total Account", value: meta?.total },
+    { title: "Active Account", value: meta?.active },
+    { title: "Inactive Account", value: meta?.inactive },
   ];
 
   return (
@@ -297,7 +298,12 @@ export default function Home() {
         </GridCol>
 
         <GridCol span={4}>
-          <AccountCard />
+          <AccountCard
+            balance={balance}
+            currency="EUR"
+            companyName="C80 Limited"
+            iban="1234567890"
+          />
         </GridCol>
       </Grid>
 

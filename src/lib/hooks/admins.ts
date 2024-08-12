@@ -34,6 +34,7 @@ export function useAdmins(customParams: IAdmins = {}) {
       obj as Record<string, string>
     ).toString();
 
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins?${params}`,
@@ -68,6 +69,7 @@ export function useSingleAdmin(id: string) {
   const [loading, setLoading] = useState(true);
 
   async function fetchUsers() {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins/${id}`,
@@ -115,6 +117,8 @@ export function useUsers(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users?${params}`,

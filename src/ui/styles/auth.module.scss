@@ -195,7 +195,9 @@
   border: none;
   padding: 0 16px;
   box-shadow: none;
+  border-radius: 0;
   background: transparent;
+  // height: 0px !important;
 
   input:-webkit-autofill,
   input:-webkit-autofill:hover,

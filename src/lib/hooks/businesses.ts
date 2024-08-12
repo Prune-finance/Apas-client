@@ -49,6 +49,7 @@ export function useBusiness(
     const params = new URLSearchParams(queryParams as Record<string, string>);
 
     try {
+      setLoading(true);
       const { data } = await axios.get(
         `${
           process.env.NEXT_PUBLIC_SERVER_URL
@@ -110,6 +111,7 @@ export function useSingleBusiness(id: string) {
   const [loading, setLoading] = useState(true);
 
   async function fetchBusiness() {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${id}`,

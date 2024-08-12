@@ -45,31 +45,11 @@ export const validateRegister = z
 export const directorEtShareholderSchema = {
   name: "",
   email: "",
-  identityType: "",
-  proofOfAddress: "",
+  identityType: null,
+  proofOfAddress: null,
   identityFileUrl: "",
   identityFileUrlBack: "",
   proofOfAddressFileUrl: "",
-};
-
-export const newBusiness = {
-  name: "",
-  domain: "",
-  country: "",
-  legalEntity: "",
-  pricingPlan: "",
-  contactNumber: "",
-  contactEmail: "",
-  businessBio: "",
-  cacCertificate: "",
-  address: "",
-  mermat: "",
-  amlCompliance: null,
-  operationalLicense: null,
-  shareholderParticular: "",
-  directorParticular: "",
-  directors: [directorEtShareholderSchema],
-  shareholders: [directorEtShareholderSchema],
 };
 
 export const newAdmin = {
@@ -92,6 +72,30 @@ export const passwordChange = {
   newPassword: "",
   confirmPassword: "",
 };
+
+export const validatePasswordChange = z
+  .object({
+    oldPassword: z.string().min(1, "Old Password is required"),
+    newPassword: z
+      .string()
+      .min(1, "New Password is required")
+      .refine(
+        (value) =>
+          /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})/.test(
+            value
+          ),
+        `Password must contain at least 8 characters, 
+          include at least one uppercase letter, 
+          one lowercase letter, a number, and one special character`
+      ),
+    confirmPassword: z.string().min(1, "Confirm the password provided above"),
+  })
+  .refine((data) => data.newPassword !== data.confirmPassword, {
+    message: "Confirm the password. Ensure it matches with your new password",
+    path: ["confirmPassword"],
+  });
+
+export type PasswordChangeType = z.infer<typeof validatePasswordChange>;
 
 export const debitRequest = {
   account: "",
@@ -123,25 +127,73 @@ export const validateNewAdmin = z.object({
   role: z.string().optional(),
 });
 
+export const newBusiness = {
+  name: "",
+  domain: "",
+  country: null,
+  legalEntity: null,
+  pricingPlan: null,
+  contactNumber: "",
+  contactEmail: "",
+  businessBio: "",
+  cacCertificate: "",
+  address: "",
+  mermat: "",
+  amlCompliance: null,
+  operationalLicense: null,
+  shareholderParticular: "",
+  directorParticular: "",
+  directors: [directorEtShareholderSchema],
+  shareholders: [directorEtShareholderSchema],
+};
+
 const emailSchema = z.string().email();
 
-export const basicInfoSchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(3, "Business name must be a minimum of 3 characters"),
-  country: z.string().min(1, "Country is required"),
-  legalEntity: z.string().min(1, "Legal Entity is required"),
-  contactNumber: z.string().min(1, "Contact number is required"),
-  address: z.string().min(1, "Business Address is required"),
-  businessBio: z.string(),
-  contactEmail: z
-    .string()
-    .email("Please provide a valid contact email")
-    .min(1, "Contact Email is required"),
-  domain: z.string().url("Please provide a valid url"),
-  pricingPlan: z.string().min(1, "Pricing Plan is required"),
-});
+export const basicInfoSchema = z
+  .object({
+    name: z
+      .string()
+      .trim()
+      .min(3, "Business name must be a minimum of 3 characters"),
+    country: z.string().nullable(),
+    legalEntity: z.string().nullable(),
+    contactNumber: z.string().min(1, "Contact number is required"),
+    address: z.string().min(1, "Business Address is required"),
+    businessBio: z.string(),
+    contactEmail: z
+      .string()
+      .email("Please provide a valid contact email")
+      .min(1, "Contact Email is required"),
+    domain: z.string().url("Please provide a valid url"),
+    pricingPlan: z.string().nullable(),
+  })
+  .superRefine((data, ctx) => {
+    if (!data.country) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Country is required",
+        path: ["country"],
+      });
+    }
+
+    if (!data.legalEntity) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Legal Entity is required",
+        path: ["legalEntity"],
+      });
+    }
+
+    if (!data.pricingPlan) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Pricing Plan is required",
+        path: ["pricingPlan"],
+      });
+    }
+
+    return data;
+  });
 
 export const documentSchema = z.object({
   cacCertificate: z.string().url("Cac certificate is required"),
@@ -175,8 +227,8 @@ export const directorsSchema = z.object({
         },
         { message: "Invalid director's email" }
       ),
-      identityType: z.string(),
-      proofOfAddress: z.string(),
+      identityType: z.string().nullable(),
+      proofOfAddress: z.string().nullable(),
       identityFileUrl: z.string(),
       identityFileUrlBack: z.string(),
 
@@ -218,8 +270,8 @@ export const shareholdersSchema = z.object({
           },
           { message: "Invalid shareholder's email" }
         ),
-        identityType: z.string(),
-        proofOfAddress: z.string(),
+        identityType: z.string().nullable(),
+        proofOfAddress: z.string().nullable(),
         identityFileUrl: z.string(),
         identityFileUrlBack: z.string(),
         proofOfAddressFileUrl: z.string(),
@@ -233,12 +285,12 @@ export const validateNewBusiness = z.object({
     .string()
     .trim()
     .min(3, "Business name must be a minimum of 3 characters"),
-  country: z.string().min(1, "Country is required"),
-  legalEntity: z.string().min(1, "Legal Entity is required"),
+  country: z.string().min(1, "Country is required").nullable(),
+  legalEntity: z.string().min(1, "Legal Entity is required").nullable(),
   contactNumber: z.string().min(1, "Contact number is required"),
   address: z.string().min(1, "Business Address is required"),
   businessBio: z.string(),
-  pricingPlan: z.string().min(1, "Pricing Plan is required"),
+  pricingPlan: z.string().min(1, "Pricing Plan is required").nullable(),
   contactEmail: z.string().email("Please provide a valid contact email"),
   cacCertificate: z.string().url("Cac certificate is required"),
   mermat: z.string().url("Memart document is required"),
@@ -270,8 +322,8 @@ export const validateNewBusiness = z.object({
           },
           { message: "Invalid director's email" }
         ),
-        identityType: z.string(),
-        proofOfAddress: z.string(),
+        identityType: z.string().nullable(),
+        proofOfAddress: z.string().nullable(),
         identityFileUrl: z.string(),
         identityFileUrlBack: z.string(),
         proofOfAddressFileUrl: z.string(),
@@ -288,8 +340,8 @@ export const validateNewBusiness = z.object({
         },
         { message: "Invalid shareholder's email" }
       ),
-      identityType: z.string(),
-      proofOfAddress: z.string(),
+      identityType: z.string().nullable(),
+      proofOfAddress: z.string().nullable(),
       identityFileUrl: z.string(),
       identityFileUrlBack: z.string(),
       proofOfAddressFileUrl: z.string(),

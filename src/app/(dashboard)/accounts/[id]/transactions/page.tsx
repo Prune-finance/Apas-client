@@ -34,11 +34,13 @@ import {
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { useSingleUserAccount } from "@/lib/hooks/accounts";
 
 export default function AccountTrx() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { loading, transactions } = useUserTransactions(params.id);
+  const { account, loading: loadingAcct } = useSingleUserAccount(params.id);
   const [selectedRequest, setSelectedRequest] = useState<TrxData | null>(null);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
@@ -85,7 +87,11 @@ export default function AccountTrx() {
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
-          { title: params.id, href: `/accounts/${params.id}` },
+          {
+            title: account?.accountName || "",
+            href: `/accounts/${params.id}`,
+            loading: loadingAcct,
+          },
           {
             title: "Transactions",
             href: `/accounts/${params.id}/transactions`,

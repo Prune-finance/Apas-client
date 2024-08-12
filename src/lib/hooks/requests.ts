@@ -33,6 +33,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
 
   async function fetchAccounts() {
     //  `${id}/requests`;: fetch all requests for a specific business
+    setLoading(true);
     try {
       const path = id ? `business/${id}/requests` : "requests";
       // const status = query ? `?status=${query}` : "";
@@ -74,6 +75,7 @@ export function useSingleRequest(id: string) {
   const [loading, setLoading] = useState(true);
 
   async function fetchRequest() {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/${id}`,
@@ -124,6 +126,7 @@ export function useUserRequests(customParams: IParams = {}) {
       obj as Record<string, string>
     ).toString();
 
+    setLoading(true);
     try {
       // const status = query ? `?status=${query}` : "";
       const { data } = await axios.get(
@@ -158,6 +161,7 @@ export function useSingleUserRequest(id: string) {
   const [loading, setLoading] = useState(true);
 
   async function fetchRequest() {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/requests/${id}`,
@@ -205,7 +209,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
-
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests?${params}`,
@@ -258,6 +262,8 @@ export function useCompanyRequests(
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
+    setLoading(true);
 
     try {
       const path = all ? "/all" : "";
@@ -329,6 +335,8 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
+
+    setLoading(true);
 
     try {
       const { data } = await axios.get(

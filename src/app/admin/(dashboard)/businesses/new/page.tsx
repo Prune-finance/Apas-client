@@ -2,7 +2,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconMail, IconPlus, IconTrash } from "@tabler/icons-react";
+import { IconMail, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
 
 import {
   Flex,
@@ -14,6 +14,7 @@ import {
   Stepper,
   Divider,
   Checkbox,
+  Modal,
 } from "@mantine/core";
 import { TextInput, Select, Button } from "@mantine/core";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
@@ -37,10 +38,23 @@ import { parseError } from "@/lib/actions/auth";
 import BasicInfo from "./BasicInfo";
 import Documents from "./Documents";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import ModalComponent from "@/ui/components/Modal";
+import { useDisclosure } from "@mantine/hooks";
+
+interface DirectorEtShareholder
+  extends Omit<
+    typeof directorEtShareholderSchema,
+    "identityType" | "proofOfAddress"
+  > {
+  identityType: string | null;
+  proofOfAddress: string | null;
+}
 
 export default function NewBusiness() {
   const router = useRouter();
   const [processing, setProcessing] = useState(false);
+
+  const [opened, { open, close }] = useDisclosure(false);
 
   const { handleSuccess, handleError } = useNotification();
 
@@ -129,9 +143,7 @@ export default function NewBusiness() {
     return false;
   }
 
-  const makeDirectorAShareholder = (
-    director: typeof directorEtShareholderSchema
-  ) => {
+  const makeDirectorAShareholder = (director: DirectorEtShareholder) => {
     form.values.shareholders &&
       form.values.shareholders.map((item, index) => {
         const data = Object.values(item).every(isEmpty);
@@ -339,7 +351,7 @@ export default function NewBusiness() {
         <Divider my={20} />
 
         <Group justify="flex-end">
-          <SecondaryBtn text="Cancel" action={form.reset} w={126} />
+          <SecondaryBtn text="Clear Form" action={open} w={126} />
           <PrimaryBtn
             text={active < 3 ? "Next" : "Submit"}
             w={126}
@@ -348,6 +360,19 @@ export default function NewBusiness() {
           />
         </Group>
       </Paper>
+
+      <ModalComponent
+        opened={opened}
+        close={close}
+        icon={<IconX color="var(--prune-warning)" />}
+        title="Clear Form?"
+        text="Are you sure you want to clear this form? All entered data will be permanently lost."
+        action={() => {
+          form.reset();
+          close();
+        }}
+        color="hsl(from var(--prune-warning) h s l / .1)"
+      />
     </main>
   );
 }
@@ -375,6 +400,7 @@ const DirectorForm = ({
           classNames={{ input: styles.input }}
           flex={1}
           placeholder="Enter Director's Email"
+          type="email"
           {...form.getInputProps(`directors.${count}.email`)}
           rightSection={<IconMail size={14} />}
         />
@@ -475,6 +501,7 @@ const ShareholderForm = ({
         <TextInput
           classNames={{ input: styles.input }}
           flex={1}
+          type="email"
           placeholder="Enter Shareholder's Email"
           {...form.getInputProps(`shareholders.${count}.email`)}
           rightSection={<IconMail size={14} />}

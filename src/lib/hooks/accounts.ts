@@ -27,6 +27,7 @@ export function useAccounts(customParams: IParams = {}) {
   }, [customParams]);
 
   async function fetchAccounts() {
+    setLoading(true);
     const params = new URLSearchParams(
       obj as Record<string, string>
     ).toString();
@@ -63,6 +64,7 @@ export function useSingleAccount(id: string) {
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}`,
@@ -113,6 +115,7 @@ export function useUserAccounts(customParams: IParams = {}) {
       obj as Record<string, string>
     ).toString();
 
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard?${params}`,
@@ -146,6 +149,7 @@ export function useSingleUserAccount(id: string) {
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
+    setLoading(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/dashboard`,

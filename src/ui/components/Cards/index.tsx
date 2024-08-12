@@ -455,9 +455,13 @@ export function CardFive({
         {loading ? (
           <Skeleton w={100} h={35} color="red" />
         ) : (
-          <Title fz={24} className={`${colored ? styles.light__green : ""}`}>
+          <Text
+            fz={24}
+            className={`${colored ? styles.light__green : ""}`}
+            fw={600}
+          >
             {formatted ? formatNumber(stat, true, currency, locale) : stat}
-          </Title>
+          </Text>
         )}
       </div>
     </Paper>

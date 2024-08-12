@@ -49,6 +49,7 @@ import { validateRequest } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
+import { SecondaryBtn } from "../Buttons";
 
 type Param = { id: string };
 interface Props {
@@ -253,23 +254,20 @@ export default function SingleAccount({
         </Stack>
 
         <Flex gap={10}>
-          <Button
-            variant="outline"
-            color="var(--prune-text-gray-300)"
-            c="var(--prune-text-gray-800)"
-            fz={12}
-            fw={500}
-            onClick={() => {
+          <SecondaryBtn
+            action={() => {
               if (account?.status === "FROZEN") return open();
               openFreeze();
             }}
             loading={loading}
             loaderProps={{ type: "dots" }}
-          >
-            {account?.status === "FROZEN"
-              ? "Unfreeze Account"
-              : "Freeze Account"}
-          </Button>
+            text={
+              account?.status === "FROZEN"
+                ? "Unfreeze Account"
+                : "Freeze Account"
+            }
+          />
+
           {/* <Button
               // onClick={() => {
               //   updateDirector(index, form.values);

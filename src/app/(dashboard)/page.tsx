@@ -224,7 +224,7 @@ export default function Home() {
         >
           Account Statement
         </Button> */}
-        <PrimaryBtn text="Debit Request" fw={600} />
+        <PrimaryBtn text="Debit Request" fw={600} action={open} />
       </Flex>
 
       <Grid mt={32} h="100%">

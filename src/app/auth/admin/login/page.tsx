@@ -12,7 +12,6 @@ import LoginForm from "./form";
 
 async function Login() {
   const { success } = await checkToken(true);
-
   if (success) return redirect("/admin/dashboard");
 
   return (

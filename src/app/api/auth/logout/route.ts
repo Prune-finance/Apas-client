@@ -10,7 +10,6 @@ export async function GET(request: Request) {
       headers: {
         Cookie: cookieHeader, // Pass the cookies received from the client
       },
-      // withCredentials: true,
     });
 
     cookies().delete("session");

@@ -14,6 +14,15 @@ export async function GET(request: Request) {
     });
 
     cookies().delete("session");
+    cookies().set("session", "", {
+      httpOnly: true,
+      ...(process.env.NODE_ENV === "production" && {
+        sameSite: "none",
+        secure: true,
+        domain: ".prunepayments.net",
+        // domain: "prune-liard.vercel.app",
+      }),
+    });
 
     return NextResponse.json({});
   } catch (error) {

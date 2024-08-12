@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
 
-import { Text, TableTd, Paper, Box, Modal } from "@mantine/core";
+import { Text, TableTd, Paper, Box, Modal, Group } from "@mantine/core";
 import { TableTbody, TableTh, TableThead } from "@mantine/core";
 import { Tooltip, rem, Button, Table } from "@mantine/core";
 import { Stack, CopyButton, ActionIcon } from "@mantine/core";
@@ -17,7 +17,7 @@ import { formatNumber } from "@/lib/utils";
 import { DynamicSkeleton2, UserDashboardData } from "@/lib/static";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 
-import { CardOne, CardOneBtn } from "@/ui/components/Cards";
+import { CardFive, CardOne, CardOneBtn } from "@/ui/components/Cards";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/user/home.module.scss";
 import { useUserDebitRequests } from "@/lib/hooks/requests";
@@ -30,6 +30,7 @@ import { Key } from "./settings/(tabs)/keys";
 import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "./debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { AccountCard } from "@/ui/components/Cards/AccountCard";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -173,6 +174,12 @@ export default function Home() {
     ];
   }, [transactions]);
 
+  const cardDetails = [
+    { title: "Total Account", value: 0 },
+    { title: "Active Account", value: 0 },
+    { title: "Inactive Account", value: 0 },
+  ];
+
   return (
     <main className={styles.main}>
       {/* <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} /> */}
@@ -200,12 +207,14 @@ export default function Home() {
         </Button>
       </Flex>
 
-      <Flex className={styles.overview__container} direction="column">
+      {/* <Flex className={styles.overview__container} direction="column">
         <Flex className={styles.container__header}>
           <Text fz={16} c="#1A1B20">
             Overview
           </Text>
         </Flex>
+
+
 
         <Flex className={styles.container__body} gap={30}>
           <Flex flex={1.5} direction="column" gap={10}>
@@ -267,7 +276,30 @@ export default function Home() {
             </Text>
           </Flex>
         </Flex>
-      </Flex>
+      </Flex> */}
+      <Grid mt={32}>
+        <GridCol span={8}>
+          <Paper style={{ border: "1px solid #f5f5f5" }} radius={8} h={116}>
+            <Group>
+              {cardDetails.map((info, index, arr) => (
+                <CardFive
+                  key={index}
+                  title={info.title}
+                  stat={typeof info.value === "number" ? info.value : 0}
+                  container
+                  borderRight={index !== arr.length - 1}
+                  flex={1}
+                  loading={loading}
+                />
+              ))}
+            </Group>
+          </Paper>
+        </GridCol>
+
+        <GridCol span={4}>
+          <AccountCard />
+        </GridCol>
+      </Grid>
 
       <div className={styles.grid__cards}>
         <Grid className={styles.grid__cards__two}>

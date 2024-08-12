@@ -31,7 +31,10 @@ import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "./debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
-import Link from "next/link";
+import { TableComponent } from "@/ui/components/Table";
+import EmptyTable from "@/ui/components/EmptyTable";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { checkToken } from "@/lib/actions/checkToken";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -43,6 +46,15 @@ export default function Home() {
 
   const [keys, setKeys] = useState<Key[]>([]);
   const { user } = User();
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      const { user } = await checkToken();
+      console.log(user);
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const { live, test } = useMemo(() => {
@@ -163,9 +175,15 @@ export default function Home() {
       pending = 0,
       failed = 0;
     transactions.map((trx) => {
-      if (trx.status === "PENDING") {
-        pending += trx.amount;
-      }
+      // if (trx.status === "PENDING") {
+      //   pending += trx.amount;
+      // }
+
+      trx.status === "PENDING"
+        ? (pending += trx.amount)
+        : trx.status === "REJECTED"
+        ? (failed += trx.amount)
+        : (completed += trx.amount);
     });
 
     return [
@@ -198,266 +216,95 @@ export default function Home() {
           </Text>
         </Flex>
 
-        <Button
+        {/* <Button
           fz={12}
           className={styles.main__cta}
           variant="filled"
           color="#C1DD06"
         >
           Account Statement
-        </Button>
+        </Button> */}
+        <PrimaryBtn text="Debit Request" fw={600} />
       </Flex>
 
-      {/* <Flex className={styles.overview__container} direction="column">
-        <Flex className={styles.container__header}>
-          <Text fz={16} c="#1A1B20">
-            Overview
-          </Text>
-        </Flex>
+      <Grid mt={32} h="100%">
+        <GridCol span={7.5}>
+          <Grid>
+            <GridCol span={12}>
+              <Paper style={{ border: "1px solid #f5f5f5" }} radius={8} h={116}>
+                <Group>
+                  {cardDetails.map((info, index, arr) => (
+                    <CardFive
+                      key={index}
+                      title={info.title}
+                      stat={typeof info.value === "number" ? info.value : 0}
+                      container
+                      borderRight={index !== arr.length - 1}
+                      flex={1}
+                      loading={loading}
+                    />
+                  ))}
+                </Group>
+              </Paper>
+            </GridCol>
 
-
-
-        <Flex className={styles.container__body} gap={30}>
-          <Flex flex={1.5} direction="column" gap={10}>
-            <Flex gap={10} align="center">
-              <Text className={styles.body__text__header}>Total Balance</Text>
-              <Button
-                onClick={open}
-                className={styles.debit__btn}
-                variant="filled"
-                color="#F9FCE6"
-                fz={10}
-                fw={600}
-                rightSection={
-                  <IconArrowUpRight
-                    color="#758604"
-                    size={13}
-                    className={styles.table__td__icon}
-                  />
-                }
+            <GridCol span={12} mih={100}>
+              <Paper
+                py={21}
+                px={24}
+                radius={8}
+                style={{ border: "1px solid #f5f5f5" }}
+                //  mt={10} className={styles.payout__table}
               >
-                Debit Request
-              </Button>
-            </Flex>
-
-            <Text className={styles.body__text} fz={24} fw={600}>
-              {formatNumber(balance, true, "EUR")}
-            </Text>
-          </Flex>
-
-          <Flex flex={1} direction="column" gap={10}>
-            <Flex gap={10} align="center">
-              <Text className={styles.body__text__header}>Total Accounts</Text>
-            </Flex>
-
-            <Text className={styles.body__text} fz={24} fw={600}>
-              {meta?.total}
-            </Text>
-          </Flex>
-
-          <Flex flex={1} direction="column" gap={10}>
-            <Flex gap={10} align="center">
-              <Text className={styles.body__text__header}>Active Accounts</Text>
-            </Flex>
-
-            <Text className={styles.body__text} fz={24} fw={600}>
-              {meta?.active}
-            </Text>
-          </Flex>
-
-          <Flex flex={1} direction="column" gap={10}>
-            <Flex gap={10} align="center">
-              <Text className={styles.body__text__header}>
-                Inactive Accounts
-              </Text>
-            </Flex>
-
-            <Text className={styles.body__text} fz={24} fw={600}>
-              {meta?.inactive}
-            </Text>
-          </Flex>
-        </Flex>
-      </Flex> */}
-      <Grid mt={32}>
-        <GridCol span={8}>
-          <Paper style={{ border: "1px solid #f5f5f5" }} radius={8} h={116}>
-            <Group>
-              {cardDetails.map((info, index, arr) => (
-                <CardFive
-                  key={index}
-                  title={info.title}
-                  stat={typeof info.value === "number" ? info.value : 0}
-                  container
-                  borderRight={index !== arr.length - 1}
-                  flex={1}
-                  loading={loading}
-                />
-              ))}
-            </Group>
-          </Paper>
-        </GridCol>
-
-        <GridCol span={4}>
-          <AccountCard
-            balance={balance}
-            currency="EUR"
-            companyName="C80 Limited"
-            iban="1234567890"
-          />
-        </GridCol>
-      </Grid>
-
-      <div className={styles.grid__cards}>
-        <Grid className={styles.grid__cards__two}>
-          <GridCol span={8} mih={100}>
-            <Paper mt={10} className={styles.payout__table}>
-              <Flex
-                style={{ borderBottom: "1px solid #f5f5f5" }}
-                justify="space-between"
-                align="center"
-                pb={14}
-              >
-                <Text className={styles.table__text} lts={0.5} fz={16} fw={600}>
-                  Debit Requests
-                </Text>
-
-                <Button
-                  component="a"
-                  href="/debit-requests"
-                  variant="transparent"
-                  color="#97AD05"
-                  fz={11}
-                  className={styles.table__cta}
-                >
-                  See all Debit Requests
-                </Button>
-              </Flex>
-
-              <TableScrollContainer
-                className={styles.table__container}
-                minWidth={500}
-              >
-                <Table className={styles.table} verticalSpacing="xs">
-                  <TableThead>
-                    <TableTr>
-                      <TableTh className={styles.table__th}>
-                        Account Name
-                      </TableTh>
-                      <TableTh className={styles.table__th}>Amount</TableTh>
-                      <TableTh className={styles.table__th}>
-                        Date Created
-                      </TableTh>
-                      <TableTh className={styles.table__th}>Status</TableTh>
-                    </TableTr>
-                  </TableThead>
-                  <TableTbody>
-                    {debitLoading ? DynamicSkeleton2(4) : rows}
-                  </TableTbody>
-                </Table>
-              </TableScrollContainer>
-            </Paper>
-          </GridCol>
-
-          <GridCol span={4}>
-            <Paper mt={10} className={styles.api__keys__container}>
-              <Flex
-                style={{ borderBottom: "1px solid #f5f5f5" }}
-                justify="space-between"
-                align="center"
-                pb={14}
-              >
-                <Text fz={16} fw={600}>
-                  API Keys
-                </Text>
-                {/* <Text>Test</Text> */}
-              </Flex>
-
-              <Stack mt={10} gap={0}>
-                <Text fz={12} c="#98A2B3">
-                  Test Key
-                </Text>
-
                 <Flex
-                  className={styles.key__container}
+                  style={{ borderBottom: "1px solid #f5f5f5" }}
                   justify="space-between"
                   align="center"
-                  // px={10}
+                  pb={14}
                 >
-                  <Text className={styles.key__container__text}>
-                    {`${test ? test?.key.slice(0, 20) : ""}****************`}
+                  <Text
+                    className={styles.table__text}
+                    lts={0.5}
+                    fz={16}
+                    fw={600}
+                  >
+                    Debit Requests
                   </Text>
 
-                  <Copy value={test?.key || ""} />
+                  <Button
+                    component="a"
+                    href="/debit-requests"
+                    variant="transparent"
+                    color="var(--prune-primary-800)"
+                    fz={11}
+                    className={styles.table__cta}
+                  >
+                    See all Debit Requests
+                  </Button>
                 </Flex>
-              </Stack>
 
-              <Stack mt={30} gap={0}>
-                <Text fz={12} c="#98A2B3">
-                  Live Key
-                </Text>
-
-                <Flex
-                  className={styles.key__container}
-                  justify="space-between"
-                  align="center"
-                  // px={10}
-                >
-                  <Text className={styles.key__container__text}>
-                    {`${live ? live?.key.slice(0, 20) : ""}****************`}
-                  </Text>
-
-                  <Copy value={live?.key || ""} />
-                </Flex>
-              </Stack>
-            </Paper>
-          </GridCol>
-        </Grid>
-
-        <Grid>
-          <GridCol span={8} mih={300}>
-            <Paper className={styles.chart__container}>
-              <div className={styles.container__text}>
-                <Text fz={16} fw={600}>
-                  Transaction Statistics
-                </Text>
-
-                <NativeSelect
-                  classNames={{
-                    wrapper: styles.select__wrapper,
-                    input: styles.select__input,
-                  }}
-                  onChange={(event) =>
-                    setChartFrequency(event.currentTarget.value)
-                  }
-                  data={["Monthly"]}
+                <TableComponent
+                  rows={rows}
+                  loading={debitLoading}
+                  head={debitTableHeader}
                 />
-              </div>
 
-              <AreaChart
-                h={250}
-                curveType="bump"
-                data={lineData}
-                dataKey="date"
-                series={[
-                  { name: "successful", color: "#22C55E" },
-                  { name: "failed", color: "#D92D20" },
-                  { name: "pending", color: "#F79009" },
-                ]}
-              />
-            </Paper>
-          </GridCol>
+                <EmptyTable
+                  loading={debitLoading}
+                  rows={rows}
+                  title="There are no debit request"
+                  text="When a debit request is made, they will appear here"
+                />
+              </Paper>
+            </GridCol>
 
-          <GridCol span={4}>
-            <Paper
-              style={{ border: "1px solid #f5f5f5", height: "100%" }}
-              p={10}
-            >
-              <Flex px={10} justify="space-between" align="center">
-                <Text fz={16} fw={600}>
-                  Transaction Volume
-                </Text>
+            <GridCol span={12} mih={300}>
+              <Paper className={styles.chart__container}>
+                <div className={styles.container__text}>
+                  <Text fz={16} fw={600}>
+                    Transaction Statistics
+                  </Text>
 
-                <Flex>
                   <NativeSelect
                     classNames={{
                       wrapper: styles.select__wrapper,
@@ -466,57 +313,163 @@ export default function Home() {
                     onChange={(event) =>
                       setChartFrequency(event.currentTarget.value)
                     }
-                    data={["Monthly", "Weekly"]}
+                    data={["Monthly"]}
+                  />
+                </div>
+
+                <AreaChart
+                  h={250}
+                  curveType="bump"
+                  data={lineData}
+                  dataKey="date"
+                  series={[
+                    { name: "successful", color: "#22C55E" },
+                    { name: "failed", color: "#D92D20" },
+                    { name: "pending", color: "#F79009" },
+                  ]}
+                />
+              </Paper>
+            </GridCol>
+          </Grid>
+        </GridCol>
+
+        <GridCol span={4.5}>
+          <Grid h="100%">
+            <GridCol span={12}>
+              <AccountCard
+                balance={balance}
+                currency="EUR"
+                companyName="C80 Limited"
+                iban="1234567890"
+              />
+            </GridCol>
+
+            <GridCol span={12}>
+              <Paper p={16} style={{ border: "1px solid #f5f5f5" }}>
+                <Flex
+                  style={{ borderBottom: "1px solid #f5f5f5" }}
+                  justify="space-between"
+                  align="center"
+                  pb={14}
+                >
+                  <Text fz={16} fw={600}>
+                    API Keys
+                  </Text>
+                  {/* <Text>Test</Text> */}
+                </Flex>
+
+                <Stack mt={10} gap={0}>
+                  <Text fz={12} c="#98A2B3">
+                    Test Key
+                  </Text>
+
+                  <Flex
+                    className={styles.key__container}
+                    justify="space-between"
+                    align="center"
+                    // px={10}
+                  >
+                    <Text className={styles.key__container__text}>
+                      {`${test ? test?.key.slice(0, 20) : ""}****************`}
+                    </Text>
+
+                    <Copy value={test?.key || ""} />
+                  </Flex>
+                </Stack>
+
+                <Stack mt={30} gap={0}>
+                  <Text fz={12} c="#98A2B3">
+                    Live Key
+                  </Text>
+
+                  <Flex
+                    className={styles.key__container}
+                    justify="space-between"
+                    align="center"
+                    // px={10}
+                  >
+                    <Text className={styles.key__container__text}>
+                      {`${live ? live?.key.slice(0, 20) : ""}****************`}
+                    </Text>
+
+                    <Copy value={live?.key || ""} />
+                  </Flex>
+                </Stack>
+              </Paper>
+            </GridCol>
+
+            <GridCol span={"auto"} mih={354} h={354}>
+              <Paper
+                style={{ border: "1px solid #f5f5f5", height: "100%" }}
+                p={10}
+                flex={1}
+              >
+                <Flex px={10} justify="space-between" align="center">
+                  <Text fz={16} fw={600}>
+                    Transaction Volume
+                  </Text>
+
+                  <Flex>
+                    <NativeSelect
+                      classNames={{
+                        wrapper: styles.select__wrapper,
+                        input: styles.select__input,
+                      }}
+                      onChange={(event) =>
+                        setChartFrequency(event.currentTarget.value)
+                      }
+                      data={["Monthly", "Weekly"]}
+                    />
+                  </Flex>
+                </Flex>
+
+                <Flex justify="center" mt={37}>
+                  <DonutChart
+                    startAngle={180}
+                    endAngle={0}
+                    // paddingAngle={4}
+                    data={donutData}
+                    chartLabel={formatNumber(
+                      donutData.reduce((prv, cur) => {
+                        return cur.value + prv;
+                      }, 0),
+                      true,
+                      "EUR"
+                    )}
+                    size={200}
+                    thickness={20}
                   />
                 </Flex>
-              </Flex>
 
-              <Flex justify="center" mt={37}>
-                <DonutChart
-                  startAngle={180}
-                  endAngle={0}
-                  // paddingAngle={4}
-                  data={donutData}
-                  chartLabel={formatNumber(
-                    donutData.reduce((prv, cur) => {
-                      return cur.value + prv;
-                    }, 0),
-                    true,
-                    "EUR"
-                  )}
-                  size={200}
-                  thickness={20}
-                />
-              </Flex>
+                <Flex px={10} gap={15} mt={-30}>
+                  {donutData.map((item, index) => {
+                    return (
+                      <Flex
+                        style={{ borderLeft: `3px solid ${item.color}` }}
+                        flex={1}
+                        key={index}
+                        direction="column"
+                        pl={10}
+                      >
+                        <Flex align="center" gap={5}>
+                          {/* <IconSquareFilled color={item.color} size={14} /> */}
+                          <Text fz={12} c="#98A2B3">
+                            {item.name}
+                          </Text>
+                        </Flex>
 
-              <Flex px={10} gap={15} mt={-30}>
-                {donutData.map((item, index) => {
-                  return (
-                    <Flex
-                      style={{ borderLeft: `3px solid ${item.color}` }}
-                      flex={1}
-                      key={index}
-                      direction="column"
-                      pl={10}
-                    >
-                      <Flex align="center" gap={5}>
-                        {/* <IconSquareFilled color={item.color} size={14} /> */}
-                        <Text fz={12} c="#98A2B3">
-                          {item.name}
+                        <Text fz={12} fw={600}>
+                          {formatNumber(item.value, true, "EUR")}
                         </Text>
                       </Flex>
-
-                      <Text fz={12} fw={600}>
-                        {formatNumber(item.value, true, "EUR")}
-                      </Text>
-                    </Flex>
-                  );
-                })}
-              </Flex>
-            </Paper>
-          </GridCol>
-        </Grid>
-      </div>
+                    );
+                  })}
+                </Flex>
+              </Paper>
+            </GridCol>
+          </Grid>
+        </GridCol>
+      </Grid>
 
       <Modal
         size="xl"
@@ -552,3 +505,209 @@ const Copy = ({ value }: { value: string }) => {
     </CopyButton>
   );
 };
+
+const debitTableHeader = ["Account Name", "Amount", "Date Created", "Status"];
+
+//  <div className={styles.grid__cards}>
+//    <Grid className={styles.grid__cards__two}>
+//      <GridCol span={8} mih={100}>
+//        <Paper mt={10} className={styles.payout__table}>
+//          <Flex
+//            style={{ borderBottom: "1px solid #f5f5f5" }}
+//            justify="space-between"
+//            align="center"
+//            pb={14}
+//          >
+//            <Text className={styles.table__text} lts={0.5} fz={16} fw={600}>
+//              Debit Requests
+//            </Text>
+
+//            <Button
+//              component="a"
+//              href="/debit-requests"
+//              variant="transparent"
+//              color="#97AD05"
+//              fz={11}
+//              className={styles.table__cta}
+//            >
+//              See all Debit Requests
+//            </Button>
+//          </Flex>
+
+//          <TableScrollContainer
+//            className={styles.table__container}
+//            minWidth={500}
+//          >
+//            <Table className={styles.table} verticalSpacing="xs">
+//              <TableThead>
+//                <TableTr>
+//                  <TableTh className={styles.table__th}>Account Name</TableTh>
+//                  <TableTh className={styles.table__th}>Amount</TableTh>
+//                  <TableTh className={styles.table__th}>Date Created</TableTh>
+//                  <TableTh className={styles.table__th}>Status</TableTh>
+//                </TableTr>
+//              </TableThead>
+//              <TableTbody>
+//                {debitLoading ? DynamicSkeleton2(4) : rows}
+//              </TableTbody>
+//            </Table>
+//          </TableScrollContainer>
+//        </Paper>
+//      </GridCol>
+
+//      <GridCol span={4}>
+//        <Paper mt={10} className={styles.api__keys__container}>
+//          <Flex
+//            style={{ borderBottom: "1px solid #f5f5f5" }}
+//            justify="space-between"
+//            align="center"
+//            pb={14}
+//          >
+//            <Text fz={16} fw={600}>
+//              API Keys
+//            </Text>
+//            {/* <Text>Test</Text> */}
+//          </Flex>
+
+//          <Stack mt={10} gap={0}>
+//            <Text fz={12} c="#98A2B3">
+//              Test Key
+//            </Text>
+
+//            <Flex
+//              className={styles.key__container}
+//              justify="space-between"
+//              align="center"
+//              // px={10}
+//            >
+//              <Text className={styles.key__container__text}>
+//                {`${test ? test?.key.slice(0, 20) : ""}****************`}
+//              </Text>
+
+//              <Copy value={test?.key || ""} />
+//            </Flex>
+//          </Stack>
+
+//          <Stack mt={30} gap={0}>
+//            <Text fz={12} c="#98A2B3">
+//              Live Key
+//            </Text>
+
+//            <Flex
+//              className={styles.key__container}
+//              justify="space-between"
+//              align="center"
+//              // px={10}
+//            >
+//              <Text className={styles.key__container__text}>
+//                {`${live ? live?.key.slice(0, 20) : ""}****************`}
+//              </Text>
+
+//              <Copy value={live?.key || ""} />
+//            </Flex>
+//          </Stack>
+//        </Paper>
+//      </GridCol>
+//    </Grid>
+
+//    <Grid>
+//      <GridCol span={8} mih={300}>
+//        <Paper className={styles.chart__container}>
+//          <div className={styles.container__text}>
+//            <Text fz={16} fw={600}>
+//              Transaction Statistics
+//            </Text>
+
+//            <NativeSelect
+//              classNames={{
+//                wrapper: styles.select__wrapper,
+//                input: styles.select__input,
+//              }}
+//              onChange={(event) =>
+//                setChartFrequency(event.currentTarget.value)
+//              }
+//              data={["Monthly"]}
+//            />
+//          </div>
+
+//          <AreaChart
+//            h={250}
+//            curveType="bump"
+//            data={lineData}
+//            dataKey="date"
+//            series={[
+//              { name: "successful", color: "#22C55E" },
+//              { name: "failed", color: "#D92D20" },
+//              { name: "pending", color: "#F79009" },
+//            ]}
+//          />
+//        </Paper>
+//      </GridCol>
+
+//      <GridCol span={4}>
+//        <Paper style={{ border: "1px solid #f5f5f5", height: "100%" }} p={10}>
+//          <Flex px={10} justify="space-between" align="center">
+//            <Text fz={16} fw={600}>
+//              Transaction Volume
+//            </Text>
+
+//            <Flex>
+//              <NativeSelect
+//                classNames={{
+//                  wrapper: styles.select__wrapper,
+//                  input: styles.select__input,
+//                }}
+//                onChange={(event) =>
+//                  setChartFrequency(event.currentTarget.value)
+//                }
+//                data={["Monthly", "Weekly"]}
+//              />
+//            </Flex>
+//          </Flex>
+
+//          <Flex justify="center" mt={37}>
+//            <DonutChart
+//              startAngle={180}
+//              endAngle={0}
+//              // paddingAngle={4}
+//              data={donutData}
+//              chartLabel={formatNumber(
+//                donutData.reduce((prv, cur) => {
+//                  return cur.value + prv;
+//                }, 0),
+//                true,
+//                "EUR"
+//              )}
+//              size={200}
+//              thickness={20}
+//            />
+//          </Flex>
+
+//          <Flex px={10} gap={15} mt={-30}>
+//            {donutData.map((item, index) => {
+//              return (
+//                <Flex
+//                  style={{ borderLeft: `3px solid ${item.color}` }}
+//                  flex={1}
+//                  key={index}
+//                  direction="column"
+//                  pl={10}
+//                >
+//                  <Flex align="center" gap={5}>
+//                    {/* <IconSquareFilled color={item.color} size={14} /> */}
+//                    <Text fz={12} c="#98A2B3">
+//                      {item.name}
+//                    </Text>
+//                  </Flex>
+
+//                  <Text fz={12} fw={600}>
+//                    {formatNumber(item.value, true, "EUR")}
+//                  </Text>
+//                </Flex>
+//              );
+//            })}
+//          </Flex>
+//        </Paper>
+//      </GridCol>
+//    </Grid>
+//  </div>;

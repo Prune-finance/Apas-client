@@ -53,7 +53,7 @@ export const AccountCard = ({
               <GiEuropeanFlag />
             </ThemeIcon>
 
-            <Text>{`${currency} ${
+            <Text fz={14} fw={500}>{`${currency} ${
               companyName ? "- " + companyName : ""
             }`}</Text>
           </Group>

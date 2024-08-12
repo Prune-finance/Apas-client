@@ -8,6 +8,7 @@ export const loginValues = {
 export const registerValues = {
   email: "",
   password: "",
+  confirmPassword: "",
 };
 
 export const validateLogin = z.object({
@@ -33,14 +34,18 @@ export const validateRegister = z
           include at least one uppercase letter, 
           one lowercase letter, a number, and one special character`
       ),
-    confirmPassword: z.string({
-      required_error: "Confirm Password is required",
-    }),
+    confirmPassword: z
+      .string({
+        required_error: "Confirm Password is required",
+      })
+      .min(1, "Confirm Password is required"),
   })
   .refine((values) => values.confirmPassword === values.password, {
-    message: "Password and confirm password must match",
+    message: "Passwords must match",
     path: ["confirmPassword"],
   });
+
+export type RegisterType = z.infer<typeof validateRegister>;
 
 export const directorEtShareholderSchema = {
   name: "",

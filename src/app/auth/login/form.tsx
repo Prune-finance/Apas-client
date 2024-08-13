@@ -76,6 +76,7 @@ export default function LoginForm() {
         w="15ch"
         p={0}
         c="var(--prune-primary-800)"
+        link="/auth/forgot-password"
       />
 
       {/* <Group gap={2}>

@@ -1,0 +1,17 @@
+.container {
+  max-height: 100svh;
+  height: 100svh;
+  display: grid;
+  place-items: center;
+
+  .paper {
+    padding: 40px 37px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    // .input:focus {
+    //   border: 1px solid var(--prune-primary-700);
+    // }
+  }
+}

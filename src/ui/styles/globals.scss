@@ -153,3 +153,28 @@ a {
     background-color: #fbfee6;
   }
 }
+
+.mantine-TextInput-input,
+.mantine-TextInput-error,
+.mantine-PasswordInput-innerInput,
+.mantine-PasswordInput-error,
+.mantine-DateInput-input,
+.mantine-DateInput-error,
+.mantine-YearPickerInput-input,
+.mantine-YearPickerInput-error,
+.mantine-Select-input,
+.mantine-Select-error,
+.mantine-Select-option,
+.mantine-MultiSelect-input,
+.mantine-MultiSelect-error,
+.mantine-MultiSelect-option,
+.mantine-Textarea-input,
+.mantine-Textarea-error,
+.mantine-NumberInput-input,
+.mantine-NumberInput-error,
+.mantine-RichTextEditor-input,
+.mantine-RichTextEditor-content {
+  &:focus {
+    border: 1px solid var(--prune-primary-700);
+  }
+}

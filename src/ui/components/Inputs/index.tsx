@@ -39,8 +39,7 @@ export const LoginInput = ({ form, label }: InputProps) => {
               my: 0,
               py: 0,
             }}
-            // variant="unstyled"
-
+            styles={{ input: { border: "none" } }}
             classNames={{
               input: styles.input,
               label: styles.label,
@@ -64,7 +63,8 @@ export const LoginInput = ({ form, label }: InputProps) => {
               label: styles.label,
               innerInput: styles.innerInput,
             }}
-            placeholder="******************"
+            styles={{ innerInput: { border: "none" } }}
+            placeholder="Enter Password"
             {...form.getInputProps(`${label}`)}
             error={false}
           />
@@ -106,8 +106,7 @@ export const RegisterInput = ({ form, label, ...props }: RegisterProps) => {
               my: 0,
               py: 0,
             }}
-            // variant="unstyled"
-
+            styles={{ input: { border: "none" } }}
             classNames={{
               input: styles.input,
               label: styles.label,
@@ -126,13 +125,14 @@ export const RegisterInput = ({ form, label, ...props }: RegisterProps) => {
               c: "var(--prune-text-gray-400)",
               tt: "capitalize",
             }}
+            styles={{ innerInput: { border: "none" } }}
             variant="unstyled"
             classNames={{
               input: styles.input,
               label: styles.label,
               innerInput: styles.innerInput,
             }}
-            placeholder="******************"
+            placeholder="Enter Password"
             {...form.getInputProps(`${label}`)}
             error={false}
           />

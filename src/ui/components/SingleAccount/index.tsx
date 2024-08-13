@@ -83,7 +83,8 @@ export default function SingleAccount({
   const accountDetails = [
     {
       title: "Euro Account",
-      value: transactions.reduce((acc, cur) => acc + cur.amount, 0),
+      value: account?.accountBalance,
+      // value: transactions.reduce((acc, cur) => acc + cur.amount, 0),
       formatted: true,
       currency: "EUR",
     },
@@ -101,6 +102,7 @@ export default function SingleAccount({
     // { title: "Bank", value: "Wema" },
     { title: "Account Name", value: account?.accountName },
     { title: "Account No", value: account?.accountNumber },
+    { title: "Account Type", value: account?.type },
   ];
 
   const lineData = useMemo(() => {

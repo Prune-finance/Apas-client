@@ -20,6 +20,7 @@ import {
   IconPointFilled,
   IconArrowsSort,
   IconPremiumRights,
+  IconArrowUpRight,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -86,6 +87,11 @@ export const UserMainLinks = [
     text: "Accounts",
     link: "/accounts",
     icon: <IconUsers size={16} />,
+  },
+  {
+    text: "Payouts",
+    link: "/payouts",
+    icon: <IconArrowUpRight size={16} />,
   },
   {
     text: "Debit Requests",

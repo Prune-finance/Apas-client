@@ -12,6 +12,7 @@ type Props<T> = {
   form: UseFormReturnType<T>;
   isStatus?: boolean;
   approvalStatus?: boolean;
+  frozenStatus?: boolean;
 };
 
 export default function Filter<T>({
@@ -21,6 +22,7 @@ export default function Filter<T>({
   form,
   isStatus,
   approvalStatus,
+  frozenStatus,
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
@@ -72,9 +74,11 @@ export default function Filter<T>({
             placeholder="Status"
             {...form.getInputProps("status")}
             data={
-              !approvalStatus
-                ? ["Active", "Inactive", "Frozen"]
-                : approvalOptions
+              approvalStatus
+                ? approvalOptions
+                : frozenStatus
+                ? frozenActiveOptions
+                : ["Active", "Inactive"]
             }
             size="xs"
             w={120}
@@ -121,3 +125,5 @@ const approvalOptions = [
   "Confirmed",
   "Failed",
 ];
+
+const frozenActiveOptions = ["Active", "Inactive", "Frozen"];

@@ -213,7 +213,7 @@ function AccountRequests() {
   };
 
   const rows = filteredSearch(
-    businesses,
+    businesses.filter((biz) => Boolean(biz._count.AccountRequests)),
     ["name", "legalEntity"],
     debouncedSearch
   ).map((element, index) => (

@@ -23,7 +23,7 @@ export default function TransactionForAccount() {
   const customParams = {
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status }),
   };
 

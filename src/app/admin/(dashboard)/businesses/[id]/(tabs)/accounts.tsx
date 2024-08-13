@@ -104,7 +104,7 @@ export default function Accounts({
     page: active,
     limit: isNaN(Number(limit)) ? 10 : parseInt(limit ?? "10", 10),
     ...(status && { status }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
   };
   const {
     loading: loadingTrx,

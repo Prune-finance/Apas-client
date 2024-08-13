@@ -82,7 +82,7 @@ function Businesses() {
     ...(!limit || isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status }),
     ...(sort && { sort }),
     page: active,

@@ -148,6 +148,11 @@ const RowComponent = ({
 };
 
 const MenuComponent = ({ id }: { id: string }) => {
+  const menuItems = {
+    edit: <IconEdit style={{ width: rem(14), height: rem(14) }} />,
+    duplicate: <IconCopy style={{ width: rem(14), height: rem(14) }} />,
+  };
+
   return (
     <Menu shadow="md" width={150}>
       <MenuTarget>
@@ -157,40 +162,19 @@ const MenuComponent = ({ id }: { id: string }) => {
       </MenuTarget>
 
       <MenuDropdown>
-        {/* <Link href={`/admin/accounts/${id}`}>
+        {Object.entries(menuItems).map(([key, item]) => (
           <MenuItem
+            key={key}
+            component={Link}
+            href={`/admin/pricing-plans/${id}/${key}`}
             fz={10}
             c="#667085"
-            leftSection={
-              <IconEye style={{ width: rem(14), height: rem(14) }} />
-            }
+            tt="capitalize"
+            leftSection={item}
           >
-            View
+            {key}
           </MenuItem>
-        </Link> */}
-
-        <MenuItem
-          component={Link}
-          href={`/admin/pricing-plans/${id}/edit`}
-          fz={10}
-          c="#667085"
-          leftSection={<IconEdit style={{ width: rem(14), height: rem(14) }} />}
-        >
-          Edit
-        </MenuItem>
-
-        <MenuItem
-          // onClick={() => {
-          //   setRowId(id);
-          //   if (status === "INACTIVE") return activateOpen();
-          //   open();
-          // }}
-          fz={10}
-          c="#667085"
-          leftSection={<IconCopy style={{ width: rem(14), height: rem(14) }} />}
-        >
-          Duplicate
-        </MenuItem>
+        ))}
       </MenuDropdown>
     </Menu>
   );

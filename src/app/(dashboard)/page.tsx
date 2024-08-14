@@ -43,8 +43,6 @@ export default function Home() {
   const { transactions } = useUserTransactions();
   const { account, loading: loadingDftAcct } = useUserDefaultAccount();
 
-  console.log(account);
-
   const [opened, { open, close }] = useDisclosure(false);
 
   const [keys, setKeys] = useState<Key[]>([]);
@@ -341,8 +339,9 @@ export default function Home() {
               <AccountCard
                 balance={account?.accountBalance ?? 0}
                 currency="EUR"
-                companyName={account?.accountName}
-                iban={account?.accountNumber ?? ""}
+                companyName={account?.accountName ?? "No Default Account"}
+                iban={account?.accountNumber ?? "No Default Account"}
+                loading={loadingDftAcct}
               />
             </GridCol>
 

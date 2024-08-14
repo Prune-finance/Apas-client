@@ -191,7 +191,6 @@ export function useUserDefaultAccount() {
         { withCredentials: true }
       );
 
-      console.log(data);
       setAccount(data.data);
     } catch (error) {
       console.log(error);

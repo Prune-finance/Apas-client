@@ -32,7 +32,7 @@ type Props = {
 };
 
 export const AccountTransactionDrawer = ({}: Props) => {
-  const { data: transaction, close, opened } = Transaction();
+  const { data: transaction, close, opened, clearData } = Transaction();
   const beneficiaryDetails = {
     "Account Name": transaction?.recipientBankCountry,
     "Account Number/IBAN": transaction?.recipientIban,
@@ -78,7 +78,10 @@ export const AccountTransactionDrawer = ({}: Props) => {
   return (
     <Drawer
       opened={opened}
-      onClose={close}
+      onClose={() => {
+        close();
+        clearData();
+      }}
       position="right"
       title={
         <Text ml={28} fz={18} fw={600} c="#1D2939">

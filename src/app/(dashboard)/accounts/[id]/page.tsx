@@ -39,7 +39,11 @@ import { AreaChart, BarChart, DonutChart } from "@mantine/charts";
 import { useMemo, useState } from "react";
 import { formatNumber } from "@/lib/utils";
 import { AccountData, useSingleUserAccount } from "@/lib/hooks/accounts";
-import { TrxData, useUserTransactions } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  TrxData,
+  useUserTransactions,
+} from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import { DynamicSkeleton } from "@/lib/static";
 
@@ -198,9 +202,10 @@ export default function Account() {
 
       <SingleAccountBody
         account={account}
-        transactions={transactions}
+        transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={trxLoading}
+        setChartFrequency={setChartFrequency}
       />
 
       <Modal

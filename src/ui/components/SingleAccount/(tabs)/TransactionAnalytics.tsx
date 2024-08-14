@@ -20,21 +20,6 @@ export default function TransactionStatistics({
   setChartFrequency,
   lineData,
 }: Props) {
-  const trxStatsData = [
-    { name: "Jan", Inflow: undefined, Outflow: undefined },
-    { name: "Feb", Inflow: undefined, Outflow: undefined },
-    { name: "Mar", Inflow: undefined, Outflow: undefined },
-    { name: "Apr", Inflow: undefined, Outflow: undefined },
-    { name: "May", Inflow: undefined, Outflow: undefined },
-    { name: "Jun", Inflow: undefined, Outflow: undefined },
-    { name: "Jul", Inflow: undefined, Outflow: undefined },
-    { name: "Aug", Inflow: undefined, Outflow: undefined },
-    { name: "Sep", Inflow: undefined, Outflow: undefined },
-    { name: "Oct", Inflow: undefined, Outflow: undefined },
-    { name: "Nov", Inflow: undefined, Outflow: undefined },
-    { name: "Dec", Inflow: undefined, Outflow: undefined },
-  ];
-
   return (
     <Paper style={{ border: "1px solid #f5f5f5" }} p={20} pl={40}>
       <Flex justify="space-between" align="center" mb={15}>

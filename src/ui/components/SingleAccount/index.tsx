@@ -59,6 +59,9 @@ import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import TabsComponent from "../Tabs";
 import { GiEuropeanFlag } from "react-icons/gi";
 import { SearchInput } from "../Inputs";
+import AccountDetails from "./(tabs)/AccountDetails";
+import { Transactions } from "./(tabs)/Transactions";
+import { Analytics } from "./(tabs)/Analytics";
 
 type Param = { id: string };
 interface Props {
@@ -542,6 +545,7 @@ interface SingleAccountProps {
   transactions: TransactionType[];
   loading: boolean;
   loadingTrx: boolean;
+  setChartFrequency: Dispatch<SetStateAction<string>>;
 }
 
 export const SingleAccountBody = ({
@@ -549,8 +553,8 @@ export const SingleAccountBody = ({
   transactions,
   loading,
   loadingTrx,
+  setChartFrequency,
 }: SingleAccountProps) => {
-  const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
     "No. of Transaction": transactions.length,
@@ -559,23 +563,7 @@ export const SingleAccountBody = ({
     "Account Type": account?.type,
     "Last Seen": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
   };
-  const accountDetails = {
-    "Account Name": account?.accountName,
-    "IBAN/Account Number": account?.accountNumber,
-    BIC: "233423421",
-    "Bank Name": "Community Federal Savings Bank",
-    "Bank Address": "Via Alessandro Specchi, 16, 00186 Roma",
-    "Bank Country": "France",
-  };
 
-  const overviewDetails = [
-    {
-      title: "Total Balance",
-      value: totalBal,
-    },
-    { title: "Money In", value: 0 },
-    { title: "Money Out", value: totalBal },
-  ];
   return (
     <Box mt={32}>
       <Grid>
@@ -601,87 +589,16 @@ export const SingleAccountBody = ({
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
-          <Group gap={7}>
-            <ThemeIcon radius="xl" color="#0052B4">
-              <GiEuropeanFlag />
-            </ThemeIcon>
-            <Text fz={16} fw={500}>
-              EUR Account Details
-            </Text>
-            <CopyButton value={account?.accountNumber ?? ""}>
-              {({ copied, copy }) => (
-                <PrimaryBtn
-                  text={copied ? "Copied" : "Copy Detail"}
-                  action={copy}
-                  td="underline"
-                  c="var(--prune-primary-800)"
-                  variant="light"
-                  radius="xl"
-                  size="xs"
-                />
-              )}
-            </CopyButton>
-          </Group>
-
-          <Paper
-            withBorder
-            p={16}
-            mt={12}
-            style={{ border: "1px solid #f5f5f5" }}
-          >
-            <Grid>
-              <GridCol span={9}>
-                <SimpleGrid cols={3} verticalSpacing={28}>
-                  {Object.entries(accountDetails).map(([key, value]) => (
-                    <Stack gap={2} key={key}>
-                      <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
-                        {key}
-                      </Text>
-                      {!loading || !loadingTrx ? (
-                        <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
-                          {value}
-                        </Text>
-                      ) : (
-                        <Skeleton w={100} h={10} />
-                      )}
-                    </Stack>
-                  ))}
-                </SimpleGrid>
-              </GridCol>
-            </Grid>
-          </Paper>
+          <AccountDetails account={account} loading={loading} />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
-          <InfoCards title="Overview" details={overviewDetails} />
-
-          <Group mt={32} justify="space-between">
-            <SearchInput />
-
-            <Group gap={12}>
-              <SecondaryBtn text="Filter" icon={IconListTree} />
-              <SecondaryBtn text="Filter" icon={IconArrowUpRight} />
-              <SecondaryBtn
-                text="Download Statement"
-                icon={IconCircleArrowDown}
-              />
-            </Group>
-          </Group>
-
-          <TableComponent
-            rows={<RowComponent data={transactions} />}
-            head={tableHeaders}
-            loading={loadingTrx}
-          />
-
-          <EmptyTable
-            loading={loadingTrx}
-            rows={transactions}
-            title="There are no transactions for this account"
-            text="When a transaction is recorded, it will appear here"
-          />
+          <Transactions transactions={transactions} loading={loadingTrx} />
         </TabsPanel>
-        <TabsPanel value={tabs[2].value}>
-          <Text>Tabs 3</Text>
+        <TabsPanel value={tabs[2].value} mt={28}>
+          <Analytics
+            transactions={transactions}
+            setChartFrequency={setChartFrequency}
+          />
         </TabsPanel>
       </TabsComponent>
     </Box>

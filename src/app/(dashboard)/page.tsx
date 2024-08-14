@@ -341,6 +341,7 @@ export default function Home() {
                 currency="EUR"
                 companyName={account?.accountName ?? "No Default Account"}
                 iban={account?.accountNumber ?? "No Default Account"}
+                bic={"233423421"}
                 loading={loadingDftAcct}
               />
             </GridCol>

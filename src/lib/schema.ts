@@ -272,26 +272,6 @@ export const directorsSchema = z.object({
     .optional(),
 });
 
-// export const directorsSchema = z
-//   .object({
-//     name: z.string().min(1, "Director's name is required"),
-//     email: z.string().refine(
-//       (val) => {
-//         if (!val) return true;
-//         return emailSchema.safeParse(val).success;
-//       },
-//       { message: "Invalid director's email" }
-//     ),
-//     identityType: z.string(),
-//     proofOfAddress: z.string(),
-//     identityFileUrl: z.string(),
-//     identityFileUrlBack: z.string(),
-
-//     proofOfAddressFileUrl: z.string(),
-//   })
-//   .array()
-//   .optional();
-
 export const shareholdersSchema = z.object({
   shareholders: z
     .array(
@@ -496,3 +476,45 @@ export const pricingPlanSchema = z
   });
 
 export type PricingPlanType = z.infer<typeof pricingPlanSchema>;
+
+export const resetPasswordValues = {
+  password: "",
+  confirmPassword: "",
+  otp: "",
+};
+
+export const resetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters long")
+      .regex(
+        /(?=.*[a-z])/,
+        "Password must contain at least one lowercase letter"
+      )
+      .regex(
+        /(?=.*[A-Z])/,
+        "Password must contain at least one uppercase letter"
+      )
+      .regex(/(?=.*[0-9])/, "Password must contain at least one number")
+      .regex(
+        /(?=.*[^A-Za-z0-9])/,
+        "Password must contain at least one special character"
+      ),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+    otp: z
+      .union([
+        z.string().min(4, "OTP must be 4 characters"),
+        z.number().min(4, "OTP must be 4 characters"),
+      ])
+      .refine((data) => data, {
+        message: "OTP is required to reset password",
+        // path: ["otp"],
+      }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export type ResetPasswordType = z.infer<typeof resetPasswordSchema>;

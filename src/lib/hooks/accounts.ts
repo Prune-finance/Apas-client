@@ -179,6 +179,40 @@ export function useSingleUserAccount(id: string) {
   return { loading, account, revalidate };
 }
 
+export function useUserDefaultAccount() {
+  const [account, setAccount] = useState<AccountData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/default`,
+        { withCredentials: true }
+      );
+
+      console.log(data);
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+
 export interface AccountMeta {
   active: number;
   inactive: number;

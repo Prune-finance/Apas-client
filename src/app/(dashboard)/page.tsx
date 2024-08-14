@@ -15,7 +15,7 @@ import { IconPointFilled, IconSquareFilled } from "@tabler/icons-react";
 
 import { formatNumber } from "@/lib/utils";
 import { DynamicSkeleton2, UserDashboardData } from "@/lib/static";
-import { useUserAccounts } from "@/lib/hooks/accounts";
+import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
 
 import { CardFive, CardOne, CardOneBtn } from "@/ui/components/Cards";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -41,6 +41,9 @@ export default function Home() {
   const { loading: debitLoading, requests } = useUserDebitRequests();
   const { loading: balanceLoading, balance } = useUserBalances();
   const { transactions } = useUserTransactions();
+  const { account, loading: loadingDftAcct } = useUserDefaultAccount();
+
+  console.log(account);
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -50,7 +53,6 @@ export default function Home() {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       const { user } = await checkToken();
-      console.log(user);
     };
 
     fetchCurrentUser();
@@ -337,10 +339,10 @@ export default function Home() {
           <Grid h="100%">
             <GridCol span={12}>
               <AccountCard
-                balance={balance}
+                balance={account?.accountBalance ?? 0}
                 currency="EUR"
-                companyName="C80 Limited"
-                iban="1234567890"
+                companyName={account?.accountName}
+                iban={account?.accountNumber ?? ""}
               />
             </GridCol>
 

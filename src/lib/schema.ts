@@ -504,8 +504,8 @@ export const resetPasswordSchema = z
     confirmPassword: z.string().min(1, "Please confirm your password"),
     otp: z
       .union([
-        z.string().min(4, "OTP must be 4 characters"),
-        z.number().min(4, "OTP must be 4 characters"),
+        z.string().min(6, "OTP must be 6 characters"),
+        z.number().min(6, "OTP must be 6 characters"),
       ])
       .refine((data) => data, {
         message: "OTP is required to reset password",

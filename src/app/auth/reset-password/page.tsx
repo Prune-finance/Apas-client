@@ -66,6 +66,7 @@ export default function UserForgotPassword() {
               {...form.getInputProps("otp")}
               mt={30}
               type="number"
+              length={6}
               error={!!form.errors.otp}
             />
 

@@ -15,6 +15,8 @@ import {
   Modal,
   Paper,
   Select,
+  SimpleGrid,
+  TabsPanel,
 } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
@@ -38,7 +40,11 @@ import {
 import Link from "next/link";
 
 import ModalComponent from "./modal";
-import { useAccounts, useUserAccounts } from "@/lib/hooks/accounts";
+import {
+  useAccounts,
+  useUserAccounts,
+  useUserDefaultAccount,
+} from "@/lib/hooks/accounts";
 import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { formatNumber } from "@/lib/utils";
 
@@ -57,6 +63,11 @@ import { z } from "zod";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import { SearchInput } from "@/ui/components/Inputs";
+import { SecondaryBtn } from "@/ui/components/Buttons";
+import { TableComponent } from "@/ui/components/Table";
+import TabsComponent from "@/ui/components/Tabs";
+import { AccountCard } from "@/ui/components/Cards/AccountCard";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -73,12 +84,14 @@ function Accounts() {
     ...(isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toUpperCase() }),
     page: active,
   });
+
+  const { account, loading: loadingDftAcct } = useUserDefaultAccount();
 
   const { handleSuccess } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -363,81 +376,70 @@ function Accounts() {
       {/* <Breadcrumbs items={[{ title: "Accounts", href: "/accounts" }]} /> */}
 
       <Paper className={styles.table__container}>
-        <div className={styles.container__header}>
+        <div
+        // className={styles.container__header}
+        >
           <Text fz={18} fw={600}>
             Accounts
           </Text>
+          <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
+            Here’s an overview of your accounts
+          </Text>
         </div>
 
-        <Group justify="space-between" mt={30}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+        <TabsComponent tabs={tabs} mt={32}>
+          <TabsPanel value={tabs[0].value}>
+            <SimpleGrid cols={3} mt={32}>
+              <AccountCard
+                balance={account?.accountBalance ?? 0}
+                currency="EUR"
+                companyName={account?.accountName ?? "No Default Account"}
+                iban={account?.accountNumber ?? "No Default Account"}
+                bic={"233423421"}
+                loading={loadingDftAcct}
+                link={`/accounts/default`}
+              />
+            </SimpleGrid>
+          </TabsPanel>
 
-          <Button
-            // className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            fz={12}
-            fw={500}
-            onClick={toggle}
-            variant="outline"
-            c="var(--prune-text-gray-800)"
-            color="var(--prune-text-gray-200)"
-          >
-            Filter
-          </Button>
-        </Group>
+          <TabsPanel value={tabs[1].value}>
+            <Group justify="space-between" mt={30}>
+              <SearchInput search={search} setSearch={setSearch} />
 
-        <Filter opened={openedFilter} toggle={toggle} form={form}>
-          <Select
-            placeholder="Type"
-            {...form.getInputProps("type")}
-            data={["Corporate", "User"]}
-            size="xs"
-            w={120}
-            h={36}
-          />
-        </Filter>
+              <SecondaryBtn text="Filter" action={toggle} />
+            </Group>
 
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                <TableTh className={styles.table__th}>Account Name</TableTh>
-                <TableTh className={styles.table__th}>Account Number</TableTh>
-                <TableTh className={styles.table__th}>Account Balance</TableTh>
-                <TableTh className={styles.table__th}>Type</TableTh>
-                <TableTh className={styles.table__th}>Business</TableTh>
-                <TableTh className={styles.table__th}>Date Created</TableTh>
-                <TableTh className={styles.table__th}>Status</TableTh>
-                <TableTh className={styles.table__th}>Action</TableTh>
-              </TableTr>
-            </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton2(8) : rows}</TableTbody>
-          </Table>
-        </TableScrollContainer>
+            <Filter opened={openedFilter} toggle={toggle} form={form}>
+              <Select
+                placeholder="Type"
+                {...form.getInputProps("type")}
+                data={["Corporate", "User"]}
+                size="xs"
+                w={120}
+                h={36}
+              />
+            </Filter>
 
-        <EmptyTable
-          rows={rows}
-          loading={loading}
-          title="There are no accounts"
-          text="When an account is created, it will appear here"
-        />
+            <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
-        <PaginationComponent
-          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
-          active={active}
-          setActive={setActive}
-          limit={limit}
-          setLimit={setLimit}
-        />
+            <EmptyTable
+              rows={rows}
+              loading={loading}
+              title="There are no accounts"
+              text="When an account is created, it will appear here"
+            />
+
+            <PaginationComponent
+              total={Math.ceil(
+                (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
+              )}
+              active={active}
+              setActive={setActive}
+              limit={limit}
+              setLimit={setLimit}
+            />
+          </TabsPanel>
+        </TabsComponent>
 
         <Modal
           size="xl"
@@ -508,3 +510,16 @@ export default function AccountSuspense() {
     </Suspense>
   );
 }
+
+const tableHeaders = [
+  "Account Name",
+  "Account Number",
+  "Account Balance",
+  "Type",
+  "Business",
+  "Date Created",
+  "Status",
+  "Action",
+];
+
+const tabs = [{ value: "Account" }, { value: "Issued Accounts" }];

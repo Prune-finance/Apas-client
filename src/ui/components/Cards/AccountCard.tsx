@@ -5,6 +5,7 @@ import {
   CardSection,
   CopyButton,
   Group,
+  Skeleton,
   Text,
   ThemeIcon,
 } from "@mantine/core";
@@ -14,23 +15,25 @@ import { SecondaryBtn } from "../Buttons";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { formatNumber } from "@/lib/utils";
 import Link from "next/link";
-import { Url } from "url";
-import { ElementType } from "react";
 
 interface Props extends CardProps {
   currency: string;
   companyName?: string;
   iban: string;
+  bic: string;
   balance: number;
   link?: string;
+  loading: boolean;
 }
 
 export const AccountCard = ({
   currency,
   companyName,
   iban,
+  bic,
   balance,
   link,
+  loading,
   ...props
 }: Props) => {
   return link ? (
@@ -53,9 +56,13 @@ export const AccountCard = ({
               <GiEuropeanFlag />
             </ThemeIcon>
 
-            <Text fz={14} fw={500}>{`${currency} ${
-              companyName ? "- " + companyName : ""
-            }`}</Text>
+            {!loading ? (
+              <Text>{`${currency} ${
+                companyName ? "- " + companyName : ""
+              }`}</Text>
+            ) : (
+              <Skeleton h={10} w={100} />
+            )}
           </Group>
 
           <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
@@ -64,13 +71,19 @@ export const AccountCard = ({
         </Group>
       </CardSection>
 
-      <Group justify="space-between" mt={27.47} preventGrowOverflow>
-        <Text tt="uppercase" inline fz={10} fw={400}>
-          Account Number/IBAN:{" "}
-          <Text span inherit fz={14} fw={600}>
-            {iban}
-          </Text>{" "}
-        </Text>
+      <Group justify="space-between" mt={27.47}>
+        <Group gap={2} align="center" c="var(--prune-text-gray-900)">
+          <Text tt="uppercase" fz={10} fw={400}>
+            IBAN:
+          </Text>
+          {!loading ? (
+            <Text fz={14} fw={600}>
+              {iban}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={100} />
+          )}
+        </Group>
 
         <CopyButton value={iban}>
           {({ copied, copy }) => (
@@ -85,9 +98,26 @@ export const AccountCard = ({
         </CopyButton>
       </Group>
 
-      <Text c="var(--prune-text-gray-900)" fz={26} fw={600} mt={13.61}>
-        {formatNumber(balance, true, "EUR")}
-      </Text>
+      {!loading ? (
+        <Text c="var(--prune-text-gray-900)" fz={26} fw={600} mt={13}>
+          {formatNumber(balance, true, "EUR")}
+        </Text>
+      ) : (
+        <Skeleton mt={13.61} h={30} w={100} />
+      )}
+
+      <Group gap={2} align="center" mt={13} c="var(--prune-text-gray-900)">
+        <Text tt="uppercase" fz={10} fw={400}>
+          BIC:
+        </Text>
+        {!loading ? (
+          <Text fz={14} fw={600}>
+            {bic}
+          </Text>
+        ) : (
+          <Skeleton h={10} w={100} />
+        )}
+      </Group>
     </Card>
   ) : (
     <Card
@@ -106,9 +136,13 @@ export const AccountCard = ({
               <GiEuropeanFlag />
             </ThemeIcon>
 
-            <Text>{`${currency} ${
-              companyName ? "- " + companyName : ""
-            }`}</Text>
+            {!loading ? (
+              <Text>{`${currency} ${
+                companyName ? "- " + companyName : ""
+              }`}</Text>
+            ) : (
+              <Skeleton h={10} w={100} />
+            )}
           </Group>
 
           <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
@@ -117,13 +151,19 @@ export const AccountCard = ({
         </Group>
       </CardSection>
 
-      <Group justify="space-between" mt={27.47} preventGrowOverflow>
-        <Text tt="uppercase" inline fz={10} fw={400}>
-          Account Number/IBAN:{" "}
-          <Text span inherit fz={14} fw={600}>
-            {iban}
-          </Text>{" "}
-        </Text>
+      <Group justify="space-between" mt={27.47}>
+        <Group gap={2} align="center" c="var(--prune-text-gray-900)">
+          <Text tt="uppercase" fz={10} fw={400}>
+            IBAN:
+          </Text>
+          {!loading ? (
+            <Text fz={14} fw={600}>
+              {iban}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={100} />
+          )}
+        </Group>
 
         <CopyButton value={iban}>
           {({ copied, copy }) => (
@@ -138,9 +178,26 @@ export const AccountCard = ({
         </CopyButton>
       </Group>
 
-      <Text c="var(--prune-text-gray-900)" fz={26} fw={600} mt={13.61}>
-        {formatNumber(balance, true, "EUR")}
-      </Text>
+      {!loading ? (
+        <Text c="var(--prune-text-gray-900)" fz={26} fw={600} mt={13.61}>
+          {formatNumber(balance, true, "EUR")}
+        </Text>
+      ) : (
+        <Skeleton mt={13.61} h={20} w={100} />
+      )}
+
+      <Group gap={2} align="center" mt={13} c="var(--prune-text-gray-900)">
+        <Text tt="uppercase" fz={10} fw={400}>
+          BIC:
+        </Text>
+        {!loading ? (
+          <Text fz={14} fw={600}>
+            {bic}
+          </Text>
+        ) : (
+          <Skeleton h={10} w={100} />
+        )}
+      </Group>
     </Card>
   );
 };

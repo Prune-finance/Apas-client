@@ -179,6 +179,54 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
   return { loading, transactions, meta, revalidate };
 }
 
+export function useUserDefaultTransactions(customParams: ITrx = {}) {
+  const [transactions, setTransactions] = useState<TrxData[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
+  async function fetchTrx() {
+    setLoading(true);
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/company/transactions?${params}`,
+        { withCredentials: true }
+      );
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, transactions, meta, revalidate };
+}
+
 export interface TrxData {
   id: string;
   senderIban: string;

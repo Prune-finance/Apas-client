@@ -69,7 +69,7 @@ function TransactionForAccount() {
   const createdAt = searchParams.get("createdAt");
 
   const { loading, transactions, meta } = useTransactions(undefined, {
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status }),
   });
 

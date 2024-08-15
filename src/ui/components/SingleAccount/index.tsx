@@ -16,6 +16,10 @@ import {
   Badge,
   TableTd,
   TableTr,
+  Box,
+  SimpleGrid,
+  TabsPanel,
+  ThemeIcon,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -23,7 +27,9 @@ import {
   IconArrowUpRight,
   IconBrandLinktree,
   IconCheck,
+  IconCircleArrowDown,
   IconCopy,
+  IconListTree,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
@@ -37,9 +43,9 @@ import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
 import EmptyTable from "../EmptyTable";
 import { TableComponent } from "../Table";
-import { Account, useSingleAccount } from "@/lib/hooks/accounts";
+import { Account, AccountData, useSingleAccount } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
-import { TransactionType } from "@/lib/hooks/transactions";
+import { TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
 import { useDisclosure } from "@mantine/hooks";
@@ -49,7 +55,13 @@ import { validateRequest } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
-import { SecondaryBtn } from "../Buttons";
+import { PrimaryBtn, SecondaryBtn } from "../Buttons";
+import TabsComponent from "../Tabs";
+import { GiEuropeanFlag } from "react-icons/gi";
+import { SearchInput } from "../Inputs";
+import AccountDetails from "./(tabs)/AccountDetails";
+import { Transactions } from "./(tabs)/Transactions";
+import { Analytics } from "./(tabs)/Analytics";
 
 type Param = { id: string };
 interface Props {
@@ -62,7 +74,7 @@ interface Props {
   revalidate?: () => void;
 }
 
-export default function SingleAccount({
+export function SingleAccount({
   account,
   setChartFrequency,
   transactions,
@@ -83,7 +95,8 @@ export default function SingleAccount({
   const accountDetails = [
     {
       title: "Euro Account",
-      value: transactions.reduce((acc, cur) => acc + cur.amount, 0),
+      value: account?.accountBalance,
+      // value: transactions.reduce((acc, cur) => acc + cur.amount, 0),
       formatted: true,
       currency: "EUR",
     },
@@ -101,6 +114,7 @@ export default function SingleAccount({
     // { title: "Bank", value: "Wema" },
     { title: "Account Name", value: account?.accountName },
     { title: "Account No", value: account?.accountNumber },
+    { title: "Account Type", value: account?.type },
   ];
 
   const lineData = useMemo(() => {
@@ -432,12 +446,7 @@ export default function SingleAccount({
 
               <TableComponent
                 head={tableHeaders}
-                rows={
-                  <RowComponent
-                    data={transactions.slice(0, 3)}
-                    id={params.id}
-                  />
-                }
+                rows={<RowComponent data={transactions.slice(0, 3)} />}
                 loading={trxLoading}
               />
 
@@ -480,9 +489,9 @@ export default function SingleAccount({
 }
 
 const tableHeaders = [
-  "Name",
-  "Bank",
-  "Account Number",
+  "Beneficiary",
+  "IBAN",
+  // "Account Number",
   "Amount",
   "Date",
   "Status",
@@ -490,10 +499,10 @@ const tableHeaders = [
 
 const RowComponent = ({
   data,
-  id,
-}: {
+}: // id,
+{
   data: TransactionType[];
-  id: string;
+  // id: string;
 }) => {
   const { push } = useRouter();
   const handleRowClick = (id: string) => {
@@ -502,13 +511,13 @@ const RowComponent = ({
   return data.map((element) => (
     <TableTr
       key={element.id}
-      onClick={() => handleRowClick(id)}
+      onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
-      <TableTd className={styles.table__td}>
+      {/* <TableTd className={styles.table__td}>
         {element.recipientBankAddress}
-      </TableTd>
+      </TableTd> */}
       <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         <Group gap={3}>
@@ -530,3 +539,74 @@ const RowComponent = ({
     </TableTr>
   ));
 };
+
+interface SingleAccountProps {
+  account: Account | null;
+  transactions: TransactionType[];
+  loading: boolean;
+  loadingTrx: boolean;
+  setChartFrequency: Dispatch<SetStateAction<string>>;
+}
+
+export const SingleAccountBody = ({
+  account,
+  transactions,
+  loading,
+  loadingTrx,
+  setChartFrequency,
+}: SingleAccountProps) => {
+  const info = {
+    "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
+    "No. of Transaction": transactions.length,
+    Currency: "EUR",
+    "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    "Account Type": account?.type,
+    "Last Seen": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
+  };
+
+  return (
+    <Box mt={32}>
+      <Grid>
+        <GridCol span={8}>
+          <SimpleGrid cols={3} verticalSpacing={28}>
+            {Object.entries(info).map(([key, value]) => (
+              <Stack gap={2} key={key}>
+                <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+                  {key}
+                </Text>
+                {!loading || !loadingTrx ? (
+                  <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+                    {value}
+                  </Text>
+                ) : (
+                  <Skeleton w={100} h={10} />
+                )}
+              </Stack>
+            ))}
+          </SimpleGrid>
+        </GridCol>
+      </Grid>
+
+      <TabsComponent tabs={tabs} mt={40}>
+        <TabsPanel value={tabs[0].value} mt={28}>
+          <AccountDetails account={account} loading={loading} />
+        </TabsPanel>
+        <TabsPanel value={tabs[1].value}>
+          <Transactions transactions={transactions} loading={loadingTrx} />
+        </TabsPanel>
+        <TabsPanel value={tabs[2].value} mt={28}>
+          <Analytics
+            transactions={transactions}
+            setChartFrequency={setChartFrequency}
+          />
+        </TabsPanel>
+      </TabsComponent>
+    </Box>
+  );
+};
+
+const tabs = [
+  { value: "Account Details" },
+  { value: "Transactions" },
+  { value: "Analytics" },
+];

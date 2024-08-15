@@ -18,7 +18,7 @@ export default function TransactionForAccount() {
 
   const { loading, account } = useSingleAccount(params.id);
   const { loading: loadingTrx, transactions } = useTransactions(params.id, {
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status }),
   });
 

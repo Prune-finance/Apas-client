@@ -1,28 +1,25 @@
 "use client";
 import dayjs from "dayjs";
 
-import { Box, Divider, Drawer, Group, Paper } from "@mantine/core";
-import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
+import { Group, Paper } from "@mantine/core";
+
 import { Text } from "@mantine/core";
-import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Flex, TableTh, TableThead } from "@mantine/core";
+import { TableTr, TableTd } from "@mantine/core";
+import { Flex } from "@mantine/core";
 
 import styles from "./styles.module.scss";
 import {
   IconArrowUpRight,
   IconSearch,
   IconListTree,
-  IconX,
-  IconPointFilled,
 } from "@tabler/icons-react";
 
-import { DynamicSkeleton2 } from "@/lib/static";
 import { formatNumber, frontendPagination } from "@/lib/utils";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   TrxData,
-  useTransactions,
+  useUserDefaultTransactions,
   useUserTransactions,
 } from "@/lib/hooks/transactions";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -38,8 +35,9 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import { SearchInput } from "@/ui/components/Inputs";
 import InfoCards from "@/ui/components/Cards/InfoCards";
+import { PayoutDrawer } from "./drawer";
 
-function AccountTrx() {
+function PayoutTrx() {
   const searchParams = useSearchParams();
   const [selectedRequest, setSelectedRequest] = useState<TrxData | null>(null);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
@@ -55,7 +53,7 @@ function AccountTrx() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, transactions } = useUserTransactions(undefined, {
+  const { loading, transactions } = useUserDefaultTransactions({
     ...(isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
@@ -76,7 +74,7 @@ function AccountTrx() {
     filteredSearch(transactions, searchProps, debouncedSearch),
     active,
     parseInt(limit ?? "10", 10)
-  ).map((element) => (
+  ).map((element: TrxData) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -85,12 +83,11 @@ function AccountTrx() {
       }}
       style={{ cursor: "pointer" }}
     >
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
       <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={styles.table__td}>
         {element.recipientBankAddress}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-      {/* <TableTd className={styles.table__td}>{dayjs().format()}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         <Flex align="center" gap={5}>
           <IconArrowUpRight
@@ -144,29 +141,11 @@ function AccountTrx() {
 
   return (
     <main className={styles.main}>
-      {/* <Breadcrumbs
-        items={[
-          {
-            title: "Transactions",
-            href: `/accounts/transactions`,
-          },
-        ]}
-      /> */}
-
       <Paper className={styles.table__container}>
         <div className={styles.container__header}>
           <Flex gap={10} align="center">
-            {/* <UnstyledButton onClick={() => router.back()}>
-              <ThemeIcon color="rgba(212, 243, 7)" radius="lg">
-                <IconArrowLeft
-                  color="#1D2939"
-                  style={{ width: "70%", height: "70%" }}
-                />
-              </ThemeIcon>
-            </UnstyledButton> */}
-
             <Text fz={18} fw={600}>
-              Transactions
+              Payouts
             </Text>
           </Flex>
         </div>
@@ -184,8 +163,8 @@ function AccountTrx() {
         <EmptyTable
           rows={rows}
           loading={loading}
-          title="There are no transactions"
-          text="When a transaction is recorded, it will appear here"
+          title="There are no payouts"
+          text="When a payout is recorded, it will appear here"
         />
         <PaginationComponent
           total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
@@ -196,127 +175,11 @@ function AccountTrx() {
         />
       </Paper>
 
-      <Drawer
+      <PayoutDrawer
         opened={drawerOpened}
-        onClose={closeDrawer}
-        position="right"
-        withCloseButton={false}
-        size="30%"
-      >
-        <Flex justify="space-between" pb={28}>
-          <Text fz={18} fw={600} c="#1D2939">
-            Transaction Details
-          </Text>
-
-          <IconX onClick={closeDrawer} />
-        </Flex>
-
-        <Box>
-          <Flex direction="column">
-            <Text c="#8B8B8B" fz={12}>
-              Amount Sent
-            </Text>
-
-            <Text c="#97AD05" fz={32} fw={600}>
-              {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-            </Text>
-          </Flex>
-
-          <Divider mt={30} mb={20} />
-
-          <Text fz={16} mb={24}>
-            Receiver Details
-          </Text>
-
-          <Flex direction="column" gap={30}>
-            {/* <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Business Name:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.Account.Company.name}</Text>
-            </Flex> */}
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Account IBAN:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.recipientIban}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Bank:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.recipientBankAddress}</Text>
-            </Flex>
-          </Flex>
-
-          <Divider my={30} />
-
-          <Text fz={16} mb={24}>
-            Other Details
-          </Text>
-
-          <Flex direction="column" gap={30}>
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Alert Type
-              </Text>
-
-              <Flex align="center">
-                <IconArrowUpRight
-                  color="#F04438"
-                  size={16}
-                  className={styles.table__td__icon}
-                  // style={{ marginTop: "-20px" }}
-                />
-
-                <Text c="#F04438" fz={14}>
-                  Debit
-                </Text>
-              </Flex>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Date and Time
-              </Text>
-
-              <Text fz={14}>
-                {dayjs(selectedRequest?.createdAt).format(
-                  "DD MMMM, YYYY - HH:mm"
-                )}
-              </Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Transaction ID
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.id}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Status:
-              </Text>
-
-              <Box bg="#FFFAEB" p={5} style={{ borderRadius: "3px" }}>
-                <Flex align="center">
-                  <IconPointFilled size={14} color="#C6A700" />
-                  <Text c="#C6A700" tt="capitalize" fz={14}>
-                    {selectedRequest?.status.toLocaleLowerCase()}
-                  </Text>
-                </Flex>
-              </Box>
-            </Flex>
-          </Flex>
-        </Box>
-      </Drawer>
+        close={closeDrawer}
+        payout={selectedRequest}
+      />
     </main>
   );
 }
@@ -324,15 +187,15 @@ function AccountTrx() {
 export default function AccountTrxSuspense() {
   return (
     <Suspense>
-      <AccountTrx />
+      <PayoutTrx />
     </Suspense>
   );
 }
 
 const tableHeaders = [
-  "Recipient IBAN",
+  "Beneficiary Name",
+  "Destination Account",
   "Bank",
-  "Reference",
   "Amount",
   "Date Created",
   "Status",

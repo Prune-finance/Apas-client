@@ -8,7 +8,7 @@ import { useState } from "react";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 
 import { useTransactions } from "@/lib/hooks/transactions";
-import SingleAccount from "@/ui/components/SingleAccount";
+import { SingleAccount } from "@/ui/components/SingleAccount";
 
 export default function Account() {
   const params = useParams<{ id: string }>();

@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 
 import { useTransactions } from "@/lib/hooks/transactions";
-import SingleAccount from "@/ui/components/SingleAccount";
+import { SingleAccount } from "@/ui/components/SingleAccount";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 
 export default function Account() {

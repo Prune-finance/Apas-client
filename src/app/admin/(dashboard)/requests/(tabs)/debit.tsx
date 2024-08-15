@@ -57,7 +57,7 @@ function Debit() {
   const { handleError, handleSuccess } = useNotification();
   const { loading, requests, revalidate } = useDebitRequests({
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
   });

@@ -67,7 +67,7 @@ function Unfreeze() {
     ...(isNaN(Number(_limit))
       ? { limit: 10 }
       : { limit: parseInt(_limit, 10) }),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
   });
@@ -78,7 +78,7 @@ function Unfreeze() {
   const queryParams = {
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    ...(createdAt && { createdAt: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     // ...(type && { type: type.toLowerCase() }),

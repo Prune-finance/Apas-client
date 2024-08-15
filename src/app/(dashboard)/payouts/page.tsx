@@ -1,28 +1,25 @@
 "use client";
 import dayjs from "dayjs";
 
-import { Box, Divider, Drawer, Group, Paper } from "@mantine/core";
-import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
+import { Group, Paper } from "@mantine/core";
+
 import { Text } from "@mantine/core";
-import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Flex, TableTh, TableThead } from "@mantine/core";
+import { TableTr, TableTd } from "@mantine/core";
+import { Flex } from "@mantine/core";
 
 import styles from "./styles.module.scss";
 import {
   IconArrowUpRight,
   IconSearch,
   IconListTree,
-  IconX,
-  IconPointFilled,
 } from "@tabler/icons-react";
 
-import { DynamicSkeleton2 } from "@/lib/static";
 import { formatNumber, frontendPagination } from "@/lib/utils";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   TrxData,
-  useTransactions,
+  useUserDefaultTransactions,
   useUserTransactions,
 } from "@/lib/hooks/transactions";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -56,7 +53,7 @@ function PayoutTrx() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, transactions } = useUserTransactions(undefined, {
+  const { loading, transactions } = useUserDefaultTransactions({
     ...(isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
@@ -77,7 +74,7 @@ function PayoutTrx() {
     filteredSearch(transactions, searchProps, debouncedSearch),
     active,
     parseInt(limit ?? "10", 10)
-  ).map((element) => (
+  ).map((element: TrxData) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -86,12 +83,11 @@ function PayoutTrx() {
       }}
       style={{ cursor: "pointer" }}
     >
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
       <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
       <TableTd className={styles.table__td}>
         {element.recipientBankAddress}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-      {/* <TableTd className={styles.table__td}>{dayjs().format()}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         <Flex align="center" gap={5}>
           <IconArrowUpRight
@@ -180,7 +176,7 @@ function PayoutTrx() {
       </Paper>
 
       <PayoutDrawer
-        opened={true}
+        opened={drawerOpened}
         close={closeDrawer}
         payout={selectedRequest}
       />

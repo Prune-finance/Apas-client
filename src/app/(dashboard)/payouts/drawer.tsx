@@ -32,10 +32,10 @@ type Props = {
 
 export const PayoutDrawer = ({ close, payout, opened }: Props) => {
   const beneficiaryDetails = {
-    "Account Name": "Whyle",
-    "Account Number/IBAN": "GBA2085958730",
-    "Bank Name": "Unicredit Bank",
-    BIC: "233423421",
+    "Account Name": payout?.recipientBankCountry,
+    "Account Number/IBAN": payout?.recipientIban,
+    "Bank Name": payout?.recipientBankAddress,
+    BIC: payout?.recipientBic,
   };
 
   const otherDetails = {
@@ -49,9 +49,9 @@ export const PayoutDrawer = ({ close, payout, opened }: Props) => {
         Debit
       </Badge>
     ),
-    "Date & Time": dayjs().format("Do MMMM, YYYY - hh:mmA"),
-    "Transaction ID": "1274t5f5475887gsgvbbaszbhdnBzv ",
-    Status: <BadgeComponent status={"SUCCESSFUL"} w={100} />,
+    "Date & Time": dayjs(payout?.createdAt).format("Do MMMM, YYYY - hh:mmA"),
+    "Transaction ID": payout?.id,
+    Status: <BadgeComponent status={payout?.status ?? ""} w={100} />,
   };
 
   const intermediaryDetails = {
@@ -127,7 +127,7 @@ export const PayoutDrawer = ({ close, payout, opened }: Props) => {
           ))}
         </Stack>
 
-        <Divider my={30} />
+        {/* <Divider my={30} />
 
         <Text fz={16} mb={24}>
           Intermediary Details
@@ -145,7 +145,7 @@ export const PayoutDrawer = ({ close, payout, opened }: Props) => {
               </Text>
             </Group>
           ))}
-        </Stack>
+        </Stack> */}
 
         <Divider my={30} />
 

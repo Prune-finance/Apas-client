@@ -22,11 +22,11 @@ import {
 } from "@/lib/schema";
 import { useRouter, useSearchParams } from "next/navigation";
 import useNotification from "@/lib/hooks/notification";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import axios from "axios";
 
-export default function UserForgotPassword() {
+function UserForgotPassword() {
   const [processing, setProcessing] = useState(false);
   const { handleError, handleSuccess } = useNotification();
   const { push } = useRouter();
@@ -134,5 +134,13 @@ export default function UserForgotPassword() {
         />
       </Paper>
     </div>
+  );
+}
+
+export default function UserForgotPasswordSuspense() {
+  return (
+    <Suspense>
+      <UserForgotPassword />
+    </Suspense>
   );
 }

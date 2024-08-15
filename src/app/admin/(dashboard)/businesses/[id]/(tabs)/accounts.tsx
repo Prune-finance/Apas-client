@@ -144,7 +144,7 @@ export default function Accounts({
     business,
     customParams.limit,
     customParams.page,
-    customParams.createdAt,
+    customParams.date,
     customParams.status,
   ]);
 

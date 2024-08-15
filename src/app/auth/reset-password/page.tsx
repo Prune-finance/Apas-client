@@ -20,12 +20,43 @@ import {
   ResetPasswordType,
   resetPasswordValues,
 } from "@/lib/schema";
+import { useRouter, useSearchParams } from "next/navigation";
+import useNotification from "@/lib/hooks/notification";
+import { useState } from "react";
+import { parseError } from "@/lib/actions/auth";
+import axios from "axios";
 
 export default function UserForgotPassword() {
+  const [processing, setProcessing] = useState(false);
+  const { handleError, handleSuccess } = useNotification();
+  const { push } = useRouter();
+
+  const searchParams = useSearchParams();
+  const code = searchParams.get("code") ?? "";
   const form = useForm<ResetPasswordType>({
-    initialValues: resetPasswordValues,
+    initialValues: { ...resetPasswordValues, otp: code },
     validate: zodResolver(resetPasswordSchema),
   });
+
+  const handleResetPassword = async () => {
+    setProcessing(true);
+    const { otp, password } = form.values;
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/reset-password`,
+        { token: otp, password }
+      );
+      handleSuccess(
+        "Successful! Password Reset",
+        "Your password has been changed successfully"
+      );
+      push("/auth/login");
+    } catch (error) {
+      handleError("Password Reset Failed", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -45,7 +76,11 @@ export default function UserForgotPassword() {
           Create a new password.
         </Text>
 
-        <Box component="form" onSubmit={form.onSubmit(() => {})} w="100%">
+        <Box
+          component="form"
+          onSubmit={form.onSubmit(() => handleResetPassword())}
+          w="100%"
+        >
           <PasswordInput
             mt={42}
             placeholder="Enter New Password"
@@ -83,6 +118,7 @@ export default function UserForgotPassword() {
             mt={39}
             fw={600}
             type="submit"
+            loading={processing}
           />
         </Box>
 

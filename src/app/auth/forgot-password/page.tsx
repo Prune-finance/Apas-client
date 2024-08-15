@@ -8,8 +8,17 @@ import { inter } from "@/ui/fonts";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
+import { useState } from "react";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
 export default function UserForgotPassword() {
+  const [processing, setProcessing] = useState(false);
+  const { handleError, handleSuccess } = useNotification();
+  const { push } = useRouter();
+
   const schema = z.object({
     email: z.string().email("Invalid Email").min(1, "Email is required"),
   });
@@ -17,6 +26,25 @@ export default function UserForgotPassword() {
     initialValues: { email: "" },
     validate: zodResolver(schema),
   });
+
+  const handleResetLink = async () => {
+    setProcessing(true);
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/forgot-password`,
+        { ...form.values }
+      );
+      handleSuccess(
+        "Email Sent",
+        `A password reset link has been sent to your email. `
+      );
+      push("/auth/reset-password");
+    } catch (error) {
+      handleError("Sending Reset Link Failed", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -36,7 +64,11 @@ export default function UserForgotPassword() {
           Do not worry, we would help you reset it.
         </Text>
 
-        <Box component="form" onSubmit={form.onSubmit(() => {})} w="100%">
+        <Box
+          component="form"
+          onSubmit={form.onSubmit(() => handleResetLink())}
+          w="100%"
+        >
           <TextInput
             mt={42}
             placeholder="Enter Email"
@@ -50,6 +82,7 @@ export default function UserForgotPassword() {
             mt={39}
             fw={600}
             type="submit"
+            loading={processing}
           />
         </Box>
 

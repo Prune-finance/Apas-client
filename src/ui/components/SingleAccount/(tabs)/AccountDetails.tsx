@@ -12,10 +12,10 @@ import {
 } from "@mantine/core";
 import { GiEuropeanFlag } from "react-icons/gi";
 import { PrimaryBtn } from "../../Buttons";
-import { AccountData } from "@/lib/hooks/accounts";
+import { Account } from "@/lib/hooks/accounts";
 
 interface Props {
-  account: AccountData | null;
+  account: Account | null;
   loading: boolean;
 }
 

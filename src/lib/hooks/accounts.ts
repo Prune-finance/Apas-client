@@ -145,7 +145,7 @@ export function useUserAccounts(customParams: IParams = {}) {
 }
 
 export function useSingleUserAccount(id: string) {
-  const [account, setAccount] = useState<AccountData | null>(null);
+  const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
@@ -180,7 +180,7 @@ export function useSingleUserAccount(id: string) {
 }
 
 export function useUserDefaultAccount() {
-  const [account, setAccount] = useState<AccountData | null>(null);
+  const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchDefaultAccount() {

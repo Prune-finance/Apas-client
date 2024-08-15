@@ -6,12 +6,14 @@ import Image from "next/image";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 import {
+  Avatar,
   Box,
   Button,
   Divider,
   Flex,
   Grid,
   GridCol,
+  Group,
   Modal,
   NativeSelect,
   Paper,
@@ -62,101 +64,14 @@ export default function Account() {
 
   const [opened, { open, close }] = useDisclosure(false);
 
-  const rows = transactions.map((element) => (
-    <TableTr key={element.id}>
-      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
-      <TableTd className={styles.table__td}>
-        {element.recipientBankAddress}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("DD MMM, YYYY")}
-      </TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        <IconArrowUpRight
-          color="#D92D20"
-          size={16}
-          className={styles.table__td__icon}
-        />
-        {formatNumber(element.amount, true, "EUR")}
-        {/* <Text fz={12}></Text> */}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.recipientBic}</TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-
-  const data = [
-    { month: "Jan", Deposits: 0, Payouts: 0 },
-    { month: "Feb", Deposits: 0, Payouts: 0 },
-    { month: "Mar", Deposits: 0, Payouts: 0 },
-    { month: "Apr", Deposits: 0, Payouts: 0 },
-    { month: "May", Deposits: 0, Payouts: 0 },
-    { month: "Jul", Deposits: 0, Payouts: 0 },
-    { month: "Jul", Deposits: 0, Payouts: 0 },
-    { month: "Aug", Deposits: 0, Payouts: 0 },
-    { month: "Sep", Deposits: 0, Payouts: 0 },
-    { month: "Oct", Deposits: 0, Payouts: 0 },
-    { month: "Nov", Deposits: 0, Payouts: 0 },
-    { month: "Dec", Deposits: 0, Payouts: 0 },
-  ];
-
-  const lineData = useMemo(() => {
-    const arr: {
-      month: string;
-      inflow: number;
-      outflow: number;
-    }[] = [];
-
-    transactions.reverse().map((trx) => {
-      let successful = 0,
-        pending = 0,
-        failed = 0;
-
-      const month = dayjs(trx.createdAt).format("MMM");
-      trx.status === "PENDING"
-        ? (pending += trx.amount)
-        : (successful += trx.amount);
-
-      arr.push({ month, inflow: successful, outflow: pending });
-    });
-
-    return arr;
-  }, [transactions]);
-
-  const donutData = useMemo(() => {
-    let completed = 0,
-      pending = 0,
-      failed = 0;
-    transactions.map((trx) => {
-      if (trx.status === "PENDING") {
-        pending += trx.amount;
-      }
-    });
-
-    return [
-      { name: "Completed", value: completed, color: "#039855" },
-      { name: "Pending", value: pending, color: "#F79009" },
-      { name: "Failed", value: failed, color: "#D92D20" },
-    ];
-  }, [transactions]);
-
-  const weekData = [
-    { day: "Mon", Deposits: 0, Payouts: 0 },
-    { day: "Tue", Deposits: 0, Payouts: 0 },
-    { day: "Wed", Deposits: 0, Payouts: 0 },
-    { day: "Thu", Deposits: 0, Payouts: 0 },
-    { day: "Fri", Deposits: 0, Payouts: 0 },
-    { day: "Sat", Deposits: 0, Payouts: 0 },
-    { day: "Sun", Deposits: 0, Payouts: 0 },
-  ];
+  console.log({ account });
 
   return (
     <main className={styles.main}>
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
+          { title: "Issued Accounts", href: "/accounts" },
           {
             title: account?.accountName || "",
             href: `/accounts/${params.id}`,
@@ -170,11 +85,54 @@ export default function Account() {
         align="center"
         className={styles.main__header}
       >
-        <Flex direction="column">
+        {/* <Flex direction="column">
           <Text fz={24} className={styles.main__header__text}>
             {account?.accountName}
           </Text>
-        </Flex>
+        </Flex> */}
+        <Group gap={12} align="center">
+          {!loading ? (
+            <Avatar
+              size="lg"
+              color="var(--prune-primary-700)"
+              // variant="light"
+            >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
+              0
+            )}`}</Avatar>
+          ) : (
+            <Skeleton circle h={50} w={50} />
+          )}
+
+          <Stack gap={0}>
+            {!loading ? (
+              <Text fz={24} className={styles.main__header__text} m={0} p={0}>
+                {account?.accountName}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={100} />
+            )}
+
+            {!loading ? (
+              <Text
+                fz={10}
+                fw={400}
+                className={styles.main__header__text}
+                m={0}
+                p={0}
+              >
+                {account?.accountNumber ?? ""}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={50} />
+            )}
+          </Stack>
+
+          {!loading ? (
+            <BadgeComponent status={account?.status ?? ""} active />
+          ) : (
+            <Skeleton w={20} h={60} />
+          )}
+        </Group>
 
         <Flex gap={10}>
           {/* <Button

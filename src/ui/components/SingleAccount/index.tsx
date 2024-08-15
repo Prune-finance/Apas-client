@@ -541,7 +541,7 @@ const RowComponent = ({
 };
 
 interface SingleAccountProps {
-  account: AccountData | null;
+  account: Account | null;
   transactions: TransactionType[];
   loading: boolean;
   loadingTrx: boolean;

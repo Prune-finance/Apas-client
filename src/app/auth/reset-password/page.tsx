@@ -44,7 +44,7 @@ function UserForgotPassword() {
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/reset-password`,
-        { token: otp, password }
+        { token: Number(otp), password }
       );
       handleSuccess(
         "Successful! Password Reset",

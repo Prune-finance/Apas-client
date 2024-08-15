@@ -1,5 +1,6 @@
 import { Fragment, Suspense } from "react";
 
+import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import axios from "axios";
 import { useState } from "react";
@@ -114,7 +115,7 @@ function Freeze() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/reject`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       await revalidate();
@@ -135,7 +136,7 @@ function Freeze() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/approve`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       await revalidate();

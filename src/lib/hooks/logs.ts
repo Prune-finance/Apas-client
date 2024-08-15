@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import { AdminData } from "./admins";
+import Cookies from "js-cookie";
 
 interface IParams {
   limit?: number;
@@ -36,7 +37,7 @@ export function useLogs(customParams: ILogs = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/logs/all?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
       setLogs(data.data);
       setMeta(data.meta);

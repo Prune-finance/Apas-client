@@ -1,4 +1,5 @@
 import { Fragment, Suspense } from "react";
+import Cookies from "js-cookie";
 
 import dayjs from "dayjs";
 import axios from "axios";
@@ -86,7 +87,7 @@ function Debit() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/reject`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       await revalidate();
@@ -107,7 +108,7 @@ function Debit() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/approve`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       await revalidate();

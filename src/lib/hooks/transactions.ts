@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
+import Cookies from "js-cookie";
 
 interface IParams {
   limit?: number;
@@ -29,7 +30,7 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
       const path = id ? `${id}/transactions` : "transactions";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${path}?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setTransactions(data.data);
@@ -83,7 +84,7 @@ export function useBusinessTransactions(
       const path = id ? `` : "transactions";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/business/${id}/transactions?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setTransactions(data.data);
@@ -154,7 +155,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
       const path = id ? `${id}/transactions` : "/transactions";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${path}?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setTransactions(data.data);
@@ -202,7 +203,7 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/company/transactions?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setTransactions(data.data);

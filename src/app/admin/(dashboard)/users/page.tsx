@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import {
   Badge,
@@ -115,7 +116,7 @@ function Users() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
         form.values,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();
@@ -143,7 +144,7 @@ function Users() {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admin/${id}`,
         { ...rest },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();

@@ -397,7 +397,7 @@ function Accounts() {
                 iban={account?.accountNumber ?? "No Default Account"}
                 bic={"233423421"}
                 loading={loadingDftAcct}
-                link={`/accounts/${account?.id}`}
+                link={`/accounts/default`}
               />
             </SimpleGrid>
           </TabsPanel>

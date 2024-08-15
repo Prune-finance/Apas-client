@@ -258,6 +258,7 @@ export interface Account {
   deletedAt: null;
   accountBalance: number;
   companyId: string;
+  companyName?: string;
   type: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
 }

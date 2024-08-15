@@ -1,60 +1,29 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import Image from "next/image";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 import {
   Avatar,
-  Box,
-  Button,
-  Divider,
   Flex,
-  Grid,
-  GridCol,
   Group,
   Modal,
-  NativeSelect,
-  Paper,
-  SimpleGrid,
   Skeleton,
   Stack,
-  Table,
-  TableScrollContainer,
-  TableTbody,
-  TableTd,
-  TableTh,
-  TableThead,
-  TableTr,
   Text,
 } from "@mantine/core";
-import {
-  IconArrowRight,
-  IconArrowUpRight,
-  IconPointFilled,
-  IconSquareFilled,
-  IconCircleChevronRight,
-} from "@tabler/icons-react";
-import { CardOne } from "@/ui/components/Cards";
-import { AreaChart, BarChart, DonutChart } from "@mantine/charts";
-import { useMemo, useState } from "react";
-import { formatNumber } from "@/lib/utils";
-import { AccountData, useSingleUserAccount } from "@/lib/hooks/accounts";
-import {
-  TransactionType,
-  TrxData,
-  useUserTransactions,
-} from "@/lib/hooks/transactions";
-import dayjs from "dayjs";
-import { DynamicSkeleton } from "@/lib/static";
 
-import EmptyImage from "@/assets/empty.png";
+import { useState } from "react";
+
+import { useSingleUserAccount } from "@/lib/hooks/accounts";
+import { TransactionType, useUserTransactions } from "@/lib/hooks/transactions";
+
 import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "../../debit-requests/new/modal";
-import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SingleAccountBody } from "@/ui/components/SingleAccount";
+import { PrimaryBtn } from "@/ui/components/Buttons";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -85,11 +54,6 @@ export default function Account() {
         align="center"
         className={styles.main__header}
       >
-        {/* <Flex direction="column">
-          <Text fz={24} className={styles.main__header__text}>
-            {account?.accountName}
-          </Text>
-        </Flex> */}
         <Group gap={12} align="center">
           {!loading ? (
             <Avatar
@@ -103,7 +67,7 @@ export default function Account() {
             <Skeleton circle h={50} w={50} />
           )}
 
-          <Stack gap={0}>
+          <Stack gap={2}>
             {!loading ? (
               <Text fz={24} className={styles.main__header__text} m={0} p={0}>
                 {account?.accountName}
@@ -130,7 +94,7 @@ export default function Account() {
           {!loading ? (
             <BadgeComponent status={account?.status ?? ""} active />
           ) : (
-            <Skeleton w={20} h={60} />
+            <Skeleton w={60} h={10} />
           )}
         </Group>
 
@@ -144,17 +108,7 @@ export default function Account() {
             Freeze Account
           </Button> */}
 
-          <Button
-            // component="a"
-            // href="/debit-requests/new"
-            onClick={open}
-            fz={12}
-            className={styles.main__cta}
-            variant="filled"
-            color="#C1DD06"
-          >
-            Debit Account
-          </Button>
+          <PrimaryBtn text="Debit Account" fw={600} action={open} />
         </Flex>
       </Flex>
 

@@ -3,14 +3,14 @@ import dayjs from "dayjs";
 
 // Mantine Imports
 import { useDisclosure } from "@mantine/hooks";
-import { Box, Divider, Drawer, Group, Paper } from "@mantine/core";
+import { Box, Divider, Drawer, Group, Modal, Paper } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { Text } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
 import { Flex, TableTh, TableThead } from "@mantine/core";
 
 // Tabler Imports
-import { IconX } from "@tabler/icons-react";
+import { IconAlignCenter, IconPlus, IconX } from "@tabler/icons-react";
 import { IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
@@ -31,6 +31,10 @@ import { useSearchParams } from "next/navigation";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import { SearchInput } from "@/ui/components/Inputs";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { TableComponent } from "@/ui/components/Table";
+import DebitRequestModal from "./new/modal";
 
 function DebitRequests() {
   const searchParams = useSearchParams();
@@ -67,6 +71,7 @@ function DebitRequests() {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
+  const [opened, { open, close }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const form = useForm<FilterType>({
@@ -118,45 +123,21 @@ function DebitRequests() {
         </div>
 
         <Group justify="space-between" mt={30}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+          <SearchInput />
 
-          <Button
-            // className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            fz={12}
-            fw={500}
-            onClick={toggle}
-            variant="outline"
-            c="var(--prune-text-gray-800)"
-            color="var(--prune-text-gray-200)"
-          >
-            Filter
-          </Button>
+          <Group gap={12}>
+            <SecondaryBtn
+              text="Filter"
+              icon={IconAlignCenter}
+              action={toggle}
+            />
+            <PrimaryBtn icon={IconPlus} text="New Request" action={open} />
+          </Group>
         </Group>
 
         <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
 
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                <TableTh className={styles.table__th}>Business Name</TableTh>
-                <TableTh className={styles.table__th}>Amount</TableTh>
-                <TableTh className={styles.table__th}>Source Account</TableTh>
-                <TableTh className={styles.table__th}>Date Created</TableTh>
-                <TableTh className={styles.table__th}>Status</TableTh>
-              </TableTr>
-            </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent rows={rows} head={tableHeaders} loading={loading} />
 
         <EmptyTable
           rows={rows}
@@ -173,6 +154,15 @@ function DebitRequests() {
           setLimit={setLimit}
         />
       </Paper>
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        size={"50%"}
+        withCloseButton={false}
+      >
+        <DebitRequestModal close={close} />
+      </Modal>
 
       <Drawer
         opened={drawerOpened}
@@ -320,3 +310,11 @@ export default function DebitReqSuspense() {
     </Suspense>
   );
 }
+
+const tableHeaders = [
+  "Business Name",
+  "Amount",
+  "Source Account",
+  "Date Created",
+  "Status",
+];

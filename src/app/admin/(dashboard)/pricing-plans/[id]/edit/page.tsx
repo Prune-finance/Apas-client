@@ -60,9 +60,9 @@ export default function EditPlan() {
     setProcessing(true);
     const { description, ...rest } = form.values;
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan`,
-        { ...rest },
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan/${params.id}`,
+        { ...form.values },
         { withCredentials: true }
       );
 

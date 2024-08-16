@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -15,7 +16,7 @@ export async function middleware(request: NextRequest) {
       const req = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/me`,
         {
-          headers: request.headers,
+          headers: { Authorization: `Bearer ${cookies().get("auth")?.value}` },
         }
       );
       if (!req.ok) {
@@ -26,7 +27,7 @@ export async function middleware(request: NextRequest) {
     }
 
     const req = await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/auth/me`, {
-      headers: request.headers,
+      headers: { Authorization: `Bearer ${cookies().get("auth")?.value}` },
     });
 
     if (!req.ok) {

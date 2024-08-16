@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
+import Cookies from "js-cookie";
 
 interface IParams {
   period?: string;
@@ -54,7 +55,7 @@ export function useBusiness(
         `${
           process.env.NEXT_PUBLIC_SERVER_URL
         }/admin/businesses?${params.toString()}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setMeta(data.meta);
@@ -75,7 +76,7 @@ export function useBusiness(
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business-stats?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
       setStats(data.data);
       setStatsMeta(data.meta);
@@ -115,7 +116,7 @@ export function useSingleBusiness(id: string) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${id}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setBusiness(data.data);

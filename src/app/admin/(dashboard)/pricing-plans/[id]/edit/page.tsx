@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -63,7 +64,7 @@ export default function EditPlan() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan`,
         { ...rest },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       push("/admin/pricing-plans");

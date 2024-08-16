@@ -1,6 +1,7 @@
 import axios, { all } from "axios";
 import { useState, useEffect, useMemo } from "react";
 import { AccountData } from "./accounts";
+import Cookies from "js-cookie";
 
 // query: string = "";
 
@@ -43,7 +44,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
 
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/${path}?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setMeta(data.meta);
@@ -79,7 +80,7 @@ export function useSingleRequest(id: string) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/${id}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setRequest(data.data);
@@ -131,7 +132,7 @@ export function useUserRequests(customParams: IParams = {}) {
       // const status = query ? `?status=${query}` : "";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setMeta(data.meta);
@@ -165,7 +166,7 @@ export function useSingleUserRequest(id: string) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/requests/${id}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setRequest(data.data);
@@ -213,7 +214,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setRequests(data.data);
@@ -269,7 +270,7 @@ export function useCompanyRequests(
       const path = all ? "/all" : "";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${id}/requests${path}?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setRequests(data.data);
@@ -341,7 +342,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/requests?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setRequests(data.data);

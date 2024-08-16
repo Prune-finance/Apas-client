@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import axios from "axios";
 import { Fragment, useMemo, useState } from "react";
@@ -64,7 +65,7 @@ export default function DebitRequest() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/request`,
         form.values,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Action Completed", "Debit request created");

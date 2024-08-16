@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
 
 interface IParams {
@@ -34,7 +35,8 @@ export function useAccounts(customParams: IParams = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts?${params}`,
-        { withCredentials: true }
+        // { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setMeta(data.meta);
@@ -68,7 +70,7 @@ export function useSingleAccount(id: string) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setAccount(data.data);
@@ -119,7 +121,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setMeta(data.meta);
@@ -153,7 +155,7 @@ export function useSingleUserAccount(id: string) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/dashboard`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setAccount(data.data);
@@ -188,7 +190,7 @@ export function useUserDefaultAccount() {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/default`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setAccount(data.data);

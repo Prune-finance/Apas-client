@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import {
   Alert,
@@ -37,7 +38,7 @@ export default function Keys() {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setKeys(data.data);
@@ -50,7 +51,7 @@ export default function Keys() {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setKeys(data.data);

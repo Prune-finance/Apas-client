@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import {
   Badge,
@@ -135,7 +136,7 @@ function Users() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
         { email: form.values.email },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();

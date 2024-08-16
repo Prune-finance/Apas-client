@@ -1,4 +1,6 @@
 "use client";
+import Cookies from "js-cookie";
+
 import {
   Button,
   Skeleton,
@@ -53,7 +55,7 @@ export default function SingleRequest() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/approve/${params.requestId}`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       closeApprove();
@@ -76,7 +78,7 @@ export default function SingleRequest() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${params.requestId}`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       close();

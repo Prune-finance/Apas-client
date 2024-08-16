@@ -3,6 +3,7 @@ import axios from "axios";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconMail, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
+import Cookies from "js-cookie";
 
 import {
   Flex,
@@ -115,7 +116,7 @@ export default function NewBusiness() {
           ...(initialDirEmpty && { directors: [] }),
           ...(initialShrEmpty && { shareholders: [] }),
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess(

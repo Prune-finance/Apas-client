@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import {
   Box,
@@ -91,7 +92,7 @@ export default function Users() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
         { email: form.values.email },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();
@@ -123,7 +124,7 @@ export default function Users() {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/change-password`,
         passwordForm.values,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Action Successful", "Your password has been updated");

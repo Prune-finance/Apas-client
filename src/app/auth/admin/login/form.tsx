@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import { LoginType, loginValues, validateLogin } from "@/lib/schema";
@@ -36,8 +37,8 @@ export default function LoginForm() {
       const authUrl = "/api/auth/admin/login";
       const { data } = await axios.post(authUrl, form.values);
 
+      Cookies.set("auth", data.meta.token);
       handleSuccess("Authentication Successful", "Welcome back Admin");
-
       setUser({ ...data.data });
       window.location.replace("/admin/dashboard");
     } catch (error) {

@@ -11,20 +11,20 @@ export async function POST(request: Request) {
       { email, password }
     );
 
-    const responseCookies = response.headers["set-cookie"];
-    if (!responseCookies) {
-      return;
-    }
-    const session = responseCookies[0].split(";")[0].split("=")[1];
+    // const responseCookies = response.headers["set-cookie"];
+    // if (!responseCookies) {
+    //   return;
+    // }
+    // const session = responseCookies[0].split(";")[0].split("=")[1];
 
-    cookies().set("session", session, {
-      httpOnly: true,
-      ...(process.env.NODE_ENV === "production" && {
-        sameSite: "none",
-        secure: true,
-        domain: ".prunepayments.net",
-      }),
-    });
+    // cookies().set("session", session, {
+    //   httpOnly: true,
+    //   ...(process.env.NODE_ENV === "production" && {
+    //     sameSite: "none",
+    //     secure: true,
+    //     domain: ".prunepayments.net",
+    //   }),
+    // });
 
     return NextResponse.json({ ...response.data });
   } catch (error) {

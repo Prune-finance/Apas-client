@@ -1,4 +1,4 @@
-import { AgGridReact } from "ag-grid-react";
+import Cookies from "js-cookie";
 
 import {
   Text,
@@ -126,7 +126,7 @@ export default function Accounts({
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${business?.id}/accounts?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setAccounts(data.data);

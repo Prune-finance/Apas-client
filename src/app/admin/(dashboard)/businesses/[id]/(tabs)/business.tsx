@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import { Button, Flex, Grid, GridCol, Text, TextInput } from "@mantine/core";
 import { IconPencilMinus } from "@tabler/icons-react";
@@ -46,7 +47,7 @@ export default function Business({
           ...business,
           ...form.values,
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Business Updated", "");

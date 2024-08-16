@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { Box, Checkbox } from "@mantine/core";
 import { useState } from "react";
 import { useParams } from "next/navigation";
@@ -35,11 +36,12 @@ export default function FormComponent({ email }: { email: string }) {
 
       const authUrl = "/api/auth/register";
 
-      const data = await axios.post(authUrl, {
+      const { data } = await axios.post(authUrl, {
         ...form.values,
         token: params.id,
       });
 
+      Cookies.set("auth", data.meta.token);
       handleSuccess("Account Created", "Welcome to Prune");
       window.location.replace("/");
     } catch (error) {

@@ -1,5 +1,6 @@
 "use client";
 
+import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import { LoginType, loginValues, validateLogin } from "@/lib/schema";
@@ -38,6 +39,7 @@ export default function LoginForm() {
 
       setUser({ ...data.data });
 
+      Cookies.set("auth", data.meta.token);
       handleSuccess("Authentication Successful", "Welcome back");
       window.location.replace("/");
     } catch (error) {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
 
 interface IParams {
@@ -38,7 +39,7 @@ export function useAdmins(customParams: IAdmins = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setUsers(data.data);
@@ -73,7 +74,7 @@ export function useSingleAdmin(id: string) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins/${id}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setUser(data.data);
@@ -122,7 +123,7 @@ export function useUsers(customParams: IParams = {}) {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users?${params}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setUsers(data.data);

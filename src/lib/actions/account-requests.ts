@@ -1,5 +1,7 @@
 import axios from "axios";
 import { parseError } from "./auth";
+import Cookies from "js-cookie";
+
 
 export const approveRequest = async (id: string) => {
   //   if (processing) return;
@@ -8,7 +10,7 @@ export const approveRequest = async (id: string) => {
     await axios.post(
       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/approve/${id}`,
       {},
-      { withCredentials: true }
+      { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
     );
 
     return { success: true, message: "Request Approved" };
@@ -28,7 +30,7 @@ export const rejectRequest = async (id: string) => {
     await axios.post(
       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${id}`,
       {},
-      { withCredentials: true }
+      { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
     );
     return { success: true, message: "Request Rejected" };
     // close();

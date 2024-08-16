@@ -15,6 +15,7 @@ import {
 } from "@tabler/icons-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 import { directorEtShareholderSchema, RemoveDirectorType } from "@/lib/schema";
 import { parseError } from "@/lib/actions/auth";
@@ -48,7 +49,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
         formData,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       if (form) {

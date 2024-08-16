@@ -1,5 +1,7 @@
 "use client";
 
+import Cookies from "js-cookie";
+
 import { Text, UnstyledButton } from "@mantine/core";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -32,12 +34,11 @@ export default function Navbar() {
   const handleAdminLogout = async () => {
     setProcessing(true);
     try {
-      await axios.get(`/api/auth/admin/logout`, {
-        withCredentials: true,
-      });
+      await axios.get(`/api/auth/admin/logout`);
 
       // await clearSession();
 
+      Cookies.remove("auth");
       window.location.replace("/auth/admin/login");
     } catch (error) {
       console.log(error);
@@ -146,6 +147,7 @@ export function UserNavbar() {
 
       // await clearSession();
 
+      Cookies.remove("auth");
       window.location.replace("/auth/login");
     } catch (error) {
       console.log(error);

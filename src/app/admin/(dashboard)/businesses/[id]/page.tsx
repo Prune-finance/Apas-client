@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import Image from "next/image";
 import {
@@ -65,7 +66,7 @@ export default function SingleBusiness() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/kyc/${params.id}`,
         { trustKyc: !currentState },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();
@@ -84,7 +85,7 @@ export default function SingleBusiness() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/registration-link`,
         { email: business?.contactEmail, companyId: business?.id },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Action Completed", `Activation Link sent`);
@@ -101,7 +102,7 @@ export default function SingleBusiness() {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${params.id}/toggle-status`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Action Completed", `Company status updated`);

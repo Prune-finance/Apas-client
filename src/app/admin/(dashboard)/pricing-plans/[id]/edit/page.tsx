@@ -1,4 +1,5 @@
 "use client";
+import Cookies from "js-cookie";
 
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";

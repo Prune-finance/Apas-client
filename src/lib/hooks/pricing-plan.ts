@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
+import Cookies from "js-cookie";
 
 interface IParams {
   period?: string;
@@ -45,7 +46,7 @@ export function usePricingPlan(customParams: IParams = {}) {
         `${
           process.env.NEXT_PUBLIC_SERVER_URL
         }/admin/pricing-plans?${params.toString()}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setMeta(data.meta);
@@ -79,7 +80,7 @@ export function useSinglePricingPlan(id: string) {
       setLoading(true);
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plans/${id}`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setPricingPlan(data.data);

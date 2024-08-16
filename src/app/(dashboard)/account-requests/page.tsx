@@ -1,6 +1,7 @@
 "use client";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import Cookies from "js-cookie";
 
 dayjs.extend(advancedFormat);
 
@@ -114,7 +115,7 @@ function AccountRequests() {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/requests/${id}/cancel`,
         {},
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();

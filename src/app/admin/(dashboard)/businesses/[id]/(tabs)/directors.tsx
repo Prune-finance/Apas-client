@@ -26,6 +26,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
+import Cookies from "js-cookie";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
@@ -81,7 +82,7 @@ export default function Directors({
           ...business,
           directors,
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess(
@@ -111,7 +112,7 @@ export default function Directors({
           ...business,
           directors: [...business.directors, { ...form.values }],
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Business Updated", "");
@@ -135,7 +136,7 @@ export default function Directors({
           ...business,
           directors,
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Business Updated", "");
@@ -381,7 +382,7 @@ const DirectorsForm = ({
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
         formData,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       if (formKey) {

@@ -4,24 +4,11 @@ import { cookies } from "next/headers";
 
 export async function GET(request: Request) {
   try {
-    const cookieHeader = request.headers.get("cookie") || "";
-
     await axios.get(`${process.env.NEXT_PUBLIC_SERVER_URL}/auth/logout`, {
       headers: {
-        Cookie: cookieHeader, // Pass the cookies received from the client
+        Authorization: `Bearer ${cookies().get("auth")?.value}`,
       },
       // withCredentials: true,
-    });
-
-    cookies().delete("session");
-    cookies().set("session", "", {
-      httpOnly: true,
-      ...(process.env.NODE_ENV === "production" && {
-        sameSite: "none",
-        secure: true,
-        domain: ".prunepayments.net",
-        // domain: "prune-liard.vercel.app",
-      }),
     });
 
     return NextResponse.json({});

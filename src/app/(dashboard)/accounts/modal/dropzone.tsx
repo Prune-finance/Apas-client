@@ -1,4 +1,5 @@
 import { Flex, Group, Loader, rem, Stack, Text } from "@mantine/core";
+import Cookies from "js-cookie";
 import {
   Dropzone,
   DropzoneProps,
@@ -49,7 +50,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
         formData,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       if (form) {

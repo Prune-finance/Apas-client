@@ -17,6 +17,7 @@ import {
   IconPencilMinus,
   IconPlus,
 } from "@tabler/icons-react";
+import Cookies from "js-cookie";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData } from "@/lib/hooks/businesses";
@@ -55,7 +56,7 @@ export default function Documents({
           ...business,
           ...form.values,
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       handleSuccess("Business Updated", "");
@@ -76,7 +77,7 @@ export default function Documents({
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
         formData,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       if (formKey) {

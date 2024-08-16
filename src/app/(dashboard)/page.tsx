@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import Cookies from "js-cookie";
 
 import { Text, TableTd, Paper, Box, Modal, Group } from "@mantine/core";
 import { TableTbody, TableTh, TableThead } from "@mantine/core";
@@ -68,7 +69,7 @@ export default function Home() {
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets`,
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setKeys(data.data);

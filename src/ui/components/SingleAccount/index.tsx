@@ -22,6 +22,8 @@ import {
   ThemeIcon,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+
 import {
   IconArrowLeft,
   IconArrowUpRight,
@@ -184,7 +186,7 @@ export function SingleAccount({
           ...(supportingDocumentUrl && { supportingDocumentUrl }),
           ...(supportingDocumentName && { supportingDocumentName }),
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate && revalidate();
@@ -209,7 +211,7 @@ export function SingleAccount({
           ...(supportingDocumentName && { supportingDocumentName }),
           ...(supportingDocumentUrl && { supportingDocumentUrl }),
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate && revalidate();

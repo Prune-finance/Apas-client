@@ -1,5 +1,6 @@
 "use client";
 import dayjs from "dayjs";
+import Cookies from "js-cookie";
 
 import React, { Dispatch, SetStateAction, Suspense, useState } from "react";
 
@@ -108,7 +109,7 @@ function Accounts() {
           ...(supportingDocumentName && { supportingDocumentName }),
           ...(supportingDocumentUrl && { supportingDocumentUrl }),
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();
@@ -134,7 +135,7 @@ function Accounts() {
           ...(supportingDocumentName && { supportingDocumentName }),
           ...(supportingDocumentUrl && { supportingDocumentUrl }),
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
       revalidate();
       handleSuccess("Action Completed", "Account Deactivated");
@@ -159,7 +160,7 @@ function Accounts() {
           ...(supportingDocumentName && { supportingDocumentName }),
           ...(supportingDocumentUrl && { supportingDocumentUrl }),
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
       revalidate();
       handleSuccess("Action Completed", "Account Activated");
@@ -184,7 +185,7 @@ function Accounts() {
           ...(supportingDocumentUrl && { supportingDocumentUrl }),
           ...(supportingDocumentName && { supportingDocumentName }),
         },
-        { withCredentials: true }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();

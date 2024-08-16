@@ -110,6 +110,8 @@ export interface PricingPlan {
   name: string;
   cycle: string;
   cost: number;
+  description: string;
+  features: string[];
 }
 
 export interface Meta {

@@ -208,6 +208,20 @@ export interface BusinessData {
   companyStatus: "ACTIVE" | "INACTIVE";
   apiCalls: number;
   _count: Count;
+  pricingPlanId: null | string;
+  pricingPlan: PricingPlan | null;
+}
+
+export interface PricingPlan {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  name: string;
+  cycle: string;
+  cost: number;
+  description: string | null;
+  features: string[];
 }
 
 export interface Count {

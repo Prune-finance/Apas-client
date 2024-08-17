@@ -25,6 +25,8 @@ import {
   Image,
   Pagination,
   Select,
+  TabsPanel,
+  SimpleGrid,
 } from "@mantine/core";
 import {
   IconBrandLinktree,
@@ -71,6 +73,8 @@ import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
+import TabsComponent from "@/ui/components/Tabs";
+import { AccountCard } from "@/ui/components/Cards/AccountCard";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -225,52 +229,90 @@ export default function Accounts({
   ));
 
   return (
-    <Box>
-      <Flex gap={20} my={24}>
-        <InfoCards
-          title="Highest Volume Account"
-          details={volumeDetails}
-          loading={loadingTrx}
-        />
-
-        <Box flex={1}>
-          <InfoCards
-            title="Overview"
-            details={overviewDetails}
-            loading={loadingTrx}
+    <TabsComponent tabs={tabs} mt={24}>
+      <TabsPanel value={tabs[0].value} mt={24}>
+        <SimpleGrid cols={3}>
+          <AccountCard
+            currency="EUR"
+            bic="34567654"
+            balance={0}
+            iban={"GB234567898765432"}
+            loading={false}
+            badgeText="Main Account"
           />
-        </Box>
-      </Flex>
+        </SimpleGrid>
+      </TabsPanel>
 
-      <Flex justify="space-between" align="center" mt={28} mb={24}>
-        <SearchInput search={search} setSearch={setSearch} />
+      <TabsPanel value={tabs[1].value}>
+        <TableComponent head={tableHead} rows={rows} loading={loading} />
 
-        <SecondaryBtn action={toggle} text="Filter" icon={IconListTree} />
-      </Flex>
+        {/* //   <EmptyTable
+    //     rows={rows}
+    //     loading={loading}
+    //     title="There are no accounts"
+    //     text="When an account is created, it will appear here"
+    //   /> */}
 
-      <Filter<BusinessFilterType> opened={opened} toggle={toggle} form={form} />
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil(
+            (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+          )}
+        />
+      </TabsPanel>
+    </TabsComponent>
 
-      <TableComponent head={tableHead} rows={rows} loading={loading} />
+    // <Box>
+    //   <Flex gap={20} my={24}>
+    //     <InfoCards
+    //       title="Highest Volume Account"
+    //       details={volumeDetails}
+    //       loading={loadingTrx}
+    //     />
 
-      <EmptyTable
-        rows={rows}
-        loading={loading}
-        title="There are no accounts"
-        text="When an account is created, it will appear here"
-      />
+    //     <Box flex={1}>
+    //       <InfoCards
+    //         title="Overview"
+    //         details={overviewDetails}
+    //         loading={loadingTrx}
+    //       />
+    //     </Box>
+    //   </Flex>
 
-      <PaginationComponent
-        active={active}
-        setActive={setActive}
-        setLimit={setLimit}
-        limit={limit}
-        total={Math.ceil(
-          (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
-        )}
-      />
-    </Box>
+    //   <Flex justify="space-between" align="center" mt={28} mb={24}>
+    //     <SearchInput search={search} setSearch={setSearch} />
+
+    //     <SecondaryBtn action={toggle} text="Filter" icon={IconListTree} />
+    //   </Flex>
+
+    //   <Filter<BusinessFilterType> opened={opened} toggle={toggle} form={form} />
+
+    //   <TableComponent head={tableHead} rows={rows} loading={loading} />
+
+    //   <EmptyTable
+    //     rows={rows}
+    //     loading={loading}
+    //     title="There are no accounts"
+    //     text="When an account is created, it will appear here"
+    //   />
+
+    //   <PaginationComponent
+    //     active={active}
+    //     setActive={setActive}
+    //     setLimit={setLimit}
+    //     limit={limit}
+    //     total={Math.ceil(
+    //       (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+    //     )}
+    //   />
+    // </Box>
   );
 }
+
+const tabs = [{ value: "Default Account" }, { value: "Issued Accounts" }];
 
 const tableHead = [
   "S/N",

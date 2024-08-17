@@ -52,6 +52,7 @@ export default function Business({
     address: business.address,
     legalEntity: business.legalEntity,
     pricingPlanId: business.pricingPlanId,
+    businessBio: business.businessBio,
   };
 
   const form = useForm({

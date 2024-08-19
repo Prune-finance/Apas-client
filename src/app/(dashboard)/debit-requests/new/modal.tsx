@@ -33,6 +33,7 @@ import { parseError } from "@/lib/actions/auth";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { formatNumber } from "@/lib/utils";
 import { SelectDropdownSearch } from "@/ui/components/SelectDropdownSearch";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function DebitRequestModal({
   close,
@@ -42,7 +43,7 @@ export default function DebitRequestModal({
   selectedId?: string;
 }) {
   const router = useRouter();
-  const { accounts } = useUserAccounts();
+  const { accounts } = useUserAccounts({ limit: 1000 });
   const [processing, setProcessing] = useState(false);
   const { handleSuccess, handleError } = useNotification();
 
@@ -79,17 +80,16 @@ export default function DebitRequestModal({
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      handleSuccess("Action Completed", "Debit request created");
+      handleSuccess(
+        "Action Completed",
+        "You have successfully sent a new debit request."
+      );
       router.push("/debit-requests");
     } catch (error) {
       handleError("Action Failed", parseError(error));
     } finally {
       setProcessing(false);
     }
-  };
-
-  const handleChange = (value: string) => {
-    form.setFieldValue("account", value);
   };
 
   return (
@@ -115,14 +115,13 @@ export default function DebitRequestModal({
             <Box flex={1}>
               <SelectDropdownSearch
                 value={form.values.account}
-                setValue={handleChange}
+                setValue={(value) => form.setFieldValue("account", value)}
               />
             </Box>
 
-            <Stack gap={4}>
+            <Stack gap={4} flex={1}>
               <NumberInput
                 classNames={{ input: styles.input, label: styles.label }}
-                flex={1}
                 label="Amount"
                 placeholder="Enter amount"
                 {...form.getInputProps("amount")}
@@ -213,27 +212,22 @@ export default function DebitRequestModal({
         </Box>
 
         <Flex mt={24} justify="flex-end" gap={15}>
-          <Button
-            onClick={() => {
+          <SecondaryBtn
+            text="Cancel"
+            w={126}
+            fw={600}
+            action={() => {
               form.reset();
               close();
             }}
-            color="#D0D5DD"
-            variant="outline"
-            className={styles.cta2}
-          >
-            Cancel
-          </Button>
-
-          <Button
-            onClick={createDebitRequest}
+          />
+          <PrimaryBtn
+            action={createDebitRequest}
             loading={processing}
-            className={styles.cta2}
-            variant="filled"
-            color="#D4F307"
-          >
-            Submit
-          </Button>
+            text="Submit"
+            fw={600}
+            w={126}
+          />
         </Flex>
       </Paper>
     </main>

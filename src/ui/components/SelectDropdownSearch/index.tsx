@@ -9,6 +9,7 @@ import {
   Avatar,
   Stack,
   ScrollArea,
+  Flex,
 } from "@mantine/core";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { filteredSearch } from "@/lib/search";
@@ -21,7 +22,7 @@ interface Item {
 
 function SelectOption({ name, iban, bic }: Item) {
   return (
-    <Group
+    <Flex
       // c="var(--prune-primary-900)"
       gap={8}
       align="center"
@@ -35,7 +36,7 @@ function SelectOption({ name, iban, bic }: Item) {
       <Stack gap={4}>
         <Text fz={12}>{name}</Text>
         <Group>
-          <Text inline fw={700} fz={11}>
+          <Text inline fw={700} fz={11} truncate w="60%">
             IBAN:{" "}
             <Text span inherit fw={400}>
               {iban}
@@ -49,7 +50,7 @@ function SelectOption({ name, iban, bic }: Item) {
           </Text>
         </Group>
       </Stack>
-    </Group>
+    </Flex>
   );
 }
 
@@ -60,7 +61,7 @@ interface Props {
 
 export function SelectDropdownSearch({ value, setValue }: Props) {
   const [search, setSearch] = useState("");
-  const { accounts, loading } = useUserAccounts();
+  const { accounts, loading } = useUserAccounts({ limit: 1000 });
   const combobox = useCombobox({
     onDropdownClose: () => {
       combobox.resetSelectedOption();

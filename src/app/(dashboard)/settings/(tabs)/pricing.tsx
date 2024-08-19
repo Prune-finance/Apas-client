@@ -1,15 +1,21 @@
 "use client";
 
-import { Button, Flex, Grid, GridCol, Text, TextInput } from "@mantine/core";
-import { IconPencilMinus } from "@tabler/icons-react";
+import { Flex, Grid, GridCol, Text, TextInput } from "@mantine/core";
 
 import styles from "../styles.module.scss";
-import { BusinessData } from "@/lib/hooks/businesses";
 import { useState } from "react";
+import { useUserBusiness } from "@/lib/hooks/businesses";
+import { usePricingPlan, useSinglePricingPlan } from "@/lib/hooks/pricing-plan";
+import { formatNumber } from "@/lib/utils";
 
 export default function Pricing() {
   const [editingTop, setEditingTop] = useState(false);
   const [editingBottom, setEditingBottom] = useState(false);
+
+  const { business, loading, meta } = useUserBusiness();
+  const { pricingPlan } = useSinglePricingPlan(business?.pricingPlanId ?? "");
+
+  const { pricingPlan: pricingPlans } = usePricingPlan();
 
   return (
     <div className={styles.business__tab}>
@@ -29,7 +35,9 @@ export default function Pricing() {
                 label: styles.label,
               }}
               label="Current Plan"
-              placeholder="Basic"
+              placeholder={
+                pricingPlan?.name ?? "No pricing plan for this business"
+              }
             />
           </GridCol>
 
@@ -41,7 +49,9 @@ export default function Pricing() {
                 label: styles.label,
               }}
               label="Cycle"
-              placeholder="Annually"
+              placeholder={
+                pricingPlan?.cycle ?? "No pricing plan for this business"
+              }
             />
           </GridCol>
 
@@ -53,11 +63,15 @@ export default function Pricing() {
                 label: styles.label,
               }}
               label="Amount"
-              placeholder="100,000"
+              placeholder={
+                pricingPlan?.cost
+                  ? formatNumber(pricingPlan.cost, true, "EUR")
+                  : "No pricing plan for this business"
+              }
             />
           </GridCol>
 
-          <GridCol span={4} className={styles.grid}>
+          {/* <GridCol span={4} className={styles.grid}>
             <TextInput
               readOnly={!editingTop}
               classNames={{
@@ -98,7 +112,7 @@ export default function Pricing() {
               // }
               // rightSectionPointerEvents="none"
             />
-          </GridCol>
+          </GridCol> */}
         </Grid>
       </div>
     </div>

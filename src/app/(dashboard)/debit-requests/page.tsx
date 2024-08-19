@@ -1,5 +1,8 @@
 "use client";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 
 // Mantine Imports
 import { useDisclosure } from "@mantine/hooks";
@@ -35,6 +38,7 @@ import { SearchInput } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import DebitRequestModal from "./new/modal";
+import { DebitRequestDrawer } from "./drawer";
 
 function DebitRequests() {
   const searchParams = useSearchParams();
@@ -88,17 +92,17 @@ function DebitRequests() {
         openDrawer();
       }}
     >
-      <TableTd className={styles.table__td}>
+      {/* <TableTd className={styles.table__td}>
         {element.Account.Company.name}
-      </TableTd>
+      </TableTd> */}
       <TableTd className={styles.table__td}>
         {formatNumber(element.amount, true, "EUR")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        {element.Account.accountNumber}
+        {element.Account.accountName}
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+        {dayjs(element.createdAt).format("Do MMMM YYYY - hh:mma")}
       </TableTd>
       <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />
@@ -164,141 +168,11 @@ function DebitRequests() {
         <DebitRequestModal close={close} />
       </Modal>
 
-      <Drawer
+      <DebitRequestDrawer
+        selectedRequest={selectedRequest}
         opened={drawerOpened}
-        onClose={closeDrawer}
-        position="right"
-        withCloseButton={false}
-        size="30%"
-      >
-        <Flex justify="space-between" pb={28}>
-          <Text fz={18} fw={600} c="#1D2939">
-            Debit Request Details
-          </Text>
-
-          <IconX onClick={closeDrawer} />
-        </Flex>
-
-        <Box>
-          <Flex direction="column">
-            <Text c="#8B8B8B" fz={12} tt="uppercase">
-              Amount
-            </Text>
-
-            <Text c="#97AD05" fz={32} fw={600}>
-              {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-            </Text>
-          </Flex>
-
-          <Divider mt={30} mb={20} />
-
-          <Text fz={16} mb={24}>
-            Account Details
-          </Text>
-
-          <Flex direction="column" gap={30}>
-            {/* <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Business Name:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.Account.Company.name}</Text>
-            </Flex> */}
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Source Account:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.Account.accountName}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Date Created:
-              </Text>
-
-              <Text fz={14}>
-                {dayjs(selectedRequest?.createdAt).format("DD MMM, YYYY")}
-              </Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Status:
-              </Text>
-
-              <BadgeComponent status={selectedRequest?.status as string} />
-            </Flex>
-          </Flex>
-
-          <Divider my={30} />
-
-          <Text fz={16} mb={24}>
-            Destination Details
-          </Text>
-
-          <Flex direction="column" gap={30}>
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                IBAN
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationIBAN}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                BIC
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationBIC}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Country
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationCountry}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Bank
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.destinationBank}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Reference:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.reference}</Text>
-            </Flex>
-          </Flex>
-
-          <Divider my={30} />
-
-          <Text fz={16} c="#1D2939" fw={600}>
-            Reason
-          </Text>
-
-          <div
-            style={{
-              marginTop: "15px",
-              background: "#F9F9F9",
-              padding: "12px 16px",
-            }}
-          >
-            <Text fz={14} c="#667085">
-              {selectedRequest?.reason || ""}
-            </Text>
-          </div>
-        </Box>
-      </Drawer>
+        close={closeDrawer}
+      />
     </main>
   );
 }
@@ -312,7 +186,7 @@ export default function DebitReqSuspense() {
 }
 
 const tableHeaders = [
-  "Business Name",
+  // "Business Name",
   "Amount",
   "Source Account",
   "Date Created",

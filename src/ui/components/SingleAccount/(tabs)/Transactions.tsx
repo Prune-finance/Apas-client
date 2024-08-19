@@ -27,7 +27,7 @@ export const Transactions = ({ transactions, loading }: Props) => {
 
   const overviewDetails = [
     {
-      title: "Total Balance",
+      title: "Total Transactions",
       value: totalBal,
       currency: "EUR",
       formatted: true,

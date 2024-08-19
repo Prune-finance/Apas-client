@@ -142,6 +142,53 @@ export function useSingleBusiness(id: string) {
   return { loading, business, revalidate };
 }
 
+export function useUserBusiness(customParams: IParams = {}) {
+  const [business, setBusiness] = useState<BusinessData | null>(null);
+  const [meta, setMeta] = useState<BusinessMeta>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchBusinesses() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${
+          process.env.NEXT_PUBLIC_SERVER_URL
+        }/auth/company?${params.toString()}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setBusiness(data.data);
+    } catch (error) {
+      setBusiness(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchBusinesses();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, business, meta };
+}
+
 export interface Director {
   name: string;
   email: string;
@@ -208,6 +255,20 @@ export interface BusinessData {
   companyStatus: "ACTIVE" | "INACTIVE";
   apiCalls: number;
   _count: Count;
+  pricingPlanId: null | string;
+  pricingPlan: PricingPlan | null;
+}
+
+export interface PricingPlan {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  name: string;
+  cycle: string;
+  cost: number;
+  description: string | null;
+  features: string[];
 }
 
 export interface Count {

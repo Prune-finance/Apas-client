@@ -5,6 +5,10 @@
 .input {
   height: rem(44px);
   padding-top: rem(18px);
+
+  &::placeholder {
+    font-size: 10px;
+  }
 }
 
 .label {

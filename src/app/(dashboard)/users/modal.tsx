@@ -65,7 +65,7 @@ export default function ModalComponent({
     >
       <Flex className={styles.modal} direction="column">
         <Box className={styles.form__container}>
-          <Flex gap={20}>
+          {/* <Flex gap={20}>
             <TextInput
               label="First name"
               classNames={{ input: styles.input, label: styles.label }}
@@ -81,9 +81,11 @@ export default function ModalComponent({
               flex={1}
               {...form.getInputProps("lastName")}
             />
-          </Flex>
+          </Flex> */}
 
-          <Flex mt={24}>
+          <Flex
+          //  mt={24}
+          >
             <TextInput
               classNames={{ input: styles.input, label: styles.label }}
               label="Email"
@@ -94,7 +96,7 @@ export default function ModalComponent({
             />
           </Flex>
 
-          <Flex mt={24}>
+          {/* <Flex mt={24}>
             <PasswordInput
               classNames={{ input: styles.input, label: styles.label }}
               label="Password"
@@ -102,8 +104,8 @@ export default function ModalComponent({
               flex={1}
               {...form.getInputProps("password")}
             />
-          </Flex>
-
+          </Flex> */}
+          {/* 
           <Flex mt={24}>
             <Select
               placeholder="Role"
@@ -113,7 +115,7 @@ export default function ModalComponent({
               data={["Admin", "Superadmin"]}
               {...form.getInputProps("role")}
             />
-          </Flex>
+          </Flex> */}
 
           <Flex mb={20} mt={40} justify="flex-end" gap={15}>
             <Button

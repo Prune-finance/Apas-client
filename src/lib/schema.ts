@@ -1,3 +1,4 @@
+import { features } from "process";
 import { z } from "zod";
 
 export const loginValues = {
@@ -444,6 +445,7 @@ export const newPricingPlan = {
   cost: "",
   cycle: null,
   description: "",
+  features: [""],
 };
 
 export const pricingPlanSchema = z
@@ -454,6 +456,7 @@ export const pricingPlanSchema = z
     cost: z.union([z.number(), z.string()]).nullish(),
     cycle: z.string().nullable(),
     description: z.string().optional(),
+    features: z.array(z.string()).optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.cost) {

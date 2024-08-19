@@ -54,26 +54,33 @@ export default function EditPlan() {
   });
 
   useEffect(() => {
-    if (!loading && pricingPlan) return form.initialize(pricingPlan);
+    if (!loading && pricingPlan)
+      return form.initialize({
+        name: pricingPlan.name,
+        cost: pricingPlan.cost,
+        description: pricingPlan.description,
+        features: pricingPlan.features,
+        cycle: pricingPlan.cycle,
+      });
   }, [pricingPlan]);
 
   const handleSubmit = async () => {
     setProcessing(true);
     const { description, ...rest } = form.values;
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan`,
-        { ...rest },
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan/${params.id}`,
+        { ...form.values },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       push("/admin/pricing-plans");
       handleSuccess(
-        "Successful! Creating Pricing Plan",
-        `${form.values.name} plan was successfully created`
+        "Successful! Pricing Plan Update",
+        `${form.values.name} plan was successfully updated`
       );
     } catch (error) {
-      handleError("Creating Pricing Plan Failed", parseError(error));
+      handleError("Updating Pricing Plan Failed", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -100,7 +107,7 @@ export default function EditPlan() {
         </Title>
 
         {/* Form goes here */}
-        <Box component="form" onSubmit={form.onSubmit(() => {})}>
+        <Box component="form" onSubmit={form.onSubmit(() => handleSubmit())}>
           <Group>
             {/* Plan Name */}
             <TextInput

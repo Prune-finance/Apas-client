@@ -20,6 +20,7 @@ import {
   SimpleGrid,
   TabsPanel,
   ThemeIcon,
+  Avatar,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -612,3 +613,153 @@ const tabs = [
   { value: "Transactions" },
   { value: "Analytics" },
 ];
+
+interface IssuedAccountHeadProps {
+  loading: boolean;
+  account: Account | null;
+  open: () => void;
+}
+
+export const IssuedAccountHead = ({
+  loading,
+  account,
+  open,
+}: IssuedAccountHeadProps) => {
+  return (
+    <Flex
+      justify="space-between"
+      align="center"
+      className={styles.main__header}
+    >
+      <Group gap={12} align="center">
+        {!loading ? (
+          <Avatar
+            size="lg"
+            color="var(--prune-primary-700)"
+          >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
+            0
+          )}`}</Avatar>
+        ) : (
+          <Skeleton circle h={50} w={50} />
+        )}
+
+        <Stack gap={2}>
+          {!loading ? (
+            <Text fz={24} className={styles.main__header__text} m={0} p={0}>
+              {account?.accountName}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={100} />
+          )}
+
+          {!loading ? (
+            <Text
+              fz={10}
+              fw={400}
+              className={styles.main__header__text}
+              m={0}
+              p={0}
+            >
+              {account?.accountNumber ?? ""}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={50} />
+          )}
+        </Stack>
+
+        {!loading ? (
+          <BadgeComponent status={account?.status ?? ""} active />
+        ) : (
+          <Skeleton w={60} h={10} />
+        )}
+      </Group>
+
+      <Flex gap={10}>
+        {/* <Button
+            fz={12}
+            className={styles.main__cta}
+            variant="filled"
+            color="#C1DD06"
+          >
+            Freeze Account
+          </Button> */}
+
+        <PrimaryBtn text="Debit Account" fw={600} action={open} />
+      </Flex>
+    </Flex>
+  );
+};
+
+export const DefaultAccountHead = ({
+  loading,
+  account,
+  open,
+}: IssuedAccountHeadProps) => {
+  return (
+    <Flex
+      justify="space-between"
+      align="center"
+      className={styles.main__header}
+    >
+      <Group gap={12} align="center">
+        {!loading ? (
+          <Avatar
+            size="lg"
+            color="var(--prune-primary-700)"
+            // variant="light"
+          >
+            {account?.accountName
+              .split(" ")
+              .map((item) => item.charAt(0))
+              .join("")}
+          </Avatar>
+        ) : (
+          <Skeleton circle h={50} w={50} />
+        )}
+
+        <Stack gap={2}>
+          {!loading ? (
+            <Text fz={24} className={styles.main__header__text} m={0} p={0}>
+              {account?.accountName}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={100} />
+          )}
+
+          {!loading ? (
+            <Text
+              fz={10}
+              fw={400}
+              className={styles.main__header__text}
+              m={0}
+              p={0}
+            >
+              {account?.accountNumber ?? ""}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={50} />
+          )}
+        </Stack>
+
+        {!loading ? (
+          <BadgeComponent status={account?.status ?? ""} active />
+        ) : (
+          <Skeleton w={60} h={10} />
+        )}
+      </Group>
+
+      <Flex gap={10}>
+        {/* <Button
+            fz={12}
+            className={styles.main__cta}
+            variant="filled"
+            color="#C1DD06"
+          >
+            Freeze Account
+          </Button> */}
+
+        <PrimaryBtn text="Send Money" fw={600} />
+      </Flex>
+    </Flex>
+  );
+};

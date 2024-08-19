@@ -1,7 +1,17 @@
 "use client";
 import Cookies from "js-cookie";
 
-import { Button, Flex, Grid, GridCol, Text, TextInput } from "@mantine/core";
+import {
+  Button,
+  Flex,
+  Grid,
+  GridCol,
+  Group,
+  Select,
+  Text,
+  Textarea,
+  TextInput,
+} from "@mantine/core";
 import { IconPencilMinus } from "@tabler/icons-react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
@@ -11,6 +21,8 @@ import { useForm } from "@mantine/form";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import { usePricingPlan } from "@/lib/hooks/pricing-plan";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function Business({
   business,
@@ -21,6 +33,13 @@ export default function Business({
 }) {
   const [editingTop, setEditingTop] = useState(false);
   const [editingBottom, setEditingBottom] = useState(false);
+  const [editingBizInfo, setEditingBizInfo] = useState(false);
+
+  const { pricingPlan } = usePricingPlan();
+  const pricingPlanOptions = pricingPlan.map((plan) => ({
+    label: plan.name,
+    value: plan.id,
+  }));
 
   const { handleSuccess, handleError } = useNotification();
 
@@ -32,6 +51,8 @@ export default function Business({
     contactEmail: business.contactEmail,
     address: business.address,
     legalEntity: business.legalEntity,
+    pricingPlanId: business.pricingPlanId,
+    businessBio: business.businessBio,
   };
 
   const form = useForm({
@@ -65,26 +86,30 @@ export default function Business({
             Basic Information
           </Text>
           {!editingTop ? (
-            <Button
-              onClick={() => setEditingTop(true)}
-              leftSection={<IconPencilMinus color="#475467" size={14} />}
-              className={styles.edit}
-            >
-              Edit
-            </Button>
+            <SecondaryBtn
+              text="Edit"
+              icon={IconPencilMinus}
+              action={() => setEditingTop(true)}
+            />
           ) : (
-            <Button
-              onClick={() => {
-                handleBusinessUpdate();
-                setEditingTop(false);
-              }}
-              // className={styles.edit}
-              variant="filled"
-              color="#D4F307"
-              style={{ fontSize: "10px", color: "#475467" }}
-            >
-              Save Changes
-            </Button>
+            <Group>
+              <SecondaryBtn
+                text="Cancel"
+                action={() => setEditingTop(false)}
+                fz={10}
+                fw={600}
+              />
+
+              <PrimaryBtn
+                fz={10}
+                fw={600}
+                text="Save Changes"
+                action={() => {
+                  handleBusinessUpdate();
+                  setEditingTop(false);
+                }}
+              />
+            </Group>
           )}
         </Flex>
 
@@ -155,7 +180,7 @@ export default function Business({
           </GridCol>
 
           <GridCol span={4} className={styles.grid}>
-            <TextInput
+            <Select
               readOnly={!editingTop}
               classNames={{
                 input: styles.input,
@@ -163,13 +188,15 @@ export default function Business({
                 root: styles.input__root,
               }}
               label="Pricing Plan"
-              placeholder="Standard"
-              rightSection={
-                <Text fz={10} fw={600}>
-                  Expires 24th Jul, 2024
-                </Text>
-              }
-              rightSectionPointerEvents="none"
+              placeholder={business.pricingPlan?.name ?? "No pricing plan"}
+              // rightSection={
+              //   <Text fz={10} fw={600}>
+              //     Expires 24th Jul, 2024
+              //   </Text>
+              // }
+              // rightSectionPointerEvents="none"
+              data={pricingPlanOptions}
+              {...form.getInputProps("pricingPlanId")}
             />
           </GridCol>
         </Grid>
@@ -181,26 +208,30 @@ export default function Business({
             Contact Information
           </Text>
           {editingBottom ? (
-            <Button
-              onClick={() => {
-                handleBusinessUpdate();
-                setEditingBottom(false);
-              }}
-              // className={styles.edit}
-              variant="filled"
-              color="#D4F307"
-              style={{ fontSize: "10px", color: "#475467" }}
-            >
-              Save Changes
-            </Button>
+            <Group>
+              <SecondaryBtn
+                text="Cancel"
+                action={() => setEditingBottom(false)}
+                fz={10}
+                fw={600}
+              />
+
+              <PrimaryBtn
+                fz={10}
+                fw={600}
+                text="Save Changes"
+                action={() => {
+                  handleBusinessUpdate();
+                  setEditingBottom(false);
+                }}
+              />
+            </Group>
           ) : (
-            <Button
-              onClick={() => setEditingBottom(true)}
-              leftSection={<IconPencilMinus color="#475467" size={14} />}
-              className={styles.edit}
-            >
-              Edit
-            </Button>
+            <SecondaryBtn
+              text="Edit"
+              icon={IconPencilMinus}
+              action={() => setEditingBottom(true)}
+            />
           )}
         </Flex>
 
@@ -228,6 +259,58 @@ export default function Business({
               label="Email"
               placeholder={business?.contactEmail}
               {...form.getInputProps("contactEmail")}
+            />
+          </GridCol>
+        </Grid>
+      </div>
+
+      <div className={styles.bottom__container}>
+        <Flex justify="space-between" align="center">
+          <Text fz={12} fw={600} tt="uppercase">
+            Business Bio
+          </Text>
+          {editingBizInfo ? (
+            <Group>
+              <SecondaryBtn
+                text="Cancel"
+                action={() => setEditingBizInfo(false)}
+                fz={10}
+                fw={600}
+              />
+
+              <PrimaryBtn
+                fz={10}
+                fw={600}
+                text="Save Changes"
+                action={() => {
+                  handleBusinessUpdate();
+                  setEditingBizInfo(false);
+                }}
+              />
+            </Group>
+          ) : (
+            <SecondaryBtn
+              icon={IconPencilMinus}
+              text="Edit"
+              action={() => setEditingBizInfo(true)}
+            />
+          )}
+        </Flex>
+
+        <Grid mt={20} className={styles.grid__container}>
+          <GridCol span={12} className={styles.grid}>
+            <Textarea
+              readOnly={!editingBizInfo}
+              classNames={{
+                input: styles.input,
+                label: styles.label,
+              }}
+              minRows={6}
+              maxRows={6}
+              autosize
+              label="Business Bio"
+              placeholder={business?.businessBio || ""}
+              {...form.getInputProps("businessBio")}
             />
           </GridCol>
         </Grid>

@@ -24,6 +24,7 @@ interface Props extends CardProps {
   balance: number;
   link?: string;
   loading: boolean;
+  badgeText?: string;
 }
 
 export const AccountCard = ({
@@ -34,6 +35,7 @@ export const AccountCard = ({
   balance,
   link,
   loading,
+  badgeText,
   ...props
 }: Props) => {
   return link ? (
@@ -66,7 +68,7 @@ export const AccountCard = ({
           </Group>
 
           <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
-            Account
+            {badgeText ? badgeText : "Account"}
           </Badge>
         </Group>
       </CardSection>
@@ -146,7 +148,7 @@ export const AccountCard = ({
           </Group>
 
           <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
-            Account
+            {badgeText ? badgeText : "Account"}
           </Badge>
         </Group>
       </CardSection>

@@ -51,7 +51,7 @@ export const DebitRequestDrawer = ({
 
       <Box>
         <Group justify="space-between" align="center">
-          <Stack>
+          <Stack gap={0}>
             <Text c="#8B8B8B" fz={12} tt="uppercase">
               Amount
             </Text>

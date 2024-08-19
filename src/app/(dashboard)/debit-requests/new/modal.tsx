@@ -14,6 +14,7 @@ import {
   Box,
   NumberInput,
   Textarea,
+  Stack,
 } from "@mantine/core";
 import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -31,6 +32,7 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { formatNumber } from "@/lib/utils";
+import { SelectDropdownSearch } from "@/ui/components/SelectDropdownSearch";
 
 export default function DebitRequestModal({
   close,
@@ -86,6 +88,10 @@ export default function DebitRequestModal({
     }
   };
 
+  const handleChange = (value: string) => {
+    form.setFieldValue("account", value);
+  };
+
   return (
     <main className={styles.main}>
       <Paper className={styles.form__container}>
@@ -95,7 +101,7 @@ export default function DebitRequestModal({
 
         <Box mt={32}>
           <Flex gap={20}>
-            <Select
+            {/* <Select
               placeholder="Select Account"
               classNames={{ input: styles.input, label: styles.label }}
               flex={1}
@@ -104,16 +110,35 @@ export default function DebitRequestModal({
               searchable
               clearable
               {...form.getInputProps("account")}
-            />
+            /> */}
 
-            <NumberInput
-              classNames={{ input: styles.input, label: styles.label }}
-              flex={1}
-              label="Amount"
-              placeholder="Enter amount"
-              {...form.getInputProps("amount")}
-              withAsterisk
-            />
+            <Box flex={1}>
+              <SelectDropdownSearch
+                value={form.values.account}
+                setValue={handleChange}
+              />
+            </Box>
+
+            <Stack gap={4}>
+              <NumberInput
+                classNames={{ input: styles.input, label: styles.label }}
+                flex={1}
+                label="Amount"
+                placeholder="Enter amount"
+                {...form.getInputProps("amount")}
+                withAsterisk
+              />
+              {form.values.account && (
+                <Text fz={12} c="var(--prune-primary-800)">
+                  {`Account balance: ${formatNumber(
+                    accounts.find((item) => item.id === form.values.account)
+                      ?.accountBalance ?? 0,
+                    true,
+                    "EUR"
+                  )}`}
+                </Text>
+              )}
+            </Stack>
           </Flex>
 
           <Box mt={40}>

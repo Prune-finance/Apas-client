@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { filteredSearch } from "@/lib/search";
+import styles from "./styles.module.scss";
 
 interface Item {
   name: string;
@@ -113,6 +114,7 @@ export function SelectDropdownSearch({ value, setValue }: Props) {
           label={"Account"}
           size="md"
           radius="md"
+          classNames={{ input: styles.input }}
         >
           {accounts.find((item) => item.id === value)?.accountName || (
             <Input.Placeholder>Select Account</Input.Placeholder>

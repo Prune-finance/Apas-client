@@ -35,6 +35,7 @@ import {
   IconPointFilled,
   IconSearch,
   IconTrash,
+  IconUserCheck,
   IconUserEdit,
   IconUserX,
 } from "@tabler/icons-react";
@@ -76,6 +77,7 @@ import { SearchInput } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { title } from "process";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -151,21 +153,40 @@ function Users() {
   };
 
   const handleEdit = (data: typeof newAdmin) => {
-    console.log(data);
     form.setValues(data);
     open();
     setIsEdit(true);
   };
 
-  console.log(users);
+  const handleUserDeactivation = async (
+    id: string,
+    status: "ACTIVE" | "INACTIVE"
+  ) => {
+    try {
+      const path = status === "ACTIVE" ? "deactivate" : "activate";
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/${id}/${path}`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      revalidate();
+      handleSuccess(
+        `Successful! User ${
+          status === "ACTIVE" ? "Deactivation" : "Activation"
+        }`,
+        `User ${status === "ACTIVE" ? "deactivated" : "activated"} successfully`
+      );
+    } catch (error) {
+      handleError(
+        `Failed! User ${status === "ACTIVE" ? "Deactivation" : "Activation"}`,
+        parseError(error)
+      );
+    }
+  };
 
   const menuItems = [
-    // {
-    //   text: "View",
-    //   icon: <IconEye style={{ width: rem(14), height: rem(14) }} />,
-    //   link: true,
-    //   href: "/admin/businesses",
-    // },
     {
       text: "Edit User",
       icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
@@ -181,97 +202,91 @@ function Users() {
     openDrawer();
   };
 
-  const rows = filteredSearch(
-    users,
-    ["email", "firstName", "lastName", "role"],
-    debouncedSearch
-  ).map((element, index) => (
-    <TableTr
-      key={index}
-      onClick={() => handleRowClick(element)}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd className={styles.table__td}>{element.email}</TableTd>
-      {/* <TableTd className={styles.table__td}>{`${element.firstName ?? ""} ${
-        element.lastName ?? ""
-      }`}</TableTd> */}
-      {/* <TableTd className={styles.table__td}>{element.role}</TableTd> */}
-      <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-      </TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.updatedAt).format("ddd DD MMM YYYY")}
-      </TableTd>
-      {/* <TableTd className={styles.table__td}></TableTd> */}
-      <TableTd className={styles.table__td}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor("ACTIVE")}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          Active
-        </Badge>
-      </TableTd>
-
-      <TableTd
-        className={`${styles.table__td}`}
-        onClick={(e) => e.stopPropagation()}
+  const rows = filteredSearch(users, ["email"], debouncedSearch).map(
+    (element, index) => (
+      <TableTr
+        key={index}
+        onClick={() => handleRowClick(element)}
+        style={{ cursor: "pointer" }}
       >
-        <Menu shadow="md" width={150}>
-          <MenuTarget>
-            <UnstyledButton>
-              <IconDotsVertical size={17} />
-            </UnstyledButton>
-          </MenuTarget>
+        <TableTd className={styles.table__td}>{element.email}</TableTd>
+        <TableTd className={`${styles.table__td}`}>
+          {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+        </TableTd>
+        <TableTd className={`${styles.table__td}`}>
+          {dayjs(element.updatedAt).format("ddd DD MMM YYYY")}
+        </TableTd>
 
-          <MenuDropdown>
-            {menuItems.map((items, index) => {
-              // if (items.link)
-              //   return (
-              //     <Link key={index} href={`${items.href}/${element.id}`}>
-              //       <MenuItem
-              //         key={index}
-              //         fz={10}
-              //         c="#667085"
-              //         leftSection={items.icon}
-              //       >
-              //         {items.text}
-              //       </MenuItem>
-              //     </Link>
-              //   );
-              {
-              }
+        <TableTd>
+          <BadgeComponent status={element.status} active />
+        </TableTd>
 
-              return (
-                <MenuItem
-                  key={index}
-                  fz={10}
-                  c="#667085"
-                  leftSection={items.icon}
-                  onClick={() => {
-                    if (items.text === "Edit User")
-                      return handleEdit({
-                        email: element.email,
-                        firstName: element.firstName,
-                        lastName: element.lastName,
-                        role: element.role,
-                        password: "",
-                      });
-                  }}
-                >
-                  {items.text}
-                </MenuItem>
-              );
-            })}
-          </MenuDropdown>
-        </Menu>
-      </TableTd>
-    </TableTr>
-  ));
+        <TableTd
+          className={`${styles.table__td}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <Menu shadow="md" width={150}>
+            <MenuTarget>
+              <UnstyledButton>
+                <IconDotsVertical size={17} />
+              </UnstyledButton>
+            </MenuTarget>
+            <MenuDropdown>
+              {(() => {
+                const menuItems = [
+                  {
+                    text: "Edit User",
+                    icon: (
+                      <IconUserEdit
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    ),
+                  },
+                  {
+                    text:
+                      element.status === "INACTIVE" ? "Activate" : "Deactivate",
+                    icon:
+                      element.status === "INACTIVE" ? (
+                        <IconUserCheck
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      ) : (
+                        <IconUserX
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      ),
+                  },
+                ];
+
+                return menuItems.map((item, index) => (
+                  <MenuItem
+                    key={index}
+                    fz={10}
+                    c="#667085"
+                    leftSection={item.icon}
+                    onClick={() => {
+                      if (item.text === "Edit User")
+                        return handleEdit({
+                          email: element.email,
+                          firstName: element.firstName,
+                          lastName: element.lastName,
+                          role: element.role,
+                          password: "",
+                        });
+
+                      return handleUserDeactivation(element.id, element.status);
+                    }}
+                  >
+                    {item.text}
+                  </MenuItem>
+                ));
+              })()}
+            </MenuDropdown>
+          </Menu>
+        </TableTd>
+      </TableTr>
+    )
+  );
 
   return (
     <main className={styles.main}>

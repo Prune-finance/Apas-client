@@ -2,10 +2,13 @@ import { DebitRequest } from "@/lib/hooks/requests";
 import { formatNumber } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import ModalComponent from "@/ui/components/Modal";
 import { Drawer, Flex, Box, Divider, Text, Stack, Group } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { IconX } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { useState } from "react";
 
 dayjs.extend(advancedFormat);
 type Props = {
@@ -13,12 +16,14 @@ type Props = {
   close: () => void;
   selectedRequest: DebitRequest | null;
 };
-
 export const DebitRequestDrawer = ({
   opened,
   close,
   selectedRequest,
 }: Props) => {
+  const [openedCancel, { open, close: closeCancel }] = useDisclosure(false);
+  const [processing, setProcessing] = useState(false);
+  const [reason, setReason] = useState("");
   const accountDetails = {
     "Source Account": selectedRequest?.Account.accountName,
     "Date Created": dayjs(selectedRequest?.createdAt).format("Do MMMM, YYYY"),
@@ -61,7 +66,13 @@ export const DebitRequestDrawer = ({
             </Text>
           </Stack>
 
-          <PrimaryBtn text="Cancel Request" color="#B42318" c="#fff" fw={600} />
+          <PrimaryBtn
+            text="Cancel Request"
+            color="#B42318"
+            c="#fff"
+            fw={600}
+            action={open}
+          />
         </Group>
 
         <Divider mt={30} mb={20} />
@@ -118,6 +129,21 @@ export const DebitRequestDrawer = ({
           </Text>
         </div>
       </Box>
+
+      <ModalComponent
+        opened={openedCancel}
+        close={closeCancel}
+        title="Cancel Request?"
+        text="You are about to cancel this debit request. This action cannot be undone."
+        icon={<IconX color="#D92D20" />}
+        color="#FEF3F2"
+        processing={processing}
+        customApproveMessage="Submit"
+        reason={reason}
+        setReason={setReason}
+        addReason
+        action={() => {}}
+      />
     </Drawer>
   );
 };

@@ -12,6 +12,7 @@ import { IconTrash, IconX } from "@tabler/icons-react";
 import styles from "./styles.module.scss";
 import DropzoneComponent from "./dropzone";
 import { UseFormReturnType } from "@mantine/form";
+import { Dispatch, SetStateAction } from "react";
 
 export default function ModalComponent({
   opened,
@@ -23,6 +24,9 @@ export default function ModalComponent({
   customApproveMessage,
   processing,
   action,
+  reason,
+  setReason,
+  addReason,
 }: ModalProps) {
   return (
     <Modal
@@ -60,6 +64,17 @@ export default function ModalComponent({
             {text}
           </Text>
         </Flex>
+
+        {addReason && setReason && (
+          <Textarea
+            minRows={4}
+            maxRows={5}
+            autosize
+            value={reason}
+            onChange={(e) => setReason(e.currentTarget.value)}
+            placeholder="Give reason here..."
+          />
+        )}
 
         <Flex className={styles.bottom__flex} justify="center" gap={15}>
           <Button
@@ -105,4 +120,7 @@ interface ModalProps {
   customApproveMessage?: string;
   action?: () => void;
   processing?: boolean;
+  reason?: string;
+  setReason?: Dispatch<SetStateAction<string>>;
+  addReason?: boolean;
 }

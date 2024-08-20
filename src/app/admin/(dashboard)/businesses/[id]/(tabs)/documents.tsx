@@ -1,12 +1,15 @@
 "use client";
 
 import {
+  ActionIcon,
+  Box,
   Button,
   FileButton,
   Flex,
   Grid,
   GridCol,
   Group,
+  Modal,
   Text,
   TextInput,
   ThemeIcon,
@@ -17,6 +20,7 @@ import {
   IconPdf,
   IconPencilMinus,
   IconPlus,
+  IconX,
 } from "@tabler/icons-react";
 import Cookies from "js-cookie";
 
@@ -28,6 +32,8 @@ import { useForm, UseFormReturnType } from "@mantine/form";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { SecondaryBtn, PrimaryBtn } from "@/ui/components/Buttons";
+import { useDisclosure } from "@mantine/hooks";
+import DropzoneComponent from "./dropzone";
 
 export default function Documents({
   business,
@@ -39,6 +45,7 @@ export default function Documents({
   const { handleSuccess, handleError } = useNotification();
   const [editing, setEditing] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const initialValues = {
     cacCertificate: business.cacCertificate,
@@ -88,7 +95,13 @@ export default function Documents({
           All Documents
         </Text>
 
-        <PrimaryBtn text="New Document" icon={IconPlus} fz={12} fw={600} />
+        <PrimaryBtn
+          text="New Document"
+          icon={IconPlus}
+          fz={12}
+          fw={600}
+          action={open}
+        />
       </Group>
       <div className={styles.top__container}>
         <Flex justify="space-between" align="center">
@@ -190,9 +203,11 @@ export default function Documents({
             />
           </GridCol>
         </Grid>
+
+        <NewBusinessModal opened={opened} close={close} />
       </div>
 
-      <Button
+      {/* <Button
         // mt={20}
         variant="transparent"
         fz={12}
@@ -206,7 +221,7 @@ export default function Documents({
         }
       >
         Add New
-      </Button>
+      </Button> */}
     </div>
   );
 }
@@ -306,5 +321,48 @@ const DocumentTextInput = ({
       label={label}
       placeholder={`${title}-${business.name}`}
     />
+  );
+};
+
+interface NewBizProps {
+  opened: boolean;
+  close: () => void;
+}
+
+const NewBusinessModal = ({ opened, close }: NewBizProps) => {
+  return (
+    <Modal
+      opened={opened}
+      onClose={close}
+      closeButtonProps={{
+        pr: 32,
+        children: (
+          <ActionIcon
+            radius="xl"
+            variant="filled"
+            color="var(--prune-text-gray-100)"
+            size={32}
+          >
+            <IconX color="var(--prune-text-gray-500)" stroke={1.5} />
+          </ActionIcon>
+        ),
+      }}
+      title={
+        <Text fz={20} fw={600}>
+          New Document
+        </Text>
+      }
+      padding={32}
+      centered
+    >
+      <Box
+        component="form"
+        style={{ display: "flex", flexDirection: "column", gap: 24 }}
+      >
+        <TextInput placeholder="Enter Document Name" />
+
+        {/* <DropzoneComponent form={form} formKey="proofOfAddressFileUrl" /> */}
+      </Box>
+    </Modal>
   );
 };

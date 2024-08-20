@@ -43,6 +43,7 @@ import useNotification from "@/lib/hooks/notification";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import classes from "@/ui/styles/containedInput.module.css";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function Directors({
   business,
@@ -228,6 +229,7 @@ const DirectorForm = ({
       <TextInput
         classNames={classes}
         label="Name"
+        // labelProps={{fz: }}
         flex={1}
         placeholder="Enter Director's name"
         {...form.getInputProps("name")}
@@ -303,7 +305,7 @@ const DirectorForm = ({
       )}
 
       <Flex mt={24} justify="flex-end" gap={15}>
-        <Button
+        {/* <Button
           style={{
             width: "120px",
             fontSize: "12px",
@@ -319,9 +321,26 @@ const DirectorForm = ({
           className={styles.cta}
         >
           Cancel
-        </Button>
+        </Button> */}
+        <SecondaryBtn
+          text="Cancel"
+          action={() => {
+            close();
+            form.reset();
+          }}
+          fw={600}
+          w={120}
+        />
 
-        <Button
+        <PrimaryBtn
+          text="Submit"
+          action={handleBusinessUpdate}
+          fw={600}
+          w={120}
+          loading={processing}
+        />
+
+        {/* <Button
           style={{
             width: "120px",
             fontSize: "12px",
@@ -335,7 +354,7 @@ const DirectorForm = ({
           color="var(--prune-primary-600)"
         >
           Submit
-        </Button>
+        </Button> */}
       </Flex>
     </>
   );

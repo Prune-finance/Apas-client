@@ -3,7 +3,7 @@
 }
 
 .input {
-  height: rem(44px);
+  height: rem(50px);
   padding-top: rem(18px);
 
   &::placeholder {
@@ -14,8 +14,9 @@
 .label {
   position: absolute;
   pointer-events: none;
-  font-size: 0.7rem;
+  font-size: 12px;
   padding-left: var(--mantine-spacing-sm);
   padding-top: calc(var(--mantine-spacing-sm) / 2);
   z-index: 1;
+  color: var(--prune-text-gray-400);
 }

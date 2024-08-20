@@ -38,6 +38,7 @@ export default function Documents({
 }) {
   const { handleSuccess, handleError } = useNotification();
   const [editing, setEditing] = useState(false);
+  const [processing, setProcessing] = useState(false);
 
   const initialValues = {
     cacCertificate: business.cacCertificate,
@@ -54,13 +55,17 @@ export default function Documents({
   });
 
   const handleBusinessUpdate = async () => {
-    const { createdAt, updatedAt, deletedAt, pricingPlanId, ...rest } =
-      business;
+    const { contactEmail, name, contactNumber, domain } = business;
+
+    setProcessing(true);
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
         {
-          ...rest,
+          contactEmail,
+          name,
+          domain,
+          contactNumber,
           ...form.values,
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
@@ -70,6 +75,9 @@ export default function Documents({
       revalidate();
     } catch (error) {
       handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+      setEditing(false);
     }
   };
 
@@ -106,9 +114,9 @@ export default function Documents({
                 fz={10}
                 fw={600}
                 text="Save Changes"
+                loading={processing}
                 action={() => {
                   handleBusinessUpdate();
-                  setEditing(false);
                 }}
               />
             </Group>

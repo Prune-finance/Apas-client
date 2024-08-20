@@ -522,9 +522,17 @@ export const resetPasswordSchema = z
 
 export type ResetPasswordType = z.infer<typeof resetPasswordSchema>;
 
-const newDocumentSchema = z.object({
-  otherDocuments: z.record(
-    z.string().min(1, "Document Name is required"),
-    z.string().min(1, "Value must bee a valid URL")
-  ),
+export const otherDocumentValues = {
+  name: "",
+  url: "",
+};
+
+export const otherDocumentSchema = z.object({
+  name: z.string().min(1, "Document Name is required"),
+  url: z
+    .string()
+    .url("Value must be a valid URL")
+    .min(1, "Document URL is required"),
 });
+
+export type OtherDocumentType = z.infer<typeof otherDocumentSchema>;

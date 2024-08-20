@@ -257,6 +257,7 @@ export interface BusinessData {
   _count: Count;
   pricingPlanId: null | string;
   pricingPlan: PricingPlan | null;
+  otherDocuments: Record<string, string>;
 }
 
 export interface PricingPlan {

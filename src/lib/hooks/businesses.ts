@@ -1,3 +1,4 @@
+import { DebitRequest } from "./requests";
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
@@ -258,6 +259,8 @@ export interface BusinessData {
   pricingPlanId: null | string;
   pricingPlan: PricingPlan | null;
   otherDocuments: Record<string, string>;
+  Accounts: { DebitRequests: { id: string }[] }[];
+  Requests: { type: string; id: string }[];
 }
 
 export interface PricingPlan {

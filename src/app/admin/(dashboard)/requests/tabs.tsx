@@ -8,6 +8,8 @@ import {
   IconUserX,
   IconSnowflake,
   IconSnowflakeOff,
+  IconArrowUpRightCircle,
+  IconCircleArrowUpRight,
 } from "@tabler/icons-react";
 import { IconBuildingSkyscraper, IconCurrencyEuro } from "@tabler/icons-react";
 import { IconListTree, IconUsers, IconUsersGroup } from "@tabler/icons-react";
@@ -19,38 +21,11 @@ import Reactivate from "./(tabs)/reactivate";
 import Deactivate from "./(tabs)/deactivate";
 import Freeze from "./(tabs)/freeze";
 import Unfreeze from "./(tabs)/unfreeze";
+import TabsComponent from "@/ui/components/Tabs";
 
 export default function TabsContainer() {
   return (
-    <Tabs
-      mt={24}
-      defaultValue="Debit"
-      variant="pills"
-      classNames={{
-        root: styles.tabs,
-        list: styles.tabs__list,
-        tab: styles.tab,
-      }}
-    >
-      <TabsList>
-        {tabs.map((tab) => (
-          <TabsTab
-            key={tab.value}
-            value={tab.value}
-            leftSection={<tab.icon size={14} />}
-          >
-            {tab.title}
-          </TabsTab>
-        ))}
-
-        {/* <TabsTab
-          value="Freeze"
-          leftSection={<IconBuildingSkyscraper size={14} />}
-        >
-          Freeze Requests
-        </TabsTab> */}
-      </TabsList>
-
+    <TabsComponent tabs={tabs} mt={24} tt="capitalize" fz={12}>
       <TabsPanel value={tabs[0].value}>
         <Debit />
       </TabsPanel>
@@ -58,42 +33,30 @@ export default function TabsContainer() {
       <TabsPanel value={tabs[1].value}>
         <Reactivate />
       </TabsPanel>
-
-      <TabsPanel value={tabs[2].value}>
-        <Deactivate />
-      </TabsPanel>
-
-      <TabsPanel value={tabs[3].value}>
-        <Freeze />
-      </TabsPanel>
-
-      <TabsPanel value={tabs[4].value}>
-        <Unfreeze />
-      </TabsPanel>
-    </Tabs>
+    </TabsComponent>
   );
 }
 
 const tabs = [
-  { title: "Debit Requests", value: "Debit", icon: IconBuildingSkyscraper },
+  { title: "Debit", value: "Debit", icon: <IconCircleArrowUpRight /> },
   {
-    title: "Reactivate Account Requests",
-    value: "Reactivate",
-    icon: IconUserPlus,
+    title: "Other Requests",
+    value: "other-requests",
+    icon: <IconUserPlus />,
   },
-  {
-    title: "Deactivate Account Requests",
-    value: "Deactivate",
-    icon: IconUserX,
-  },
-  {
-    title: "Freeze Account Requests",
-    value: "Freeze",
-    icon: IconSnowflake,
-  },
-  {
-    title: "Unfreeze Accounts Requests",
-    value: "Unfreeze",
-    icon: IconSnowflakeOff,
-  },
+  // {
+  //   title: "Deactivate Account Requests",
+  //   value: "Deactivate",
+  //   icon: IconUserX,
+  // },
+  // {
+  //   title: "Freeze Account Requests",
+  //   value: "Freeze",
+  //   icon: IconSnowflake,
+  // },
+  // {
+  //   title: "Unfreeze Accounts Requests",
+  //   value: "Unfreeze",
+  //   icon: IconSnowflakeOff,
+  // },
 ];

@@ -1,4 +1,4 @@
-import { Fragment, Suspense } from "react";
+import { Fragment, Suspense, useMemo } from "react";
 import Cookies from "js-cookie";
 
 import dayjs from "dayjs";
@@ -45,6 +45,8 @@ import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
+import { useBusiness } from "@/lib/hooks/businesses";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 function Debit() {
   const searchParams = useSearchParams();
@@ -56,12 +58,14 @@ function Debit() {
     sort,
   } = Object.fromEntries(searchParams.entries());
   const { handleError, handleSuccess } = useNotification();
-  const { loading, requests, revalidate } = useDebitRequests({
+  const { requests, revalidate } = useDebitRequests({
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
   });
+
+  const { businesses, loading } = useBusiness({}, undefined, true);
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
@@ -100,6 +104,25 @@ function Debit() {
       setProcessing(false);
     }
   };
+
+  const filteredBusinesses = useMemo(() => {
+    const hasAccounts = businesses.filter(
+      (business) => business.Accounts.length > 0
+    );
+
+    const bizWithDebCount = hasAccounts.map((business) => {
+      const updatedBusiness: Record<string, any> = { ...business };
+
+      const debitCount = business.Accounts.reduce((acc, account) => {
+        return acc + account.DebitRequests.length;
+      }, 0);
+
+      updatedBusiness["debitCount"] = debitCount;
+      return updatedBusiness;
+    });
+
+    return bizWithDebCount.filter((biz) => biz.debitCount > 0);
+  }, [businesses]);
 
   const handleAcceptRequest = async () => {
     if (!selectedRequest) return;
@@ -158,8 +181,8 @@ function Debit() {
   };
 
   const rows = filteredSearch(
-    requests,
-    ["Account.Company.name", "Account.accountNumber"],
+    filteredBusinesses,
+    ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -167,31 +190,14 @@ function Debit() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{element.Account.Company.name}</TableTd>
-      {/* <TableTd className={styles.table__td}>{element.amount}</TableTd> */}
-      {/* <TableTd className={styles.table__td}>
-        {`${element.Account.Company.name
-          .toLowerCase()
-          .split(" ")
-          .join("")}@example.com`}
-      </TableTd> */}
-      <TableTd className={`${styles.table__td}`}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={approvedBadgeColor(element.status)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          {element.status.toLowerCase()}
-        </Badge>
+      <TableTd>{element.name}</TableTd>
+      <TableTd className={styles.table__td}>{element.debitCount}</TableTd>
+      <TableTd className={styles.table__td} tt="lowercase">
+        {element.contactEmail}
       </TableTd>
-
-      {/* <TableTd className={`${styles.table__td}`}>
-        <MenuComponent request={element} />
-      </TableTd> */}
+      <TableTd>
+        <BadgeComponent status={element.companyStatus} active />
+      </TableTd>
     </TableTr>
   ));
 
@@ -404,8 +410,8 @@ function Debit() {
 
 const tableHeaders = [
   "Business Name",
-  // "Number of Requests",
-  // "Contact Email",
+  "Number of Requests",
+  "Contact Email",
   "Status",
   // "Action",
 ];

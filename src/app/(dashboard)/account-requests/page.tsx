@@ -68,6 +68,8 @@ import { activeBadgeColor, approvedBadgeColor } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import Account from "../accounts/[id]/page";
+import { AccountRequestsDrawer } from "./drawer";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -158,25 +160,6 @@ function AccountRequests() {
       </TableTd> */}
     </TableTr>
   ));
-
-  const accountDetails = [
-    {
-      label: "Account Name",
-      value: `${selectedRequest?.firstName ?? ""} ${
-        selectedRequest?.lastName ?? ""
-      }`,
-    },
-    {
-      label: "Country",
-      value: selectedRequest?.Company.country,
-    },
-    { label: "Account Type", value: selectedRequest?.accountType },
-    {
-      label: "Date Created",
-      value: dayjs(selectedRequest?.createdAt).format("Do MMMM, YYYY"),
-    },
-    { label: "Status", value: selectedRequest?.status },
-  ];
 
   return (
     <main className={styles.main}>
@@ -272,124 +255,11 @@ function AccountRequests() {
         text="You are about to delete this account request"
       />
 
-      <Drawer
+      <AccountRequestsDrawer
         opened={drawerOpened}
-        onClose={closeDrawer}
-        position="right"
-        withCloseButton={false}
-        size="30%"
-      >
-        <Flex justify="space-between" pb={28}>
-          <Text fz={18} fw={600} c="#1D2939">
-            Account Request Details
-          </Text>
-
-          <IconX onClick={closeDrawer} />
-        </Flex>
-
-        <Box>
-          <Divider mb={20} />
-
-          <Text fz={16} mb={24}>
-            Account Details
-          </Text>
-
-          <Stack gap={28}>
-            {accountDetails.map((item, index) => (
-              <Group justify="space-between" key={index}>
-                <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
-                  {item.label}
-                </Text>
-                {item.label !== "Status" ? (
-                  <Text fz={14} fw={500} c="var(--prune-text-gray-600)">
-                    {item.value}
-                  </Text>
-                ) : (
-                  <Badge
-                    tt="capitalize"
-                    variant="light"
-                    color={approvedBadgeColor(item.value || "")}
-                    w={90}
-                    h={24}
-                    fw={400}
-                    fz={12}
-                  >
-                    {item.value}
-                  </Badge>
-                )}
-              </Group>
-            ))}
-          </Stack>
-
-          <Divider mt={30} mb={20} />
-
-          <Text fz={16} mb={24}>
-            Supporting Documents
-          </Text>
-
-          {selectedRequest?.accountType === "USER" && (
-            <Stack gap={28}>
-              <TextInput
-                readOnly
-                classNames={{
-                  input: styles.input,
-                  label: styles.label,
-                  section: styles.section,
-                  root: styles.input__root2,
-                }}
-                leftSection={<IconPdf />}
-                leftSectionPointerEvents="none"
-                rightSection={
-                  <UnstyledButton
-                    onClick={() =>
-                      window.open(
-                        selectedRequest.documentData.idFileUrl || "",
-                        "_blank"
-                      )
-                    }
-                    className={styles.input__right__section}
-                  >
-                    <Text fw={600} fz={10} c="##475467">
-                      View
-                    </Text>
-                  </UnstyledButton>
-                }
-                label="ID"
-                placeholder={`Identification card`}
-              />
-
-              <TextInput
-                readOnly
-                classNames={{
-                  input: styles.input,
-                  label: styles.label,
-                  section: styles.section,
-                  root: styles.input__root2,
-                }}
-                leftSection={<IconPdf />}
-                leftSectionPointerEvents="none"
-                rightSection={
-                  <UnstyledButton
-                    onClick={() =>
-                      window.open(
-                        selectedRequest.documentData.poaFileUrl || "",
-                        "_blank"
-                      )
-                    }
-                    className={styles.input__right__section}
-                  >
-                    <Text fw={600} fz={10} c="##475467">
-                      View
-                    </Text>
-                  </UnstyledButton>
-                }
-                label="Proof of Address"
-                placeholder={`Utility Bill`}
-              />
-            </Stack>
-          )}
-        </Box>
-      </Drawer>
+        close={closeDrawer}
+        selectedRequest={selectedRequest}
+      />
     </main>
   );
 }

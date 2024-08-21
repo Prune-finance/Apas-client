@@ -6,16 +6,14 @@ import {
   InputBase,
   useCombobox,
   Text,
+  Avatar,
+  Stack,
+  ScrollArea,
+  Flex,
 } from "@mantine/core";
-
-const groceries = [
-  "🍎 Apples",
-  "🍌 Bananas",
-  "🥦 Broccoli",
-  "🥕 Carrots",
-  "🍫 Chocolate",
-  "🍇 Grapes",
-];
+import { useUserAccounts } from "@/lib/hooks/accounts";
+import { filteredSearch } from "@/lib/search";
+import styles from "./styles.module.scss";
 
 interface Item {
   name: string;
@@ -25,22 +23,46 @@ interface Item {
 
 function SelectOption({ name, iban, bic }: Item) {
   return (
-    <Group>
-      <Text fz={20}>{name}</Text>
-      <div>
-        <Text fz="sm" fw={500}>
-          {name}
-        </Text>
-        <Text fz="xs" opacity={0.6}>
-          {iban}
-        </Text>
-      </div>
-    </Group>
+    <Flex
+      // c="var(--prune-primary-900)"
+      gap={8}
+      align="center"
+    >
+      <Avatar color="var(--prune-primary-700)" variant="filled" size={28}>
+        {name
+          .split(" ")
+          .map((i) => i.charAt(0))
+          .join("")}
+      </Avatar>
+      <Stack gap={4}>
+        <Text fz={12}>{name}</Text>
+        <Group>
+          <Text inline fw={700} fz={11} truncate w="60%">
+            IBAN:{" "}
+            <Text span inherit fw={400}>
+              {iban}
+            </Text>
+          </Text>
+          <Text inline fw={700} fz={11}>
+            BIC:{" "}
+            <Text span inherit fw={400}>
+              {bic}
+            </Text>
+          </Text>
+        </Group>
+      </Stack>
+    </Flex>
   );
 }
 
-export function SelectDropdownSearch() {
+interface Props {
+  setValue: (val: string) => void;
+  value: string;
+}
+
+export function SelectDropdownSearch({ value, setValue }: Props) {
   const [search, setSearch] = useState("");
+  const { accounts, loading } = useUserAccounts({ limit: 1000 });
   const combobox = useCombobox({
     onDropdownClose: () => {
       combobox.resetSelectedOption();
@@ -53,15 +75,22 @@ export function SelectDropdownSearch() {
     },
   });
 
-  const [value, setValue] = useState<string | null>(null);
+  // const [value, setValue] = useState<string | null>(null);
 
-  const options = groceries
-    .filter((item) => item.toLowerCase().includes(search.toLowerCase().trim()))
-    .map((item) => (
-      <Combobox.Option value={item} key={item}>
-        {item}
-      </Combobox.Option>
-    ));
+  // .filter((item) => item.toLowerCase().includes(search.toLowerCase().trim()))
+  const options = filteredSearch(
+    accounts,
+    ["accountName", "accountNumber"],
+    search
+  ).map((item) => (
+    <Combobox.Option value={item.id} key={item.id}>
+      <SelectOption
+        name={item.accountName}
+        iban={item.accountNumber}
+        bic={String(item.accountId)}
+      />
+    </Combobox.Option>
+  ));
 
   return (
     <Combobox
@@ -69,6 +98,7 @@ export function SelectDropdownSearch() {
       withinPortal={false}
       onOptionSubmit={(val) => {
         setValue(val);
+
         combobox.closeDropdown();
       }}
     >
@@ -80,8 +110,15 @@ export function SelectDropdownSearch() {
           rightSection={<Combobox.Chevron />}
           onClick={() => combobox.toggleDropdown()}
           rightSectionPointerEvents="none"
+          labelProps={{ mb: 10, fz: 12 }}
+          label={"Account"}
+          size="md"
+          radius="md"
+          classNames={{ input: styles.input }}
         >
-          {value || <Input.Placeholder>Pick value</Input.Placeholder>}
+          {accounts.find((item) => item.id === value)?.accountName || (
+            <Input.Placeholder>Select Account</Input.Placeholder>
+          )}
         </InputBase>
       </Combobox.Target>
 
@@ -89,14 +126,16 @@ export function SelectDropdownSearch() {
         <Combobox.Search
           value={search}
           onChange={(event) => setSearch(event.currentTarget.value)}
-          placeholder="Search groceries"
+          placeholder="Search for IBAN or Account Name"
         />
         <Combobox.Options>
-          {options.length > 0 ? (
-            options
-          ) : (
-            <Combobox.Empty>Nothing found</Combobox.Empty>
-          )}
+          <ScrollArea h={209} scrollbars="y" scrollbarSize={3}>
+            {options.length > 0 && !loading ? (
+              options
+            ) : (
+              <Combobox.Empty>Loading...</Combobox.Empty>
+            )}
+          </ScrollArea>
         </Combobox.Options>
       </Combobox.Dropdown>
     </Combobox>

@@ -47,6 +47,8 @@ import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { SearchInput } from "@/ui/components/Inputs";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 
 function Debit() {
   const searchParams = useSearchParams();
@@ -58,6 +60,7 @@ function Debit() {
     sort,
   } = Object.fromEntries(searchParams.entries());
   const { handleError, handleSuccess } = useNotification();
+
   const { requests, revalidate } = useDebitRequests({
     ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
@@ -208,31 +211,16 @@ function Debit() {
 
   return (
     <Fragment>
-      <div className={`${styles.container__search__filter}`}>
-        <TextInput
-          placeholder="Search here..."
-          leftSectionPointerEvents="none"
-          leftSection={searchIcon}
-          // classNames={{ wrapper: styles.search, input: styles.input__search }}
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          w={324}
-          styles={{ input: { border: "1px solid #F5F5F5" } }}
-        />
+      <Group justify="space-between" mt={32}>
+        <SearchInput search={search} setSearch={setSearch} />
 
-        <Button
-          // className={styles.filter__cta}
-          rightSection={<IconListTree size={14} />}
-          fz={12}
-          fw={500}
-          variant="outline"
-          color="var(--prune-text-gray-200)"
-          c="var(--prune-text-gray-800)"
-          onClick={toggle}
-        >
-          Filter
-        </Button>
-      </div>
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          fw={600}
+          icon={IconListTree}
+        />
+      </Group>
 
       <Filter<BusinessFilterType>
         opened={openedFilter}

@@ -38,11 +38,15 @@ export default function TabsContainer() {
 }
 
 const tabs = [
-  { title: "Debit", value: "Debit", icon: <IconCircleArrowUpRight /> },
+  {
+    title: "Debit",
+    value: "Debit",
+    icon: <IconCircleArrowUpRight size={16} />,
+  },
   {
     title: "Other Requests",
     value: "other-requests",
-    icon: <IconUserPlus />,
+    icon: <IconUserPlus size={16} />,
   },
   // {
   //   title: "Deactivate Account Requests",

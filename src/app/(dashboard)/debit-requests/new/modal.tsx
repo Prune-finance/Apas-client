@@ -100,8 +100,7 @@ export default function DebitRequestModal({
         </Flex>
 
         <Box mt={32}>
-          <Flex gap={20}>
-            {/* <Select
+          {/* <Select
               placeholder="Select Account"
               classNames={{ input: styles.input, label: styles.label }}
               flex={1}
@@ -112,39 +111,58 @@ export default function DebitRequestModal({
               {...form.getInputProps("account")}
             /> */}
 
-            <Box flex={1}>
-              <SelectDropdownSearch
-                value={form.values.account}
-                setValue={(value) => form.setFieldValue("account", value)}
-              />
-            </Box>
+          <Box flex={1} mb={24}>
+            <SelectDropdownSearch
+              value={form.values.account}
+              setValue={(value) => form.setFieldValue("account", value)}
+              label="Account Name"
+            />
+          </Box>
 
-            <Stack gap={4} flex={1}>
-              <NumberInput
-                classNames={{ input: styles.input, label: styles.label }}
-                label="Amount"
-                placeholder="Enter amount"
-                {...form.getInputProps("amount")}
-                withAsterisk
-              />
-              {form.values.account && (
-                <Text fz={12} c="var(--prune-primary-800)">
-                  {`Account balance: ${formatNumber(
-                    accounts.find((item) => item.id === form.values.account)
-                      ?.accountBalance ?? 0,
-                    true,
-                    "EUR"
-                  )}`}
-                </Text>
-              )}
-            </Stack>
-          </Flex>
+          <Stack gap={4} flex={1}>
+            <NumberInput
+              classNames={{ input: styles.input, label: styles.label }}
+              label="Amount"
+              placeholder="Enter amount"
+              {...form.getInputProps("amount")}
+              withAsterisk
+            />
+            {form.values.account && (
+              <Text fz={12} c="var(--prune-primary-800)">
+                {`Account balance: ${formatNumber(
+                  accounts.find((item) => item.id === form.values.account)
+                    ?.accountBalance ?? 0,
+                  true,
+                  "EUR"
+                )}`}
+              </Text>
+            )}
+          </Stack>
 
           <Box mt={40}>
             <Text fz={16} c="#97AD05">
               Destination Account:
             </Text>
 
+            <Flex gap={20} mt={24}>
+              <TextInput
+                classNames={{ input: styles.input, label: styles.label }}
+                flex={1}
+                withAsterisk
+                label="First Name"
+                placeholder="Enter first name"
+                {...form.getInputProps("destinationFirstName")}
+              />
+
+              <TextInput
+                classNames={{ input: styles.input, label: styles.label }}
+                flex={1}
+                withAsterisk
+                label="Last Name"
+                placeholder="Enter last name"
+                {...form.getInputProps("destinationLastName")}
+              />
+            </Flex>
             <Flex gap={20} mt={24}>
               <TextInput
                 classNames={{ input: styles.input, label: styles.label }}
@@ -192,6 +210,7 @@ export default function DebitRequestModal({
                 withAsterisk
                 label="Reference"
                 placeholder="Enter reference"
+                readOnly
                 {...form.getInputProps("reference")}
               />
             </Flex>

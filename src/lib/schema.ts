@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { features } from "process";
 import { z } from "zod";
 
@@ -139,8 +140,10 @@ export const debitRequest = {
   destinationBIC: "",
   destinationCountry: "",
   destinationBank: "",
-  reference: "",
+  reference: crypto.randomUUID(),
   reason: "",
+  destinationFirstName: "",
+  destinationLastName: "",
 };
 
 export const validateNewUser = z.object({
@@ -408,6 +411,8 @@ export const validateDebitRequest = z.object({
   destinationBank: z.string().min(2, "Bank is required"),
   reference: z.string().min(2, "Reference number is required"),
   reason: z.string().min(2, "Reason is required"),
+  destinationFirstName: z.string().min(2, "Receiver First Name is required"),
+  destinationLastName: z.string().min(2, "Receiver Last Name is required"),
 });
 
 export const filterValues = {

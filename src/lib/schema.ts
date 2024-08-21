@@ -433,7 +433,7 @@ export const removeDirectorValues = {
 };
 
 export const removeDirectorSchema = z.object({
-  reason: z.string(),
+  reason: z.string().min(1, "Please enter a reason"),
   supportingDoc: z.string(),
   supportingDocUrl: z.string(),
 });

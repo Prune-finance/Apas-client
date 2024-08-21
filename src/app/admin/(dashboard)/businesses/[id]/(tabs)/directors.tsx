@@ -48,6 +48,11 @@ import classes from "@/ui/styles/containedInput.module.css";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { set } from "zod";
 import DropzoneComponent from "@/ui/components/Dropzone";
+import {
+  closeButtonProps,
+  DocumentTextInput,
+  RemoveDirectorModal,
+} from "./utils";
 
 export default function Directors({
   business,
@@ -216,6 +221,7 @@ export default function Directors({
         }
         size="43%"
         centered
+        closeButtonProps={closeButtonProps}
       >
         <Box>
           <DirectorForm
@@ -336,6 +342,7 @@ const DirectorForm = ({
       <Flex mt={24} justify="flex-end" gap={15}>
         <SecondaryBtn
           text="Cancel"
+          disabled={processing}
           action={() => {
             close();
             form.reset();
@@ -355,16 +362,6 @@ const DirectorForm = ({
     </>
   );
 };
-
-interface IDirector {
-  name: string;
-  email: string;
-  identityType: string;
-  proofOfAddress: string;
-  identityFileUrl: string;
-  identityFileUrlBack: string;
-  proofOfAddressFileUrl: string;
-}
 
 const DirectorsForm = ({
   deleteDirector,
@@ -528,281 +525,8 @@ const DirectorsForm = ({
         close={close}
         index={index}
         deleteDirector={deleteDirector}
+        type="director"
       />
     </div>
-  );
-};
-
-type DocumentTextInputProps = {
-  editing: boolean;
-  director: IDirector;
-  formKey: keyof IDirector;
-  documentKey: keyof IDirector;
-  form: UseFormReturnType<IDirector>;
-  label: string;
-  title: string;
-};
-
-const DocumentTextInput = ({
-  editing,
-  director,
-  form,
-  formKey,
-  documentKey,
-  label,
-  title,
-}: DocumentTextInputProps) => {
-  const [opened, { open, close }] = useDisclosure(false);
-
-  return (
-    <Box>
-      <Select
-        readOnly
-        data={
-          formKey === "identityType"
-            ? ["ID Card", "Passport", "Residence Permit"]
-            : ["Utility Bill"]
-        }
-        classNames={{
-          input: styles.input,
-          label: styles.label,
-          section: styles.section,
-        }}
-        leftSection={<IconFileInfo />}
-        leftSectionPointerEvents="none"
-        rightSectionPointerEvents="auto"
-        {...form.getInputProps(formKey)}
-        rightSection={
-          !editing ? (
-            <UnstyledButton
-              onClick={() => window.open(director[formKey] || "", "_blank")}
-              className={styles.input__right__section}
-            >
-              <Text fw={600} fz={10} c="#475467">
-                View
-              </Text>
-            </UnstyledButton>
-          ) : (
-            <UnstyledButton
-              onClick={open}
-              className={styles.input__right__section}
-              w="100%"
-            >
-              <Text fw={600} fz={10} c="#475467">
-                Re-upload
-              </Text>
-            </UnstyledButton>
-          )
-        }
-        label={label}
-        placeholder={title}
-      />
-
-      <ReUploadDocsModal
-        opened={opened}
-        close={close}
-        formKey={formKey}
-        form={form}
-        documentKey={documentKey}
-      />
-    </Box>
-  );
-};
-
-interface ReUploadProps {
-  opened: boolean;
-  close: () => void;
-  formKey: keyof IDirector;
-  form: UseFormReturnType<IDirector>;
-  documentKey: keyof IDirector;
-}
-
-const ReUploadDocsModal = ({
-  opened,
-  close,
-  formKey,
-  form,
-  documentKey,
-}: ReUploadProps) => {
-  const closeButtonProps = {
-    mr: 10,
-
-    children: (
-      <ActionIcon
-        radius="xl"
-        variant="filled"
-        color="var(--prune-text-gray-100)"
-        size={32}
-      >
-        <IconX color="var(--prune-text-gray-500)" stroke={1.5} />
-      </ActionIcon>
-    ),
-  };
-
-  return (
-    <Modal
-      opened={opened}
-      onClose={close}
-      closeButtonProps={closeButtonProps}
-      title={
-        <Text fz={20} fw={600}>
-          Re-upload Document
-        </Text>
-      }
-      padding={32}
-      centered
-    >
-      <Box
-        component="form"
-        onSubmit={form.onSubmit(() => {})}
-        style={{ display: "flex", flexDirection: "column", gap: 16 }}
-      >
-        <Select
-          comboboxProps={{ withinPortal: true }}
-          data={
-            formKey === "identityType"
-              ? ["ID Card", "Passport", "Residence Permit"]
-              : ["Utility Bill"]
-          }
-          placeholder={
-            formKey === "identityType"
-              ? "Select Identity Type"
-              : "Select Proof of Address"
-          }
-          {...form.getInputProps(formKey)}
-          size="lg"
-          radius={4}
-        />
-
-        <DropzoneComponent
-          DirectorForm={
-            form as unknown as UseFormReturnType<
-              typeof directorEtShareholderSchema
-            >
-          }
-          formKey={documentKey}
-          uploadedFileUrl={form.values[documentKey]}
-        />
-
-        <Flex gap={16}>
-          <SecondaryBtn
-            fullWidth
-            text="Cancel"
-            action={() => {
-              close();
-              form.reset();
-            }}
-            fw={600}
-          />
-          <PrimaryBtn
-            fullWidth
-            text="Proceed"
-            type="submit"
-            action={close}
-            // loading={processing}
-            fw={600}
-          />
-        </Flex>
-      </Box>
-    </Modal>
-  );
-};
-
-const RemoveDirectorModal = ({
-  opened,
-  close,
-  index,
-  deleteDirector,
-}: {
-  opened: boolean;
-  close: () => void;
-  index: number;
-  deleteDirector: (index: number) => Promise<void>;
-}) => {
-  const [processing, setProcessing] = useState(false);
-  const form = useForm({
-    initialValues: removeDirectorValues,
-    validate: zodResolver(removeDirectorSchema),
-  });
-
-  const handleDelete = async () => {
-    setProcessing(true);
-    try {
-      await deleteDirector(index);
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  return (
-    <Modal opened={opened} onClose={close} centered w={400} padding={20}>
-      <Stack align="center" gap={30}>
-        <ThemeIcon radius="xl" color="#D92D20" size={64} variant="light">
-          <IconX size={32} />
-        </ThemeIcon>
-
-        <Text fz={18} fw={600}>
-          Remove This Director?
-        </Text>
-
-        <Text
-          fz={12}
-          fw={400}
-          ta="center"
-          c="var(--prune-text-gray-500)"
-          w="45ch"
-        >
-          You are about to remove this director from the system. Please know
-          that you cannot undo this action.
-        </Text>
-
-        <Textarea
-          placeholder="Give reason here..."
-          minRows={5}
-          w="100%"
-          {...form.getInputProps("reason")}
-        />
-
-        <Select
-          placeholder="Select Supporting Document (optional)"
-          data={["ID Card", "Passport", "Residence Permit"]}
-          w="100%"
-          {...form.getInputProps("supportingDoc")}
-        />
-
-        <Box w="100%">
-          <DropzoneComponent
-            removeDirectorForm={form}
-            formKey={`supportingDocUrl`}
-            uploadedFileUrl={form.values.supportingDocUrl}
-          />
-        </Box>
-
-        <Flex w="100%" gap={20}>
-          <Button
-            variant="outline"
-            color="var(--prune-text-gray-300"
-            c="var(--prune-text-gray-800"
-            fz={12}
-            fw={500}
-            flex={1}
-            onClick={close}
-          >
-            Cancel
-          </Button>
-          <Button
-            color="var(--prune-primary-600)"
-            fz={12}
-            fw={500}
-            c="var(--prune-text-gray-800"
-            flex={1}
-            onClick={() => handleDelete()}
-            loading={processing}
-          >
-            Proceed
-          </Button>
-        </Flex>
-      </Stack>
-    </Modal>
   );
 };

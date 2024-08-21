@@ -104,6 +104,11 @@ export default function Account() {
             loading: !business?.name || loadingBiz,
           },
           {
+            title: "IssuedAccounts",
+            href: `/admin/businesses/accounts/${params.id}`,
+            loading: loading,
+          },
+          {
             title: account?.accountName || "",
             href: `/admin/businesses/accounts/${params.id}`,
             loading: loading,

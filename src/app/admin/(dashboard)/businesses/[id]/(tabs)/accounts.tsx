@@ -19,7 +19,7 @@ import localFont from "next/font/local";
 import axios from "axios";
 import { BusinessData } from "@/lib/hooks/businesses";
 import { useState, useEffect, useMemo } from "react";
-import { AccountData } from "@/lib/hooks/accounts";
+import { AccountData, useBusinessDefaultAccount } from "@/lib/hooks/accounts";
 
 import { activeBadgeColor, formatNumber, serialNumber } from "@/lib/utils";
 import useNotification from "@/lib/hooks/notification";
@@ -55,6 +55,9 @@ export default function Accounts({
   business: BusinessData | null;
 }) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
+  // const [defaultAccount, setDefaultAccount] = useState<AccountData | null>(
+  //   null
+  // );
   const [meta, setMeta] = useState<{ total: number } | null>(null);
   const { handleError } = useNotification();
 
@@ -83,6 +86,8 @@ export default function Accounts({
     meta: bizTrxMeta,
   } = useBusinessTransactions(params.id, customParams);
 
+  const { account: defaultAccount } = useBusinessDefaultAccount(params.id);
+
   const form = useForm<FilterType>({
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
@@ -109,8 +114,29 @@ export default function Accounts({
     }
   };
 
+  // const fetchCompanyDefaultAccount = async () => {
+  //   if (!business) return;
+  //   const params = new URLSearchParams(
+  //     customParams as unknown as Record<string, string>
+  //   );
+  //   setLoading(true);
+  //   try {
+  //     const { data } = await axios.get(
+  //       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${business?.id}/default-account?${params}`,
+  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+  //     );
+
+  //     setDefaultAccount(data.data);
+  //   } catch (error) {
+  //     handleError("An error occurred", parseError(error));
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   useEffect(() => {
     fetchCompanyAccounts();
+    // fetchCompanyDefaultAccount();
   }, [
     business,
     customParams.limit,
@@ -180,10 +206,11 @@ export default function Accounts({
           <AccountCard
             currency="EUR"
             bic="34567654"
-            balance={0}
-            iban={"GB234567898765432"}
-            loading={false}
+            balance={defaultAccount?.accountBalance ?? 0}
+            iban={defaultAccount?.accountNumber ?? ""}
+            loading={loading}
             badgeText="Main Account"
+            link={`/admin/businesses/${params.id}/default`}
           />
         </SimpleGrid>
       </TabsPanel>

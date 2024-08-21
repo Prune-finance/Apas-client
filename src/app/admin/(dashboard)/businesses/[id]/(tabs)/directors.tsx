@@ -32,7 +32,7 @@ import Cookies from "js-cookie";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
-import DropzoneComponent from "./dropzone";
+
 import { useDisclosure } from "@mantine/hooks";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
 import {
@@ -47,6 +47,7 @@ import { parseError } from "@/lib/actions/auth";
 import classes from "@/ui/styles/containedInput.module.css";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { set } from "zod";
+import DropzoneComponent from "@/ui/components/Dropzone";
 
 export default function Directors({
   business,
@@ -78,12 +79,16 @@ export default function Directors({
 
   const deleteDirector = async (index: number) => {
     setProcessing(true);
+    const { contactEmail, name, contactNumber, domain } = business;
     try {
       const directors = removeItemAtIndex(index);
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
         {
-          ...business,
+          contactEmail,
+          name,
+          domain,
+          contactNumber,
           directors,
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
@@ -105,6 +110,7 @@ export default function Directors({
 
   const handleBusinessUpdate = async () => {
     setProcessing(true);
+    const { contactEmail, name, contactNumber, domain } = business;
     try {
       const { error } = validateDirectors.safeParse(form.values);
       if (error) {
@@ -113,7 +119,10 @@ export default function Directors({
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
         {
-          ...business,
+          contactEmail,
+          name,
+          domain,
+          contactNumber,
           directors: [...business.directors, { ...form.values }],
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
@@ -132,12 +141,16 @@ export default function Directors({
 
   const updateDirector = async (index: number, directorValue: Director) => {
     setProcessing(true);
+    const { contactEmail, name, contactNumber, domain } = business;
     try {
       const directors = replaceItemAtIndex(index, directorValue);
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
         {
-          ...business,
+          contactEmail,
+          name,
+          domain,
+          contactNumber,
           directors,
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
@@ -156,6 +169,20 @@ export default function Directors({
 
   return (
     <div className={styles.business__tab}>
+      <Group justify="space-between" mb={20}>
+        <Text fz={12} fw={600} tt="capitalize">
+          All Directors
+        </Text>
+
+        <PrimaryBtn
+          text="New Director"
+          icon={IconPlus}
+          fz={12}
+          fw={600}
+          action={open}
+        />
+      </Group>
+
       {business?.directors.map((director, index) => {
         return (
           <Fragment key={index}>
@@ -175,26 +202,13 @@ export default function Directors({
         </Text>
       )}
 
-      <Button
-        mt={20}
-        variant="transparent"
-        fz={12}
-        fw={400}
-        c="#000"
-        onClick={open}
-        leftSection={
-          <ThemeIcon radius="xl" color="var(--prune-primary-500)">
-            <IconPlus color="#344054" size={14} />
-          </ThemeIcon>
-        }
-      >
-        Add New
-      </Button>
-
       <Modal
         // position="right"
         opened={opened}
-        onClose={close}
+        onClose={() => {
+          close();
+          form.reset();
+        }}
         title={
           <Text fz={24} fw={600}>
             Add a Director
@@ -269,7 +283,11 @@ const DirectorForm = ({
                   : "Identity Card"
               } ${form.values.identityType !== "Passport" ? "(Front)" : ""}`}
             </Text>
-            <DropzoneComponent form={form} formKey="identityFileUrl" />
+            <DropzoneComponent
+              DirectorForm={form}
+              formKey="identityFileUrl"
+              uploadedFileUrl={form.values.identityFileUrl}
+            />
           </Box>
 
           {form.values.identityType !== "Passport" && (
@@ -281,7 +299,11 @@ const DirectorForm = ({
                     : "Identity Card"
                 } (Back)`}
               </Text>
-              <DropzoneComponent form={form} formKey={`identityFileUrlBack`} />
+              <DropzoneComponent
+                DirectorForm={form}
+                formKey={`identityFileUrlBack`}
+                uploadedFileUrl={form.values.identityFileUrlBack}
+              />
             </Box>
           )}
         </Flex>
@@ -303,28 +325,15 @@ const DirectorForm = ({
           <Text fz={12} c="#344054" mb={10}>
             Upload utility Bill
           </Text>
-          <DropzoneComponent form={form} formKey="proofOfAddressFileUrl" />
+          <DropzoneComponent
+            DirectorForm={form}
+            formKey="proofOfAddressFileUrl"
+            uploadedFileUrl={form.values.proofOfAddressFileUrl}
+          />
         </Box>
       )}
 
       <Flex mt={24} justify="flex-end" gap={15}>
-        {/* <Button
-          style={{
-            width: "120px",
-            fontSize: "12px",
-            borderRadius: "8px",
-            color: "#344054",
-          }}
-          onClick={() => {
-            form.reset();
-            close();
-          }}
-          color="#D0D5DD"
-          variant="outline"
-          className={styles.cta}
-        >
-          Cancel
-        </Button> */}
         <SecondaryBtn
           text="Cancel"
           action={() => {
@@ -342,22 +351,6 @@ const DirectorForm = ({
           w={120}
           loading={processing}
         />
-
-        {/* <Button
-          style={{
-            width: "120px",
-            fontSize: "12px",
-            borderRadius: "8px",
-            color: "#344054",
-          }}
-          onClick={handleBusinessUpdate}
-          loading={processing}
-          className={styles.cta}
-          variant="filled"
-          color="var(--prune-primary-600)"
-        >
-          Submit
-        </Button> */}
       </Flex>
     </>
   );
@@ -379,8 +372,8 @@ const DirectorsForm = ({
   director,
   index,
 }: {
-  deleteDirector: (index: number) => void;
-  updateDirector: (index: number, director: Director) => void;
+  deleteDirector: (index: number) => Promise<void>;
+  updateDirector: (index: number, director: Director) => Promise<void>;
   director: Director;
   index: number;
 }) => {
@@ -403,28 +396,14 @@ const DirectorsForm = ({
     // validate: zodResolver(validateNewBusiness),
   });
 
-  const handleUpload = async (file: File | null, formKey: string) => {
+  const handleUpdate = async () => {
     setProcessing(true);
+
     try {
-      if (!file) return;
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
-
-      if (formKey) {
-        form.setFieldValue(formKey, data.data.url);
-      }
-      // setUploaded(true);
-    } catch (error) {
-      console.log(error);
+      await updateDirector(index, form.values);
     } finally {
       setProcessing(false);
+      setEditing(false);
     }
   };
 
@@ -460,6 +439,7 @@ const DirectorsForm = ({
             <SecondaryBtn
               text="Cancel"
               action={() => setEditing(false)}
+              disabled={processing}
               fz={10}
               fw={600}
             />
@@ -467,9 +447,9 @@ const DirectorsForm = ({
             <PrimaryBtn
               text="Save Changes"
               action={() => {
-                setEditing(false);
-                updateDirector(index, form.values);
+                handleUpdate();
               }}
+              loading={processing}
               fz={10}
               fw={600}
             />
@@ -505,52 +485,6 @@ const DirectorsForm = ({
         </GridCol>
 
         <GridCol span={4} className={styles.grid}>
-          {/* <TextInput
-            readOnly
-            classNames={{
-              input: styles.input,
-              label: styles.label,
-              section: styles.section,
-            }}
-            leftSection={<IconFileInfo />}
-            leftSectionPointerEvents="none"
-            rightSection={
-              !editing ? (
-                <UnstyledButton
-                  onClick={() =>
-                    window.open(director.identityFileUrl || "", "_blank")
-                  }
-                  className={styles.input__right__section}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              ) : (
-                <FileButton
-                  disabled={processing}
-                  onChange={(file) => handleUpload(file, "identityFileUrl")}
-                  accept="image/png,image/jpeg"
-                >
-                  {(props) => (
-                    <UnstyledButton
-                      disabled={processing}
-                      w={"100%"}
-                      className={styles.input__right__section}
-                      {...props}
-                    >
-                      <Text fw={600} fz={10} c="#475467">
-                        Re-upload
-                      </Text>
-                    </UnstyledButton>
-                  )}
-                </FileButton>
-              )
-            }
-            label="Identity Type"
-            placeholder={director.identityType}
-          /> */}
-
           <DocumentTextInput
             editing={editing}
             form={form}
@@ -562,97 +496,21 @@ const DirectorsForm = ({
           />
         </GridCol>
 
-        {director.identityFileUrlBack ||
-          (form.values.identityType !== "Passport" && (
-            <GridCol span={4} className={styles.grid}>
-              {/* <TextInput
-                readOnly
-                classNames={{
-                  input: styles.input,
-                  label: styles.label,
-                  section: styles.section,
-                }}
-                leftSection={<IconFileInfo />}
-                leftSectionPointerEvents="none"
-                rightSection={
-                  <UnstyledButton
-                    onClick={() =>
-                      window.open(director.identityFileUrlBack || "", "_blank")
-                    }
-                    className={styles.input__right__section}
-                  >
-                    <Text fw={600} fz={10} c="#475467">
-                      View
-                    </Text>
-                  </UnstyledButton>
-                }
-                label="Identity Type Back"
-                placeholder={`${director.identityType} Back`}
-              /> */}
-
-              <DocumentTextInput
-                editing={editing}
-                form={form}
-                formKey="identityType"
-                documentKey="identityFileUrlBack"
-                label="Identity Type (Back)"
-                title={director.identityType}
-                director={director}
-              />
-            </GridCol>
-          ))}
+        {form.values.identityType !== "Passport" && (
+          <GridCol span={4} className={styles.grid}>
+            <DocumentTextInput
+              editing={editing}
+              form={form}
+              formKey="identityType"
+              documentKey="identityFileUrlBack"
+              label="Identity Type (Back)"
+              title={director.identityType}
+              director={director}
+            />
+          </GridCol>
+        )}
 
         <GridCol span={4} className={styles.grid}>
-          {/* <Select
-            readOnly
-            classNames={{
-              input: styles.input,
-              label: styles.label,
-              section: styles.section,
-            }}
-            data={["Utility Bill"]}
-
-            leftSection={<IconFileInfo />}
-            leftSectionPointerEvents="none"
-            rightSection={
-              !editing ? (
-                <UnstyledButton
-                  onClick={() =>
-                    window.open(director.proofOfAddressFileUrl || "", "_blank")
-                  }
-                  className={styles.input__right__section}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              ) : (
-                <FileButton
-                  disabled={processing}
-                  onChange={(file) =>
-                    handleUpload(file, "proofOfAddressFileUrl")
-                  }
-                  accept="image/png,image/jpeg"
-                >
-                  {(props) => (
-                    <UnstyledButton
-                      disabled={processing}
-                      w={"100%"}
-                      className={styles.input__right__section}
-                      {...props}
-                    >
-                      <Text fw={600} fz={10} c="#475467">
-                        Re-upload
-                      </Text>
-                    </UnstyledButton>
-                  )}
-                </FileButton>
-              )
-            }
-            label="Proof of Address"
-            placeholder={director.proofOfAddress}
-          /> */}
-
           <DocumentTextInput
             editing={editing}
             form={form}
@@ -694,41 +552,17 @@ const DocumentTextInput = ({
   label,
   title,
 }: DocumentTextInputProps) => {
-  const [processing, setProcessing] = useState(false);
-  const { handleError } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
 
-  const handleUpload = async (file: File | null, formKey: string) => {
-    setProcessing(true);
-    try {
-      if (!file) return;
-
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
-
-      if (formKey) {
-        form.setFieldValue(formKey, data.data.url);
-      }
-      // setUploaded(true);
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
   return (
     <Box>
       <Select
-        // readOnly={!editing}
         readOnly
-        // comboboxProps={{ withinPortal: false, zIndex: 100 }}
-        data={["ID Card", "Passport", "Residence Permit"]}
+        data={
+          formKey === "identityType"
+            ? ["ID Card", "Passport", "Residence Permit"]
+            : ["Utility Bill"]
+        }
         classNames={{
           input: styles.input,
           label: styles.label,
@@ -764,13 +598,13 @@ const DocumentTextInput = ({
         placeholder={title}
       />
 
-      <ReUploadProofOfAddress
+      <ReUploadDocsModal
         opened={opened}
         close={close}
         formKey={formKey}
         form={form}
+        documentKey={documentKey}
       />
-      {/* <ReUploadIdentityType opened={opened} close={close} /> */}
     </Box>
   );
 };
@@ -780,13 +614,15 @@ interface ReUploadProps {
   close: () => void;
   formKey: keyof IDirector;
   form: UseFormReturnType<IDirector>;
+  documentKey: keyof IDirector;
 }
 
-const ReUploadProofOfAddress = ({
+const ReUploadDocsModal = ({
   opened,
   close,
   formKey,
   form,
+  documentKey,
 }: ReUploadProps) => {
   const closeButtonProps = {
     mr: 10,
@@ -816,55 +652,58 @@ const ReUploadProofOfAddress = ({
       padding={32}
       centered
     >
-      <Select
-        comboboxProps={{ withinPortal: true }}
-        data={
-          formKey === "identityType"
-            ? ["ID Card", "Passport", "Residence Permit"]
-            : ["Utility Bill"]
-        }
-        placeholder={
-          formKey === "identityType"
-            ? "Select Identity Type"
-            : "Select Proof of Address"
-        }
-        {...form.getInputProps(formKey)}
-        size="lg"
-        radius={4}
-      />
-    </Modal>
-  );
-};
-
-const ReUploadIdentityType = ({ opened, close }: ReUploadProps) => {
-  const closeButtonProps = {
-    pr: 32,
-    children: (
-      <ActionIcon
-        radius="xl"
-        variant="filled"
-        color="var(--prune-text-gray-100)"
-        size={32}
+      <Box
+        component="form"
+        onSubmit={form.onSubmit(() => {})}
+        style={{ display: "flex", flexDirection: "column", gap: 16 }}
       >
-        <IconX color="var(--prune-text-gray-500)" stroke={1.5} />
-      </ActionIcon>
-    ),
-  };
+        <Select
+          comboboxProps={{ withinPortal: true }}
+          data={
+            formKey === "identityType"
+              ? ["ID Card", "Passport", "Residence Permit"]
+              : ["Utility Bill"]
+          }
+          placeholder={
+            formKey === "identityType"
+              ? "Select Identity Type"
+              : "Select Proof of Address"
+          }
+          {...form.getInputProps(formKey)}
+          size="lg"
+          radius={4}
+        />
 
-  return (
-    <Modal
-      opened={opened}
-      onClose={close}
-      closeButtonProps={closeButtonProps}
-      title={
-        <Text fz={20} fw={600}>
-          Re-upload Document
-        </Text>
-      }
-      padding={32}
-      centered
-    >
-      <Text>djfjfhhffhghfgfg</Text>
+        <DropzoneComponent
+          DirectorForm={
+            form as unknown as UseFormReturnType<
+              typeof directorEtShareholderSchema
+            >
+          }
+          formKey={documentKey}
+          uploadedFileUrl={form.values[documentKey]}
+        />
+
+        <Flex gap={16}>
+          <SecondaryBtn
+            fullWidth
+            text="Cancel"
+            action={() => {
+              close();
+              form.reset();
+            }}
+            fw={600}
+          />
+          <PrimaryBtn
+            fullWidth
+            text="Proceed"
+            type="submit"
+            action={close}
+            // loading={processing}
+            fw={600}
+          />
+        </Flex>
+      </Box>
     </Modal>
   );
 };
@@ -878,12 +717,22 @@ const RemoveDirectorModal = ({
   opened: boolean;
   close: () => void;
   index: number;
-  deleteDirector: (index: number) => void;
+  deleteDirector: (index: number) => Promise<void>;
 }) => {
+  const [processing, setProcessing] = useState(false);
   const form = useForm({
     initialValues: removeDirectorValues,
     validate: zodResolver(removeDirectorSchema),
   });
+
+  const handleDelete = async () => {
+    setProcessing(true);
+    try {
+      await deleteDirector(index);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <Modal opened={opened} onClose={close} centered w={400} padding={20}>
@@ -925,6 +774,7 @@ const RemoveDirectorModal = ({
           <DropzoneComponent
             removeDirectorForm={form}
             formKey={`supportingDocUrl`}
+            uploadedFileUrl={form.values.supportingDocUrl}
           />
         </Box>
 
@@ -946,7 +796,8 @@ const RemoveDirectorModal = ({
             fw={500}
             c="var(--prune-text-gray-800"
             flex={1}
-            onClick={() => deleteDirector(index)}
+            onClick={() => handleDelete()}
+            loading={processing}
           >
             Proceed
           </Button>

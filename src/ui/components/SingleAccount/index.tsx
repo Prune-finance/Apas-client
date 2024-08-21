@@ -65,6 +65,7 @@ import { SearchInput } from "../Inputs";
 import AccountDetails from "./(tabs)/AccountDetails";
 import { Transactions } from "./(tabs)/Transactions";
 import { Analytics } from "./(tabs)/Analytics";
+import { BusinessData } from "@/lib/hooks/businesses";
 
 type Param = { id: string };
 interface Props {
@@ -549,6 +550,8 @@ interface SingleAccountProps {
   loading: boolean;
   loadingTrx: boolean;
   setChartFrequency: Dispatch<SetStateAction<string>>;
+  business?: BusinessData | null;
+  admin?: boolean;
 }
 
 export const SingleAccountBody = ({
@@ -557,11 +560,14 @@ export const SingleAccountBody = ({
   loading,
   loadingTrx,
   setChartFrequency,
+  business,
+  admin,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
     "No. of Transaction": transactions.length,
     Currency: "EUR",
+    ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
     "Account Type": account?.type,
     "Last Seen": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
@@ -570,8 +576,8 @@ export const SingleAccountBody = ({
   return (
     <Box mt={32}>
       <Grid>
-        <GridCol span={8}>
-          <SimpleGrid cols={3} verticalSpacing={28}>
+        <GridCol span={!admin ? 8 : 9}>
+          <SimpleGrid cols={!admin ? 3 : 4} verticalSpacing={28}>
             {Object.entries(info).map(([key, value]) => (
               <Stack gap={2} key={key}>
                 <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
@@ -618,12 +624,16 @@ interface IssuedAccountHeadProps {
   loading: boolean;
   account: Account | null;
   open: () => void;
+  openFreeze?: () => void;
+  admin?: boolean;
 }
 
 export const IssuedAccountHead = ({
   loading,
   account,
   open,
+  openFreeze,
+  admin,
 }: IssuedAccountHeadProps) => {
   return (
     <Flex
@@ -675,16 +685,23 @@ export const IssuedAccountHead = ({
       </Group>
 
       <Flex gap={10}>
-        {/* <Button
-            fz={12}
-            className={styles.main__cta}
-            variant="filled"
-            color="#C1DD06"
-          >
-            Freeze Account
-          </Button> */}
-
-        <PrimaryBtn text="Debit Account" fw={600} action={open} />
+        {!admin ? (
+          <PrimaryBtn text="Debit Account" fw={600} action={open} />
+        ) : (
+          <SecondaryBtn
+            action={() => {
+              if (account?.status === "FROZEN") return open();
+              openFreeze && openFreeze();
+            }}
+            loading={loading}
+            loaderProps={{ type: "dots" }}
+            text={
+              account?.status === "FROZEN"
+                ? "Unfreeze Account"
+                : "Freeze Account"
+            }
+          />
+        )}
       </Flex>
     </Flex>
   );

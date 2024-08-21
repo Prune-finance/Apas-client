@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ActionIcon,
   Box,
   Button,
   Drawer,
@@ -10,6 +11,7 @@ import {
   GridCol,
   Group,
   Modal,
+  Paper,
   Select,
   Stack,
   Text,
@@ -44,6 +46,7 @@ import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import classes from "@/ui/styles/containedInput.module.css";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { set } from "zod";
 
 export default function Directors({
   business,
@@ -360,6 +363,16 @@ const DirectorForm = ({
   );
 };
 
+interface IDirector {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  identityFileUrlBack: string;
+  proofOfAddressFileUrl: string;
+}
+
 const DirectorsForm = ({
   deleteDirector,
   updateDirector,
@@ -423,49 +436,43 @@ const DirectorsForm = ({
         </Text>
         {!editing ? (
           <Flex gap={10}>
-            <Button
-              onClick={() => setEditing(true)}
-              leftSection={<IconPencilMinus color="#475467" size={14} />}
-              className={styles.edit}
-            >
-              Edit
-            </Button>
-
-            <Button
-              onClick={() => {
-                open();
-                // deleteDirector(index);
-              }}
-              leftSection={<IconTrash color="#475467" size={14} />}
-              className={styles.edit}
-            >
-              Remove
-            </Button>
+            <SecondaryBtn
+              text="Edit"
+              action={() => setEditing(true)}
+              icon={IconPencilMinus}
+              variant="light"
+              color="var(--prune-text-gray-400)"
+              fz={10}
+              fw={600}
+            />
+            <SecondaryBtn
+              text="Remove"
+              action={open}
+              icon={IconTrash}
+              variant="light"
+              color="var(--prune-text-gray-400)"
+              fz={10}
+              fw={600}
+            />
           </Flex>
         ) : (
           <Flex gap={10}>
-            <Button
-              variant="outline"
-              color="var(--prune-text-gray-300"
-              c="var(--prune-text-gray-800"
-              fz={12}
-              fw={500}
-              onClick={() => setEditing(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                updateDirector(index, form.values);
+            <SecondaryBtn
+              text="Cancel"
+              action={() => setEditing(false)}
+              fz={10}
+              fw={600}
+            />
+
+            <PrimaryBtn
+              text="Save Changes"
+              action={() => {
                 setEditing(false);
+                updateDirector(index, form.values);
               }}
-              // className={styles.edit}
-              variant="filled"
-              color="var(--prune-primary-600)"
-              style={{ fontSize: "10px", color: "#475467" }}
-            >
-              Save Changes
-            </Button>
+              fz={10}
+              fw={600}
+            />
           </Flex>
         )}
       </Flex>
@@ -486,7 +493,7 @@ const DirectorsForm = ({
 
         <GridCol span={4} className={styles.grid}>
           <TextInput
-            readOnly
+            readOnly={!editing}
             classNames={{
               input: styles.input,
               label: styles.label,
@@ -498,7 +505,7 @@ const DirectorsForm = ({
         </GridCol>
 
         <GridCol span={4} className={styles.grid}>
-          <TextInput
+          {/* <TextInput
             readOnly
             classNames={{
               input: styles.input,
@@ -515,7 +522,7 @@ const DirectorsForm = ({
                   }
                   className={styles.input__right__section}
                 >
-                  <Text fw={600} fz={10} c="##475467">
+                  <Text fw={600} fz={10} c="#475467">
                     View
                   </Text>
                 </UnstyledButton>
@@ -532,7 +539,7 @@ const DirectorsForm = ({
                       className={styles.input__right__section}
                       {...props}
                     >
-                      <Text fw={600} fz={10} c="##475467">
+                      <Text fw={600} fz={10} c="#475467">
                         Re-upload
                       </Text>
                     </UnstyledButton>
@@ -542,46 +549,69 @@ const DirectorsForm = ({
             }
             label="Identity Type"
             placeholder={director.identityType}
+          /> */}
+
+          <DocumentTextInput
+            editing={editing}
+            form={form}
+            formKey="identityType"
+            documentKey="identityFileUrl"
+            label="Identity Type"
+            title={director.identityType}
+            director={director}
           />
         </GridCol>
 
-        {director.identityFileUrlBack && (
-          <GridCol span={4} className={styles.grid}>
-            <TextInput
-              readOnly
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-                section: styles.section,
-              }}
-              leftSection={<IconFileInfo />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton
-                  onClick={() =>
-                    window.open(director.identityFileUrlBack || "", "_blank")
-                  }
-                  className={styles.input__right__section}
-                >
-                  <Text fw={600} fz={10} c="##475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
-              label="Identity Type Back"
-              placeholder={`${director.identityType} Back`}
-            />
-          </GridCol>
-        )}
+        {director.identityFileUrlBack ||
+          (form.values.identityType !== "Passport" && (
+            <GridCol span={4} className={styles.grid}>
+              {/* <TextInput
+                readOnly
+                classNames={{
+                  input: styles.input,
+                  label: styles.label,
+                  section: styles.section,
+                }}
+                leftSection={<IconFileInfo />}
+                leftSectionPointerEvents="none"
+                rightSection={
+                  <UnstyledButton
+                    onClick={() =>
+                      window.open(director.identityFileUrlBack || "", "_blank")
+                    }
+                    className={styles.input__right__section}
+                  >
+                    <Text fw={600} fz={10} c="#475467">
+                      View
+                    </Text>
+                  </UnstyledButton>
+                }
+                label="Identity Type Back"
+                placeholder={`${director.identityType} Back`}
+              /> */}
+
+              <DocumentTextInput
+                editing={editing}
+                form={form}
+                formKey="identityType"
+                documentKey="identityFileUrlBack"
+                label="Identity Type (Back)"
+                title={director.identityType}
+                director={director}
+              />
+            </GridCol>
+          ))}
 
         <GridCol span={4} className={styles.grid}>
-          <TextInput
+          {/* <Select
             readOnly
             classNames={{
               input: styles.input,
               label: styles.label,
               section: styles.section,
             }}
+            data={["Utility Bill"]}
+
             leftSection={<IconFileInfo />}
             leftSectionPointerEvents="none"
             rightSection={
@@ -592,7 +622,7 @@ const DirectorsForm = ({
                   }
                   className={styles.input__right__section}
                 >
-                  <Text fw={600} fz={10} c="##475467">
+                  <Text fw={600} fz={10} c="#475467">
                     View
                   </Text>
                 </UnstyledButton>
@@ -611,7 +641,7 @@ const DirectorsForm = ({
                       className={styles.input__right__section}
                       {...props}
                     >
-                      <Text fw={600} fz={10} c="##475467">
+                      <Text fw={600} fz={10} c="#475467">
                         Re-upload
                       </Text>
                     </UnstyledButton>
@@ -621,6 +651,16 @@ const DirectorsForm = ({
             }
             label="Proof of Address"
             placeholder={director.proofOfAddress}
+          /> */}
+
+          <DocumentTextInput
+            editing={editing}
+            form={form}
+            formKey="proofOfAddress"
+            documentKey="proofOfAddressFileUrl"
+            label="Proof of Addresses"
+            title={director.proofOfAddress}
+            director={director}
           />
         </GridCol>
       </Grid>
@@ -632,6 +672,200 @@ const DirectorsForm = ({
         deleteDirector={deleteDirector}
       />
     </div>
+  );
+};
+
+type DocumentTextInputProps = {
+  editing: boolean;
+  director: IDirector;
+  formKey: keyof IDirector;
+  documentKey: keyof IDirector;
+  form: UseFormReturnType<IDirector>;
+  label: string;
+  title: string;
+};
+
+const DocumentTextInput = ({
+  editing,
+  director,
+  form,
+  formKey,
+  documentKey,
+  label,
+  title,
+}: DocumentTextInputProps) => {
+  const [processing, setProcessing] = useState(false);
+  const { handleError } = useNotification();
+  const [opened, { open, close }] = useDisclosure(false);
+
+  const handleUpload = async (file: File | null, formKey: string) => {
+    setProcessing(true);
+    try {
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
+        formData,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      if (formKey) {
+        form.setFieldValue(formKey, data.data.url);
+      }
+      // setUploaded(true);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+  return (
+    <Box>
+      <Select
+        // readOnly={!editing}
+        readOnly
+        // comboboxProps={{ withinPortal: false, zIndex: 100 }}
+        data={["ID Card", "Passport", "Residence Permit"]}
+        classNames={{
+          input: styles.input,
+          label: styles.label,
+          section: styles.section,
+        }}
+        leftSection={<IconFileInfo />}
+        leftSectionPointerEvents="none"
+        rightSectionPointerEvents="auto"
+        {...form.getInputProps(formKey)}
+        rightSection={
+          !editing ? (
+            <UnstyledButton
+              onClick={() => window.open(director[formKey] || "", "_blank")}
+              className={styles.input__right__section}
+            >
+              <Text fw={600} fz={10} c="#475467">
+                View
+              </Text>
+            </UnstyledButton>
+          ) : (
+            <UnstyledButton
+              onClick={open}
+              className={styles.input__right__section}
+              w="100%"
+            >
+              <Text fw={600} fz={10} c="#475467">
+                Re-upload
+              </Text>
+            </UnstyledButton>
+          )
+        }
+        label={label}
+        placeholder={title}
+      />
+
+      <ReUploadProofOfAddress
+        opened={opened}
+        close={close}
+        formKey={formKey}
+        form={form}
+      />
+      {/* <ReUploadIdentityType opened={opened} close={close} /> */}
+    </Box>
+  );
+};
+
+interface ReUploadProps {
+  opened: boolean;
+  close: () => void;
+  formKey: keyof IDirector;
+  form: UseFormReturnType<IDirector>;
+}
+
+const ReUploadProofOfAddress = ({
+  opened,
+  close,
+  formKey,
+  form,
+}: ReUploadProps) => {
+  const closeButtonProps = {
+    mr: 10,
+
+    children: (
+      <ActionIcon
+        radius="xl"
+        variant="filled"
+        color="var(--prune-text-gray-100)"
+        size={32}
+      >
+        <IconX color="var(--prune-text-gray-500)" stroke={1.5} />
+      </ActionIcon>
+    ),
+  };
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={close}
+      closeButtonProps={closeButtonProps}
+      title={
+        <Text fz={20} fw={600}>
+          Re-upload Document
+        </Text>
+      }
+      padding={32}
+      centered
+    >
+      <Select
+        comboboxProps={{ withinPortal: true }}
+        data={
+          formKey === "identityType"
+            ? ["ID Card", "Passport", "Residence Permit"]
+            : ["Utility Bill"]
+        }
+        placeholder={
+          formKey === "identityType"
+            ? "Select Identity Type"
+            : "Select Proof of Address"
+        }
+        {...form.getInputProps(formKey)}
+        size="lg"
+        radius={4}
+      />
+    </Modal>
+  );
+};
+
+const ReUploadIdentityType = ({ opened, close }: ReUploadProps) => {
+  const closeButtonProps = {
+    pr: 32,
+    children: (
+      <ActionIcon
+        radius="xl"
+        variant="filled"
+        color="var(--prune-text-gray-100)"
+        size={32}
+      >
+        <IconX color="var(--prune-text-gray-500)" stroke={1.5} />
+      </ActionIcon>
+    ),
+  };
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={close}
+      closeButtonProps={closeButtonProps}
+      title={
+        <Text fz={20} fw={600}>
+          Re-upload Document
+        </Text>
+      }
+      padding={32}
+      centered
+    >
+      <Text>djfjfhhffhghfgfg</Text>
+    </Modal>
   );
 };
 

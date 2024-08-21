@@ -16,6 +16,7 @@ import styles from "./modal.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { newAdmin } from "@/lib/schema";
 import { Dispatch, SetStateAction } from "react";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function ModalComponent({
   opened,
@@ -64,7 +65,11 @@ export default function ModalComponent({
       }
     >
       <Flex className={styles.modal} direction="column">
-        <Box className={styles.form__container}>
+        <Box
+          className={styles.form__container}
+          component="form"
+          onSubmit={form.onSubmit(() => action && action())}
+        >
           {/* <Flex gap={20}>
             <TextInput
               label="First name"
@@ -118,29 +123,22 @@ export default function ModalComponent({
           </Flex> */}
 
           <Flex mb={20} mt={40} justify="flex-end" gap={15}>
-            <Button
-              onClick={() => {
+            <SecondaryBtn
+              text="Cancel"
+              action={() => {
                 close();
                 setIsEdit(false);
                 form.reset();
               }}
-              color="#D0D5DD"
-              variant="default"
-              // className={styles.cta}
-            >
-              Cancel
-            </Button>
+              fw={600}
+            />
 
-            <Button
-              onClick={action}
+            <PrimaryBtn
+              text={isEdit ? "Save Changes" : "Send Invite"}
               loading={processing}
-              // className={styles.cta}
-              variant="filled"
-              color="var(--prune-primary-600)"
-              c="var(--prune-text-gray-800)"
-            >
-              {isEdit ? "Save Changes" : "Send Invite"}
-            </Button>
+              type="submit"
+              fw={600}
+            />
           </Flex>
         </Box>
       </Flex>

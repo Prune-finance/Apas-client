@@ -26,7 +26,19 @@ export const filteredSearch = <T>(
       const itemValue = (
         getNestedValue(item, key) as unknown as string
       )?.toLowerCase();
-      return itemValue?.includes(searchValue.toLowerCase());
+
+      // Check if itemValue is undefined or null
+      // if (itemValue === undefined || itemValue === null) {
+      //   return true;
+      // }
+
+      // return itemValue.includes(searchValue.toLowerCase());
+
+      // Ensure itemValue is a string, or an empty string if it's null/undefined
+      const normalizedValue =
+        itemValue != null ? String(itemValue).toLowerCase() : "";
+
+      return normalizedValue.includes(searchValue.toLowerCase());
     });
   });
 };

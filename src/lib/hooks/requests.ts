@@ -237,6 +237,55 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
 
   return { loading, requests, revalidate };
 }
+export function useCompanyDebitRequests(
+  id: string,
+  customParams: IDebitRequest = {}
+) {
+  const [requests, setRequests] = useState<DebitRequest[]>([]);
+  const [meta, setMeta] = useState<RequestMeta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
+  async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/${id}/requests?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setRequests(data.data);
+      setMeta(data.meta as RequestMeta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+
+  return { loading, requests, revalidate, meta };
+}
 
 interface ICompanyRequest extends Omit<IParams, "query"> {}
 export function useCompanyRequests(
@@ -388,16 +437,55 @@ interface BaseData {
 export interface DebitRequest {
   id: string;
   accountId: string;
-  amount: number;
   reason: string;
+  destinationFirstName: null;
+  destinationLastName: null;
   destinationIBAN: string;
   destinationBIC: string;
   destinationCountry: string;
   destinationBank: string;
   reference: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
   createdAt: Date;
-  Account: AccountData;
+  deletedAt: null;
+  updatedAt: Date;
+  amount: number;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  companyAccountId: null;
+  Account: Account;
+}
+
+export interface Account {
+  id: string;
+  firstName: string;
+  lastName: string;
+  accountId: number;
+  accountName: string;
+  accountNumber: string;
+  accountDocuments: AccountDocuments;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  accountBalance: number;
+  companyId: string;
+  type: string;
+  status: string;
+  accountRequestId: null;
+  Company: Company;
+}
+
+export interface Company {
+  name: string;
+}
+
+export interface AccountDocuments {
+  idType: string;
+  poaType: string;
+  idFileURL: string;
+  poaFileURL: string;
+}
+
+export interface Meta {
+  total: number;
 }
 
 interface UserRequestData extends BaseData {

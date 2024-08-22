@@ -284,7 +284,7 @@ export default function SingleBusiness() {
             </TabsPanel>
 
             <TabsPanel value="keys">
-              <Keys business={business} />
+              <Keys business={business} loading={loading} />
             </TabsPanel>
           </Tabs>
         </div>

@@ -33,7 +33,6 @@ export default function Keys() {
   const [processing, setProcessing] = useState(false);
 
   const { business, loading, meta } = useUserBusiness();
-  console.log({ business, loading, meta });
 
   const { live, test } = useMemo(() => {
     const live = keys.find((key) => key.staging === "LIVE");

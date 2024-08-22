@@ -56,7 +56,7 @@ export default function ModalComponent({
             </div>
           </Flex>
 
-          <Text ta="center" fz={18} fw={600} mt={25}>
+          <Text ta="center" fz={18} fw={600} mt={25} tt="capitalize">
             {title}
           </Text>
 

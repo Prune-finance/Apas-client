@@ -23,18 +23,26 @@ dayjs.extend(advancedFormat);
 import styles from "./styles.module.scss";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import Transaction from "@/lib/store/transaction";
 
 type Props = {
-  close: () => void;
-  payout: TrxData | null;
-  opened: boolean;
+  close?: () => void;
+  payout?: boolean;
 };
 
-export const PayoutDrawer = ({ close, payout, opened }: Props) => {
+export const PayoutDrawer = ({}: //  close, payout, opened
+Props) => {
+  const { data: payout, close, opened, clearData } = Transaction();
+
+  const senderDetails = {
+    "Business Name": "N/A",
+    "Account Type": "Payout Account",
+  };
   const beneficiaryDetails = {
-    "Account Name": payout?.recipientBankCountry,
+    "Account Name": "N/A",
     "Account Number/IBAN": payout?.recipientIban,
     "Bank Name": payout?.recipientBankAddress,
+    "Bank Address": "N/A",
     BIC: payout?.recipientBic,
   };
 
@@ -55,9 +63,9 @@ export const PayoutDrawer = ({ close, payout, opened }: Props) => {
   };
 
   const intermediaryDetails = {
-    Name: "Blessing John",
-    Email: "blessingjohn@gmail.com",
-    Address: "5, Kalu Str, Maitia, Uk",
+    Name: "N/A",
+    Email: "N/A",
+    Address: "N/A",
     Invoice: (
       <PrimaryBtn
         text="INV-0237"
@@ -109,27 +117,39 @@ export const PayoutDrawer = ({ close, payout, opened }: Props) => {
 
         <Divider my={20} />
 
-        <Text fz={16} mb={24}>
-          Beneficiary Details
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
+          Sender Details
         </Text>
 
         <Stack gap={28}>
-          {Object.entries(beneficiaryDetails).map(([key, value], index) => (
+          {Object.entries(senderDetails).map(([key, value], index) => (
             <Group key={index} justify="space-between">
               <Text fz={14} c="var(--prune-text-gray-400)" fw={400}>
                 {`${key}:`}
               </Text>
 
-              <Text fz={14} c="var(--prune-text-gray-600)" fw={500}>
+              <Text fz={14} c="var(--prune-text-gray-600)" fw={600}>
                 {value}
               </Text>
             </Group>
           ))}
         </Stack>
 
-        {/* <Divider my={30} />
+        <Divider my={20} />
 
-        <Text fz={16} mb={24}>
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
           Intermediary Details
         </Text>
 
@@ -140,16 +160,48 @@ export const PayoutDrawer = ({ close, payout, opened }: Props) => {
                 {`${key}:`}
               </Text>
 
-              <Text fz={14} c="var(--prune-text-gray-600)" fw={500}>
+              <Text fz={14} c="var(--prune-text-gray-600)" fw={600}>
                 {value}
               </Text>
             </Group>
           ))}
-        </Stack> */}
+        </Stack>
+
+        <Divider my={20} />
+
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
+          Beneficiary Details
+        </Text>
+
+        <Stack gap={28}>
+          {Object.entries(beneficiaryDetails).map(([key, value], index) => (
+            <Group key={index} justify="space-between">
+              <Text fz={14} c="var(--prune-text-gray-400)" fw={400}>
+                {`${key}:`}
+              </Text>
+
+              <Text fz={14} c="var(--prune-text-gray-600)" fw={600}>
+                {value}
+              </Text>
+            </Group>
+          ))}
+        </Stack>
 
         <Divider my={30} />
 
-        <Text fz={16} mb={24}>
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
           Other Details
         </Text>
 
@@ -160,7 +212,7 @@ export const PayoutDrawer = ({ close, payout, opened }: Props) => {
                 {`${key}:`}
               </Text>
 
-              <Text fz={14} c="var(--prune-text-gray-600)" fw={500}>
+              <Text fz={14} c="var(--prune-text-gray-600)" fw={600}>
                 {value}
               </Text>
             </Group>

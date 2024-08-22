@@ -552,6 +552,7 @@ interface SingleAccountProps {
   setChartFrequency: Dispatch<SetStateAction<string>>;
   business?: BusinessData | null;
   admin?: boolean;
+  payout?: boolean;
 }
 
 export const SingleAccountBody = ({
@@ -562,6 +563,7 @@ export const SingleAccountBody = ({
   setChartFrequency,
   business,
   admin,
+  payout,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -569,8 +571,16 @@ export const SingleAccountBody = ({
     Currency: "EUR",
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    "Account Type": account?.type,
-    "Last Seen": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
+    "Account Type": payout ? (
+      <Text fw={600} fz={14} c="var(--prune-primary-800)">
+        Payout Account
+      </Text>
+    ) : (
+      account?.type
+    ),
+    [payout ? "Last Activity" : "Last Seen"]: dayjs(account?.updatedAt).format(
+      "Do MMMM, YYYY"
+    ),
   };
 
   return (
@@ -601,7 +611,11 @@ export const SingleAccountBody = ({
           <AccountDetails account={account} loading={loading} />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
-          <Transactions transactions={transactions} loading={loadingTrx} />
+          <Transactions
+            transactions={transactions}
+            loading={loadingTrx}
+            payout={payout}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
           <Analytics
@@ -626,6 +640,7 @@ interface IssuedAccountHeadProps {
   open: () => void;
   openFreeze?: () => void;
   admin?: boolean;
+  payout?: boolean;
 }
 
 export const IssuedAccountHead = ({
@@ -711,6 +726,7 @@ export const DefaultAccountHead = ({
   loading,
   account,
   open,
+  payout,
 }: IssuedAccountHeadProps) => {
   return (
     <Flex
@@ -775,7 +791,7 @@ export const DefaultAccountHead = ({
             Freeze Account
           </Button> */}
 
-        <PrimaryBtn text="Send Money" fw={600} />
+        {!payout && <PrimaryBtn text="Send Money" fw={600} />}
       </Flex>
     </Flex>
   );

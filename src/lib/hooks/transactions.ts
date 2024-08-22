@@ -266,4 +266,7 @@ export interface TransactionType {
   status: "PENDING" | "COMPLETED" | "REJECTED";
   createdAt: Date;
   updatedAt: Date;
+  destinationFirstName: string;
+  destinationLastName: string;
+  intermediary?: string;
 }

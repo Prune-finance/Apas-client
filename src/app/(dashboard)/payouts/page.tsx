@@ -18,6 +18,7 @@ import { formatNumber, frontendPagination } from "@/lib/utils";
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
+  TransactionType,
   TrxData,
   useUserDefaultTransactions,
   useUserTransactions,
@@ -36,6 +37,11 @@ import { TableComponent } from "@/ui/components/Table";
 import { SearchInput } from "@/ui/components/Inputs";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import { PayoutDrawer } from "./drawer";
+import { useUserDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  DefaultAccountHead,
+  SingleAccountBody,
+} from "@/ui/components/SingleAccount";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
@@ -52,7 +58,11 @@ function PayoutTrx() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [chartFrequency, setChartFrequency] = useState<string>("monthly");
 
+  const [openedDebit, { open, close }] = useDisclosure(false);
+
+  const { loading: loadingAcct, account } = useUserDefaultAccount();
   const { loading, transactions } = useUserDefaultTransactions({
     ...(isNaN(Number(limit))
       ? { limit: 10 }
@@ -141,7 +151,22 @@ function PayoutTrx() {
 
   return (
     <main className={styles.main}>
-      <Paper className={styles.table__container}>
+      <DefaultAccountHead
+        loading={loadingAcct}
+        account={account}
+        open={open}
+        payout
+      />
+      <SingleAccountBody
+        account={account}
+        loading={loadingAcct}
+        loadingTrx={loading}
+        transactions={transactions as TransactionType[]}
+        setChartFrequency={setChartFrequency}
+        payout
+      />
+
+      {/* <Paper className={styles.table__container}>
         <div className={styles.container__header}>
           <Flex gap={10} align="center">
             <Text fz={18} fw={600}>
@@ -173,13 +198,9 @@ function PayoutTrx() {
           limit={limit}
           setLimit={setLimit}
         />
-      </Paper>
+      </Paper> */}
 
-      <PayoutDrawer
-        opened={drawerOpened}
-        close={closeDrawer}
-        payout={selectedRequest}
-      />
+      <PayoutDrawer />
     </main>
   );
 }

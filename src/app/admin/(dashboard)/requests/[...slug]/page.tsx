@@ -1,24 +1,21 @@
 "use client";
 
-import { Fragment, Suspense } from "react";
+import { Suspense } from "react";
 import Cookies from "js-cookie";
 
 import dayjs from "dayjs";
 import axios from "axios";
 import { useState } from "react";
 
-import Image from "next/image";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import {
-  Badge,
+  Avatar,
   Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Paper,
-  Select,
   Skeleton,
   TableTd,
 } from "@mantine/core";
@@ -27,10 +24,9 @@ import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
 import { TableTr, Pagination } from "@mantine/core";
 
 import {
-  IconArrowLeft,
-  IconDots,
-  IconEye,
+  IconDotsVertical,
   IconUserCheck,
+  IconUserX,
 } from "@tabler/icons-react";
 import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
 import { IconListTree } from "@tabler/icons-react";
@@ -38,15 +34,8 @@ import { IconListTree } from "@tabler/icons-react";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
-import {
-  DebitRequest,
-  IUserRequest,
-  RequestData,
-  useCompanyRequests,
-  useDebitRequests,
-  useRequests,
-} from "@/lib/hooks/requests";
+import { formatNumber } from "@/lib/utils";
+import { DebitRequest, useCompanyDebitRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -63,7 +52,10 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { SearchInput } from "@/ui/components/Inputs";
+import DebitDrawer from "../drawer";
+import { useSingleBusiness } from "@/lib/hooks/businesses";
 
 function CompanyRequestType() {
   const searchParams = useSearchParams();
@@ -78,36 +70,9 @@ function CompanyRequestType() {
   const [limit, setLimit] = useState<string | null>("10");
   const [active, setActive] = useState(1);
 
-  const { loading, requests, revalidate, meta } = useCompanyRequests(
-    {
-      ...(isNaN(Number(limit))
-        ? { limit: 10 }
-        : { limit: parseInt(limit ?? "10", 10) }),
-      ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-      ...(status && { status: status.toLowerCase() }),
-      ...(sort && { sort: sort.toLowerCase() }),
-      type: tab.toUpperCase(),
-      page: active,
-    },
-    id,
-    tab.toLowerCase() !== "debit"
-  );
-
-  const {
-    requests: debitRequests,
-    revalidate: revalidateDebit,
-    loading: loadingDebit,
-    meta: debitMeta,
-  } = useRequests(
-    {
-      limit: parseInt(limit ?? "10", 10),
-      page: active,
-    },
-    id
-  );
-
-  const { push, back } = useRouter();
-  const [selectedRequest, setSelectedRequest] = useState<IUserRequest | null>(
+  const { loading, requests, revalidate, meta } = useCompanyDebitRequests(id);
+  const { business, loading: loadingBusiness } = useSingleBusiness(id);
+  const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
   );
   const [processing, setProcessing] = useState(false);
@@ -118,8 +83,6 @@ function CompanyRequestType() {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
-
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -166,60 +129,50 @@ function CompanyRequestType() {
     }
   };
 
-  const MenuComponent = ({ request }: { request: IUserRequest }) => {
+  const menuItems = {
+    approve: <IconUserCheck size={14} />,
+    deny: <IconUserX size={14} />,
+  };
+
+  const MenuComponent = ({ request }: { request: DebitRequest }) => {
     return (
       <Menu shadow="md" width={150}>
         <MenuTarget>
           <UnstyledButton>
-            <IconDots size={17} />
+            <IconDotsVertical size={17} />
           </UnstyledButton>
         </MenuTarget>
 
         <MenuDropdown>
-          <MenuItem
-            // onClick={() => {
-            //   setSelectedRequest(request);
-            //   openDrawer();
-            // }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconUserCheck
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            Approve
-          </MenuItem>
-          <MenuItem
-            // onClick={() => {
-            //   setSelectedRequest(request);
-            //   openDrawer();
-            // }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconUserCheck
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            Deny
-          </MenuItem>
+          {Object.entries(menuItems).map(([key, value]) => (
+            <MenuItem
+              key={key}
+              onClick={() => {
+                if (key === "approve") {
+                  setSelectedRequest(request);
+                  return openApprove();
+                }
+                if (key === "deny") {
+                  setSelectedRequest(request);
+                  return open();
+                }
+              }}
+              fz={10}
+              c="#667085"
+              leftSection={value}
+              tt="capitalize"
+            >
+              {key}
+            </MenuItem>
+          ))}
         </MenuDropdown>
       </Menu>
     );
   };
 
-  const handleRowClick = (id: string) => {
-    push(`/admin/requests/${id}/debit`);
-  };
-
   const rows = filteredSearch(
     requests,
-    ["Company.name", "firstName", "lastName"],
+    ["destinationFirstName", "destinationLastName"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -228,32 +181,18 @@ function CompanyRequestType() {
         setSelectedRequest(element);
         openDrawer();
       }}
-      // onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{element.Company.name}</TableTd>
-      {/* <TableTd className={styles.table__td}>{element.amount}</TableTd>
+      <TableTd>{element.Account.accountName}</TableTd>
       <TableTd className={styles.table__td}>
-        {`${element.Account.Company.name
-          .toLowerCase()
-          .split(" ")
-          .join("")}@example.com`}
-      </TableTd> */}
+        {formatNumber(element.amount, true, "EUR")}
+      </TableTd>
+
       <TableTd>
         {dayjs(element.createdAt).format("DD, MMM, YYYY - hh:mm A")}
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={approvedBadgeColor(element.status)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          {element.status.toLowerCase()}
-        </Badge>
+        <BadgeComponent status={element.status} />
       </TableTd>
 
       <TableTd
@@ -270,8 +209,6 @@ function CompanyRequestType() {
     validate: zodResolver(businessFilterSchema),
   });
 
-  console.log({ debitRequests, debitMeta });
-
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -282,53 +219,39 @@ function CompanyRequestType() {
         ]}
       />
       <div className={styles.table__container}>
-        <Button
-          fz={14}
-          c="var(--prune-text-gray-500)"
-          fw={400}
-          px={0}
-          variant="transparent"
-          onClick={back}
-          leftSection={
-            <IconArrowLeft
-              color="#1D2939"
-              style={{ width: "70%", height: "70%" }}
-            />
-          }
-          //   style={{ pointerEvents: !account ? "none" : "auto" }}
-        >
-          Back
-        </Button>
+        <BackBtn />
 
-        {!loading ? (
-          <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
-            {requests.length > 1 ? requests[0].Company.name : ""}
-          </Text>
-        ) : (
-          <Skeleton h={10} w={100} />
-        )}
+        <Group gap={7} mt={24}>
+          {!loadingBusiness ? (
+            <Avatar color="var(--prune-primary-700)" size={39} variant="filled">
+              {business?.name
+                .split(" ")
+                .map((name) => name.charAt(0))
+                .join("")}
+            </Avatar>
+          ) : (
+            <Skeleton circle h={39} w={39} />
+          )}
 
-        <div className={`${styles.container__search__filter}`}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
+          {!loadingBusiness ? (
+            <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
+              {business?.name}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={100} />
+          )}
+        </Group>
+
+        <Group justify="space-between" mt={32}>
+          <SearchInput search={search} setSearch={setSearch} />
+
+          <SecondaryBtn
+            text="Filter"
+            action={toggle}
+            fw={600}
+            icon={IconListTree}
           />
-
-          <Button
-            // className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            fz={12}
-            fw={500}
-            variant="default"
-            onClick={toggle}
-          >
-            Filter
-          </Button>
-        </div>
+        </Group>
 
         {tab.toLowerCase() !== "debit" ? (
           <>
@@ -351,13 +274,13 @@ function CompanyRequestType() {
           <>
             <TableComponent
               head={debitTableHeaders}
-              rows={[]}
-              loading={false}
+              rows={rows}
+              loading={loading}
             />
 
             <EmptyTable
-              rows={[]}
-              loading={false}
+              rows={rows}
+              loading={loading}
               title="There are no debit requests"
               text="When a debit request is made, it will appear here"
             />
@@ -372,9 +295,18 @@ function CompanyRequestType() {
           total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
 
-        <Drawer
+        <DebitDrawer
           opened={drawerOpened}
-          onClose={closeDrawer}
+          close={closeDrawer}
+          selectedRequest={selectedRequest}
+          revalidate={revalidate}
+        />
+
+        <Drawer
+          opened={false}
+          onClose={() => {}}
+          // opened={drawerOpened}
+          // onClose={closeDrawer}
           position="right"
           withCloseButton={false}
           size="30%"
@@ -406,7 +338,7 @@ function CompanyRequestType() {
                   Business Name:
                 </Text>
 
-                <Text fz={14}>{selectedRequest?.Company.name}</Text>
+                {/* <Text fz={14}>{selectedRequest?.Company.name}</Text> */}
               </Flex>
 
               <Flex justify="space-between">

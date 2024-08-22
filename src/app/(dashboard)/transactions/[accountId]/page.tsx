@@ -4,6 +4,7 @@ import {
   TrxData,
   useUserDefaultTransactions,
   useUserTransactions,
+  useUserTransactionsByIBAN,
 } from "@/lib/hooks/transactions";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
@@ -30,11 +31,17 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 import { useState } from "react";
 import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
 import { useParams } from "next/navigation";
-import { useSingleUserAccount } from "@/lib/hooks/accounts";
+import {
+  useSingleUserAccount,
+  useSingleUserAccountByIBAN,
+} from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 
 export default function AccountTransactions() {
@@ -43,17 +50,10 @@ export default function AccountTransactions() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, transactions } = useUserTransactions(accountId, {
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
+  const { transactions, loading, meta } = useUserTransactionsByIBAN(accountId);
 
-    // ...(status && { status: status.toLowerCase() }),
-
-    page: active,
-  });
-
-  const { account, loading: loadingAcct } = useSingleUserAccount(accountId);
+  const { account, loading: loadingAcct } =
+    useSingleUserAccountByIBAN(accountId);
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -70,25 +70,29 @@ export default function AccountTransactions() {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: account?.accountBalance || 0,
       formatted: true,
       currency: "EUR",
+      loading: loadingAcct,
     },
     {
       title: "Money In",
       value: 0,
       formatted: true,
       currency: "EUR",
+      loading: loading,
     },
     {
       title: "Money Out",
       value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
+      loading: loading,
     },
     {
       title: "Total Transactions",
       value: transactions.length,
+      loading: loading,
     },
   ];
 
@@ -107,11 +111,11 @@ export default function AccountTransactions() {
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
-      <TableTd className={styles.table__td}>
+      <TableTd className={styles.table__td}>{"N/A"}</TableTd>
+      {/* <TableTd className={styles.table__td}>
         {element.recipientBankAddress}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+      <TableTd className={styles.table__td}>{element.reference}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         <Flex align="center" gap={5}>
           <IconArrowUpRight
@@ -123,7 +127,7 @@ export default function AccountTransactions() {
         </Flex>
       </TableTd>
       <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
       </TableTd>
       <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />
@@ -190,7 +194,7 @@ export default function AccountTransactions() {
       </Group>
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
-      <TableComponent rows={rows} loading={loading} head={tableHeaders} />
+      <TableComponent rows={rows} loading={loading} head={tableHeader} />
 
       <EmptyTable
         rows={rows}
@@ -223,3 +227,5 @@ const tableHeaders = [
   "Date Created",
   "Status",
 ];
+
+const tableHeader = ["Name", "Amount", "Date", "Status"];

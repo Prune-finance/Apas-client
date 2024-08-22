@@ -216,6 +216,48 @@ export function useSingleUserAccount(id: string) {
   return { loading, account, revalidate };
 }
 
+// {
+//   {
+//     account - srv;
+//   }
+// }
+// /v1/accnostu / number / GB12045505050505128;
+
+export function useSingleUserAccountByIBAN(iban: string) {
+  const [account, setAccount] = useState<Account | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/number/${iban}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccount();
+  }
+
+  useEffect(() => {
+    fetchAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+
 export function useUserDefaultAccount() {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);

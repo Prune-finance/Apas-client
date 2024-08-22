@@ -18,12 +18,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-import { newBusiness, NewBusinessType } from "@/lib/schema";
+import {
+  directorEtShareholderSchema,
+  NewBusinessType,
+  OtherDocumentType,
+  RemoveDirectorType,
+} from "@/lib/schema";
 
 interface DropzoneCustomProps extends Partial<DropzoneProps> {
   form?: UseFormReturnType<NewBusinessType>;
-  // form?: UseFormReturnType<typeof newBusiness>;
-  // formKey?: "mermat" | "operationalLicense" | "amlCompliance" | "shareholderParticular" | "directorParticular" | "cacCertificate";
+  DirectorForm?: UseFormReturnType<typeof directorEtShareholderSchema>;
+  removeDirectorForm?: UseFormReturnType<RemoveDirectorType>;
+  otherDocumentForm?: UseFormReturnType<OtherDocumentType>;
   formKey?: string;
   uploadedFileUrl?: string;
 }
@@ -62,6 +68,22 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
         if (!formKey) return;
         form.setFieldValue(formKey, data.data.url);
       }
+
+      if (props.removeDirectorForm) {
+        if (!formKey) return;
+        props.removeDirectorForm.setFieldValue(formKey, data.data.url);
+      }
+
+      if (props.otherDocumentForm) {
+        if (!formKey) return;
+        props.otherDocumentForm.setFieldValue(formKey, data.data.url);
+      }
+
+      if (props.DirectorForm) {
+        if (!formKey) return;
+        props.DirectorForm.setFieldValue(formKey, data.data.url);
+      }
+
       setUploaded(true);
     } catch (error) {
       console.log(error);
@@ -142,7 +164,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
               style={{
                 width: rem(52),
                 height: rem(52),
-                color: "#97AD05",
+                color: "var(--prune-text-gray-400)",
               }}
               stroke={1.5}
             />

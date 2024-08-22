@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { features } from "process";
 import { z } from "zod";
 
@@ -139,8 +140,10 @@ export const debitRequest = {
   destinationBIC: "",
   destinationCountry: "",
   destinationBank: "",
-  reference: "",
+  reference: crypto.randomUUID(),
   reason: "",
+  destinationFirstName: "",
+  destinationLastName: "",
 };
 
 export const validateNewUser = z.object({
@@ -408,6 +411,8 @@ export const validateDebitRequest = z.object({
   destinationBank: z.string().min(2, "Bank is required"),
   reference: z.string().min(2, "Reference number is required"),
   reason: z.string().min(2, "Reason is required"),
+  destinationFirstName: z.string().min(2, "Receiver First Name is required"),
+  destinationLastName: z.string().min(2, "Receiver Last Name is required"),
 });
 
 export const filterValues = {
@@ -433,7 +438,7 @@ export const removeDirectorValues = {
 };
 
 export const removeDirectorSchema = z.object({
-  reason: z.string(),
+  reason: z.string().min(1, "Please enter a reason"),
   supportingDoc: z.string(),
   supportingDocUrl: z.string(),
 });
@@ -521,3 +526,18 @@ export const resetPasswordSchema = z
   });
 
 export type ResetPasswordType = z.infer<typeof resetPasswordSchema>;
+
+export const otherDocumentValues = {
+  name: "",
+  url: "",
+};
+
+export const otherDocumentSchema = z.object({
+  name: z.string().min(1, "Document Name is required"),
+  url: z
+    .string()
+    .url("Value must be a valid URL")
+    .min(1, "Document URL is required"),
+});
+
+export type OtherDocumentType = z.infer<typeof otherDocumentSchema>;

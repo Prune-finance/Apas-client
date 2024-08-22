@@ -52,6 +52,7 @@ import { TableComponent } from "@/ui/components/Table";
 import { useBusiness } from "@/lib/hooks/businesses";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 function Reactivate() {
   const searchParams = useSearchParams();
@@ -185,7 +186,7 @@ function Reactivate() {
   };
 
   const rows = filteredSearch(
-    businesses,
+    businesses.filter((business) => business.Requests.length > 0),
     ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
@@ -195,20 +196,12 @@ function Reactivate() {
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element.name}</TableTd>
-      {/* <TableTd className={styles.table__td}>{element.amount}</TableTd> */}
-      <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
+      <TableTd className={styles.table__td}>{element.Requests.length}</TableTd>
+      <TableTd tt="lowercase" className={styles.table__td}>
+        {element.contactEmail}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor(element.companyStatus)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          {element.companyStatus.toLowerCase()}
-        </Badge>
+        <BadgeComponent status={element.companyStatus} active />
       </TableTd>
 
       {/* <TableTd className={`${styles.table__td}`}>
@@ -408,7 +401,7 @@ function Reactivate() {
 
 const tableHeaders = [
   "Business Name",
-  // "Number of Requests",
+  "Number of Requests",
   "Contact Email",
   "Status",
   // "Action",

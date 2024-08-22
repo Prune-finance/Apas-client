@@ -48,7 +48,7 @@ export const AdminMainLinks = [
     icon: <IconUserPlus size={16} />,
   },
   {
-    text: "All Requests",
+    text: "Other Requests",
     link: "/admin/requests",
     icon: <IconCreditCardPay size={16} />,
   },

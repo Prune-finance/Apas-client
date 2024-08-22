@@ -152,7 +152,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
     ).toString();
 
     try {
-      const path = id ? `${id}/transactions` : "/transactions";
+      const path = id ? `${id}/transactions` : "transactions";
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${path}?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
@@ -266,4 +266,7 @@ export interface TransactionType {
   status: "PENDING" | "COMPLETED" | "REJECTED";
   createdAt: Date;
   updatedAt: Date;
+  destinationFirstName: string;
+  destinationLastName: string;
+  intermediary?: string;
 }

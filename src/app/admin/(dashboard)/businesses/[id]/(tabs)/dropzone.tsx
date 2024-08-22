@@ -4,6 +4,7 @@ import {
   DropzoneProps,
   FileWithPath,
   IMAGE_MIME_TYPE,
+  PDF_MIME_TYPE,
 } from "@mantine/dropzone";
 import { UseFormReturnType } from "@mantine/form";
 import {
@@ -17,13 +18,18 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-import { directorEtShareholderSchema, RemoveDirectorType } from "@/lib/schema";
+import {
+  directorEtShareholderSchema,
+  OtherDocumentType,
+  RemoveDirectorType,
+} from "@/lib/schema";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 
 interface DropzoneCustomProps extends Partial<DropzoneProps> {
   form?: UseFormReturnType<typeof directorEtShareholderSchema>;
   removeDirectorForm?: UseFormReturnType<RemoveDirectorType>;
+  otherDocumentForm?: UseFormReturnType<OtherDocumentType>;
   formKey?: string;
 }
 
@@ -37,6 +43,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
   const form = props.form;
   const formKey = props.formKey;
   const removeDirectorForm = props.removeDirectorForm;
+  const otherDocumentForm = props.otherDocumentForm;
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -60,6 +67,10 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
         if (!formKey) return;
         removeDirectorForm.setFieldValue(formKey, data.data.url);
       }
+      if (otherDocumentForm) {
+        if (!formKey) return;
+        otherDocumentForm.setFieldValue(formKey, data.data.url);
+      }
       setUploaded(true);
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -77,7 +88,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       onDrop={(files) => setFile(files[0])}
       onReject={(files) => console.log("rejected files", files[0])}
       maxSize={5 * 1024 ** 2}
-      accept={IMAGE_MIME_TYPE}
+      accept={[...IMAGE_MIME_TYPE, ...PDF_MIME_TYPE]}
       {...props}
       h={140}
       bg="#FCFCFD"
@@ -133,7 +144,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
               style={{
                 width: rem(52),
                 height: rem(52),
-                color: "#97AD05",
+                color: "var(--prune-text-gray-400)",
               }}
               stroke={1.5}
             />

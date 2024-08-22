@@ -1,12 +1,15 @@
 "use client";
 
 import {
+  ActionIcon,
+  Box,
   Button,
   FileButton,
   Flex,
   Grid,
   GridCol,
   Group,
+  Modal,
   Text,
   TextInput,
   ThemeIcon,
@@ -17,6 +20,7 @@ import {
   IconPdf,
   IconPencilMinus,
   IconPlus,
+  IconX,
 } from "@tabler/icons-react";
 import Cookies from "js-cookie";
 
@@ -24,10 +28,17 @@ import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData } from "@/lib/hooks/businesses";
 import { useState } from "react";
 import axios from "axios";
-import { useForm, UseFormReturnType } from "@mantine/form";
+import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { SecondaryBtn, PrimaryBtn } from "@/ui/components/Buttons";
+import { useDisclosure } from "@mantine/hooks";
+import DropzoneComponent from "./dropzone";
+import {
+  otherDocumentSchema,
+  OtherDocumentType,
+  otherDocumentValues,
+} from "@/lib/schema";
 
 export default function Documents({
   business,
@@ -38,6 +49,8 @@ export default function Documents({
 }) {
   const { handleSuccess, handleError } = useNotification();
   const [editing, setEditing] = useState(false);
+  const [processing, setProcessing] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const initialValues = {
     cacCertificate: business.cacCertificate,
@@ -53,15 +66,22 @@ export default function Documents({
     // validate: zodResolver(validateNewBusiness),
   });
 
-  const handleBusinessUpdate = async () => {
-    const { createdAt, updatedAt, deletedAt, pricingPlanId, ...rest } =
-      business;
+  const handleBusinessUpdate = async (
+    otherDocuments?: Record<string, string>
+  ) => {
+    const { contactEmail, name, contactNumber, domain } = business;
+
+    setProcessing(true);
     try {
       await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
         {
-          ...rest,
+          contactEmail,
+          name,
+          domain,
+          contactNumber,
           ...form.values,
+          ...(otherDocuments && { otherDocuments }),
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -70,6 +90,9 @@ export default function Documents({
       revalidate();
     } catch (error) {
       handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+      setEditing(false);
     }
   };
 
@@ -80,7 +103,13 @@ export default function Documents({
           All Documents
         </Text>
 
-        <PrimaryBtn text="New Document" icon={IconPlus} fz={12} fw={600} />
+        <PrimaryBtn
+          text="New Document"
+          icon={IconPlus}
+          fz={12}
+          fw={600}
+          action={open}
+        />
       </Group>
       <div className={styles.top__container}>
         <Flex justify="space-between" align="center">
@@ -106,9 +135,9 @@ export default function Documents({
                 fz={10}
                 fw={600}
                 text="Save Changes"
+                loading={processing}
                 action={() => {
                   handleBusinessUpdate();
-                  setEditing(false);
                 }}
               />
             </Group>
@@ -182,23 +211,14 @@ export default function Documents({
             />
           </GridCol>
         </Grid>
-      </div>
 
-      <Button
-        // mt={20}
-        variant="transparent"
-        fz={12}
-        fw={400}
-        c="#000"
-        // onClick={open}
-        leftSection={
-          <ThemeIcon radius="xl" color="var(--prune-primary-500)">
-            <IconPlus color="#344054" size={14} />
-          </ThemeIcon>
-        }
-      >
-        Add New
-      </Button>
+        <NewBusinessModal
+          opened={opened}
+          close={close}
+          handleBusinessUpdate={handleBusinessUpdate}
+          business={business}
+        />
+      </div>
     </div>
   );
 }
@@ -298,5 +318,121 @@ const DocumentTextInput = ({
       label={label}
       placeholder={`${title}-${business.name}`}
     />
+  );
+};
+
+interface NewBizProps {
+  opened: boolean;
+  close: () => void;
+  handleBusinessUpdate: (
+    otherDocuments?: Record<string, string>
+  ) => Promise<void>;
+  business: BusinessData;
+}
+
+const NewBusinessModal = ({
+  opened,
+  close,
+  handleBusinessUpdate,
+  business,
+}: NewBizProps) => {
+  const [processing, setProcessing] = useState(false);
+
+  const { handleError, handleSuccess } = useNotification();
+
+  const form = useForm<OtherDocumentType>({
+    initialValues: otherDocumentValues,
+    validate: zodResolver(otherDocumentSchema),
+  });
+
+  const handleUpload = async () => {
+    setProcessing(true);
+
+    const { name, url } = form.values;
+    try {
+      await handleBusinessUpdate(
+        business.otherDocuments
+          ? { ...business.otherDocuments, [name]: url }
+          : { [name]: url }
+      );
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const closeButtonProps = {
+    mr: 10,
+    children: (
+      <ActionIcon
+        radius="xl"
+        variant="filled"
+        color="var(--prune-text-gray-100)"
+        size={32}
+      >
+        <IconX color="var(--prune-text-gray-500)" stroke={1.5} />
+      </ActionIcon>
+    ),
+  };
+
+  return (
+    <Modal
+      opened={opened}
+      onClose={() => {
+        close();
+        form.reset();
+      }}
+      closeButtonProps={closeButtonProps}
+      title={
+        <Text fz={20} fw={600}>
+          New Document
+        </Text>
+      }
+      padding={32}
+      centered
+    >
+      <Box
+        component="form"
+        onSubmit={form.onSubmit(() => handleUpload())}
+        style={{ display: "flex", flexDirection: "column", gap: 24 }}
+      >
+        <TextInput
+          placeholder="Enter Document Name"
+          {...form.getInputProps("name")}
+          size="lg"
+          radius={4}
+          errorProps={{ fz: 12 }}
+        />
+
+        <Box>
+          <DropzoneComponent otherDocumentForm={form} formKey="url" />
+          {form.errors.url && (
+            <Text c="var(--prune-warning)" fz={12} mt={0} p={0}>
+              {form.errors.url}
+            </Text>
+          )}
+        </Box>
+
+        <Flex gap={16}>
+          <SecondaryBtn
+            fullWidth
+            text="Cancel"
+            action={() => {
+              close();
+              form.reset();
+            }}
+            fw={600}
+          />
+          <PrimaryBtn
+            fullWidth
+            text="Submit"
+            type="submit"
+            loading={processing}
+            fw={600}
+          />
+        </Flex>
+      </Box>
+    </Modal>
   );
 };

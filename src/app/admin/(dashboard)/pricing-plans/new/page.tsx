@@ -49,7 +49,7 @@ export default function CreateNewPlan() {
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan`,
-        { ...rest },
+        { ...rest, description },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 

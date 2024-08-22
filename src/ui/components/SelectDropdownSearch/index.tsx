@@ -37,7 +37,7 @@ function SelectOption({ name, iban, bic }: Item) {
       <Stack gap={4}>
         <Text fz={12}>{name}</Text>
         <Group>
-          <Text inline fw={700} fz={11} truncate w="60%">
+          <Text inline fw={700} fz={11}>
             IBAN:{" "}
             <Text span inherit fw={400}>
               {iban}
@@ -58,9 +58,10 @@ function SelectOption({ name, iban, bic }: Item) {
 interface Props {
   setValue: (val: string) => void;
   value: string;
+  label?: string;
 }
 
-export function SelectDropdownSearch({ value, setValue }: Props) {
+export function SelectDropdownSearch({ value, setValue, label }: Props) {
   const [search, setSearch] = useState("");
   const { accounts, loading } = useUserAccounts({ limit: 1000 });
   const combobox = useCombobox({
@@ -111,7 +112,7 @@ export function SelectDropdownSearch({ value, setValue }: Props) {
           onClick={() => combobox.toggleDropdown()}
           rightSectionPointerEvents="none"
           labelProps={{ mb: 10, fz: 12 }}
-          label={"Account"}
+          label={label ?? "Account"}
           size="md"
           radius="md"
           classNames={{ input: styles.input }}

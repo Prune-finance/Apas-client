@@ -1,5 +1,9 @@
 import form from "@/app/auth/login/form";
-import { TrxData, useUserDefaultTransactions } from "@/lib/hooks/transactions";
+import {
+  TrxData,
+  useUserDefaultTransactions,
+  useUserTransactions,
+} from "@/lib/hooks/transactions";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
 import { frontendPagination, formatNumber } from "@/lib/utils";
@@ -16,6 +20,9 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 import { useState } from "react";
 import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
@@ -31,16 +38,18 @@ export const IssuedAccountsTab = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, accounts, revalidate, meta } = useUserAccounts({
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-    ...(type && { type: type.toUpperCase() }),
-    page: active,
-  });
+  // const { loading, accounts, revalidate, meta } = useUserAccounts({
+  //   ...(isNaN(Number(limit))
+  //     ? { limit: 10 }
+  //     : { limit: parseInt(limit ?? "10", 10) }),
+  //   ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+  //   ...(status && { status: status.toUpperCase() }),
+  //   ...(sort && { sort: sort.toLowerCase() }),
+  //   ...(type && { type: type.toUpperCase() }),
+  //   page: active,
+  // });
+
+  const { transactions, revalidate, loading } = useUserTransactions();
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -54,9 +63,9 @@ export const IssuedAccountsTab = () => {
     validate: zodResolver(filterSchema),
   });
 
-  const searchProps = ["accountName", "accountNumber", "type"];
+  const searchProps = ["senderIban", "recipientIban", "amount"];
 
-  const rows = filteredSearch(accounts, searchProps, debouncedSearch).map(
+  const rows = filteredSearch(transactions, searchProps, debouncedSearch).map(
     (element) => (
       <TableTr
         key={element.id}
@@ -67,15 +76,24 @@ export const IssuedAccountsTab = () => {
         }}
         style={{ cursor: "pointer" }}
       >
-        <TableTd className={styles.table__td}>{element.accountName}</TableTd>
-        <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
-        <TableTd className={styles.table__td}>{element.type}</TableTd>
+        <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+        <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
+        <TableTd className={styles.table__td}>
+          <Flex align="center" gap={5}>
+            <IconArrowUpRight
+              color="#D92D20"
+              size={16}
+              className={styles.table__td__icon}
+            />
+            {formatNumber(element.amount, true, "EUR")}
+          </Flex>
+        </TableTd>
 
         <TableTd className={styles.table__td}>
-          {dayjs(element.createdAt).format("DD MMM, YYYY")}
+          {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
         </TableTd>
         <TableTd className={styles.table__td}>
-          <BadgeComponent status={element.status} active />
+          <BadgeComponent status={element.status} />
         </TableTd>
       </TableTr>
     )
@@ -99,7 +117,7 @@ export const IssuedAccountsTab = () => {
         text="When an account is created, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}
@@ -116,9 +134,9 @@ export const IssuedAccountsTab = () => {
 };
 
 const tableHeaders = [
-  "Account Name",
-  "IBAN",
-  "Account Type",
+  "Sender Name",
+  "Beneficiary Name",
+  "Amount",
   "Date Created",
   "Status",
 ];

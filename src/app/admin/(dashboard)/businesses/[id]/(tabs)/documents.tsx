@@ -363,7 +363,7 @@ const NewBusinessModal = ({
   };
 
   const closeButtonProps = {
-    pr: 32,
+    mr: 10,
     children: (
       <ActionIcon
         radius="xl"

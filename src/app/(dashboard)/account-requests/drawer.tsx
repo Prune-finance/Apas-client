@@ -18,6 +18,7 @@ import { IconX, IconPdf } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import TabsComponent from "@/ui/components/Tabs";
+import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 
 dayjs.extend(advancedFormat);
 
@@ -60,6 +61,7 @@ export const AccountRequestsDrawer = ({
   ];
 
   const contactPerson = {
+    Name: "N/A",
     Email: business?.contactEmail,
     "Phone Number": business?.contactNumber,
   };
@@ -68,21 +70,26 @@ export const AccountRequestsDrawer = ({
       opened={opened}
       onClose={close}
       position="right"
-      withCloseButton={false}
-      size={selectedRequest?.accountType === "USER" ? "30%" : "40%"}
-    >
-      <Flex justify="space-between" pb={28}>
-        <Text fz={18} fw={600} c="#1D2939">
+      // withCloseButton={false}
+      closeButtonProps={{ ...closeButtonProps, mr: 28 }}
+      title={
+        <Text fz={18} fw={600} c="#1D2939" ml={28}>
           Account Request Details
         </Text>
+      }
+      padding={0}
+      size={selectedRequest?.accountType === "USER" ? "30%" : "40%"}
+    >
+      <Divider mb={20} />
 
-        <IconX onClick={close} />
-      </Flex>
-
-      <Box>
-        <Divider mb={20} />
-
-        <Text fz={16} mb={24}>
+      <Box px={28} pb={28}>
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
           Account Details
         </Text>
 
@@ -95,7 +102,7 @@ export const AccountRequestsDrawer = ({
               {
                 <Text
                   fz={14}
-                  fw={500}
+                  fw={600}
                   c="var(--prune-text-gray-600)"
                   tt="capitalize"
                 >
@@ -109,7 +116,15 @@ export const AccountRequestsDrawer = ({
         {selectedRequest?.accountType === "USER" && (
           <Stack gap={28}>
             <Divider mt={30} />
-            <Text fz={16}>Supporting Documents</Text>
+            <Text
+              fz={16}
+              // mb={24}
+              tt="uppercase"
+              c="var(--prune-text-gray-800)"
+              fw={600}
+            >
+              Supporting Documents
+            </Text>
 
             <TextInputWithFile
               label="ID"
@@ -123,7 +138,17 @@ export const AccountRequestsDrawer = ({
               url={selectedRequest.documentData.poaFileUrl}
             />
 
-            <Text fz={16}>Contact Person Details</Text>
+            <Divider />
+
+            <Text
+              fz={16}
+              // mb={24}
+              tt="uppercase"
+              c="var(--prune-text-gray-800)"
+              fw={600}
+            >
+              Contact Person Details
+            </Text>
 
             <Stack gap={28}>
               {Object.entries(contactPerson).map(([key, value], index) => (
@@ -132,7 +157,7 @@ export const AccountRequestsDrawer = ({
                     {key}
                   </Text>
                   {
-                    <Text fz={14} fw={500} c="var(--prune-text-gray-600)">
+                    <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
                       {value}
                     </Text>
                   }
@@ -145,9 +170,16 @@ export const AccountRequestsDrawer = ({
         {selectedRequest?.accountType === "CORPORATE" && (
           <Box mt={28}>
             <Divider mb={20} />
-            <Text fz={16}>Other Details</Text>
+            <Text
+              fz={16}
+              tt="uppercase"
+              c="var(--prune-text-gray-800)"
+              fw={600}
+            >
+              Other Details
+            </Text>
 
-            <TabsComponent tabs={tabs} fz={8} mt={28}>
+            <TabsComponent tabs={tabs} fz={8} mt={28} tt="capitalize">
               <TabsPanel value={tabs[0].value} mt={28}>
                 <Stack gap={28}>
                   {Object.entries(contactPerson).map(([key, value], index) => (
@@ -156,7 +188,7 @@ export const AccountRequestsDrawer = ({
                         {key}:
                       </Text>
                       {
-                        <Text fz={14} fw={500} c="var(--prune-text-gray-600)">
+                        <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
                           {value}
                         </Text>
                       }

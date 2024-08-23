@@ -28,6 +28,8 @@ import {
   IconPointFilled,
   IconUsers,
   IconUsersGroup,
+  IconCheck,
+  IconX,
 } from "@tabler/icons-react";
 
 import ActiveBadge from "@/assets/active-badge.svg";
@@ -46,6 +48,9 @@ import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { activeBadgeColor } from "@/lib/utils";
+import { BadgeComponent } from "@/ui/components/Badge";
+import { useDisclosure } from "@mantine/hooks";
+import ModalComponent from "@/ui/components/Modal";
 
 export default function SingleBusiness() {
   const router = useRouter();
@@ -58,6 +63,10 @@ export default function SingleBusiness() {
   const { handleSuccess, handleError } = useNotification();
   const [processingLink, setProcessingLink] = useState(false);
   const [processingActive, setProcessingActive] = useState(false);
+
+  const [opened, { open, close }] = useDisclosure(false);
+  const [openedTrust, { open: openTrust, close: closeTrust }] =
+    useDisclosure(false);
 
   const handleBusinessTrust = async () => {
     try {
@@ -107,6 +116,7 @@ export default function SingleBusiness() {
 
       handleSuccess("Action Completed", `Company status updated`);
       revalidate();
+      close();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -163,17 +173,18 @@ export default function SingleBusiness() {
             )}
 
             {business && (
-              <Badge
-                tt="capitalize"
-                variant="light"
-                color={activeBadgeColor(business.companyStatus)}
-                w={82}
-                h={24}
-                fw={400}
-                fz={12}
-              >
-                {business.companyStatus.toLowerCase()}
-              </Badge>
+              // <Badge
+              //   tt="capitalize"
+              //   variant="light"
+              //   color={activeBadgeColor(business.companyStatus)}
+              //   w={82}
+              //   h={24}
+              //   fw={400}
+              //   fz={12}
+              // >
+              //   {business.companyStatus.toLowerCase()}
+              // </Badge>
+              <BadgeComponent status={business.companyStatus} active />
             )}
           </div>
 
@@ -191,8 +202,9 @@ export default function SingleBusiness() {
                 c="var(--prune-text-gray-700)"
                 fz={12}
                 h={32}
-                onClick={toggleBusinessActivation}
-                loading={processingActive}
+                // onClick={toggleBusinessActivation}
+                onClick={open}
+                // loading={processingActive}
                 style={{ border: "1px solid var(--prune-text-gray-200)" }}
               >
                 {business?.companyStatus === "ACTIVE"
@@ -289,6 +301,25 @@ export default function SingleBusiness() {
           </Tabs>
         </div>
       </div>
+
+      <ModalComponent
+        opened={opened}
+        close={close}
+        title={
+          business?.companyStatus === "ACTIVE"
+            ? "Deactivate This Business?"
+            : "Activate This Business?"
+        }
+        text={
+          business?.companyStatus === "ACTIVE"
+            ? "Are you sure you want to deactivate this business? This will render this business inactive and will not be able to receive new transactions."
+            : "Are you sure you want to activate this business? This will render this business active and will be able to receive new transactions."
+        }
+        action={toggleBusinessActivation}
+        icon={business?.companyStatus === "ACTIVE" ? <IconX /> : <IconCheck />}
+        processing={processingActive}
+        color="#ECFDF3"
+      />
     </main>
   );
 }

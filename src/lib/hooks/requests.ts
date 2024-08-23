@@ -564,17 +564,23 @@ export interface DocumentData {
 }
 
 export interface Directors {
-  [key: `director_${number}`]: Director;
+  [key: `director_${number}`]: CorporateDirector;
 }
 
 export interface Shareholder {
-  [key: `shareholder_${number}`]: Director;
+  [key: `shareholder_${number}`]: CorporateDirector;
 }
 
 export interface Director {
   idFileUrl: string;
   idType: string;
   poaFileUrl: string;
+  poaType: string;
+}
+export interface CorporateDirector {
+  idFile: string;
+  idType: string;
+  poaFile: string;
   poaType: string;
 }
 

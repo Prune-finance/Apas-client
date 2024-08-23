@@ -49,6 +49,7 @@ export default function Documents({
 }) {
   const { handleSuccess, handleError } = useNotification();
   const [editing, setEditing] = useState(false);
+  const [editingDoc, setEditingDoc] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -59,6 +60,7 @@ export default function Documents({
     shareholderParticular: business.shareholderParticular,
     amlCompliance: business.amlCompliance,
     operationalLicense: business.operationalLicense,
+    // otherDocuments: business.otherDocuments,
   };
 
   const form = useForm({
@@ -93,6 +95,7 @@ export default function Documents({
     } finally {
       setProcessing(false);
       setEditing(false);
+      setEditingDoc(false);
     }
   };
 
@@ -219,6 +222,64 @@ export default function Documents({
           business={business}
         />
       </div>
+
+      {business.otherDocuments &&
+        Object.keys(business.otherDocuments).length > 0 && (
+          <div className={styles.top__container} style={{ marginTop: "32px" }}>
+            <Flex justify="space-between" align="center">
+              <Text fz={12} fw={600} tt="uppercase">
+                Other Documents
+              </Text>
+
+              {/* {!editingDoc ? (
+              <SecondaryBtn
+                text="Edit"
+                icon={IconPencilMinus}
+                action={() => setEditingDoc(true)}
+              />
+            ) : (
+              <Group>
+                <SecondaryBtn
+                  text="Cancel"
+                  action={() => setEditingDoc(false)}
+                  fz={10}
+                  fw={600}
+                />
+
+                <PrimaryBtn
+                  fz={10}
+                  fw={600}
+                  text="Save Changes"
+                  loading={processing}
+                  action={() => {
+                    handleBusinessUpdate();
+                  }}
+                />
+              </Group>
+            )} */}
+            </Flex>
+
+            <Grid mt={20} className={styles.grid__container}>
+              {Object.entries(business.otherDocuments).map(
+                ([entry, value], index) => {
+                  return (
+                    <GridCol span={4} className={styles.grid}>
+                      <OtherDocumentTextInput
+                        title={`${entry}`}
+                        label={entry}
+                        form={form}
+                        // formKey={``}
+                        editing={false}
+                        business={business}
+                        url={value}
+                      />
+                    </GridCol>
+                  );
+                }
+              )}
+            </Grid>
+          </div>
+        )}
     </div>
   );
 }
@@ -239,6 +300,7 @@ type DocumentTextInputProps = {
   form: UseFormReturnType<FormValues>;
   label: string;
   title: string;
+  url?: string;
 };
 
 const DocumentTextInput = ({
@@ -248,9 +310,10 @@ const DocumentTextInput = ({
   formKey,
   label,
   title,
+  url,
 }: DocumentTextInputProps) => {
   const [processing, setProcessing] = useState(false);
-  const { handleError } = useNotification();
+  const { handleError, handleInfo } = useNotification();
 
   const handleUpload = async (file: File | null, formKey: string) => {
     setProcessing(true);
@@ -288,7 +351,19 @@ const DocumentTextInput = ({
       rightSection={
         !editing ? (
           <UnstyledButton
-            onClick={() => window.open(business[formKey] || "", "_blank")}
+            onClick={() => {
+              if (url) {
+                return window.open(url || "", "_blank");
+              }
+
+              if (!business[formKey]) {
+                return handleInfo("No documents here", "");
+              }
+
+              if (typeof business[formKey] === "string") {
+                window.open(business[formKey] || "", "_blank");
+              }
+            }}
             className={styles.input__right__section}
           >
             <Text fw={600} fz={10} c="#475467">
@@ -313,6 +388,104 @@ const DocumentTextInput = ({
               </UnstyledButton>
             )}
           </FileButton>
+        )
+      }
+      label={label}
+      placeholder={`${title}-${business.name}`}
+    />
+  );
+};
+
+interface OtherDocumentTextInputProps
+  extends Omit<DocumentTextInputProps, "formKey"> {}
+
+const OtherDocumentTextInput = ({
+  editing,
+  business,
+  form,
+  // formKey,
+  label,
+  title,
+  url,
+}: OtherDocumentTextInputProps) => {
+  const [processing, setProcessing] = useState(false);
+  const { handleError, handleInfo } = useNotification();
+
+  const handleUpload = async (file: File | null, formKey: string) => {
+    setProcessing(true);
+    try {
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
+        formData,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      if (formKey) {
+        form.setFieldValue(formKey, data.data.url);
+      }
+      // setUploaded(true);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+  return (
+    <TextInput
+      readOnly={!editing}
+      classNames={{
+        input: styles.input,
+        label: styles.label,
+      }}
+      leftSection={<IconPdf />}
+      leftSectionPointerEvents="none"
+      rightSection={
+        !editing ? (
+          <UnstyledButton
+            onClick={() => {
+              if (!url) return handleInfo("No documents here", "");
+              return window.open(url, "_blank");
+            }}
+            className={styles.input__right__section}
+          >
+            <Text fw={600} fz={10} c="#475467">
+              View
+            </Text>
+          </UnstyledButton>
+        ) : (
+          // <FileButton
+          //   disabled={processing}
+          //   // onChange={(file) => handleUpload(file, formKey)}
+          //   accept="image/png, image/jpeg, application/pdf"
+          // >
+          //   {(props) => (
+          //     <UnstyledButton
+          //       w={"100%"}
+          //       className={styles.input__right__section}
+          //       {...props}
+          //     >
+          //       <Text fw={600} fz={10} c="##475467">
+          //         Re-upload
+          //       </Text>
+          //     </UnstyledButton>
+          //   )}
+          // </FileButton>
+          <UnstyledButton
+            onClick={() => {
+              if (!url) return handleInfo("No documents here", "");
+              return window.open(url, "_blank");
+            }}
+            className={styles.input__right__section}
+          >
+            <Text fw={600} fz={10} c="#475467">
+              View
+            </Text>
+          </UnstyledButton>
         )
       }
       label={label}

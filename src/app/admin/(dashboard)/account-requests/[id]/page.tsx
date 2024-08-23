@@ -150,7 +150,10 @@ function BusinessAccountRequests() {
     );
   };
 
-  const handleRowClick = (id: string) => {
+  const handleRowClick = (id: string, status: string) => {
+    console.log(status);
+    if (status === "APPROVED") return push(`/admin/accounts/${params.id}`);
+
     push(`/admin/account-requests/${params.id}/${id}`);
   };
 
@@ -161,7 +164,7 @@ function BusinessAccountRequests() {
   ).map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id)}
+      onClick={() => handleRowClick(element.id, element.status)}
       style={{ cursor: "pointer" }}
     >
       <TableTd

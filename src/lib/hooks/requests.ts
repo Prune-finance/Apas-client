@@ -548,11 +548,13 @@ export interface Meta {
 
 interface UserRequestData extends BaseData {
   accountType: "USER";
+  country: string;
   documentData: Director;
 }
 
 interface CorporateRequestData extends BaseData {
   accountType: "CORPORATE";
+  country: string;
   documentData: DocumentData;
 }
 

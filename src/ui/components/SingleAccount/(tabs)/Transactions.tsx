@@ -33,9 +33,9 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
   const overviewDetails = [
     {
       title: "Total Transactions",
-      value: totalBal,
-      currency: "EUR",
-      formatted: true,
+      value: transactions?.length,
+      // currency: "EUR",
+      // formatted: true,
     },
     { title: "Money In", value: 0, currency: "EUR", formatted: true },
     { title: "Money Out", value: totalBal, currency: "EUR", formatted: true },
@@ -156,7 +156,7 @@ const PayoutRowComponent = ({
   };
 
   const { setData, open } = Transaction();
-  return data.map((element) => (
+  return data?.reverse().map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {

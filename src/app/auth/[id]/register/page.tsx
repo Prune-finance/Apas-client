@@ -142,7 +142,7 @@ export default async function Register({ params }: Props) {
                 p={0}
                 m={0}
                 c="var(--prune-primary-800)"
-                link="https://prune-payments.gitbook.io/prune-api-services/"
+                link="https://prunepayments.com/privacy-policy"
                 h={"auto"}
               />
               <Text fz={14}>and</Text>
@@ -154,7 +154,7 @@ export default async function Register({ params }: Props) {
                 p={0}
                 m={0}
                 c="var(--prune-primary-800)"
-                link="https://prune-payments.gitbook.io/prune-api-services/"
+                link="https://app.prunepayments.com/docs/termsofService.pdf"
                 h={"auto"}
               />
             </Flex>

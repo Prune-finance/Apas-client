@@ -41,6 +41,7 @@ import Documents from "./Documents";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
 
 interface DirectorEtShareholder
   extends Omit<
@@ -57,7 +58,7 @@ export default function NewBusiness() {
 
   const [opened, { open, close }] = useDisclosure(false);
 
-  const { handleSuccess, handleError } = useNotification();
+  const { handleSuccess, handleError, handleInfo } = useNotification();
 
   const [active, setActive] = useState(0);
 
@@ -113,8 +114,8 @@ export default function NewBusiness() {
         {
           ...rest,
           pricingPlanId: pricingPlan,
-          ...(initialDirEmpty && { directors: [] }),
-          ...(initialShrEmpty && { shareholders: [] }),
+          ...(initialDirEmpty ? { directors: [] } : directors),
+          ...(initialShrEmpty ? { shareholders: [] } : shareholders),
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -142,14 +143,47 @@ export default function NewBusiness() {
     return false;
   }
 
+  // const makeDirectorAShareholder = (director: DirectorEtShareholder) => {
+  //   form.values.shareholders &&
+  //     form.values.shareholders.map((item, index) => {
+  //       const data = Object.values(item).every(isEmpty);
+
+  //       if (data) form.removeListItem("shareholders", index);
+  //     });
+
+  //   form.insertListItem("shareholders", director);
+  // };
+
   const makeDirectorAShareholder = (director: DirectorEtShareholder) => {
+    // Remove empty shareholders
     form.values.shareholders &&
-      form.values.shareholders.map((item, index) => {
+      form.values.shareholders.forEach((item, index) => {
         const data = Object.values(item).every(isEmpty);
 
         if (data) form.removeListItem("shareholders", index);
       });
 
+    // Check if the director already exists as a shareholder
+    const exists =
+      form.values.shareholders &&
+      form.values.shareholders.some((shareholder) => {
+        return Object.keys(director).every((key) => {
+          return (
+            director[key as keyof DirectorEtShareholder] ===
+            shareholder[key as keyof DirectorEtShareholder]
+          );
+        });
+      });
+
+    notifications.clean();
+
+    // If the director exists, return the handleInfo function to display a toast
+    if (exists) {
+      handleInfo("Director already exists as a shareholder", "");
+      return;
+    }
+
+    // If the director doesn't exist, add them as a shareholder
     form.insertListItem("shareholders", director);
   };
 

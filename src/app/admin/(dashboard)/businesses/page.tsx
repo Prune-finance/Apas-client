@@ -200,19 +200,6 @@ function Businesses() {
 
           <MenuDropdown>
             {menuItems.map((items, index) => {
-              // if (items.link)
-              //   return (
-              //     <Link key={index} href={`${items.href}/${element.id}`}>
-              //       <MenuItem
-              //         key={index}
-              //         fz={10}
-              //         c="#667085"
-              //         leftSection={items.icon}
-              //       >
-              //         {items.text}
-              //       </MenuItem>
-              //     </Link>
-              //   );
               return (
                 <MenuItem
                   key={index}
@@ -250,7 +237,7 @@ function Businesses() {
           details={infoDetails}
           loading={loading || loadingTrx}
         >
-          <Select
+          {/* <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
             placeholder="Last Week"
@@ -264,7 +251,7 @@ function Businesses() {
                 border: "none",
               },
             }}
-          />
+          /> */}
         </InfoCards>
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}

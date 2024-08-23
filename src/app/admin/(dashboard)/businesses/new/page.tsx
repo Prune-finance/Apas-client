@@ -114,8 +114,8 @@ export default function NewBusiness() {
         {
           ...rest,
           pricingPlanId: pricingPlan,
-          ...(initialDirEmpty && { directors: [] }),
-          ...(initialShrEmpty && { shareholders: [] }),
+          ...(initialDirEmpty ? { directors: [] } : directors),
+          ...(initialShrEmpty ? { shareholders: [] } : shareholders),
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );

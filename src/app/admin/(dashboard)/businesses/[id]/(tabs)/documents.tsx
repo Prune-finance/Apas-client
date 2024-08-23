@@ -60,7 +60,7 @@ export default function Documents({
     shareholderParticular: business.shareholderParticular,
     amlCompliance: business.amlCompliance,
     operationalLicense: business.operationalLicense,
-    otherDocuments: business.otherDocuments,
+    // otherDocuments: business.otherDocuments,
   };
 
   const form = useForm({
@@ -264,12 +264,12 @@ export default function Documents({
                 ([entry, value], index) => {
                   return (
                     <GridCol span={4} className={styles.grid}>
-                      <DocumentTextInput
+                      <OtherDocumentTextInput
                         title={`${entry}`}
                         label={entry}
                         form={form}
-                        formKey={`otherDocuments`}
-                        editing={editing}
+                        // formKey={``}
+                        editing={false}
                         business={business}
                         url={value}
                       />
@@ -278,13 +278,6 @@ export default function Documents({
                 }
               )}
             </Grid>
-
-            <NewBusinessModal
-              opened={opened}
-              close={close}
-              handleBusinessUpdate={handleBusinessUpdate}
-              business={business}
-            />
           </div>
         )}
     </div>
@@ -298,7 +291,6 @@ interface FormValues {
   shareholderParticular: string | null;
   amlCompliance: string | null;
   operationalLicense: string | null;
-  otherDocuments: Record<string, string>;
 }
 
 type DocumentTextInputProps = {
@@ -396,6 +388,104 @@ const DocumentTextInput = ({
               </UnstyledButton>
             )}
           </FileButton>
+        )
+      }
+      label={label}
+      placeholder={`${title}-${business.name}`}
+    />
+  );
+};
+
+interface OtherDocumentTextInputProps
+  extends Omit<DocumentTextInputProps, "formKey"> {}
+
+const OtherDocumentTextInput = ({
+  editing,
+  business,
+  form,
+  // formKey,
+  label,
+  title,
+  url,
+}: OtherDocumentTextInputProps) => {
+  const [processing, setProcessing] = useState(false);
+  const { handleError, handleInfo } = useNotification();
+
+  const handleUpload = async (file: File | null, formKey: string) => {
+    setProcessing(true);
+    try {
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
+        formData,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      if (formKey) {
+        form.setFieldValue(formKey, data.data.url);
+      }
+      // setUploaded(true);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+  return (
+    <TextInput
+      readOnly={!editing}
+      classNames={{
+        input: styles.input,
+        label: styles.label,
+      }}
+      leftSection={<IconPdf />}
+      leftSectionPointerEvents="none"
+      rightSection={
+        !editing ? (
+          <UnstyledButton
+            onClick={() => {
+              if (!url) return handleInfo("No documents here", "");
+              return window.open(url, "_blank");
+            }}
+            className={styles.input__right__section}
+          >
+            <Text fw={600} fz={10} c="#475467">
+              View
+            </Text>
+          </UnstyledButton>
+        ) : (
+          // <FileButton
+          //   disabled={processing}
+          //   // onChange={(file) => handleUpload(file, formKey)}
+          //   accept="image/png, image/jpeg, application/pdf"
+          // >
+          //   {(props) => (
+          //     <UnstyledButton
+          //       w={"100%"}
+          //       className={styles.input__right__section}
+          //       {...props}
+          //     >
+          //       <Text fw={600} fz={10} c="##475467">
+          //         Re-upload
+          //       </Text>
+          //     </UnstyledButton>
+          //   )}
+          // </FileButton>
+          <UnstyledButton
+            onClick={() => {
+              if (!url) return handleInfo("No documents here", "");
+              return window.open(url, "_blank");
+            }}
+            className={styles.input__right__section}
+          >
+            <Text fw={600} fz={10} c="#475467">
+              View
+            </Text>
+          </UnstyledButton>
         )
       }
       label={label}

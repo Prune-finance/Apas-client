@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 
 import {
   Button,
+  Group,
   Skeleton,
   Tabs,
   TabsList,
@@ -35,6 +36,7 @@ import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
@@ -132,15 +134,19 @@ export default function SingleRequest() {
           Back
         </Button>
         <div className={styles.container__header}>
-          <div className={styles.header__left}>
-            {request ? (
-              <Text fz={18} fw={600}>
-                {request.firstName} {request.lastName}
-              </Text>
-            ) : (
-              <Skeleton h={10} w={100} />
-            )}
-          </div>
+          <Group>
+            <div className={styles.header__left}>
+              {request ? (
+                <Text fz={18} fw={600}>
+                  {request.firstName} {request.lastName}
+                </Text>
+              ) : (
+                <Skeleton h={10} w={100} />
+              )}
+            </div>
+
+            <BadgeComponent status={request?.status ?? ""} />
+          </Group>
 
           {request && request.status === "PENDING" && (
             <div className={styles.header__right}>

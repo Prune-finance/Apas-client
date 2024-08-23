@@ -19,6 +19,8 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import TabsComponent from "@/ui/components/Tabs";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import { notifications } from "@mantine/notifications";
+import useNotification from "@/lib/hooks/notification";
 
 dayjs.extend(advancedFormat);
 
@@ -34,7 +36,7 @@ export const AccountRequestsDrawer = ({
   selectedRequest,
 }: Props) => {
   const { business } = useUserBusiness();
-  console.log(selectedRequest, business);
+
   const accountDetails = [
     {
       label: "Account Name",
@@ -44,7 +46,7 @@ export const AccountRequestsDrawer = ({
     },
     {
       label: "Country",
-      value: selectedRequest?.Company.country ?? "N/A",
+      value: selectedRequest?.country ?? "N/A",
     },
     {
       label: "Account Type",
@@ -65,6 +67,9 @@ export const AccountRequestsDrawer = ({
     Email: business?.contactEmail,
     "Phone Number": business?.contactNumber,
   };
+
+  console.log(selectedRequest?.documentData);
+  console.log(business);
   return (
     <Drawer
       opened={opened}
@@ -129,16 +134,16 @@ export const AccountRequestsDrawer = ({
             <TextInputWithFile
               label="ID"
               placeholder={"Identification card"}
-              url={selectedRequest.documentData.idFileUrl}
+              url={selectedRequest.documentData.idFileURL}
             />
 
             <TextInputWithFile
               label="Proof of Address"
               placeholder={"Utility Bill"}
-              url={selectedRequest.documentData.poaFileUrl}
+              url={selectedRequest.documentData.poaFileURL}
             />
 
-            <Divider />
+            {/* <Divider />
 
             <Text
               fz={16}
@@ -163,7 +168,7 @@ export const AccountRequestsDrawer = ({
                   }
                 </Group>
               ))}
-            </Stack>
+            </Stack> */}
           </Stack>
         )}
 
@@ -180,7 +185,7 @@ export const AccountRequestsDrawer = ({
             </Text>
 
             <TabsComponent tabs={tabs} fz={8} mt={28} tt="capitalize">
-              <TabsPanel value={tabs[0].value} mt={28}>
+              {/* <TabsPanel value={tabs[0].value} mt={28}>
                 <Stack gap={28}>
                   {Object.entries(contactPerson).map(([key, value], index) => (
                     <Group justify="space-between" key={index}>
@@ -195,49 +200,122 @@ export const AccountRequestsDrawer = ({
                     </Group>
                   ))}
                 </Stack>
+              </TabsPanel> */}
+
+              <TabsPanel value={tabs[0].value}>
+                {Object.keys(selectedRequest.documentData.directors).length >
+                0 ? (
+                  <>
+                    {Object.keys(selectedRequest.documentData.directors).map(
+                      (director, index) => (
+                        <Stack gap={28} key={index} mt={28}>
+                          <Text fz={14} c="var(--prune-text-gray-800)">
+                            Director {index + 1}:
+                          </Text>
+                          <TextInputWithFile
+                            label="ID"
+                            placeholder={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].idType
+                            }
+                            url={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].idFile
+                            }
+                            // url={director.identityFileUrl}
+                          />
+
+                          <TextInputWithFile
+                            label="Proof of Address"
+                            placeholder={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].poaType
+                            }
+                            url={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].poaFile
+                            }
+                            // url={director.proofOfAddressFileUrl}
+                            // url={director.proofOfAddressFileUrl}
+                          />
+                        </Stack>
+                      )
+                    )}
+                  </>
+                ) : (
+                  <Text
+                    fz={14}
+                    w="100%"
+                    // ta="center"
+                    mt={28}
+                    c="var(--prune-text-gray-800)"
+                  >
+                    No Directors
+                  </Text>
+                )}
               </TabsPanel>
 
               <TabsPanel value={tabs[1].value}>
-                {business?.directors.map((director, index) => (
-                  <Stack gap={28} key={index} mt={28}>
-                    <Text fz={14} c="var(--prune-text-gray-800)">
-                      Director {index + 1}:
-                    </Text>
-                    <TextInputWithFile
-                      label="ID"
-                      placeholder={director.identityType}
-                      url={director.identityFileUrl}
-                    />
+                {Object.keys(selectedRequest.documentData.shareholders).length >
+                0 ? (
+                  <>
+                    {Object.keys(selectedRequest.documentData.shareholders).map(
+                      (shareholder, index) => (
+                        <Stack gap={28} key={index} mt={28}>
+                          <Text fz={14} c="var(--prune-text-gray-800)">
+                            Shareholder {index + 1}:
+                          </Text>
 
-                    <TextInputWithFile
-                      label="Proof of Address"
-                      placeholder={director.proofOfAddress}
-                      url={director.proofOfAddressFileUrl}
-                    />
-                  </Stack>
-                ))}
-              </TabsPanel>
+                          <TextInputWithFile
+                            label="ID"
+                            placeholder={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].idType
+                            }
+                            url={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].idFile
+                            }
+                            // url={shareholder.identityFileUrl}
+                            // url={shareholder.identityFileUrl}
+                          />
 
-              <TabsPanel value={tabs[2].value}>
-                {business?.shareholders.map((shareholder, index) => (
-                  <Stack gap={28} key={index} mt={28}>
-                    <Text fz={14} c="var(--prune-text-gray-800)">
-                      Shareholder {index + 1}:
-                    </Text>
-
-                    <TextInputWithFile
-                      label="ID"
-                      placeholder={shareholder.identityType}
-                      url={shareholder.identityFileUrl}
-                    />
-
-                    <TextInputWithFile
-                      label="Proof of Address"
-                      placeholder={shareholder.proofOfAddress}
-                      url={shareholder.proofOfAddressFileUrl}
-                    />
-                  </Stack>
-                ))}
+                          <TextInputWithFile
+                            label="Proof of Address"
+                            placeholder={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].poaType
+                            }
+                            url={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].poaFile
+                            }
+                            // url={shareholder.proofOfAddressFileUrl}
+                            // url={shareholder.proofOfAddressFileUrl}
+                          />
+                        </Stack>
+                      )
+                    )}
+                  </>
+                ) : (
+                  <Text
+                    fz={14}
+                    w="100%"
+                    // ta="center"
+                    mt={28}
+                    c="var(--prune-text-gray-800)"
+                  >
+                    No Shareholders
+                  </Text>
+                )}
               </TabsPanel>
             </TabsComponent>
           </Box>
@@ -249,7 +327,7 @@ export const AccountRequestsDrawer = ({
 
 const tabs = [
   //   { value: "Documents" },
-  { value: "Contact Person" },
+  // { value: "Contact Person" },
   { value: "Directors" },
   { value: "Shareholders" },
 ];
@@ -265,6 +343,7 @@ const TextInputWithFile = ({
   url,
   placeholder,
 }: TextInputWithFileProps) => {
+  const { handleInfo } = useNotification();
   return (
     <TextInput
       readOnly
@@ -278,7 +357,11 @@ const TextInputWithFile = ({
       leftSectionPointerEvents="none"
       rightSection={
         <UnstyledButton
-          onClick={() => window.open(url || "", "_blank")}
+          onClick={() => {
+            notifications.clean();
+            if (!url) return handleInfo("No file provided", "");
+            return window.open(url, "_blank");
+          }}
           className={styles.input__right__section}
         >
           <Text fw={600} fz={10} c="#475467">

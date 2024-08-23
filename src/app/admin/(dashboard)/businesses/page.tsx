@@ -129,10 +129,10 @@ function Businesses() {
   ];
 
   const menuItems = [
-    {
-      text: "Deactivate",
-      icon: <IconUserCancel style={{ width: rem(14), height: rem(14) }} />,
-    },
+    // {
+    //   text: "Deactivate",
+    //   icon: <IconUserCancel style={{ width: rem(14), height: rem(14) }} />,
+    // },
     {
       text: "Download Report",
       icon: <IconDownload style={{ width: rem(14), height: rem(14) }} />,

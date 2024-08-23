@@ -66,15 +66,16 @@ export const DebitRequestDrawer = ({
             </Text>
           </Stack>
 
-          <PrimaryBtn
-            text="Cancel Request"
-            color="#B42318"
-            c="#fff"
-            fw={600}
-            action={open}
-          />
+          {accountDetails?.Status?.props?.status === "PENDING" && (
+            <PrimaryBtn
+              text="Cancel Request"
+              color="#B42318"
+              c="#fff"
+              fw={600}
+              action={open}
+            />
+          )}
         </Group>
-
         <Divider mt={30} mb={20} />
 
         <Text fz={16} mb={24} fw={500}>

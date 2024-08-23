@@ -87,7 +87,9 @@ export const AccountCard = ({
           )}
         </Group>
 
-        <CopyButton value={iban}>
+        <CopyButton
+          value={`IBAN: ${iban}, Account Name: ${companyName}, BIC: ${bic}`}
+        >
           {({ copied, copy }) => (
             <SecondaryBtn
               icon={copied ? IconCheck : IconCopy}

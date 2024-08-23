@@ -15,9 +15,9 @@ import {
   MenuTarget,
   Select,
 } from "@mantine/core";
-import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
-import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
-import { TableTr, TableTd, TableTbody } from "@mantine/core";
+import { Button, TextInput, Table } from "@mantine/core";
+import { UnstyledButton, rem, Text } from "@mantine/core";
+import { TableTr, TableTd } from "@mantine/core";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/accounts.module.scss";
@@ -34,9 +34,8 @@ import {
 
 // import ModalComponent from "@/ui/components/Modal";
 import { AccountData, useAccounts } from "@/lib/hooks/accounts";
-import { activeBadgeColor, formatNumber } from "@/lib/utils";
+import { activeBadgeColor } from "@/lib/utils";
 
-import EmptyImage from "@/assets/empty.png";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
@@ -55,6 +54,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import ModalComponent from "./modal";
 import { validateRequest } from "@/lib/schema";
+import { SearchInput } from "@/ui/components/Inputs";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -234,16 +234,7 @@ function Accounts() {
           mt={24}
           // className={styles.container__search__filter}
         >
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <Group gap={12}>
             <Button

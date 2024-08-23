@@ -36,6 +36,7 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { checkToken } from "@/lib/actions/checkToken";
+import { BarChartComponent } from "@/ui/components/Charts";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -249,6 +250,56 @@ export default function Home() {
               </Paper>
             </GridCol>
 
+            {/* Transaction Statistics */}
+            <GridCol span={12} mih={465}>
+              <Paper
+                className={styles.chart__container}
+                h="100%"
+                // style={{ border: "1px solid red" }}
+              >
+                <div className={styles.container__text}>
+                  <Text fz={16} fw={600}>
+                    Transaction Statistics
+                  </Text>
+
+                  <NativeSelect
+                    classNames={{
+                      wrapper: styles.select__wrapper,
+                      input: styles.select__input,
+                    }}
+                    onChange={(event) =>
+                      setChartFrequency(event.currentTarget.value)
+                    }
+                    data={["Monthly"]}
+                  />
+                </div>
+
+                {/* <BarChartComponent
+                  h={250}
+                  // curveType="bump"
+                  data={lineData}
+                  dataKey="date"
+                  series={[
+                    { name: "successful", color: "#22C55E" },
+                    { name: "failed", color: "#D92D20" },
+                    { name: "pending", color: "#F79009" },
+                  ]}
+                /> */}
+                <AreaChart
+                  h={350}
+                  curveType="bump"
+                  data={lineData}
+                  dataKey="date"
+                  series={[
+                    { name: "successful", color: "#22C55E" },
+                    { name: "failed", color: "#D92D20" },
+                    { name: "pending", color: "#F79009" },
+                  ]}
+                />
+              </Paper>
+            </GridCol>
+
+            {/* Debit Request Table */}
             <GridCol span={12} mih={100}>
               <Paper
                 py={21}
@@ -298,39 +349,6 @@ export default function Home() {
                 />
               </Paper>
             </GridCol>
-
-            <GridCol span={12} mih={300}>
-              <Paper className={styles.chart__container}>
-                <div className={styles.container__text}>
-                  <Text fz={16} fw={600}>
-                    Transaction Statistics
-                  </Text>
-
-                  <NativeSelect
-                    classNames={{
-                      wrapper: styles.select__wrapper,
-                      input: styles.select__input,
-                    }}
-                    onChange={(event) =>
-                      setChartFrequency(event.currentTarget.value)
-                    }
-                    data={["Monthly"]}
-                  />
-                </div>
-
-                <AreaChart
-                  h={250}
-                  curveType="bump"
-                  data={lineData}
-                  dataKey="date"
-                  series={[
-                    { name: "successful", color: "#22C55E" },
-                    { name: "failed", color: "#D92D20" },
-                    { name: "pending", color: "#F79009" },
-                  ]}
-                />
-              </Paper>
-            </GridCol>
           </Grid>
         </GridCol>
 
@@ -345,60 +363,6 @@ export default function Home() {
                 bic={"233423421"}
                 loading={loadingDftAcct}
               />
-            </GridCol>
-
-            <GridCol span={12}>
-              <Paper p={16} style={{ border: "1px solid #f5f5f5" }}>
-                <Flex
-                  style={{ borderBottom: "1px solid #f5f5f5" }}
-                  justify="space-between"
-                  align="center"
-                  pb={14}
-                >
-                  <Text fz={16} fw={600}>
-                    API Keys
-                  </Text>
-                  {/* <Text>Test</Text> */}
-                </Flex>
-
-                <Stack mt={10} gap={0}>
-                  <Text fz={12} c="#98A2B3">
-                    Test Key
-                  </Text>
-
-                  <Flex
-                    className={styles.key__container}
-                    justify="space-between"
-                    align="center"
-                    // px={10}
-                  >
-                    <Text className={styles.key__container__text}>
-                      {`${test ? test?.key.slice(0, 20) : ""}****************`}
-                    </Text>
-
-                    <Copy value={test?.key || ""} />
-                  </Flex>
-                </Stack>
-
-                <Stack mt={30} gap={0}>
-                  <Text fz={12} c="#98A2B3">
-                    Live Key
-                  </Text>
-
-                  <Flex
-                    className={styles.key__container}
-                    justify="space-between"
-                    align="center"
-                    // px={10}
-                  >
-                    <Text className={styles.key__container__text}>
-                      {`${live ? live?.key.slice(0, 20) : ""}****************`}
-                    </Text>
-
-                    <Copy value={live?.key || ""} />
-                  </Flex>
-                </Stack>
-              </Paper>
             </GridCol>
 
             <GridCol span={"auto"} mih={354} h={354}>
@@ -714,3 +678,58 @@ const debitTableHeader = ["Account Name", "Amount", "Date Created", "Status"];
 //      </GridCol>
 //    </Grid>
 //  </div>;
+
+// API Keys component
+//  <GridCol span={12}>
+//    <Paper p={16} style={{ border: "1px solid #f5f5f5" }}>
+//      <Flex
+//        style={{ borderBottom: "1px solid #f5f5f5" }}
+//        justify="space-between"
+//        align="center"
+//        pb={14}
+//      >
+//        <Text fz={16} fw={600}>
+//          API Keys
+//        </Text>
+//        {/* <Text>Test</Text> */}
+//      </Flex>
+
+//      <Stack mt={10} gap={0}>
+//        <Text fz={12} c="#98A2B3">
+//          Test Key
+//        </Text>
+
+//        <Flex
+//          className={styles.key__container}
+//          justify="space-between"
+//          align="center"
+//          // px={10}
+//        >
+//          <Text className={styles.key__container__text}>
+//            {`${test ? test?.key.slice(0, 20) : ""}****************`}
+//          </Text>
+
+//          <Copy value={test?.key || ""} />
+//        </Flex>
+//      </Stack>
+
+//      <Stack mt={30} gap={0}>
+//        <Text fz={12} c="#98A2B3">
+//          Live Key
+//        </Text>
+
+//        <Flex
+//          className={styles.key__container}
+//          justify="space-between"
+//          align="center"
+//          // px={10}
+//        >
+//          <Text className={styles.key__container__text}>
+//            {`${live ? live?.key.slice(0, 20) : ""}****************`}
+//          </Text>
+
+//          <Copy value={live?.key || ""} />
+//        </Flex>
+//      </Stack>
+//    </Paper>
+//  </GridCol>;

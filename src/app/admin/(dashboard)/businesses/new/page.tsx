@@ -74,6 +74,9 @@ export default function NewBusiness() {
     },
   });
 
+  const prevStep = () =>
+    setActive((current) => (current > 0 ? current - 1 : current));
+
   const nextStep = () => {
     const { hasErrors, errors } = form.validate();
     if (hasErrors) return;
@@ -114,8 +117,8 @@ export default function NewBusiness() {
         {
           ...rest,
           pricingPlanId: pricingPlan,
-          ...(initialDirEmpty ? { directors: [] } : directors),
-          ...(initialShrEmpty ? { shareholders: [] } : shareholders),
+          ...(initialDirEmpty ? { directors: [] } : { directors }),
+          ...(initialShrEmpty ? { shareholders: [] } : { shareholders }),
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -383,14 +386,18 @@ export default function NewBusiness() {
 
         <Divider my={20} />
 
-        <Group justify="flex-end">
+        <Group justify="space-between">
           <SecondaryBtn text="Clear Form" action={open} w={126} />
-          <PrimaryBtn
-            text={active < 3 ? "Next" : "Submit"}
-            w={126}
-            action={active < 3 ? nextStep : handleCreate}
-            loading={processing}
-          />
+
+          <Group justify="flex-end">
+            <SecondaryBtn text="Previous" action={prevStep} w={126} />
+            <PrimaryBtn
+              text={active < 3 ? "Next" : "Submit"}
+              w={126}
+              action={active < 3 ? nextStep : handleCreate}
+              loading={processing}
+            />
+          </Group>
         </Group>
       </Paper>
 

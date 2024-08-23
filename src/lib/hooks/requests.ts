@@ -548,11 +548,13 @@ export interface Meta {
 
 interface UserRequestData extends BaseData {
   accountType: "USER";
+  country: string;
   documentData: Director;
 }
 
 interface CorporateRequestData extends BaseData {
   accountType: "CORPORATE";
+  country: string;
   documentData: DocumentData;
 }
 
@@ -564,17 +566,23 @@ export interface DocumentData {
 }
 
 export interface Directors {
-  [key: `director_${number}`]: Director;
+  [key: `director_${number}`]: CorporateDirector;
 }
 
 export interface Shareholder {
-  [key: `shareholder_${number}`]: Director;
+  [key: `shareholder_${number}`]: CorporateDirector;
 }
 
 export interface Director {
-  idFileUrl: string;
+  idFileURL: string;
   idType: string;
-  poaFileUrl: string;
+  poaFileURL: string;
+  poaType: string;
+}
+export interface CorporateDirector {
+  idFile: string;
+  idType: string;
+  poaFile: string;
   poaType: string;
 }
 

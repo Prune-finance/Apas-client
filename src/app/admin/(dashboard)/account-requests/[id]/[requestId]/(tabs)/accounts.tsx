@@ -18,8 +18,11 @@ import {
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { RequestData } from "@/lib/hooks/requests";
+import useNotification from "@/lib/hooks/notification";
 
 export default function Account({ request }: { request: RequestData | null }) {
+  const { handleInfo } = useNotification();
+
   return (
     <div className={styles.business__tab}>
       <div className={styles.top__container}>
@@ -68,15 +71,17 @@ export default function Account({ request }: { request: RequestData | null }) {
                 leftSectionPointerEvents="none"
                 rightSection={
                   <UnstyledButton
-                    onClick={() =>
+                    onClick={() => {
+                      if (!request.documentData.idFileURL)
+                        return handleInfo("No document was provided", "");
                       window.open(
-                        request.documentData.idFileUrl || "",
+                        request.documentData.idFileURL || "",
                         "_blank"
-                      )
-                    }
+                      );
+                    }}
                     className={styles.input__right__section}
                   >
-                    <Text fw={600} fz={10} c="##475467">
+                    <Text fw={600} fz={10} c="#475467">
                       View
                     </Text>
                   </UnstyledButton>
@@ -99,15 +104,17 @@ export default function Account({ request }: { request: RequestData | null }) {
                 leftSectionPointerEvents="none"
                 rightSection={
                   <UnstyledButton
-                    onClick={() =>
+                    onClick={() => {
+                      if (!request.documentData.poaFileURL)
+                        return handleInfo("No document was provided", "");
                       window.open(
-                        request.documentData.poaFileUrl || "",
+                        request.documentData.poaFileURL || "",
                         "_blank"
-                      )
-                    }
+                      );
+                    }}
                     className={styles.input__right__section}
                   >
-                    <Text fw={600} fz={10} c="##475467">
+                    <Text fw={600} fz={10} c="#475467">
                       View
                     </Text>
                   </UnstyledButton>

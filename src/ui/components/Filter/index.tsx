@@ -42,7 +42,7 @@ export default function Filter<T>({
 
   return (
     <Collapse in={opened}>
-      <Flex mt={24} gap={12}>
+      <Flex mt={24} gap={12} align="center" h={40}>
         {/* <Select
           placeholder="Sort"
           data={["Asc", "Desc"]}
@@ -86,13 +86,17 @@ export default function Filter<T>({
           />
         )}
 
-        <Flex ml="auto" gap={12}>
+        <Flex
+          // ml="auto"
+          gap={12}
+        >
           <Button
             variant="light"
             color="var(--prune-text-gray-700)"
             w={80}
             h={36}
             fz={12}
+            size="xs"
             onClick={handleApply}
           >
             Apply

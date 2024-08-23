@@ -223,14 +223,15 @@ export default function Documents({
         />
       </div>
 
-      {Object.keys(business.otherDocuments).length > 0 && (
-        <div className={styles.top__container} style={{ marginTop: "32px" }}>
-          <Flex justify="space-between" align="center">
-            <Text fz={12} fw={600} tt="uppercase">
-              Other Documents
-            </Text>
+      {business.otherDocuments &&
+        Object.keys(business.otherDocuments).length > 0 && (
+          <div className={styles.top__container} style={{ marginTop: "32px" }}>
+            <Flex justify="space-between" align="center">
+              <Text fz={12} fw={600} tt="uppercase">
+                Other Documents
+              </Text>
 
-            {/* {!editingDoc ? (
+              {/* {!editingDoc ? (
               <SecondaryBtn
                 text="Edit"
                 icon={IconPencilMinus}
@@ -256,36 +257,36 @@ export default function Documents({
                 />
               </Group>
             )} */}
-          </Flex>
+            </Flex>
 
-          <Grid mt={20} className={styles.grid__container}>
-            {Object.entries(business.otherDocuments).map(
-              ([entry, value], index) => {
-                return (
-                  <GridCol span={4} className={styles.grid}>
-                    <DocumentTextInput
-                      title={`${entry}`}
-                      label={entry}
-                      form={form}
-                      formKey={`otherDocuments`}
-                      editing={editing}
-                      business={business}
-                      url={value}
-                    />
-                  </GridCol>
-                );
-              }
-            )}
-          </Grid>
+            <Grid mt={20} className={styles.grid__container}>
+              {Object.entries(business.otherDocuments).map(
+                ([entry, value], index) => {
+                  return (
+                    <GridCol span={4} className={styles.grid}>
+                      <DocumentTextInput
+                        title={`${entry}`}
+                        label={entry}
+                        form={form}
+                        formKey={`otherDocuments`}
+                        editing={editing}
+                        business={business}
+                        url={value}
+                      />
+                    </GridCol>
+                  );
+                }
+              )}
+            </Grid>
 
-          <NewBusinessModal
-            opened={opened}
-            close={close}
-            handleBusinessUpdate={handleBusinessUpdate}
-            business={business}
-          />
-        </div>
-      )}
+            <NewBusinessModal
+              opened={opened}
+              close={close}
+              handleBusinessUpdate={handleBusinessUpdate}
+              business={business}
+            />
+          </div>
+        )}
     </div>
   );
 }

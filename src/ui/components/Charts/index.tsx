@@ -1,5 +1,11 @@
 import { formatNumber } from "@/lib/utils";
-import { AreaChart, AreaChartProps, DonutChart } from "@mantine/charts";
+import {
+  AreaChart,
+  AreaChartProps,
+  BarChart,
+  BarChartProps,
+  DonutChart,
+} from "@mantine/charts";
 import { ReactNode } from "react";
 
 type Series = { name: string; color: string };
@@ -63,6 +69,37 @@ export function DonutChartComponent({
           fontWeight: 600,
         },
       }}
+    />
+  );
+}
+
+interface IBarChartProps extends BarChartProps {
+  data: any;
+  h?: number;
+  series: Series[];
+  withDot?: boolean;
+  withLegend?: boolean;
+}
+
+export function BarChartComponent({
+  data,
+  series,
+  withDot,
+  withLegend,
+  ...props
+}: IBarChartProps) {
+  return (
+    <BarChart
+      {...props}
+      h={props.h ? props.h : 300}
+      data={data}
+      // dataKey="name"
+      dataKey="month"
+      series={series}
+      // curveType="natural"
+      gridAxis="x"
+      withLegend={withLegend}
+      valueFormatter={(value) => formatNumber(value, true, "EUR")}
     />
   );
 }

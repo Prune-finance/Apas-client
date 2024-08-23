@@ -19,6 +19,8 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import TabsComponent from "@/ui/components/Tabs";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import { notifications } from "@mantine/notifications";
+import useNotification from "@/lib/hooks/notification";
 
 dayjs.extend(advancedFormat);
 
@@ -67,6 +69,7 @@ export const AccountRequestsDrawer = ({
   };
 
   console.log(selectedRequest?.documentData);
+  console.log(business);
   return (
     <Drawer
       opened={opened}
@@ -200,46 +203,119 @@ export const AccountRequestsDrawer = ({
               </TabsPanel> */}
 
               <TabsPanel value={tabs[0].value}>
-                {business?.directors.map((director, index) => (
-                  <Stack gap={28} key={index} mt={28}>
-                    <Text fz={14} c="var(--prune-text-gray-800)">
-                      Director {index + 1}:
-                    </Text>
-                    <TextInputWithFile
-                      label="ID"
-                      placeholder={director.identityType}
-                      url={director.identityFileUrl}
-                    />
+                {Object.keys(selectedRequest.documentData.directors).length >
+                0 ? (
+                  <>
+                    {Object.keys(selectedRequest.documentData.directors).map(
+                      (director, index) => (
+                        <Stack gap={28} key={index} mt={28}>
+                          <Text fz={14} c="var(--prune-text-gray-800)">
+                            Director {index + 1}:
+                          </Text>
+                          <TextInputWithFile
+                            label="ID"
+                            placeholder={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].idType
+                            }
+                            url={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].idFile
+                            }
+                            // url={director.identityFileUrl}
+                          />
 
-                    <TextInputWithFile
-                      label="Proof of Address"
-                      placeholder={director.proofOfAddress}
-                      url={director.proofOfAddressFileUrl}
-                    />
-                  </Stack>
-                ))}
+                          <TextInputWithFile
+                            label="Proof of Address"
+                            placeholder={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].poaType
+                            }
+                            url={
+                              selectedRequest.documentData.directors[
+                                `director_${index + 1}`
+                              ].poaFile
+                            }
+                            // url={director.proofOfAddressFileUrl}
+                            // url={director.proofOfAddressFileUrl}
+                          />
+                        </Stack>
+                      )
+                    )}
+                  </>
+                ) : (
+                  <Text
+                    fz={14}
+                    w="100%"
+                    // ta="center"
+                    mt={28}
+                    c="var(--prune-text-gray-800)"
+                  >
+                    No Directors
+                  </Text>
+                )}
               </TabsPanel>
 
               <TabsPanel value={tabs[1].value}>
-                {business?.shareholders.map((shareholder, index) => (
-                  <Stack gap={28} key={index} mt={28}>
-                    <Text fz={14} c="var(--prune-text-gray-800)">
-                      Shareholder {index + 1}:
-                    </Text>
+                {Object.keys(selectedRequest.documentData.shareholders).length >
+                0 ? (
+                  <>
+                    {Object.keys(selectedRequest.documentData.shareholders).map(
+                      (shareholder, index) => (
+                        <Stack gap={28} key={index} mt={28}>
+                          <Text fz={14} c="var(--prune-text-gray-800)">
+                            Shareholder {index + 1}:
+                          </Text>
 
-                    <TextInputWithFile
-                      label="ID"
-                      placeholder={shareholder.identityType}
-                      url={shareholder.identityFileUrl}
-                    />
+                          <TextInputWithFile
+                            label="ID"
+                            placeholder={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].idType
+                            }
+                            url={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].idFile
+                            }
+                            // url={shareholder.identityFileUrl}
+                            // url={shareholder.identityFileUrl}
+                          />
 
-                    <TextInputWithFile
-                      label="Proof of Address"
-                      placeholder={shareholder.proofOfAddress}
-                      url={shareholder.proofOfAddressFileUrl}
-                    />
-                  </Stack>
-                ))}
+                          <TextInputWithFile
+                            label="Proof of Address"
+                            placeholder={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].poaType
+                            }
+                            url={
+                              selectedRequest.documentData.shareholders[
+                                `shareholder_${index + 1}`
+                              ].poaFile
+                            }
+                            // url={shareholder.proofOfAddressFileUrl}
+                            // url={shareholder.proofOfAddressFileUrl}
+                          />
+                        </Stack>
+                      )
+                    )}
+                  </>
+                ) : (
+                  <Text
+                    fz={14}
+                    w="100%"
+                    // ta="center"
+                    mt={28}
+                    c="var(--prune-text-gray-800)"
+                  >
+                    No Shareholders
+                  </Text>
+                )}
               </TabsPanel>
             </TabsComponent>
           </Box>
@@ -267,6 +343,7 @@ const TextInputWithFile = ({
   url,
   placeholder,
 }: TextInputWithFileProps) => {
+  const { handleInfo } = useNotification();
   return (
     <TextInput
       readOnly
@@ -280,7 +357,11 @@ const TextInputWithFile = ({
       leftSectionPointerEvents="none"
       rightSection={
         <UnstyledButton
-          onClick={() => window.open(url || "", "_blank")}
+          onClick={() => {
+            notifications.clean();
+            if (!url) return handleInfo("No file provided", "");
+            return window.open(url, "_blank");
+          }}
           className={styles.input__right__section}
         >
           <Text fw={600} fz={10} c="#475467">

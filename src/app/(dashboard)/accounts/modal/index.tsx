@@ -62,12 +62,12 @@ export default function ModalComponent({
           </Text>
 
           <Textarea
-            mt={20}
+            my={20}
             placeholder="Give reason here..."
             {...form.getInputProps("reason")}
           />
 
-          <Select
+          {/* <Select
             mt={20}
             mb={20}
             placeholder="Select Supporting Document (Optional)"
@@ -75,7 +75,7 @@ export default function ModalComponent({
             data={["Utility Bill"]}
             classNames={{ input: styles.input }}
             {...form.getInputProps("supportingDocumentName")}
-          />
+          /> */}
 
           <DropzoneComponent form={form} formKey="supportingDocumentUrl" />
         </Flex>

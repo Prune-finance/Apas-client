@@ -70,7 +70,7 @@ export const IssuedAccountsTab = () => {
       <TableTr
         key={element.id}
         onClick={() => {
-          window.location.href = `/transactions/${element.id}`;
+          window.location.href = `/transactions/${element.senderIban}`;
           // setSelectedRequest(element);
           // openDrawer();
         }}

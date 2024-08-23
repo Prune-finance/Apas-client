@@ -13,9 +13,6 @@ export default function Pricing() {
   const [editingBottom, setEditingBottom] = useState(false);
 
   const { business, loading, meta } = useUserBusiness();
-  const { pricingPlan } = useSinglePricingPlan(business?.pricingPlanId ?? "");
-
-  const { pricingPlan: pricingPlans } = usePricingPlan();
 
   return (
     <div className={styles.business__tab}>
@@ -36,7 +33,8 @@ export default function Pricing() {
               }}
               label="Current Plan"
               placeholder={
-                pricingPlan?.name ?? "No pricing plan for this business"
+                business?.pricingPlan?.name ??
+                "No pricing plan set up for this business"
               }
             />
           </GridCol>
@@ -50,7 +48,8 @@ export default function Pricing() {
               }}
               label="Cycle"
               placeholder={
-                pricingPlan?.cycle ?? "No pricing plan for this business"
+                business?.pricingPlan?.cycle ??
+                "No pricing plan set up for this business"
               }
             />
           </GridCol>
@@ -64,9 +63,9 @@ export default function Pricing() {
               }}
               label="Amount"
               placeholder={
-                pricingPlan?.cost
-                  ? formatNumber(pricingPlan.cost, true, "EUR")
-                  : "No pricing plan for this business"
+                business?.pricingPlan?.cost
+                  ? formatNumber(business?.pricingPlan.cost, true, "EUR")
+                  : "No pricing plan set up for this business"
               }
             />
           </GridCol>

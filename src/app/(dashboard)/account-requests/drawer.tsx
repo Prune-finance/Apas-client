@@ -44,7 +44,7 @@ export const AccountRequestsDrawer = ({
     },
     {
       label: "Country",
-      value: selectedRequest?.Company.country ?? "N/A",
+      value: selectedRequest?.country ?? "N/A",
     },
     {
       label: "Account Type",
@@ -65,6 +65,8 @@ export const AccountRequestsDrawer = ({
     Email: business?.contactEmail,
     "Phone Number": business?.contactNumber,
   };
+
+  console.log(selectedRequest?.documentData);
   return (
     <Drawer
       opened={opened}
@@ -129,16 +131,16 @@ export const AccountRequestsDrawer = ({
             <TextInputWithFile
               label="ID"
               placeholder={"Identification card"}
-              url={selectedRequest.documentData.idFileUrl}
+              url={selectedRequest.documentData.idFileURL}
             />
 
             <TextInputWithFile
               label="Proof of Address"
               placeholder={"Utility Bill"}
-              url={selectedRequest.documentData.poaFileUrl}
+              url={selectedRequest.documentData.poaFileURL}
             />
 
-            <Divider />
+            {/* <Divider />
 
             <Text
               fz={16}
@@ -163,7 +165,7 @@ export const AccountRequestsDrawer = ({
                   }
                 </Group>
               ))}
-            </Stack>
+            </Stack> */}
           </Stack>
         )}
 

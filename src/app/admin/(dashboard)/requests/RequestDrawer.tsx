@@ -63,9 +63,12 @@ export default function RequestDrawer({
 
   const accountDetails = {
     "Business Name": selectedRequest?.Company.name,
-    "Account Name": selectedRequest?.accountId.split("-").pop(),
-    IBAN: selectedRequest?.accountId.split("-").pop(),
-    "User Type": selectedRequest?.accountId.split("-").pop(),
+    "Account Name": selectedRequest?.Account.accountName,
+    IBAN: selectedRequest?.Account.accountNumber,
+    "User Type":
+      selectedRequest?.Account.type === "CORPORATE"
+        ? "Corporate"
+        : "Individual",
   };
 
   const otherDetails = {

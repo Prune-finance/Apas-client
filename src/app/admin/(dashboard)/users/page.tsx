@@ -3,16 +3,11 @@ import Cookies from "js-cookie";
 
 import {
   Badge,
-  Button,
-  Checkbox,
-  Flex,
   Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Pagination,
-  Select,
   TableTd,
   TableTr,
   Text,
@@ -28,7 +23,7 @@ import {
   IconUserEdit,
   IconUserX,
 } from "@tabler/icons-react";
-import Image from "next/image";
+
 import dayjs from "dayjs";
 import { useRouter, useSearchParams } from "next/navigation";
 

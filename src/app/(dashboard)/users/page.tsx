@@ -2,54 +2,33 @@
 import Cookies from "js-cookie";
 
 import {
-  Badge,
-  Button,
-  Checkbox,
-  Flex,
   Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Pagination,
-  Select,
-  Table,
-  TableScrollContainer,
-  TableTbody,
   TableTd,
-  TableTh,
-  TableThead,
   TableTr,
   Text,
-  TextInput,
   UnstyledButton,
   rem,
 } from "@mantine/core";
 import {
-  IconDots,
   IconDotsVertical,
-  IconDownload,
-  IconEye,
   IconListTree,
   IconPlus,
-  IconPointFilled,
   IconSearch,
-  IconTrash,
   IconUserCheck,
   IconUserEdit,
   IconUserX,
 } from "@tabler/icons-react";
-import Link from "next/link";
-import Image from "next/image";
+
 import dayjs from "dayjs";
 import { useRouter, useSearchParams } from "next/navigation";
 
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 
-import EmptyImage from "@/assets/empty.png";
-import { AllBusinessSkeleton } from "@/lib/static";
-import { AdminData, useAdmins, useUsers } from "@/lib/hooks/admins";
+import { AdminData, useUsers } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import { useForm, zodResolver } from "@mantine/form";
@@ -68,20 +47,16 @@ import { parseError } from "@/lib/actions/auth";
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
-import { activeBadgeColor } from "@/lib/utils";
 import ModalComponent from "./modal";
 import UserDrawer from "./drawer";
-import User from "@/lib/store/user";
 import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
-import { title } from "process";
 import { BadgeComponent } from "@/ui/components/Badge";
 
 function Users() {
   const searchParams = useSearchParams();
-  const { push } = useRouter();
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -106,15 +81,11 @@ function Users() {
     useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
 
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-
   const [isEdit, setIsEdit] = useState(false);
   const [user, setUser] = useState<AdminData | null>(null);
   const [processing, setProcessing] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
-
-  // const {} = Tr
 
   const form = useForm({
     initialValues: newAdmin,
@@ -143,10 +114,11 @@ function Users() {
 
       revalidate();
       close();
+      form.reset();
       handleSuccess("Successful! User Invite", "User invite sent successfully");
       router.push("/users");
     } catch (error) {
-      console.log(error);
+      handleError("Failed! User Invite", parseError(error));
     } finally {
       setProcessing(false);
     }

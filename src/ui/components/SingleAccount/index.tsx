@@ -320,7 +320,13 @@ export function SingleAccount({
             loading={loading}
             h={190}
           >
-            <CopyButton value={account?.accountNumber || ""} timeout={2000}>
+            <CopyButton
+              value={
+                `Account Name: ${account?.accountName}, Account No: ${account?.accountNumber}, Account Type:${account?.type}` ||
+                ""
+              }
+              timeout={2000}
+            >
               {({ copied, copy }) => (
                 <Tooltip
                   label={copied ? "Copied" : "Copy"}

@@ -38,8 +38,6 @@ export const DebitRequestDrawer = ({
     Reference: selectedRequest?.reference,
   };
 
-  console.log(accountDetails?.Status?.props?.status);
-
   return (
     <Drawer
       opened={opened}

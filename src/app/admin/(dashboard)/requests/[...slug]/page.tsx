@@ -195,12 +195,12 @@ function CompanyRequestType() {
         <BadgeComponent status={element.status} />
       </TableTd>
 
-      <TableTd
+      {/* <TableTd
         className={`${styles.table__td}`}
         onClick={(e) => e.stopPropagation()}
       >
         <MenuComponent request={element} />
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -458,7 +458,7 @@ const debitTableHeaders = [
   "Amount",
   "Date Created",
   "Status",
-  "Action",
+  // "Action",
 ];
 
 export default function BusinessDebitSuspense() {

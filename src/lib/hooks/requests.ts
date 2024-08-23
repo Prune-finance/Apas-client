@@ -572,9 +572,9 @@ export interface Shareholder {
 }
 
 export interface Director {
-  idFileUrl: string;
+  idFileURL: string;
   idType: string;
-  poaFileUrl: string;
+  poaFileURL: string;
   poaType: string;
 }
 export interface CorporateDirector {

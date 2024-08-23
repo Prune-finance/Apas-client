@@ -34,7 +34,7 @@ export const AccountRequestsDrawer = ({
   selectedRequest,
 }: Props) => {
   const { business } = useUserBusiness();
-  console.log(selectedRequest, business);
+
   const accountDetails = [
     {
       label: "Account Name",
@@ -129,13 +129,13 @@ export const AccountRequestsDrawer = ({
             <TextInputWithFile
               label="ID"
               placeholder={"Identification card"}
-              url={selectedRequest.documentData.idFileUrl}
+              url={selectedRequest.documentData.idFileURL}
             />
 
             <TextInputWithFile
               label="Proof of Address"
               placeholder={"Utility Bill"}
-              url={selectedRequest.documentData.poaFileUrl}
+              url={selectedRequest.documentData.poaFileURL}
             />
 
             <Divider />
@@ -180,7 +180,7 @@ export const AccountRequestsDrawer = ({
             </Text>
 
             <TabsComponent tabs={tabs} fz={8} mt={28} tt="capitalize">
-              <TabsPanel value={tabs[0].value} mt={28}>
+              {/* <TabsPanel value={tabs[0].value} mt={28}>
                 <Stack gap={28}>
                   {Object.entries(contactPerson).map(([key, value], index) => (
                     <Group justify="space-between" key={index}>
@@ -195,9 +195,9 @@ export const AccountRequestsDrawer = ({
                     </Group>
                   ))}
                 </Stack>
-              </TabsPanel>
+              </TabsPanel> */}
 
-              <TabsPanel value={tabs[1].value}>
+              <TabsPanel value={tabs[0].value}>
                 {business?.directors.map((director, index) => (
                   <Stack gap={28} key={index} mt={28}>
                     <Text fz={14} c="var(--prune-text-gray-800)">
@@ -218,7 +218,7 @@ export const AccountRequestsDrawer = ({
                 ))}
               </TabsPanel>
 
-              <TabsPanel value={tabs[2].value}>
+              <TabsPanel value={tabs[1].value}>
                 {business?.shareholders.map((shareholder, index) => (
                   <Stack gap={28} key={index} mt={28}>
                     <Text fz={14} c="var(--prune-text-gray-800)">
@@ -249,7 +249,7 @@ export const AccountRequestsDrawer = ({
 
 const tabs = [
   //   { value: "Documents" },
-  { value: "Contact Person" },
+  // { value: "Contact Person" },
   { value: "Directors" },
   { value: "Shareholders" },
 ];

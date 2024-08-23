@@ -188,12 +188,12 @@ function BusinessAccountRequests() {
         </Badge>
       </TableTd>
 
-      <TableTd
+      {/* <TableTd
         className={`${styles.table__td}`}
         onClick={(e) => e.stopPropagation()}
       >
         <MenuComponent id={element.id} />
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -297,7 +297,7 @@ const tableHeaders = [
   // "Country",
   "Date Created",
   "Status",
-  "Action",
+  // "Action",
 ];
 
 export default function BusinessAccountRequestsSuspense() {

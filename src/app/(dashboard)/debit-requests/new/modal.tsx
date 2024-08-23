@@ -222,8 +222,8 @@ export default function DebitRequestModal({
                 minRows={3}
                 classNames={{ input: styles.textarea, label: styles.label }}
                 withAsterisk
-                label="Reason"
-                placeholder="Enter reason"
+                label="Narration"
+                placeholder="Enter narration"
                 {...form.getInputProps("reason")}
               />
             </Flex>

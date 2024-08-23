@@ -18,10 +18,11 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 
 import styles from "../styles.module.scss";
-import { useClipboard } from "@mantine/hooks";
+import { useClipboard, useDisclosure } from "@mantine/hooks";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useUserBusiness } from "@/lib/hooks/businesses";
+import ModalComponent from "@/ui/components/Modal";
 
 export default function Keys() {
   const [keys, setKeys] = useState<Key[]>([]);
@@ -31,6 +32,7 @@ export default function Keys() {
   const hookClipboard = useClipboard({ timeout: 500 });
   const { handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const { business, loading, meta } = useUserBusiness();
 
@@ -71,6 +73,7 @@ export default function Keys() {
         "Successful! Secret Key Reset",
         "Secret key reset successfully"
       );
+      close();
     } catch (error) {
       handleError("Secret Key Reset Failed", parseError(error));
     } finally {
@@ -108,10 +111,11 @@ export default function Keys() {
             <Flex gap={10}>
               <Button
                 leftSection={<IconAB2 color="#475467" size={14} />}
-                onClick={resetSecrets}
+                onClick={open}
+                // onClick={resetSecrets}
                 className={styles.edit}
-                loading={processing}
-                loaderProps={{ color: "var(--prune-primary-700)" }}
+                // loading={processing}
+                // loaderProps={{ color: "var(--prune-primary-700)" }}
               >
                 Reset
               </Button>
@@ -275,6 +279,17 @@ export default function Keys() {
           </Text>
         </Flex>
       </Flex>
+
+      <ModalComponent
+        opened={opened}
+        close={close}
+        title="Reset Keys?"
+        text="Are you sure you want to reset your keys?"
+        action={resetSecrets}
+        icon={<IconAB2 color="#475467" size={14} />}
+        color="var(--prune-text-gray-300)"
+        processing={processing}
+      />
     </div>
   );
 }

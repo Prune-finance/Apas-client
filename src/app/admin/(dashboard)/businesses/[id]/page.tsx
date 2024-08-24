@@ -154,14 +154,12 @@ export default function SingleBusiness() {
       case true:
         return {
           trustTitle: "Untrust This Business?",
-          trustText:
-            "Are you sure you want to mark this business as trusted? This will indicate that the business is reliable and can be trusted by others.",
+          trustText: "Are you sure you want to mark this business as trusted?",
         };
       default:
         return {
           trustTitle: "Trust This Business?",
-          trustText:
-            "Are you sure you want to mark this business as trusted? This will indicate that the business is reliable and can be trusted by others.",
+          trustText: "Are you sure you want to mark this business as trusted? ",
         };
     }
   }, [business?.companyStatus]);

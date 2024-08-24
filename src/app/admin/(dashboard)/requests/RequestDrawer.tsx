@@ -63,57 +63,15 @@ export default function RequestDrawer({
 
   const accountDetails = {
     "Business Name": selectedRequest?.Company.name,
-    "Account Name": selectedRequest?.accountId.split("-").pop(),
-    IBAN: selectedRequest?.accountId.split("-").pop(),
-    "User Type": selectedRequest?.accountId.split("-").pop(),
+    "Account Name": selectedRequest?.Account.accountName,
+    IBAN: selectedRequest?.Account.accountNumber,
+    "User Type": selectedRequest?.Account.type.toLowerCase(),
   };
 
   const otherDetails = {
     "Date Created": dayjs(selectedRequest?.createdAt).format("Do MMMM, YYYY"),
     Status: <BadgeComponent status={selectedRequest?.status || ""} />,
   };
-
-  // const handleRejectRequest = async () => {
-  //   if (!selectedRequest) return;
-  //   setProcessing(true);
-  //   try {
-  //     await axios.post(
-  //       `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/reject`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-  //     );
-
-  //     revalidate && revalidate();
-  //     close();
-  //     close();
-  //     handleSuccess("Action Completed", "Request Denied");
-  //   } catch (error) {
-  //     handleError("An error occurred", parseError(error));
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
-
-  // const handleAcceptRequest = async () => {
-  //   if (!selectedRequest) return;
-  //   setProcessing(true);
-  //   try {
-  //     await axios.post(
-  //       `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/approve`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-  //     );
-
-  //     revalidate && revalidate();
-  //     closeApprove();
-  //     close();
-  //     handleSuccess("Action Completed", "Request Approved");
-  //   } catch (error) {
-  //     handleError("An error occurred", parseError(error));
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
 
   return (
     <Drawer
@@ -149,7 +107,12 @@ export default function RequestDrawer({
                 {`${title}:`}
               </Text>
 
-              <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
+              <Text
+                fz={14}
+                fw={600}
+                c="var(--prune-text-gray-600)"
+                tt="capitalize"
+              >
                 {value}
               </Text>
             </Flex>

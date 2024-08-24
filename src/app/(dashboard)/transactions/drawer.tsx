@@ -103,11 +103,11 @@ export const TransactionDrawer = ({
           c="var(--prune-text-gray-800)"
           fw={600}
         >
-          Beneficiary Details
+          Sender Details
         </Text>
 
         <Stack gap={24}>
-          {Object.entries(beneficiaryDetails).map(([key, value]) => (
+          {Object.entries(senderDetails).map(([key, value]) => (
             <Group justify="space-between" key={key}>
               <Text fz={12} c="var(--prune-text-gray-500)">
                 {key}:
@@ -129,11 +129,11 @@ export const TransactionDrawer = ({
           c="var(--prune-text-gray-800)"
           fw={600}
         >
-          Sender Details
+          Beneficiary Details
         </Text>
 
         <Stack gap={24}>
-          {Object.entries(senderDetails).map(([key, value]) => (
+          {Object.entries(beneficiaryDetails).map(([key, value]) => (
             <Group justify="space-between" key={key}>
               <Text fz={12} c="var(--prune-text-gray-500)">
                 {key}:

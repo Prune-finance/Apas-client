@@ -68,8 +68,6 @@ export const AccountRequestsDrawer = ({
     "Phone Number": business?.contactNumber,
   };
 
-  console.log(selectedRequest?.documentData);
-  console.log(business);
   return (
     <Drawer
       opened={opened}
@@ -142,33 +140,6 @@ export const AccountRequestsDrawer = ({
               placeholder={"Utility Bill"}
               url={selectedRequest.documentData.poaFileURL}
             />
-
-            {/* <Divider />
-
-            <Text
-              fz={16}
-              // mb={24}
-              tt="uppercase"
-              c="var(--prune-text-gray-800)"
-              fw={600}
-            >
-              Contact Person Details
-            </Text>
-
-            <Stack gap={28}>
-              {Object.entries(contactPerson).map(([key, value], index) => (
-                <Group justify="space-between" key={index}>
-                  <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
-                    {key}
-                  </Text>
-                  {
-                    <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
-                      {value}
-                    </Text>
-                  }
-                </Group>
-              ))}
-            </Stack> */}
           </Stack>
         )}
 

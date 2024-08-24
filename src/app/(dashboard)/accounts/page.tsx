@@ -449,7 +449,11 @@ function Accounts() {
           centered
           withCloseButton={false}
         >
-          <DebitRequestModal close={debitClose} selectedId={rowId || ""} />
+          <DebitRequestModal
+            close={debitClose}
+            selectedId={rowId || ""}
+            accountsData={accounts}
+          />
         </Modal>
 
         <ModalComponent

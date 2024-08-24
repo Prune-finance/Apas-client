@@ -2,7 +2,7 @@
 import Cookies from "js-cookie";
 
 import axios from "axios";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
 
@@ -15,6 +15,7 @@ import {
   NumberInput,
   Textarea,
   Stack,
+  Group,
 } from "@mantine/core";
 import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -30,35 +31,25 @@ import {
 } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import { useUserAccounts } from "@/lib/hooks/accounts";
+import { AccountData, useUserAccounts } from "@/lib/hooks/accounts";
 import { formatNumber } from "@/lib/utils";
 import { SelectDropdownSearch } from "@/ui/components/SelectDropdownSearch";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { countries } from "@/lib/static";
 
 export default function DebitRequestModal({
   close,
   selectedId,
+  accountsData,
 }: {
   close: () => void;
   selectedId?: string;
+  accountsData?: AccountData[];
 }) {
   const router = useRouter();
   const { accounts } = useUserAccounts({ limit: 1000 });
   const [processing, setProcessing] = useState(false);
   const { handleSuccess, handleError } = useNotification();
-
-  const accountsIBAN = useMemo(() => {
-    return accounts.map((account) => {
-      return {
-        value: account.id,
-        label: `${account.accountNumber} (${formatNumber(
-          account.accountBalance,
-          true,
-          "EUR"
-        )})`,
-      };
-    });
-  }, [accounts]);
 
   const form = useForm({
     initialValues: {
@@ -68,15 +59,24 @@ export default function DebitRequestModal({
     validate: zodResolver(validateDebitRequest),
   });
 
+  useEffect(() => {
+    form.setFieldValue(
+      "accountBalance",
+      accounts.find((item) => item.id === form.values.account)
+        ?.accountBalance ?? 0
+    );
+  }, [form.values.account]);
+
   const createDebitRequest = async () => {
     setProcessing(true);
     try {
       const { hasErrors } = form.validate();
-      if (hasErrors) return;
 
+      if (hasErrors) return;
+      const { accountBalance, ...rest } = form.values;
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/request`,
-        form.values,
+        { ...rest },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -116,6 +116,7 @@ export default function DebitRequestModal({
               value={form.values.account}
               setValue={(value) => form.setFieldValue("account", value)}
               label="Account Name"
+              accountsData={accountsData}
             />
           </Box>
 
@@ -137,19 +138,8 @@ export default function DebitRequestModal({
               label="Amount"
               placeholder="Enter amount"
               {...form.getInputProps("amount")}
-              description={
-                Number(form.values.amount) >
-                Number(
-                  accounts.find((item) => item.id === form.values.account)
-                    ?.accountBalance
-                ) ? (
-                  <Text fz={12} c="red">
-                    Insufficient balance
-                  </Text>
-                ) : (
-                  ""
-                )
-              }
+              // value={form.values.amount}
+              // onChange={(value) => form.setFieldValue("amount", Number(value))}
               withAsterisk
             />
 
@@ -163,6 +153,23 @@ export default function DebitRequestModal({
                 )}`}
               </Text>
             )}
+            {/* <Group justify="space-between">
+              {form.errors.accountBalance && (
+                <Text fz={12} c="var(--prune-warning)">
+                  {form.errors.accountBalance}
+                </Text>
+              )}
+              {form.values.account && (
+                <Text fz={12} c="var(--prune-primary-800)">
+                  {`Account balance: ${formatNumber(
+                    accounts.find((item) => item.id === form.values.account)
+                      ?.accountBalance ?? 0,
+                    true,
+                    "EUR"
+                  )}`}
+                </Text>
+              )}
+            </Group> */}
           </Stack>
 
           <Box mt={40}>
@@ -215,16 +222,16 @@ export default function DebitRequestModal({
                 classNames={{ input: styles.input, label: styles.label }}
                 flex={1}
                 label="Country"
-                data={["United Kingdom", "Belgium", "Spain"]}
+                data={countries}
                 {...form.getInputProps("destinationCountry")}
               />
 
-              <Select
-                placeholder="Select Bank"
+              <TextInput
+                placeholder="Enter Bank Name"
                 classNames={{ input: styles.input, label: styles.label }}
                 flex={1}
                 label="Bank"
-                data={["Standard Chartered", "IBSN"]}
+                // data={["Standard Chartered", "IBSN"]}
                 {...form.getInputProps("destinationBank")}
               />
             </Flex>

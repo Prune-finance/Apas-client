@@ -221,13 +221,13 @@ function Reactivate() {
     >
       <TableTd>{element.Company.name}</TableTd>
       <TableTd className={styles.table__td}>
-        {element.accountId.split("-").pop()}
+        {element.Account.accountName}
       </TableTd>
       <TableTd className={styles.table__td}>
-        {element.accountId.split("-").pop()}
+        {element.Account.accountNumber}
       </TableTd>
-      <TableTd className={styles.table__td}>
-        {element.accountId.split("-").pop()}
+      <TableTd className={styles.table__td} tt="capitalize">
+        {element.Account.type.toLowerCase()}
       </TableTd>
       <TableTd tt="capitalize" className={styles.table__td}>
         {element.type.toLowerCase()}

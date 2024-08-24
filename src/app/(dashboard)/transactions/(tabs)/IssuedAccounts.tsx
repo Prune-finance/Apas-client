@@ -70,13 +70,22 @@ export const IssuedAccountsTab = () => {
       <TableTr
         key={element.id}
         onClick={() => {
-          window.location.href = `/transactions/${element.senderIban}`;
-          // setSelectedRequest(element);
-          // openDrawer();
+          // window.location.href = `/transactions/${element.senderIban}`;
+          setSelectedRequest(element);
+          openDrawer();
         }}
         style={{ cursor: "pointer" }}
       >
-        <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+        <TableTd
+          className={styles.table__td}
+          td="underline"
+          onClick={(e) => {
+            e.stopPropagation();
+            window.location.href = `/transactions/${element.senderIban}`;
+          }}
+        >
+          {element.senderIban}
+        </TableTd>
         <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
         <TableTd className={styles.table__td}>
           <Flex align="center" gap={5}>

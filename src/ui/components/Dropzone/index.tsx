@@ -25,16 +25,19 @@ import {
   RemoveDirectorType,
 } from "@/lib/schema";
 
-interface DropzoneCustomProps extends Partial<DropzoneProps> {
+interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   form?: UseFormReturnType<NewBusinessType>;
   DirectorForm?: UseFormReturnType<typeof directorEtShareholderSchema>;
   removeDirectorForm?: UseFormReturnType<RemoveDirectorType>;
   otherDocumentForm?: UseFormReturnType<OtherDocumentType>;
   formKey?: string;
   uploadedFileUrl?: string;
+  otherForm?: UseFormReturnType<T>;
 }
 
-export default function DropzoneComponent(props: DropzoneCustomProps) {
+export default function DropzoneComponent<T>(
+  props: DropzoneCustomProps<T> = {}
+) {
   const [file, setFile] = useState<FileWithPath | null>(null);
   const form = props.form;
   const formKey = props.formKey;
@@ -82,6 +85,11 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       if (props.DirectorForm) {
         if (!formKey) return;
         props.DirectorForm.setFieldValue(formKey, data.data.url);
+      }
+
+      if (props.otherForm) {
+        if (!formKey) return;
+        props.otherForm.setFieldValue(formKey, data.data.url);
       }
 
       setUploaded(true);

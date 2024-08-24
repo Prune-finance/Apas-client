@@ -158,13 +158,14 @@
         }
 
         .api__container {
-          height: calc(100vh - 400px);
+          // height: calc(100vh - 400px);
 
           .api__calls {
             width: 200px;
             border-left: 1px solid var(--prune-text-gray-200);
             padding: 18px;
             height: 100%;
+            min-height: calc(100vh - 200px);
             // border-radius: 8px;
           }
 

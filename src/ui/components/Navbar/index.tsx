@@ -2,7 +2,7 @@
 
 import Cookies from "js-cookie";
 
-import { Text, UnstyledButton } from "@mantine/core";
+import { NavLink, Stack, Text, UnstyledButton } from "@mantine/core";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
@@ -24,6 +24,7 @@ import ModalComponent from "../Modal";
 import axios from "axios";
 import { useState } from "react";
 import { clearSession } from "@/lib/actions/checkToken";
+import path from "path";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -59,26 +60,41 @@ export default function Navbar() {
             MAIN MENU
           </Text>
 
-          <div className={styles.links}>
+          {/* <div className={styles.links}> */}
+          <Stack gap={12} mt={32}>
             {AdminMainLinks.map((item, index) => {
               return (
-                <Link key={index} href={item.link}>
-                  <div
-                    className={`${styles.link} ${
-                      pathname.startsWith(item.link) ? styles.link__active : ""
-                    }`}
-                  >
-                    <div>
-                      <Text fz={12} className={styles.link__text}>
-                        {item.text}
-                      </Text>
-                    </div>
-                    {item.icon}
-                  </div>
-                </Link>
+                // <Link key={index} href={item.link}>
+                //   <div
+                //     className={`${styles.link} ${
+                //       pathname.startsWith(item.link) ? styles.link__active : ""
+                //     }`}
+                //   >
+                //     <div>
+                //       <Text fz={12} className={styles.link__text}>
+                //         {item.text}
+                //       </Text>
+                //     </div>
+                //     {item.icon}
+                //   </div>
+                // </Link>
+
+                <NavLink
+                  key={index}
+                  leftSection={item.icon}
+                  component={Link}
+                  label={item.text}
+                  href={item.link}
+                  active={pathname.startsWith(item.link)}
+                  fz={8}
+                  color="var(--prune-primary-900, #596603)"
+                  styles={{ label: { fontSize: 12 } }}
+                  classNames={{ root: styles.root }}
+                />
               );
             })}
-          </div>
+          </Stack>
+          {/* </div> */}
         </div>
 
         <div className={styles.container}>
@@ -86,26 +102,24 @@ export default function Navbar() {
             OTHERS
           </Text>
 
-          <div className={styles.links}>
+          <Stack gap={12} mt={32}>
             {AdminOtherLinks.map((item, index) => {
               return (
-                <Link key={index} href={item.link}>
-                  <div
-                    className={`${styles.link} ${
-                      pathname.startsWith(item.link) ? styles.link__active : ""
-                    }`}
-                  >
-                    <div>
-                      <Text fz={12} className={styles.link__text}>
-                        {item.text}
-                      </Text>
-                    </div>
-                    {item.icon}
-                  </div>
-                </Link>
+                <NavLink
+                  key={index}
+                  leftSection={item.icon}
+                  component={Link}
+                  label={item.text}
+                  href={item.link}
+                  active={pathname.startsWith(item.link)}
+                  fz={8}
+                  color="var(--prune-primary-900, #596603)"
+                  styles={{ label: { fontSize: 12 } }}
+                  classNames={{ root: styles.root }}
+                />
               );
             })}
-          </div>
+          </Stack>
         </div>
       </div>
 
@@ -156,6 +170,13 @@ export function UserNavbar() {
     }
   };
 
+  const isActive = (link: string): boolean => {
+    return (
+      (pathname === "/" && link === "/") ||
+      (pathname.startsWith(link) && link !== "/")
+    );
+  };
+
   return (
     <nav className={`${styles.user__nav}`}>
       <div className={styles.logo__container}>
@@ -168,59 +189,58 @@ export function UserNavbar() {
             MAIN MENU
           </Text>
 
-          <div className={styles.links}>
+          <Stack gap={12} mt={32}>
             {UserMainLinks.map((item, index) => {
               return (
-                <Link key={index} href={item.link}>
-                  <div
-                    className={`${styles.link} ${
-                      pathname === "/" &&
-                      item.link === "/" &&
-                      styles.link__active
-                    } ${
-                      pathname.startsWith(item.link) && item.link !== "/"
-                        ? styles.link__active
-                        : ""
-                    }`}
-                  >
-                    <div>
-                      <Text fz={12} className={styles.link__text}>
-                        {item.text}
-                      </Text>
-                    </div>
-                    {item.icon}
-                  </div>
-                </Link>
+                <NavLink
+                  key={index}
+                  leftSection={item.icon}
+                  component={Link}
+                  label={item.text}
+                  href={item.link}
+                  active={isActive(item.link)}
+                  fz={8}
+                  color="var(--prune-primary-900, #596603)"
+                  styles={{ label: { fontSize: 12 } }}
+                  classNames={{ root: styles.root }}
+                  style={{
+                    borderRight: isActive(item.link)
+                      ? "3px solid var(--prune-primary-900, #596603)"
+                      : "none",
+                  }}
+                />
               );
             })}
-          </div>
+          </Stack>
         </div>
 
-        <div className={styles.container}>
+        <div className={styles.container} style={{ marginTop: 20 }}>
           <Text fz={10} className={styles.container__header} pl={10}>
             OTHERS
           </Text>
-
-          <div className={styles.links}>
+          <Stack gap={12} mt={32}>
             {UserOtherLinks.map((item, index) => {
               return (
-                <Link key={index} href={item.link}>
-                  <div
-                    className={`${styles.link} ${
-                      pathname.startsWith(item.link) ? styles.link__active : ""
-                    }`}
-                  >
-                    <div>
-                      <Text fz={12} className={styles.link__text}>
-                        {item.text}
-                      </Text>
-                    </div>
-                    {item.icon}
-                  </div>
-                </Link>
+                <NavLink
+                  key={index}
+                  leftSection={item.icon}
+                  component={Link}
+                  label={item.text}
+                  href={item.link}
+                  active={isActive(item.link)}
+                  fz={8}
+                  color="var(--prune-primary-900, #596603)"
+                  styles={{ label: { fontSize: 12 } }}
+                  classNames={{ root: styles.root }}
+                  style={{
+                    borderRight: isActive(item.link)
+                      ? "3px solid var(--prune-primary-900, #596603)"
+                      : "none",
+                  }}
+                />
               );
             })}
-          </div>
+          </Stack>
         </div>
       </div>
 

@@ -10,8 +10,9 @@ import {
 import { IconTrash, IconX } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
-import DropzoneComponent from "./dropzone";
 import { UseFormReturnType } from "@mantine/form";
+import DropzoneComponent from "@/ui/components/Dropzone";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function ModalComponent({
   opened,
@@ -77,31 +78,26 @@ export default function ModalComponent({
             {...form.getInputProps("supportingDocumentName")}
           /> */}
 
-          <DropzoneComponent form={form} formKey="supportingDocumentUrl" />
+          <DropzoneComponent<typeof reqValues>
+            otherForm={form}
+            formKey="supportingDocumentUrl"
+            uploadedFileUrl={form.values.supportingDocumentUrl}
+          />
         </Flex>
 
         <Flex className={styles.bottom__flex} justify="center" gap={15}>
-          <Button
-            onClick={processing ? () => {} : close}
-            variant="outline"
-            color="var(--prune-text-gray-200)"
-            c="var(--prune-text-gray-800)"
+          <SecondaryBtn
+            text="Cancel"
+            action={processing ? () => {} : close}
             fullWidth
-          >
-            Cancel
-          </Button>
+          />
 
-          <Button
-            onClick={action}
-            // className={styles.cta}
-            variant="filled"
-            color="var(--prune-primary-600)"
-            c="var(--prune-text-gray-800)"
-            loading={processing}
+          <PrimaryBtn
+            text={customApproveMessage || "Proceed"}
+            action={action}
             fullWidth
-          >
-            {customApproveMessage || "Proceed"}
-          </Button>
+            loading={processing}
+          />
         </Flex>
       </Flex>
     </Modal>

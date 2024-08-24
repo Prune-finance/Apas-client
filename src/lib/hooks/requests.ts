@@ -413,6 +413,7 @@ export interface IUserRequest {
   companyId: string;
   accountId: string;
   Company: Company;
+  Account: Account;
 }
 
 export interface Company {

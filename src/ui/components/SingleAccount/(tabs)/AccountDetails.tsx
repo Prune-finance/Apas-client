@@ -38,7 +38,13 @@ export default function AccountDetails({ account, loading }: Props) {
         <Text fz={16} fw={500}>
           EUR Account Details
         </Text>
-        <CopyButton value={account?.accountNumber ?? ""}>
+        <CopyButton
+          value={`Account Name: ${
+            account?.accountName ?? ""
+          },\nIBAN/Account Number: ${
+            account?.accountNumber ?? ""
+          },\nBIC: 233423421,\nBank Name: Community Federal Savings Bank,\nBank Address: Via Alessandro Specchi, 16, 00186 Roma,\nBank Country: France`}
+        >
           {({ copied, copy }) => (
             <PrimaryBtn
               text={copied ? "Copied" : "Copy Detail"}

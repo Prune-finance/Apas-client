@@ -320,11 +320,13 @@ export function SingleAccount({
             loading={loading}
             h={190}
           >
+           
             <CopyButton
-              value={
-                `Account Name: ${account?.accountName}, Account No: ${account?.accountNumber}, Account Type:${account?.type}` ||
-                ""
-              }
+              value={`Account Name: ${
+                account?.accountName ?? ""
+              },\nAccount No: ${account?.accountNumber ?? ""},\nAccount Type:${
+                account?.type ?? ""
+              }`}
               timeout={2000}
             >
               {({ copied, copy }) => (

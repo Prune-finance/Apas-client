@@ -35,6 +35,7 @@ import { AccountData, useUserAccounts } from "@/lib/hooks/accounts";
 import { formatNumber } from "@/lib/utils";
 import { SelectDropdownSearch } from "@/ui/components/SelectDropdownSearch";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { countries } from "@/lib/static";
 
 export default function DebitRequestModal({
   close,
@@ -221,7 +222,7 @@ export default function DebitRequestModal({
                 classNames={{ input: styles.input, label: styles.label }}
                 flex={1}
                 label="Country"
-                data={["United Kingdom", "Belgium", "Spain"]}
+                data={countries}
                 {...form.getInputProps("destinationCountry")}
               />
 

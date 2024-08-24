@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Combobox,
   Group,
@@ -11,7 +11,7 @@ import {
   ScrollArea,
   Flex,
 } from "@mantine/core";
-import { useUserAccounts } from "@/lib/hooks/accounts";
+import { AccountData, useUserAccounts } from "@/lib/hooks/accounts";
 import { filteredSearch } from "@/lib/search";
 import styles from "./styles.module.scss";
 
@@ -59,11 +59,25 @@ interface Props {
   setValue: (val: string) => void;
   value: string;
   label?: string;
+  accountsData?: AccountData[];
 }
 
-export function SelectDropdownSearch({ value, setValue, label }: Props) {
+export function SelectDropdownSearch({
+  value,
+  setValue,
+  label,
+  accountsData,
+}: Props) {
   const [search, setSearch] = useState("");
   const { accounts, loading } = useUserAccounts({ limit: 1000 });
+  const [localAccounts, setLocalAccounts] = useState<AccountData[] | undefined>(
+    accountsData
+  );
+
+  useEffect(() => {
+    setLocalAccounts((prev) => (accounts.length > 0 ? accounts : accountsData));
+  }, [accounts]);
+
   const combobox = useCombobox({
     onDropdownClose: () => {
       combobox.resetSelectedOption();
@@ -80,7 +94,7 @@ export function SelectDropdownSearch({ value, setValue, label }: Props) {
 
   // .filter((item) => item.toLowerCase().includes(search.toLowerCase().trim()))
   const options = filteredSearch(
-    accounts,
+    localAccounts ?? [],
     ["accountName", "accountNumber"],
     search
   ).map((item) => (
@@ -117,7 +131,7 @@ export function SelectDropdownSearch({ value, setValue, label }: Props) {
           radius="md"
           classNames={{ input: styles.input }}
         >
-          {accounts.find((item) => item.id === value)?.accountName || (
+          {localAccounts?.find((item) => item.id === value)?.accountName || (
             <Input.Placeholder>Select Account</Input.Placeholder>
           )}
         </InputBase>
@@ -131,7 +145,7 @@ export function SelectDropdownSearch({ value, setValue, label }: Props) {
         />
         <Combobox.Options>
           <ScrollArea h={209} scrollbars="y" scrollbarSize={3}>
-            {options.length > 0 && !loading ? (
+            {options.length > 0 ? (
               options
             ) : (
               <Combobox.Empty>Loading...</Combobox.Empty>

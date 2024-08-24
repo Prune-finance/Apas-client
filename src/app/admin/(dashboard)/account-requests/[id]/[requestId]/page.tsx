@@ -49,6 +49,7 @@ export default function SingleRequest() {
     useDisclosure(false);
 
   const [processing, setProcessing] = useState(false);
+  const [reason, setReason] = useState("");
 
   const handleApproval = async () => {
     if (processing) return;
@@ -79,7 +80,7 @@ export default function SingleRequest() {
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${params.requestId}`,
-        {},
+        { ...(reason && { reason }) },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -246,6 +247,9 @@ export default function SingleRequest() {
           title="Reject This Account  Request?"
           text="This means you are rejecting the debit request of this business."
           customApproveMessage="Yes, Deny"
+          addReason
+          reason={reason}
+          setReason={setReason}
         />
 
         <ModalComponent

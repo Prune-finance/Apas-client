@@ -130,3 +130,11 @@
     }
   }
 }
+
+.root:focus,
+.root:focus-visible {
+  // border: none !important;
+  // outline: none !important;
+  outline: 0.4 solid var(--prune-text-gray-100) !important;
+  border-radius: 4px 0 0 4px;
+}

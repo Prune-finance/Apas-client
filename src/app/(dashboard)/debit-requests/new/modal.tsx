@@ -122,6 +122,18 @@ export default function DebitRequestModal({
           <Stack gap={4} flex={1}>
             <NumberInput
               classNames={{ input: styles.input, label: styles.label }}
+              styles={{
+                input: {
+                  border:
+                    Number(form.values.amount) >
+                    Number(
+                      accounts.find((item) => item.id === form.values.account)
+                        ?.accountBalance
+                    )
+                      ? "1px solid red"
+                      : "1px solid #eaecf0",
+                },
+              }}
               label="Amount"
               placeholder="Enter amount"
               {...form.getInputProps("amount")}
@@ -129,6 +141,7 @@ export default function DebitRequestModal({
               // onChange={(value) => form.setFieldValue("amount", Number(value))}
               withAsterisk
             />
+
             {form.values.account && (
               <Text fz={12} c="var(--prune-primary-800)">
                 {`Account balance: ${formatNumber(

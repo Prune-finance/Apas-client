@@ -79,7 +79,7 @@ async function Login() {
             fw={600}
             p={0}
             c="var(--prune-primary-800)"
-            link="https://prune-payments.gitbook.io/prune-api-services/"
+            link="https://prunepayments.com/contact-us"
           />
         </Group>
         <Box w={{ base: "90vw", sm: 394 }}>

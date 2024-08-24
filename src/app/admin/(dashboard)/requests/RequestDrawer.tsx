@@ -65,7 +65,10 @@ export default function RequestDrawer({
     "Business Name": selectedRequest?.Company.name,
     "Account Name": selectedRequest?.Account.accountName,
     IBAN: selectedRequest?.Account.accountNumber,
-    "User Type": selectedRequest?.Account.type.toLowerCase(),
+    "User Type":
+      selectedRequest?.Account.type === "CORPORATE"
+        ? "Corporate"
+        : "Individual",
   };
 
   const otherDetails = {

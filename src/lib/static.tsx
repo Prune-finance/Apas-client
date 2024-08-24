@@ -259,6 +259,7 @@ export const countries = [
   "Luxembourg",
   "Malta",
   "Netherlands",
+  "Nigeria",
   "Poland",
   "Portugal",
   "Romania",

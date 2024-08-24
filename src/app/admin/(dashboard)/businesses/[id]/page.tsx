@@ -30,6 +30,8 @@ import {
   IconUsersGroup,
   IconCheck,
   IconX,
+  IconAlertTriangle,
+  IconShieldCheck,
 } from "@tabler/icons-react";
 
 import ActiveBadge from "@/assets/active-badge.svg";
@@ -45,12 +47,13 @@ import Keys from "./(tabs)/keys";
 
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { activeBadgeColor } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
+import { PrimaryBtn } from "@/ui/components/Buttons";
 
 export default function SingleBusiness() {
   const router = useRouter();
@@ -63,12 +66,15 @@ export default function SingleBusiness() {
   const { handleSuccess, handleError } = useNotification();
   const [processingLink, setProcessingLink] = useState(false);
   const [processingActive, setProcessingActive] = useState(false);
+  const [processingTrust, setProcessingTrust] = useState(false);
+  // const [trusted, setTrusted] = useState(business ? business.kycTrusted : false);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
     useDisclosure(false);
 
   const handleBusinessTrust = async () => {
+    setProcessingTrust(true);
     try {
       const currentState = business?.kycTrusted;
 
@@ -83,8 +89,11 @@ export default function SingleBusiness() {
         "Action Completed",
         `This business is ${currentState ? "not trusted" : "now trusted"}`
       );
+      closeTrust();
     } catch (error) {
       handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessingTrust(false);
     }
   };
 
@@ -123,6 +132,39 @@ export default function SingleBusiness() {
       setProcessingActive(false);
     }
   };
+  const { activateTitle, activateText } = useMemo(() => {
+    switch (business?.companyStatus) {
+      case "ACTIVE":
+        return {
+          activateTitle: "Deactivate This Business?",
+          activateText:
+            "Are you sure you want to deactivate this business? This will render this business inactive and will not be able to receive new transactions.",
+        };
+      default:
+        return {
+          activateTitle: "Activate This Business?",
+          activateText:
+            "Are you sure you want to activate this business? This will render this business active and will be able to receive new transactions.",
+        };
+    }
+  }, [business?.companyStatus]);
+
+  const { trustTitle, trustText } = useMemo(() => {
+    switch (business?.kycTrusted) {
+      case true:
+        return {
+          trustTitle: "Untrust This Business?",
+          trustText:
+            "Are you sure you want to mark this business as trusted? This will indicate that the business is reliable and can be trusted by others.",
+        };
+      default:
+        return {
+          trustTitle: "Trust This Business?",
+          trustText:
+            "Are you sure you want to mark this business as trusted? This will indicate that the business is reliable and can be trusted by others.",
+        };
+    }
+  }, [business?.companyStatus]);
 
   return (
     <main className={styles.main}>
@@ -173,17 +215,6 @@ export default function SingleBusiness() {
             )}
 
             {business && (
-              // <Badge
-              //   tt="capitalize"
-              //   variant="light"
-              //   color={activeBadgeColor(business.companyStatus)}
-              //   w={82}
-              //   h={24}
-              //   fw={400}
-              //   fz={12}
-              // >
-              //   {business.companyStatus.toLowerCase()}
-              // </Badge>
               <BadgeComponent status={business.companyStatus} active />
             )}
           </div>
@@ -194,53 +225,49 @@ export default function SingleBusiness() {
             </Button>
 
             {business?.companyStatus && (
-              <Button
-                // className={styles.header__cta}
-                radius={4}
-                variant="filled"
+              <PrimaryBtn
+                text={
+                  business?.companyStatus === "ACTIVE"
+                    ? "Deactivate"
+                    : "Activate"
+                }
+                action={open}
                 color="#f6f6f6"
                 c="var(--prune-text-gray-700)"
                 fz={12}
+                fw={600}
                 h={32}
-                // onClick={toggleBusinessActivation}
-                onClick={open}
-                // loading={processingActive}
-                style={{ border: "1px solid var(--prune-text-gray-200)" }}
-              >
-                {business?.companyStatus === "ACTIVE"
-                  ? "Deactivate"
-                  : "Activate"}
-              </Button>
+                radius={4}
+              />
             )}
 
-            <div className={styles.biz_trust}>
-              <Text fw={600} fz={12} className={styles.biz__trust__text}>
-                Trust this business
-              </Text>
-              {!loading && (
-                <Switch
-                  defaultChecked={business?.kycTrusted}
-                  onChange={handleBusinessTrust}
-                  // color="rgba(212, 243, 7)"
-                  color="var(--prune-success-500)"
-                  size="xs"
-                />
-              )}
-            </div>
-
             <Button
-              // className={styles.header__cta}
-              variant="filled"
-              color="var(--prune-primary-600)"
-              onClick={sendActivationLink}
-              loading={processingLink}
-              radius={4}
-              fz={12}
-              h={32}
+              onClick={openTrust}
+              color="#f6f6f6"
               c="var(--prune-text-gray-700)"
+              fz={12}
+              fw={600}
+              h={32}
+              radius={4}
             >
-              Send Activation Link
+              <Switch
+                label="Trust this business"
+                checked={business?.kycTrusted}
+                labelPosition="left"
+                fz={12}
+                size="xs"
+                color="var(--prune-success-500)"
+              />
             </Button>
+
+            <PrimaryBtn
+              text="Send Activation Link"
+              action={sendActivationLink}
+              radius={4}
+              loading={processingLink}
+              h={32}
+              fw={600}
+            />
           </div>
         </div>
 
@@ -305,20 +332,43 @@ export default function SingleBusiness() {
       <ModalComponent
         opened={opened}
         close={close}
-        title={
-          business?.companyStatus === "ACTIVE"
-            ? "Deactivate This Business?"
-            : "Activate This Business?"
-        }
-        text={
-          business?.companyStatus === "ACTIVE"
-            ? "Are you sure you want to deactivate this business? This will render this business inactive and will not be able to receive new transactions."
-            : "Are you sure you want to activate this business? This will render this business active and will be able to receive new transactions."
-        }
+        title={activateTitle}
+        text={activateText}
         action={toggleBusinessActivation}
-        icon={business?.companyStatus === "ACTIVE" ? <IconX /> : <IconCheck />}
+        icon={
+          business?.companyStatus === "ACTIVE" ? (
+            <IconX color="#D92D20" />
+          ) : (
+            <IconCheck color="#12B76A" />
+          )
+        }
         processing={processingActive}
-        color="#ECFDF3"
+        color={
+          business?.companyStatus === "ACTIVE"
+            ? "hsl(from var(--prune-warning) h s l / .1)"
+            : "#ECFDF3"
+        }
+      />
+
+      <ModalComponent
+        opened={openedTrust}
+        close={closeTrust}
+        title={trustTitle}
+        text={trustText}
+        action={handleBusinessTrust}
+        icon={
+          business?.kycTrusted ? (
+            <IconAlertTriangle color="#D92D20" />
+          ) : (
+            <IconShieldCheck color="#12B76A" />
+          )
+        }
+        processing={processingTrust}
+        color={
+          business?.kycTrusted
+            ? "hsl(from var(--prune-warning) h s l / .1)"
+            : "#ECFDF3"
+        }
       />
     </main>
   );

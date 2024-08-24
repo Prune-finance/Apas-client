@@ -68,7 +68,7 @@ function Debit() {
     ...(sort && { sort: sort.toLowerCase() }),
   });
 
-  const { businesses, loading } = useBusiness({}, undefined, true);
+  const { businesses, loading } = useBusiness({ limit: 100 }, undefined, true);
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null

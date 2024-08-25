@@ -78,8 +78,8 @@ export default function Keys() {
   const fetchWebHooks = async () => {
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/webhooks`,
-        { headers: { Authorization: `Bearer ${live?.key}` } }
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/webhooks/dashboard`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setWebHook(data.data);
@@ -101,9 +101,9 @@ export default function Keys() {
     setProcessingWebHook(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/webhooks`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/webhooks/dashboard`,
         { eventURL, callbackURL },
-        { headers: { Authorization: `Bearer ${live?.key}` } }
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
       handleSuccess("Webhooks Updated", "Webhooks updated successfully");
       await fetchWebHooks();

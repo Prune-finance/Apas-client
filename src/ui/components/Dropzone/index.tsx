@@ -33,6 +33,7 @@ interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   formKey?: string;
   uploadedFileUrl?: string;
   otherForm?: UseFormReturnType<T>;
+  isUser?: boolean;
 }
 
 export default function DropzoneComponent<T>(
@@ -42,6 +43,7 @@ export default function DropzoneComponent<T>(
   const form = props.form;
   const formKey = props.formKey;
   const uploadedFileUrl = props.uploadedFileUrl;
+  const isUser = props.isUser;
 
   function getNestedValue(obj: any, path: string) {
     return path.split(".").reduce((acc, part) => acc && acc[part], obj);
@@ -52,6 +54,7 @@ export default function DropzoneComponent<T>(
   );
 
   const [processing, setProcessing] = useState(false);
+  // {{auth-srv}}/v1/auth/upload
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -61,8 +64,10 @@ export default function DropzoneComponent<T>(
       const formData = new FormData();
       formData.append("file", file);
 
+      const path = isUser ? "auth" : "admin";
+
       const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/${path}/upload`,
         formData,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );

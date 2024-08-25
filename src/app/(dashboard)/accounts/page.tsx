@@ -3,7 +3,6 @@ import dayjs from "dayjs";
 import Cookies from "js-cookie";
 
 import React, { Suspense, useState } from "react";
-import Image from "next/image";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -19,20 +18,15 @@ import {
   SimpleGrid,
   TabsPanel,
 } from "@mantine/core";
-import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
-import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
-import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Flex, TableTh, TableThead } from "@mantine/core";
+import { UnstyledButton, rem, Text } from "@mantine/core";
+import { TableTr, TableTd } from "@mantine/core";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 import {
-  IconPointFilled,
   IconDots,
-  IconEye,
   IconBrandLinktree,
   IconX,
-  IconListTree,
   IconSearch,
   IconCheck,
   IconArrowDownLeft,
@@ -41,15 +35,9 @@ import {
 import Link from "next/link";
 
 import ModalComponent from "./modal";
-import {
-  useAccounts,
-  useUserAccounts,
-  useUserDefaultAccount,
-} from "@/lib/hooks/accounts";
-import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
+import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
 import { formatNumber } from "@/lib/utils";
 
-import EmptyImage from "@/assets/empty.png";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useForm, zodResolver } from "@mantine/form";
@@ -60,7 +48,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import DebitRequestModal from "../debit-requests/new/modal";
-import { z } from "zod";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -69,6 +56,7 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import TabsComponent from "@/ui/components/Tabs";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
+import { parseError } from "@/lib/actions/auth";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -94,7 +82,7 @@ function Accounts() {
 
   const { account, loading: loadingDftAcct } = useUserDefaultAccount();
 
-  const { handleSuccess } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
   const [unfreezeOpened, { open: unfreezeOpen, close: unfreezeClose }] =
@@ -149,7 +137,7 @@ function Accounts() {
       freezeClose();
       requestForm.reset();
     } catch (error) {
-      console.log(error);
+      handleError("Freeze Request Failed", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -181,7 +169,7 @@ function Accounts() {
       );
       close();
     } catch (error) {
-      console.log(error);
+      handleError("Deactivation Request Failed", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -210,7 +198,7 @@ function Accounts() {
       handleSuccess("Action Completed", "Account Activation request submitted");
       activateClose();
     } catch (error) {
-      console.log(error);
+      handleError("Activation Request Failed", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -239,7 +227,7 @@ function Accounts() {
       handleSuccess("Action Completed", "Account Unfreeze request submitted");
       unfreezeClose();
     } catch (error) {
-      console.log(error);
+      handleError("Unfreeze Request Failed", parseError(error));
     } finally {
       setProcessing(false);
     }

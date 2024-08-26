@@ -187,7 +187,9 @@ export default function Keys() {
             <Stack gap={10}>
               <KeyComponent keyString={test?.key} keyType="Secret Test Key" />
 
-              <KeyComponent keyString={live?.key} keyType="Secret Live Key" />
+              {/* {live && live.key && (
+                <KeyComponent keyString={live?.key} keyType="Secret Live Key" />
+              )} */}
             </Stack>
           </Paper>
 

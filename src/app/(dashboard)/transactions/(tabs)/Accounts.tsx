@@ -1,4 +1,8 @@
-import { TrxData, useUserDefaultTransactions } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  TrxData,
+  useUserDefaultTransactions,
+} from "@/lib/hooks/transactions";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
 import { frontendPagination, formatNumber } from "@/lib/utils";
@@ -29,7 +33,8 @@ export const AccountsTab = () => {
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
-  const [selectedRequest, setSelectedRequest] = useState<TrxData | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<TransactionType | null>(null);
 
   const form = useForm<FilterType>({
     initialValues: filterValues,

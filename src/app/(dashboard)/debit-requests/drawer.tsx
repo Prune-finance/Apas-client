@@ -1,3 +1,6 @@
+import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import { parseError } from "@/lib/actions/auth";
+import useNotification from "@/lib/hooks/notification";
 import { DebitRequest } from "@/lib/hooks/requests";
 import { formatNumber } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
@@ -6,9 +9,12 @@ import ModalComponent from "@/ui/components/Modal";
 import { Drawer, Flex, Box, Divider, Text, Stack, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconX } from "@tabler/icons-react";
+import axios from "axios";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useState } from "react";
+import Cookies from "js-cookie";
+import { notifications } from "@mantine/notifications";
 
 dayjs.extend(advancedFormat);
 type Props = {
@@ -24,6 +30,8 @@ export const DebitRequestDrawer = ({
   const [openedCancel, { open, close: closeCancel }] = useDisclosure(false);
   const [processing, setProcessing] = useState(false);
   const [reason, setReason] = useState("");
+
+  const { handleError, handleSuccess, handleInfo } = useNotification();
   const accountDetails = {
     "Source Account": selectedRequest?.Account.accountName,
     "Date Created": dayjs(selectedRequest?.createdAt).format("Do MMMM, YYYY"),
@@ -38,23 +46,55 @@ export const DebitRequestDrawer = ({
     Reference: selectedRequest?.reference,
   };
 
+  const cancelRequest = async () => {
+    notifications.clean();
+    if (!reason)
+      return handleInfo("Please enter a reason for cancelling the request", "");
+
+    setProcessing(true);
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/debit/request/${selectedRequest?.id}/cancel`,
+        {
+          reason: reason,
+        },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess("Cancel Request Successful", "");
+      closeCancel();
+    } catch (error) {
+      handleError("Cancel Request Failed", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <Drawer
       opened={opened}
       onClose={close}
       position="right"
-      withCloseButton={false}
+      closeButtonProps={{ ...closeButtonProps, mr: 28 }}
       size="30%"
+      title={
+        <Text fz={18} fw={600} c="#1D2939" ml={28}>
+          Debit Request Details
+        </Text>
+      }
+      padding={0}
     >
-      <Flex justify="space-between" pb={28}>
+      {/* <Flex justify="space-between" pb={28}>
         <Text fz={18} fw={600} c="#1D2939">
           Debit Request Details
         </Text>
 
         <IconX onClick={close} />
-      </Flex>
+      </Flex> */}
+      <Divider mb={20} />
 
-      <Box>
+      <Box px={28} pb={28}>
         <Group justify="space-between" align="center">
           <Stack gap={0}>
             <Text c="#8B8B8B" fz={12} tt="uppercase">
@@ -78,43 +118,65 @@ export const DebitRequestDrawer = ({
         </Group>
         <Divider mt={30} mb={20} />
 
-        <Text fz={16} mb={24} fw={500}>
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
           Account Details
         </Text>
 
         <Flex direction="column" gap={30}>
           {Object.entries(accountDetails).map(([key, value]) => (
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
+            <Flex justify="space-between" key={key}>
+              <Text fz={12} c="var(--prune-text-gray-500)">
                 {`${key}:`}
               </Text>
 
-              <Text fz={14}>{value}</Text>
+              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                {value}
+              </Text>
             </Flex>
           ))}
         </Flex>
 
         <Divider my={30} />
 
-        <Text fz={16} mb={24} fw={500}>
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
           Destination Details
         </Text>
 
         <Flex direction="column" gap={30}>
           {Object.entries(destDetails).map(([key, value]) => (
             <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
+              <Text fz={12} c="var(--prune-text-gray-500)">
                 {`${key}:`}
               </Text>
 
-              <Text fz={14}>{value}</Text>
+              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                {value}
+              </Text>
             </Flex>
           ))}
         </Flex>
 
         <Divider my={30} />
 
-        <Text fz={16} c="#1D2939" fw={500}>
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
           Reason
         </Text>
 
@@ -143,7 +205,7 @@ export const DebitRequestDrawer = ({
         reason={reason}
         setReason={setReason}
         addReason
-        action={() => {}}
+        action={cancelRequest}
       />
     </Drawer>
   );

@@ -2,7 +2,6 @@
 import dayjs from "dayjs";
 
 import Link from "next/link";
-import Image from "next/image";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -15,10 +14,9 @@ import {
   MenuTarget,
   Select,
 } from "@mantine/core";
-import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
-import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
-import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Flex, TableTh, TableThead } from "@mantine/core";
+import { Button, TextInput } from "@mantine/core";
+import { UnstyledButton, rem, Text } from "@mantine/core";
+import { TableTr, TableTd } from "@mantine/core";
 
 // Tabler Imports
 import {
@@ -32,7 +30,6 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { useRequests } from "@/lib/hooks/requests";
-import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 
 // UI Imports
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -40,7 +37,6 @@ import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
-import EmptyImage from "@/assets/empty.png";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
@@ -51,7 +47,7 @@ import {
 } from "./schema";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
-import { activeBadgeColor, approvedBadgeColor } from "@/lib/utils";
+import { activeBadgeColor } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";

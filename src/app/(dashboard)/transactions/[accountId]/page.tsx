@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  TransactionType,
   TrxData,
   useUserDefaultTransactions,
   useUserTransactions,
@@ -60,7 +61,8 @@ export default function AccountTransactions() {
     useDisclosure(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
-  const [selectedRequest, setSelectedRequest] = useState<TrxData | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<TransactionType | null>(null);
 
   const form = useForm<FilterType>({
     initialValues: filterValues,

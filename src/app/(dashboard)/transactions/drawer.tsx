@@ -1,4 +1,4 @@
-import { TrxData } from "@/lib/hooks/transactions";
+import { TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { formatNumber } from "@/lib/utils";
 import {
   Drawer,
@@ -24,9 +24,15 @@ import styles from "./styles.module.scss";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import {
+  ReceiptDetails,
+  TransactionReceipt,
+} from "@/ui/components/TransactionReceipt";
+import { useRef } from "react";
+import { handlePdfDownload } from "@/lib/actions/auth";
 
 interface TransactionDrawerProps {
-  selectedRequest: TrxData | null;
+  selectedRequest: TransactionType | null;
   close: () => void;
   opened: boolean;
 }
@@ -36,6 +42,7 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
+  const pdfRef = useRef<HTMLDivElement>(null);
   const beneficiaryDetails = {
     "Account Name": "N/A",
     IBAN: selectedRequest?.recipientIban,
@@ -68,6 +75,40 @@ export const TransactionDrawer = ({
     "Transaction ID": selectedRequest?.id,
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
+
+  const BeneficiaryDetails = {
+    "Amount Received": formatNumber(selectedRequest?.amount ?? 0, true, "EUR"),
+    "First Name": selectedRequest?.destinationFirstName ?? "N/A",
+    "Last Name": selectedRequest?.destinationLastName ?? "N/A",
+    IBAN: selectedRequest?.recipientIban ?? "",
+    "Bank Name": selectedRequest?.recipientBankAddress ?? "",
+    Country: selectedRequest?.recipientBankCountry ?? "",
+    "Bank Address": "N/A",
+  };
+
+  const SenderDetails = {
+    "Account Name": "N/A",
+    "Account Number": selectedRequest?.senderIban ?? "",
+    "Bank Name": "N/A",
+    BIC: "N/A",
+  };
+
+  const OtherDetails = {
+    Type: "Debit",
+    "Payment Date": dayjs(selectedRequest?.createdAt).format(
+      "hh:mm A Do MMM YYYY"
+    ),
+    Reference: selectedRequest?.reference ?? "N/A",
+    "Transaction ID": selectedRequest?.id ?? "",
+  };
+  const details: ReceiptDetails[] = [
+    {
+      title: "Sender Details",
+      value: SenderDetails,
+    },
+    { title: "Beneficiary Details", value: BeneficiaryDetails },
+    { title: "Other Details", value: OtherDetails },
+  ];
   return (
     <Drawer
       opened={opened}
@@ -179,6 +220,16 @@ export const TransactionDrawer = ({
           text="Download Receipt"
           fullWidth
           fw={600}
+          action={() => handlePdfDownload(pdfRef)}
+        />
+      </Box>
+
+      <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
+        <TransactionReceipt
+          amount={selectedRequest?.amount ?? 0}
+          amountType="Amount Sent"
+          details={details}
+          receiptRef={pdfRef}
         />
       </Box>
     </Drawer>

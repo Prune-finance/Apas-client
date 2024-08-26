@@ -1,4 +1,4 @@
-import { TrxData } from "@/lib/hooks/transactions";
+import { TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { formatNumber } from "@/lib/utils";
 import {
   Drawer,
@@ -32,7 +32,7 @@ import { useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
 
 interface TransactionDrawerProps {
-  selectedRequest: TrxData | null;
+  selectedRequest: TransactionType | null;
   close: () => void;
   opened: boolean;
 }
@@ -77,27 +77,29 @@ export const TransactionDrawer = ({
   };
 
   const BeneficiaryDetails = {
-    "Amount Received": formatNumber(123445, true, "EUR"),
-    "First Name": "John",
-    "Last Name": "Doe",
-    IBAN: "GBE89370400440532013000",
-    "Bank Name": "Prune Holdings",
-    Country: "United Kingdom",
-    "Bank Address": "Prune Holdings, 123 Main Street, London, UK",
+    "Amount Received": formatNumber(selectedRequest?.amount ?? 0, true, "EUR"),
+    "First Name": selectedRequest?.destinationFirstName ?? "N/A",
+    "Last Name": selectedRequest?.destinationLastName ?? "N/A",
+    IBAN: selectedRequest?.recipientIban ?? "",
+    "Bank Name": selectedRequest?.recipientBankAddress ?? "",
+    Country: selectedRequest?.recipientBankCountry ?? "",
+    "Bank Address": "N/A",
   };
 
   const SenderDetails = {
-    "Account Name": "John Doe",
-    "Account Number": "GBE89370400440532013000",
-    "Bank Name": "Prune Holdings",
-    BIC: "GBE8937",
+    "Account Name": "N/A",
+    "Account Number": selectedRequest?.senderIban ?? "",
+    "Bank Name": "N/A",
+    BIC: "N/A",
   };
 
   const OtherDetails = {
     Type: "Debit",
-    "Payment Date": dayjs().format("hh:mm A Do MMM YYYY"),
-    Reference: "1234567890",
-    "Transaction ID": "1234567890",
+    "Payment Date": dayjs(selectedRequest?.createdAt).format(
+      "hh:mm A Do MMM YYYY"
+    ),
+    Reference: selectedRequest?.reference ?? "N/A",
+    "Transaction ID": selectedRequest?.id ?? "",
   };
   const details: ReceiptDetails[] = [
     {
@@ -224,7 +226,7 @@ export const TransactionDrawer = ({
 
       <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
         <TransactionReceipt
-          amount={123445}
+          amount={selectedRequest?.amount ?? 0}
           amountType="Amount Sent"
           details={details}
           receiptRef={pdfRef}

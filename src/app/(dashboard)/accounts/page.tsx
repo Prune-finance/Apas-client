@@ -255,19 +255,23 @@ function Accounts() {
             </MenuItem>
           </Link> */}
 
-          <MenuItem
-            onClick={() => {
-              setRowId(id);
-              debitOpen();
-            }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconArrowDownLeft style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            Debit Account
-          </MenuItem>
+          {status === "ACTIVE" && (
+            <MenuItem
+              onClick={() => {
+                setRowId(id);
+                debitOpen();
+              }}
+              fz={10}
+              c="#667085"
+              leftSection={
+                <IconArrowDownLeft
+                  style={{ width: rem(14), height: rem(14) }}
+                />
+              }
+            >
+              Debit Account
+            </MenuItem>
+          )}
 
           <MenuItem
             onClick={() => {

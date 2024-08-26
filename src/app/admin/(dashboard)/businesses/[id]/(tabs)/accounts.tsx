@@ -44,6 +44,7 @@ import {
 import PaginationComponent from "@/ui/components/Pagination";
 import TabsComponent from "@/ui/components/Tabs";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -205,7 +206,7 @@ export default function Accounts({
         <SimpleGrid cols={3}>
           <AccountCard
             currency="EUR"
-            bic="34567654"
+            bic="ARPYGB21XXX"
             balance={defaultAccount?.accountBalance ?? 0}
             iban={defaultAccount?.accountNumber ?? ""}
             loading={loading}
@@ -217,6 +218,13 @@ export default function Accounts({
 
       <TabsPanel value={tabs[1].value}>
         <TableComponent head={tableHead} rows={rows} loading={loading} />
+
+        <EmptyTable
+          rows={rows}
+          loading={loading}
+          text="When an account is created, it will appear here"
+          title="There are no accounts"
+        />
 
         <PaginationComponent
           active={active}

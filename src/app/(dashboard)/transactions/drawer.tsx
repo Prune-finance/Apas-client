@@ -24,6 +24,12 @@ import styles from "./styles.module.scss";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import {
+  ReceiptDetails,
+  TransactionReceipt,
+} from "@/ui/components/TransactionReceipt";
+import { useRef } from "react";
+import { handlePdfDownload } from "@/lib/actions/auth";
 
 interface TransactionDrawerProps {
   selectedRequest: TrxData | null;
@@ -36,6 +42,7 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
+  const pdfRef = useRef<HTMLDivElement>(null);
   const beneficiaryDetails = {
     "Account Name": "N/A",
     IBAN: selectedRequest?.recipientIban,
@@ -68,6 +75,38 @@ export const TransactionDrawer = ({
     "Transaction ID": selectedRequest?.id,
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
+
+  const BeneficiaryDetails = {
+    "Amount Received": formatNumber(123445, true, "EUR"),
+    "First Name": "John",
+    "Last Name": "Doe",
+    IBAN: "GBE89370400440532013000",
+    "Bank Name": "Prune Holdings",
+    Country: "United Kingdom",
+    "Bank Address": "Prune Holdings, 123 Main Street, London, UK",
+  };
+
+  const SenderDetails = {
+    "Account Name": "John Doe",
+    "Account Number": "GBE89370400440532013000",
+    "Bank Name": "Prune Holdings",
+    BIC: "GBE8937",
+  };
+
+  const OtherDetails = {
+    Type: "Debit",
+    "Payment Date": dayjs().format("hh:mm A Do MMM YYYY"),
+    Reference: "1234567890",
+    "Transaction ID": "1234567890",
+  };
+  const details: ReceiptDetails[] = [
+    {
+      title: "Sender Details",
+      value: SenderDetails,
+    },
+    { title: "Beneficiary Details", value: BeneficiaryDetails },
+    { title: "Other Details", value: OtherDetails },
+  ];
   return (
     <Drawer
       opened={opened}
@@ -179,6 +218,16 @@ export const TransactionDrawer = ({
           text="Download Receipt"
           fullWidth
           fw={600}
+          action={() => handlePdfDownload(pdfRef)}
+        />
+      </Box>
+
+      <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
+        <TransactionReceipt
+          amount={123445}
+          amountType="Amount Sent"
+          details={details}
+          receiptRef={pdfRef}
         />
       </Box>
     </Drawer>

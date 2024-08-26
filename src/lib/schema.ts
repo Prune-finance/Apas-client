@@ -152,6 +152,16 @@ export const validateNewAdmin = z.object({
   role: z.string().optional(),
 });
 
+export const contactPerson = {
+  firstName: "",
+  lastName: "",
+  identityType: null,
+  proofOfAddress: null,
+  identityFileUrl: "",
+  identityFileUrlBack: "",
+  proofOfAddressFileUrl: "",
+};
+
 export const newBusiness = {
   name: "",
   domain: "",
@@ -161,6 +171,7 @@ export const newBusiness = {
   contactNumber: "",
   contactEmail: "",
   businessBio: "",
+  contactPerson,
   cacCertificate: "",
   address: "",
   mermat: "",
@@ -173,6 +184,16 @@ export const newBusiness = {
 };
 
 const emailSchema = z.string().email();
+
+const contactPersonSchema = z.object({
+  firstName: z.string().min(1, "First Name is required"),
+  lastName: z.string().min(1, "Last Name is required"),
+  identityType: z.string().nullable(),
+  proofOfAddress: z.string().nullable(),
+  identityFileUrl: z.string(),
+  identityFileUrlBack: z.string(),
+  proofOfAddressFileUrl: z.string(),
+});
 
 export const basicInfoSchema = z
   .object({
@@ -191,6 +212,7 @@ export const basicInfoSchema = z
       .min(1, "Contact Email is required"),
     domain: z.string().url("Please provide a valid url"),
     pricingPlan: z.string().nullable(),
+    contactPerson: contactPersonSchema,
   })
   .superRefine((data, ctx) => {
     if (!data.country) {
@@ -297,6 +319,7 @@ export const validateNewBusiness = z.object({
   businessBio: z.string(),
   pricingPlan: z.string().min(1, "Pricing Plan is required").nullable(),
   contactEmail: z.string().email("Please provide a valid contact email"),
+  contactPerson: contactPersonSchema,
   cacCertificate: z.string().url("Cac certificate is required"),
   mermat: z.string().url("Memart document is required"),
   directorParticular: z

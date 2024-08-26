@@ -12,7 +12,7 @@ import { IconX } from "@tabler/icons-react";
 import axios from "axios";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
 
@@ -21,11 +21,15 @@ type Props = {
   opened: boolean;
   close: () => void;
   selectedRequest: DebitRequest | null;
+  revalidate: () => void;
+  setSelectedRequest: Dispatch<SetStateAction<DebitRequest | null>>;
 };
 export const DebitRequestDrawer = ({
   opened,
   close,
   selectedRequest,
+  revalidate,
+  setSelectedRequest,
 }: Props) => {
   const [openedCancel, { open, close: closeCancel }] = useDisclosure(false);
   const [processing, setProcessing] = useState(false);
@@ -51,11 +55,12 @@ export const DebitRequestDrawer = ({
     if (!reason)
       return handleInfo("Please enter a reason for cancelling the request", "");
 
+    if (!selectedRequest) return;
     setProcessing(true);
 
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/debit/request/${selectedRequest?.id}/cancel`,
+      const { data: res } = await axios.post(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/request/${selectedRequest?.id}/cancel`,
         {
           reason: reason,
         },
@@ -64,6 +69,17 @@ export const DebitRequestDrawer = ({
 
       handleSuccess("Cancel Request Successful", "");
       closeCancel();
+      revalidate();
+      setReason("");
+
+      setSelectedRequest((prev) => {
+        if (!prev) return prev; // or return null;
+        return {
+          ...prev,
+          status: res.data.status,
+          id: res.data.id,
+        };
+      });
     } catch (error) {
       handleError("Cancel Request Failed", parseError(error));
     } finally {

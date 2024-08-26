@@ -41,10 +41,12 @@ export default function DebitRequestModal({
   close,
   selectedId,
   accountsData,
+  revalidate,
 }: {
   close: () => void;
   selectedId?: string;
   accountsData?: AccountData[];
+  revalidate?: () => void;
 }) {
   const router = useRouter();
   const { accounts } = useUserAccounts({ limit: 1000 });
@@ -85,6 +87,8 @@ export default function DebitRequestModal({
         "You have successfully sent a new debit request."
       );
       router.push("/debit-requests");
+      revalidate && revalidate();
+      close();
     } catch (error) {
       handleError("Action Failed", parseError(error));
     } finally {

@@ -508,7 +508,7 @@ export interface DebitRequest {
   deletedAt: null;
   updatedAt: Date;
   amount: number;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   companyAccountId: null;
   Account: Account;
 }

@@ -41,7 +41,8 @@ export default function AccountTrx() {
   const params = useParams<{ id: string }>();
   const { loading, transactions } = useUserTransactions(params.id);
   const { account, loading: loadingAcct } = useSingleUserAccount(params.id);
-  const [selectedRequest, setSelectedRequest] = useState<TrxData | null>(null);
+  const [selectedRequest, setSelectedRequest] =
+    useState<TransactionType | null>(null);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
 

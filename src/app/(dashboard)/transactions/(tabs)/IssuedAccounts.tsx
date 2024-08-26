@@ -88,7 +88,9 @@ export const IssuedAccountsTab = () => {
         >
           {element.senderIban}
         </TableTd>
-        <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
+        <TableTd className={styles.table__td}>
+          {element.recipientName || element.recipientIban}
+        </TableTd>
         <TableTd className={styles.table__td}>
           <Flex align="center" gap={5}>
             <IconArrowUpRight

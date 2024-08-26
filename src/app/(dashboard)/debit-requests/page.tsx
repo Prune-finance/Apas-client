@@ -59,7 +59,7 @@ function DebitRequests() {
     // ...(type && { type: type.toLowerCase() }),
   };
 
-  const { loading, requests, meta } = useUserDebitRequests({
+  const { loading, requests, meta, revalidate } = useUserDebitRequests({
     ...(isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
@@ -165,13 +165,15 @@ function DebitRequests() {
         size={"50%"}
         withCloseButton={false}
       >
-        <DebitRequestModal close={close} />
+        <DebitRequestModal close={close} revalidate={revalidate} />
       </Modal>
 
       <DebitRequestDrawer
         selectedRequest={selectedRequest}
+        setSelectedRequest={setSelectedRequest}
         opened={drawerOpened}
         close={closeDrawer}
+        revalidate={revalidate}
       />
     </main>
   );

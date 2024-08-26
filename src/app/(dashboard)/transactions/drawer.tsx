@@ -9,6 +9,7 @@ import {
   Badge,
   Stack,
   Group,
+  Skeleton,
 } from "@mantine/core";
 import {
   IconX,
@@ -30,6 +31,8 @@ import {
 } from "@/ui/components/TransactionReceipt";
 import { useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
+import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
+import { send } from "process";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
@@ -42,9 +45,14 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
+  console.log(selectedRequest);
   const pdfRef = useRef<HTMLDivElement>(null);
+
+  const { account: senderAccount, loading: loadingSenderAcct } =
+    useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
+
   const beneficiaryDetails = {
-    "Account Name": "N/A",
+    "Account Name": selectedRequest?.recipientName || "N/A",
     IBAN: selectedRequest?.recipientIban,
     BIC: selectedRequest?.recipientBic,
     "Bank Name": selectedRequest?.recipientBankAddress,
@@ -53,9 +61,13 @@ export const TransactionDrawer = ({
   };
 
   const senderDetails = {
-    "Account Name": "N/A",
+    "Account Name": loadingSenderAcct ? (
+      <Skeleton h={10} w={100} />
+    ) : (
+      senderAccount?.accountName ?? "N/A"
+    ),
     IBAN: selectedRequest?.senderIban,
-    BIC: "N/A",
+    BIC: "ARPYGB21XXX",
   };
 
   const otherDetails = {
@@ -78,8 +90,9 @@ export const TransactionDrawer = ({
 
   const BeneficiaryDetails = {
     "Amount Received": formatNumber(selectedRequest?.amount ?? 0, true, "EUR"),
-    "First Name": selectedRequest?.destinationFirstName ?? "N/A",
-    "Last Name": selectedRequest?.destinationLastName ?? "N/A",
+    // "First Name": selectedRequest?.destinationFirstName ?? "N/A",
+    // "Last Name": selectedRequest?.destinationLastName ?? "N/A",
+    Name: selectedRequest?.recipientName || "N/A",
     IBAN: selectedRequest?.recipientIban ?? "",
     "Bank Name": selectedRequest?.recipientBankAddress ?? "",
     Country: selectedRequest?.recipientBankCountry ?? "",
@@ -87,10 +100,10 @@ export const TransactionDrawer = ({
   };
 
   const SenderDetails = {
-    "Account Name": "N/A",
+    "Account Name": senderAccount?.accountName ?? "N/A",
     "Account Number": selectedRequest?.senderIban ?? "",
-    "Bank Name": "N/A",
-    BIC: "N/A",
+    "Bank Name": "Prune Payments LTD",
+    BIC: "ARPYGB21XXX",
   };
 
   const OtherDetails = {

@@ -216,13 +216,6 @@ export function useSingleUserAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-// {
-//   {
-//     account - srv;
-//   }
-// }
-// /v1/accnostu / number / GB12045505050505128;
-
 export function useSingleUserAccountByIBAN(iban: string) {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
@@ -253,7 +246,7 @@ export function useSingleUserAccountByIBAN(iban: string) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [iban]);
 
   return { loading, account, revalidate };
 }

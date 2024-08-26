@@ -311,6 +311,7 @@ export interface TransactionType {
   recipientBic: string;
   recipientBankAddress: string;
   recipientBankCountry: string;
+  recipientName: string;
   amount: number;
   reference: string;
   centrolinkRef: string;

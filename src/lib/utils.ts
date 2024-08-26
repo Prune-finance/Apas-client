@@ -31,17 +31,12 @@ export const formatDateTime = (time: string) => {
 
 export const approvedBadgeColor = (status: string) => {
   switch (true) {
-    case status === "APPROVED":
+    case status === "APPROVED" ||
+      status === "COMPLETED" ||
+      status === "SUCCESSFUL" ||
+      status === "CONFIRMED":
       return "#12B76A";
-    case status === "COMPLETED":
-      return "#12B76A";
-    case status === "SUCCESSFUL":
-      return "#12B76A";
-    case status === "CONFIRMED":
-      return "#12B76A";
-    case status === "REJECTED":
-      return "#FF4D4F";
-    case status === "FAILED":
+    case status === "REJECTED" || status === "CANCELLED" || status === "FAILED":
       return "#FF4D4F";
     case status === "PENDING":
       return "#C6A700";

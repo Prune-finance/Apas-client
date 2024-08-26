@@ -23,10 +23,10 @@ export default function AccountDetails({ account, loading }: Props) {
   const accountDetails = {
     "Account Name": account?.accountName,
     "IBAN/Account Number": account?.accountNumber,
-    BIC: "233423421",
-    "Bank Name": "Community Federal Savings Bank",
-    "Bank Address": "Via Alessandro Specchi, 16, 00186 Roma",
-    "Bank Country": "France",
+    BIC: "ARPYGB21XXX",
+    "Bank Name": "Prune Payments LTD",
+    "Bank Address": "Office 7 35-37 Ludgate Hill, London",
+    "Bank Country": "Lithuania",
   };
 
   return (
@@ -43,7 +43,7 @@ export default function AccountDetails({ account, loading }: Props) {
             account?.accountName ?? ""
           },\nIBAN/Account Number: ${
             account?.accountNumber ?? ""
-          },\nBIC: 233423421,\nBank Name: Community Federal Savings Bank,\nBank Address: Via Alessandro Specchi, 16, 00186 Roma,\nBank Country: France`}
+          },\nBIC: ARPYGB21XXX,\nBank Name: Prune Payments LTD,\nBank Address: Office 7 35-37 Ludgate Hill, London,\nBank Country: Lithuania`}
         >
           {({ copied, copy }) => (
             <PrimaryBtn

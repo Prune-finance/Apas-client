@@ -26,7 +26,7 @@ export default function AccountDetails({ account, loading }: Props) {
     BIC: "ARPYGB21XXX",
     "Bank Name": "Prune Payments LTD",
     "Bank Address": "Office 7 35-37 Ludgate Hill, London",
-    "Bank Country": "Lithuania",
+    "Bank Country": "United Kingdom",
   };
 
   return (
@@ -43,7 +43,7 @@ export default function AccountDetails({ account, loading }: Props) {
             account?.accountName ?? ""
           },\nIBAN/Account Number: ${
             account?.accountNumber ?? ""
-          },\nBIC: ARPYGB21XXX,\nBank Name: Prune Payments LTD,\nBank Address: Office 7 35-37 Ludgate Hill, London,\nBank Country: Lithuania`}
+          },\nBIC: ARPYGB21XXX,\nBank Name: Prune Payments LTD,\nBank Address: Office 7 35-37 Ludgate Hill, London,\nBank Country: United Kingdom`}
         >
           {({ copied, copy }) => (
             <PrimaryBtn

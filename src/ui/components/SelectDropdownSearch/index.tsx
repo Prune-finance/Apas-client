@@ -60,6 +60,7 @@ interface Props {
   value: string;
   label?: string;
   accountsData?: AccountData[];
+  disabled?: boolean;
 }
 
 export function SelectDropdownSearch({
@@ -67,6 +68,7 @@ export function SelectDropdownSearch({
   setValue,
   label,
   accountsData,
+  disabled,
 }: Props) {
   const [search, setSearch] = useState("");
   const { accounts, loading } = useUserAccounts({ limit: 1000 });
@@ -127,6 +129,7 @@ export function SelectDropdownSearch({
           rightSectionPointerEvents="none"
           labelProps={{ mb: 10, fz: 12 }}
           label={label ?? "Account"}
+          disabled={disabled}
           size="md"
           radius="md"
           classNames={{ input: styles.input }}

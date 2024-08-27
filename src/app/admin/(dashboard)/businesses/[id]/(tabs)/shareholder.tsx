@@ -182,14 +182,14 @@ export default function Shareholders({
       </Group>
       {business?.shareholders.map((shareholder, index) => {
         return (
-          <Fragment key={index}>
+          <Stack gap={20} key={index}>
             <DirectorsForm
               updateDirector={updateDirector}
               deleteDirector={deleteDirector}
               director={shareholder}
               index={index}
             />
-          </Fragment>
+          </Stack>
         );
       })}
 

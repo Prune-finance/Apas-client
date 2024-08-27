@@ -16,6 +16,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import {
+  IconFileTypePdf,
   IconJpg,
   IconPdf,
   IconPencilMinus,
@@ -83,7 +84,7 @@ export default function Documents({
           domain,
           contactNumber,
           ...form.values,
-          ...(otherDocuments && { otherDocuments }),
+          ...(otherDocuments && { documents: otherDocuments }),
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -346,7 +347,7 @@ const DocumentTextInput = ({
         input: styles.input,
         label: styles.label,
       }}
-      leftSection={<IconPdf />}
+      leftSection={<IconFileTypePdf color="var(--prune-text-gray-700)" />}
       leftSectionPointerEvents="none"
       rightSection={
         !editing ? (
@@ -382,7 +383,7 @@ const DocumentTextInput = ({
                 className={styles.input__right__section}
                 {...props}
               >
-                <Text fw={600} fz={10} c="##475467">
+                <Text fw={600} fz={10} c="#475467">
                   Re-upload
                 </Text>
               </UnstyledButton>
@@ -442,7 +443,7 @@ const OtherDocumentTextInput = ({
         input: styles.input,
         label: styles.label,
       }}
-      leftSection={<IconPdf />}
+      leftSection={<IconFileTypePdf color="var(--prune-text-gray-700)" />}
       leftSectionPointerEvents="none"
       rightSection={
         !editing ? (

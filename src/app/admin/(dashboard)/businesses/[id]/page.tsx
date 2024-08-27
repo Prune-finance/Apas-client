@@ -53,7 +53,7 @@ import { activeBadgeColor } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
-import { PrimaryBtn } from "@/ui/components/Buttons";
+import { BackBtn, PrimaryBtn } from "@/ui/components/Buttons";
 
 export default function SingleBusiness() {
   const router = useRouter();
@@ -179,7 +179,7 @@ export default function SingleBusiness() {
       />
 
       <div className={styles.page__container}>
-        <Group gap={8} mb={24}>
+        {/* <Group gap={8} mb={24}>
           <UnstyledButton onClick={router.back}>
             <ThemeIcon variant="transparent" radius="lg">
               <IconArrowLeft
@@ -192,7 +192,8 @@ export default function SingleBusiness() {
           <Text fz={14} c="var(--prune-text-gray-500)" fw={400}>
             Business
           </Text>
-        </Group>
+        </Group> */}
+        <BackBtn text="Business" />
         <div className={styles.container__header}>
           <div className={styles.header__left}>
             {business ? (

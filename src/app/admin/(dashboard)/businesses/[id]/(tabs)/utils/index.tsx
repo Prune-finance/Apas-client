@@ -21,7 +21,7 @@ import {
   Textarea,
   ThemeIcon,
 } from "@mantine/core";
-import { IconFileInfo, IconX } from "@tabler/icons-react";
+import { IconFileInfo, IconFileTypePdf, IconX } from "@tabler/icons-react";
 import DropzoneComponent from "@/ui/components/Dropzone";
 import { useState } from "react";
 import useNotification from "@/lib/hooks/notification";
@@ -88,7 +88,7 @@ export const DocumentTextInput = ({
           label: styles.label,
           section: styles.section,
         }}
-        leftSection={<IconFileInfo />}
+        leftSection={<IconFileTypePdf color="var(--prune-text-gray-700)" />}
         leftSectionPointerEvents="none"
         rightSectionPointerEvents="auto"
         {...form.getInputProps(formKey)}

@@ -320,7 +320,6 @@ export function SingleAccount({
             loading={loading}
             h={190}
           >
-           
             <CopyButton
               value={`Account Name: ${
                 account?.accountName ?? ""
@@ -667,6 +666,7 @@ export const IssuedAccountHead = ({
       <Group gap={12} align="center">
         {!loading ? (
           <Avatar
+            variant="filled"
             size="lg"
             color="var(--prune-primary-700)"
           >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(

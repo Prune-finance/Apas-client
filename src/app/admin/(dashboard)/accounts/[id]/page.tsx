@@ -7,8 +7,14 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { useState } from "react";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 
-import { useTransactions } from "@/lib/hooks/transactions";
-import { SingleAccount } from "@/ui/components/SingleAccount";
+import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
+import {
+  IssuedAccountHead,
+  SingleAccount,
+  SingleAccountBody,
+} from "@/ui/components/SingleAccount";
+import { useDisclosure } from "@mantine/hooks";
+import { Space } from "@mantine/core";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -20,6 +26,9 @@ export default function Account() {
 
   const { loading, account, revalidate } = useSingleAccount(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
+  const [opened, { open, close }] = useDisclosure(false);
+  const [openedFreeze, { open: openFreeze, close: closeFreeze }] =
+    useDisclosure(false);
 
   return (
     <main>
@@ -35,7 +44,7 @@ export default function Account() {
         ]}
       />
 
-      <SingleAccount
+      {/* <SingleAccount
         setChartFrequency={setChartFrequency}
         account={account}
         transactions={transactions}
@@ -43,6 +52,24 @@ export default function Account() {
         loading={loading}
         params={params}
         revalidate={revalidate}
+      /> */}
+
+      {/* Add OpenFreeze useDisclosure */}
+      <Space mt={32} />
+      <IssuedAccountHead
+        account={account}
+        loading={loading}
+        open={open}
+        openFreeze={openFreeze}
+        admin
+      />
+
+      <SingleAccountBody
+        account={account}
+        transactions={transactions as TransactionType[]}
+        loading={loading}
+        loadingTrx={trxLoading}
+        setChartFrequency={setChartFrequency}
       />
     </main>
   );

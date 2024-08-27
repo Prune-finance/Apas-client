@@ -47,7 +47,7 @@ export default function AccountDetails({ account, loading }: Props) {
         >
           {({ copied, copy }) => (
             <PrimaryBtn
-              text={copied ? "Copied" : "Copy Detail"}
+              text={copied ? "Copied" : "Copy Details"}
               action={copy}
               td="underline"
               c="var(--prune-primary-800)"

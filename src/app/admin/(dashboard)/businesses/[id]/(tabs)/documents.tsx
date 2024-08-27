@@ -26,7 +26,7 @@ import {
 import Cookies from "js-cookie";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessData } from "@/lib/hooks/businesses";
+import { BusinessData, OtherDocuments } from "@/lib/hooks/businesses";
 import { useState } from "react";
 import axios from "axios";
 import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
@@ -40,6 +40,7 @@ import {
   OtherDocumentType,
   otherDocumentValues,
 } from "@/lib/schema";
+import { title } from "process";
 
 export default function Documents({
   business,
@@ -61,6 +62,7 @@ export default function Documents({
     shareholderParticular: business.shareholderParticular,
     amlCompliance: business.amlCompliance,
     operationalLicense: business.operationalLicense,
+
     // otherDocuments: business.otherDocuments,
   };
 
@@ -69,9 +71,11 @@ export default function Documents({
     // validate: zodResolver(validateNewBusiness),
   });
 
-  const handleBusinessUpdate = async (
-    otherDocuments?: Record<string, string>
-  ) => {
+  const otherDocsForm = useForm<{ documents: OtherDocuments[] }>({
+    initialValues: { documents: business.documents },
+  });
+
+  const handleBusinessUpdate = async (documents?: OtherDocuments[]) => {
     const { contactEmail, name, contactNumber, domain } = business;
 
     setProcessing(true);
@@ -84,7 +88,7 @@ export default function Documents({
           domain,
           contactNumber,
           ...form.values,
-          ...(otherDocuments && { documents: otherDocuments }),
+          ...(documents && { documents }),
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -216,7 +220,7 @@ export default function Documents({
           </GridCol>
         </Grid>
 
-        <NewBusinessModal
+        <NewDocumentModal
           opened={opened}
           close={close}
           handleBusinessUpdate={handleBusinessUpdate}
@@ -224,15 +228,14 @@ export default function Documents({
         />
       </div>
 
-      {business.otherDocuments &&
-        Object.keys(business.otherDocuments).length > 0 && (
-          <div className={styles.top__container} style={{ marginTop: "32px" }}>
-            <Flex justify="space-between" align="center">
-              <Text fz={12} fw={600} tt="uppercase">
-                Other Documents
-              </Text>
+      {business.documents && business.documents.length > 0 && (
+        <div className={styles.top__container} style={{ marginTop: "32px" }}>
+          <Flex justify="space-between" align="center">
+            <Text fz={12} fw={600} tt="uppercase">
+              Other Documents
+            </Text>
 
-              {/* {!editingDoc ? (
+            {!editingDoc ? (
               <SecondaryBtn
                 text="Edit"
                 icon={IconPencilMinus}
@@ -253,34 +256,33 @@ export default function Documents({
                   text="Save Changes"
                   loading={processing}
                   action={() => {
-                    handleBusinessUpdate();
+                    handleBusinessUpdate(otherDocsForm.values.documents);
                   }}
                 />
               </Group>
-            )} */}
-            </Flex>
+            )}
+          </Flex>
 
-            <Grid mt={20} className={styles.grid__container}>
-              {Object.entries(business.otherDocuments).map(
-                ([entry, value], index) => {
-                  return (
-                    <GridCol span={4} className={styles.grid}>
-                      <OtherDocumentTextInput
-                        title={`${entry}`}
-                        label={entry}
-                        form={form}
-                        // formKey={``}
-                        editing={false}
-                        business={business}
-                        url={value}
-                      />
-                    </GridCol>
-                  );
-                }
-              )}
-            </Grid>
-          </div>
-        )}
+          <Grid mt={20} className={styles.grid__container}>
+            {business.documents.map((value, index) => {
+              return (
+                <GridCol span={4} className={styles.grid} key={index}>
+                  <OtherDocumentTextInput
+                    title={`${value.title}`}
+                    label={value.title}
+                    form={otherDocsForm}
+                    editing={editingDoc}
+                    business={business}
+                    url={value.documentURL}
+                    index={index}
+                    handleBusinessUpdate={handleBusinessUpdate}
+                  />
+                </GridCol>
+              );
+            })}
+          </Grid>
+        </div>
+      )}
     </div>
   );
 }
@@ -398,21 +400,27 @@ const DocumentTextInput = ({
 };
 
 interface OtherDocumentTextInputProps
-  extends Omit<DocumentTextInputProps, "formKey"> {}
+  extends Omit<DocumentTextInputProps, "formKey" | "form"> {
+  index: number;
+  form: UseFormReturnType<{ documents: OtherDocuments[] }>;
+  handleBusinessUpdate: (documents: OtherDocuments[]) => Promise<void>;
+}
 
 const OtherDocumentTextInput = ({
   editing,
   business,
-  form,
-  // formKey,
+  index,
   label,
   title,
   url,
+  form,
+  handleBusinessUpdate,
 }: OtherDocumentTextInputProps) => {
   const [processing, setProcessing] = useState(false);
   const { handleError, handleInfo } = useNotification();
+  const [docName, setDocName] = useState(title);
 
-  const handleUpload = async (file: File | null, formKey: string) => {
+  const handleUpload = async (file: File | null) => {
     setProcessing(true);
     try {
       if (!file) return;
@@ -420,16 +428,13 @@ const OtherDocumentTextInput = ({
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data } = await axios.post(
+      const { data: res } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
         formData,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      if (formKey) {
-        form.setFieldValue(formKey, data.data.url);
-      }
-      // setUploaded(true);
+      form.setFieldValue(`documents.${index}.documentURL`, res.data.url);
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -443,6 +448,7 @@ const OtherDocumentTextInput = ({
         input: styles.input,
         label: styles.label,
       }}
+      {...form.getInputProps(`documents.${index}.title`)}
       leftSection={<IconFileTypePdf color="var(--prune-text-gray-700)" />}
       leftSectionPointerEvents="none"
       rightSection={
@@ -459,34 +465,23 @@ const OtherDocumentTextInput = ({
             </Text>
           </UnstyledButton>
         ) : (
-          // <FileButton
-          //   disabled={processing}
-          //   // onChange={(file) => handleUpload(file, formKey)}
-          //   accept="image/png, image/jpeg, application/pdf"
-          // >
-          //   {(props) => (
-          //     <UnstyledButton
-          //       w={"100%"}
-          //       className={styles.input__right__section}
-          //       {...props}
-          //     >
-          //       <Text fw={600} fz={10} c="##475467">
-          //         Re-upload
-          //       </Text>
-          //     </UnstyledButton>
-          //   )}
-          // </FileButton>
-          <UnstyledButton
-            onClick={() => {
-              if (!url) return handleInfo("No documents here", "");
-              return window.open(url, "_blank");
-            }}
-            className={styles.input__right__section}
+          <FileButton
+            disabled={processing}
+            onChange={(file) => handleUpload(file)}
+            accept="image/png, image/jpeg, application/pdf"
           >
-            <Text fw={600} fz={10} c="#475467">
-              View
-            </Text>
-          </UnstyledButton>
+            {(props) => (
+              <UnstyledButton
+                w={"100%"}
+                className={styles.input__right__section}
+                {...props}
+              >
+                <Text fw={600} fz={10} c="#475467">
+                  Re-upload
+                </Text>
+              </UnstyledButton>
+            )}
+          </FileButton>
         )
       }
       label={label}
@@ -498,13 +493,11 @@ const OtherDocumentTextInput = ({
 interface NewBizProps {
   opened: boolean;
   close: () => void;
-  handleBusinessUpdate: (
-    otherDocuments?: Record<string, string>
-  ) => Promise<void>;
+  handleBusinessUpdate: (documents: OtherDocuments[]) => Promise<void>;
   business: BusinessData;
 }
 
-const NewBusinessModal = ({
+const NewDocumentModal = ({
   opened,
   close,
   handleBusinessUpdate,
@@ -525,10 +518,12 @@ const NewBusinessModal = ({
     const { name, url } = form.values;
     try {
       await handleBusinessUpdate(
-        business.otherDocuments
-          ? { ...business.otherDocuments, [name]: url }
-          : { [name]: url }
+        business.documents
+          ? [...business.documents, { title: name, documentURL: url }]
+          : [{ title: name, documentURL: url }]
       );
+      close();
+      form.reset();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {

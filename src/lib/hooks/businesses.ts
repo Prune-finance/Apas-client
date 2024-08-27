@@ -1,3 +1,4 @@
+import { otherDocumentSchema } from "./../schema";
 import { DebitRequest } from "./requests";
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
@@ -259,8 +260,14 @@ export interface BusinessData {
   pricingPlanId: null | string;
   pricingPlan: PricingPlan | null;
   otherDocuments: Record<string, string>;
+  documents: OtherDocuments[];
   Accounts: { DebitRequests: { id: string }[] }[];
   Requests: { type: string; id: string }[];
+}
+
+export interface OtherDocuments {
+  title: string;
+  documentURL: string;
 }
 
 export interface PricingPlan {

@@ -141,7 +141,7 @@ export const DebitRequestDrawer = ({
           c="var(--prune-text-gray-800)"
           fw={600}
         >
-          Account Details
+          Sender Details
         </Text>
 
         <Flex direction="column" gap={30}>
@@ -167,12 +167,12 @@ export const DebitRequestDrawer = ({
           c="var(--prune-text-gray-800)"
           fw={600}
         >
-          Destination Details
+          Beneficiary Details
         </Text>
 
         <Flex direction="column" gap={30}>
           {Object.entries(destDetails).map(([key, value]) => (
-            <Flex justify="space-between">
+            <Flex justify="space-between" key={key}>
               <Text fz={12} c="var(--prune-text-gray-500)">
                 {`${key}:`}
               </Text>

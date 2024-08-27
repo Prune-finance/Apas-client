@@ -121,13 +121,26 @@ export default function DebitRequestModal({
               setValue={(value) => form.setFieldValue("account", value)}
               label="Account Name"
               accountsData={accountsData}
+              disabled={!!selectedId}
             />
           </Box>
 
           <Stack gap={4} flex={1}>
             <NumberInput
               classNames={{ input: styles.input, label: styles.label }}
+              description={
+                Number(form.values.amount) >
+                Number(
+                  accounts.find((item) => item.id === form.values.account)
+                    ?.accountBalance
+                )
+                  ? "Insufficient Balance"
+                  : ""
+              }
               styles={{
+                description: {
+                  color: "var(--prune-warning)",
+                },
                 input: {
                   border:
                     Number(form.values.amount) >

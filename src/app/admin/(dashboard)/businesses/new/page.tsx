@@ -190,6 +190,38 @@ export default function NewBusiness() {
     form.insertListItem("shareholders", director);
   };
 
+  const removeShareholder = (director: DirectorEtShareholder) => {
+    // Find the index of the shareholder to remove using director object
+    const index =
+      form.values.shareholders &&
+      form.values.shareholders.findIndex((item) => {
+        return Object.keys(item).every(
+          (key) =>
+            item[key as keyof DirectorEtShareholder] ===
+            director[key as keyof DirectorEtShareholder]
+        );
+      });
+    // Remove the shareholder from the form
+    if (index && index !== -1) form.removeListItem("shareholders", index);
+  };
+
+  const isShareholderADirector = (director: DirectorEtShareholder) => {
+    // return false if the director's value is empty
+    if (Object.values(director).every(isEmpty)) return false;
+
+    return (
+      form.values.shareholders &&
+      form.values.shareholders.some((shareholder) => {
+        return Object.keys(director).every((key) => {
+          return (
+            director[key as keyof DirectorEtShareholder] ===
+            shareholder[key as keyof DirectorEtShareholder]
+          );
+        });
+      })
+    );
+  };
+
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -229,29 +261,20 @@ export default function NewBusiness() {
             <Documents form={form} />
           </Stepper.Step>
           <Stepper.Step label="Directors">
-            <Group justify="space-between">
+            <Group justify="space-between" mb={30}>
               <Text fz={16} fw={600} c="var(--prune-text-gray-700)">
                 Directors
               </Text>
-              <Button
-                variant="transparent"
-                fz={14}
-                color="var(--prune-text-gray-700)"
-                leftSection={
-                  <ThemeIcon
-                    color="var(--prune-primary-600)"
-                    radius="xl"
-                    size={24}
-                  >
-                    <IconPlus size={16} color="var(--prune-text-gray-700)" />
-                  </ThemeIcon>
-                }
-                onClick={() =>
+
+              <PrimaryBtn
+                text="Add Director"
+                icon={IconPlus}
+                action={() =>
                   form.insertListItem("directors", directorEtShareholderSchema)
                 }
-              >
-                Add New Director
-              </Button>
+                fw={600}
+                h={28}
+              />
             </Group>
             <Box>
               {form.values.directors &&
@@ -291,10 +314,11 @@ export default function NewBusiness() {
                       fz={8}
                       styles={{ label: { fontSize: "12px", fontWeight: 500 } }}
                       color="var(--prune-primary-600)"
+                      checked={isShareholderADirector(director)}
                       onChange={(e) => {
                         e.target.checked
                           ? makeDirectorAShareholder(director)
-                          : {};
+                          : removeShareholder(director);
                       }}
                     />
 
@@ -304,11 +328,11 @@ export default function NewBusiness() {
             </Box>
           </Stepper.Step>
           <Stepper.Step label="Shareholders">
-            <Group justify="space-between">
+            <Group justify="space-between" mb={30}>
               <Text fz={16} fw={600} c="var(--prune-text-gray-700)">
                 Shareholders
               </Text>
-              <Button
+              {/* <Button
                 variant="transparent"
                 fz={14}
                 color="var(--prune-text-gray-700)"
@@ -329,7 +353,19 @@ export default function NewBusiness() {
                 }
               >
                 Add New Shareholder
-              </Button>
+              </Button> */}
+              <PrimaryBtn
+                text="Add Shareholder"
+                icon={IconPlus}
+                action={() =>
+                  form.insertListItem(
+                    "shareholders",
+                    directorEtShareholderSchema
+                  )
+                }
+                fw={600}
+                h={28}
+              />
             </Group>
             <Box>
               {form.values.shareholders &&

@@ -29,6 +29,8 @@ export default function BasicInfo({ form }: Props) {
     value: plan.id,
   }));
 
+  console.log(form.values);
+
   return (
     <Box>
       <Text fz={18} fw={600} c="var(--prune-text-gray-700)" mb={24}>
@@ -122,7 +124,7 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           label="First Name"
           placeholder="Enter First Name"
-          // {...form.getInputProps("name")}
+          {...form.getInputProps("contactFirstName")}
           withAsterisk
         />
         <TextInput
@@ -130,7 +132,7 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           label="Last Name"
           placeholder="Enter Last Name"
-          // {...form.getInputProps("name")}
+          {...form.getInputProps("contactLastName")}
           withAsterisk
         />
       </Flex>
@@ -171,7 +173,7 @@ export default function BasicInfo({ form }: Props) {
           classNames={{ input: styles.input }}
           flex={1}
           data={["ID Card", "Passport", "Residence Permit"]}
-          {...form.getInputProps(`contactPerson.identityType`)}
+          {...form.getInputProps(`contactIdType`)}
         />
 
         <Select
@@ -179,42 +181,38 @@ export default function BasicInfo({ form }: Props) {
           classNames={{ input: styles.input }}
           flex={1}
           data={["Utility Bill"]}
-          {...form.getInputProps(`contactPerson.proofOfAddress`)}
+          {...form.getInputProps(`contactPOAType`)}
           withAsterisk
         />
       </Flex>
 
       <Flex mt={24} gap={20}>
-        {form.values.contactPerson.identityType && (
+        {form.values.contactIdType && (
           <>
             <Box flex={1}>
               <Text fz={12} c="#344054" mb={10}>
-                {`Upload ${form.values.contactPerson.identityType} ${
-                  form.values.contactPerson.identityType !== "Passport"
-                    ? "(Front)"
-                    : ""
+                {`Upload ${form.values.contactIdType} ${
+                  form.values.contactIdType !== "Passport" ? "(Front)" : ""
                 }`}
               </Text>
               <DropzoneComponent
                 form={form}
-                formKey={`directors.identityFileUrl`}
-                uploadedFileUrl={form.values.contactPerson.identityFileUrl}
+                formKey={`contactIdUrl`}
+                uploadedFileUrl={form.values.contactIdUrl}
               />
             </Box>
 
             <>
-              {form.values.contactPerson.identityType !== "Passport" && (
+              {form.values.contactIdType !== "Passport" && (
                 <Box flex={1}>
                   <Text fz={12} c="#344054" mb={10}>
                     {`Upload
-                ${form.values.contactPerson.identityType}  (Back)`}
+                ${form.values.contactIdType}  (Back)`}
                   </Text>
                   <DropzoneComponent
                     form={form}
-                    formKey={`contactPerson.identityFileUrlBack`}
-                    uploadedFileUrl={
-                      form.values.contactPerson.identityFileUrlBack
-                    }
+                    formKey={`contactIdUrlBack`}
+                    uploadedFileUrl={form.values.contactIdUrlBack}
                   />
                 </Box>
               )}
@@ -222,15 +220,15 @@ export default function BasicInfo({ form }: Props) {
           </>
         )}
 
-        {form.values.directors && form.values.contactPerson.proofOfAddress && (
+        {form.values.directors && form.values.contactPOAType && (
           <Box flex={1}>
             <Text fz={12} c="#344054" mb={10}>
               Upload Utility Bill
             </Text>
             <DropzoneComponent
               form={form}
-              formKey={`directors.proofOfAddressFileUrl`}
-              uploadedFileUrl={form.values.contactPerson.proofOfAddressFileUrl}
+              formKey={`contactPOAUrl`}
+              uploadedFileUrl={form.values.contactPOAUrl}
             />
           </Box>
         )}

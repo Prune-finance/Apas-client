@@ -39,7 +39,7 @@ export default function LoginForm() {
 
       setUser({ ...data.data });
 
-      Cookies.set("auth", data.meta.token);
+      Cookies.set("auth", data.meta.token, { expires: 0.25 });
       handleSuccess("Authentication Successful", "Welcome back");
       window.location.replace("/");
     } catch (error) {

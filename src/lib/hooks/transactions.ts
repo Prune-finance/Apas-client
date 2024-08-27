@@ -321,4 +321,5 @@ export interface TransactionType {
   destinationFirstName: string;
   destinationLastName: string;
   intermediary?: string;
+  type: "DEBIT" | "CREDIT";
 }

@@ -107,7 +107,7 @@ export const TransactionDrawer = ({
   };
 
   const OtherDetails = {
-    Type: "Debit",
+    Type: selectedRequest?.type === "DEBIT" ? "Debit" : "Credit",
     "Payment Date": dayjs(selectedRequest?.createdAt).format(
       "hh:mm A Do MMM YYYY"
     ),

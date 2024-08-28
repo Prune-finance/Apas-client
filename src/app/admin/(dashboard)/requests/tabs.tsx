@@ -19,7 +19,7 @@ import { TabsList, TabsTab, Tabs, TabsPanel } from "@mantine/core";
 import Debit from "./(tabs)/debit";
 import Reactivate from "./(tabs)/reactivate";
 import Deactivate from "./(tabs)/deactivate";
-import Freeze from "./(tabs)/freeze";
+import PayoutAccount from "./(tabs)/payout";
 import Unfreeze from "./(tabs)/unfreeze";
 import TabsComponent from "@/ui/components/Tabs";
 
@@ -31,6 +31,10 @@ export default function TabsContainer() {
       </TabsPanel>
 
       <TabsPanel value={tabs[1].value}>
+        <PayoutAccount />
+      </TabsPanel>
+
+      <TabsPanel value={tabs[2].value}>
         <Reactivate />
       </TabsPanel>
     </TabsComponent>
@@ -42,6 +46,11 @@ const tabs = [
     title: "Debit",
     value: "Debit",
     icon: <IconCircleArrowUpRight size={16} />,
+  },
+  {
+    title: "Payout Account",
+    value: "payout-account",
+    icon: <IconUserPlus size={16} />,
   },
   {
     title: "Other Requests",

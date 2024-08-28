@@ -2,6 +2,9 @@ import { Fragment, Suspense } from "react";
 
 import Cookies from "js-cookie";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 import axios from "axios";
 import { useState } from "react";
 
@@ -36,7 +39,11 @@ import {
   approvedBadgeColor,
   formatNumber,
 } from "@/lib/utils";
-import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
+import {
+  DebitRequest,
+  useDebitRequests,
+  usePayoutRequests,
+} from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -52,8 +59,11 @@ import { TableComponent } from "@/ui/components/Table";
 import { useBusiness } from "@/lib/hooks/businesses";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import { BadgeComponent } from "@/ui/components/Badge";
+import { SearchInput } from "@/ui/components/Inputs";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 
-function Freeze() {
+function PayoutAccount() {
   const searchParams = useSearchParams();
 
   const {
@@ -63,14 +73,6 @@ function Freeze() {
     sort,
   } = Object.fromEntries(searchParams.entries());
   const { handleError, handleSuccess } = useNotification();
-  const { requests, revalidate } = useDebitRequests({
-    ...(isNaN(Number(_limit))
-      ? { limit: 10 }
-      : { limit: parseInt(_limit, 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-  });
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -84,11 +86,8 @@ function Freeze() {
     // ...(type && { type: type.toLowerCase() }),
   };
 
-  const { loading, meta, businesses } = useBusiness(
-    queryParams,
-    undefined,
-    true
-  );
+  const { requests, loading, revalidate, meta } =
+    usePayoutRequests(queryParams);
 
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
@@ -185,38 +184,26 @@ function Freeze() {
     push(`/admin/requests/${id}/freeze`);
   };
 
-  const rows = filteredSearch(
-    businesses,
-    ["name", "contactEmail"],
-    debouncedSearch
-  ).map((element, index) => (
-    <TableTr
-      key={index}
-      onClick={() => handleRowClick(element.id)}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd>{element.name}</TableTd>
-      {/* <TableTd className={styles.table__td}>{element.amount}</TableTd> */}
-      <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor(element.companyStatus)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          {element.companyStatus.toLowerCase()}
-        </Badge>
-      </TableTd>
+  const rows = filteredSearch(requests, ["companyName"], debouncedSearch).map(
+    (element, index) => (
+      <TableTr
+        key={index}
+        onClick={() => handleRowClick(element.id)}
+        style={{ cursor: "pointer" }}
+      >
+        <TableTd>{element.companyName}</TableTd>
+        <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
 
-      {/* <TableTd className={`${styles.table__td}`}>
+        <TableTd className={`${styles.table__td}`}>
+          <BadgeComponent status={element.status} />
+        </TableTd>
+
+        {/* <TableTd className={`${styles.table__td}`}>
         <MenuComponent request={element} />
       </TableTd> */}
-    </TableTr>
-  ));
+      </TableTr>
+    )
+  );
 
   const form = useForm<BusinessFilterType>({
     initialValues: businessFilterValues,
@@ -226,29 +213,9 @@ function Freeze() {
   return (
     <Fragment>
       <div className={`${styles.container__search__filter}`}>
-        <TextInput
-          placeholder="Search here..."
-          leftSectionPointerEvents="none"
-          leftSection={searchIcon}
-          // classNames={{ wrapper: styles.search, input: styles.input__search }}
-          value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
-          w={324}
-          styles={{ input: { border: "1px solid #f5f5f5" } }}
-        />
+        <SearchInput search={search} setSearch={setSearch} />
 
-        <Button
-          // className={styles.filter__cta}
-          rightSection={<IconListTree size={14} />}
-          fz={12}
-          fw={500}
-          variant="outline"
-          color="var(--prune-text-gray-200)"
-          c="var(--prune-text-gray-800)"
-          onClick={toggle}
-        >
-          Filter
-        </Button>
+        <SecondaryBtn text="Filter" action={toggle} />
       </div>
 
       <Filter<BusinessFilterType>
@@ -387,7 +354,7 @@ function Freeze() {
         close={close}
         action={handleRejectRequest}
         processing={processing}
-        title="Deny This Debit Request?"
+        title="Reject This Debit Request?"
         text="This means you are rejecting the debit request of this business."
         customApproveMessage="Yes, Deny It"
       />
@@ -409,17 +376,16 @@ function Freeze() {
 
 const tableHeaders = [
   "Business Name",
-  // "Number of Requests",
-  "Contact Email",
+  "Requests Date",
+  // "Contact Email",
   "Status",
-  // "Action",
+  "Action",
 ];
 
-<Freeze />;
-export default function FreezeSuspense() {
+export default function PayoutAccountSuspense() {
   return (
     <Suspense>
-      <Freeze />
+      <PayoutAccount />
     </Suspense>
   );
 }

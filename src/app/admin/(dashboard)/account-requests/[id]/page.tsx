@@ -204,7 +204,7 @@ function BusinessAccountRequests() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Account Requests", href: "/admin/account-requests" },
+          { title: "Account Creation", href: "/admin/account-requests" },
           {
             title: requests[0]?.Company.name,
             href: `/admin/account-requests/${params.id}`,

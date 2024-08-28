@@ -53,6 +53,11 @@ export const AdminMainLinks = [
     icon: <IconArrowsSort size={16} />,
   },
   {
+    text: "Payouts",
+    link: "/admin/payouts",
+    icon: <IconArrowUpRight size={16} />,
+  },
+  {
     text: "Requests",
     link: "/admin/requests",
     icon: <IconCreditCardPay size={16} />,

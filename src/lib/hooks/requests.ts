@@ -2,6 +2,7 @@ import axios, { all } from "axios";
 import { useState, useEffect, useMemo } from "react";
 import { AccountData } from "./accounts";
 import Cookies from "js-cookie";
+import { set } from "zod";
 
 // query: string = "";
 
@@ -290,6 +291,52 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
   }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate };
+}
+export function usePayoutRequests(customParams: IDebitRequest = {}) {
+  const [requests, setRequests] = useState<PayoutAccount[]>([]);
+  const [meta, setMeta] = useState<RequestMeta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
+  async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/requests/payout?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setRequests(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+
+  return { loading, requests, revalidate, meta };
 }
 export function useCompanyDebitRequests(
   id: string,
@@ -590,5 +637,40 @@ export interface CorporateDirector {
 export interface RequestMeta {
   approvedRequests: number;
   pendingRequests: number;
+  total: number;
+}
+
+export interface PayoutAccount {
+  id: string;
+  status: string;
+  companyName: string;
+  documentData: PayoutDocumentData;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  companyId: string;
+  Company: Company;
+}
+
+export interface Company {
+  name: string;
+  id: string;
+}
+
+export interface PayoutDocumentData {
+  directors: PayoutDirector[];
+  shareholders: PayoutDirector[];
+}
+
+export interface PayoutDirector {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  proofOfAddressFileUrl: string;
+}
+
+export interface Meta {
   total: number;
 }

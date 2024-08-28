@@ -10,8 +10,9 @@ import {
 import { IconTrash, IconX } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
-import DropzoneComponent from "./dropzone";
+// import DropzoneComponent from "./dropzone";
 import { UseFormReturnType } from "@mantine/form";
+import DropzoneComponent from "@/ui/components/Dropzone";
 
 export default function ModalComponent({
   opened,
@@ -29,7 +30,10 @@ export default function ModalComponent({
     <Modal
       closeOnClickOutside={!processing}
       opened={opened}
-      onClose={close}
+      onClose={() => {
+        close();
+        form.reset();
+      }}
       centered
       withCloseButton={false}
     >
@@ -65,9 +69,10 @@ export default function ModalComponent({
             mt={20}
             placeholder="Give reason here..."
             {...form.getInputProps("reason")}
+            mb={20}
           />
 
-          <Select
+          {/* <Select
             mt={20}
             mb={20}
             placeholder="Select Supporting Document (Optional)"
@@ -75,9 +80,13 @@ export default function ModalComponent({
             data={["Utility Bill"]}
             classNames={{ input: styles.input }}
             {...form.getInputProps("supportingDocumentName")}
-          />
+          /> */}
 
-          <DropzoneComponent form={form} formKey="supportingDocumentUrl" />
+          <DropzoneComponent<typeof reqValues>
+            otherForm={form}
+            formKey="supportingDocumentUrl"
+            uploadedFileUrl={form.values.supportingDocumentUrl}
+          />
         </Flex>
 
         <Flex className={styles.bottom__flex} justify="center" gap={15}>

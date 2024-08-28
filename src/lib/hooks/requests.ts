@@ -637,6 +637,7 @@ export interface CorporateDirector {
 export interface RequestMeta {
   approvedRequests: number;
   pendingRequests: number;
+  inactiveAccounts: number;
   total: number;
 }
 

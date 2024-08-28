@@ -26,7 +26,7 @@ import Image from "next/image";
 interface ICardOne {
   title: string;
   stat: number;
-  text: React.ReactElement;
+  text?: React.ReactElement;
   link?: string;
   colored?: boolean;
   formatted?: boolean;
@@ -38,11 +38,11 @@ interface ICardOne {
   btnLink?: string;
 }
 
-const SeeAll = () => {
+export const SeeAll = ({ name = "See All" }: { name?: string }) => {
   return (
     <div className={styles.card__link}>
       <Text fz={12} td="underline">
-        See All
+        {name}
       </Text>
       <IconChevronRight size={11} />
     </div>
@@ -65,9 +65,9 @@ export function CardOne({
   return (
     <Paper
       flex={flex}
-      withBorder={!!withBorder}
+      withBorder
       className={styles.card__one}
-      style={{ height: container ? "100%" : "130px" }}
+      style={{ height: container ? "100%" : "130px", borderColor: "#f2f4f7" }}
     >
       <div className={styles.card__title}>
         <Text fz={10} tt="uppercase" fw={600}>
@@ -259,7 +259,7 @@ interface ICardThree {
   minTitle: string;
   amount: number;
   percentage: string;
-  subTitle: string;
+  subTitle?: string;
 }
 export function CardThree({
   title,

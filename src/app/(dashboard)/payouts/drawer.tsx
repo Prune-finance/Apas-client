@@ -150,7 +150,7 @@ Props) => {
           c="var(--prune-text-gray-800)"
           fw={600}
         >
-          Intermediary Details
+          Ultimate Debtor Details
         </Text>
 
         <Stack gap={28}>

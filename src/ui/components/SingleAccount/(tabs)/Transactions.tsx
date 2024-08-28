@@ -90,7 +90,7 @@ const tableHeaders = [
 const payoutTableHeaders = [
   "Beneficiary Name",
   "Destination Account",
-  "Intermediary",
+  "Ultimate Debtor",
   "Amount",
   "Date & Time",
   "Status",

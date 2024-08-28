@@ -292,6 +292,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
 
   return { loading, requests, revalidate };
 }
+
 export function usePayoutRequests(customParams: IDebitRequest = {}) {
   const [requests, setRequests] = useState<PayoutAccount[]>([]);
   const [meta, setMeta] = useState<RequestMeta>();
@@ -313,7 +314,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/requests/payout?${params}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 

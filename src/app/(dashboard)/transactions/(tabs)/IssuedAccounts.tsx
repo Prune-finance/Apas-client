@@ -29,6 +29,7 @@ import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
+import { AmountGroup } from "@/ui/components/AmountGroup";
 
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
@@ -88,18 +89,12 @@ export const IssuedAccountsTab = () => {
         >
           {element.senderIban}
         </TableTd>
+        <TableTd>{"N/A"}</TableTd>
         <TableTd className={styles.table__td}>
           {element.recipientName || element.recipientIban}
         </TableTd>
         <TableTd className={styles.table__td}>
-          <Flex align="center" gap={5}>
-            <IconArrowUpRight
-              color="#D92D20"
-              size={16}
-              className={styles.table__td__icon}
-            />
-            {formatNumber(element.amount, true, "EUR")}
-          </Flex>
+          <AmountGroup amount={element.amount} type={element.type} />
         </TableTd>
 
         <TableTd className={styles.table__td}>
@@ -146,10 +141,19 @@ export const IssuedAccountsTab = () => {
   );
 };
 
+// const tableHeaders = [
+//   "Sender Name",
+//   "Beneficiary Name",
+//   "Amount",
+//   "Date Created",
+//   "Status",
+// ];
+
 const tableHeaders = [
-  "Sender Name",
-  "Beneficiary Name",
+  "Sender",
+  "Business",
+  "Beneficiary",
   "Amount",
-  "Date Created",
+  "Date",
   "Status",
 ];

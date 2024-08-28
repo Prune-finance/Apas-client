@@ -8,42 +8,27 @@ dayjs.extend(advancedFormat);
 import axios from "axios";
 import { useState } from "react";
 
-import Image from "next/image";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import {
-  Badge,
-  Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Select,
   TableTd,
 } from "@mantine/core";
 import { Flex, Box, Divider, Button, TextInput } from "@mantine/core";
 import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
-import { TableTr, Pagination } from "@mantine/core";
+import { TableTr } from "@mantine/core";
 
 import { IconDots, IconEye } from "@tabler/icons-react";
 import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
-import { IconListTree } from "@tabler/icons-react";
 
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import EmptyImage from "@/assets/empty.png";
-
-import {
-  activeBadgeColor,
-  approvedBadgeColor,
-  formatNumber,
-} from "@/lib/utils";
-import {
-  DebitRequest,
-  useDebitRequests,
-  usePayoutRequests,
-} from "@/lib/hooks/requests";
+import { formatNumber } from "@/lib/utils";
+import { DebitRequest, usePayoutRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -56,7 +41,6 @@ import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
-import { useBusiness } from "@/lib/hooks/businesses";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";

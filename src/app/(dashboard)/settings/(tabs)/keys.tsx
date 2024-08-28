@@ -49,6 +49,8 @@ export default function Keys() {
 
   const { business, loading, meta } = useUserBusiness();
 
+  console.log(business);
+
   const { live, test } = useMemo(() => {
     const live = keys.find((key) => key.staging === "LIVE");
     const test = keys.find((key) => key.staging === "TEST");
@@ -186,9 +188,9 @@ export default function Keys() {
                 API KEYS:
               </Text>
               <Tooltip
-                label=" API Keys are used to authenticate your application. You can use
-              them to make API calls to your application."
+                label="Please do not use your test keys for production. They are only for test."
                 multiline
+                color="red"
                 w={220}
               >
                 <IconInfoCircle size={16} color="var(--prune-warning)" />

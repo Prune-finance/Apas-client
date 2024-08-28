@@ -82,9 +82,7 @@ export const AccountsTab = () => {
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
-      <TableTd className={styles.table__td}>
-        {element.recipientBankAddress}
-      </TableTd>
+      <TableTd className={styles.table__td}>{"N/A"}</TableTd>
       <TableTd className={styles.table__td}>{element.reference}</TableTd>
       {/* <TableTd className={styles.table__td}>{dayjs().format()}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
@@ -144,11 +142,20 @@ export const AccountsTab = () => {
   );
 };
 
+// const tableHeaders = [
+//   "Recipient IBAN",
+//   "Bank",
+//   "Reference",
+//   "Amount",
+//   "Date Created",
+//   "Status",
+// ];
+
 const tableHeaders = [
-  "Recipient IBAN",
-  "Bank",
-  "Reference",
+  "Sender",
+  "Business",
+  "Beneficiary",
   "Amount",
-  "Date Created",
+  "Date",
   "Status",
 ];

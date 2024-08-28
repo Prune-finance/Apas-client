@@ -19,9 +19,14 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 import { useState } from "react";
 import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
+import { OwnAccountTableHeaders } from "@/lib/static";
+import { AmountGroup } from "@/ui/components/AmountGroup";
 
 export const AccountsTab = () => {
   const { transactions, loading } = useUserDefaultTransactions();
@@ -81,24 +86,17 @@ export const AccountsTab = () => {
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
-      <TableTd className={styles.table__td}>{"N/A"}</TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-      {/* <TableTd className={styles.table__td}>{dayjs().format()}</TableTd> */}
-      <TableTd className={`${styles.table__td}`}>
-        <Flex align="center" gap={5}>
-          <IconArrowUpRight
-            color="#D92D20"
-            size={16}
-            className={styles.table__td__icon}
-            // style={{ marginTop: "-20px" }}
-          />
-          {formatNumber(element.amount, true, "EUR")}
-        </Flex>
-        {/* <Text fz={12}></Text> */}
+      <TableTd className={styles.table__td}>
+        {element.recipientName || element.recipientIban}
       </TableTd>
       <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
       </TableTd>
       <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />
@@ -117,7 +115,11 @@ export const AccountsTab = () => {
       </Group>
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
-      <TableComponent rows={rows} loading={loading} head={tableHeaders} />
+      <TableComponent
+        rows={rows}
+        loading={loading}
+        head={OwnAccountTableHeaders}
+      />
 
       <EmptyTable
         rows={rows}
@@ -150,12 +152,3 @@ export const AccountsTab = () => {
 //   "Date Created",
 //   "Status",
 // ];
-
-const tableHeaders = [
-  "Sender",
-  "Business",
-  "Beneficiary",
-  "Amount",
-  "Date",
-  "Status",
-];

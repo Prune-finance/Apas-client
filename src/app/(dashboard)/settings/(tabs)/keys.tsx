@@ -49,8 +49,6 @@ export default function Keys() {
 
   const { business, loading, meta } = useUserBusiness();
 
-  console.log(business);
-
   const { live, test } = useMemo(() => {
     const live = keys.find((key) => key.staging === "LIVE");
     const test = keys.find((key) => key.staging === "TEST");

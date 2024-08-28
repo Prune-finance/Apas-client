@@ -30,6 +30,7 @@ import { TransactionDrawer } from "../drawer";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
 import { AmountGroup } from "@/ui/components/AmountGroup";
+import { IssuedAccountTableHeaders } from "@/lib/static";
 
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
@@ -94,8 +95,12 @@ export const IssuedAccountsTab = () => {
           {element.recipientName || element.recipientIban}
         </TableTd>
         <TableTd className={styles.table__td}>
-          <AmountGroup amount={element.amount} type={element.type} />
+          <AmountGroup type={element.type} fz={12} fw={400} />
         </TableTd>
+        <TableTd className={styles.table__td}>
+          {formatNumber(element.amount, true, "EUR")}
+        </TableTd>
+        <TableTd className={styles.table__td}>{element.reference}</TableTd>
 
         <TableTd className={styles.table__td}>
           {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
@@ -116,7 +121,11 @@ export const IssuedAccountsTab = () => {
       </Group>
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
-      <TableComponent rows={rows} loading={loading} head={tableHeaders} />
+      <TableComponent
+        rows={rows}
+        loading={loading}
+        head={IssuedAccountTableHeaders}
+      />
 
       <EmptyTable
         rows={rows}

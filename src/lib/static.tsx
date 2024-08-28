@@ -273,3 +273,23 @@ export const countries = [
   "Sweden",
   "United Kingdom",
 ];
+
+export const OwnAccountTableHeaders = [
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Reference",
+  "Date & Time",
+  "Status",
+];
+
+export const IssuedAccountTableHeaders = [
+  "Sender's Name",
+  "Business",
+  "Beneficiary Name",
+  "Type",
+  "Amount",
+  "Reference",
+  "Date",
+  "Status",
+];

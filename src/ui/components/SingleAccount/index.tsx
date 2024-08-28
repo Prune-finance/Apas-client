@@ -66,6 +66,7 @@ import AccountDetails from "./(tabs)/AccountDetails";
 import { Transactions } from "./(tabs)/Transactions";
 import { Analytics } from "./(tabs)/Analytics";
 import { BusinessData } from "@/lib/hooks/businesses";
+import { Documents } from "./(tabs)/Documents";
 
 type Param = { id: string };
 interface Props {
@@ -578,6 +579,9 @@ export const SingleAccountBody = ({
     Currency: "EUR",
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
+      account?.updatedAt
+    ).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
@@ -585,10 +589,14 @@ export const SingleAccountBody = ({
     ) : (
       account?.type
     ),
-    [payout ? "Last Activity" : "Last Seen"]: dayjs(account?.updatedAt).format(
-      "Do MMMM, YYYY"
-    ),
   };
+
+  const tabs = [
+    { value: "Account Details" },
+    { value: "Transactions" },
+    { value: admin ? "Statistics" : "Analytics" },
+    { value: "Documents" },
+  ];
 
   return (
     <Box mt={32}>
@@ -630,16 +638,13 @@ export const SingleAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
+        <TabsPanel value={tabs[3].value} mt={28}>
+          <Documents account={account} />
+        </TabsPanel>
       </TabsComponent>
     </Box>
   );
 };
-
-const tabs = [
-  { value: "Account Details" },
-  { value: "Transactions" },
-  { value: "Analytics" },
-];
 
 interface IssuedAccountHeadProps {
   loading: boolean;

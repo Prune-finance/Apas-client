@@ -317,20 +317,49 @@ export interface AccountDocuments {
   poaFileURL: string;
 }
 
-export interface Account {
+type DocumentType = "passport" | "driverLicense" | "nationalID" | string;
+type POAType = "bankStatement" | "utilityBill" | "leaseAgreement" | string;
+
+export interface PersonDocuments {
+  idFile: string;
+  idType: DocumentType;
+  poaFile: string;
+  poaType: POAType;
+}
+
+export interface CorporateAccountDocuments {
+  directors: {
+    [key: string]: PersonDocuments;
+  };
+  shareholders: {
+    [key: string]: PersonDocuments;
+  };
+}
+
+export interface BaseAccount {
   id: string;
   firstName: string;
   lastName: string;
   accountId: number;
   accountName: string;
   accountNumber: string;
-  accountDocuments: AccountDocuments;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
   companyId: string;
   companyName?: string;
-  type: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
 }
+
+export interface UserAccount extends BaseAccount {
+  accountDocuments: AccountDocuments;
+  type: "USER";
+}
+
+export interface CorporateAccount extends BaseAccount {
+  accountDocuments: CorporateAccountDocuments;
+  type: "CORPORATE";
+}
+
+export type Account = UserAccount | CorporateAccount;

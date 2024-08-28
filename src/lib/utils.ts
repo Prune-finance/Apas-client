@@ -58,3 +58,7 @@ export const frontendPagination = (
   page: number,
   perPage: number
 ) => data.slice((page - 1) * perPage, page * perPage);
+
+export function splitCamelCase(input: string): string {
+  return input.replace(/([a-z])([A-Z])/g, "$1 $2");
+}

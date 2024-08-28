@@ -107,7 +107,7 @@ export const AccountsTab = () => {
   ));
 
   return (
-    <TabsPanel value="Account">
+    <TabsPanel value="Own Account">
       <InfoCards details={infoDetails} title="Overview" />
 
       <Group justify="space-between" mt={30}>

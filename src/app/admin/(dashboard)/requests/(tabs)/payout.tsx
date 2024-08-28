@@ -11,10 +11,12 @@ import { useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import {
+  Badge,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
+  Stack,
   TableTd,
 } from "@mantine/core";
 import { Flex, Box, Divider, Button, TextInput } from "@mantine/core";
@@ -28,7 +30,11 @@ import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
 import { formatNumber } from "@/lib/utils";
-import { DebitRequest, usePayoutRequests } from "@/lib/hooks/requests";
+import {
+  DebitRequest,
+  PayoutAccount,
+  usePayoutRequests,
+} from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -45,9 +51,10 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput } from "@/ui/components/Inputs";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { closeButtonProps } from "../../businesses/[id]/(tabs)/utils";
 
-function PayoutAccount() {
+function AccountPayout() {
   const searchParams = useSearchParams();
 
   const {
@@ -74,7 +81,7 @@ function PayoutAccount() {
     usePayoutRequests(queryParams);
 
   const { push } = useRouter();
-  const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
+  const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
     null
   );
   const [processing, setProcessing] = useState(false);
@@ -88,6 +95,12 @@ function PayoutAccount() {
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
+  const BusinessDetails = {
+    "Business Name": selectedRequest?.Company.name,
+    "Request Date": dayjs(selectedRequest?.createdAt).format("DD MMM, YYYY"),
+    Status: <BadgeComponent status={selectedRequest?.status ?? ""} />,
+  };
+
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
@@ -95,16 +108,16 @@ function PayoutAccount() {
     if (!selectedRequest) return;
     setProcessing(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/reject`,
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/reject`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      await revalidate();
+      revalidate();
       close();
       closeDrawer();
-      handleSuccess("Action Completed", "Request Denied");
+      handleSuccess("Action Completed", `Payout Request Denied`);
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -116,16 +129,16 @@ function PayoutAccount() {
     if (!selectedRequest) return;
     setProcessing(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/approve`,
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/approve`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      await revalidate();
+      revalidate();
       closeApprove();
       closeDrawer();
-      handleSuccess("Action Completed", "Request Approved");
+      handleSuccess("Action Completed", `Payout Request Approved`);
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -133,7 +146,7 @@ function PayoutAccount() {
     }
   };
 
-  const MenuComponent = ({ request }: { request: DebitRequest }) => {
+  const MenuComponent = ({ request }: { request: PayoutAccount }) => {
     return (
       <Menu shadow="md" width={150}>
         <MenuTarget>
@@ -172,7 +185,10 @@ function PayoutAccount() {
     (element, index) => (
       <TableTr
         key={index}
-        onClick={() => handleRowClick(element.id)}
+        onClick={() => {
+          setSelectedRequest(element);
+          openDrawer();
+        }}
         style={{ cursor: "pointer" }}
       >
         <TableTd>{element.companyName}</TableTd>
@@ -182,9 +198,9 @@ function PayoutAccount() {
           <BadgeComponent status={element.status} />
         </TableTd>
 
-        {/* <TableTd className={`${styles.table__td}`}>
-        <MenuComponent request={element} />
-      </TableTd> */}
+        <TableTd className={`${styles.table__td}`}>
+          <MenuComponent request={element} />
+        </TableTd>
       </TableTr>
     )
   );
@@ -229,106 +245,54 @@ function PayoutAccount() {
         opened={drawerOpened}
         onClose={closeDrawer}
         position="right"
-        withCloseButton={false}
         size="30%"
+        title={
+          <Text fz={18} fw={600} c="#1D2939" ml={24}>
+            Payout Account Request Details
+          </Text>
+        }
+        closeButtonProps={{ ...closeButtonProps, mr: 24 }}
+        padding={0}
       >
-        <Flex justify="space-between" pb={28}>
-          <Text fz={18} fw={600} c="#1D2939">
-            Request Details
-          </Text>
-
-          <IconX onClick={closeDrawer} />
-        </Flex>
-
-        <Box>
-          <Flex direction="column">
-            <Text c="#8B8B8B" fz={12} tt="uppercase">
-              Amount
+        {/* <Stack>
+          <Box></Box>
+        </Stack> */}
+        <Divider mb={30} />
+        <Stack px={24} pb={24} justify="space-between" h="calc(100vh - 100px)">
+          <Box flex={1}>
+            <Text
+              fz={14}
+              fw={600}
+              c="var(--prune-text-gray-800)"
+              tt="uppercase"
+              mb={20}
+            >
+              Business Details
             </Text>
 
-            <Text c="#97AD05" fz={32} fw={600}>
-              {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-            </Text>
-          </Flex>
-
-          <Divider my={30} />
-
-          <Flex direction="column" gap={30}>
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Business Name:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.Account.Company.name}</Text>
+            <Flex direction="column" gap={30}>
+              {Object.entries(BusinessDetails).map(([title, value]) => (
+                <Flex justify="space-between" key={title}>
+                  <Text fz={12} c="var(--prune-text-gray-500)" fw={400}>
+                    {title}:
+                  </Text>
+                  <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                    {value}
+                  </Text>
+                </Flex>
+              ))}
             </Flex>
 
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Source Account:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.Account.accountName}</Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Date Created:
-              </Text>
-
-              <Text fz={14}>
-                {dayjs(selectedRequest?.createdAt).format("DD MMM, YYYY")}
-              </Text>
-            </Flex>
-
-            <Flex justify="space-between">
-              <Text fz={14} c="#8B8B8B">
-                Status:
-              </Text>
-
-              <Text fz={14}>{selectedRequest?.status}</Text>
-            </Flex>
-          </Flex>
-
-          <Divider my={30} />
-
-          <Text fz={12} c="#1D2939" fw={600}>
-            REASON FOR DEBIT
-          </Text>
-
-          <div
-            style={{
-              marginTop: "15px",
-              background: "#F9F9F9",
-              padding: "12px 16px",
-            }}
-          >
-            <Text fz={12} c="#667085">
-              {selectedRequest?.reason || ""}
-            </Text>
-          </div>
+            <Divider my={30} />
+          </Box>
 
           {selectedRequest?.status === "PENDING" && (
             <Flex mt={40} justify="flex-end" gap={10}>
-              <Button
-                onClick={open}
-                color="#D0D5DD"
-                variant="outline"
-                className={styles.cta}
-              >
-                Deny
-              </Button>
-
-              <Button
-                className={styles.cta}
-                onClick={openApprove}
-                variant="filled"
-                color="#D4F307"
-              >
-                Approve
-              </Button>
+              <SecondaryBtn text="Reject" action={open} />
+              <PrimaryBtn text="Approve" action={openApprove} />
             </Flex>
           )}
-        </Box>
+        </Stack>
       </Drawer>
 
       <ModalComponent
@@ -338,9 +302,9 @@ function PayoutAccount() {
         close={close}
         action={handleRejectRequest}
         processing={processing}
-        title="Reject This Debit Request?"
-        text="This means you are rejecting the debit request of this business."
-        customApproveMessage="Yes, Deny It"
+        title="Reject This Payout Account Request?"
+        text="This means you are rejecting the payout account request of this business."
+        customApproveMessage="Yes, Reject It"
       />
 
       <ModalComponent
@@ -350,8 +314,8 @@ function PayoutAccount() {
         close={closeApprove}
         action={handleAcceptRequest}
         processing={processing}
-        title="Approve This Debit Request?"
-        text="This means you are accepting the debit request of this business"
+        title="Approve This Payout Account Request?"
+        text="This means you are accepting the payout account request of this business"
         customApproveMessage="Yes, Approve It"
       />
     </Fragment>
@@ -369,7 +333,7 @@ const tableHeaders = [
 export default function PayoutAccountSuspense() {
   return (
     <Suspense>
-      <PayoutAccount />
+      <AccountPayout />
     </Suspense>
   );
 }

@@ -118,7 +118,6 @@ function TransactionForAccount() {
     validate: zodResolver(filterSchema),
   });
 
-  console.log(transactions);
   return (
     <main>
       <Breadcrumbs

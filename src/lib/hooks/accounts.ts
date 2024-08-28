@@ -1,3 +1,4 @@
+import { Meta } from "./transactions";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
@@ -129,6 +130,43 @@ export function useBusinessDefaultAccount(id: string) {
   }, []);
 
   return { loading, account, revalidate };
+}
+
+export function usePayoutAccount() {
+  const [accounts, setAccounts] = useState<AccountData[] | null>(null);
+  const [meta, setMeta] = useState<AccountMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setAccounts(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccount();
+  }
+
+  useEffect(() => {
+    fetchAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, accounts, revalidate, meta };
 }
 
 export function useUserAccounts(customParams: IParams = {}) {

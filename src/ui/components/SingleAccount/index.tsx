@@ -594,7 +594,7 @@ export const SingleAccountBody = ({
   const tabs = [
     { value: "Account Details" },
     { value: "Transactions" },
-    { value: admin ? "Statistics" : "Analytics" },
+    { value: "Statistics" },
     { value: "Documents" },
   ];
 

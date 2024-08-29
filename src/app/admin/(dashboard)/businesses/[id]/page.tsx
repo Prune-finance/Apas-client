@@ -32,6 +32,7 @@ import {
   IconX,
   IconAlertTriangle,
   IconShieldCheck,
+  IconRosetteDiscountCheckFilled,
 } from "@tabler/icons-react";
 
 import ActiveBadge from "@/assets/active-badge.svg";
@@ -195,7 +196,13 @@ export default function SingleBusiness() {
         </Group> */}
         <BackBtn text="Business" />
         <div className={styles.container__header}>
-          <div className={styles.header__left}>
+          <Group gap={8}>
+            {business?.kycTrusted && (
+              <IconRosetteDiscountCheckFilled
+                size={25}
+                color="var(--prune-primary-700)"
+              />
+            )}
             {business ? (
               <Text fz={18} fw={600}>
                 {business.name}
@@ -204,19 +211,12 @@ export default function SingleBusiness() {
               <Skeleton h={10} w={100} />
             )}
 
-            {business?.kycTrusted && (
-              <Image
-                width={20}
-                height={20}
-                src={ActiveBadge}
-                alt="active badge"
-              />
-            )}
-
-            {business && (
+            {business ? (
               <BadgeComponent status={business.companyStatus} active />
+            ) : (
+              <Skeleton h={10} w={100} />
             )}
-          </div>
+          </Group>
 
           <div className={styles.header__right}>
             <Button size="xs" className={styles.header__right__cta}>

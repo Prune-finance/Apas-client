@@ -23,7 +23,10 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/user/home.module.scss";
 import { useUserDebitRequests } from "@/lib/hooks/requests";
 import { useUserBalances } from "@/lib/hooks/balance";
-import { useUserTransactions } from "@/lib/hooks/transactions";
+import {
+  useUserDefaultTransactions,
+  useUserTransactions,
+} from "@/lib/hooks/transactions";
 import User from "@/lib/store/user";
 import dayjs from "dayjs";
 import axios from "axios";
@@ -37,6 +40,9 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { checkToken } from "@/lib/actions/checkToken";
 import { BarChartComponent } from "@/ui/components/Charts";
+import Image from "next/image";
+import EmptyImage from "@/assets/empty.png";
+import { AmountGroup } from "@/ui/components/AmountGroup";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -44,6 +50,9 @@ export default function Home() {
   const { loading: balanceLoading, balance } = useUserBalances();
   const { transactions } = useUserTransactions();
   const { account, loading: loadingDftAcct } = useUserDefaultAccount();
+
+  const { loading: loadingPayout, transactions: payoutTrx } =
+    useUserDefaultTransactions();
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -102,41 +111,21 @@ export default function Home() {
         {dayjs(element.createdAt).format("DD MMM, YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        {/* <div
-          className={styles.table__td__status}
-          style={{
-            background:
-              element.status === "PENDING"
-                ? "#FFFAEB"
-                : element.status === "REJECTED"
-                ? "#FCF1F2"
-                : "#ECFDF3",
-          }}
-        >
-          <IconPointFilled
-            size={14}
-            color={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          />
-          <Text
-            tt="capitalize"
-            fz={12}
-            c={
-              element.status === "PENDING"
-                ? "#C6A700"
-                : element.status === "REJECTED"
-                ? "#D92D20"
-                : "#12B76A"
-            }
-          >
-            {element.status.toLowerCase()}
-          </Text>
-        </div> */}
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+
+  const payoutRows = payoutTrx.slice(0, 2).map((element) => (
+    <TableTr key={element.id}>
+      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
+      <TableTd className={styles.table__td}>
+        <AmountGroup amount={element.amount} type={"DEBIT"} />
+      </TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.createdAt).format("DD MMM, YYYY")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
@@ -285,7 +274,7 @@ export default function Home() {
                     { name: "pending", color: "#F79009" },
                   ]}
                 /> */}
-                <AreaChart
+                {/* <AreaChart
                   h={350}
                   curveType="bump"
                   data={lineData}
@@ -295,57 +284,18 @@ export default function Home() {
                     { name: "failed", color: "#D92D20" },
                     { name: "pending", color: "#F79009" },
                   ]}
-                />
-              </Paper>
-            </GridCol>
+                /> */}
 
-            {/* Debit Request Table */}
-            <GridCol span={12} mih={100}>
-              <Paper
-                py={21}
-                px={24}
-                radius={8}
-                style={{ border: "1px solid #f5f5f5" }}
-                //  mt={10} className={styles.payout__table}
-              >
-                <Flex
-                  style={{ borderBottom: "1px solid #f5f5f5" }}
-                  justify="space-between"
-                  align="center"
-                  pb={14}
-                >
-                  <Text
-                    className={styles.table__text}
-                    lts={0.5}
-                    fz={16}
-                    fw={600}
-                  >
-                    Debit Requests
-                  </Text>
-
-                  <Button
-                    component="a"
-                    href="/debit-requests"
-                    variant="transparent"
-                    color="var(--prune-primary-800)"
-                    fz={11}
-                    className={styles.table__cta}
-                  >
-                    See all Debit Requests
-                  </Button>
-                </Flex>
-
-                <TableComponent
-                  rows={rows}
-                  loading={debitLoading}
-                  head={debitTableHeader}
-                />
-
-                <EmptyTable
-                  loading={debitLoading}
-                  rows={rows}
-                  title="There are no debit request"
-                  text="When a debit request is made, they will appear here"
+                <BarChartComponent
+                  h={350}
+                  data={lineData}
+                  dataKey="date"
+                  type="default"
+                  series={[
+                    { name: "successful", color: "#22C55E" },
+                    { name: "failed", color: "#D92D20" },
+                    { name: "pending", color: "#F79009" },
+                  ]}
                 />
               </Paper>
             </GridCol>
@@ -432,6 +382,158 @@ export default function Home() {
                     );
                   })}
                 </Flex>
+              </Paper>
+            </GridCol>
+          </Grid>
+        </GridCol>
+        <GridCol span={12} mih={100}>
+          <Grid>
+            {/* Debit Request Table */}
+            <GridCol span={6} mih={100}>
+              <Paper
+                py={21}
+                px={24}
+                radius={8}
+                style={{ border: "1px solid #f5f5f5" }}
+                //  mt={10} className={styles.payout__table}
+              >
+                <Flex
+                  // style={{ borderBottom: "1px solid #f5f5f5" }}
+                  justify="space-between"
+                  align="center"
+                  pb={14}
+                >
+                  <Text
+                    className={styles.table__text}
+                    lts={0.5}
+                    fz={16}
+                    fw={600}
+                  >
+                    Debit Requests
+                  </Text>
+
+                  <Button
+                    component="a"
+                    href="/debit-requests"
+                    variant="transparent"
+                    color="var(--prune-primary-800)"
+                    fz={11}
+                    className={styles.table__cta}
+                  >
+                    See all Debit Requests
+                  </Button>
+                </Flex>
+
+                {/* <TableComponent
+                  rows={rows}
+                  loading={debitLoading}
+                  head={debitTableHeader}
+                /> */}
+
+                <Table verticalSpacing={15} fz={12}>
+                  <TableThead style={{ borderBottom: "1px solid #f5f5f5" }}>
+                    {debitTableHeader.map((header) => (
+                      <TableTh className={styles.table__th}>{header}</TableTh>
+                    ))}
+                  </TableThead>
+                  <TableTbody>
+                    {debitLoading
+                      ? DynamicSkeleton2(debitTableHeader.length)
+                      : rows}
+                  </TableTbody>
+                </Table>
+
+                <EmptyTable
+                  loading={debitLoading}
+                  rows={rows}
+                  title="There are no debit request"
+                  text="When a debit request is made, they will appear here"
+                />
+              </Paper>
+            </GridCol>
+
+            <GridCol span={6} mih={300}>
+              <Paper
+                py={21}
+                px={24}
+                radius={8}
+                mih={250}
+                style={{ border: "1px solid #f5f5f5" }}
+                //  mt={10} className={styles.payout__table}
+              >
+                <Flex
+                  style={{ borderBottom: "1px solid #f5f5f5" }}
+                  justify="space-between"
+                  align="center"
+                  pb={14}
+                >
+                  <Text
+                    className={styles.table__text}
+                    lts={0.5}
+                    fz={16}
+                    fw={600}
+                  >
+                    Payouts
+                  </Text>
+
+                  <Button
+                    component="a"
+                    href="/payouts"
+                    variant="transparent"
+                    color="var(--prune-primary-800)"
+                    fz={11}
+                    className={styles.table__cta}
+                  >
+                    See all
+                  </Button>
+                </Flex>
+
+                {/* <TableComponent
+                  rows={payoutRows}
+                  loading={loadingPayout}
+                  head={["Beneficiary Name", "Amount", "Date", "Status"]}
+                /> */}
+
+                <Table verticalSpacing={15} fz={12}>
+                  <TableThead style={{ borderBottom: "1px solid #f5f5f5" }}>
+                    {["Beneficiary Name", "Amount", "Date", "Status"].map(
+                      (header) => (
+                        <TableTh className={styles.table__th}>{header}</TableTh>
+                      )
+                    )}
+                  </TableThead>
+                  <TableTbody>
+                    {loadingPayout
+                      ? DynamicSkeleton2(
+                          ["Beneficiary Name", "Amount", "Date", "Status"]
+                            .length
+                        )
+                      : payoutRows}
+                  </TableTbody>
+                </Table>
+
+                {payoutTrx.length === 0 && (
+                  <Flex
+                    style={{ flexGrow: 1 }}
+                    direction="column"
+                    align="center"
+                    justify="center"
+                    mt={24}
+                  >
+                    <Image
+                      src={EmptyImage}
+                      alt="no content"
+                      width={80}
+                      height={60}
+                    />
+                    <Text mt={14} fz={10} c="#1D2939">
+                      No payout history.
+                    </Text>
+                    {/* <Text fz={10} c="#667085">
+              When an account is created, it will appear here
+            </Text> */}
+                  </Flex>
+                )}
               </Paper>
             </GridCol>
           </Grid>

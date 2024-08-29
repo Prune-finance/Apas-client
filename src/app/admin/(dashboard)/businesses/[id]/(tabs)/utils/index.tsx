@@ -3,6 +3,7 @@ import { useDisclosure } from "@mantine/hooks";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import {
+  BasicInfoType,
   directorEtShareholderSchema,
   removeDirectorSchema,
   removeDirectorValues,
@@ -324,5 +325,151 @@ export const RemoveDirectorModal = ({
         </Flex>
       </Stack>
     </Modal>
+  );
+};
+
+interface ContactDocumentTextInputProps
+  extends Omit<
+    DocumentTextInputProps,
+    "form" | "director" | "formKey" | "documentKey"
+  > {
+  form: UseFormReturnType<BasicInfoType>;
+  business: BasicInfoType;
+  formKey: keyof BasicInfoType;
+  documentKey: keyof BasicInfoType;
+}
+
+export const ContactDocumentTextInput = ({
+  editing,
+  business,
+  form,
+  formKey,
+  documentKey,
+  label,
+  title,
+}: ContactDocumentTextInputProps) => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const { handleInfo } = useNotification();
+
+  return (
+    <Box>
+      <Select
+        readOnly
+        data={
+          formKey === "contactIdType"
+            ? ["ID Card", "Passport", "Residence Permit"]
+            : ["Utility Bill"]
+        }
+        classNames={{
+          input: styles.input,
+          label: styles.label,
+          section: styles.section,
+        }}
+        leftSection={<IconFileTypePdf color="var(--prune-text-gray-700)" />}
+        leftSectionPointerEvents="none"
+        rightSectionPointerEvents="auto"
+        {...form.getInputProps(formKey)}
+        rightSection={
+          !editing ? (
+            <UnstyledButton
+              onClick={() => {
+                notifications.clean();
+                if (!business[documentKey])
+                  return handleInfo("Please upload the document first", "");
+
+                window.open(business[documentKey] || "", "_blank");
+              }}
+              className={styles.input__right__section}
+            >
+              <Text fw={600} fz={10} c="#475467">
+                View
+              </Text>
+            </UnstyledButton>
+          ) : (
+            <UnstyledButton
+              onClick={open}
+              className={styles.input__right__section}
+              w="100%"
+            >
+              <Text fw={600} fz={10} c="#475467">
+                Re-upload
+              </Text>
+            </UnstyledButton>
+          )
+        }
+        label={label}
+        placeholder={title}
+      />
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        closeButtonProps={closeButtonProps}
+        title={
+          <Text fz={20} fw={600}>
+            Re-upload Document
+          </Text>
+        }
+        padding={32}
+        centered
+      >
+        <Box
+          component="form"
+          onSubmit={form.onSubmit(() => {})}
+          style={{ display: "flex", flexDirection: "column", gap: 16 }}
+        >
+          <Select
+            comboboxProps={{ withinPortal: true }}
+            data={
+              formKey === "contactIdType"
+                ? ["ID Card", "Passport", "Residence Permit"]
+                : ["Utility Bill"]
+            }
+            placeholder={
+              formKey === "contactIdType"
+                ? "Select Identity Type"
+                : "Select Proof of Address"
+            }
+            {...form.getInputProps(formKey)}
+            size="lg"
+            radius={4}
+          />
+
+          <DropzoneComponent<BasicInfoType>
+            otherForm={form}
+            formKey={documentKey}
+            uploadedFileUrl={form.values[documentKey] as string}
+          />
+
+          <Flex gap={16}>
+            <SecondaryBtn
+              fullWidth
+              text="Cancel"
+              action={() => {
+                close();
+                form.reset();
+              }}
+              fw={600}
+            />
+            <PrimaryBtn
+              fullWidth
+              text="Proceed"
+              type="submit"
+              action={close}
+              // loading={processing}
+              fw={600}
+            />
+          </Flex>
+        </Box>
+      </Modal>
+
+      {/* <ReUploadDocsModal
+        opened={opened}
+        close={close}
+        formKey={formKey}
+        form={form}
+        documentKey={documentKey}
+      /> */}
+    </Box>
   );
 };

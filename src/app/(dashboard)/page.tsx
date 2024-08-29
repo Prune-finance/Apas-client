@@ -443,12 +443,35 @@ export default function Home() {
                   </TableTbody>
                 </Table>
 
-                <EmptyTable
+                {/* <EmptyTable
                   loading={debitLoading}
                   rows={rows}
                   title="There are no debit request"
                   text="When a debit request is made, they will appear here"
-                />
+                /> */}
+
+                {rows.length === 0 && (
+                  <Flex
+                    style={{ flexGrow: 1 }}
+                    direction="column"
+                    align="center"
+                    justify="center"
+                    mt={24}
+                  >
+                    <Image
+                      src={EmptyImage}
+                      alt="no content"
+                      width={80}
+                      height={60}
+                    />
+                    <Text mt={14} fz={10} c="#1D2939">
+                      No debit request.
+                    </Text>
+                    {/* <Text fz={10} c="#667085">
+              When an account is created, it will appear here
+            </Text> */}
+                  </Flex>
+                )}
               </Paper>
             </GridCol>
 

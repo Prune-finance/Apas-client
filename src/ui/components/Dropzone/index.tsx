@@ -24,6 +24,7 @@ import {
   OtherDocumentType,
   RemoveDirectorType,
 } from "@/lib/schema";
+import useNotification from "@/lib/hooks/notification";
 
 interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   form?: UseFormReturnType<NewBusinessType>;
@@ -40,6 +41,7 @@ export default function DropzoneComponent<T>(
   props: DropzoneCustomProps<T> = {}
 ) {
   const [file, setFile] = useState<FileWithPath | null>(null);
+  const { handleError } = useNotification();
   const form = props.form;
   const formKey = props.formKey;
   const uploadedFileUrl = props.uploadedFileUrl;
@@ -112,7 +114,10 @@ export default function DropzoneComponent<T>(
   return (
     <Dropzone
       onDrop={(files) => setFile(files[0])}
-      onReject={(files) => console.log("rejected files", files[0])}
+      onReject={(files) =>
+        handleError("File was rejected", files[0].errors[0].message)
+      }
+      // onReject={(files) => console.log("rejected files", files[0])}
       maxSize={5 * 1024 ** 2}
       // accept={IMAGE_MIME_TYPE}
       accept={[

@@ -158,14 +158,13 @@ function Businesses() {
       </TableTd>
       <TableTd className={styles.table__td}>
         <Group gap={9}>
-          {element.name}
-
           {element.kycTrusted && (
             <IconRosetteDiscountCheckFilled
               size={25}
               color="var(--prune-primary-700)"
             />
           )}
+          {element.name}
         </Group>
       </TableTd>
       <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>

@@ -37,6 +37,7 @@ import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
@@ -102,7 +103,7 @@ export default function SingleRequest() {
       <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/admin/dashboard" },
-          { title: "Account Requests", href: "/admin/account-requests" },
+          { title: "Account Creation", href: "/admin/account-requests" },
           {
             title: request?.Company.name || "",
             href: `/admin/account-requests/${request?.Company.id}`,
@@ -151,31 +152,8 @@ export default function SingleRequest() {
 
           {request && request.status === "PENDING" && (
             <div className={styles.header__right}>
-              <Button
-                onClick={open}
-                // className={styles.header__cta}
-                variant="outline"
-                color="var(--prune-text-gray-300)"
-                c="var(--prune-text-gray-800)"
-                // w={90}
-                fz={12}
-                fw={500}
-              >
-                Deny
-              </Button>
-
-              <Button
-                onClick={openApprove}
-                // className={styles.header__cta}
-                variant="filled"
-                color="var(--prune-primary-600)"
-                c="var(--prune-text-gray-800)"
-                // w={90}
-                fz={12}
-                fw={500}
-              >
-                Approve
-              </Button>
+              <SecondaryBtn text="Reject" action={open} />
+              <PrimaryBtn text="Approve" action={openApprove} />
             </div>
           )}
         </div>

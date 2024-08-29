@@ -37,7 +37,7 @@ export default function LoginForm() {
       const authUrl = "/api/auth/admin/login";
       const { data } = await axios.post(authUrl, form.values);
 
-      Cookies.set("auth", data.meta.token);
+      Cookies.set("auth", data.meta.token, { expires: 0.25 });
       handleSuccess("Authentication Successful", "Welcome back Admin");
       setUser({ ...data.data });
       window.location.replace("/admin/dashboard");

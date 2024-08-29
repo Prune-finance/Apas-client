@@ -14,7 +14,7 @@ import {
   Text,
   TabsPanel,
 } from "@mantine/core";
-import { IconX, IconPdf } from "@tabler/icons-react";
+import { IconX, IconPdf, IconFileTypePdf } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import TabsComponent from "@/ui/components/Tabs";
@@ -309,7 +309,7 @@ interface TextInputWithFileProps {
   url: string;
 }
 
-const TextInputWithFile = ({
+export const TextInputWithFile = ({
   label,
   url,
   placeholder,
@@ -324,7 +324,7 @@ const TextInputWithFile = ({
         section: styles.section,
         root: styles.input__root2,
       }}
-      leftSection={<IconPdf />}
+      leftSection={<IconFileTypePdf color="#475467" />}
       leftSectionPointerEvents="none"
       rightSection={
         <UnstyledButton

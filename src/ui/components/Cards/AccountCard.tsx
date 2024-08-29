@@ -15,6 +15,7 @@ import { SecondaryBtn } from "../Buttons";
 import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { formatNumber } from "@/lib/utils";
 import Link from "next/link";
+import { SeeAll } from ".";
 
 interface Props extends CardProps {
   currency: string;
@@ -110,7 +111,7 @@ export const AccountCard = ({
         <Skeleton mt={13.61} h={30} w={100} />
       )}
 
-      <Group gap={2} align="center" mt={13} c="var(--prune-text-gray-900)">
+      {/* <Group gap={2} align="center" mt={13} c="var(--prune-text-gray-900)">
         <Text tt="uppercase" fz={10} fw={400}>
           BIC:
         </Text>
@@ -120,6 +121,13 @@ export const AccountCard = ({
           </Text>
         ) : (
           <Skeleton h={10} w={100} />
+        )}
+      </Group> */}
+      <Group gap={2} align="center" mt={13} c="var(--prune-text-gray-900)">
+        {link && (
+          <Link href={link}>
+            <SeeAll name="See More" />
+          </Link>
         )}
       </Group>
     </Card>

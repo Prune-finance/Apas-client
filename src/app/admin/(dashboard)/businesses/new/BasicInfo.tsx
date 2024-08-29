@@ -16,6 +16,7 @@ import { UseFormReturnType } from "@mantine/form";
 import { NewBusinessType } from "@/lib/schema";
 import { IconMail, IconPhone, IconWorldWww } from "@tabler/icons-react";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
+import DropzoneComponent from "@/ui/components/Dropzone";
 
 type Props = {
   form: UseFormReturnType<NewBusinessType>;
@@ -27,6 +28,8 @@ export default function BasicInfo({ form }: Props) {
     label: plan.name,
     value: plan.id,
   }));
+
+  console.log(form.values);
 
   return (
     <Box>
@@ -59,7 +62,7 @@ export default function BasicInfo({ form }: Props) {
           placeholder="Select Business Type"
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
-          label="Legal Entity"
+          label="Business Type"
           withAsterisk
           data={["Corporate"]}
           {...form.getInputProps("legalEntity")}
@@ -87,7 +90,7 @@ export default function BasicInfo({ form }: Props) {
           {...form.getInputProps("address")}
         />
         <Select
-          placeholder="Enter Pricing Plan"
+          placeholder="Select Pricing Plan"
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           withAsterisk
@@ -103,12 +106,43 @@ export default function BasicInfo({ form }: Props) {
         />
       </Flex>
 
+      <Textarea
+        mt={24}
+        label="Business Bio"
+        placeholder="Business Bio"
+        classNames={{ input: styles.input, label: styles.label }}
+        {...form.getInputProps("businessBio")}
+      />
+
+      <Text fz={18} fw={600} c="var(--prune-text-gray-700)" mt={32} mb={24}>
+        Contact Person:
+      </Text>
+
+      <Flex gap={20}>
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          label="First Name"
+          placeholder="Enter First Name"
+          {...form.getInputProps("contactFirstName")}
+          withAsterisk
+        />
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          label="Last Name"
+          placeholder="Enter Last Name"
+          {...form.getInputProps("contactLastName")}
+          withAsterisk
+        />
+      </Flex>
+
       <Flex gap={20} mt={24}>
         <TextInput
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           withAsterisk
-          label="Contact email"
+          label="Contact Email"
           type="email"
           placeholder="Enter Contact Email"
           {...form.getInputProps("contactEmail")}
@@ -119,7 +153,7 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           withAsterisk
           type="tel"
-          label="Contact phone number"
+          label="Contact Phone Number"
           placeholder="Enter Contact Phone Number"
           {...form.getInputProps("contactNumber")}
           rightSection={<IconPhone size={14} />}
@@ -133,13 +167,72 @@ export default function BasicInfo({ form }: Props) {
         />
       </Flex>
 
-      <Textarea
-        mt={24}
-        label="Business Bio"
-        placeholder="Business Bio"
-        classNames={{ input: styles.input, label: styles.label }}
-        {...form.getInputProps("businessBio")}
-      />
+      <Flex mt={24} gap={20}>
+        <Select
+          placeholder="Select Identity Type"
+          classNames={{ input: styles.input }}
+          flex={1}
+          data={["ID Card", "Passport", "Residence Permit"]}
+          {...form.getInputProps(`contactIdType`)}
+        />
+
+        <Select
+          placeholder="Select Proof of Address"
+          classNames={{ input: styles.input }}
+          flex={1}
+          data={["Utility Bill"]}
+          {...form.getInputProps(`contactPOAType`)}
+          withAsterisk
+        />
+      </Flex>
+
+      <Flex mt={24} gap={20}>
+        {form.values.contactIdType && (
+          <>
+            <Box flex={1}>
+              <Text fz={12} c="#344054" mb={10}>
+                {`Upload ${form.values.contactIdType} ${
+                  form.values.contactIdType !== "Passport" ? "(Front)" : ""
+                }`}
+              </Text>
+              <DropzoneComponent
+                form={form}
+                formKey={`contactIdUrl`}
+                uploadedFileUrl={form.values.contactIdUrl}
+              />
+            </Box>
+
+            <>
+              {form.values.contactIdType !== "Passport" && (
+                <Box flex={1}>
+                  <Text fz={12} c="#344054" mb={10}>
+                    {`Upload
+                ${form.values.contactIdType}  (Back)`}
+                  </Text>
+                  <DropzoneComponent
+                    form={form}
+                    formKey={`contactIdUrlBack`}
+                    uploadedFileUrl={form.values.contactIdUrlBack}
+                  />
+                </Box>
+              )}
+            </>
+          </>
+        )}
+
+        {form.values.directors && form.values.contactPOAType && (
+          <Box flex={1}>
+            <Text fz={12} c="#344054" mb={10}>
+              Upload Utility Bill
+            </Text>
+            <DropzoneComponent
+              form={form}
+              formKey={`contactPOAUrl`}
+              uploadedFileUrl={form.values.contactPOAUrl}
+            />
+          </Box>
+        )}
+      </Flex>
     </Box>
   );
 }

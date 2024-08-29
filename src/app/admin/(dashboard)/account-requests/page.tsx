@@ -54,6 +54,8 @@ import useNotification from "@/lib/hooks/notification";
 import { useBusiness } from "@/lib/hooks/businesses";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import { SearchInput } from "@/ui/components/Inputs";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -85,7 +87,7 @@ function AccountRequests() {
     ...(isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toLowerCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toLowerCase() }),
@@ -259,17 +261,17 @@ function AccountRequests() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Account Requests", href: "/admin/accounts" },
         ]}
-      />
+      /> */}
 
       <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
-            Account Requests
+            Account Creation
           </Text>
         </div>
 
@@ -279,29 +281,10 @@ function AccountRequests() {
           mt={24}
           // className={styles.container__search__filter}
         >
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <Group gap={12}>
-            <Button
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-              leftSection={<IconListTree size={14} />}
-              fz={12}
-              fw={500}
-              onClick={toggle}
-            >
-              Filter
-            </Button>
+            <SecondaryBtn text="Filter" icon={IconListTree} action={toggle} />
           </Group>
         </Group>
 

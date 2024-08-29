@@ -20,6 +20,9 @@ import { BadgeComponent } from "../../Badge";
 import Transaction from "@/lib/store/transaction";
 import { AccountTransactionDrawer } from "./drawer";
 import { PayoutDrawer } from "@/app/(dashboard)/payouts/drawer";
+import { IssuedAccountTableHeaders } from "@/lib/static";
+import { AmountGroup } from "../../AmountGroup";
+import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 
 interface Props {
   transactions: TransactionType[];
@@ -29,6 +32,7 @@ interface Props {
 
 export const Transactions = ({ transactions, loading, payout }: Props) => {
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
+  const { data, opened, close } = Transaction();
 
   const overviewDetails = [
     {
@@ -62,7 +66,7 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
             <RowComponent data={transactions} />
           )
         }
-        head={payout ? payoutTableHeaders : tableHeaders}
+        head={payout ? payoutTableHeaders : IssuedAccountTableHeaders}
         loading={loading}
       />
 
@@ -73,7 +77,15 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         text="When a transaction is recorded, it will appear here"
       />
 
-      {payout ? <PayoutDrawer /> : <AccountTransactionDrawer />}
+      {!payout && (
+        <TransactionDrawer
+          opened={opened}
+          close={close}
+          selectedRequest={data}
+        />
+      )}
+
+      {payout && <PayoutDrawer />}
     </>
   );
 };
@@ -90,7 +102,7 @@ const tableHeaders = [
 const payoutTableHeaders = [
   "Beneficiary Name",
   "Destination Account",
-  "Intermediary",
+  "Ultimate Debtor",
   "Amount",
   "Date & Time",
   "Status",
@@ -120,22 +132,17 @@ const RowComponent = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element.senderIban}</TableTd>
-      {/* <TableTd className={styles.table__td}>
-        {element.recipientBankAddress}
-      </TableTd> */}
-      <TableTd>{element.recipientIban}</TableTd>
+      <TableTd>{"N/A"}</TableTd>
+      <TableTd>{element.recipientName || element.recipientIban}</TableTd>
       <TableTd>
-        <Group gap={3}>
-          <IconArrowUpRight
-            color="#D92D20"
-            size={16}
-            // className={styles.table__td__icon}
-          />
-          {formatNumber(element.amount, true, "EUR")}
-          {/* <Text fz={12}></Text> */}
-        </Group>
+        <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
-      <TableTd>{dayjs(element.createdAt).format("DD MMM, YYYY")}</TableTd>
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>{element.reference}</TableTd>
+
+      <TableTd>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
+      </TableTd>
       <TableTd>
         <BadgeComponent status={element.status} />
       </TableTd>

@@ -13,20 +13,13 @@ import {
   Paper,
   Select,
   Stack,
-  Table,
-  TableScrollContainer,
-  TableTbody,
   TableTd,
-  TableThead,
   TableTr,
   Text,
   TextInput,
   Title,
 } from "@mantine/core";
 import {
-  IconArrowDownLeft,
-  IconArrowLeft,
-  IconArrowUpRight,
   IconCircleArrowDown,
   IconListTree,
   IconSearch,
@@ -34,7 +27,7 @@ import {
 } from "@tabler/icons-react";
 import styles from "./styles.module.scss";
 
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import Filter from "@/ui/components/Filter";
@@ -52,9 +45,22 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
-import { Suspense, useState } from "react";
+import { Suspense, useRef, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "@/ui/components/Pagination";
+import { AmountGroup } from "@/ui/components/AmountGroup";
+import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
+import { BadgeComponent } from "@/ui/components/Badge";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import {
+  ReceiptDetails,
+  TransactionReceipt,
+} from "@/ui/components/TransactionReceipt";
+import { handlePdfDownload } from "@/lib/actions/auth";
+import { SearchInput } from "@/ui/components/Inputs";
+import { IssuedAccountTableHeaders } from "@/lib/static";
+import Link from "next/link";
+import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 
 function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -108,41 +114,25 @@ function TransactionForAccount() {
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
   });
+
   return (
     <main>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           {
             title: "Transactions",
             href: `/admin/transactions`,
           },
         ]}
-      />
+      /> */}
 
       <Paper p={20} mt={16}>
-        {/* <Button
-          fz={14}
-          c="var(--prune-text-gray-500)"
-          fw={400}
-          px={0}
-          variant="transparent"
-          onClick={back}
-          leftSection={
-            <IconArrowLeft
-              color="#1D2939"
-              style={{ width: "70%", height: "70%" }}
-            />
-          }
-        >
-          Back
-        </Button> */}
-
         <Title c="var(--prune-text-gray-700)" fz={24} fw={600} my={28}>
           Transactions
         </Title>
 
         <InfoCards title="Overview" details={infoDetails} loading={loading}>
-          <Select
+          {/* <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
             placeholder="Last Week"
@@ -156,71 +146,26 @@ function TransactionForAccount() {
                 border: "none",
               },
             }}
-          />
+          /> */}
         </InfoCards>
 
         <Flex justify="space-between" align="center" mt={38}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            // leftSection={searchIcon}
-            leftSection={<IconSearch size={20} />}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            color="var(--prune-text-gray-200)"
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            c="#000"
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <Flex gap={12}>
-            <Button
-              // className={styles.filter__cta}
-              leftSection={<IconListTree size={14} />}
-              onClick={toggle}
-              fz={12}
-              fw={500}
-              radius={4}
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-            >
-              Filter
-            </Button>
-            <Button
-              // className={styles.filter__cta}
-              leftSection={<IconArrowUpRight size={14} />}
-              onClick={toggle}
-              fz={12}
-              fw={500}
-              radius={4}
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-            >
-              Export CSV
-            </Button>
-            <Button
-              // className={styles.filter__cta}
-              leftSection={<IconCircleArrowDown size={14} />}
-              onClick={toggle}
-              fz={12}
-              fw={500}
-              radius={4}
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-            >
-              Download Statement
-            </Button>
+            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+            <SecondaryBtn
+              text="Download Statement"
+              // action={toggle}
+              icon={IconCircleArrowDown}
+            />
           </Flex>
         </Flex>
 
         <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
         <TableComponent
-          head={tableHeaders}
+          head={IssuedAccountTableHeaders}
           rows={
             <RowComponent
               data={transactions}
@@ -251,7 +196,14 @@ function TransactionForAccount() {
           )}
         />
 
-        {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
+        {data && (
+          <TransactionDrawer
+            opened={openedDrawer}
+            close={close}
+            selectedRequest={data}
+          />
+        )}
+        {/* {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />} */}
       </Paper>
     </main>
   );
@@ -263,6 +215,15 @@ const tableHeaders = [
   "Name",
   "Bank",
   "Account Number",
+  "Amount",
+  "Date",
+  "Status",
+];
+
+const trxTableHeaders = [
+  "Sender",
+  "Business",
+  "Beneficiary",
   "Amount",
   "Date",
   "Status",
@@ -283,7 +244,7 @@ const RowComponent = ({
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
-    filteredSearch(data, searchProps, search),
+    filteredSearch(data.reverse(), searchProps, search),
     active,
     parseInt(limit ?? "10", 10)
   ).map((element) => (
@@ -295,36 +256,34 @@ const RowComponent = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
-      <TableTd className={styles.table__td}>
-        {element.recipientBankAddress}
+      <TableTd
+        className={styles.table__td}
+        td="underline"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <Link href={`/admin/transactions/${element.senderIban}`}>
+          {element.senderIban}
+        </Link>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        <Group gap={3}>
-          <IconArrowUpRight
-            color="#D92D20"
-            size={16}
-            className={styles.table__td__icon}
-          />
-          {formatNumber(element.amount, true, "EUR")}
-          {/* <Text fz={12}></Text> */}
-        </Group>
-      </TableTd>
+      <TableTd>{"N/A"}</TableTd>
       <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("DD MMM, YYYY-hh:mmA")}
+        {element.recipientName || element.recipientIban}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <Badge
-          color={approvedBadgeColor(element.status.toUpperCase())}
-          tt="capitalize"
-          fz={10}
-          fw={400}
-          w={90}
-          variant="light"
-        >
-          {element.status.toLowerCase()}
-        </Badge>
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        {formatNumber(element.amount, true, "EUR")}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));
@@ -346,22 +305,66 @@ type TRXDrawerProps = {
 
 const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
   const { clearData } = Transaction();
+  const pdfRef = useRef<HTMLDivElement>(null);
 
   const senderDetails = [
-    { title: "Account Name", value: data.senderIban },
+    { title: "Account Name", value: "N/A" },
     { title: "Bank", value: data.recipientBankAddress },
-    { title: "Account Number", value: data.recipientIban },
+    { title: "Account Number", value: data.senderIban },
   ];
 
   const otherDetails = [
-    { title: "Alert Type", value: "Debit" },
+    { title: "Alert Type", value: <AmountGroup type={data.type} /> },
     {
       title: "Date & Time",
       value: dayjs(data.createdAt).format("DD MMM, YYYY-hh:mmA"),
     },
     { title: "Transaction ID", value: data.id },
-    { title: "Status", value: data.status },
+    { title: "Status", value: <BadgeComponent status={data.status} /> },
   ];
+
+  const beneficiaryDetails = {
+    "Account Name": data.recipientName || "N/A",
+    IBAN: data.recipientIban,
+    BIC: data.recipientBic,
+    "Bank Name": "N/A",
+    "Bank Address": data.recipientBankAddress,
+    Country: data.recipientBankCountry,
+  };
+
+  const BeneficiaryDetails = {
+    "Amount Received": formatNumber(data?.amount ?? 0, true, "EUR"),
+    // "First Name": selectedRequest?.destinationFirstName ?? "N/A",
+    // "Last Name": selectedRequest?.destinationLastName ?? "N/A",
+    Name: data?.recipientName || "N/A",
+    IBAN: data?.recipientIban ?? "",
+    "Bank Name": data?.recipientBankAddress ?? "",
+    Country: data?.recipientBankCountry ?? "",
+    "Bank Address": "N/A",
+  };
+
+  const SenderDetails = {
+    "Account Name": "N/A",
+    "Account Number": data?.senderIban ?? "",
+    "Bank Name": "Prune Payments LTD",
+    BIC: "ARPYGB21XXX",
+  };
+
+  const OtherDetails = {
+    Type: data.type === "DEBIT" ? "Debit" : "Credit",
+    "Payment Date": dayjs(data?.createdAt).format("hh:mm A Do MMM YYYY"),
+    Reference: data?.reference ?? "N/A",
+    "Transaction ID": data?.id ?? "",
+  };
+  const details: ReceiptDetails[] = [
+    {
+      title: "Sender Details",
+      value: SenderDetails,
+    },
+    { title: "Beneficiary Details", value: BeneficiaryDetails },
+    { title: "Other Details", value: OtherDetails },
+  ];
+
   return (
     <Drawer
       opened={opened}
@@ -370,28 +373,20 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
         close();
         clearData();
       }}
-      withCloseButton={false}
+      // withCloseButton={false}
+      closeButtonProps={{ ...closeButtonProps, mr: 24 }}
       padding={0}
-    >
-      <Flex justify="space-between" align="center" px={24} py={16}>
-        <Text fz={20} fw={600}>
+      title={
+        <Text fz={20} fw={600} ml={24}>
           Transactions Details
         </Text>
-
-        <ActionIcon
-          onClick={close}
-          variant="transparent"
-          color="var(--prune-text-gray-800)"
-        >
-          <IconX />
-        </ActionIcon>
-      </Flex>
-
+      }
+    >
       <Divider />
       <Box px={24} py={16}>
         <Stack gap={2}>
           <Text fz={12} c="var(--prune-text-gray-500)" fw={500}>
-            Amount Received
+            {data.type === "DEBIT" ? "Amount Sent" : "Amount Received"}
           </Text>
           <Text c="var(--prune-primary-700)" fw={600} fz={32}>
             {formatNumber(data.amount, true, "EUR")}
@@ -400,16 +395,16 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
 
         <Divider my={24} />
 
-        <Text fz={16} fw={600} c="var(--prune-text-gray-800)">
+        <Text fz={14} fw={600} c="var(--prune-text-gray-800)" tt="uppercase">
           Sender Details
         </Text>
         <Stack gap={12} mt={24}>
           {senderDetails.map((detail) => (
             <Group key={detail.title} justify="space-between">
-              <Text c="var(--prune-text-gray-400)" fz={14} fw={400}>
+              <Text c="var(--prune-text-gray-500)" fz={12} fw={400}>
                 {detail.title}:
               </Text>
-              <Text c="var(--prune-text-gray-600)" fz={14} fw={600}>
+              <Text c="var(--prune-text-gray-700)" fz={12} fw={600}>
                 {detail.value}
               </Text>
             </Group>
@@ -418,50 +413,64 @@ const TRXDrawer = ({ opened, close, data }: TRXDrawerProps) => {
 
         <Divider my={24} />
 
-        <Text fz={16} fw={600} c="var(--prune-text-gray-800)">
+        <Text fz={14} fw={600} c="var(--prune-text-gray-800)" tt="uppercase">
+          Beneficiary Details
+        </Text>
+
+        <Stack gap={12} mt={24}>
+          {Object.entries(beneficiaryDetails).map(([title, value]) => (
+            <Group key={title} justify="space-between">
+              <Text c="var(--prune-text-gray-500)" fz={12} fw={400}>
+                {title}:
+              </Text>
+
+              <Text c={"var(--prune-text-gray-700)"} fz={12} fw={600}>
+                {value}
+              </Text>
+            </Group>
+          ))}
+        </Stack>
+
+        <Divider my={24} />
+
+        <Text fz={14} fw={600} c="var(--prune-text-gray-800)" tt="uppercase">
           Other Details
         </Text>
 
         <Stack gap={12} mt={24}>
           {otherDetails.map((detail) => (
             <Group key={detail.title} justify="space-between">
-              <Text c="var(--prune-text-gray-400)" fz={14} fw={400}>
+              <Text c="var(--prune-text-gray-500)" fz={12} fw={400}>
                 {detail.title}:
               </Text>
-              {detail.title === "Status" ? (
-                <Badge
-                  color={approvedBadgeColor(detail.value.toUpperCase())}
-                  tt="capitalize"
-                  fz={10}
-                  fw={400}
-                  w={90}
-                  variant="light"
-                >
-                  {detail.value.toLowerCase()}
-                </Badge>
-              ) : (
-                <Group gap={0}>
-                  {detail.title === "Alert Type" && (
-                    <ActionIcon variant="transparent">
-                      <IconArrowUpRight size={14} color="#D92D20" />
-                    </ActionIcon>
-                  )}
-                  <Text
-                    c={
-                      // detail.title === "Alert Type"
-                      //   ? "#D92D20"
-                      "var(--prune-text-gray-600)"
-                    }
-                    fz={14}
-                    fw={600}
-                  >
-                    {detail.value}
-                  </Text>
-                </Group>
-              )}
+
+              <Text c={"var(--prune-text-gray-700)"} fz={12} fw={600}>
+                {detail.value}
+              </Text>
             </Group>
           ))}
         </Stack>
+
+        <Divider my={24} />
+
+        <PrimaryBtn
+          text="Download Receipt"
+          icon={IconCircleArrowDown}
+          fw={600}
+          fullWidth
+          action={() => handlePdfDownload(pdfRef)}
+        />
+      </Box>
+
+      <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
+        <TransactionReceipt
+          amount={data?.amount ?? 0}
+          amountType={
+            data?.type === "DEBIT" ? "Amount Sent" : "Amount Received"
+          }
+          details={details}
+          receiptRef={pdfRef}
+        />
       </Box>
     </Drawer>
   );

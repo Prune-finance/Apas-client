@@ -1,3 +1,4 @@
+import { Meta } from "./transactions";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
@@ -129,6 +130,43 @@ export function useBusinessDefaultAccount(id: string) {
   }, []);
 
   return { loading, account, revalidate };
+}
+
+export function usePayoutAccount() {
+  const [accounts, setAccounts] = useState<AccountData[] | null>(null);
+  const [meta, setMeta] = useState<AccountMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setAccounts(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccount();
+  }
+
+  useEffect(() => {
+    fetchAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, accounts, revalidate, meta };
 }
 
 export function useUserAccounts(customParams: IParams = {}) {
@@ -288,6 +326,8 @@ export interface AccountMeta {
   active: number;
   inactive: number;
   total: number;
+  frozen: number;
+  deactivated: number;
 }
 
 export interface AccountData {
@@ -317,20 +357,49 @@ export interface AccountDocuments {
   poaFileURL: string;
 }
 
-export interface Account {
+type DocumentType = "passport" | "driverLicense" | "nationalID" | string;
+type POAType = "bankStatement" | "utilityBill" | "leaseAgreement" | string;
+
+export interface PersonDocuments {
+  idFile: string;
+  idType: DocumentType;
+  poaFile: string;
+  poaType: POAType;
+}
+
+export interface CorporateAccountDocuments {
+  directors: {
+    [key: string]: PersonDocuments;
+  };
+  shareholders: {
+    [key: string]: PersonDocuments;
+  };
+}
+
+export interface BaseAccount {
   id: string;
   firstName: string;
   lastName: string;
   accountId: number;
   accountName: string;
   accountNumber: string;
-  accountDocuments: AccountDocuments;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
   companyId: string;
   companyName?: string;
-  type: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
 }
+
+export interface UserAccount extends BaseAccount {
+  accountDocuments: AccountDocuments;
+  type: "USER";
+}
+
+export interface CorporateAccount extends BaseAccount {
+  accountDocuments: CorporateAccountDocuments;
+  type: "CORPORATE";
+}
+
+export type Account = UserAccount | CorporateAccount;

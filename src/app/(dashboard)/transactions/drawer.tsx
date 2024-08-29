@@ -33,6 +33,7 @@ import { useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { send } from "process";
+import { AmountGroup } from "@/ui/components/AmountGroup";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
@@ -72,19 +73,17 @@ export const TransactionDrawer = ({
 
   const otherDetails = {
     "Alert Type": (
-      <Badge
-        leftSection={<IconArrowUpRight size={14} />}
-        color="var(--prune-warning)"
-        variant="transparent"
-        tt="capitalize"
-      >
-        Debit
-      </Badge>
+      <AmountGroup
+        type={selectedRequest?.type as "DEBIT" | "CREDIT"}
+        colored
+        fz={12}
+      />
     ),
     "Date and Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
     ),
     "Transaction ID": selectedRequest?.id,
+    Reference: selectedRequest?.reference ?? "N/A",
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
 
@@ -107,7 +106,7 @@ export const TransactionDrawer = ({
   };
 
   const OtherDetails = {
-    Type: "Debit",
+    Type: selectedRequest?.type === "DEBIT" ? "Debit" : "Credit",
     "Payment Date": dayjs(selectedRequest?.createdAt).format(
       "hh:mm A Do MMM YYYY"
     ),
@@ -139,8 +138,10 @@ export const TransactionDrawer = ({
       <Divider mb={20} />
       <Box px={28} pb={28}>
         <Flex direction="column">
-          <Text c="#8B8B8B" fz={12}>
-            Amount Sent
+          <Text c="var(--prune-text-gray-500)" fz={12}>
+            {selectedRequest?.type === "DEBIT"
+              ? "Amount Sent"
+              : "Amount Received"}
           </Text>
 
           <Text c="#97AD05" fz={32} fw={600}>

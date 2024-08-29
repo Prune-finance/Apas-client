@@ -66,6 +66,7 @@ import AccountDetails from "./(tabs)/AccountDetails";
 import { Transactions } from "./(tabs)/Transactions";
 import { Analytics } from "./(tabs)/Analytics";
 import { BusinessData } from "@/lib/hooks/businesses";
+import { Documents } from "./(tabs)/Documents";
 
 type Param = { id: string };
 interface Props {
@@ -320,7 +321,6 @@ export function SingleAccount({
             loading={loading}
             h={190}
           >
-           
             <CopyButton
               value={`Account Name: ${
                 account?.accountName ?? ""
@@ -579,6 +579,9 @@ export const SingleAccountBody = ({
     Currency: "EUR",
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
+      account?.updatedAt
+    ).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
@@ -586,10 +589,14 @@ export const SingleAccountBody = ({
     ) : (
       account?.type
     ),
-    [payout ? "Last Activity" : "Last Seen"]: dayjs(account?.updatedAt).format(
-      "Do MMMM, YYYY"
-    ),
   };
+
+  const tabs = [
+    { value: "Account Details" },
+    { value: "Transactions" },
+    { value: "Statistics" },
+    { value: "Documents" },
+  ];
 
   return (
     <Box mt={32}>
@@ -631,16 +638,13 @@ export const SingleAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
+        <TabsPanel value={tabs[3].value} mt={28}>
+          <Documents account={account} />
+        </TabsPanel>
       </TabsComponent>
     </Box>
   );
 };
-
-const tabs = [
-  { value: "Account Details" },
-  { value: "Transactions" },
-  { value: "Analytics" },
-];
 
 interface IssuedAccountHeadProps {
   loading: boolean;
@@ -667,6 +671,7 @@ export const IssuedAccountHead = ({
       <Group gap={12} align="center">
         {!loading ? (
           <Avatar
+            variant="filled"
             size="lg"
             color="var(--prune-primary-700)"
           >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
@@ -800,6 +805,7 @@ export const DefaultAccountHead = ({
           </Button> */}
 
         {!payout && <PrimaryBtn text="Send Money" fw={600} />}
+        {/* {payout && <PrimaryBtn text="Request Payout Account" fw={600} />} */}
       </Flex>
     </Flex>
   );

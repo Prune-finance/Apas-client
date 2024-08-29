@@ -29,6 +29,8 @@ import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
+import { AmountGroup } from "@/ui/components/AmountGroup";
+import { IssuedAccountTableHeaders } from "@/lib/static";
 
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
@@ -88,19 +90,17 @@ export const IssuedAccountsTab = () => {
         >
           {element.senderIban}
         </TableTd>
+        <TableTd>{"N/A"}</TableTd>
         <TableTd className={styles.table__td}>
           {element.recipientName || element.recipientIban}
         </TableTd>
         <TableTd className={styles.table__td}>
-          <Flex align="center" gap={5}>
-            <IconArrowUpRight
-              color="#D92D20"
-              size={16}
-              className={styles.table__td__icon}
-            />
-            {formatNumber(element.amount, true, "EUR")}
-          </Flex>
+          <AmountGroup type={element.type} fz={12} fw={400} />
         </TableTd>
+        <TableTd className={styles.table__td}>
+          {formatNumber(element.amount, true, "EUR")}
+        </TableTd>
+        <TableTd className={styles.table__td}>{element.reference}</TableTd>
 
         <TableTd className={styles.table__td}>
           {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
@@ -121,7 +121,11 @@ export const IssuedAccountsTab = () => {
       </Group>
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
-      <TableComponent rows={rows} loading={loading} head={tableHeaders} />
+      <TableComponent
+        rows={rows}
+        loading={loading}
+        head={IssuedAccountTableHeaders}
+      />
 
       <EmptyTable
         rows={rows}
@@ -146,10 +150,19 @@ export const IssuedAccountsTab = () => {
   );
 };
 
+// const tableHeaders = [
+//   "Sender Name",
+//   "Beneficiary Name",
+//   "Amount",
+//   "Date Created",
+//   "Status",
+// ];
+
 const tableHeaders = [
-  "Sender Name",
-  "Beneficiary Name",
+  "Sender",
+  "Business",
+  "Beneficiary",
   "Amount",
-  "Date Created",
+  "Date",
   "Status",
 ];

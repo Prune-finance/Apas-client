@@ -44,6 +44,9 @@ import {
   useSingleUserAccountByIBAN,
 } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import { IssuedAccountTableHeaders } from "@/lib/static";
+import { AmountGroup } from "@/ui/components/AmountGroup";
+import { useUserBusiness } from "@/lib/hooks/businesses";
 
 export default function AccountTransactions() {
   const { accountId } = useParams<{ accountId: string }>();
@@ -113,23 +116,21 @@ export default function AccountTransactions() {
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{"N/A"}</TableTd>
-      {/* <TableTd className={styles.table__td}>
-        {element.recipientBankAddress}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd> */}
-      <TableTd className={`${styles.table__td}`}>
-        <Flex align="center" gap={5}>
-          <IconArrowUpRight
-            color="#D92D20"
-            size={16}
-            className={styles.table__td__icon}
-          />
-          {formatNumber(element.amount, true, "EUR")}
-        </Flex>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd>{"N/A"}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientName || element.recipientIban}
       </TableTd>
       <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        {formatNumber(element.amount, true, "EUR")}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
       </TableTd>
       <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />
@@ -152,6 +153,7 @@ export default function AccountTransactions() {
       <Group gap={12} align="center" mt={32}>
         {!loading ? (
           <Avatar
+            variant="filled"
             size="lg"
             color="var(--prune-primary-700)"
             // variant="light"
@@ -196,7 +198,11 @@ export default function AccountTransactions() {
       </Group>
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
-      <TableComponent rows={rows} loading={loading} head={tableHeader} />
+      <TableComponent
+        rows={rows}
+        loading={loading}
+        head={IssuedAccountTableHeaders}
+      />
 
       <EmptyTable
         rows={rows}

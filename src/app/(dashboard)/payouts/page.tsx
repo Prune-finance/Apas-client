@@ -1,7 +1,7 @@
 "use client";
 import dayjs from "dayjs";
 
-import { Group, Paper } from "@mantine/core";
+import { Group, Paper, SimpleGrid } from "@mantine/core";
 
 import { Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
@@ -32,7 +32,7 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { filteredSearch } from "@/lib/search";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import { SearchInput } from "@/ui/components/Inputs";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -42,6 +42,11 @@ import {
   DefaultAccountHead,
   SingleAccountBody,
 } from "@/ui/components/SingleAccount";
+import { AccountCard } from "@/ui/components/Cards/AccountCard";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
@@ -59,6 +64,10 @@ function PayoutTrx() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [chartFrequency, setChartFrequency] = useState<string>("monthly");
+
+  const [processing, setProcessing] = useState(false);
+
+  const { handleError, handleInfo, handleSuccess } = useNotification();
 
   const [openedDebit, { open, close }] = useDisclosure(false);
 
@@ -149,9 +158,53 @@ function PayoutTrx() {
     },
   ];
 
+  // {{account-srv}}/v1/accounts/payout/request
+
+  const requestPayoutAccount = async () => {
+    setProcessing(true);
+
+    try {
+      await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/payout/request`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+      handleSuccess("Action Completed", "Payout Account Requested");
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <main className={styles.main}>
-      <DefaultAccountHead
+      <Group justify="space-between">
+        <div
+        // className={styles.container__header}
+        >
+          <Text fz={18} fw={600}>
+            Payouts
+          </Text>
+          <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
+            Here’s an overview of your payout account activities
+          </Text>
+        </div>
+
+        <PrimaryBtn text="Request Payout Account" fw={600} />
+      </Group>
+
+      <SimpleGrid cols={3} mt={32}>
+        <AccountCard
+          balance={account?.accountBalance ?? 0}
+          currency="EUR"
+          companyName={account?.accountName ?? "No Default Account"}
+          iban={account?.accountNumber ?? "No Default Account"}
+          bic={"ARPYGB21XXX"}
+          loading={loadingAcct}
+          link={`/payouts/${account?.id}`}
+        />
+      </SimpleGrid>
+      {/* <DefaultAccountHead
         loading={loadingAcct}
         account={account}
         open={open}
@@ -164,7 +217,7 @@ function PayoutTrx() {
         transactions={transactions as TransactionType[]}
         setChartFrequency={setChartFrequency}
         payout
-      />
+      /> */}
 
       {/* <Paper className={styles.table__container}>
         <div className={styles.container__header}>

@@ -183,6 +183,8 @@
   display: flex;
   flex-direction: column;
   border: 1px solid #f2f4f7;
+  height: 100%;
+  padding-bottom: 23px;
 
   .card__title {
     color: var(--prune-text-gray-600);

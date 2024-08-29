@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   Avatar,
   Badge,
+  Box,
   Button,
   Flex,
   Paper,
@@ -326,7 +327,7 @@ interface ICardFourItems {
 
 export function CardFour({ title, link, items }: ICardFour) {
   return (
-    <div className={styles.card__four}>
+    <Box className={styles.card__four} mb={30}>
       <div className={styles.card__title}>
         <Text fz={10} tt="uppercase" fw={600}>
           {title}
@@ -404,7 +405,7 @@ export function CardFour({ title, link, items }: ICardFour) {
           </Flex>
         )}
       </div>
-    </div>
+    </Box>
   );
 }
 

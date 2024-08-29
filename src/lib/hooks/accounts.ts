@@ -326,6 +326,8 @@ export interface AccountMeta {
   active: number;
   inactive: number;
   total: number;
+  frozen: number;
+  deactivated: number;
 }
 
 export interface AccountData {

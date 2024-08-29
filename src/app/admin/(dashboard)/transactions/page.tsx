@@ -13,20 +13,13 @@ import {
   Paper,
   Select,
   Stack,
-  Table,
-  TableScrollContainer,
-  TableTbody,
   TableTd,
-  TableThead,
   TableTr,
   Text,
   TextInput,
   Title,
 } from "@mantine/core";
 import {
-  IconArrowDownLeft,
-  IconArrowLeft,
-  IconArrowUpRight,
   IconCircleArrowDown,
   IconListTree,
   IconSearch,
@@ -34,7 +27,7 @@ import {
 } from "@tabler/icons-react";
 import styles from "./styles.module.scss";
 
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import Filter from "@/ui/components/Filter";
@@ -58,12 +51,16 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { PrimaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import {
   ReceiptDetails,
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
 import { handlePdfDownload } from "@/lib/actions/auth";
+import { SearchInput } from "@/ui/components/Inputs";
+import { IssuedAccountTableHeaders } from "@/lib/static";
+import Link from "next/link";
+import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 
 function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -120,39 +117,22 @@ function TransactionForAccount() {
 
   return (
     <main>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           {
             title: "Transactions",
             href: `/admin/transactions`,
           },
         ]}
-      />
+      /> */}
 
       <Paper p={20} mt={16}>
-        {/* <Button
-          fz={14}
-          c="var(--prune-text-gray-500)"
-          fw={400}
-          px={0}
-          variant="transparent"
-          onClick={back}
-          leftSection={
-            <IconArrowLeft
-              color="#1D2939"
-              style={{ width: "70%", height: "70%" }}
-            />
-          }
-        >
-          Back
-        </Button> */}
-
         <Title c="var(--prune-text-gray-700)" fz={24} fw={600} my={28}>
           Transactions
         </Title>
 
         <InfoCards title="Overview" details={infoDetails} loading={loading}>
-          <Select
+          {/* <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
             placeholder="Last Week"
@@ -166,59 +146,26 @@ function TransactionForAccount() {
                 border: "none",
               },
             }}
-          />
+          /> */}
         </InfoCards>
 
         <Flex justify="space-between" align="center" mt={38}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            // leftSection={searchIcon}
-            leftSection={<IconSearch size={20} />}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            color="var(--prune-text-gray-200)"
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            c="#000"
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <Flex gap={12}>
-            <Button
-              // className={styles.filter__cta}
-              leftSection={<IconListTree size={14} />}
-              onClick={toggle}
-              fz={12}
-              fw={500}
-              radius={4}
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-            >
-              Filter
-            </Button>
-
-            <Button
-              // className={styles.filter__cta}
-              leftSection={<IconCircleArrowDown size={14} />}
-              onClick={toggle}
-              fz={12}
-              fw={500}
-              radius={4}
-              variant="outline"
-              color="var(--prune-text-gray-200)"
-              c="var(--prune-text-gray-800)"
-            >
-              Download Statement
-            </Button>
+            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+            <SecondaryBtn
+              text="Download Statement"
+              // action={toggle}
+              icon={IconCircleArrowDown}
+            />
           </Flex>
         </Flex>
 
         <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
         <TableComponent
-          head={trxTableHeaders}
+          head={IssuedAccountTableHeaders}
           rows={
             <RowComponent
               data={transactions}
@@ -249,7 +196,14 @@ function TransactionForAccount() {
           )}
         />
 
-        {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />}
+        {data && (
+          <TransactionDrawer
+            opened={openedDrawer}
+            close={close}
+            selectedRequest={data}
+          />
+        )}
+        {/* {data && <TRXDrawer opened={openedDrawer} close={close} data={data} />} */}
       </Paper>
     </main>
   );
@@ -302,30 +256,34 @@ const RowComponent = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd
+        className={styles.table__td}
+        td="underline"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+      >
+        <Link href={`/admin/transactions/${element.senderIban}`}>
+          {element.senderIban}
+        </Link>
+      </TableTd>
+      <TableTd>{"N/A"}</TableTd>
       <TableTd className={styles.table__td}>
-        {element.recipientBankAddress}
+        {element.recipientName || element.recipientIban}
       </TableTd>
       <TableTd className={styles.table__td}>
-        {element.recipientName || "N/A"}
-      </TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        <AmountGroup amount={element.amount} type={element.type} />
+        <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
       <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("DD MMM, YYYY-hh:mmA")}
+        {formatNumber(element.amount, true, "EUR")}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <Badge
-          color={approvedBadgeColor(element.status.toUpperCase())}
-          tt="capitalize"
-          fz={10}
-          fw={400}
-          w={90}
-          variant="light"
-        >
-          {element.status.toLowerCase()}
-        </Badge>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));

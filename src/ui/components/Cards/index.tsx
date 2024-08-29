@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Flex,
+  Group,
   Paper,
   Skeleton,
   Text,
@@ -204,9 +205,24 @@ export function CardTwo({ title, link, items }: ICardTwo) {
           return (
             <div key={index} className={styles.item__container}>
               <div className={styles.item__header}>
-                <Text fz={12} fw={600} className={styles.header__text}>
-                  {item.title}
-                </Text>
+                <Group>
+                  <Avatar
+                    variant="filled"
+                    color="var(--prune-primary-600)"
+                    radius="sm"
+                    styles={{
+                      placeholder: { color: "var(--prune-text-gray-700)" },
+                    }}
+                  >
+                    {item.title
+                      .split(" ")
+                      .map((item) => item.charAt(0))
+                      .join("")}
+                  </Avatar>
+                  <Text fz={12} fw={600} className={styles.header__text}>
+                    {item.title}
+                  </Text>
+                </Group>
                 <Text fz={12} fw={600} className={styles.header__text}>
                   {formatNumber(item.amount, true, "EUR")}
                 </Text>
@@ -348,8 +364,11 @@ export function CardFour({ title, link, items }: ICardFour) {
                 <div className={styles.item__header}>
                   <Avatar
                     variant="filled"
-                    color="rgb(242, 251, 178)"
+                    color="var(--prune-primary-600)"
                     radius="sm"
+                    styles={{
+                      placeholder: { color: "var(--prune-text-gray-700)" },
+                    }}
                   >
                     <Text fw={600} c="#1D2939">
                       {item.title.split(" ")[0].charAt(0)}

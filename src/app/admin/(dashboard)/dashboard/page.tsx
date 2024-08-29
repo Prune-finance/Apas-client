@@ -10,6 +10,7 @@ import {
   Button,
   Flex,
   Box,
+  Group,
 } from "@mantine/core";
 import {
   Table,
@@ -27,7 +28,13 @@ import {
 } from "@tabler/icons-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import { CardFour, CardOne, CardThree, CardTwo } from "@/ui/components/Cards";
+import {
+  CardFour,
+  CardOne,
+  CardThree,
+  CardTwo,
+  SeeAll,
+} from "@/ui/components/Cards";
 import styles from "@/ui/styles/page.module.scss";
 
 import { formatNumber } from "@/lib/utils";
@@ -42,6 +49,9 @@ import Link from "next/link";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { IssuedAccountTableHeaders } from "@/lib/static";
+import { useTransactions } from "@/lib/hooks/transactions";
+import { AmountGroup } from "@/ui/components/AmountGroup";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 export default function Home() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
@@ -59,6 +69,8 @@ export default function Home() {
     meta: requestMeta,
     requests,
   } = useRequests({ status: "PENDING" });
+
+  const { loading: loadingTrx, transactions } = useTransactions();
 
   const data = stats;
 
@@ -151,26 +163,26 @@ export default function Home() {
     });
   }, [debitRequests]);
 
-  const rows = tableData.map((element) => (
-    <TableTr key={element.AccName}>
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        <IconArrowUpRight
-          color="#D92D20"
-          size={16}
-          className={styles.table__td__icon}
-        />
-        {formatNumber(element.Amount)}
-        {/* <Text fz={12}></Text> */}
+  const rows = transactions.slice(0, 4).map((element) => (
+    <TableTr key={element.id}>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd>{"N/A"}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientName || element.recipientIban}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          <IconPointFilled size={14} color="#12B76A" />
-          <Text tt="capitalize" fz={12} c="#12B76A">
-            {element.Status}
-          </Text>
-        </div>
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        {formatNumber(element.amount, true, "EUR")}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));
@@ -231,11 +243,11 @@ export default function Home() {
                 <CardOne
                   loading={requestsLoading}
                   stat={requestMeta?.approvedRequests || 0}
-                  title="Approved Accounts"
+                  title="Approved Account Requests"
                   text={
                     <>
                       This shows the total number of approved account requests
-                      in the system
+                      for all businesses
                     </>
                   }
                 />
@@ -247,11 +259,11 @@ export default function Home() {
                 <CardOne
                   loading={requestsLoading}
                   stat={requestMeta?.pendingRequests || 0}
-                  title="Pending Accounts"
+                  title="Pending Account Requests"
                   text={
                     <>
-                      This shows the total number of pending account requests in
-                      the system
+                      This shows the total number of pending account requests
+                      for all businesses
                     </>
                   }
                 />
@@ -276,7 +288,7 @@ export default function Home() {
                           fw={600}
                           className={styles.text}
                         >
-                          Business Registration Statistics
+                          Business Overview
                         </Text>
 
                         <NativeSelect
@@ -303,16 +315,31 @@ export default function Home() {
                     </div>
 
                     <Box style={{ border: "1px solid #f2f4f7" }} p={15} mt={15}>
+                      <Group justify="space-between">
+                        <Text
+                          tt="uppercase"
+                          fz={10}
+                          fw={600}
+                          className={styles.text}
+                        >
+                          Transactions
+                        </Text>
+
+                        <Link href="/admin/transactions">
+                          <SeeAll />
+                        </Link>
+                      </Group>
+
                       <TableComponent
                         head={IssuedAccountTableHeaders}
-                        rows={[]}
-                        loading={false}
+                        rows={rows}
+                        loading={loadingTrx}
                         noBg
                       />
 
                       <EmptyTable
-                        loading={false}
-                        rows={[]}
+                        loading={loadingTrx}
+                        rows={rows}
                         title="There is no transaction"
                         text="When a transaction is created it will appear here"
                       />

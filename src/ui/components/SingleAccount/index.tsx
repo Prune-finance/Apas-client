@@ -805,6 +805,7 @@ export const DefaultAccountHead = ({
           </Button> */}
 
         {!payout && <PrimaryBtn text="Send Money" fw={600} />}
+        {/* {payout && <PrimaryBtn text="Request Payout Account" fw={600} />} */}
       </Flex>
     </Flex>
   );

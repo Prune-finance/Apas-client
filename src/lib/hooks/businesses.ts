@@ -261,6 +261,19 @@ export interface BusinessData {
   otherDocuments: Record<string, string>;
   Accounts: { DebitRequests: { id: string }[] }[];
   Requests: { type: string; id: string }[];
+  contactFirstName: string;
+  contactIdType: string;
+  contactIdUrl: string;
+  contactIdUrlBack: string;
+  contactLastName: string;
+  contactPOAType: string;
+  contactPOAUrl: string;
+  documents: Document[];
+}
+
+export interface Document {
+  title: string;
+  documentURL: string;
 }
 
 export interface PricingPlan {

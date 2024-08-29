@@ -255,6 +255,8 @@ export const basicInfoSchema = z
     return data;
   });
 
+export type BasicInfoType = z.infer<typeof basicInfoSchema>;
+
 export const documentSchema = z.object({
   cacCertificate: z.string().url("Cac certificate is required"),
   mermat: z.string().url("Memart document is required"),

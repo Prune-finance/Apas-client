@@ -25,11 +25,12 @@ import {
 } from "@/lib/schema";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
-import { IconX } from "@tabler/icons-react";
+import { IconSearch, IconX } from "@tabler/icons-react";
 import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
+import classes from "../styles.module.scss";
 
 export default function CreateNewPlan() {
   const [opened, { open, close }] = useDisclosure(false);
@@ -89,9 +90,18 @@ export default function CreateNewPlan() {
           <Group>
             {/* Plan Name */}
             <TextInput
-              withAsterisk
+              // withAsterisk
+              size="lg"
+              classNames={{
+                input: classes.custom_input,
+              }}
               flex={1}
-              label="Plan Name"
+              radius={4}
+              label={
+                <Text fz={14}>
+                  Plan Name <span style={{ color: "red" }}>*</span>
+                </Text>
+              }
               placeholder="Enter Plan Name"
               {...form.getInputProps("name")}
             />
@@ -99,17 +109,32 @@ export default function CreateNewPlan() {
             <Select
               data={["Monthly", "Annually"]}
               flex={1}
-              withAsterisk
-              label="Billing Cycle"
+              size="lg"
+              classNames={{
+                input: classes.custom_input,
+                option: classes.dropdown_custom,
+              }}
+              label={
+                <Text fz={14}>
+                  Billing Cycle <span style={{ color: "red" }}>*</span>
+                </Text>
+              }
               placeholder="Select Billing Cycle"
               {...form.getInputProps("cycle")}
             />
           </Group>
 
           <NumberInput
-            label="Amount"
             placeholder="Enter Amount"
-            withAsterisk
+            size="lg"
+            label={
+              <Text fz={14}>
+                Amount <span style={{ color: "red" }}>*</span>
+              </Text>
+            }
+            classNames={{
+              input: classes.custom_input,
+            }}
             mt={24}
             min={0}
             allowNegative={false}
@@ -124,23 +149,53 @@ export default function CreateNewPlan() {
             mt={24}
             h={88}
             mb={60}
+            classNames={{
+              input: classes.custom_textarea,
+            }}
             {...form.getInputProps("description")}
           />
 
-          {/* <Text mb={21} fz={16} fw={500}>
-            Features:
-          </Text>
+          <Select
+            data={[
+              "Search existing features and press Enter to add them.",
+              "The feature selected shows down here as a sentence.",
+              "The feature selected shows down",
+            ]}
+            flex={1}
+            size="lg"
+            classNames={{
+              input: classes.custom_input,
+              option: classes.dropdown_custom,
+            }}
+            leftSection={<IconSearch size={18} color="#667085" />}
+            label={<Text fz={14}>Features:</Text>}
+            placeholder="Search existing features and press Enter to add them."
+            {...form.getInputProps("features")}
+          />
 
-          <MultiSelectCreatable /> */}
+          {/* <MultiSelectCreatable /> */}
 
-          <Group justify="flex-end" gap={20}>
-            <SecondaryBtn text="Clear" action={open} />
+          <Group justify="flex-end" gap={20} mt={24}>
+            <SecondaryBtn
+              text="Clear"
+              action={open}
+              w={126}
+              h={40}
+              radius={4}
+              fz={14}
+              fw={500}
+            />
 
             <PrimaryBtn
               text="Submit"
               action={() => {}}
               type="submit"
               loading={processing}
+              w={126}
+              h={40}
+              radius={4}
+              fz={14}
+              fw={500}
             />
           </Group>
         </Box>

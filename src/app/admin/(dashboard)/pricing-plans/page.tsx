@@ -114,7 +114,15 @@ export default function PricingPlans() {
   );
 }
 
-const tableHeaders = ["Plan Name", "Cycle", "Amount", "Date Created", "Action"];
+const tableHeaders = [
+  "Plan Name",
+  "Cycle",
+  "Amount",
+  "Date Created",
+  "Description",
+  "Features",
+  "Action",
+];
 
 const RowComponent = ({
   plans,
@@ -139,6 +147,10 @@ const RowComponent = ({
         <TableTd>{plan.cycle}</TableTd>
         <TableTd>{formatNumber(plan.cost, true, "EUR")}</TableTd>
         <TableTd>{dayjs(plan.createdAt).format("Do MMM, YYYY")}</TableTd>
+        <TableTd>{plan.description ? plan.description : "-"}</TableTd>
+        <TableTd>
+          {plan.features.length ? plan.features.join(", ") : "-"}
+        </TableTd>
         <TableTd onClick={(e) => e.stopPropagation()}>
           <MenuComponent id={plan.id.toString()} />
         </TableTd>

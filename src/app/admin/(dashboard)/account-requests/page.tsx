@@ -318,7 +318,11 @@ function AccountRequests() {
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+          // total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+          total={Math.ceil(
+            (businesses.filter((biz) => Boolean(biz._count.AccountRequests))
+              .length ?? 1) / parseInt(limit ?? "10", 10)
+          )}
         />
       </div>
     </main>

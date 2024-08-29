@@ -15,6 +15,7 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import {
   DefaultAccountHead,
   SingleAccountBody,
+  SingleDefaultAccountBody,
 } from "@/ui/components/SingleAccount";
 import { Paper } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -60,7 +61,7 @@ export default function BusinessDefaultAccount() {
       <Paper p={28} mt={20} mih="calc(100vh - 150px)">
         <DefaultAccountHead loading={loading} account={account} open={open} />
 
-        <SingleAccountBody
+        <SingleDefaultAccountBody
           account={account}
           transactions={transactions as TransactionType[]}
           loading={loading}

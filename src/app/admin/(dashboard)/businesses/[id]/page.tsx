@@ -70,6 +70,8 @@ export default function SingleBusiness() {
   const [processingTrust, setProcessingTrust] = useState(false);
   // const [trusted, setTrusted] = useState(business ? business.kycTrusted : false);
 
+  const [activeTab, setActiveTab] = useState<string | null>(tab);
+
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
     useDisclosure(false);
@@ -218,60 +220,64 @@ export default function SingleBusiness() {
             )}
           </Group>
 
-          <div className={styles.header__right}>
-            <Button size="xs" className={styles.header__right__cta}>
-              <IconDownload color="#344054" stroke={2} size={16} />
-            </Button>
+          {activeTab === "business" && (
+            <div className={styles.header__right}>
+              <Button size="xs" className={styles.header__right__cta}>
+                <IconDownload color="#344054" stroke={2} size={16} />
+              </Button>
 
-            {business?.companyStatus && (
-              <PrimaryBtn
-                text={
-                  business?.companyStatus === "ACTIVE"
-                    ? "Deactivate"
-                    : "Activate"
-                }
-                action={open}
+              {business?.companyStatus && (
+                <PrimaryBtn
+                  text={
+                    business?.companyStatus === "ACTIVE"
+                      ? "Deactivate"
+                      : "Activate"
+                  }
+                  action={open}
+                  color="#f6f6f6"
+                  c="var(--prune-text-gray-700)"
+                  fz={12}
+                  fw={600}
+                  h={32}
+                  radius={4}
+                />
+              )}
+
+              <Button
+                onClick={openTrust}
                 color="#f6f6f6"
                 c="var(--prune-text-gray-700)"
                 fz={12}
                 fw={600}
                 h={32}
                 radius={4}
-              />
-            )}
+              >
+                <Switch
+                  label="Trust this business"
+                  checked={business?.kycTrusted}
+                  labelPosition="left"
+                  fz={12}
+                  size="xs"
+                  color="var(--prune-success-500)"
+                />
+              </Button>
 
-            <Button
-              onClick={openTrust}
-              color="#f6f6f6"
-              c="var(--prune-text-gray-700)"
-              fz={12}
-              fw={600}
-              h={32}
-              radius={4}
-            >
-              <Switch
-                label="Trust this business"
-                checked={business?.kycTrusted}
-                labelPosition="left"
-                fz={12}
-                size="xs"
-                color="var(--prune-success-500)"
+              <PrimaryBtn
+                text="Send Activation Link"
+                action={sendActivationLink}
+                radius={4}
+                loading={processingLink}
+                h={32}
+                fw={600}
               />
-            </Button>
-
-            <PrimaryBtn
-              text="Send Activation Link"
-              action={sendActivationLink}
-              radius={4}
-              loading={processingLink}
-              h={32}
-              fw={600}
-            />
-          </div>
+            </div>
+          )}
         </div>
 
         <div className={styles.container__body}>
           <Tabs
+            value={activeTab}
+            onChange={setActiveTab}
             defaultValue={tab}
             variant="pills"
             classNames={{

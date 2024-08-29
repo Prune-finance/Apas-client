@@ -20,7 +20,9 @@ export const Documents = ({ account }: Props) => {
             />
             <TextInputWithFile
               url={account.accountDocuments.poaFileURL}
-              placeholder={splitCamelCase(account.accountDocuments.poaType)}
+              placeholder={splitCamelCase(
+                account.accountDocuments.poaType ?? ""
+              )}
               label="Proof of Address"
             />
           </SimpleGrid>
@@ -48,12 +50,12 @@ export const Documents = ({ account }: Props) => {
                   <SimpleGrid cols={3}>
                     <TextInputWithFile
                       url={director.idFile}
-                      placeholder={splitCamelCase(director.idType)}
+                      placeholder={splitCamelCase(director.idType ?? "")}
                       label={"Identity Type"}
                     />
                     <TextInputWithFile
                       url={director.poaFile}
-                      placeholder={splitCamelCase(director.poaType)}
+                      placeholder={splitCamelCase(director.poaType ?? "")}
                       label={"Proof of Address"}
                     />
                   </SimpleGrid>
@@ -85,12 +87,12 @@ export const Documents = ({ account }: Props) => {
                   <SimpleGrid cols={3}>
                     <TextInputWithFile
                       url={director.idFile}
-                      placeholder={splitCamelCase(director.idType)}
+                      placeholder={splitCamelCase(director.idType ?? "")}
                       label={"Identity Type"}
                     />
                     <TextInputWithFile
                       url={director.poaFile}
-                      placeholder={splitCamelCase(director.poaType)}
+                      placeholder={splitCamelCase(director.poaType ?? "")}
                       label={"Proof of Address"}
                     />
                   </SimpleGrid>

@@ -1,10 +1,17 @@
 "use client";
 
-import { Button, ButtonProps } from "@mantine/core";
-import { Icon, IconArrowLeft, IconPlus, IconProps } from "@tabler/icons-react";
+import { Button, ButtonProps, Group, UnstyledButton } from "@mantine/core";
+import {
+  Icon,
+  IconArrowLeft,
+  IconCircleChevronLeft,
+  IconPlus,
+  IconProps,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
+import { FaCircleChevronLeft } from "react-icons/fa6";
 
 interface Props extends ButtonProps {
   link?: string;
@@ -20,15 +27,13 @@ export const BackBtn = ({ link, text = "Back", ...props }: Props) => {
       component={Link}
       href={link}
       fz={14}
-      c="var(--prune-text-gray-500)"
+      color="var(--prune-text-gray-700)"
       fw={400}
       px={0}
       variant="transparent"
+      m={0}
       leftSection={
-        <IconArrowLeft
-          color="#1D2939"
-          style={{ width: "70%", height: "70%" }}
-        />
+        <FaCircleChevronLeft size={20} fill="var(--prune-text-gray-700)" />
       }
       {...props}
     >
@@ -38,15 +43,13 @@ export const BackBtn = ({ link, text = "Back", ...props }: Props) => {
     <Button
       onClick={back}
       fz={14}
-      c="var(--prune-text-gray-500)"
+      color="var(--prune-text-gray-700)"
       fw={400}
       px={0}
       variant="transparent"
+      m={0}
       leftSection={
-        <IconArrowLeft
-          color="#1D2939"
-          style={{ width: "70%", height: "70%" }}
-        />
+        <FaCircleChevronLeft size={20} fill="var(--prune-text-gray-700)" />
       }
       {...props}
     >

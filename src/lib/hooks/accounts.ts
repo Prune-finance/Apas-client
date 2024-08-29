@@ -98,7 +98,7 @@ export function useSingleAccount(id: string) {
 }
 
 export function useBusinessDefaultAccount(id: string) {
-  const [account, setAccount] = useState<Account | null>(null);
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
@@ -402,4 +402,26 @@ export interface CorporateAccount extends BaseAccount {
   type: "CORPORATE";
 }
 
+export interface DefaultAccountDocuments {
+  directors: Director[];
+  shareholders: Director[];
+}
+
+export interface DefaultCorporateAccount extends BaseAccount {
+  accountDocuments: DefaultAccountDocuments;
+  type: "CORPORATE";
+}
+
+export interface Director {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  identityFileUrlBack: string;
+  proofOfAddressFileUrl: string;
+}
+
 export type Account = UserAccount | CorporateAccount;
+
+export type DefaultAccount = UserAccount | DefaultCorporateAccount;

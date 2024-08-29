@@ -214,12 +214,12 @@ function Accounts() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Accounts", href: "/admin/accounts" },
         ]}
-      />
+      /> */}
 
       <div className={styles.table__container}>
         <div className={styles.container__header}>

@@ -46,7 +46,12 @@ import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
 import EmptyTable from "../EmptyTable";
 import { TableComponent } from "../Table";
-import { Account, AccountData, useSingleAccount } from "@/lib/hooks/accounts";
+import {
+  Account,
+  AccountData,
+  DefaultAccount,
+  useSingleAccount,
+} from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
@@ -67,6 +72,8 @@ import { Transactions } from "./(tabs)/Transactions";
 import { Analytics } from "./(tabs)/Analytics";
 import { BusinessData } from "@/lib/hooks/businesses";
 import { Documents } from "./(tabs)/Documents";
+import DefaultAccountDetails from "./(defaultTabs)/DefaultAccountDetails";
+import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
 
 type Param = { id: string };
 interface Props {
@@ -561,6 +568,7 @@ interface SingleAccountProps {
   business?: BusinessData | null;
   admin?: boolean;
   payout?: boolean;
+  isDefault?: boolean;
 }
 
 export const SingleAccountBody = ({
@@ -572,6 +580,7 @@ export const SingleAccountBody = ({
   business,
   admin,
   payout,
+  isDefault,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -640,6 +649,95 @@ export const SingleAccountBody = ({
         </TabsPanel>
         <TabsPanel value={tabs[3].value} mt={28}>
           <Documents account={account} />
+        </TabsPanel>
+      </TabsComponent>
+    </Box>
+  );
+};
+
+interface SingleDefaultAccountProps
+  extends Omit<SingleAccountProps, "account"> {
+  account: DefaultAccount | null;
+}
+
+export const SingleDefaultAccountBody = ({
+  account,
+  transactions,
+  loading,
+  loadingTrx,
+  setChartFrequency,
+  business,
+  admin,
+  payout,
+  isDefault,
+}: SingleDefaultAccountProps) => {
+  const info = {
+    "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
+    "No. of Transaction": transactions.length,
+    Currency: "EUR",
+    ...(business && { "Created By": business?.name }),
+    "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
+      account?.updatedAt
+    ).format("Do MMMM, YYYY"),
+    "Account Type": payout ? (
+      <Text fw={600} fz={14} c="var(--prune-primary-800)">
+        Payout Account
+      </Text>
+    ) : (
+      account?.type
+    ),
+  };
+
+  const tabs = [
+    { value: "Account Details" },
+    { value: "Transactions" },
+    { value: "Statistics" },
+    { value: "Documents" },
+  ];
+
+  return (
+    <Box mt={32}>
+      <Grid>
+        <GridCol span={!admin ? 8 : 9}>
+          <SimpleGrid cols={!admin ? 3 : 4} verticalSpacing={28}>
+            {Object.entries(info).map(([key, value]) => (
+              <Stack gap={2} key={key}>
+                <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+                  {key}
+                </Text>
+                {!loading || !loadingTrx ? (
+                  <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+                    {value}
+                  </Text>
+                ) : (
+                  <Skeleton w={100} h={10} />
+                )}
+              </Stack>
+            ))}
+          </SimpleGrid>
+        </GridCol>
+      </Grid>
+
+      <TabsComponent tabs={tabs} mt={40}>
+        <TabsPanel value={tabs[0].value} mt={28}>
+          <DefaultAccountDetails account={account} loading={loading} />
+        </TabsPanel>
+        <TabsPanel value={tabs[1].value}>
+          <Transactions
+            transactions={transactions}
+            loading={loadingTrx}
+            payout={payout}
+          />
+        </TabsPanel>
+        <TabsPanel value={tabs[2].value} mt={28}>
+          <Analytics
+            transactions={transactions}
+            setChartFrequency={setChartFrequency}
+          />
+        </TabsPanel>
+        <TabsPanel value={tabs[3].value} mt={28}>
+          <DefaultDocuments account={account} isDefault={isDefault} />
         </TabsPanel>
       </TabsComponent>
     </Box>
@@ -735,12 +833,17 @@ export const IssuedAccountHead = ({
   );
 };
 
+interface DefaultAccountHeadProps
+  extends Omit<IssuedAccountHeadProps, "account"> {
+  account: DefaultAccount | null;
+}
+
 export const DefaultAccountHead = ({
   loading,
   account,
   open,
   payout,
-}: IssuedAccountHeadProps) => {
+}: DefaultAccountHeadProps) => {
   return (
     <Flex
       justify="space-between"
@@ -795,17 +898,8 @@ export const DefaultAccountHead = ({
       </Group>
 
       <Flex gap={10}>
-        {/* <Button
-            fz={12}
-            className={styles.main__cta}
-            variant="filled"
-            color="#C1DD06"
-          >
-            Freeze Account
-          </Button> */}
-
-        {!payout && <PrimaryBtn text="Send Money" fw={600} />}
-        {/* {payout && <PrimaryBtn text="Request Payout Account" fw={600} />} */}
+        {/* {!payout && <PrimaryBtn text="Send Money" fw={600} />} */}
+        {!payout && <SecondaryBtn text="Freeze Account" fw={600} />}
       </Flex>
     </Flex>
   );

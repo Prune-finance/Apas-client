@@ -260,7 +260,6 @@ export interface BusinessData {
   pricingPlanId: null | string;
   pricingPlan: PricingPlan | null;
   otherDocuments: Record<string, string>;
-  documents: OtherDocuments[];
   Accounts: { DebitRequests: { id: string }[] }[];
   Requests: { type: string; id: string }[];
   contactFirstName: string;

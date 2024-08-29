@@ -275,7 +275,6 @@ export default function Documents({
                     business={business}
                     url={value.documentURL}
                     index={index}
-                    handleBusinessUpdate={handleBusinessUpdate}
                   />
                 </GridCol>
               );
@@ -403,7 +402,6 @@ interface OtherDocumentTextInputProps
   extends Omit<DocumentTextInputProps, "formKey" | "form"> {
   index: number;
   form: UseFormReturnType<{ documents: OtherDocuments[] }>;
-  handleBusinessUpdate: (documents: OtherDocuments[]) => Promise<void>;
 }
 
 const OtherDocumentTextInput = ({
@@ -414,11 +412,9 @@ const OtherDocumentTextInput = ({
   title,
   url,
   form,
-  handleBusinessUpdate,
 }: OtherDocumentTextInputProps) => {
   const [processing, setProcessing] = useState(false);
   const { handleError, handleInfo } = useNotification();
-  const [docName, setDocName] = useState(title);
 
   const handleUpload = async (file: File | null) => {
     setProcessing(true);
@@ -518,7 +514,7 @@ const NewDocumentModal = ({
     const { name, url } = form.values;
     try {
       await handleBusinessUpdate(
-        business.documents
+        business.documents && business.documents.length > 0
           ? [...business.documents, { title: name, documentURL: url }]
           : [{ title: name, documentURL: url }]
       );

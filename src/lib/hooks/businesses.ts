@@ -146,7 +146,7 @@ export function useSingleBusiness(id: string) {
 
 export function useUserBusiness(customParams: IParams = {}) {
   const [business, setBusiness] = useState<BusinessData | null>(null);
-  const [meta, setMeta] = useState<BusinessMeta>();
+  const [meta, setMeta] = useState<UserBusinessMeta>();
 
   const [loading, setLoading] = useState(true);
 
@@ -180,6 +180,8 @@ export function useUserBusiness(customParams: IParams = {}) {
     }
   }
 
+  const revalidate = () => fetchBusinesses();
+
   useEffect(() => {
     fetchBusinesses();
 
@@ -188,7 +190,7 @@ export function useUserBusiness(customParams: IParams = {}) {
     };
   }, []);
 
-  return { loading, business, meta };
+  return { loading, business, meta, revalidate };
 }
 
 export interface Director {
@@ -224,6 +226,13 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
+}
+
+export interface UserBusinessMeta {
+  activeLKReq: number;
+  activePAReq: number;
+  hasLiveKey: number;
+  hasPayoutAccount: number;
 }
 
 export interface StatsMeta {

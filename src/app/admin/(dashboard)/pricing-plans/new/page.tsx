@@ -15,6 +15,8 @@ import {
   NumberInput,
   Textarea,
   Text,
+  Pill,
+  Flex,
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
@@ -35,6 +37,8 @@ import classes from "../styles.module.scss";
 export default function CreateNewPlan() {
   const [opened, { open, close }] = useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
+  const [value, setValue] = useState<string[]>([]);
   const { push } = useRouter();
 
   const [processing, setProcessing] = useState(false);
@@ -50,7 +54,7 @@ export default function CreateNewPlan() {
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan`,
-        { ...rest, description },
+        { ...rest, description, features: selectedValues },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -64,6 +68,11 @@ export default function CreateNewPlan() {
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleDelete = (item: string) => {
+    setSelectedValues((current) => current.filter((v) => v !== item));
+    setValue((current) => current.filter((v) => v !== item));
   };
 
   return (
@@ -155,7 +164,7 @@ export default function CreateNewPlan() {
             {...form.getInputProps("description")}
           />
 
-          <Select
+          {/* <Select
             data={[
               "Search existing features and press Enter to add them.",
               "The feature selected shows down here as a sentence.",
@@ -168,12 +177,43 @@ export default function CreateNewPlan() {
               option: classes.dropdown_custom,
             }}
             leftSection={<IconSearch size={18} color="#667085" />}
-            label={<Text fz={14}>Features:</Text>}
+            label="Features:"
+            labelProps={{ fz: 14 }}
             placeholder="Search existing features and press Enter to add them."
             {...form.getInputProps("features")}
-          />
+          /> */}
 
-          {/* <MultiSelectCreatable /> */}
+          <MultiSelectCreatable
+            setSelectedValues={setSelectedValues}
+            value={value}
+            setValue={setValue}
+            placeholder="Search existing features and press Enter to add them."
+          />
+          <Flex align="center" gap={10} mt={20}>
+            {selectedValues.map((item) => (
+              <Flex
+                align="center"
+                gap={18}
+                p={10}
+                bg="#f9fafb"
+                style={{ borderRadius: 4, border: "1px solid #f2f4f7" }}
+              >
+                <Text fz={12} fw={500} c="#344054">
+                  {item}
+                </Text>
+                <IconX
+                  size={16}
+                  color="#344054"
+                  // onClick={() =>
+                  //   setSelectedValues((current) =>
+                  //     current.filter((v) => v !== item)
+                  //   )
+                  // }
+                  onClick={() => handleDelete(item)}
+                />
+              </Flex>
+            ))}
+          </Flex>
 
           <Group justify="flex-end" gap={20} mt={24}>
             <SecondaryBtn

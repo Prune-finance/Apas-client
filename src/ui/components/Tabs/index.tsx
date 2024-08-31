@@ -31,6 +31,7 @@ export default function TabsComponent({ tabs, children, ...props }: Props) {
             value={tab.value}
             {...(tab.icon && { leftSection: tab.icon })}
             {...(props.tt && { tt: props.tt })}
+            {...(props.fz && { fz: props.fz })}
           >
             {tab.title || tab.value}
           </TabsTab>

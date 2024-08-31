@@ -177,9 +177,6 @@ export default function Keys() {
     }
   };
 
-  console.log(business, meta);
-  console.log(live, keys);
-
   return (
     <div className={styles.business__tab}>
       <Flex className={styles.api__container} gap={40}>
@@ -209,6 +206,8 @@ export default function Keys() {
                 {...(Boolean(meta?.activeLKReq) && {
                   icon: IconCheck,
                 })}
+                loading={loading}
+                loaderProps={{ type: "dots" }}
                 disabled={Boolean(meta?.activeLKReq)}
                 fw={600}
                 justify="center"

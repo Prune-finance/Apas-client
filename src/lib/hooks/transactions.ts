@@ -175,7 +175,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [id]);
 
   return { loading, transactions, meta, revalidate };
 }

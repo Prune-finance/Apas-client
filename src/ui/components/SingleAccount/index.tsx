@@ -678,7 +678,7 @@ export const SingleDefaultAccountBody = ({
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
     [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
-      account?.updatedAt
+      business?.lastLogin
     ).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
@@ -836,6 +836,8 @@ export const IssuedAccountHead = ({
 interface DefaultAccountHeadProps
   extends Omit<IssuedAccountHeadProps, "account"> {
   account: DefaultAccount | null;
+  business: BusinessData | null;
+  loadingBiz: boolean;
 }
 
 export const DefaultAccountHead = ({
@@ -843,6 +845,8 @@ export const DefaultAccountHead = ({
   account,
   open,
   payout,
+  business,
+  loadingBiz,
 }: DefaultAccountHeadProps) => {
   return (
     <Flex
@@ -852,11 +856,7 @@ export const DefaultAccountHead = ({
     >
       <Group gap={12} align="center">
         {!loading ? (
-          <Avatar
-            size="lg"
-            color="var(--prune-primary-700)"
-            // variant="light"
-          >
+          <Avatar size="lg" color="var(--prune-primary-700)" variant="filled">
             {account?.accountName
               .split(" ")
               .map((item) => item.charAt(0))
@@ -875,7 +875,7 @@ export const DefaultAccountHead = ({
             <Skeleton h={10} w={100} />
           )}
 
-          {!loading ? (
+          {!loadingBiz ? (
             <Text
               fz={10}
               fw={400}
@@ -883,7 +883,7 @@ export const DefaultAccountHead = ({
               m={0}
               p={0}
             >
-              {account?.accountNumber ?? ""}
+              {business?.contactEmail ?? ""}
             </Text>
           ) : (
             <Skeleton h={10} w={50} />

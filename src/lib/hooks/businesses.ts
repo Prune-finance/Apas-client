@@ -279,6 +279,7 @@ export interface BusinessData {
   contactPOAType: string;
   contactPOAUrl: string;
   documents: Document[];
+  lastLogin: Date;
 }
 
 export interface Document {

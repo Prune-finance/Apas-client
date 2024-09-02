@@ -198,9 +198,9 @@ function AccountPayout() {
           <BadgeComponent status={element.status} />
         </TableTd>
 
-        <TableTd className={`${styles.table__td}`}>
+        {/* <TableTd className={`${styles.table__td}`}>
           <MenuComponent request={element} />
-        </TableTd>
+        </TableTd> */}
       </TableTr>
     )
   );
@@ -327,7 +327,7 @@ const tableHeaders = [
   "Requests Date",
   // "Contact Email",
   "Status",
-  "Action",
+  // "Action",
 ];
 
 export default function PayoutAccountSuspense() {

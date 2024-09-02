@@ -71,13 +71,7 @@ export const getInitials = (name: string) => {
     .join("");
 };
 
-export const getUserType = (userType: string) => {
-  switch (userType) {
-    case "USER":
-      return "Individual";
-    case "CORPORATE":
-      return "Corporate";
-    default:
-      return "Individual";
-  }
+export const getUserType = (userType: "USER" | "CORPORATE") => {
+  if (userType === "USER") return "Individual";
+  return "Corporate";
 };

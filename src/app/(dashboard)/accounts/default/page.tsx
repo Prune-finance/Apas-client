@@ -9,14 +9,27 @@ import {
 } from "@/lib/hooks/transactions";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { SingleAccountBody } from "@/ui/components/SingleAccount";
-import { Flex, Group, Avatar, Skeleton, Stack, Text } from "@mantine/core";
+import {
+  DefaultAccountHead,
+  SingleDefaultAccountBody,
+} from "@/ui/components/SingleAccount";
+import {
+  Flex,
+  Group,
+  Avatar,
+  Skeleton,
+  Stack,
+  Text,
+  Space,
+} from "@mantine/core";
 import { useState } from "react";
+import { useUserBusiness } from "@/lib/hooks/businesses";
 
 export default function DefaultAccount() {
   const { account, loading } = useUserDefaultAccount();
   const { transactions, loading: loadingTrx } = useUserDefaultTransactions();
-  console.log(account);
+
+  const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
@@ -25,6 +38,7 @@ export default function DefaultAccount() {
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
+          { title: "Own Accounts", href: "/accounts/default" },
           {
             title: account?.accountName || "",
             href: `/accounts/default`,
@@ -33,7 +47,7 @@ export default function DefaultAccount() {
         ]}
       />
 
-      <Flex
+      {/* <Flex
         justify="space-between"
         align="center"
         className={styles.main__header}
@@ -86,20 +100,20 @@ export default function DefaultAccount() {
         </Group>
 
         <Flex gap={10}>
-          {/* <Button
-            fz={12}
-            className={styles.main__cta}
-            variant="filled"
-            color="#C1DD06"
-          >
-            Freeze Account
-          </Button> */}
-
           <PrimaryBtn text="Send Money" fw={600} />
         </Flex>
-      </Flex>
+      </Flex> */}
 
-      <SingleAccountBody
+      <Space mt={32} />
+      <DefaultAccountHead
+        account={account}
+        business={business}
+        loadingBiz={loadingBiz}
+        loading={loading}
+        open={() => {}}
+      />
+
+      <SingleDefaultAccountBody
         account={account}
         transactions={transactions as TransactionType[]}
         loading={loading}

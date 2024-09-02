@@ -3,7 +3,7 @@ import { IconCircleFilled } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
 
-import { AreaChartComponent } from "@/ui/components/Charts";
+import { AreaChartComponent, BarChartComponent } from "@/ui/components/Charts";
 import { Dispatch, SetStateAction } from "react";
 
 interface LineData {
@@ -24,7 +24,7 @@ export default function TransactionStatistics({
     <Paper style={{ border: "1px solid #f5f5f5" }} p={20} pl={40}>
       <Flex justify="space-between" align="center" mb={15}>
         <Text fz={16} fw={600} c="var(--prune-text-gray-800)">
-          Transaction Analytics
+          Transaction Statistics
         </Text>
 
         <Group>
@@ -47,10 +47,21 @@ export default function TransactionStatistics({
           />
         </Group>
       </Flex>
-      <AreaChartComponent
+      {/* <AreaChartComponent
         h={250}
         mt={30}
         curveType="bump"
+        data={lineData}
+        dataKey="month"
+        series={[
+          { name: "Inflow", color: "#D5E855" },
+          { name: "Outflow", color: "#D92D20" },
+        ]}
+      /> */}
+
+      <BarChartComponent
+        h={250}
+        mt={30}
         data={lineData}
         dataKey="month"
         series={[

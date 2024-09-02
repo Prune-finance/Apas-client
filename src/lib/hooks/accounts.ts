@@ -290,7 +290,7 @@ export function useSingleUserAccountByIBAN(iban: string) {
 }
 
 export function useUserDefaultAccount() {
-  const [account, setAccount] = useState<Account | null>(null);
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchDefaultAccount() {

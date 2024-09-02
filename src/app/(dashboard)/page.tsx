@@ -56,7 +56,6 @@ export default function Home() {
 
   const [opened, { open, close }] = useDisclosure(false);
 
-  const [keys, setKeys] = useState<Key[]>([]);
   const { user } = User();
 
   useEffect(() => {
@@ -68,29 +67,6 @@ export default function Home() {
   }, []);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
-  const { live, test } = useMemo(() => {
-    const live = keys.find((key) => key.staging === "LIVE");
-    const test = keys.find((key) => key.staging === "TEST");
-
-    return { live, test };
-  }, [keys]);
-
-  const fetchBusinessSecrets = async () => {
-    try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
-
-      setKeys(data.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchBusinessSecrets();
-  }, []);
 
   const rows = requests.slice(0, 2).map((element) => (
     <TableTr key={element.id}>

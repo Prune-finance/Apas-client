@@ -173,8 +173,10 @@ a {
 .mantine-NumberInput-input,
 .mantine-NumberInput-error,
 .mantine-RichTextEditor-input,
-.mantine-RichTextEditor-content {
+.mantine-RichTextEditor-content,
+.m_6c018570,
+.mantine-PillsInput-wrapper {
   &:focus {
-    border: 1px solid var(--prune-primary-700);
+    border: 1px solid var(--prune-primary-700) !important;
   }
 }

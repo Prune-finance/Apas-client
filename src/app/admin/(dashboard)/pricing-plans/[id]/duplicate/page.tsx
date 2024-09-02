@@ -15,6 +15,7 @@ import {
   NumberInput,
   Textarea,
   Text,
+  Flex,
 } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
@@ -31,6 +32,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import { useSinglePricingPlan } from "@/lib/hooks/pricing-plan";
+import classes from "@/app/admin/(dashboard)/pricing-plans/styles.module.scss";
 
 export default function EditPlan() {
   const params = useParams<{ id: string }>();
@@ -38,6 +40,9 @@ export default function EditPlan() {
   const { handleError, handleSuccess } = useNotification();
   const { push } = useRouter();
   const { loading, pricingPlan } = useSinglePricingPlan(params.id);
+
+  const [selectedValues, setSelectedValues] = useState<string[]>([]);
+  const [value, setValue] = useState<string[]>([]);
 
   const [processing, setProcessing] = useState(false);
 
@@ -57,13 +62,20 @@ export default function EditPlan() {
     if (!loading && pricingPlan) return form.initialize(pricingPlan);
   }, [pricingPlan]);
 
+  useEffect(() => {
+    if (pricingPlan?.features) {
+      setValue(pricingPlan.features);
+      setSelectedValues(pricingPlan.features);
+    }
+  }, [pricingPlan]);
+
   const handleSubmit = async () => {
     setProcessing(true);
     const { description, ...rest } = form.values;
     try {
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan`,
-        { ...rest },
+        { ...rest, features: selectedValues },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -77,6 +89,11 @@ export default function EditPlan() {
     } finally {
       setProcessing(false);
     }
+  };
+
+  const handleDelete = (item: string) => {
+    setSelectedValues((current) => current.filter((v) => v !== item));
+    setValue((current) => current.filter((v) => v !== item));
   };
 
   return (
@@ -104,9 +121,17 @@ export default function EditPlan() {
           <Group>
             {/* Plan Name */}
             <TextInput
-              withAsterisk
+              // withAsterisk
+              size="lg"
+              classNames={{
+                input: classes.custom_input,
+              }}
               flex={1}
-              label="Plan Name"
+              label={
+                <Text fz={14}>
+                  Plan Name <span style={{ color: "red" }}>*</span>
+                </Text>
+              }
               placeholder="Enter Plan Name"
               {...form.getInputProps("name")}
             />
@@ -114,17 +139,33 @@ export default function EditPlan() {
             <Select
               data={["Monthly", "Annually"]}
               flex={1}
-              withAsterisk
-              label="Billing Cycle"
+              size="lg"
+              label={
+                <Text fz={14}>
+                  Billing Cycle <span style={{ color: "red" }}>*</span>
+                </Text>
+              }
+              classNames={{
+                input: classes.custom_input,
+                option: classes.dropdown_custom,
+              }}
               placeholder="Select Billing Cycle"
               {...form.getInputProps("cycle")}
             />
           </Group>
 
           <NumberInput
-            label="Amount"
+            label={
+              <Text fz={14}>
+                Amount <span style={{ color: "red" }}>*</span>
+              </Text>
+            }
             placeholder="Enter Amount"
-            withAsterisk
+            // withAsterisk
+            size="lg"
+            classNames={{
+              input: classes.custom_input,
+            }}
             mt={24}
             min={0}
             allowNegative={false}
@@ -148,14 +189,61 @@ export default function EditPlan() {
 
           <MultiSelectCreatable /> */}
 
+          <MultiSelectCreatable
+            setSelectedValues={setSelectedValues}
+            value={value}
+            setValue={setValue}
+            placeholder="Search existing features and press Enter to add them."
+            multiSelectData={pricingPlan?.features}
+          />
+          <Flex align="center" gap={10} mt={20}>
+            {selectedValues?.length > 0 &&
+              selectedValues.map((item) => (
+                <Flex
+                  align="center"
+                  gap={18}
+                  p={10}
+                  bg="#f9fafb"
+                  style={{ borderRadius: 4, border: "1px solid #f2f4f7" }}
+                >
+                  <Text fz={12} fw={500} c="#344054">
+                    {item}
+                  </Text>
+                  <IconX
+                    size={16}
+                    color="#344054"
+                    // onClick={() =>
+                    //   setSelectedValues((current) =>
+                    //     current.filter((v) => v !== item)
+                    //   )
+                    // }
+                    onClick={() => handleDelete(item)}
+                  />
+                </Flex>
+              ))}
+          </Flex>
+
           <Group justify="flex-end" gap={20}>
-            <SecondaryBtn text="Clear" action={open} />
+            <SecondaryBtn
+              text="Clear"
+              action={open}
+              w={126}
+              h={40}
+              radius={4}
+              fz={14}
+              fw={500}
+            />
 
             <PrimaryBtn
               text="Submit"
               action={() => {}}
               type="submit"
               loading={processing}
+              w={126}
+              h={40}
+              radius={4}
+              fz={14}
+              fw={500}
             />
           </Group>
         </Box>

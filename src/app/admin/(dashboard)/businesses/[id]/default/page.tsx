@@ -59,7 +59,13 @@ export default function BusinessDefaultAccount() {
       />
 
       <Paper p={28} mt={20} mih="calc(100vh - 150px)">
-        <DefaultAccountHead loading={loading} account={account} open={open} />
+        <DefaultAccountHead
+          loading={loading}
+          account={account}
+          open={open}
+          business={business}
+          loadingBiz={loadingBiz}
+        />
 
         <SingleDefaultAccountBody
           account={account}

@@ -46,7 +46,7 @@ import { Suspense, useState } from "react";
 import dayjs from "dayjs";
 import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { filteredSearch } from "@/lib/search";
-import { approvedBadgeColor } from "@/lib/utils";
+import { approvedBadgeColor, getUserType } from "@/lib/utils";
 import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
@@ -171,9 +171,9 @@ function BusinessAccountRequests() {
         className={styles.table__td}
       >{`${element.firstName} ${element.lastName}`}</TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
-        {element.accountType.toLowerCase()}
+        {getUserType(element.accountType)}
       </TableTd>
-      {/* <TableTd className={styles.table__td}>{element.Company.country}</TableTd> */}
+      <TableTd className={styles.table__td}>{element?.country}</TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
@@ -296,8 +296,8 @@ function BusinessAccountRequests() {
 
 const tableHeaders = [
   "Account Name",
-  "Type",
-  // "Country",
+  "User Type",
+  "Country",
   "Date Created",
   "Status",
   // "Action",

@@ -224,14 +224,16 @@ function AccountRequests() {
       <TableTd className={styles.table__td} tt="capitalize">
         {element._count.AccountRequests}
       </TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
+      {/* <TableTd className={styles.table__td} tt="capitalize">
         {(element.legalEntity ?? "").toLowerCase()}
-      </TableTd>
+      </TableTd> */}
       {/* <TableTd className={styles.table__td}>{element.Company.country}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+        {/* {dayjs(element.createdAt).format("ddd DD MMM YYYY")} */}
+
+        {element?.contactEmail}
       </TableTd>
-      <TableTd className={styles.table__td}>
+      {/* <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
           variant="light"
@@ -243,7 +245,7 @@ function AccountRequests() {
         >
           {element.companyStatus.toLowerCase()}
         </Badge>
-      </TableTd>
+      </TableTd> */}
 
       {/* <TableTd
         className={`${styles.table__td}`}
@@ -332,9 +334,9 @@ function AccountRequests() {
 const tableHeaders = [
   "Business Name",
   "Number of Requests",
-  "Type",
+  // "Type",
   "Contact Email",
-  "Status",
+  // "Status",
   // "Action",
 ];
 

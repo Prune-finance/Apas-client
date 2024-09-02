@@ -70,3 +70,14 @@ export const getInitials = (name: string) => {
     .map((item) => item.charAt(0).toUpperCase())
     .join("");
 };
+
+export const getUserType = (userType: string) => {
+  switch (userType) {
+    case "USER":
+      return "Individual";
+    case "CORPORATE":
+      return "Corporate";
+    default:
+      return "Individual";
+  }
+};

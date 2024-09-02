@@ -10,6 +10,10 @@ import {
   MenuTarget,
   TableTd,
   TableTr,
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
   Text,
   TextInput,
   UnstyledButton,
@@ -21,6 +25,7 @@ import {
   IconPlus,
   IconSearch,
   IconUserEdit,
+  IconUsers,
   IconUserX,
 } from "@tabler/icons-react";
 
@@ -29,6 +34,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
+import stylesTab from "@/ui/styles/settings.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { useAdmins } from "@/lib/hooks/admins";
@@ -52,11 +58,13 @@ import { activeBadgeColor } from "@/lib/utils";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import TabsComponent from "@/ui/components/Tabs";
 
 function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
   const { handleError, handleSuccess } = useNotification();
+  const [tab, setTab] = useState<string | null>("Users");
 
   const {
     rows: _rows,
@@ -287,64 +295,82 @@ function Users() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} />
-
+      {/* <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} /> */}
       <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
-            All Users
+            User Management
           </Text>
         </div>
+        <>
+          <TabsComponent tabs={tabs} tt="capitalize" mt={32}>
+            <TabsPanel value={tabs[0].value}>
+              <Group justify="space-between" mt={28}>
+                <TextInput
+                  placeholder="Search here..."
+                  leftSectionPointerEvents="none"
+                  leftSection={searchIcon}
+                  w={324}
+                  styles={{ input: { border: "1px solid #F5F5F5" } }}
+                  // classNames={{ wrapper: styles.search, input: styles.input__search }}
+                  value={search}
+                  onChange={(e) => setSearch(e.currentTarget.value)}
+                />
 
-        <Group justify="space-between" mt={28}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-          />
+                <Group gap={12}>
+                  <SecondaryBtn
+                    text="Filter"
+                    action={toggle}
+                    icon={IconListTree}
+                  />
+                  <PrimaryBtn
+                    text="Invite New User"
+                    action={() => {
+                      open();
+                      setIsEdit(false);
+                    }}
+                    icon={IconPlus}
+                  />
+                </Group>
+              </Group>
+              <Filter<BusinessFilterType>
+                opened={openedFilter}
+                toggle={toggle}
+                form={filterForm}
+              />
+              <TableComponent
+                head={tableHeaders}
+                rows={rows}
+                loading={loading}
+              />
+              <EmptyTable
+                loading={loading}
+                rows={rows}
+                title="There are no users"
+                text="When a user is added, they will appear here."
+              />
+              <PaginationComponent
+                active={active}
+                setActive={setActive}
+                setLimit={setLimit}
+                limit={limit}
+                total={Math.ceil(
+                  (meta?.total ?? 1) / parseInt(limit ?? "10", 10)
+                )}
+              />
+            </TabsPanel>
 
-          <Group gap={12}>
-            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-            <PrimaryBtn
-              text="Invite New User"
-              action={() => {
-                open();
-                setIsEdit(false);
-              }}
-              icon={IconPlus}
-            />
-          </Group>
-        </Group>
-
-        <Filter<BusinessFilterType>
-          opened={openedFilter}
-          toggle={toggle}
-          form={filterForm}
-        />
-
-        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
-
-        <EmptyTable
-          loading={loading}
-          rows={rows}
-          title="There are no users"
-          text="When a user is added, they will appear here."
-        />
-
-        <PaginationComponent
-          active={active}
-          setActive={setActive}
-          setLimit={setLimit}
-          limit={limit}
-          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
-        />
+            <TabsPanel value={tabs[1].value}>
+              <EmptyTable
+                loading={loading}
+                rows={[]}
+                title="There are no business users"
+                text="When a business user is added, they will appear here."
+              />
+            </TabsPanel>
+          </TabsComponent>
+        </>
       </div>
-
       {/* <ModalComponent
         action={isEdit ? editAdmin : addAdmin}
         processing={processing}
@@ -374,3 +400,111 @@ const tableHeaders = [
   "Status",
   "Action",
 ];
+
+const tabs = [
+  { title: "Own Users", value: "Users", icon: <IconUsers size={14} /> },
+  {
+    title: "Business Users",
+    value: "Business Users",
+    icon: <IconUsers size={14} />,
+  },
+];
+
+// <Tabs
+//   // defaultValue="Logs"
+//   value={tab}
+//   onChange={setTab}
+//   variant="pills"
+//   classNames={{
+//     root: stylesTab.tabs,
+//     list: stylesTab.tabs__list,
+//     tab: stylesTab.tab,
+//   }}
+//   mt={24}
+// >
+//   <TabsList>
+//     {tabs.map((tab) => (
+//       <TabsTab
+//         key={tab.title}
+//         value={tab.value || tab.title}
+//         leftSection={tab.icon}
+//       >
+//         {tab.title}
+//       </TabsTab>
+//     ))}
+//   </TabsList>
+
+//   <TabsPanel value="Logs">
+//     <main className={styles.main}>
+//       {/* <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} /> */}
+
+//       <div className={styles.table__container}>
+//         <div className={styles.container__header}>
+//           <Text fz={18} fw={600}>
+//             User Management
+//           </Text>
+//         </div>
+
+//         <Group justify="space-between" mt={28}>
+//           <TextInput
+//             placeholder="Search here..."
+//             leftSectionPointerEvents="none"
+//             leftSection={searchIcon}
+//             w={324}
+//             styles={{ input: { border: "1px solid #F5F5F5" } }}
+//             // classNames={{ wrapper: styles.search, input: styles.input__search }}
+//             value={search}
+//             onChange={(e) => setSearch(e.currentTarget.value)}
+//           />
+
+//           <Group gap={12}>
+//             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+//             <PrimaryBtn
+//               text="Invite New User"
+//               action={() => {
+//                 open();
+//                 setIsEdit(false);
+//               }}
+//               icon={IconPlus}
+//             />
+//           </Group>
+//         </Group>
+
+//         <Filter<BusinessFilterType>
+//           opened={openedFilter}
+//           toggle={toggle}
+//           form={filterForm}
+//         />
+
+//         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+
+//         <EmptyTable
+//           loading={loading}
+//           rows={rows}
+//           title="There are no users"
+//           text="When a user is added, they will appear here."
+//         />
+
+//         <PaginationComponent
+//           active={active}
+//           setActive={setActive}
+//           setLimit={setLimit}
+//           limit={limit}
+//           total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+//         />
+//       </div>
+
+//       {/* <ModalComponent
+//       action={isEdit ? editAdmin : addAdmin}
+//       processing={processing}
+//       opened={opened}
+//       close={close}
+//       form={form}
+//       isEdit={isEdit}
+//     /> */}
+//     </main>
+//   </TabsPanel>
+//   <TabsPanel value="Notifications">
+//     <Text>Hello world</Text>
+//   </TabsPanel>
+// </Tabs>;

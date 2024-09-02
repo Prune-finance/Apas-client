@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   CheckIcon,
   Combobox,
@@ -7,17 +7,23 @@ import {
   PillsInput,
   useCombobox,
 } from "@mantine/core";
+import classes from "@/app/admin/(dashboard)/pricing-plans/styles.module.scss";
 
-const groceries = [
-  "The feature selected shows down here as a sentence 1",
-  "The feature selected shows down here as a sentence 2",
-  "The feature selected shows down here as a sentence 3",
-  "The feature selected shows down here as a sentence 4",
-  "The feature selected shows down here as a sentence 5",
-  "The feature selected shows down here as a sentence 6",
-];
+const groceries = ["Enterprise", "Startup", "Business"];
 
-export function MultiSelectCreatable() {
+export function MultiSelectCreatable({
+  setSelectedValues,
+  value,
+  setValue,
+  placeholder,
+  multiSelectData,
+}: {
+  setSelectedValues: React.Dispatch<React.SetStateAction<string[]>>;
+  value: string[];
+  placeholder?: string;
+  setValue: React.Dispatch<React.SetStateAction<string[]>>;
+  multiSelectData?: string[];
+}) {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
     onDropdownOpen: () => combobox.updateSelectedOptionIndex("active"),
@@ -25,8 +31,14 @@ export function MultiSelectCreatable() {
 
   const [search, setSearch] = useState("");
   const [data, setData] = useState(groceries);
-  const [value, setValue] = useState<string[]>([]);
-  const [selectedValues, setSelectedValues] = useState<string[]>([]);
+  // const [value, setValue] = useState<string[]>([]);
+  // const [selectedValues, setSelectedValues] = useState<string[]>([]);
+
+  useMemo(
+    () =>
+      multiSelectData?.length && setData([...multiSelectData, ...groceries]),
+    [multiSelectData]
+  );
 
   const exactOptionMatch = data.some((item) => item === search);
 
@@ -35,7 +47,7 @@ export function MultiSelectCreatable() {
 
     if (val === "$create") {
       setData((current) => [...current, search]);
-      //   setValue((current) => [...current, search]);
+      setValue((current) => [...current, search]);
       setSelectedValues((current) => [...current, search]);
     } else {
       setSelectedValues((current) =>
@@ -43,11 +55,11 @@ export function MultiSelectCreatable() {
           ? current.filter((v) => v !== val)
           : [...current, val]
       );
-      //   setValue((current) =>
-      //     current.includes(val)
-      //       ? current.filter((v) => v !== val)
-      //       : [...current, val]
-      //   );
+      setValue((current) =>
+        current.includes(val)
+          ? current.filter((v) => v !== val)
+          : [...current, val]
+      );
     }
   };
 
@@ -55,7 +67,13 @@ export function MultiSelectCreatable() {
     setValue((current) => current.filter((v) => v !== val));
 
   const values = value.map((item) => (
-    <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
+    <Pill
+      key={item}
+      withRemoveButton
+      onRemove={() => handleValueRemove(item)}
+      fz={14}
+      display="none"
+    >
       {item}
     </Pill>
   ));
@@ -71,6 +89,8 @@ export function MultiSelectCreatable() {
       </Combobox.Option>
     ));
 
+  // onDelete(item);
+
   return (
     <Combobox
       store={combobox}
@@ -78,7 +98,22 @@ export function MultiSelectCreatable() {
       withinPortal={false}
     >
       <Combobox.DropdownTarget>
-        <PillsInput onClick={() => combobox.openDropdown()}>
+        <PillsInput
+          classNames={{
+            input: classes.custom_multiselect_active,
+          }}
+          styles={{
+            input: {
+              border: combobox.dropdownOpened
+                ? "1px solid var(--prune-primary-700)"
+                : "1px solid #eaecf0",
+            },
+          }}
+          onClick={() => combobox.openDropdown()}
+          size="lg"
+          label="Features:"
+          labelProps={{ fz: 14 }}
+        >
           <Pill.Group>
             {values}
 
@@ -86,9 +121,12 @@ export function MultiSelectCreatable() {
               <PillsInput.Field
                 onFocus={() => combobox.openDropdown()}
                 onBlur={() => combobox.closeDropdown()}
-                value={[]}
-                // value={search}
-                placeholder="Search values"
+                // value={[]}
+                classNames={{
+                  field: classes.custom_multiselect,
+                }}
+                value={search}
+                placeholder={placeholder}
                 onChange={(event) => {
                   combobox.updateSelectedOptionIndex();
                   setSearch(event.currentTarget.value);

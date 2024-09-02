@@ -239,35 +239,35 @@ export default function Home() {
               </GridCol>
 
               <GridCol span={{ lg: 4, md: 6 }}>
-                {/* <Link href="/admin/accounts?status=Active"> */}
-                <CardOne
-                  loading={requestsLoading}
-                  stat={requestMeta?.approvedRequests || 0}
-                  title="Approved Account Requests"
-                  text={
-                    <>
-                      This shows the total number of approved account requests
-                      for all businesses
-                    </>
-                  }
-                />
-                {/* </Link> */}
+                <Link href="/admin/account-requests?status=Active">
+                  <CardOne
+                    loading={requestsLoading}
+                    stat={requestMeta?.approvedRequests || 0}
+                    title="Approved Account Requests"
+                    text={
+                      <>
+                        This shows the total number of approved account requests
+                        for all businesses
+                      </>
+                    }
+                  />
+                </Link>
               </GridCol>
 
               <GridCol span={{ lg: 4, md: 6 }}>
-                {/* <Link href="/admin/accounts?status=Inactive"> */}
-                <CardOne
-                  loading={requestsLoading}
-                  stat={requestMeta?.pendingRequests || 0}
-                  title="Pending Account Requests"
-                  text={
-                    <>
-                      This shows the total number of pending account requests
-                      for all businesses
-                    </>
-                  }
-                />
-                {/* </Link> */}
+                <Link href="/admin/account-requests?status=PENDING">
+                  <CardOne
+                    loading={requestsLoading}
+                    stat={requestMeta?.pendingRequests || 0}
+                    title="Pending Account Requests"
+                    text={
+                      <>
+                        This shows the total number of pending account requests
+                        for all businesses
+                      </>
+                    }
+                  />
+                </Link>
               </GridCol>
 
               <GridCol span={{ lg: 12, md: 9 }}>

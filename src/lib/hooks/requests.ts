@@ -339,6 +339,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
 
   return { loading, requests, revalidate, meta };
 }
+
 export function useCompanyDebitRequests(
   id: string,
   customParams: IDebitRequest = {}
@@ -385,6 +386,41 @@ export function useCompanyDebitRequests(
       // Any cleanup code can go here
     };
   }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+
+  return { loading, requests, revalidate, meta };
+}
+
+export function useLiveKeyRequests() {
+  const [requests, setRequests] = useState<LiveKeyRequest[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccounts() {
+    setLoading(true);
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setRequests(res.data);
+      setMeta(res.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
 
   return { loading, requests, revalidate, meta };
 }
@@ -654,11 +690,6 @@ export interface PayoutAccount {
   Company: Company;
 }
 
-export interface Company {
-  name: string;
-  id: string;
-}
-
 export interface PayoutDocumentData {
   directors: PayoutDirector[];
   shareholders: PayoutDirector[];
@@ -675,4 +706,67 @@ export interface PayoutDirector {
 
 export interface Meta {
   total: number;
+}
+
+export interface LiveKeyRequest {
+  id: string;
+  status: string;
+  date: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  companyId: string;
+  Company: Company;
+}
+
+export interface Company {
+  id: string;
+  contactEmail: string;
+  contactNumber: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  domain: string;
+  name: string;
+  staging: string;
+  kycTrusted: boolean;
+  address: string;
+  country: string;
+  legalEntity: string;
+  cacCertificate: string;
+  mermat: string;
+  directors: LiveKeyDirector[];
+  shareholders: LiveKeyDirector[];
+  companyStatus: string;
+  apiCalls: number;
+  amlCompliance: null | string;
+  businessBio: string;
+  directorParticular: string;
+  operationalLicense: null | string;
+  shareholderParticular: null | string;
+  pricingPlanId: string;
+  contactFirstName: null | string;
+  contactIdType: null | string;
+  contactIdUrl: null | string;
+  contactIdUrlBack: null | string;
+  contactLastName: null | string;
+  contactPOAType: null | string;
+  contactPOAUrl: null | string;
+  documents: Document[];
+  lastLogIn: Date;
+}
+
+export interface LiveKeyDirector {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  identityFileUrlBack: string;
+  proofOfAddressFileUrl: string;
+}
+
+export interface Document {
+  title?: string;
+  documentURL?: string;
 }

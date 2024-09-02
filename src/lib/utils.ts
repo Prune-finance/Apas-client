@@ -62,3 +62,11 @@ export const frontendPagination = (
 export function splitCamelCase(input: string): string {
   return input.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
+
+export const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((item) => item.charAt(0).toUpperCase())
+    .join("");
+};

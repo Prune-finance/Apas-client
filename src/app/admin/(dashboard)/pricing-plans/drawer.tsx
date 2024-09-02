@@ -12,11 +12,11 @@ export default function PlanDrawer({ data }: { data: PricingPlan | null }) {
   const senderDetails = [
     { title: "Plan Name", value: data?.name },
     { title: "Cycle", value: data?.cycle },
-    // { title: "Description", value: data?.description },
-    {
-      title: "Date Created",
-      value: dayjs(data?.createdAt).format("Do MMM YYYY"),
-    },
+    { title: "Description", value: data?.description },
+    // {
+    //   title: "Date Created",
+    //   value: dayjs(data?.createdAt).format("Do MMM YYYY"),
+    // },
   ];
 
   return (

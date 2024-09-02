@@ -21,6 +21,7 @@ import User from "@/lib/store/user";
 import { checkToken, clearSession } from "@/lib/actions/checkToken";
 import axios from "axios";
 import Link from "next/link";
+import { getInitials } from "@/lib/utils";
 
 export default function Header() {
   const { user, setUser } = User();
@@ -138,10 +139,7 @@ export function UserHeader() {
           // src={AdminAvatar.src}
           alt="admin avatar"
         >
-          {user?.company?.name
-            .split(" ")
-            .map((item) => item.charAt(0).toUpperCase())
-            .join("")}
+          {getInitials(user?.company?.name ?? "")}
         </Avatar>
         <Stack gap={0}>
           <Text

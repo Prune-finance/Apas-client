@@ -153,13 +153,13 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
 
     try {
       const path = id ? `${id}/transactions` : "transactions";
-      const { data } = await axios.get(
+      const { data: res } = await axios.get(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${path}?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      setTransactions(data.data);
-      setMeta(data.meta);
+      setTransactions(res.data);
+      setMeta(res.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -175,7 +175,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [id]);
 
   return { loading, transactions, meta, revalidate };
 }

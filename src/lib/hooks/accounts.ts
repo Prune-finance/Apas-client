@@ -98,7 +98,7 @@ export function useSingleAccount(id: string) {
 }
 
 export function useBusinessDefaultAccount(id: string) {
-  const [account, setAccount] = useState<Account | null>(null);
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
@@ -322,6 +322,41 @@ export function useUserDefaultAccount() {
   return { loading, account, revalidate };
 }
 
+export function useUserDefaultPayoutAccount() {
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // {{account-srv}}/v1/accounts/payout
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/payout`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+
 export interface AccountMeta {
   active: number;
   inactive: number;
@@ -402,4 +437,26 @@ export interface CorporateAccount extends BaseAccount {
   type: "CORPORATE";
 }
 
+export interface DefaultAccountDocuments {
+  directors: Director[];
+  shareholders: Director[];
+}
+
+export interface DefaultCorporateAccount extends BaseAccount {
+  accountDocuments: DefaultAccountDocuments;
+  type: "CORPORATE";
+}
+
+export interface Director {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  identityFileUrlBack: string;
+  proofOfAddressFileUrl: string;
+}
+
 export type Account = UserAccount | CorporateAccount;
+
+export type DefaultAccount = UserAccount | DefaultCorporateAccount;

@@ -30,6 +30,9 @@ import {
 } from "@tabler/icons-react";
 
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 import { useRouter, useSearchParams } from "next/navigation";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -59,6 +62,7 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import TabsComponent from "@/ui/components/Tabs";
+import { SearchInput } from "@/ui/components/Inputs";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -174,7 +178,7 @@ function Users() {
     //   href: "/admin/businesses",
     // },
     {
-      text: "Edit User",
+      text: "Update Details",
       icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
     },
     {
@@ -203,7 +207,9 @@ function Users() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.email}</TableTd>
+      <TableTd className={styles.table__td} tt="lowercase">
+        {element.email}
+      </TableTd>
       <TableTd
         className={styles.table__td}
       >{`${element.firstName} ${element.lastName}`}</TableTd>
@@ -212,7 +218,8 @@ function Users() {
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.updatedAt).format("ddd DD MMM YYYY")}
+        {dayjs(element.lastLogIn).fromNow()}
+        {/* {dayjs(element.lastLogIn).format("ddd DD MMM YYYY")} */}
       </TableTd>
       {/* <TableTd className={styles.table__td}></TableTd> */}
       <TableTd className={styles.table__td}>
@@ -306,16 +313,7 @@ function Users() {
           <TabsComponent tabs={tabs} tt="capitalize" mt={32}>
             <TabsPanel value={tabs[0].value}>
               <Group justify="space-between" mt={28}>
-                <TextInput
-                  placeholder="Search here..."
-                  leftSectionPointerEvents="none"
-                  leftSection={searchIcon}
-                  w={324}
-                  styles={{ input: { border: "1px solid #F5F5F5" } }}
-                  // classNames={{ wrapper: styles.search, input: styles.input__search }}
-                  value={search}
-                  onChange={(e) => setSearch(e.currentTarget.value)}
-                />
+                <SearchInput search={search} setSearch={setSearch} />
 
                 <Group gap={12}>
                   <SecondaryBtn

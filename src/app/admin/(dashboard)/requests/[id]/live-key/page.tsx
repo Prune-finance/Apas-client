@@ -21,7 +21,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
-import classes from "@/ui/styles/containedInput.module.css";
+import classes from "@/ui/styles/containedInput.module.scss";
 import { SearchInput } from "@/ui/components/Inputs";
 import { filteredSearch } from "@/lib/search";
 import { useForm, zodResolver } from "@mantine/form";

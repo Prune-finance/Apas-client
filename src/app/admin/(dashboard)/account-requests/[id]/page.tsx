@@ -28,6 +28,7 @@ import {
   MenuTarget,
   rem,
   UnstyledButton,
+  Avatar,
 } from "@mantine/core";
 import {
   IconArrowLeft,
@@ -46,13 +47,14 @@ import { Suspense, useState } from "react";
 import dayjs from "dayjs";
 import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { filteredSearch } from "@/lib/search";
-import { approvedBadgeColor, getUserType } from "@/lib/utils";
+import { approvedBadgeColor, getInitials, getUserType } from "@/lib/utils";
 import EmptyImage from "@/assets/empty.png";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
+import { BackBtn } from "@/ui/components/Buttons";
 
 function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
@@ -151,7 +153,6 @@ function BusinessAccountRequests() {
   };
 
   const handleRowClick = (id: string, status: string) => {
-    console.log(status);
     if (status === "APPROVED") return push(`/admin/accounts/${params.id}`);
 
     push(`/admin/account-requests/${params.id}/${id}`);
@@ -214,7 +215,7 @@ function BusinessAccountRequests() {
       />
 
       <Paper p={28} className={styles.grid__container}>
-        <Button
+        {/* <Button
           fz={14}
           c="var(--prune-text-gray-500)"
           fw={400}
@@ -230,15 +231,26 @@ function BusinessAccountRequests() {
           //   style={{ pointerEvents: !account ? "none" : "auto" }}
         >
           Back
-        </Button>
+        </Button> */}
 
-        {!loading ? (
-          <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
-            {requests[0]?.Company.name}
-          </Text>
-        ) : (
-          <Skeleton h={10} w={100} />
-        )}
+        {/* <BackBtn /> */}
+
+        <Group gap={9}>
+          {!loading ? (
+            <Avatar color="var(--prune-primary-700)" size={39} variant="filled">
+              {getInitials(requests[0]?.Company.name)}
+            </Avatar>
+          ) : (
+            <Skeleton circle h={39} w={39} />
+          )}
+          {!loading ? (
+            <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
+              {requests[0]?.Company.name}
+            </Text>
+          ) : (
+            <Skeleton h={10} w={100} />
+          )}
+        </Group>
 
         <Group
           justify="space-between"

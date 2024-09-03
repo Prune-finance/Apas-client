@@ -2,7 +2,8 @@
 
 import { Flex, Grid, GridCol, Text, TextInput } from "@mantine/core";
 
-import styles from "@/ui/styles/singlebusiness.module.scss";
+// import styles from "@/ui/styles/singlebusiness.module.scss";
+import styles from "./styles.module.scss";
 import { RequestData } from "@/lib/hooks/requests";
 
 export default function Business({ request }: { request: RequestData | null }) {

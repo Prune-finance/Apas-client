@@ -63,6 +63,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import TabsComponent from "@/ui/components/Tabs";
 import { SearchInput } from "@/ui/components/Inputs";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -98,6 +99,7 @@ function Users() {
 
   const [processing, setProcessing] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [id, setId] = useState("");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
@@ -181,20 +183,21 @@ function Users() {
       text: "Update Details",
       icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
     },
-    {
-      text: "Deactivate",
-      icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
-    },
+    // {
+    //   text: "Deactivate",
+    //   icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
+    // },
   ];
 
   const handleRowClick = (id: string) => {
     push(`/admin/users/${id}`);
   };
 
-  const handleEdit = (data: typeof newAdmin) => {
+  const handleEdit = (data: typeof newAdmin, id: string) => {
     form.setValues(data);
     open();
     setIsEdit(true);
+    setId(id);
   };
 
   const rows = filteredSearch(
@@ -223,17 +226,7 @@ function Users() {
       </TableTd>
       {/* <TableTd className={styles.table__td}></TableTd> */}
       <TableTd className={styles.table__td}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor("ACTIVE")}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          Active
-        </Badge>
+        <BadgeComponent status="ACTIVE" active />
       </TableTd>
 
       <TableTd
@@ -270,14 +263,17 @@ function Users() {
                   c="#667085"
                   leftSection={items.icon}
                   onClick={() => {
-                    if (items.text === "Edit User")
-                      return handleEdit({
-                        email: element.email,
-                        firstName: element.firstName,
-                        lastName: element.lastName,
-                        role: element.role,
-                        password: "",
-                      });
+                    if (items.text === "Update Details")
+                      return handleEdit(
+                        {
+                          email: element.email,
+                          firstName: element.firstName,
+                          lastName: element.lastName,
+                          role: element.role,
+                          password: "",
+                        },
+                        element.id
+                      );
                   }}
                 >
                   {items.text}
@@ -286,7 +282,7 @@ function Users() {
             })}
           </MenuDropdown>
 
-          <ModalComponent
+          {/* <ModalComponent
             action={isEdit ? () => editAdmin(element.id) : addAdmin}
             processing={processing}
             opened={opened}
@@ -294,7 +290,7 @@ function Users() {
             form={form}
             isEdit={isEdit}
             setIsEdit={setIsEdit}
-          />
+          /> */}
         </Menu>
       </TableTd>
     </TableTr>
@@ -377,6 +373,16 @@ function Users() {
         form={form}
         isEdit={isEdit}
       /> */}
+
+      <ModalComponent
+        action={isEdit ? () => editAdmin(id) : addAdmin}
+        processing={processing}
+        opened={opened}
+        close={close}
+        form={form}
+        isEdit={isEdit}
+        setIsEdit={setIsEdit}
+      />
     </main>
   );
 }

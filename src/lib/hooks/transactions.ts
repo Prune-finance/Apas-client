@@ -115,6 +115,58 @@ export function useBusinessTransactions(
   return { loading, transactions, meta, revalidate };
 }
 
+export function usePayoutTransactions(customParams: IParams = {}) {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+
+    // {{account-srv}}/v1/admin/accounts/payout/trx
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+    try {
+      setLoading(true);
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout/trx?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransactions(data.data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    customParams.createdAt,
+    customParams.limit,
+    customParams.status,
+    customParams.sort,
+    customParams.page,
+  ]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
 export interface BusinessTrxMeta {
   out: number;
   total: number;

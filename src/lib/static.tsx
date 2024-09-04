@@ -293,3 +293,15 @@ export const IssuedAccountTableHeaders = [
   "Date",
   "Status",
 ];
+
+export const PayoutTableHeaders = [
+  "Holding Account",
+  "Senders Name",
+  "our Reference",
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Reference",
+  "Date",
+  "Status",
+];

@@ -1,7 +1,10 @@
 "use client";
 
+import { usePayoutTransactions } from "@/lib/hooks/transactions";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
+import { PayoutTableHeaders } from "@/lib/static";
+import { formatNumber } from "@/lib/utils";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
@@ -29,14 +32,16 @@ export const PayoutTransactions = () => {
 
   const [opened, { toggle }] = useDisclosure(false);
 
+  const { transactions, loading, meta, revalidate } = usePayoutTransactions();
+
   const form = useForm<FilterType>({
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
   });
 
   const rows = filteredSearch(
-    data,
-    ["name", "type", "recipientName"],
+    transactions,
+    ["senderIban", "recipientIban", "recipientBic", "recipientBankAddress"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -44,11 +49,15 @@ export const PayoutTransactions = () => {
       //    onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{`${element.name}`}</TableTd>
-      <TableTd>{`${element.recipientName}`}</TableTd>
+      <TableTd>{`${"N/A"}`}</TableTd>
+      <TableTd>{`${element.senderIban}`}</TableTd>
+      <TableTd>{element.reference}</TableTd>
+      <TableTd>{element.recipientName}</TableTd>
       <TableTd>
-        <AmountGroup amount={element.amount} type={element.type as "DEBIT"} />
+        <AmountGroup type={element.type} />
       </TableTd>
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>{"N/A"}</TableTd>
 
       <TableTd>{dayjs(element.createdAt).format("Do MMMM YYYY")}</TableTd>
       <TableTd>
@@ -67,13 +76,13 @@ export const PayoutTransactions = () => {
 
       <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
 
-      <TableComponent head={tableHeaders} rows={rows} loading={false} />
+      <TableComponent head={PayoutTableHeaders} rows={rows} loading={loading} />
 
       <EmptyTable
         rows={rows}
-        loading={false}
-        title="There are no users requests"
-        text="When a request is created, it will appear here."
+        loading={loading}
+        title="There are no payout transactions"
+        text="When a payout transaction is created, it will appear here."
       />
 
       <PaginationComponent
@@ -86,15 +95,6 @@ export const PayoutTransactions = () => {
     </Box>
   );
 };
-
-const tableHeaders = [
-  "Business Name",
-  "Beneficiary",
-  "Amount",
-  "Date Created",
-  "Status",
-  //   "Action",
-];
 
 const data = [
   {

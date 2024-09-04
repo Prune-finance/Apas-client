@@ -16,6 +16,7 @@ import {
   Divider,
   Checkbox,
   Modal,
+  Image,
 } from "@mantine/core";
 import { TextInput, Select, Button } from "@mantine/core";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
@@ -42,6 +43,8 @@ import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import SuccessModalImage from "@/assets/success-modal-image.png";
+import SuccessModal from "@/ui/components/SuccessModal";
 
 interface DirectorEtShareholder
   extends Omit<
@@ -57,6 +60,9 @@ export default function NewBusiness() {
   const [processing, setProcessing] = useState(false);
 
   const [opened, { open, close }] = useDisclosure(false);
+
+  const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
+    useDisclosure(false);
 
   const { handleSuccess, handleError, handleInfo } = useNotification();
 
@@ -123,11 +129,12 @@ export default function NewBusiness() {
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      handleSuccess(
-        "Business Created",
-        `${form.values.name} has been added to your list of business`
-      );
-      router.push("/admin/businesses");
+      // handleSuccess(
+      //   "Business Created",
+      //   `${form.values.name} has been added to your list of business`
+      // );
+      // router.push("/admin/businesses");
+      openSuccess();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -220,6 +227,11 @@ export default function NewBusiness() {
         });
       })
     );
+  };
+
+  const handleCloseSuccessModal = () => {
+    router.push("/admin/businesses");
+    closeSuccess();
   };
 
   return (
@@ -448,6 +460,12 @@ export default function NewBusiness() {
           close();
         }}
         color="hsl(from var(--prune-warning) h s l / .1)"
+      />
+
+      <SuccessModal
+        openedSuccess={openedSuccess}
+        handleCloseSuccessModal={handleCloseSuccessModal}
+        image={SuccessModalImage.src}
       />
     </main>
   );

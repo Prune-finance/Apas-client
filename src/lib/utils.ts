@@ -70,3 +70,8 @@ export const getInitials = (name: string) => {
     .map((item) => item.charAt(0).toUpperCase())
     .join("");
 };
+
+export const getUserType = (userType: "USER" | "CORPORATE") => {
+  if (userType === "USER") return "Individual";
+  return "Corporate";
+};

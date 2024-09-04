@@ -1,13 +1,14 @@
 "use client";
 
 import Cookies from "js-cookie";
-import { Box, Checkbox } from "@mantine/core";
+import { Box, Checkbox, PasswordInput, TextInput } from "@mantine/core";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
 
 import styles from "@/ui/styles/auth.module.scss";
+import classes from "@/ui/styles/containedInput.module.scss";
 import { registerValues, validateRegister } from "@/lib/schema";
 
 import useNotification from "@/lib/hooks/notification";
@@ -53,9 +54,69 @@ export default function FormComponent({ email }: { email: string }) {
 
   return (
     <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
-      <RegisterInput form={form} label="email" disabled />
+      <TextInput
+        mt="md"
+        classNames={classes}
+        label="Email"
+        size="xs"
+        flex={1}
+        disabled
+        placeholder="jane.zi@prune.io"
+        {...form.getInputProps("email")}
+      />
+
+      <PasswordInput
+        mt="md"
+        classNames={classes}
+        styles={{
+          input: {
+            border: "1px solid var(--prune-text-gray-300)",
+            "&:focus": { border: "none", outline: "none" },
+            "&:active": { border: "none", outline: "none" },
+          },
+
+          innerInput: {
+            border: "none",
+            outline: "none",
+            paddingTop: "18px",
+            height: "100%",
+          },
+        }}
+        label="Password"
+        flex={1}
+        placeholder="Enter Password"
+        size="xs"
+        {...form.getInputProps("password")}
+        color="#C1DD06"
+      />
+
+      <PasswordInput
+        mt="md"
+        classNames={classes}
+        styles={{
+          input: {
+            border: "1px solid var(--prune-text-gray-300)",
+            "&:focus": { border: "none", outline: "none" },
+            "&:active": { border: "none", outline: "none" },
+          },
+
+          innerInput: {
+            border: "none",
+            outline: "none",
+            paddingTop: "18px",
+            height: "100%",
+          },
+        }}
+        label="Confirm Password"
+        flex={1}
+        placeholder="Enter Password"
+        size="xs"
+        {...form.getInputProps("confirmPassword")}
+        color="#C1DD06"
+      />
+      {/* <RegisterInput form={form} label="email" disabled />
       <RegisterInput form={form} label="password" />
-      <RegisterInput form={form} label="confirmPassword" />
+      <RegisterInput form={form} label="confirmPassword" /> */}
 
       <div className={styles.login__actions}>
         <PrimaryBtn

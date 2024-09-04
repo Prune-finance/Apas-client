@@ -2,9 +2,11 @@
 import Cookies from "js-cookie";
 
 import {
+  Avatar,
   Button,
   Group,
   Skeleton,
+  Stack,
   Tabs,
   TabsList,
   TabsPanel,
@@ -16,7 +18,10 @@ import {
   IconArrowLeft,
   IconBuildingSkyscraper,
   IconCheck,
+  IconFileDescription,
   IconPointFilled,
+  IconRosetteDiscountCheckFilled,
+  IconUser,
   IconUsers,
   IconUsersGroup,
   IconX,
@@ -37,11 +42,19 @@ import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { getInitials } from "@/lib/utils";
+import { useSingleBusiness } from "@/lib/hooks/businesses";
+import Link from "next/link";
+import Documents from "./(tabs)/documents";
+import TabsComponent from "@/ui/components/Tabs";
 
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
   const { revalidate, request, loading } = useSingleRequest(params.requestId);
+  const { business, loading: loadingBiz } = useSingleBusiness(
+    request?.Company.id ?? ""
+  );
   const { handleSuccess, handleError } = useNotification();
   const { back } = useRouter();
 
@@ -118,33 +131,64 @@ export default function SingleRequest() {
       />
 
       <div className={styles.page__container}>
-        <Button
-          fz={14}
-          c="var(--prune-text-gray-500)"
-          fw={400}
-          px={0}
-          variant="transparent"
-          onClick={back}
-          leftSection={
-            <IconArrowLeft
-              color="#1D2939"
-              style={{ width: "70%", height: "70%" }}
-            />
-          }
-          //   style={{ pointerEvents: !account ? "none" : "auto" }}
-        >
-          Back
-        </Button>
+        {/* <BackBtn /> */}
         <div className={styles.container__header}>
           <Group>
             <div className={styles.header__left}>
-              {request ? (
-                <Text fz={18} fw={600}>
-                  {request.firstName} {request.lastName}
-                </Text>
-              ) : (
-                <Skeleton h={10} w={100} />
-              )}
+              <Group gap={12}>
+                {!loading ? (
+                  <Avatar
+                    color="var(--prune-primary-700)"
+                    size={39}
+                    variant="filled"
+                  >
+                    {getInitials(
+                      `${request?.firstName ?? ""} ${request?.lastName ?? ""}`
+                    )}
+                  </Avatar>
+                ) : (
+                  <Skeleton circle h={39} w={39} />
+                )}
+
+                <Stack gap={2}>
+                  {!loading ? (
+                    <Text
+                      fz={20}
+                      className={styles.main__header__text}
+                      m={0}
+                      p={0}
+                      fw={600}
+                    >
+                      {request?.firstName} {request?.lastName}
+                    </Text>
+                  ) : (
+                    <Skeleton h={10} w={100} />
+                  )}
+
+                  <Group gap={8}>
+                    {business?.kycTrusted && (
+                      <IconRosetteDiscountCheckFilled
+                        size={17}
+                        color="var(--prune-primary-700)"
+                      />
+                    )}
+                    {!loadingBiz ? (
+                      <Text
+                        fz={12}
+                        fw={500}
+                        c="var(--prune-text-gray-600)"
+                        td="underline"
+                        component={Link}
+                        href={`/admin/businesses/${business?.id}`}
+                      >
+                        {business?.name}
+                      </Text>
+                    ) : (
+                      <Skeleton h={10} w={70} />
+                    )}
+                  </Group>
+                </Stack>
+              </Group>
             </div>
 
             <BadgeComponent status={request?.status ?? ""} />
@@ -158,62 +202,29 @@ export default function SingleRequest() {
           )}
         </div>
 
-        <div className={styles.container__body}>
-          <Tabs
-            defaultValue="Account"
-            variant="pills"
-            classNames={{
-              root: styles.tabs,
-              list: styles.tabs__list,
-              tab: styles.tab,
-            }}
-          >
-            <TabsList>
-              <TabsTab value="Account" leftSection={<IconUsers size={14} />}>
-                Account Information
-              </TabsTab>
-              <TabsTab
-                value="Business"
-                leftSection={<IconBuildingSkyscraper size={14} />}
-              >
-                Business Information
-              </TabsTab>
-              {request && request.accountType === "CORPORATE" && (
-                <>
-                  {" "}
-                  <TabsTab
-                    value="Directors"
-                    leftSection={<IconUsers size={14} />}
-                  >
-                    Directors
-                  </TabsTab>
-                  <TabsTab
-                    value="Shareholders"
-                    leftSection={<IconUsersGroup size={14} />}
-                  >
-                    Key Shareholders
-                  </TabsTab>{" "}
-                </>
-              )}
-            </TabsList>
+        {/* <div className={styles.container__body}> */}
+        {request && request.accountType === "USER" && (
+          <div>
+            <Account request={request} />
+            {/* <Business request={request} /> */}
+            <Documents request={request} business={business} />
+          </div>
+        )}
 
-            <TabsPanel value="Business">
-              <Business request={request} />
-            </TabsPanel>
-
-            <TabsPanel value="Account">
+        {request && request.accountType === "CORPORATE" && (
+          <TabsComponent tabs={tabs} tt="capitalize" fz={12} fw={500} mt={28}>
+            <TabsPanel value={tabs[0].value}>
               <Account request={request} />
+              <Documents request={request} business={business} />
             </TabsPanel>
-
-            <TabsPanel value="Directors">
+            <TabsPanel value={tabs[1].value}>
               <Directors request={request} />
             </TabsPanel>
-
-            <TabsPanel value="Shareholders">
+            <TabsPanel value={tabs[2].value}>
               <Shareholders request={request} />
             </TabsPanel>
-          </Tabs>
-        </div>
+          </TabsComponent>
+        )}
 
         <ModalComponent
           action={handleRejection}
@@ -285,3 +296,12 @@ export default function SingleRequest() {
 //      </div>
 //    );
 //  }
+
+const tabs = [
+  { value: "Account Information", icon: <IconUser size={14} /> },
+  { value: "Directors Documents", icon: <IconFileDescription size={14} /> },
+  {
+    value: "Key Shareholders Documents",
+    icon: <IconFileDescription size={14} />,
+  },
+];

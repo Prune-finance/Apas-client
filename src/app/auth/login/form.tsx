@@ -7,12 +7,20 @@ import { LoginType, loginValues, validateLogin } from "@/lib/schema";
 import User from "@/lib/store/user";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { LoginInput } from "@/ui/components/Inputs";
-import { Box, Checkbox, Group, Text } from "@mantine/core";
+import {
+  Box,
+  Checkbox,
+  Group,
+  PasswordInput,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
 import { useState } from "react";
 
 import styles from "@/ui/styles/auth.module.scss";
+import classes from "@/ui/styles/containedInput.module.scss";
 
 export default function LoginForm() {
   //   const searchParams = useSearchParams();
@@ -51,8 +59,43 @@ export default function LoginForm() {
 
   return (
     <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
-      <LoginInput form={form} label="email" />
-      <LoginInput form={form} label="password" />
+      <TextInput
+        mt="md"
+        classNames={classes}
+        label="Email"
+        size="xs"
+        flex={1}
+        placeholder="jane.zi@prune.io"
+        {...form.getInputProps("email")}
+      />
+
+      <PasswordInput
+        mt="md"
+        classNames={classes}
+        styles={{
+          input: {
+            border: "1px solid var(--prune-text-gray-300)",
+            "&:focus": { border: "none", outline: "none" },
+            "&:active": { border: "none", outline: "none" },
+          },
+
+          innerInput: {
+            border: "none",
+            outline: "none",
+            paddingTop: "18px",
+            height: "100%",
+          },
+        }}
+        label="Password"
+        flex={1}
+        placeholder="Enter Password"
+        size="xs"
+        {...form.getInputProps("password")}
+        color="#C1DD06"
+      />
+
+      {/* <LoginInput form={form} label="email" />
+      <LoginInput form={form} label="password" /> */}
 
       <div className={styles.login__actions}>
         <Checkbox label="Remember me" size="xs" color="#C1DD06" />

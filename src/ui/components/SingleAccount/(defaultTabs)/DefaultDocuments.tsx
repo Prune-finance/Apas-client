@@ -9,6 +9,7 @@ interface Props {
 }
 
 export const DefaultDocuments = ({ account, isDefault }: Props) => {
+  console.log({ account });
   return (
     <Box>
       {account?.type === "USER" && (

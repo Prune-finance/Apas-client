@@ -83,7 +83,7 @@ export function useAllRequests(customParams: IParams = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
-      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
@@ -610,7 +610,7 @@ export interface Account {
   deletedAt: null;
   accountBalance: number;
   companyId: string;
-  type: string;
+  type: "USER" | "CORPORATE";
   status: string;
   accountRequestId: null;
   Company: Company;

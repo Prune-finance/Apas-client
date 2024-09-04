@@ -16,9 +16,11 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
-import styles from "@/ui/styles/singlebusiness.module.scss";
+import styles from "./styles.module.scss";
+// import styles from "@/ui/styles/singlebusiness.module.scss";
 import { RequestData } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
+import { getUserType } from "@/lib/utils";
 
 export default function Account({ request }: { request: RequestData | null }) {
   const { handleInfo } = useNotification();
@@ -33,6 +35,48 @@ export default function Account({ request }: { request: RequestData | null }) {
         </Flex>
 
         <Grid mt={20} className={styles.grid__container}>
+          {request?.accountType === "USER" && (
+            <>
+              <GridCol span={4} className={styles.grid}>
+                <TextInput
+                  readOnly
+                  classNames={{
+                    input: styles.input,
+                    label: styles.label,
+                  }}
+                  label="First Name"
+                  placeholder={`${request?.firstName || ""} `}
+                />
+              </GridCol>
+
+              <GridCol span={4} className={styles.grid}>
+                <TextInput
+                  readOnly
+                  classNames={{
+                    input: styles.input,
+                    label: styles.label,
+                  }}
+                  label="Last Name"
+                  placeholder={`${request?.lastName || ""}`}
+                />
+              </GridCol>
+            </>
+          )}
+
+          {request?.accountType === "CORPORATE" && (
+            <GridCol span={4} className={styles.grid}>
+              <TextInput
+                readOnly
+                classNames={{
+                  input: styles.input,
+                  label: styles.label,
+                }}
+                label="Company Name"
+                placeholder={`${request?.Company.name || ""}`}
+              />
+            </GridCol>
+          )}
+
           <GridCol span={4} className={styles.grid}>
             <TextInput
               readOnly
@@ -40,10 +84,8 @@ export default function Account({ request }: { request: RequestData | null }) {
                 input: styles.input,
                 label: styles.label,
               }}
-              label="Account Name"
-              placeholder={`${request?.firstName || ""} ${
-                request?.lastName || ""
-              }`}
+              label="User Type"
+              placeholder={getUserType(request?.accountType ?? "USER")}
             />
           </GridCol>
 
@@ -54,76 +96,10 @@ export default function Account({ request }: { request: RequestData | null }) {
                 input: styles.input,
                 label: styles.label,
               }}
-              label="Type"
-              placeholder={request?.accountType}
+              label="Country of Operation"
+              placeholder={request?.country}
             />
           </GridCol>
-
-          {request?.accountType === "USER" && (
-            <GridCol span={4} className={styles.grid}>
-              <TextInput
-                classNames={{
-                  input: styles.input,
-                  label: styles.label,
-                  section: styles.section,
-                }}
-                leftSection={<IconFileInfo />}
-                leftSectionPointerEvents="none"
-                rightSection={
-                  <UnstyledButton
-                    onClick={() => {
-                      if (!request.documentData.idFileURL)
-                        return handleInfo("No document was provided", "");
-                      window.open(
-                        request.documentData.idFileURL || "",
-                        "_blank"
-                      );
-                    }}
-                    className={styles.input__right__section}
-                  >
-                    <Text fw={600} fz={10} c="#475467">
-                      View
-                    </Text>
-                  </UnstyledButton>
-                }
-                label="Identity Type"
-                placeholder={`${request.documentData.idType}-${request.firstName} ${request.lastName}`}
-              />
-            </GridCol>
-          )}
-
-          {request?.accountType === "USER" && (
-            <GridCol span={4} className={styles.grid}>
-              <TextInput
-                classNames={{
-                  input: styles.input,
-                  label: styles.label,
-                  section: styles.section,
-                }}
-                leftSection={<IconFileInfo />}
-                leftSectionPointerEvents="none"
-                rightSection={
-                  <UnstyledButton
-                    onClick={() => {
-                      if (!request.documentData.poaFileURL)
-                        return handleInfo("No document was provided", "");
-                      window.open(
-                        request.documentData.poaFileURL || "",
-                        "_blank"
-                      );
-                    }}
-                    className={styles.input__right__section}
-                  >
-                    <Text fw={600} fz={10} c="#475467">
-                      View
-                    </Text>
-                  </UnstyledButton>
-                }
-                label="Proof of Address Type"
-                placeholder={`${request.documentData.poaType}-${request.firstName} ${request.lastName}`}
-              />
-            </GridCol>
-          )}
         </Grid>
       </div>
     </div>

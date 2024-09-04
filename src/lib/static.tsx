@@ -284,9 +284,21 @@ export const OwnAccountTableHeaders = [
 ];
 
 export const IssuedAccountTableHeaders = [
-  "Sender's Name",
+  "Sender Name",
   "Business",
-  "Beneficiary Name",
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Reference",
+  "Date",
+  "Status",
+];
+
+export const PayoutTableHeaders = [
+  "Holding Account",
+  "Senders Name",
+  "our Reference",
+  "Beneficiary",
   "Type",
   "Amount",
   "Reference",

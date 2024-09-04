@@ -10,7 +10,7 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { Box, Group, TableTd, TableTr } from "@mantine/core";
+import { Box, Group, Table, TableData, TableTd, TableTr } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
@@ -36,6 +36,19 @@ export const Users = () => {
     validate: zodResolver(filterSchema),
   });
 
+  const tableData: TableData = {
+    head: tableHeaders,
+    body: filteredSearch(
+      accounts ?? [],
+      ["Company.name", "legalEntity"],
+      debouncedSearch
+    ).map((element, index) => [
+      `${element.Company.name}`,
+      dayjs(element.createdAt).format("Do MMM, YYYY"),
+      <BadgeComponent status={element.status} active />,
+    ]),
+  };
+
   const rows = filteredSearch(
     accounts ?? [],
     ["Company.name", "legalEntity"],
@@ -48,7 +61,7 @@ export const Users = () => {
     >
       <TableTd>{`${element.Company.name}`}</TableTd>
 
-      <TableTd>{dayjs(element.createdAt).format("Do MMMM YYYY")}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("Do MMM, YYYY")}</TableTd>
       <TableTd>
         <BadgeComponent status={element.status} active />
       </TableTd>
@@ -64,6 +77,27 @@ export const Users = () => {
       </Group>
 
       <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
+
+      {/* <Table
+        data={tableData}
+        styles={{
+          table: { borderColor: "#f5f5f5", marginTop: "30px" },
+          th: {
+            color: "var(--prune-text-gray-600)",
+            fontSize: "10px",
+            fontWeight: 600,
+            textTransform: "capitalize",
+            letterSpacing: "0.5px",
+          },
+          td: {
+            fontSize: "12px",
+            fontWeight: 500,
+            color: "var(--prune-text-gray-800)",
+          },
+          thead: { backgroundColor: "#f9f9f9" },
+        }}
+        horizontalSpacing={"calc(100% / 6"}
+      /> */}
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

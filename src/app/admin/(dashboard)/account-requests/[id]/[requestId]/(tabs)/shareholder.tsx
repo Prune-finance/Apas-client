@@ -17,7 +17,8 @@ import {
 } from "@tabler/icons-react";
 import { Fragment } from "react";
 
-import styles from "@/ui/styles/singlebusiness.module.scss";
+import styles from "./styles.module.scss";
+// import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
 import { RequestData } from "@/lib/hooks/requests";
 import { request } from "http";
@@ -73,6 +74,11 @@ const DirectorsForm = ({
                 input: styles.input,
                 label: styles.label,
                 section: styles.section,
+              }}
+              styles={{
+                input: {
+                  "&::placeholder": { textTransform: "uppercase" },
+                },
               }}
               leftSection={<IconFileInfo />}
               leftSectionPointerEvents="none"

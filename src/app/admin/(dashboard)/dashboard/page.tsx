@@ -42,6 +42,9 @@ import { useBusiness } from "@/lib/hooks/businesses";
 import { useDebitRequests, useRequests } from "@/lib/hooks/requests";
 import { useAccounts } from "@/lib/hooks/accounts";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 
 import EmptyImage from "@/assets/empty.png";
 import Image from "next/image";

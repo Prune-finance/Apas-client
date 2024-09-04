@@ -55,12 +55,12 @@ export default function DebitRequests() {
   const [tab, setTab] = useState<string | null>("Logs");
   return (
     <main className={styles.main}>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/admin/dashboard" },
           { title: `${tab}`, href: "/admin/settings" },
         ]}
-      />
+      /> */}
 
       <div className={styles.table__container}>
         <div className={styles.container__header}>

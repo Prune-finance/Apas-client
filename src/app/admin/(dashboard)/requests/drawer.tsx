@@ -31,6 +31,7 @@ export default function DebitDrawer({
   selectedRequest,
   revalidate,
 }: Props) {
+  console.log(selectedRequest);
   const [openedDeny, { close: closeDeny, open: openDeny }] =
     useDisclosure(false);
   const [openedApprove, { close: closeApprove, open: openApprove }] =
@@ -39,6 +40,10 @@ export default function DebitDrawer({
   const [processing, setProcessing] = useState(false);
 
   const { handleError, handleSuccess } = useNotification();
+
+  const businessDetails = {
+    "Business Name": selectedRequest?.Account.Company.name,
+  };
 
   const accountDetails = {
     "Business Name": selectedRequest?.Account.Company.name,
@@ -135,23 +140,23 @@ export default function DebitDrawer({
         <Divider my={30} />
 
         <Text
-          fz={16}
+          fz={14}
           fw={600}
           c="var(--prune-text-gray-800)"
           tt="uppercase"
           mb={24}
         >
-          Account Details
+          Business Details
         </Text>
 
         <Stack>
-          {Object.entries(accountDetails).map(([title, value]) => (
+          {Object.entries(businessDetails).map(([title, value]) => (
             <Flex justify="space-between" key={title}>
-              <Text fz={14} c="var(--prune-text-gray-500)">
+              <Text fz={12} c="var(--prune-text-gray-500)">
                 {`${title}:`}
               </Text>
 
-              <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
+              <Text fz={12} fw={600} c="var(--prune-text-gray-700)">
                 {value}
               </Text>
             </Flex>
@@ -161,23 +166,49 @@ export default function DebitDrawer({
         <Divider my={30} />
 
         <Text
-          fz={16}
+          fz={14}
           fw={600}
           c="var(--prune-text-gray-800)"
           tt="uppercase"
           mb={24}
         >
-          Destination Details
+          Sender Details
+        </Text>
+
+        <Stack>
+          {Object.entries(accountDetails).map(([title, value]) => (
+            <Flex justify="space-between" key={title}>
+              <Text fz={12} c="var(--prune-text-gray-500)">
+                {`${title}:`}
+              </Text>
+
+              <Text fz={12} fw={600} c="var(--prune-text-gray-700)">
+                {value}
+              </Text>
+            </Flex>
+          ))}
+        </Stack>
+
+        <Divider my={30} />
+
+        <Text
+          fz={14}
+          fw={600}
+          c="var(--prune-text-gray-800)"
+          tt="uppercase"
+          mb={24}
+        >
+          Beneficiary Details
         </Text>
 
         <Stack>
           {Object.entries(destDetails).map(([title, value]) => (
             <Flex justify="space-between" key={title}>
-              <Text fz={14} c="var(--prune-text-gray-500)">
+              <Text fz={12} c="var(--prune-text-gray-500)">
                 {`${title}:`}
               </Text>
 
-              <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
+              <Text fz={12} fw={600} c="var(--prune-text-gray-700)">
                 {value}
               </Text>
             </Flex>

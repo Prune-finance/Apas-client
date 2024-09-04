@@ -317,3 +317,13 @@ export interface Director {
   identityFileUrlBack: string;
   proofOfAddressFileUrl: string;
 }
+
+export interface Service {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  title: string;
+  serviceCode: string;
+  serviceIdentifier: string;
+}

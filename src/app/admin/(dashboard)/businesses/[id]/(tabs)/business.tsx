@@ -103,6 +103,12 @@ export default function Business({
         business={business}
       />
 
+      <Services
+        form={form as unknown as UseFormReturnType<BasicInfoType>}
+        handleBusinessUpdate={handleBusinessUpdate}
+        business={business}
+      />
+
       <BusinessBio
         form={form as unknown as UseFormReturnType<BasicInfoType>}
         handleBusinessUpdate={handleBusinessUpdate}
@@ -463,6 +469,47 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
           />
         )}
       </Flex>
+
+      <Grid mt={20} className={styles.grid__container}>
+        <GridCol span={12} className={styles.grid}>
+          <Textarea
+            readOnly={!editingBizInfo}
+            classNames={{
+              input: styles.input,
+              label: styles.label,
+            }}
+            minRows={6}
+            maxRows={6}
+            autosize
+            label="Business Bio"
+            placeholder={business?.businessBio || ""}
+            {...form.getInputProps("businessBio")}
+          />
+        </GridCol>
+      </Grid>
+    </div>
+  );
+};
+
+const Services = ({ business, form, handleBusinessUpdate }: IProps) => {
+  const [editingBizInfo, setEditingBizInfo] = useState(false);
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = async () => {
+    setProcessing(true);
+    try {
+      await handleBusinessUpdate();
+      setEditingBizInfo(false);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className={styles.bottom__container}>
+      <Text fz={12} fw={600} tt="uppercase">
+        Services
+      </Text>
 
       <Grid mt={20} className={styles.grid__container}>
         <GridCol span={12} className={styles.grid}>

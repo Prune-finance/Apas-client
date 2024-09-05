@@ -509,7 +509,8 @@ const Services = () => {
             <Checkbox
               label={service.title}
               checked={service.active}
-              onChange={() => handleServiceChange(service.id)}
+              // onChange={() => handleServiceChange(service.id)}
+              color="var(--prune-primary-700)"
               classNames={{
                 root: styles.input,
                 label: styles.label,

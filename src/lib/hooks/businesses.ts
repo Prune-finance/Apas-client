@@ -111,6 +111,7 @@ export function useBusiness(
 
 export function useSingleBusiness(id: string) {
   const [business, setBusiness] = useState<BusinessData | null>(null);
+  const [meta, setMeta] = useState<SingleBizMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchBusiness() {
@@ -122,6 +123,7 @@ export function useSingleBusiness(id: string) {
       );
 
       setBusiness(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -141,7 +143,7 @@ export function useSingleBusiness(id: string) {
     };
   }, [id]);
 
-  return { loading, business, revalidate };
+  return { loading, business, revalidate, meta };
 }
 
 export function useBusinessServices(id: string) {
@@ -262,6 +264,19 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
+}
+
+export interface SingleBizMeta {
+  activationLinkCount: number;
+  activeActivationLink: ActiveActivationLink;
+  users: number;
+}
+
+export interface ActiveActivationLink {
+  id: string;
+  status: string;
+  token: string;
+  createdAt: Date;
 }
 
 export interface UserBusinessMeta {

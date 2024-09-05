@@ -139,7 +139,7 @@ export function usePayoutTransactions(customParams: IParams = {}) {
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      setTransactions(data.data.data);
+      setTransactions(data.data);
       setMeta(data.meta);
     } catch (error) {
       console.log(error);

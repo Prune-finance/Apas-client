@@ -111,6 +111,7 @@ export function useBusiness(
 
 export function useSingleBusiness(id: string) {
   const [business, setBusiness] = useState<BusinessData | null>(null);
+  const [meta, setMeta] = useState<SingleBizMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchBusiness() {
@@ -122,6 +123,7 @@ export function useSingleBusiness(id: string) {
       );
 
       setBusiness(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -141,7 +143,43 @@ export function useSingleBusiness(id: string) {
     };
   }, [id]);
 
-  return { loading, business, revalidate };
+  return { loading, business, revalidate, meta };
+}
+
+export function useBusinessServices(id: string) {
+  const [services, setServices] = useState<Service[]>([]);
+  const [meta, setMeta] = useState<BusinessMeta>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchServices() {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/services/business/${id}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setServices(data.data);
+    } catch (error) {
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchServices();
+
+  useEffect(() => {
+    fetchServices();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [id]);
+
+  return { loading, services, meta, revalidate };
 }
 
 export function useUserBusiness(customParams: IParams = {}) {
@@ -226,6 +264,19 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
+}
+
+export interface SingleBizMeta {
+  activationLinkCount: number;
+  activeActivationLink: ActiveActivationLink;
+  users: number;
+}
+
+export interface ActiveActivationLink {
+  id: string;
+  status: string;
+  token: string;
+  createdAt: Date;
 }
 
 export interface UserBusinessMeta {
@@ -316,4 +367,15 @@ export interface Director {
   identityFileUrl: string;
   identityFileUrlBack: string;
   proofOfAddressFileUrl: string;
+}
+
+export interface Service {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  title: string;
+  serviceCode: string;
+  serviceIdentifier: string;
+  active: boolean;
 }

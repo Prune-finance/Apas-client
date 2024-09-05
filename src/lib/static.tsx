@@ -305,3 +305,11 @@ export const PayoutTableHeaders = [
   "Date",
   "Status",
 ];
+
+export const debitTableHeaders = [
+  "Account Name",
+  "Amount",
+  "Date Created",
+  "Status",
+  // "Action",
+];

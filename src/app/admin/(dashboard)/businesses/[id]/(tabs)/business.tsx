@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 
 import {
   Button,
+  Checkbox,
   Flex,
   Grid,
   GridCol,
@@ -15,7 +16,7 @@ import {
 import { IconPencilMinus } from "@tabler/icons-react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessData } from "@/lib/hooks/businesses";
+import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState } from "react";
 import { useForm, UseFormReturnType } from "@mantine/form";
 import axios from "axios";
@@ -25,6 +26,7 @@ import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BasicInfoType } from "@/lib/schema";
 import { ContactDocumentTextInput } from "./utils";
+import { useParams } from "next/navigation";
 
 export default function Business({
   business,
@@ -102,6 +104,8 @@ export default function Business({
         handleBusinessUpdate={handleBusinessUpdate}
         business={business}
       />
+
+      <Services />
 
       <BusinessBio
         form={form as unknown as UseFormReturnType<BasicInfoType>}
@@ -480,6 +484,61 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
             {...form.getInputProps("businessBio")}
           />
         </GridCol>
+      </Grid>
+    </div>
+  );
+};
+
+const Services = () => {
+  const { id } = useParams<{ id: string }>();
+  const { services, meta, revalidate } = useBusinessServices(id);
+
+  const handleServiceChange = (id: string) => {
+    console.log(id);
+  };
+
+  return (
+    <div className={styles.bottom__container}>
+      <Text fz={12} fw={600} tt="uppercase">
+        Services
+      </Text>
+
+      <Grid mt={20} className={styles.grid__container}>
+        {services.map((service) => (
+          <GridCol span={4} className={styles.grid} key={service.id}>
+            <Checkbox
+              label={service.title}
+              checked={service.active}
+              // onChange={() => handleServiceChange(service.id)}
+              color="var(--prune-primary-700)"
+              classNames={{
+                root: styles.input,
+                label: styles.label,
+              }}
+              styles={{
+                root: {
+                  padding: "12px 16px",
+                },
+              }}
+            />
+          </GridCol>
+        ))}
+        {/* <GridCol span={4} className={styles.grid}>
+          <Checkbox
+            label={"Account Service"}
+            // checked={true}
+            // onChange={() => handleServiceChange("service.id")}
+            classNames={{
+              root: styles.input,
+              label: styles.label,
+            }}
+            styles={{
+              root: {
+                padding: "12px 16px",
+              },
+            }}
+          />
+        </GridCol> */}
       </Grid>
     </div>
   );

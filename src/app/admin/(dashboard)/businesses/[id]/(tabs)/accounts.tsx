@@ -12,12 +12,13 @@ import {
   TableTr,
   TabsPanel,
   SimpleGrid,
+  Switch,
 } from "@mantine/core";
 import { IconBrandLinktree, IconDots, IconEye } from "@tabler/icons-react";
 import Link from "next/link";
 import localFont from "next/font/local";
 import axios from "axios";
-import { BusinessData } from "@/lib/hooks/businesses";
+import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect, useMemo } from "react";
 import { AccountData, useBusinessDefaultAccount } from "@/lib/hooks/accounts";
 
@@ -88,6 +89,7 @@ export default function Accounts({
   } = useBusinessTransactions(params.id, customParams);
 
   const { account: defaultAccount } = useBusinessDefaultAccount(params.id);
+  const { services } = useBusinessServices(params.id);
 
   const form = useForm<FilterType>({
     initialValues: filterValues,
@@ -212,7 +214,20 @@ export default function Accounts({
             loading={loading}
             badgeText="Main Account"
             link={`/admin/businesses/${params.id}/default`}
-          />
+            business
+            disable
+          >
+            <Switch
+              readOnly
+              label="Disabled"
+              defaultChecked={
+                !services.find(
+                  (service) => service.serviceIdentifier === "PAYOUT_SERVICE"
+                )?.active
+              }
+              labelPosition="left"
+            />
+          </AccountCard>
         </SimpleGrid>
       </TabsPanel>
 

@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 
 import {
   Button,
+  Checkbox,
   Flex,
   Grid,
   GridCol,
@@ -15,7 +16,7 @@ import {
 import { IconPencilMinus } from "@tabler/icons-react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessData } from "@/lib/hooks/businesses";
+import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState } from "react";
 import { useForm, UseFormReturnType } from "@mantine/form";
 import axios from "axios";
@@ -25,6 +26,7 @@ import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BasicInfoType } from "@/lib/schema";
 import { ContactDocumentTextInput } from "./utils";
+import { useParams } from "next/navigation";
 
 export default function Business({
   business,
@@ -103,11 +105,7 @@ export default function Business({
         business={business}
       />
 
-      <Services
-        form={form as unknown as UseFormReturnType<BasicInfoType>}
-        handleBusinessUpdate={handleBusinessUpdate}
-        business={business}
-      />
+      <Services />
 
       <BusinessBio
         form={form as unknown as UseFormReturnType<BasicInfoType>}
@@ -491,18 +489,12 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
   );
 };
 
-const Services = ({ business, form, handleBusinessUpdate }: IProps) => {
-  const [editingBizInfo, setEditingBizInfo] = useState(false);
-  const [processing, setProcessing] = useState(false);
+const Services = () => {
+  const { id } = useParams<{ id: string }>();
+  const { services, meta, revalidate } = useBusinessServices(id);
 
-  const handleSubmit = async () => {
-    setProcessing(true);
-    try {
-      await handleBusinessUpdate();
-      setEditingBizInfo(false);
-    } finally {
-      setProcessing(false);
-    }
+  const handleServiceChange = (id: string) => {
+    console.log(id);
   };
 
   return (
@@ -512,21 +504,40 @@ const Services = ({ business, form, handleBusinessUpdate }: IProps) => {
       </Text>
 
       <Grid mt={20} className={styles.grid__container}>
-        <GridCol span={12} className={styles.grid}>
-          <Textarea
-            readOnly={!editingBizInfo}
+        {services.map((service) => (
+          <GridCol span={4} className={styles.grid} key={service.id}>
+            <Checkbox
+              label={service.title}
+              checked={service.active}
+              onChange={() => handleServiceChange(service.id)}
+              classNames={{
+                root: styles.input,
+                label: styles.label,
+              }}
+              styles={{
+                root: {
+                  padding: "12px 16px",
+                },
+              }}
+            />
+          </GridCol>
+        ))}
+        {/* <GridCol span={4} className={styles.grid}>
+          <Checkbox
+            label={"Account Service"}
+            // checked={true}
+            // onChange={() => handleServiceChange("service.id")}
             classNames={{
-              input: styles.input,
+              root: styles.input,
               label: styles.label,
             }}
-            minRows={6}
-            maxRows={6}
-            autosize
-            label="Business Bio"
-            placeholder={business?.businessBio || ""}
-            {...form.getInputProps("businessBio")}
+            styles={{
+              root: {
+                padding: "12px 16px",
+              },
+            }}
           />
-        </GridCol>
+        </GridCol> */}
       </Grid>
     </div>
   );

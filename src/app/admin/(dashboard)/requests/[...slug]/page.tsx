@@ -450,7 +450,7 @@ const tableHeaders = [
   "Action",
 ];
 
-const debitTableHeaders = [
+export const debitTableHeaders = [
   "Account Name",
   "Amount",
   "Date Created",

@@ -33,6 +33,7 @@ import {
   IconAlertTriangle,
   IconShieldCheck,
   IconRosetteDiscountCheckFilled,
+  IconCreditCardPay,
 } from "@tabler/icons-react";
 
 import ActiveBadge from "@/assets/active-badge.svg";
@@ -55,6 +56,7 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 import { BackBtn, PrimaryBtn } from "@/ui/components/Buttons";
+import { Requests } from "./(tabs)/requests";
 
 export default function SingleBusiness() {
   const router = useRouter();
@@ -330,6 +332,10 @@ export default function SingleBusiness() {
             <TabsPanel value="keys">
               <Keys business={business} loading={loading} />
             </TabsPanel>
+
+            <TabsPanel value="requests">
+              <Requests business={business} />
+            </TabsPanel>
           </Tabs>
         </div>
       </div>
@@ -390,4 +396,5 @@ const tabs = [
   { title: "Key Shareholders", value: "shareholders", icon: IconUsersGroup },
   { value: "accounts", icon: IconCurrencyEuro },
   { title: "API Keys", value: "keys", icon: IconKey },
+  { value: "requests", icon: IconCreditCardPay },
 ];

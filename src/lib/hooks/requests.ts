@@ -126,6 +126,63 @@ export function useAllRequests(customParams: IParams = {}) {
   return { loading, requests, meta, revalidate };
 }
 
+export function useAllCompanyRequests(
+  businessId: string,
+  customParams: IParams = {}
+) {
+  const [requests, setRequests] = useState<IUserRequest[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type.toUpperCase() }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+  }, [customParams]);
+
+  async function fetchAccounts() {
+    //  `${id}/requests`;: fetch all requests for a specific business
+    setLoading(true);
+    try {
+      // const status = query ? `?status=${query}` : "";
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${businessId}/requests/all?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setRequests(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccounts();
+  }
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+
+  return { loading, requests, meta, revalidate };
+}
+
 export function useSingleRequest(id: string) {
   const [request, setRequest] = useState<RequestData | null>(null);
   const [loading, setLoading] = useState(true);

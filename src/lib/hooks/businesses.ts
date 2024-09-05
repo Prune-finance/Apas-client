@@ -144,6 +144,42 @@ export function useSingleBusiness(id: string) {
   return { loading, business, revalidate };
 }
 
+export function useBusinessServices(id: string) {
+  const [services, setServices] = useState<Service[]>([]);
+  const [meta, setMeta] = useState<BusinessMeta>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchServices() {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/services/business/${id}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setServices(data.data);
+    } catch (error) {
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchServices();
+
+  useEffect(() => {
+    fetchServices();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [id]);
+
+  return { loading, services, meta, revalidate };
+}
+
 export function useUserBusiness(customParams: IParams = {}) {
   const [business, setBusiness] = useState<BusinessData | null>(null);
   const [meta, setMeta] = useState<UserBusinessMeta>();
@@ -326,4 +362,5 @@ export interface Service {
   title: string;
   serviceCode: string;
   serviceIdentifier: string;
+  active: boolean;
 }

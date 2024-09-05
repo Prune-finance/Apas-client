@@ -16,9 +16,10 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
-import { debitTableHeaders } from "@/app/admin/(dashboard)/requests/[...slug]/page";
+
 import DebitDrawer from "@/app/admin/(dashboard)/requests/drawer";
 import PaginationComponent from "@/ui/components/Pagination";
+import { debitTableHeaders } from "@/lib/static";
 
 export const Debit = () => {
   const { id } = useParams<{ id: string }>();

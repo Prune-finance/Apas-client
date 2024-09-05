@@ -17,6 +17,7 @@ import {
   MenuDropdown,
   MenuItem,
   MenuTarget,
+  Select,
   TableTd,
 } from "@mantine/core";
 import { Flex, Box, Divider, Button } from "@mantine/core";
@@ -36,7 +37,7 @@ import { IconListTree } from "@tabler/icons-react";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, getUserType } from "@/lib/utils";
 import {
   DebitRequest,
   IUserRequest,
@@ -91,6 +92,7 @@ function Reactivate() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [type, setType] = useState<string | null>("");
 
   const queryParams = {
     page: active,
@@ -100,7 +102,9 @@ function Reactivate() {
     ...(sort && { sort: sort.toLowerCase() }),
   };
 
-  const { requests, revalidate, loading, meta } = useAllRequests();
+  const { requests, revalidate, loading, meta } = useAllRequests({
+    ...(type === "All" || !type ? {} : { type }),
+  });
 
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
@@ -117,7 +121,7 @@ function Reactivate() {
       closeDrawer();
       handleSuccess(
         "Action Completed",
-        `${(type ?? "").replace(/^./, (letter) =>
+        `${(requestType ?? "").replace(/^./, (letter) =>
           letter.toUpperCase()
         )} Request Denied`
       );
@@ -143,7 +147,7 @@ function Reactivate() {
       closeDrawer();
       handleSuccess(
         "Action Completed",
-        `${(type ?? "").replace(/^./, (letter) =>
+        `${(requestType ?? "").replace(/^./, (letter) =>
           letter.toUpperCase()
         )} Request Approved`
       );
@@ -154,7 +158,7 @@ function Reactivate() {
     }
   };
 
-  const type = useMemo(() => {
+  const requestType = useMemo(() => {
     switch (selectedRequest?.type) {
       case "ACTIVATE":
         return "reactivate";
@@ -227,7 +231,7 @@ function Reactivate() {
         {element.Account.accountNumber}
       </TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
-        {element.Account.type.toLowerCase()}
+        {getUserType(element.Account.type ?? "USER")}
       </TableTd>
       <TableTd tt="capitalize" className={styles.table__td}>
         {element.type.toLowerCase()}
@@ -258,12 +262,22 @@ function Reactivate() {
       <Group mt={32} justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn
-          icon={IconListTree}
-          action={toggle}
-          text="Filter"
-          fw={600}
-        />
+        <Group>
+          <Select
+            placeholder="Type"
+            data={["All", "Freeze", "Unfreeze", "Activate", "Deactivate"]}
+            w={120}
+            styles={{ option: { fontSize: 12 }, input: { fontSize: 12 } }}
+            value={type}
+            onChange={(e) => setType(e)}
+          />
+          <SecondaryBtn
+            icon={IconListTree}
+            action={toggle}
+            text="Filter"
+            fw={600}
+          />
+        </Group>
       </Group>
 
       <Filter<BusinessFilterType>
@@ -293,7 +307,7 @@ function Reactivate() {
         opened={drawerOpened}
         close={closeDrawer}
         selectedRequest={selectedRequest}
-        type={type as string}
+        type={requestType as string}
         rejectFunc={handleRejectRequest}
         approveFunc={handleAcceptRequest}
         processing={processing}
@@ -306,8 +320,8 @@ function Reactivate() {
         close={close}
         action={handleRejectRequest}
         processing={processing}
-        title={`Deny This ${type} Request?`}
-        text={`This means you are rejecting the ${type} request for this business.`}
+        title={`Deny This ${requestType} Request?`}
+        text={`This means you are rejecting the ${requestType} request for this business.`}
         customApproveMessage="Yes, Deny It"
         addReason
       />
@@ -319,8 +333,8 @@ function Reactivate() {
         close={closeApprove}
         action={handleAcceptRequest}
         processing={processing}
-        title={`Approve This ${type} Request?`}
-        text={`This means you are accepting the ${type} request for this business`}
+        title={`Approve This ${requestType} Request?`}
+        text={`This means you are accepting the ${requestType} request for this business`}
         customApproveMessage="Yes, Approve It"
       />
     </Fragment>

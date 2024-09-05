@@ -15,12 +15,12 @@ const switzer = localFont({
 export default function DebitRequests() {
   return (
     <main className={styles.main}>
-      <Breadcrumbs
+      {/* <Breadcrumbs
         items={[
           // { title: "Dashboard", href: "/admin/dashboard" },
           { title: "Requests", href: "/admin/requests" },
         ]}
-      />
+      /> */}
 
       <div className={styles.table__container}>
         <div className={styles.container__header}>

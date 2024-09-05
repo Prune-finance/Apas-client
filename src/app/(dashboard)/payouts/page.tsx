@@ -1,7 +1,7 @@
 "use client";
 import dayjs from "dayjs";
 
-import { Group, Paper } from "@mantine/core";
+import { Center, Group, Paper, SimpleGrid, Stack } from "@mantine/core";
 
 import { Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
@@ -12,6 +12,7 @@ import {
   IconArrowUpRight,
   IconSearch,
   IconListTree,
+  IconCheck,
 } from "@tabler/icons-react";
 
 import { formatNumber, frontendPagination } from "@/lib/utils";
@@ -32,16 +33,25 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { filteredSearch } from "@/lib/search";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import { SearchInput } from "@/ui/components/Inputs";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import { PayoutDrawer } from "./drawer";
-import { useUserDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  useUserDefaultAccount,
+  useUserDefaultPayoutAccount,
+} from "@/lib/hooks/accounts";
 import {
   DefaultAccountHead,
   SingleAccountBody,
 } from "@/ui/components/SingleAccount";
+import { AccountCard } from "@/ui/components/Cards/AccountCard";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useUserBusiness } from "@/lib/hooks/businesses";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
@@ -60,147 +70,111 @@ function PayoutTrx() {
   const [limit, setLimit] = useState<string | null>("10");
   const [chartFrequency, setChartFrequency] = useState<string>("monthly");
 
+  const [processing, setProcessing] = useState(false);
+
+  const { handleError, handleInfo, handleSuccess } = useNotification();
+
   const [openedDebit, { open, close }] = useDisclosure(false);
 
-  const { loading: loadingAcct, account } = useUserDefaultAccount();
-  const { loading, transactions } = useUserDefaultTransactions({
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-    page: active,
-  });
+  const { loading: loadingAcct, account } = useUserDefaultPayoutAccount();
+  const { business, meta, revalidate, loading } = useUserBusiness();
 
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-  const [opened, { toggle }] = useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 500);
+  const requestPayoutAccount = async () => {
+    setProcessing(true);
 
-  const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
-
-  const rows = frontendPagination(
-    filteredSearch(transactions, searchProps, debouncedSearch),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element: TrxData) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        setSelectedRequest(element);
-        openDrawer();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
-      <TableTd className={styles.table__td}>
-        {element.recipientBankAddress}
-      </TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        <Flex align="center" gap={5}>
-          <IconArrowUpRight
-            color="#D92D20"
-            size={16}
-            className={styles.table__td__icon}
-            // style={{ marginTop: "-20px" }}
-          />
-          {formatNumber(element.amount, true, "EUR")}
-        </Flex>
-        {/* <Text fz={12}></Text> */}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("DD MMM, YYYY")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-
-  const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
-  });
-
-  const infoDetails = [
-    {
-      title: "Total Balance",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
-      formatted: true,
-      currency: "EUR",
-    },
-    {
-      title: "Money In",
-      value: 0,
-      formatted: true,
-      currency: "EUR",
-    },
-    {
-      title: "Money Out",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
-      formatted: true,
-      currency: "EUR",
-    },
-    {
-      title: "Total Transactions",
-      value: transactions.length,
-    },
-  ];
+    try {
+      await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/payout/request`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+      revalidate();
+      handleSuccess(
+        "Request Sent",
+        "You will receive a notification once your request has been approved."
+      );
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <main className={styles.main}>
-      <DefaultAccountHead
-        loading={loadingAcct}
-        account={account}
-        open={open}
-        payout
-      />
-      <SingleAccountBody
-        account={account}
-        loading={loadingAcct}
-        loadingTrx={loading}
-        transactions={transactions as TransactionType[]}
-        setChartFrequency={setChartFrequency}
-        payout
-      />
-
-      {/* <Paper className={styles.table__container}>
-        <div className={styles.container__header}>
-          <Flex gap={10} align="center">
-            <Text fz={18} fw={600}>
-              Payouts
-            </Text>
-          </Flex>
+      <Group justify="space-between">
+        <div
+        // className={styles.container__header}
+        >
+          <Text fz={18} fw={600}>
+            Payouts
+          </Text>
+          <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
+            Here’s an overview of your payout account activities
+          </Text>
         </div>
 
-        <InfoCards details={infoDetails} title="Overview" />
-        <Group justify="space-between" mt={30}>
-          <SearchInput search={search} setSearch={setSearch} />
+        {!Boolean(meta?.hasPayoutAccount) && (
+          <PrimaryBtn
+            fw={600}
+            text={
+              Boolean(meta?.activePAReq)
+                ? "Request Sent"
+                : "Request Payout Account"
+            }
+            {...(Boolean(meta?.activePAReq) && {
+              icon: IconCheck,
+            })}
+            loading={loading || processing}
+            loaderProps={{ type: "dots" }}
+            disabled={Boolean(meta?.activePAReq)}
+            action={requestPayoutAccount}
+          />
+        )}
+      </Group>
 
-          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-        </Group>
-        <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+      {Boolean(meta?.hasPayoutAccount) && (
+        <SimpleGrid cols={3} mt={32}>
+          <AccountCard
+            balance={account?.accountBalance ?? 0}
+            currency="EUR"
+            companyName={account?.accountName ?? "No Default Account"}
+            badgeText="Payout Account"
+            iban={account?.accountNumber ?? "No Default Account"}
+            bic={"ARPYGB21XXX"}
+            loading={loadingAcct}
+            link={`/payouts/${account?.id}`}
+          />
+        </SimpleGrid>
+      )}
 
-        <TableComponent rows={rows} loading={loading} head={tableHeaders} />
+      {!Boolean(meta?.hasPayoutAccount) && (
+        <Center h="calc(100vh - 10px)">
+          <Stack>
+            <EmptyTable
+              rows={[]}
+              loading={loading}
+              title="You do not have a payout account now."
+              text="Request for a payout account and  it would appear here."
+            />
 
-        <EmptyTable
-          rows={rows}
-          loading={loading}
-          title="There are no payouts"
-          text="When a payout is recorded, it will appear here"
-        />
-        <PaginationComponent
-          total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
-          active={active}
-          setActive={setActive}
-          limit={limit}
-          setLimit={setLimit}
-        />
-      </Paper> */}
-
-      <PayoutDrawer />
+            <PrimaryBtn
+              fw={600}
+              text={
+                Boolean(meta?.activePAReq)
+                  ? "Request Sent"
+                  : "Request Payout Account"
+              }
+              {...(Boolean(meta?.activePAReq) && {
+                icon: IconCheck,
+              })}
+              loading={loading || processing}
+              loaderProps={{ type: "dots" }}
+              disabled={Boolean(meta?.activePAReq)}
+              action={requestPayoutAccount}
+            />
+          </Stack>
+        </Center>
+      )}
     </main>
   );
 }

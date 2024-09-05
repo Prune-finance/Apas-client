@@ -94,7 +94,7 @@ export default function Filter<T>({
             variant="light"
             color="var(--prune-text-gray-700)"
             w={80}
-            h={36}
+            // h={30}
             fz={12}
             size="xs"
             onClick={handleApply}
@@ -109,7 +109,7 @@ export default function Filter<T>({
               replace(pathname);
             }}
             // w={62}
-            h={36}
+            // h={36}
             fz={12}
             px={0}
             fw={400}

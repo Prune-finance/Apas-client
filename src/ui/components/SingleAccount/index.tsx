@@ -21,6 +21,7 @@ import {
   TabsPanel,
   ThemeIcon,
   Avatar,
+  Modal,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -46,7 +47,12 @@ import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
 import EmptyTable from "../EmptyTable";
 import { TableComponent } from "../Table";
-import { Account, AccountData, useSingleAccount } from "@/lib/hooks/accounts";
+import {
+  Account,
+  AccountData,
+  DefaultAccount,
+  useSingleAccount,
+} from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
@@ -66,6 +72,10 @@ import AccountDetails from "./(tabs)/AccountDetails";
 import { Transactions } from "./(tabs)/Transactions";
 import { Analytics } from "./(tabs)/Analytics";
 import { BusinessData } from "@/lib/hooks/businesses";
+import { Documents } from "./(tabs)/Documents";
+import DefaultAccountDetails from "./(defaultTabs)/DefaultAccountDetails";
+import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
+import SendMoneyModal from "./sendMoneyModal";
 
 type Param = { id: string };
 interface Props {
@@ -320,7 +330,6 @@ export function SingleAccount({
             loading={loading}
             h={190}
           >
-           
             <CopyButton
               value={`Account Name: ${
                 account?.accountName ?? ""
@@ -561,6 +570,7 @@ interface SingleAccountProps {
   business?: BusinessData | null;
   admin?: boolean;
   payout?: boolean;
+  isDefault?: boolean;
 }
 
 export const SingleAccountBody = ({
@@ -572,6 +582,7 @@ export const SingleAccountBody = ({
   business,
   admin,
   payout,
+  isDefault,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -579,6 +590,9 @@ export const SingleAccountBody = ({
     Currency: "EUR",
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
+      account?.updatedAt
+    ).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
@@ -586,10 +600,14 @@ export const SingleAccountBody = ({
     ) : (
       account?.type
     ),
-    [payout ? "Last Activity" : "Last Seen"]: dayjs(account?.updatedAt).format(
-      "Do MMMM, YYYY"
-    ),
   };
+
+  const tabs = [
+    { value: "Account Details" },
+    { value: "Transactions" },
+    { value: "Statistics" },
+    { value: "Documents" },
+  ];
 
   return (
     <Box mt={32}>
@@ -631,16 +649,102 @@ export const SingleAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
+        <TabsPanel value={tabs[3].value} mt={28}>
+          <Documents account={account} />
+        </TabsPanel>
       </TabsComponent>
     </Box>
   );
 };
 
-const tabs = [
-  { value: "Account Details" },
-  { value: "Transactions" },
-  { value: "Analytics" },
-];
+interface SingleDefaultAccountProps
+  extends Omit<SingleAccountProps, "account"> {
+  account: DefaultAccount | null;
+}
+
+export const SingleDefaultAccountBody = ({
+  account,
+  transactions,
+  loading,
+  loadingTrx,
+  setChartFrequency,
+  business,
+  admin,
+  payout,
+  isDefault,
+}: SingleDefaultAccountProps) => {
+  const info = {
+    "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
+    "No. of Transaction": transactions.length,
+    Currency: "EUR",
+    ...(business && { "Created By": business?.name }),
+    "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
+      business?.lastLogin
+    ).format("Do MMMM, YYYY"),
+    "Account Type": payout ? (
+      <Text fw={600} fz={14} c="var(--prune-primary-800)">
+        Payout Account
+      </Text>
+    ) : (
+      account?.type
+    ),
+  };
+
+  const tabs = [
+    { value: "Account Details" },
+    { value: "Transactions" },
+    { value: "Statistics" },
+    { value: "Documents" },
+  ];
+
+  return (
+    <Box mt={32}>
+      <Grid>
+        <GridCol span={!admin ? 8 : 9}>
+          <SimpleGrid cols={!admin ? 3 : 4} verticalSpacing={28}>
+            {Object.entries(info).map(([key, value]) => (
+              <Stack gap={2} key={key}>
+                <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+                  {key}
+                </Text>
+                {!loading || !loadingTrx ? (
+                  <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+                    {value}
+                  </Text>
+                ) : (
+                  <Skeleton w={100} h={10} />
+                )}
+              </Stack>
+            ))}
+          </SimpleGrid>
+        </GridCol>
+      </Grid>
+
+      <TabsComponent tabs={tabs} mt={40}>
+        <TabsPanel value={tabs[0].value} mt={28}>
+          <DefaultAccountDetails account={account} loading={loading} />
+        </TabsPanel>
+        <TabsPanel value={tabs[1].value}>
+          <Transactions
+            transactions={transactions}
+            loading={loadingTrx}
+            payout={payout}
+          />
+        </TabsPanel>
+        <TabsPanel value={tabs[2].value} mt={28}>
+          <Analytics
+            transactions={transactions}
+            setChartFrequency={setChartFrequency}
+          />
+        </TabsPanel>
+        <TabsPanel value={tabs[3].value} mt={28}>
+          <DefaultDocuments account={account} isDefault={isDefault} />
+        </TabsPanel>
+      </TabsComponent>
+    </Box>
+  );
+};
 
 interface IssuedAccountHeadProps {
   loading: boolean;
@@ -667,6 +771,7 @@ export const IssuedAccountHead = ({
       <Group gap={12} align="center">
         {!loading ? (
           <Avatar
+            variant="filled"
             size="lg"
             color="var(--prune-primary-700)"
           >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
@@ -730,77 +835,88 @@ export const IssuedAccountHead = ({
   );
 };
 
+interface DefaultAccountHeadProps
+  extends Omit<IssuedAccountHeadProps, "account"> {
+  account: DefaultAccount | null;
+  business: BusinessData | null;
+  loadingBiz: boolean;
+}
+
 export const DefaultAccountHead = ({
   loading,
   account,
   open,
   payout,
-}: IssuedAccountHeadProps) => {
+  business,
+  loadingBiz,
+}: DefaultAccountHeadProps) => {
+  const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
   return (
-    <Flex
-      justify="space-between"
-      align="center"
-      className={styles.main__header}
-    >
-      <Group gap={12} align="center">
-        {!loading ? (
-          <Avatar
-            size="lg"
-            color="var(--prune-primary-700)"
-            // variant="light"
-          >
-            {account?.accountName
-              .split(" ")
-              .map((item) => item.charAt(0))
-              .join("")}
-          </Avatar>
-        ) : (
-          <Skeleton circle h={50} w={50} />
-        )}
-
-        <Stack gap={2}>
+    <>
+      <Flex
+        justify="space-between"
+        align="center"
+        className={styles.main__header}
+      >
+        <Group gap={12} align="center">
           {!loading ? (
-            <Text fz={24} className={styles.main__header__text} m={0} p={0}>
-              {account?.accountName}
-            </Text>
+            <Avatar size="lg" color="var(--prune-primary-700)" variant="filled">
+              {account?.accountName
+                .split(" ")
+                .map((item) => item.charAt(0))
+                .join("")}
+            </Avatar>
           ) : (
-            <Skeleton h={10} w={100} />
+            <Skeleton circle h={50} w={50} />
           )}
 
+          <Stack gap={2}>
+            {!loading ? (
+              <Text fz={24} className={styles.main__header__text} m={0} p={0}>
+                {account?.accountName}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={100} />
+            )}
+
+            {!loadingBiz ? (
+              <Text
+                fz={10}
+                fw={400}
+                className={styles.main__header__text}
+                m={0}
+                p={0}
+              >
+                {business?.contactEmail ?? ""}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={50} />
+            )}
+          </Stack>
+
           {!loading ? (
-            <Text
-              fz={10}
-              fw={400}
-              className={styles.main__header__text}
-              m={0}
-              p={0}
-            >
-              {account?.accountNumber ?? ""}
-            </Text>
+            <BadgeComponent status={account?.status ?? ""} active />
           ) : (
-            <Skeleton h={10} w={50} />
+            <Skeleton w={60} h={10} />
           )}
-        </Stack>
+        </Group>
 
-        {!loading ? (
-          <BadgeComponent status={account?.status ?? ""} active />
-        ) : (
-          <Skeleton w={60} h={10} />
-        )}
-      </Group>
-
-      <Flex gap={10}>
-        {/* <Button
-            fz={12}
-            className={styles.main__cta}
-            variant="filled"
-            color="#C1DD06"
-          >
-            Freeze Account
-          </Button> */}
-
-        {!payout && <PrimaryBtn text="Send Money" fw={600} />}
+        <Flex gap={10}>
+          {!payout && (
+            <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
+          )}
+          {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
+        </Flex>
       </Flex>
-    </Flex>
+
+      <Modal
+        opened={opened}
+        onClose={closeMoney}
+        size={"35%"}
+        withCloseButton={false}
+      >
+        <SendMoneyModal account={account} close={closeMoney} />
+      </Modal>
+    </>
   );
 };

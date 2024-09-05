@@ -9,6 +9,8 @@ import {
   TableScrollContainer,
   Button,
   Flex,
+  Box,
+  Group,
 } from "@mantine/core";
 import {
   Table,
@@ -26,7 +28,13 @@ import {
 } from "@tabler/icons-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import { CardFour, CardOne, CardThree, CardTwo } from "@/ui/components/Cards";
+import {
+  CardFour,
+  CardOne,
+  CardThree,
+  CardTwo,
+  SeeAll,
+} from "@/ui/components/Cards";
 import styles from "@/ui/styles/page.module.scss";
 
 import { formatNumber } from "@/lib/utils";
@@ -34,9 +42,19 @@ import { useBusiness } from "@/lib/hooks/businesses";
 import { useDebitRequests, useRequests } from "@/lib/hooks/requests";
 import { useAccounts } from "@/lib/hooks/accounts";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 
 import EmptyImage from "@/assets/empty.png";
 import Image from "next/image";
+import Link from "next/link";
+import { TableComponent } from "@/ui/components/Table";
+import EmptyTable from "@/ui/components/EmptyTable";
+import { IssuedAccountTableHeaders } from "@/lib/static";
+import { useTransactions } from "@/lib/hooks/transactions";
+import { AmountGroup } from "@/ui/components/AmountGroup";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 export default function Home() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
@@ -55,12 +73,14 @@ export default function Home() {
     requests,
   } = useRequests({ status: "PENDING" });
 
+  const { loading: loadingTrx, transactions } = useTransactions();
+
   const data = stats;
 
   const cardFourItems = useMemo(() => {
     if (loading) return [];
 
-    return requests.slice(0, 3).map((request) => {
+    return requests.slice(0, 4).map((request) => {
       return {
         title: request.Company.name,
         date: request.createdAt,
@@ -146,26 +166,26 @@ export default function Home() {
     });
   }, [debitRequests]);
 
-  const rows = tableData.map((element) => (
-    <TableTr key={element.AccName}>
-      <TableTd className={styles.table__td}>{element.AccName}</TableTd>
-      <TableTd className={styles.table__td}>{element.Biz}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        <IconArrowUpRight
-          color="#D92D20"
-          size={16}
-          className={styles.table__td__icon}
-        />
-        {formatNumber(element.Amount)}
-        {/* <Text fz={12}></Text> */}
+  const rows = transactions.slice(0, 4).map((element) => (
+    <TableTr key={element.id}>
+      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
+      <TableTd>{"N/A"}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientName || element.recipientIban}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <div className={styles.table__td__status}>
-          <IconPointFilled size={14} color="#12B76A" />
-          <Text tt="capitalize" fz={12} c="#12B76A">
-            {element.Status}
-          </Text>
-        </div>
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        {formatNumber(element.amount, true, "EUR")}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+
+      <TableTd className={styles.table__td}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));
@@ -192,136 +212,161 @@ export default function Home() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} />
+      {/* <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} /> */}
 
       <div className={styles.grid__cards}>
         <Grid>
-          <GridCol span={{ lg: 3, md: 6 }}>
-            <CardOne
-              loading={loading}
-              title="Total Business"
-              stat={loading ? 0 : meta?.total || 0}
-              // link="/admin/businesses"
-              // colored
-              text={
-                <>
-                  There is a{" "}
-                  <Text bg="#ECFDF3" c="#12B76A" fz={9} span>
-                    +100%
-                  </Text>{" "}
-                  increase this month and a total of{" "}
-                  <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
-                    {statsMeta?.weekCount || 0}
-                  </Text>{" "}
-                  new businesses this week
-                </>
-              }
-            />
-          </GridCol>
-
-          <GridCol span={{ lg: 3, md: 6 }}>
-            <CardOne
-              loading={requestsLoading}
-              stat={requestMeta?.approvedRequests || 0}
-              title="Approved Accounts"
-              text={
-                <>
-                  This shows the total number of approved account requests in
-                  the system
-                </>
-              }
-            />
-          </GridCol>
-
-          <GridCol span={{ lg: 3, md: 6 }}>
-            <CardOne
-              loading={requestsLoading}
-              stat={requestMeta?.pendingRequests || 0}
-              title="Pending Accounts"
-              text={
-                <>
-                  This shows the total number of pending account requests in the
-                  system
-                </>
-              }
-            />
-          </GridCol>
-          <GridCol span={{ lg: 3, md: 6 }}>
-            <CardOne
-              title="Account Balance"
-              stat={accounts.reduce((prv, curr) => {
-                return prv + curr.accountBalance;
-              }, 0)}
-              formatted
-              // colored
-              currency="EUR"
-              loading={accountsLoading}
-              text={
-                <>{`From Jul 01, 2024 to ${dayjs().format("MMM DD, YYYY")}`}</>
-              }
-            />
-          </GridCol>
-        </Grid>
-
-        <Grid className={styles.grid__cards__two}>
-          <GridCol
-            className={styles.grid__cards__charts}
-            span={{ base: 12, sm: 12, md: 12, lg: 9 }}
-            mt={5}
-          >
-            <div className={styles.chart__container}>
-              <div className={styles.container__text}>
-                <Text tt="uppercase" fz={10} fw={600} className={styles.text}>
-                  Business Registration Statistics
-                </Text>
-
-                <NativeSelect
-                  classNames={{
-                    wrapper: styles.select__wrapper,
-                    input: styles.select__input,
-                  }}
-                  onChange={(event) =>
-                    setChartFrequency(event.currentTarget.value)
+          <GridCol span={9}>
+            <Grid>
+              <GridCol span={{ lg: 4, md: 6 }}>
+                <CardOne
+                  loading={loading}
+                  title="Total Business"
+                  stat={loading ? 0 : meta?.total || 0}
+                  link="/admin/businesses"
+                  // colored
+                  text={
+                    <>
+                      There is a{" "}
+                      <Text bg="#ECFDF3" c="#12B76A" fz={9} span>
+                        +100%
+                      </Text>{" "}
+                      increase this month and a total of{" "}
+                      <Text bg="#FBFEE6" c="#97AD05" fz={9} span>
+                        {statsMeta?.weekCount || 0}
+                      </Text>{" "}
+                      new businesses this week
+                    </>
                   }
-                  data={["Monthly", "Weekly"]}
-                />
-              </div>
-
-              <BarChart
-                style={{ marginLeft: "-12px" }}
-                h={230}
-                data={data}
-                dataKey={chartFrequency === "Monthly" ? "month" : "day"}
-                barProps={{ barSize: 20, radius: 3 }}
-                series={[{ name: "registration", color: "#97AD05" }]}
-                tickLine="y"
-              />
-            </div>
-
-            <Grid mt={15}>
-              <GridCol span={{ base: 12, xs: 12, sm: 12, md: 5, lg: 5 }}>
-                <CardTwo
-                  title="Debit Requests"
-                  link="/admin/requests"
-                  items={cardTwoItems}
                 />
               </GridCol>
 
-              <GridCol
-                span={{ base: 12, xs: 12, sm: 12, md: 7, lg: 7 }}
-                mih={345}
-              >
-                <div className={styles.payout__table}>
-                  <Text
-                    className={styles.table__text}
-                    lts={0.5}
-                    fz={10}
-                    fw={600}
-                  >
-                    Payout History
-                  </Text>
+              <GridCol span={{ lg: 4, md: 6 }}>
+                <Link href="/admin/account-requests?status=Active">
+                  <CardOne
+                    loading={requestsLoading}
+                    stat={requestMeta?.approvedRequests || 0}
+                    title="Approved Account Requests"
+                    text={
+                      <>
+                        This shows the total number of approved account requests
+                        for all businesses
+                      </>
+                    }
+                  />
+                </Link>
+              </GridCol>
 
-                  {/* <TableScrollContainer minWidth={500}>
+              <GridCol span={{ lg: 4, md: 6 }}>
+                <Link href="/admin/account-requests?status=PENDING">
+                  <CardOne
+                    loading={requestsLoading}
+                    stat={requestMeta?.pendingRequests || 0}
+                    title="Pending Account Requests"
+                    text={
+                      <>
+                        This shows the total number of pending account requests
+                        for all businesses
+                      </>
+                    }
+                  />
+                </Link>
+              </GridCol>
+
+              <GridCol span={{ lg: 12, md: 9 }}>
+                <Grid className={styles.grid__cards__two}>
+                  <GridCol
+                    className={styles.grid__cards__charts}
+                    span={{ base: 12, sm: 12, md: 12, lg: 12 }}
+                    mt={5}
+                  >
+                    <div
+                      className={styles.chart__container}
+                      style={{ border: "1px solid #f2f4f7" }}
+                    >
+                      <div className={styles.container__text}>
+                        <Text
+                          tt="uppercase"
+                          fz={10}
+                          fw={600}
+                          className={styles.text}
+                        >
+                          Business Overview
+                        </Text>
+
+                        <NativeSelect
+                          classNames={{
+                            wrapper: styles.select__wrapper,
+                            input: styles.select__input,
+                          }}
+                          onChange={(event) =>
+                            setChartFrequency(event.currentTarget.value)
+                          }
+                          data={["Monthly", "Weekly"]}
+                        />
+                      </div>
+
+                      <BarChart
+                        style={{ marginLeft: "-12px" }}
+                        h={230}
+                        data={data}
+                        dataKey={chartFrequency === "Monthly" ? "month" : "day"}
+                        barProps={{ barSize: 20, radius: 3 }}
+                        series={[{ name: "registration", color: "#97AD05" }]}
+                        tickLine="y"
+                      />
+                    </div>
+
+                    <Box style={{ border: "1px solid #f2f4f7" }} p={15} mt={15}>
+                      <Group justify="space-between">
+                        <Text
+                          tt="uppercase"
+                          fz={10}
+                          fw={600}
+                          className={styles.text}
+                        >
+                          Transactions
+                        </Text>
+
+                        <Link href="/admin/transactions">
+                          <SeeAll />
+                        </Link>
+                      </Group>
+
+                      <TableComponent
+                        head={IssuedAccountTableHeaders}
+                        rows={rows}
+                        loading={loadingTrx}
+                        noBg
+                      />
+
+                      <EmptyTable
+                        loading={loadingTrx}
+                        rows={rows}
+                        title="There is no transaction"
+                        text="When a transaction is created it will appear here"
+                      />
+                    </Box>
+
+                    <Grid mt={15}>
+                      <GridCol
+                        span={{ base: 12, xs: 12, sm: 12, md: 7, lg: 6 }}
+                        mih={345}
+                      >
+                        <div
+                          className={styles.payout__table}
+                          style={{ border: "1px solid #f2f4f7" }}
+                        >
+                          <Text
+                            className={styles.table__text}
+                            lts={0.5}
+                            fz={10}
+                            fw={600}
+                          >
+                            Payout History
+                          </Text>
+
+                          {/* <TableScrollContainer minWidth={500}>
                     <Table className={styles.table} verticalSpacing="lg">
                       <TableThead>
                         <TableTr>
@@ -348,69 +393,155 @@ export default function Home() {
                     See All Transactions
                   </Button> */}
 
-                  <Flex
-                    style={{ flexGrow: 1 }}
-                    direction="column"
-                    align="center"
-                    justify="center"
-                    mt={24}
-                  >
-                    <Image
-                      src={EmptyImage}
-                      alt="no content"
-                      width={120}
-                      height={96}
-                    />
-                    <Text mt={14} fz={10} c="#1D2939">
-                      No payout history.
-                    </Text>
-                    {/* <Text fz={10} c="#667085">
+                          <Flex
+                            style={{ flexGrow: 1 }}
+                            direction="column"
+                            align="center"
+                            justify="center"
+                            mt={24}
+                          >
+                            <Image
+                              src={EmptyImage}
+                              alt="no content"
+                              width={120}
+                              height={96}
+                            />
+                            <Text mt={14} fz={10} c="#1D2939">
+                              No payout history.
+                            </Text>
+                            {/* <Text fz={10} c="#667085">
               When an account is created, it will appear here
             </Text> */}
-                  </Flex>
-                </div>
+                          </Flex>
+                        </div>
+                      </GridCol>
+
+                      <GridCol
+                        span={{ base: 12, xs: 12, sm: 12, md: 5, lg: 6 }}
+                      >
+                        <CardTwo
+                          title="Debit Requests"
+                          link="/admin/requests"
+                          items={cardTwoItems}
+                        />
+                      </GridCol>
+                    </Grid>
+                  </GridCol>
+                </Grid>
               </GridCol>
+
+              {/* <GridCol span={{ lg: 3, md: 6 }}> */}
+              {/* <Link href="/admin/accounts?status=Frozen"> */}
+              {/* <CardOne
+              loading={requestsLoading}
+              stat={requestMeta?.inactiveAccounts || 0}
+              title="Deactivated Accounts"
+            /> */}
+              {/* </Link> */}
+              {/* </GridCol> */}
+
+              {/* <GridCol span={{ lg: 3, md: 6 }}>
+            <CardOne
+              title="Account Balance"
+              stat={accounts.reduce((prv, curr) => {
+                return prv + curr.accountBalance;
+              }, 0)}
+              formatted
+              // colored
+              currency="EUR"
+              loading={accountsLoading}
+              text={
+                <>{`From Jul 01, 2024 to ${dayjs().format("MMM DD, YYYY")}`}</>
+              }
+            />
+          </GridCol> */}
             </Grid>
           </GridCol>
 
-          <GridCol
-            className={styles.grid__cards__side}
-            span={{ md: 12, lg: 3 }}
-            mt={5}
-          >
-            <Grid className={styles.grid__cards__grid}>
+          <GridCol span={3}>
+            <Grid>
+              {/* Grid for Account Status */}
+
               <GridCol
-                span={{ lg: 12, md: 3.5 }}
-                className={styles.grid__card}
-                mih={200}
+                className={styles.grid__cards__side}
+                span={{ md: 12, lg: 12 }}
+                // mt={5}
               >
-                <CardThree
-                  title="Account Status"
-                  bg="#ECFDF3"
-                  color="#12B76A"
-                  minTitle="Active Accounts"
-                  amount={accountsMeta?.active || 0}
-                  percentage="0"
-                  subTitle="Total Number of Active Accounts for all Business"
-                />
-              </GridCol>
-              <GridCol span={{ lg: 12, md: 3.5 }} className={styles.grid__card}>
-                <CardThree
-                  title="Account Status"
-                  bg="#FEF3F2"
-                  color="#D92D20"
-                  minTitle="In-active Accounts"
-                  amount={accountsMeta?.inactive || 0}
-                  percentage="0"
-                  subTitle="Total Number of In-active Accounts for all Business"
-                />
-              </GridCol>
-              <GridCol span={{ lg: 12, md: 5 }} className={styles.grid__card}>
-                <CardFour
-                  title="Pending Account Requests"
-                  link="/admin/account-requests"
-                  items={cardFourItems}
-                />
+                <Grid className={styles.grid__cards__grid}>
+                  <GridCol
+                    span={{ lg: 12, md: 3.5 }}
+                    className={styles.grid__card}
+                    mih={200}
+                  >
+                    <CardThree
+                      title="Account Status"
+                      bg="#ECFDF3"
+                      color="#12B76A"
+                      minTitle="Active Accounts"
+                      amount={accountsMeta?.active || 0}
+                      percentage="0"
+                      // subTitle="Total Number of Active Accounts for all Business"
+                    />
+                  </GridCol>
+
+                  <GridCol
+                    span={{ lg: 12, md: 3.5 }}
+                    className={styles.grid__card}
+                  >
+                    <CardThree
+                      title="Account Status"
+                      bg="#EAECF0"
+                      color="#667085"
+                      minTitle="In-active Accounts"
+                      amount={accountsMeta?.inactive || 0}
+                      percentage="0"
+                      // subTitle="Total Number of In-active Accounts for all Business"
+                    />
+                  </GridCol>
+
+                  <GridCol
+                    span={{ lg: 12, md: 3.5 }}
+                    className={styles.grid__card}
+                    mih={200}
+                  >
+                    <CardThree
+                      title="Account Status"
+                      bg="#FEF3F2"
+                      color="#D92D20"
+                      minTitle="Deactivated Accounts"
+                      amount={accountsMeta?.deactivated || 0}
+                      percentage="0"
+                      // subTitle="Total Number of Active Accounts for all Business"
+                    />
+                  </GridCol>
+
+                  <GridCol
+                    span={{ lg: 12, md: 3.5 }}
+                    className={styles.grid__card}
+                    mih={200}
+                  >
+                    <CardThree
+                      title="Account Status"
+                      bg="#e6f0ff"
+                      color="#0047b3"
+                      minTitle="Frozen Accounts"
+                      amount={accountsMeta?.frozen || 0}
+                      percentage="0"
+                      // subTitle="Total Number of Active Accounts for all Business"
+                    />
+                  </GridCol>
+
+                  <GridCol
+                    span={{ lg: 12, md: 5 }}
+                    className={styles.grid__card}
+                  >
+                    <CardFour
+                      title="Account Creation"
+                      link="/admin/account-requests"
+                      items={cardFourItems}
+                    />
+                  </GridCol>
+                </Grid>
               </GridCol>
             </Grid>
           </GridCol>

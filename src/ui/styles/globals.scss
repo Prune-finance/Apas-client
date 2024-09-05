@@ -153,11 +153,13 @@ a {
     background-color: #fbfee6;
   }
 }
-
+.mantine-PasswordInput-wrapper,
+.mantine-PasswordInput-root,
+.mantine-PasswordInput-innerInput,
+.mantine-PasswordInput-input,
+.mantine-PasswordInput-error,
 .mantine-TextInput-input,
 .mantine-TextInput-error,
-.mantine-PasswordInput-innerInput,
-.mantine-PasswordInput-error,
 .mantine-DateInput-input,
 .mantine-DateInput-error,
 .mantine-YearPickerInput-input,
@@ -173,8 +175,10 @@ a {
 .mantine-NumberInput-input,
 .mantine-NumberInput-error,
 .mantine-RichTextEditor-input,
-.mantine-RichTextEditor-content {
+.mantine-RichTextEditor-content,
+.m_6c018570,
+.mantine-PillsInput-wrapper {
   &:focus {
-    border: 1px solid var(--prune-primary-700);
+    border: 1px solid var(--prune-primary-700) !important;
   }
 }

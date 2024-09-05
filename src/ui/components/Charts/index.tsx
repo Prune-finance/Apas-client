@@ -90,16 +90,16 @@ export function BarChartComponent({
 }: IBarChartProps) {
   return (
     <BarChart
-      {...props}
       h={props.h ? props.h : 300}
       data={data}
       // dataKey="name"
-      dataKey="month"
+      // dataKey="month"
       series={series}
       // curveType="natural"
       gridAxis="x"
       withLegend={withLegend}
-      valueFormatter={(value) => formatNumber(value, true, "EUR")}
+      // valueFormatter={(value) => formatNumber(value, true, "EUR")}
+      {...props}
     />
   );
 }

@@ -34,7 +34,7 @@ import { IconListTree } from "@tabler/icons-react";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, getInitials } from "@/lib/utils";
 import { DebitRequest, useCompanyDebitRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -224,10 +224,7 @@ function CompanyRequestType() {
         <Group gap={7} mt={24}>
           {!loadingBusiness ? (
             <Avatar color="var(--prune-primary-700)" size={39} variant="filled">
-              {business?.name
-                .split(" ")
-                .map((name) => name.charAt(0))
-                .join("")}
+              {getInitials(business?.name ?? "")}
             </Avatar>
           ) : (
             <Skeleton circle h={39} w={39} />
@@ -454,7 +451,7 @@ const tableHeaders = [
 ];
 
 const debitTableHeaders = [
-  "Source Account",
+  "Account Name",
   "Amount",
   "Date Created",
   "Status",

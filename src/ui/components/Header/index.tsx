@@ -20,6 +20,8 @@ import styles from "./styles.module.scss";
 import User from "@/lib/store/user";
 import { checkToken, clearSession } from "@/lib/actions/checkToken";
 import axios from "axios";
+import Link from "next/link";
+import { getInitials } from "@/lib/utils";
 
 export default function Header() {
   const { user, setUser } = User();
@@ -58,10 +60,16 @@ export default function Header() {
       </div>
 
       <div className={styles.profile}>
-        <Text fz={14} fw={600} className={styles.profile__text}>
+        <Avatar size="md" src={AdminAvatar.src} alt="admin avatar" />
+        <Text
+          fz={14}
+          fw={600}
+          className={styles.profile__text}
+          component={Link}
+          href={"/admin/settings"}
+        >
           {user?.firstName} {user?.lastName}
         </Text>
-        <Avatar size="md" src={AdminAvatar.src} alt="admin avatar" />
       </div>
     </header>
   );
@@ -131,13 +139,16 @@ export function UserHeader() {
           // src={AdminAvatar.src}
           alt="admin avatar"
         >
-          {user?.company?.name
-            .split(" ")
-            .map((item) => item.charAt(0).toUpperCase())
-            .join("")}
+          {getInitials(user?.company?.name ?? "")}
         </Avatar>
         <Stack gap={0}>
-          <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
+          <Text
+            fz={14}
+            fw={600}
+            c="var(--prune-text-gray-600)"
+            component={Link}
+            href={"/settings"}
+          >
             {user?.company?.name}
           </Text>
           <Text fz={10} fw={400} c="var(--prune-text-gray-600)">

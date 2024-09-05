@@ -2,6 +2,7 @@ import axios, { all } from "axios";
 import { useState, useEffect, useMemo } from "react";
 import { AccountData } from "./accounts";
 import Cookies from "js-cookie";
+import { set } from "zod";
 
 // query: string = "";
 
@@ -82,7 +83,7 @@ export function useAllRequests(customParams: IParams = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
-      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
@@ -291,6 +292,54 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
 
   return { loading, requests, revalidate };
 }
+
+export function usePayoutRequests(customParams: IDebitRequest = {}) {
+  const [requests, setRequests] = useState<PayoutAccount[]>([]);
+  const [meta, setMeta] = useState<RequestMeta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
+  async function fetchAccounts() {
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setRequests(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+
+  return { loading, requests, revalidate, meta };
+}
+
 export function useCompanyDebitRequests(
   id: string,
   customParams: IDebitRequest = {}
@@ -337,6 +386,41 @@ export function useCompanyDebitRequests(
       // Any cleanup code can go here
     };
   }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+
+  return { loading, requests, revalidate, meta };
+}
+
+export function useLiveKeyRequests() {
+  const [requests, setRequests] = useState<LiveKeyRequest[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccounts() {
+    setLoading(true);
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setRequests(res.data);
+      setMeta(res.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
 
   return { loading, requests, revalidate, meta };
 }
@@ -526,7 +610,7 @@ export interface Account {
   deletedAt: null;
   accountBalance: number;
   companyId: string;
-  type: string;
+  type: "USER" | "CORPORATE";
   status: string;
   accountRequestId: null;
   Company: Company;
@@ -562,6 +646,8 @@ interface CorporateRequestData extends BaseData {
 export type RequestData = UserRequestData | CorporateRequestData;
 
 export interface DocumentData {
+  certOfInc: string;
+  mermat: string;
   directors: Directors;
   shareholders: Shareholder;
 }
@@ -590,5 +676,99 @@ export interface CorporateDirector {
 export interface RequestMeta {
   approvedRequests: number;
   pendingRequests: number;
+  inactiveAccounts: number;
   total: number;
+}
+
+export interface PayoutAccount {
+  id: string;
+  status: string;
+  companyName: string;
+  documentData: PayoutDocumentData;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  companyId: string;
+  Company: Company;
+}
+
+export interface PayoutDocumentData {
+  directors: PayoutDirector[];
+  shareholders: PayoutDirector[];
+}
+
+export interface PayoutDirector {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  proofOfAddressFileUrl: string;
+}
+
+export interface Meta {
+  total: number;
+}
+
+export interface LiveKeyRequest {
+  id: string;
+  status: string;
+  date: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  companyId: string;
+  Company: Company;
+}
+
+export interface Company {
+  id: string;
+  contactEmail: string;
+  contactNumber: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  domain: string;
+  name: string;
+  staging: string;
+  kycTrusted: boolean;
+  address: string;
+  country: string;
+  legalEntity: string;
+  cacCertificate: string;
+  mermat: string;
+  directors: LiveKeyDirector[];
+  shareholders: LiveKeyDirector[];
+  companyStatus: string;
+  apiCalls: number;
+  amlCompliance: null | string;
+  businessBio: string;
+  directorParticular: string;
+  operationalLicense: null | string;
+  shareholderParticular: null | string;
+  pricingPlanId: string;
+  contactFirstName: null | string;
+  contactIdType: null | string;
+  contactIdUrl: null | string;
+  contactIdUrlBack: null | string;
+  contactLastName: null | string;
+  contactPOAType: null | string;
+  contactPOAUrl: null | string;
+  documents: Document[];
+  lastLogIn: Date;
+}
+
+export interface LiveKeyDirector {
+  name: string;
+  email: string;
+  identityType: string;
+  proofOfAddress: string;
+  identityFileUrl: string;
+  identityFileUrlBack: string;
+  proofOfAddressFileUrl: string;
+}
+
+export interface Document {
+  title?: string;
+  documentURL?: string;
 }

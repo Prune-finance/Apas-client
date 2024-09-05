@@ -58,3 +58,20 @@ export const frontendPagination = (
   page: number,
   perPage: number
 ) => data.slice((page - 1) * perPage, page * perPage);
+
+export function splitCamelCase(input: string): string {
+  return input.replace(/([a-z])([A-Z])/g, "$1 $2");
+}
+
+export const getInitials = (name: string) => {
+  return name
+    .split(" ")
+    .slice(0, 2)
+    .map((item) => item.charAt(0).toUpperCase())
+    .join("");
+};
+
+export const getUserType = (userType: "USER" | "CORPORATE") => {
+  if (userType === "USER") return "Individual";
+  return "Corporate";
+};

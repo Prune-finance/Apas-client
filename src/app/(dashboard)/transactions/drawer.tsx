@@ -33,6 +33,7 @@ import { useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { send } from "process";
+import { AmountGroup } from "@/ui/components/AmountGroup";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
@@ -51,6 +52,13 @@ export const TransactionDrawer = ({
   const { account: senderAccount, loading: loadingSenderAcct } =
     useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
 
+  const businessDetails = {
+    "Business Name": "N/A",
+    "Account Type": "N/A",
+    IBAN: selectedRequest?.recipientIban,
+    BIC: selectedRequest?.recipientBic,
+  };
+
   const beneficiaryDetails = {
     "Account Name": selectedRequest?.recipientName || "N/A",
     IBAN: selectedRequest?.recipientIban,
@@ -58,6 +66,7 @@ export const TransactionDrawer = ({
     "Bank Name": selectedRequest?.recipientBankAddress,
     "Bank Address": "N/A",
     Country: selectedRequest?.recipientBankCountry,
+    "Reference 2": selectedRequest?.reference ?? "N/A",
   };
 
   const senderDetails = {
@@ -68,23 +77,17 @@ export const TransactionDrawer = ({
     ),
     IBAN: selectedRequest?.senderIban,
     BIC: "ARPYGB21XXX",
+    Bank: "N/A",
+    "Bank Address": "N/A",
+    Country: "N/A",
   };
 
   const otherDetails = {
-    "Alert Type": (
-      <Badge
-        leftSection={<IconArrowUpRight size={14} />}
-        color="var(--prune-warning)"
-        variant="transparent"
-        tt="capitalize"
-      >
-        Debit
-      </Badge>
-    ),
+    "Reference 1": "N/A",
+    "Transaction ID": selectedRequest?.id,
     "Date and Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
     ),
-    "Transaction ID": selectedRequest?.id,
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
 
@@ -107,7 +110,7 @@ export const TransactionDrawer = ({
   };
 
   const OtherDetails = {
-    Type: "Debit",
+    Type: selectedRequest?.type === "DEBIT" ? "Debit" : "Credit",
     "Payment Date": dayjs(selectedRequest?.createdAt).format(
       "hh:mm A Do MMM YYYY"
     ),
@@ -138,16 +141,51 @@ export const TransactionDrawer = ({
     >
       <Divider mb={20} />
       <Box px={28} pb={28}>
-        <Flex direction="column">
-          <Text c="#8B8B8B" fz={12}>
-            Amount Sent
-          </Text>
+        <Flex align="center" justify="space-between">
+          <Flex direction="column">
+            <Text c="var(--prune-text-gray-500)" fz={12}>
+              {selectedRequest?.type === "DEBIT"
+                ? "Amount Sent"
+                : "Amount Received"}
+            </Text>
 
-          <Text c="#97AD05" fz={32} fw={600}>
-            {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-          </Text>
+            <Text c="#97AD05" fz={32} fw={600}>
+              {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
+            </Text>
+          </Flex>
+
+          <AmountGroup
+            type={selectedRequest?.type as "DEBIT" | "CREDIT"}
+            colored
+            fz={12}
+          />
         </Flex>
 
+        <Divider mt={30} mb={20} />
+
+        <Text
+          fz={16}
+          mb={24}
+          tt="uppercase"
+          c="var(--prune-text-gray-800)"
+          fw={600}
+        >
+          Business Details
+        </Text>
+
+        <Stack gap={24}>
+          {Object.entries(businessDetails).map(([key, value]) => (
+            <Group justify="space-between" key={key}>
+              <Text fz={12} c="var(--prune-text-gray-500)">
+                {key}:
+              </Text>
+
+              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                {value}
+              </Text>
+            </Group>
+          ))}
+        </Stack>
         <Divider mt={30} mb={20} />
 
         <Text

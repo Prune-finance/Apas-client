@@ -43,25 +43,30 @@ export const AdminMainLinks = [
     icon: <IconUsers size={16} />,
   },
   {
-    text: "Account Requests",
+    text: "Account Creation",
     link: "/admin/account-requests",
     icon: <IconUserPlus size={16} />,
-  },
-  {
-    text: "Other Requests",
-    link: "/admin/requests",
-    icon: <IconCreditCardPay size={16} />,
   },
   {
     text: "Transactions",
     link: "/admin/transactions",
     icon: <IconArrowsSort size={16} />,
   },
+  {
+    text: "Payouts",
+    link: "/admin/payouts",
+    icon: <IconArrowUpRight size={16} />,
+  },
+  {
+    text: "Requests",
+    link: "/admin/requests",
+    icon: <IconCreditCardPay size={16} />,
+  },
 ];
 
 export const AdminOtherLinks = [
   {
-    text: "Users",
+    text: "User Management",
     link: "/admin/users",
     icon: <IconUsers size={16} />,
   },
@@ -267,4 +272,36 @@ export const countries = [
   "Spain",
   "Sweden",
   "United Kingdom",
+];
+
+export const OwnAccountTableHeaders = [
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Reference",
+  "Date & Time",
+  "Status",
+];
+
+export const IssuedAccountTableHeaders = [
+  "Sender Name",
+  "Business",
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Reference",
+  "Date",
+  "Status",
+];
+
+export const PayoutTableHeaders = [
+  "Holding Account",
+  "Senders Name",
+  "our Reference",
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Reference",
+  "Date",
+  "Status",
 ];

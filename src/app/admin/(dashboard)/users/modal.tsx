@@ -17,6 +17,7 @@ import { UseFormReturnType } from "@mantine/form";
 import { newAdmin } from "@/lib/schema";
 import { Dispatch, SetStateAction } from "react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
 
 export default function ModalComponent({
   opened,
@@ -38,27 +39,29 @@ export default function ModalComponent({
       }}
       centered
       // withCloseButton={false}
-      closeButtonProps={{
-        icon: (
-          <ActionIcon
-            variant="light"
-            color="var(--prune-text-gray-400)"
-            radius="xl"
-          >
-            <IconX color="var(--prune-text-gray-600)" size={20} />
-          </ActionIcon>
-        ),
-      }}
+      // closeButtonProps={{
+      //   icon: (
+      //     <ActionIcon
+      //       variant="light"
+      //       color="var(--prune-text-gray-400)"
+      //       radius="xl"
+      //     >
+      //       <IconX color="var(--prune-text-gray-600)" size={20} />
+      //     </ActionIcon>
+      //   ),
+      // }}
+
+      closeButtonProps={{ ...closeButtonProps }}
       size="lg"
       padding={40}
       title={
         <Flex direction="column">
           <Text fz={24} fw={600}>
-            {isEdit ? "Edit User" : "Invite a New User"}
+            {isEdit ? "Update User Details" : "Invite a New User"}
           </Text>
           <Text fz={14} className="grey-400">
             {isEdit
-              ? "Update User Details"
+              ? "Update user details here and save."
               : "Invite a user to collaborate with you."}
           </Text>
         </Flex>
@@ -120,7 +123,7 @@ export default function ModalComponent({
 
           <Flex mb={20} mt={40} justify="flex-end" gap={15}>
             <SecondaryBtn
-              text="cancel"
+              text="Cancel"
               fw={600}
               action={() => {
                 close();
@@ -129,7 +132,7 @@ export default function ModalComponent({
             />
 
             <PrimaryBtn
-              text={isEdit ? "save Changes" : "send Invite"}
+              text={isEdit ? "Save Changes" : "Submit"}
               action={() => {
                 if (action) {
                   action();

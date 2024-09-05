@@ -41,7 +41,7 @@ import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
-import classes from "@/ui/styles/containedInput.module.css";
+import classes from "@/ui/styles/containedInput.module.scss";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import {
   closeButtonProps,
@@ -182,14 +182,14 @@ export default function Shareholders({
       </Group>
       {business?.shareholders.map((shareholder, index) => {
         return (
-          <Fragment key={index}>
+          <Stack gap={20} key={index}>
             <DirectorsForm
               updateDirector={updateDirector}
               deleteDirector={deleteDirector}
               director={shareholder}
               index={index}
             />
-          </Fragment>
+          </Stack>
         );
       })}
 

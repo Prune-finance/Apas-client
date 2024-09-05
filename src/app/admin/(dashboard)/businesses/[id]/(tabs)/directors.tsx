@@ -44,7 +44,7 @@ import {
 import useNotification from "@/lib/hooks/notification";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
-import classes from "@/ui/styles/containedInput.module.css";
+import classes from "@/ui/styles/containedInput.module.scss";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { set } from "zod";
 import DropzoneComponent from "@/ui/components/Dropzone";
@@ -190,14 +190,14 @@ export default function Directors({
 
       {business?.directors.map((director, index) => {
         return (
-          <Fragment key={index}>
+          <Stack gap={20} key={index}>
             <DirectorsForm
               deleteDirector={deleteDirector}
               updateDirector={updateDirector}
               director={director}
               index={index}
             />
-          </Fragment>
+          </Stack>
         );
       })}
 

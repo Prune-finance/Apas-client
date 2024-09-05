@@ -14,6 +14,7 @@ import {
   rem,
 } from "@mantine/core";
 import {
+  IconCheck,
   IconDotsVertical,
   IconListTree,
   IconPlus,
@@ -21,9 +22,13 @@ import {
   IconUserCheck,
   IconUserEdit,
   IconUserX,
+  IconX,
 } from "@tabler/icons-react";
 
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 import { useRouter, useSearchParams } from "next/navigation";
 
 import styles from "./styles.module.scss";
@@ -47,13 +52,14 @@ import { parseError } from "@/lib/actions/auth";
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
-import ModalComponent from "./modal";
+import MainModalComponent from "./modal";
 import UserDrawer from "./drawer";
 import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { BadgeComponent } from "@/ui/components/Badge";
+import ModalComponent from "@/ui/components/Modal";
 
 function Users() {
   const searchParams = useSearchParams();
@@ -84,8 +90,14 @@ function Users() {
   const [isEdit, setIsEdit] = useState(false);
   const [user, setUser] = useState<AdminData | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const [activateOpened, { open: activateOpen, close: activateClose }] =
+    useDisclosure(false);
+  const [deactivateOpened, { open: deactivateOpen, close: deactivateClose }] =
+    useDisclosure(false);
 
   const form = useForm({
     initialValues: newAdmin,
@@ -134,6 +146,7 @@ function Users() {
     id: string,
     status: "ACTIVE" | "INACTIVE"
   ) => {
+    setProcessingStatus(true);
     try {
       const path = status === "ACTIVE" ? "deactivate" : "activate";
 
@@ -150,28 +163,38 @@ function Users() {
         }`,
         `User ${status === "ACTIVE" ? "deactivated" : "activated"} successfully`
       );
+      if (status === "ACTIVE") return deactivateClose();
+      return activateClose();
     } catch (error) {
       handleError(
         `Failed! User ${status === "ACTIVE" ? "Deactivation" : "Activation"}`,
         parseError(error)
       );
+    } finally {
+      setProcessingStatus(false);
     }
   };
 
   const menuItems = [
     {
-      text: "Edit User",
+      text: "Update Details",
       icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
     },
-    {
-      text: "Deactivate",
-      icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
-    },
+    // {
+    //   text: "Deactivate",
+    //   icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
+    // },
   ];
 
   const handleRowClick = (user: AdminData) => {
     setUser(user);
     openDrawer();
+  };
+
+  const handleStatusChange = (user: AdminData, status: string) => {
+    setUser(user);
+    if (status === "ACTIVE") return deactivateOpen();
+    return activateOpen();
   };
 
   const rows = filteredSearch(users, ["email"], debouncedSearch).map(
@@ -186,7 +209,8 @@ function Users() {
           {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
         </TableTd>
         <TableTd className={`${styles.table__td}`}>
-          {dayjs(element.updatedAt).format("ddd DD MMM YYYY")}
+          {dayjs(element.updatedAt).fromNow()}
+          {/* {dayjs(element.updatedAt).format("ddd DD MMM YYYY")} */}
         </TableTd>
 
         <TableTd>
@@ -207,7 +231,7 @@ function Users() {
               {(() => {
                 const menuItems = [
                   {
-                    text: "Edit User",
+                    text: "Update Details",
                     icon: (
                       <IconUserEdit
                         style={{ width: rem(14), height: rem(14) }}
@@ -237,7 +261,7 @@ function Users() {
                     c="#667085"
                     leftSection={item.icon}
                     onClick={() => {
-                      if (item.text === "Edit User")
+                      if (item.text === "Update Details")
                         return handleEdit({
                           email: element.email,
                           firstName: element.firstName,
@@ -246,7 +270,7 @@ function Users() {
                           password: "",
                         });
 
-                      return handleUserDeactivation(element.id, element.status);
+                      return handleStatusChange(element, element.status);
                     }}
                   >
                     {item.text}
@@ -312,7 +336,7 @@ function Users() {
         total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
       />
 
-      <ModalComponent
+      <MainModalComponent
         action={addAdmin}
         processing={processing}
         opened={opened}
@@ -323,6 +347,30 @@ function Users() {
       />
 
       <UserDrawer opened={openedDrawer} close={closeDrawer} user={user} />
+
+      <ModalComponent
+        processing={processingStatus}
+        action={() => handleUserDeactivation(String(user?.id), "ACTIVE")}
+        color="#FEF3F2"
+        icon={<IconX color="#D92D20" />}
+        opened={deactivateOpened}
+        close={deactivateClose}
+        // form={requestForm}
+        title="Deactivate This Account?"
+        text="You are about to deactivate this account. This means the account will be inactive."
+      />
+
+      <ModalComponent
+        processing={processingStatus}
+        action={() => handleUserDeactivation(String(user?.id), "INACTIVE")}
+        color="#ECFDF3"
+        icon={<IconCheck color="#12B76A" />}
+        opened={activateOpened}
+        close={activateClose}
+        // form={requestForm}
+        title="Activate This Account?"
+        text="You are about to activate this account. This means the account will become active."
+      />
     </main>
   );
 }

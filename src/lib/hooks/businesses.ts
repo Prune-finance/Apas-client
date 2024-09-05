@@ -1,3 +1,4 @@
+import { otherDocumentSchema } from "./../schema";
 import { DebitRequest } from "./requests";
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
@@ -145,7 +146,7 @@ export function useSingleBusiness(id: string) {
 
 export function useUserBusiness(customParams: IParams = {}) {
   const [business, setBusiness] = useState<BusinessData | null>(null);
-  const [meta, setMeta] = useState<BusinessMeta>();
+  const [meta, setMeta] = useState<UserBusinessMeta>();
 
   const [loading, setLoading] = useState(true);
 
@@ -179,6 +180,8 @@ export function useUserBusiness(customParams: IParams = {}) {
     }
   }
 
+  const revalidate = () => fetchBusinesses();
+
   useEffect(() => {
     fetchBusinesses();
 
@@ -187,7 +190,7 @@ export function useUserBusiness(customParams: IParams = {}) {
     };
   }, []);
 
-  return { loading, business, meta };
+  return { loading, business, meta, revalidate };
 }
 
 export interface Director {
@@ -223,6 +226,13 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
+}
+
+export interface UserBusinessMeta {
+  activeLKReq: number;
+  activePAReq: number;
+  hasLiveKey: number;
+  hasPayoutAccount: number;
 }
 
 export interface StatsMeta {
@@ -261,6 +271,25 @@ export interface BusinessData {
   otherDocuments: Record<string, string>;
   Accounts: { DebitRequests: { id: string }[] }[];
   Requests: { type: string; id: string }[];
+  contactFirstName: string;
+  contactIdType: string;
+  contactIdUrl: string;
+  contactIdUrlBack: string;
+  contactLastName: string;
+  contactPOAType: string;
+  contactPOAUrl: string;
+  documents: Document[];
+  lastLogin: Date;
+}
+
+export interface Document {
+  title: string;
+  documentURL: string;
+}
+
+export interface OtherDocuments {
+  title: string;
+  documentURL: string;
 }
 
 export interface PricingPlan {
@@ -287,4 +316,14 @@ export interface Director {
   identityFileUrl: string;
   identityFileUrlBack: string;
   proofOfAddressFileUrl: string;
+}
+
+export interface Service {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  title: string;
+  serviceCode: string;
+  serviceIdentifier: string;
 }

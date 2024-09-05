@@ -23,6 +23,8 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { BasicInfoType } from "@/lib/schema";
+import { ContactDocumentTextInput } from "./utils";
 
 export default function Business({
   business,
@@ -54,6 +56,14 @@ export default function Business({
     legalEntity: business.legalEntity,
     pricingPlanId: business.pricingPlanId,
     businessBio: business.businessBio,
+    contactFirstName: business.contactFirstName,
+    contactLastName: business.contactLastName,
+    contactIdType: business.contactIdType,
+    contactIdUrl: business.contactIdUrl,
+    contactIdUrlBack: business.contactIdUrlBack,
+    contactPOAType: business.contactPOAType,
+    contactPOAUrl: business.contactPOAUrl,
+    // documents: business.documents,
   };
 
   const form = useForm({
@@ -82,19 +92,25 @@ export default function Business({
   return (
     <div className={styles.business__tab}>
       <BasicInformation
-        form={form}
+        form={form as unknown as UseFormReturnType<BasicInfoType>}
         handleBusinessUpdate={handleBusinessUpdate}
         business={business}
       />
 
       <ContactInfo
-        form={form}
+        form={form as unknown as UseFormReturnType<BasicInfoType>}
+        handleBusinessUpdate={handleBusinessUpdate}
+        business={business}
+      />
+
+      <Services
+        form={form as unknown as UseFormReturnType<BasicInfoType>}
         handleBusinessUpdate={handleBusinessUpdate}
         business={business}
       />
 
       <BusinessBio
-        form={form}
+        form={form as unknown as UseFormReturnType<BasicInfoType>}
         handleBusinessUpdate={handleBusinessUpdate}
         business={business}
       />
@@ -116,7 +132,7 @@ interface NewBusinessType {
 
 interface IProps {
   business: BusinessData;
-  form: UseFormReturnType<NewBusinessType>;
+  form: UseFormReturnType<BasicInfoType>;
   handleBusinessUpdate: () => Promise<void>;
 }
 
@@ -182,7 +198,7 @@ const BasicInformation = ({ business, form, handleBusinessUpdate }: IProps) => {
               input: styles.input,
               label: styles.label,
             }}
-            label="Business Name"
+            label="Legal Business Name"
             placeholder={business?.name}
             {...form.getInputProps("name")}
           />
@@ -195,7 +211,7 @@ const BasicInformation = ({ business, form, handleBusinessUpdate }: IProps) => {
               input: styles.input,
               label: styles.label,
             }}
-            label="Country of Origin"
+            label="Country"
             placeholder={business?.country || ""}
             {...form.getInputProps("country")}
           />
@@ -208,7 +224,7 @@ const BasicInformation = ({ business, form, handleBusinessUpdate }: IProps) => {
               input: styles.input,
               label: styles.label,
             }}
-            label="Legal Entity"
+            label="Type"
             placeholder={business?.legalEntity || ""}
             {...form.getInputProps("legalEntity")}
           />
@@ -282,7 +298,7 @@ const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
     <div className={styles.bottom__container}>
       <Flex justify="space-between" align="center">
         <Text fz={12} fw={600} tt="uppercase">
-          Contact Information
+          Contact Person Information
         </Text>
         {editingBottom ? (
           <Group>
@@ -320,9 +336,21 @@ const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
               input: styles.input,
               label: styles.label,
             }}
-            label="Phone Number"
-            placeholder={business?.contactNumber || ""}
-            {...form.getInputProps("contactNumber")}
+            label="First Name"
+            placeholder={business?.contactFirstName || ""}
+            {...form.getInputProps("contactFirstName")}
+          />
+        </GridCol>
+        <GridCol span={4} className={styles.grid}>
+          <TextInput
+            readOnly={!editingBottom}
+            classNames={{
+              input: styles.input,
+              label: styles.label,
+            }}
+            label="Last Name"
+            placeholder={business?.contactLastName || ""}
+            {...form.getInputProps("contactLastName")}
           />
         </GridCol>
 
@@ -336,6 +364,57 @@ const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
             label="Email"
             placeholder={business?.contactEmail}
             {...form.getInputProps("contactEmail")}
+          />
+        </GridCol>
+
+        <GridCol span={4} className={styles.grid}>
+          <TextInput
+            readOnly={!editingBottom}
+            classNames={{
+              input: styles.input,
+              label: styles.label,
+            }}
+            label="Phone Number"
+            placeholder={business?.contactNumber || ""}
+            {...form.getInputProps("contactNumber")}
+          />
+        </GridCol>
+
+        <GridCol span={4} className={styles.grid}>
+          <ContactDocumentTextInput
+            editing={editingBottom}
+            form={form}
+            formKey="contactIdType"
+            documentKey="contactIdUrl"
+            label="Identity Type"
+            title={business.contactIdType}
+            business={business as BasicInfoType}
+          />
+        </GridCol>
+
+        {form.values.contactIdType !== "Passport" && (
+          <GridCol span={4} className={styles.grid}>
+            <ContactDocumentTextInput
+              editing={editingBottom}
+              form={form}
+              formKey="contactIdType"
+              documentKey="contactIdUrlBack"
+              label="Identity Type (Back)"
+              title={business.contactIdType}
+              business={business as BasicInfoType}
+            />
+          </GridCol>
+        )}
+
+        <GridCol span={4} className={styles.grid}>
+          <ContactDocumentTextInput
+            editing={editingBottom}
+            form={form}
+            formKey="contactPOAType"
+            documentKey="contactPOAUrl"
+            label="Proof of Address"
+            title={business.contactPOAType}
+            business={business as BasicInfoType}
           />
         </GridCol>
       </Grid>
@@ -390,6 +469,47 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
           />
         )}
       </Flex>
+
+      <Grid mt={20} className={styles.grid__container}>
+        <GridCol span={12} className={styles.grid}>
+          <Textarea
+            readOnly={!editingBizInfo}
+            classNames={{
+              input: styles.input,
+              label: styles.label,
+            }}
+            minRows={6}
+            maxRows={6}
+            autosize
+            label="Business Bio"
+            placeholder={business?.businessBio || ""}
+            {...form.getInputProps("businessBio")}
+          />
+        </GridCol>
+      </Grid>
+    </div>
+  );
+};
+
+const Services = ({ business, form, handleBusinessUpdate }: IProps) => {
+  const [editingBizInfo, setEditingBizInfo] = useState(false);
+  const [processing, setProcessing] = useState(false);
+
+  const handleSubmit = async () => {
+    setProcessing(true);
+    try {
+      await handleBusinessUpdate();
+      setEditingBizInfo(false);
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  return (
+    <div className={styles.bottom__container}>
+      <Text fz={12} fw={600} tt="uppercase">
+        Services
+      </Text>
 
       <Grid mt={20} className={styles.grid__container}>
         <GridCol span={12} className={styles.grid}>

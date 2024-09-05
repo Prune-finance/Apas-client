@@ -79,7 +79,7 @@ export default function Keys({
 
           <KeyComponent keyString={live?.key} keyType="Live Key" />
 
-          <KeyComponent keyString={live?.key} keyType="Test Webhook URL" />
+          {/* <KeyComponent keyString={live?.key} keyType="Test Webhook URL" /> */}
         </Flex>
 
         <Flex

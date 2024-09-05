@@ -32,6 +32,7 @@ import {
   IconX,
   IconAlertTriangle,
   IconShieldCheck,
+  IconRosetteDiscountCheckFilled,
 } from "@tabler/icons-react";
 
 import ActiveBadge from "@/assets/active-badge.svg";
@@ -53,7 +54,7 @@ import { activeBadgeColor } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
-import { PrimaryBtn } from "@/ui/components/Buttons";
+import { BackBtn, PrimaryBtn } from "@/ui/components/Buttons";
 
 export default function SingleBusiness() {
   const router = useRouter();
@@ -68,6 +69,8 @@ export default function SingleBusiness() {
   const [processingActive, setProcessingActive] = useState(false);
   const [processingTrust, setProcessingTrust] = useState(false);
   // const [trusted, setTrusted] = useState(business ? business.kycTrusted : false);
+
+  const [activeTab, setActiveTab] = useState<string | null>(tab);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
@@ -179,7 +182,7 @@ export default function SingleBusiness() {
       />
 
       <div className={styles.page__container}>
-        <Group gap={8} mb={24}>
+        {/* <Group gap={8} mb={24}>
           <UnstyledButton onClick={router.back}>
             <ThemeIcon variant="transparent" radius="lg">
               <IconArrowLeft
@@ -192,9 +195,16 @@ export default function SingleBusiness() {
           <Text fz={14} c="var(--prune-text-gray-500)" fw={400}>
             Business
           </Text>
-        </Group>
+        </Group> */}
+        <BackBtn text="Business" />
         <div className={styles.container__header}>
-          <div className={styles.header__left}>
+          <Group gap={8}>
+            {business?.kycTrusted && (
+              <IconRosetteDiscountCheckFilled
+                size={25}
+                color="var(--prune-primary-700)"
+              />
+            )}
             {business ? (
               <Text fz={18} fw={600}>
                 {business.name}
@@ -203,74 +213,71 @@ export default function SingleBusiness() {
               <Skeleton h={10} w={100} />
             )}
 
-            {business?.kycTrusted && (
-              <Image
-                width={20}
-                height={20}
-                src={ActiveBadge}
-                alt="active badge"
-              />
-            )}
-
-            {business && (
+            {business ? (
               <BadgeComponent status={business.companyStatus} active />
+            ) : (
+              <Skeleton h={10} w={100} />
             )}
-          </div>
+          </Group>
 
-          <div className={styles.header__right}>
-            <Button size="xs" className={styles.header__right__cta}>
-              <IconDownload color="#344054" stroke={2} size={16} />
-            </Button>
+          {activeTab === "business" && (
+            <div className={styles.header__right}>
+              <Button size="xs" className={styles.header__right__cta}>
+                <IconDownload color="#344054" stroke={2} size={16} />
+              </Button>
 
-            {business?.companyStatus && (
-              <PrimaryBtn
-                text={
-                  business?.companyStatus === "ACTIVE"
-                    ? "Deactivate"
-                    : "Activate"
-                }
-                action={open}
+              {business?.companyStatus && (
+                <PrimaryBtn
+                  text={
+                    business?.companyStatus === "ACTIVE"
+                      ? "Deactivate"
+                      : "Activate"
+                  }
+                  action={open}
+                  color="#f6f6f6"
+                  c="var(--prune-text-gray-700)"
+                  fz={12}
+                  fw={600}
+                  h={32}
+                  radius={4}
+                />
+              )}
+
+              <Button
+                onClick={openTrust}
                 color="#f6f6f6"
                 c="var(--prune-text-gray-700)"
                 fz={12}
                 fw={600}
                 h={32}
                 radius={4}
-              />
-            )}
+              >
+                <Switch
+                  label="Trust this business"
+                  checked={business?.kycTrusted}
+                  labelPosition="left"
+                  fz={12}
+                  size="xs"
+                  color="var(--prune-success-500)"
+                />
+              </Button>
 
-            <Button
-              onClick={openTrust}
-              color="#f6f6f6"
-              c="var(--prune-text-gray-700)"
-              fz={12}
-              fw={600}
-              h={32}
-              radius={4}
-            >
-              <Switch
-                label="Trust this business"
-                checked={business?.kycTrusted}
-                labelPosition="left"
-                fz={12}
-                size="xs"
-                color="var(--prune-success-500)"
+              <PrimaryBtn
+                text="Send Activation Link"
+                action={sendActivationLink}
+                radius={4}
+                loading={processingLink}
+                h={32}
+                fw={600}
               />
-            </Button>
-
-            <PrimaryBtn
-              text="Send Activation Link"
-              action={sendActivationLink}
-              radius={4}
-              loading={processingLink}
-              h={32}
-              fw={600}
-            />
-          </div>
+            </div>
+          )}
         </div>
 
         <div className={styles.container__body}>
           <Tabs
+            value={activeTab}
+            onChange={setActiveTab}
             defaultValue={tab}
             variant="pills"
             classNames={{

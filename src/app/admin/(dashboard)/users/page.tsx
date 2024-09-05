@@ -10,6 +10,10 @@ import {
   MenuTarget,
   TableTd,
   TableTr,
+  Tabs,
+  TabsList,
+  TabsPanel,
+  TabsTab,
   Text,
   TextInput,
   UnstyledButton,
@@ -21,14 +25,19 @@ import {
   IconPlus,
   IconSearch,
   IconUserEdit,
+  IconUsers,
   IconUserX,
 } from "@tabler/icons-react";
 
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 import { useRouter, useSearchParams } from "next/navigation";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
+import stylesTab from "@/ui/styles/settings.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { useAdmins } from "@/lib/hooks/admins";
@@ -48,15 +57,18 @@ import {
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
-import { activeBadgeColor } from "@/lib/utils";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import TabsComponent from "@/ui/components/Tabs";
+import { SearchInput } from "@/ui/components/Inputs";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
   const { handleError, handleSuccess } = useNotification();
+  const [tab, setTab] = useState<string | null>("Users");
 
   const {
     rows: _rows,
@@ -86,6 +98,7 @@ function Users() {
 
   const [processing, setProcessing] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [id, setId] = useState("");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
@@ -166,23 +179,24 @@ function Users() {
     //   href: "/admin/businesses",
     // },
     {
-      text: "Edit User",
+      text: "Update Details",
       icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
     },
-    {
-      text: "Deactivate",
-      icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
-    },
+    // {
+    //   text: "Deactivate",
+    //   icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
+    // },
   ];
 
   const handleRowClick = (id: string) => {
     push(`/admin/users/${id}`);
   };
 
-  const handleEdit = (data: typeof newAdmin) => {
+  const handleEdit = (data: typeof newAdmin, id: string) => {
     form.setValues(data);
     open();
     setIsEdit(true);
+    setId(id);
   };
 
   const rows = filteredSearch(
@@ -195,7 +209,9 @@ function Users() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>{element.email}</TableTd>
+      <TableTd className={styles.table__td} tt="lowercase">
+        {element.email}
+      </TableTd>
       <TableTd
         className={styles.table__td}
       >{`${element.firstName} ${element.lastName}`}</TableTd>
@@ -204,21 +220,12 @@ function Users() {
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.updatedAt).format("ddd DD MMM YYYY")}
+        {dayjs(element.lastLogIn).fromNow()}
+        {/* {dayjs(element.lastLogIn).format("ddd DD MMM YYYY")} */}
       </TableTd>
       {/* <TableTd className={styles.table__td}></TableTd> */}
       <TableTd className={styles.table__td}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor("ACTIVE")}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          Active
-        </Badge>
+        <BadgeComponent status="ACTIVE" active />
       </TableTd>
 
       <TableTd
@@ -255,14 +262,17 @@ function Users() {
                   c="#667085"
                   leftSection={items.icon}
                   onClick={() => {
-                    if (items.text === "Edit User")
-                      return handleEdit({
-                        email: element.email,
-                        firstName: element.firstName,
-                        lastName: element.lastName,
-                        role: element.role,
-                        password: "",
-                      });
+                    if (items.text === "Update Details")
+                      return handleEdit(
+                        {
+                          email: element.email,
+                          firstName: element.firstName,
+                          lastName: element.lastName,
+                          role: element.role,
+                          password: "",
+                        },
+                        element.id
+                      );
                   }}
                 >
                   {items.text}
@@ -271,7 +281,7 @@ function Users() {
             })}
           </MenuDropdown>
 
-          <ModalComponent
+          {/* <ModalComponent
             action={isEdit ? () => editAdmin(element.id) : addAdmin}
             processing={processing}
             opened={opened}
@@ -279,7 +289,7 @@ function Users() {
             form={form}
             isEdit={isEdit}
             setIsEdit={setIsEdit}
-          />
+          /> */}
         </Menu>
       </TableTd>
     </TableTr>
@@ -287,64 +297,73 @@ function Users() {
 
   return (
     <main className={styles.main}>
-      <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} />
-
+      {/* <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} /> */}
       <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
-            All Users
+            User Management
           </Text>
         </div>
+        <>
+          <TabsComponent tabs={tabs} tt="capitalize" mt={32}>
+            <TabsPanel value={tabs[0].value}>
+              <Group justify="space-between" mt={28}>
+                <SearchInput search={search} setSearch={setSearch} />
 
-        <Group justify="space-between" mt={28}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-          />
+                <Group gap={12}>
+                  <SecondaryBtn
+                    text="Filter"
+                    action={toggle}
+                    icon={IconListTree}
+                  />
+                  <PrimaryBtn
+                    text="Invite New User"
+                    action={() => {
+                      open();
+                      setIsEdit(false);
+                    }}
+                    icon={IconPlus}
+                  />
+                </Group>
+              </Group>
+              <Filter<BusinessFilterType>
+                opened={openedFilter}
+                toggle={toggle}
+                form={filterForm}
+              />
+              <TableComponent
+                head={tableHeaders}
+                rows={rows}
+                loading={loading}
+              />
+              <EmptyTable
+                loading={loading}
+                rows={rows}
+                title="There are no users"
+                text="When a user is added, they will appear here."
+              />
+              <PaginationComponent
+                active={active}
+                setActive={setActive}
+                setLimit={setLimit}
+                limit={limit}
+                total={Math.ceil(
+                  (meta?.total ?? 1) / parseInt(limit ?? "10", 10)
+                )}
+              />
+            </TabsPanel>
 
-          <Group gap={12}>
-            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-            <PrimaryBtn
-              text="Invite New User"
-              action={() => {
-                open();
-                setIsEdit(false);
-              }}
-              icon={IconPlus}
-            />
-          </Group>
-        </Group>
-
-        <Filter<BusinessFilterType>
-          opened={openedFilter}
-          toggle={toggle}
-          form={filterForm}
-        />
-
-        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
-
-        <EmptyTable
-          loading={loading}
-          rows={rows}
-          title="There are no users"
-          text="When a user is added, they will appear here."
-        />
-
-        <PaginationComponent
-          active={active}
-          setActive={setActive}
-          setLimit={setLimit}
-          limit={limit}
-          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
-        />
+            <TabsPanel value={tabs[1].value}>
+              <EmptyTable
+                loading={loading}
+                rows={[]}
+                title="There are no business users"
+                text="When a business user is added, they will appear here."
+              />
+            </TabsPanel>
+          </TabsComponent>
+        </>
       </div>
-
       {/* <ModalComponent
         action={isEdit ? editAdmin : addAdmin}
         processing={processing}
@@ -353,6 +372,16 @@ function Users() {
         form={form}
         isEdit={isEdit}
       /> */}
+
+      <ModalComponent
+        action={isEdit ? () => editAdmin(id) : addAdmin}
+        processing={processing}
+        opened={opened}
+        close={close}
+        form={form}
+        isEdit={isEdit}
+        setIsEdit={setIsEdit}
+      />
     </main>
   );
 }
@@ -374,3 +403,111 @@ const tableHeaders = [
   "Status",
   "Action",
 ];
+
+const tabs = [
+  { title: "Own Users", value: "Users", icon: <IconUsers size={14} /> },
+  {
+    title: "Business Users",
+    value: "Business Users",
+    icon: <IconUsers size={14} />,
+  },
+];
+
+// <Tabs
+//   // defaultValue="Logs"
+//   value={tab}
+//   onChange={setTab}
+//   variant="pills"
+//   classNames={{
+//     root: stylesTab.tabs,
+//     list: stylesTab.tabs__list,
+//     tab: stylesTab.tab,
+//   }}
+//   mt={24}
+// >
+//   <TabsList>
+//     {tabs.map((tab) => (
+//       <TabsTab
+//         key={tab.title}
+//         value={tab.value || tab.title}
+//         leftSection={tab.icon}
+//       >
+//         {tab.title}
+//       </TabsTab>
+//     ))}
+//   </TabsList>
+
+//   <TabsPanel value="Logs">
+//     <main className={styles.main}>
+//       {/* <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} /> */}
+
+//       <div className={styles.table__container}>
+//         <div className={styles.container__header}>
+//           <Text fz={18} fw={600}>
+//             User Management
+//           </Text>
+//         </div>
+
+//         <Group justify="space-between" mt={28}>
+//           <TextInput
+//             placeholder="Search here..."
+//             leftSectionPointerEvents="none"
+//             leftSection={searchIcon}
+//             w={324}
+//             styles={{ input: { border: "1px solid #F5F5F5" } }}
+//             // classNames={{ wrapper: styles.search, input: styles.input__search }}
+//             value={search}
+//             onChange={(e) => setSearch(e.currentTarget.value)}
+//           />
+
+//           <Group gap={12}>
+//             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+//             <PrimaryBtn
+//               text="Invite New User"
+//               action={() => {
+//                 open();
+//                 setIsEdit(false);
+//               }}
+//               icon={IconPlus}
+//             />
+//           </Group>
+//         </Group>
+
+//         <Filter<BusinessFilterType>
+//           opened={openedFilter}
+//           toggle={toggle}
+//           form={filterForm}
+//         />
+
+//         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+
+//         <EmptyTable
+//           loading={loading}
+//           rows={rows}
+//           title="There are no users"
+//           text="When a user is added, they will appear here."
+//         />
+
+//         <PaginationComponent
+//           active={active}
+//           setActive={setActive}
+//           setLimit={setLimit}
+//           limit={limit}
+//           total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+//         />
+//       </div>
+
+//       {/* <ModalComponent
+//       action={isEdit ? editAdmin : addAdmin}
+//       processing={processing}
+//       opened={opened}
+//       close={close}
+//       form={form}
+//       isEdit={isEdit}
+//     /> */}
+//     </main>
+//   </TabsPanel>
+//   <TabsPanel value="Notifications">
+//     <Text>Hello world</Text>
+//   </TabsPanel>
+// </Tabs>;

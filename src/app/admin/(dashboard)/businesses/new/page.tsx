@@ -16,6 +16,7 @@ import {
   Divider,
   Checkbox,
   Modal,
+  Image,
 } from "@mantine/core";
 import { TextInput, Select, Button } from "@mantine/core";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
@@ -42,6 +43,8 @@ import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
+import SuccessModalImage from "@/assets/success-modal-image.png";
+import SuccessModal from "@/ui/components/SuccessModal";
 
 interface DirectorEtShareholder
   extends Omit<
@@ -57,6 +60,9 @@ export default function NewBusiness() {
   const [processing, setProcessing] = useState(false);
 
   const [opened, { open, close }] = useDisclosure(false);
+
+  const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
+    useDisclosure(false);
 
   const { handleSuccess, handleError, handleInfo } = useNotification();
 
@@ -123,11 +129,12 @@ export default function NewBusiness() {
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      handleSuccess(
-        "Business Created",
-        `${form.values.name} has been added to your list of business`
-      );
-      router.push("/admin/businesses");
+      // handleSuccess(
+      //   "Business Created",
+      //   `${form.values.name} has been added to your list of business`
+      // );
+      // router.push("/admin/businesses");
+      openSuccess();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -190,6 +197,43 @@ export default function NewBusiness() {
     form.insertListItem("shareholders", director);
   };
 
+  const removeShareholder = (director: DirectorEtShareholder) => {
+    // Find the index of the shareholder to remove using director object
+    const index =
+      form.values.shareholders &&
+      form.values.shareholders.findIndex((item) => {
+        return Object.keys(item).every(
+          (key) =>
+            item[key as keyof DirectorEtShareholder] ===
+            director[key as keyof DirectorEtShareholder]
+        );
+      });
+    // Remove the shareholder from the form
+    if (index && index !== -1) form.removeListItem("shareholders", index);
+  };
+
+  const isShareholderADirector = (director: DirectorEtShareholder) => {
+    // return false if the director's value is empty
+    if (Object.values(director).every(isEmpty)) return false;
+
+    return (
+      form.values.shareholders &&
+      form.values.shareholders.some((shareholder) => {
+        return Object.keys(director).every((key) => {
+          return (
+            director[key as keyof DirectorEtShareholder] ===
+            shareholder[key as keyof DirectorEtShareholder]
+          );
+        });
+      })
+    );
+  };
+
+  const handleCloseSuccessModal = () => {
+    router.push("/admin/businesses");
+    closeSuccess();
+  };
+
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -229,29 +273,20 @@ export default function NewBusiness() {
             <Documents form={form} />
           </Stepper.Step>
           <Stepper.Step label="Directors">
-            <Group justify="space-between">
+            <Group justify="space-between" mb={30}>
               <Text fz={16} fw={600} c="var(--prune-text-gray-700)">
                 Directors
               </Text>
-              <Button
-                variant="transparent"
-                fz={14}
-                color="var(--prune-text-gray-700)"
-                leftSection={
-                  <ThemeIcon
-                    color="var(--prune-primary-600)"
-                    radius="xl"
-                    size={24}
-                  >
-                    <IconPlus size={16} color="var(--prune-text-gray-700)" />
-                  </ThemeIcon>
-                }
-                onClick={() =>
+
+              <PrimaryBtn
+                text="Add Director"
+                icon={IconPlus}
+                action={() =>
                   form.insertListItem("directors", directorEtShareholderSchema)
                 }
-              >
-                Add New Director
-              </Button>
+                fw={600}
+                h={28}
+              />
             </Group>
             <Box>
               {form.values.directors &&
@@ -291,10 +326,11 @@ export default function NewBusiness() {
                       fz={8}
                       styles={{ label: { fontSize: "12px", fontWeight: 500 } }}
                       color="var(--prune-primary-600)"
+                      checked={isShareholderADirector(director)}
                       onChange={(e) => {
                         e.target.checked
                           ? makeDirectorAShareholder(director)
-                          : {};
+                          : removeShareholder(director);
                       }}
                     />
 
@@ -304,11 +340,11 @@ export default function NewBusiness() {
             </Box>
           </Stepper.Step>
           <Stepper.Step label="Shareholders">
-            <Group justify="space-between">
+            <Group justify="space-between" mb={30}>
               <Text fz={16} fw={600} c="var(--prune-text-gray-700)">
                 Shareholders
               </Text>
-              <Button
+              {/* <Button
                 variant="transparent"
                 fz={14}
                 color="var(--prune-text-gray-700)"
@@ -329,7 +365,19 @@ export default function NewBusiness() {
                 }
               >
                 Add New Shareholder
-              </Button>
+              </Button> */}
+              <PrimaryBtn
+                text="Add Shareholder"
+                icon={IconPlus}
+                action={() =>
+                  form.insertListItem(
+                    "shareholders",
+                    directorEtShareholderSchema
+                  )
+                }
+                fw={600}
+                h={28}
+              />
             </Group>
             <Box>
               {form.values.shareholders &&
@@ -412,6 +460,12 @@ export default function NewBusiness() {
           close();
         }}
         color="hsl(from var(--prune-warning) h s l / .1)"
+      />
+
+      <SuccessModal
+        openedSuccess={openedSuccess}
+        handleCloseSuccessModal={handleCloseSuccessModal}
+        image={SuccessModalImage.src}
       />
     </main>
   );

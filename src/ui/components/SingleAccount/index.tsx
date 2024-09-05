@@ -21,6 +21,7 @@ import {
   TabsPanel,
   ThemeIcon,
   Avatar,
+  Modal,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -74,6 +75,7 @@ import { BusinessData } from "@/lib/hooks/businesses";
 import { Documents } from "./(tabs)/Documents";
 import DefaultAccountDetails from "./(defaultTabs)/DefaultAccountDetails";
 import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
+import SendMoneyModal from "./sendMoneyModal";
 
 type Param = { id: string };
 interface Props {
@@ -848,59 +850,73 @@ export const DefaultAccountHead = ({
   business,
   loadingBiz,
 }: DefaultAccountHeadProps) => {
+  const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
   return (
-    <Flex
-      justify="space-between"
-      align="center"
-      className={styles.main__header}
-    >
-      <Group gap={12} align="center">
-        {!loading ? (
-          <Avatar size="lg" color="var(--prune-primary-700)" variant="filled">
-            {account?.accountName
-              .split(" ")
-              .map((item) => item.charAt(0))
-              .join("")}
-          </Avatar>
-        ) : (
-          <Skeleton circle h={50} w={50} />
-        )}
-
-        <Stack gap={2}>
+    <>
+      <Flex
+        justify="space-between"
+        align="center"
+        className={styles.main__header}
+      >
+        <Group gap={12} align="center">
           {!loading ? (
-            <Text fz={24} className={styles.main__header__text} m={0} p={0}>
-              {account?.accountName}
-            </Text>
+            <Avatar size="lg" color="var(--prune-primary-700)" variant="filled">
+              {account?.accountName
+                .split(" ")
+                .map((item) => item.charAt(0))
+                .join("")}
+            </Avatar>
           ) : (
-            <Skeleton h={10} w={100} />
+            <Skeleton circle h={50} w={50} />
           )}
 
-          {!loadingBiz ? (
-            <Text
-              fz={10}
-              fw={400}
-              className={styles.main__header__text}
-              m={0}
-              p={0}
-            >
-              {business?.contactEmail ?? ""}
-            </Text>
+          <Stack gap={2}>
+            {!loading ? (
+              <Text fz={24} className={styles.main__header__text} m={0} p={0}>
+                {account?.accountName}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={100} />
+            )}
+
+            {!loadingBiz ? (
+              <Text
+                fz={10}
+                fw={400}
+                className={styles.main__header__text}
+                m={0}
+                p={0}
+              >
+                {business?.contactEmail ?? ""}
+              </Text>
+            ) : (
+              <Skeleton h={10} w={50} />
+            )}
+          </Stack>
+
+          {!loading ? (
+            <BadgeComponent status={account?.status ?? ""} active />
           ) : (
-            <Skeleton h={10} w={50} />
+            <Skeleton w={60} h={10} />
           )}
-        </Stack>
+        </Group>
 
-        {!loading ? (
-          <BadgeComponent status={account?.status ?? ""} active />
-        ) : (
-          <Skeleton w={60} h={10} />
-        )}
-      </Group>
-
-      <Flex gap={10}>
-        {/* {!payout && <PrimaryBtn text="Send Money" fw={600} />} */}
-        {!payout && <SecondaryBtn text="Freeze Account" fw={600} />}
+        <Flex gap={10}>
+          {!payout && (
+            <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
+          )}
+          {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
+        </Flex>
       </Flex>
-    </Flex>
+
+      <Modal
+        opened={opened}
+        onClose={closeMoney}
+        size={"35%"}
+        withCloseButton={false}
+      >
+        <SendMoneyModal account={account} close={closeMoney} />
+      </Modal>
+    </>
   );
 };

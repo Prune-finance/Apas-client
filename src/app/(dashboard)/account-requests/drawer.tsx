@@ -93,7 +93,7 @@ export const AccountRequestsDrawer = ({
           c="var(--prune-text-gray-800)"
           fw={600}
         >
-          Account Details
+          Account Information
         </Text>
 
         <Stack gap={28}>
@@ -155,25 +155,43 @@ export const AccountRequestsDrawer = ({
               Other Details
             </Text>
 
-            <TabsComponent tabs={tabs} fz={8} mt={28} tt="capitalize">
-              {/* <TabsPanel value={tabs[0].value} mt={28}>
-                <Stack gap={28}>
-                  {Object.entries(contactPerson).map(([key, value], index) => (
-                    <Group justify="space-between" key={index}>
-                      <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
-                        {key}:
-                      </Text>
-                      {
-                        <Text fz={14} fw={600} c="var(--prune-text-gray-600)">
-                          {value}
-                        </Text>
-                      }
-                    </Group>
-                  ))}
-                </Stack>
-              </TabsPanel> */}
+            <TabsComponent tabs={tabs} fz={12} mt={28} tt="capitalize">
+              <TabsPanel value={tabs[0].value} mt={28}>
+                {selectedRequest?.documentData?.certOfInc ? (
+                  <Stack gap={28}>
+                    <TextInputWithFile
+                      label="Certificate of Incorporation"
+                      placeholder="File"
+                      url={selectedRequest.documentData.certOfInc}
+                    />
+                  </Stack>
+                ) : null}
 
-              <TabsPanel value={tabs[0].value}>
+                {selectedRequest.documentData?.mermat ? (
+                  <Stack gap={28} mt={20}>
+                    <TextInputWithFile
+                      label="Mermat"
+                      placeholder="File"
+                      url={selectedRequest.documentData.mermat}
+                    />
+                  </Stack>
+                ) : null}
+
+                {!selectedRequest?.documentData?.certOfInc &&
+                  !selectedRequest?.documentData?.mermat && (
+                    <Text
+                      fz={14}
+                      w="100%"
+                      // ta="center"
+                      mt={28}
+                      c="var(--prune-text-gray-800)"
+                    >
+                      No Documents
+                    </Text>
+                  )}
+              </TabsPanel>
+
+              <TabsPanel value={tabs[1].value}>
                 {Object.keys(selectedRequest.documentData.directors).length >
                 0 ? (
                   <>
@@ -230,7 +248,7 @@ export const AccountRequestsDrawer = ({
                 )}
               </TabsPanel>
 
-              <TabsPanel value={tabs[1].value}>
+              <TabsPanel value={tabs[2].value}>
                 {Object.keys(selectedRequest.documentData.shareholders).length >
                 0 ? (
                   <>
@@ -297,7 +315,7 @@ export const AccountRequestsDrawer = ({
 };
 
 const tabs = [
-  //   { value: "Documents" },
+  { value: "Documents" },
   // { value: "Contact Person" },
   { value: "Directors" },
   { value: "Shareholders" },
@@ -334,13 +352,18 @@ export const TextInputWithFile = ({
             return window.open(url, "_blank");
           }}
           className={styles.input__right__section}
+          mr={20}
         >
           <Text fw={600} fz={10} c="#475467">
             View
           </Text>
         </UnstyledButton>
       }
-      label={label}
+      label={
+        <Text fz={12} mb={2}>
+          {label}
+        </Text>
+      }
       placeholder={`${placeholder}`}
     />
   );

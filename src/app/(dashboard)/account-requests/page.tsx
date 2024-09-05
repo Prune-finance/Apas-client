@@ -142,9 +142,12 @@ function AccountRequests() {
         className={styles.table__td}
       >{`${element.firstName} ${element.lastName}`}</TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
+        {element?.country}
+      </TableTd>
+      <TableTd className={styles.table__td} tt="capitalize">
         {element.accountType.toLowerCase()}
       </TableTd>
-      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
+      {/* <TableTd className={styles.table__td}>{element.Company.name}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
@@ -208,8 +211,9 @@ function AccountRequests() {
             <TableThead>
               <TableTr>
                 <TableTh className={styles.table__th}>Account Name</TableTh>
+                <TableTh className={styles.table__th}>Country</TableTh>
                 <TableTh className={styles.table__th}>Type</TableTh>
-                <TableTh className={styles.table__th}>Business</TableTh>
+                {/* <TableTh className={styles.table__th}>Business</TableTh> */}
                 <TableTh className={styles.table__th}>Date Created</TableTh>
                 <TableTh className={styles.table__th}>Status</TableTh>
                 {/* <TableTh className={styles.table__th}>Action</TableTh> */}

@@ -215,9 +215,9 @@ export default function Accounts({
             badgeText="Main Account"
             link={`/admin/businesses/${params.id}/default`}
             business
-            disable
+            // disable
           >
-            <Switch
+            {/* <Switch
               readOnly
               label="Disabled"
               defaultChecked={
@@ -226,7 +226,7 @@ export default function Accounts({
                 )?.active
               }
               labelPosition="left"
-            />
+            /> */}
           </AccountCard>
         </SimpleGrid>
       </TabsPanel>

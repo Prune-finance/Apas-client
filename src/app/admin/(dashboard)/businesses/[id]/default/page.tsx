@@ -75,6 +75,7 @@ export default function BusinessDefaultAccount() {
           setChartFrequency={setChartFrequency}
           business={business}
           admin
+          isDefault
         />
       </Paper>
     </main>

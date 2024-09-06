@@ -58,6 +58,7 @@ import { TableComponent } from "@/ui/components/Table";
 import TabsComponent from "@/ui/components/Tabs";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import { parseError } from "@/lib/actions/auth";
+import { PendingAccounts } from "./PendingAccounts";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -443,6 +444,10 @@ function Accounts() {
                   limit={limit}
                   setLimit={setLimit}
                 />
+              </TabsPanel>
+
+              <TabsPanel value={issuedAccountTabs[1].value}>
+                <PendingAccounts />
               </TabsPanel>
             </TabsComponent>
           </TabsPanel>

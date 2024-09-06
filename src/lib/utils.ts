@@ -75,3 +75,12 @@ export const getUserType = (userType: "USER" | "CORPORATE") => {
   if (userType === "USER") return "Individual";
   return "Corporate";
 };
+
+export function camelCaseToTitleCase(text: string): string {
+  if (text === text.toLowerCase())
+    return text.charAt(0).toUpperCase() + text.slice(1);
+
+  const result = text.replace(/([a-z])([A-Z])/g, "$1 $2");
+
+  return result.charAt(0).toUpperCase() + result.slice(1);
+}

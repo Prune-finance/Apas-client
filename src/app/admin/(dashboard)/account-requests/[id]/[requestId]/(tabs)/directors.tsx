@@ -2,6 +2,7 @@
 
 import {
   Button,
+  camelToKebabCase,
   Flex,
   Grid,
   GridCol,
@@ -24,6 +25,8 @@ import { RequestData } from "@/lib/hooks/requests";
 import { request } from "http";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
+import { FileTextInput } from "../FileTextInput";
+import { camelCaseToTitleCase } from "@/lib/utils";
 
 export default function Directors({
   request,
@@ -69,46 +72,13 @@ const DirectorsForm = ({
       <Grid mt={20} className={styles.grid__container}>
         {request.accountType === "CORPORATE" && (
           <GridCol span={4} className={styles.grid}>
-            <TextInput
-              readOnly
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-                section: styles.section,
-              }}
-              styles={{
-                input: {
-                  "&::placeholder": { textTransform: "uppercase" },
-                },
-              }}
-              leftSection={<IconFileInfo />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton
-                  className={styles.input__right__section}
-                  onClick={() => {
-                    notifications.clean();
-                    if (
-                      !request.documentData.directors[`director_${index + 1}`]
-                        .idFile
-                    )
-                      return handleInfo("No Identity File provided", "");
-
-                    return window.open(
-                      request.documentData.directors[`director_${index + 1}`]
-                        .idFile,
-                      "_blank"
-                    );
-                  }}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
+            <FileTextInput
               label="Identity Type"
-              placeholder={
+              placeholder={camelCaseToTitleCase(
                 request.documentData.directors[`director_${index + 1}`].idType
+              )}
+              url={
+                request.documentData.directors[`director_${index + 1}`].idFile
               }
             />
           </GridCol>
@@ -116,41 +86,13 @@ const DirectorsForm = ({
 
         {request.accountType === "CORPORATE" && (
           <GridCol span={4} className={styles.grid}>
-            <TextInput
-              readOnly
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-                section: styles.section,
-              }}
-              leftSection={<IconFileInfo />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton
-                  className={styles.input__right__section}
-                  onClick={() => {
-                    notifications.clean();
-                    if (
-                      !request.documentData.directors[`director_${index + 1}`]
-                        .poaFile
-                    )
-                      return handleInfo("No Proof of Address provided", "");
-
-                    return window.open(
-                      request.documentData.directors[`director_${index + 1}`]
-                        .poaFile,
-                      "_blank"
-                    );
-                  }}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
+            <FileTextInput
               label="Proof of Address"
-              placeholder={
+              placeholder={camelCaseToTitleCase(
                 request.documentData.directors[`director_${index + 1}`].poaType
+              )}
+              url={
+                request.documentData.directors[`director_${index + 1}`].poaFile
               }
             />
           </GridCol>

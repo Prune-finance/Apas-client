@@ -703,6 +703,8 @@ interface CorporateRequestData extends BaseData {
 export type RequestData = UserRequestData | CorporateRequestData;
 
 export interface DocumentData {
+  mermat: string;
+  certOfInc: string;
   directors: Directors;
   shareholders: Shareholder;
 }

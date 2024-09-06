@@ -59,7 +59,7 @@ export default function Account() {
             <Avatar
               size="lg"
               color="var(--prune-primary-700)"
-              // variant="light"
+              variant="filled"
             >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
               0
             )}`}</Avatar>

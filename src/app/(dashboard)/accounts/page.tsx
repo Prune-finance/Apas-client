@@ -31,12 +31,13 @@ import {
   IconCheck,
   IconArrowDownLeft,
   IconTrash,
+  IconUsers,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
 import ModalComponent from "./modal";
 import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, getUserType } from "@/lib/utils";
 
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
@@ -337,14 +338,14 @@ function Accounts() {
         className={styles.table__td}
         tt="capitalize"
       >
-        {element.type.toLowerCase()}
+        {getUserType(element.type ?? "USER")}
       </TableTd>
-      <TableTd
+      {/* <TableTd
         onClick={() => router.push(`/accounts/${element.id}`)}
         className={styles.table__td}
       >
         {element.Company.name}
-      </TableTd>
+      </TableTd> */}
       <TableTd
         onClick={() => router.push(`/accounts/${element.id}`)}
         className={`${styles.table__td}`}
@@ -358,9 +359,9 @@ function Accounts() {
         <BadgeComponent status={element.status} active />
       </TableTd>
 
-      <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
         <MenuComponent id={element.id} status={element.status} />
-      </TableTd>
+      </TableTd> */}
     </TableTr>
   ));
 
@@ -396,41 +397,54 @@ function Accounts() {
           </TabsPanel>
 
           <TabsPanel value={tabs[1].value}>
-            <Group justify="space-between" mt={30}>
-              <SearchInput search={search} setSearch={setSearch} />
+            <TabsComponent
+              tabs={issuedAccountTabs}
+              mt={30}
+              tt="capitalize"
+              fz={12}
+            >
+              <TabsPanel value={issuedAccountTabs[0].value}>
+                <Group justify="space-between" mt={30}>
+                  <SearchInput search={search} setSearch={setSearch} />
 
-              <SecondaryBtn text="Filter" action={toggle} />
-            </Group>
+                  <SecondaryBtn text="Filter" action={toggle} />
+                </Group>
 
-            <Filter opened={openedFilter} toggle={toggle} form={form}>
-              <Select
-                placeholder="Type"
-                {...form.getInputProps("type")}
-                data={["Corporate", "User"]}
-                size="xs"
-                w={120}
-                h={36}
-              />
-            </Filter>
+                <Filter opened={openedFilter} toggle={toggle} form={form}>
+                  <Select
+                    placeholder="Type"
+                    {...form.getInputProps("type")}
+                    data={["Corporate", "User"]}
+                    size="xs"
+                    w={120}
+                    h={36}
+                  />
+                </Filter>
 
-            <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+                <TableComponent
+                  head={tableHeaders}
+                  rows={rows}
+                  loading={loading}
+                />
 
-            <EmptyTable
-              rows={rows}
-              loading={loading}
-              title="There are no accounts"
-              text="When an account is created, it will appear here"
-            />
+                <EmptyTable
+                  rows={rows}
+                  loading={loading}
+                  title="There are no accounts"
+                  text="When an account is created, it will appear here"
+                />
 
-            <PaginationComponent
-              total={Math.ceil(
-                (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
-              )}
-              active={active}
-              setActive={setActive}
-              limit={limit}
-              setLimit={setLimit}
-            />
+                <PaginationComponent
+                  total={Math.ceil(
+                    (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
+                  )}
+                  active={active}
+                  setActive={setActive}
+                  limit={limit}
+                  setLimit={setLimit}
+                />
+              </TabsPanel>
+            </TabsComponent>
           </TabsPanel>
         </TabsComponent>
 
@@ -510,13 +524,18 @@ export default function AccountSuspense() {
 
 const tableHeaders = [
   "Account Name",
-  "Account Number",
+  "IBAN",
   "Account Balance",
-  "Type",
-  "Business",
+  "Account Type",
+  // "Business",
   "Date Created",
   "Status",
-  "Action",
+  // "Action",
 ];
 
 const tabs = [{ value: "Own Account" }, { value: "Issued Accounts" }];
+
+const issuedAccountTabs = [
+  { value: "All Accounts", icon: <IconUsers size={14} /> },
+  { value: "Pending Accounts", icon: <IconUsers size={14} /> },
+];

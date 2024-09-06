@@ -46,6 +46,7 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import {
   TransactionType,
+  useDefaultAccountTransactions,
   usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
@@ -87,6 +88,8 @@ function TransactionForAccount() {
 
   const { transactions: payoutTransactions, loading: loadingPayout } =
     usePayoutTransactions();
+  const { transactions: defaultTransactions, loading: loadingDefault } =
+    useDefaultAccountTransactions();
 
   const [opened, { toggle }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();
@@ -116,6 +119,40 @@ function TransactionForAccount() {
     {
       title: "Total Transactions",
       value: transactions.length,
+    },
+  ];
+
+  const defaultInfoDetails = [
+    {
+      title: "Total Balance",
+      value: defaultTransactions.reduce((acc, cur) => acc + cur.amount, 0),
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Money In",
+      value:
+        defaultTransactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((acc, cur) => acc + cur.amount, 0) || 0,
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Money Out",
+      value:
+        defaultTransactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((acc, cur) => acc + cur.amount, 0) || 0,
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Total Transactions",
+      value: payoutTransactions.length,
     },
   ];
 
@@ -151,6 +188,80 @@ function TransactionForAccount() {
           mt={28}
           styles={{ list: { marginBottom: 28 } }}
         >
+          <TabsPanel value={tabs[0].value}>
+            <InfoCards
+              title="Overview"
+              details={defaultInfoDetails}
+              loading={loading}
+            >
+              {/* <Select
+            data={["Last Week", "Last Month"]}
+            variant="filled"
+            placeholder="Last Week"
+            defaultValue={"Last Week"}
+            w={150}
+            // h={22}
+            color="var(--prune-text-gray-500)"
+            styles={{
+              input: {
+                outline: "none",
+                border: "none",
+              },
+            }}
+          /> */}
+            </InfoCards>
+            <Flex justify="space-between" align="center" mt={38}>
+              <SearchInput search={search} setSearch={setSearch} />
+
+              <Flex gap={12}>
+                <SecondaryBtn
+                  text="Filter"
+                  action={toggle}
+                  icon={IconListTree}
+                />
+                <SecondaryBtn
+                  text="Download Statement"
+                  // action={toggle}
+                  icon={IconCircleArrowDown}
+                />
+              </Flex>
+            </Flex>
+
+            <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+
+            <TableComponent
+              head={IssuedAccountTableHeaders}
+              rows={
+                <RowComponent
+                  data={defaultTransactions}
+                  id={params.id}
+                  search={debouncedSearch}
+                  active={active}
+                  limit={limit}
+                />
+              }
+              loading={loading}
+            />
+
+            <EmptyTable
+              rows={defaultTransactions}
+              loading={loading}
+              text="Transactions will be shown here"
+              title="There are no transactions"
+            />
+
+            <PaginationComponent
+              active={active}
+              setActive={setActive}
+              setLimit={setLimit}
+              limit={limit}
+              total={Math.ceil(
+                filteredSearch(defaultTransactions, searchProps, search)
+                  .length / parseInt(limit ?? "10", 10)
+              )}
+            />
+          </TabsPanel>
+
           <TabsPanel value={tabs[1].value}>
             <InfoCards title="Overview" details={infoDetails} loading={loading}>
               {/* <Select

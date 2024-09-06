@@ -41,7 +41,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber, getUserType } from "@/lib/utils";
 import Link from "next/link";
 import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
@@ -689,8 +689,10 @@ export const SingleDefaultAccountBody = ({
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
       </Text>
+    ) : isDefault ? (
+      "Main Account"
     ) : (
-      account?.type
+      getUserType(account?.type ?? "USER")
     ),
   };
 

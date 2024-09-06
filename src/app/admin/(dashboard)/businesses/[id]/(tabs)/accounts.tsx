@@ -20,7 +20,11 @@ import localFont from "next/font/local";
 import axios from "axios";
 import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect, useMemo } from "react";
-import { AccountData, useBusinessDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  AccountData,
+  useBusinessDefaultAccount,
+  useBusinessPayoutAccount,
+} from "@/lib/hooks/accounts";
 
 import { activeBadgeColor, formatNumber, serialNumber } from "@/lib/utils";
 import useNotification from "@/lib/hooks/notification";
@@ -88,7 +92,10 @@ export default function Accounts({
     meta: bizTrxMeta,
   } = useBusinessTransactions(params.id, customParams);
 
-  const { account: defaultAccount } = useBusinessDefaultAccount(params.id);
+  const { account: defaultAccount, loading: loadingDefault } =
+    useBusinessDefaultAccount(params.id);
+  const { account: payoutAccount, loading: loadingPayout } =
+    useBusinessPayoutAccount(params.id);
   const { services } = useBusinessServices(params.id);
 
   const form = useForm<FilterType>({
@@ -201,6 +208,10 @@ export default function Accounts({
       </TableTd>
     </TableTr>
   ));
+  console.log(
+    services.find((service) => service.serviceIdentifier === "PAYOUT_SERVICE")
+      ?.active
+  );
 
   return (
     <TabsComponent tabs={tabs} mt={24}>
@@ -211,23 +222,39 @@ export default function Accounts({
             bic="ARPYGB21XXX"
             balance={defaultAccount?.accountBalance ?? 0}
             iban={defaultAccount?.accountNumber ?? ""}
-            loading={loading}
+            loading={loadingDefault}
             badgeText="Main Account"
             link={`/admin/businesses/${params.id}/default`}
             business
-            disable
-          >
-            <Switch
-              readOnly
-              label="Disabled"
-              defaultChecked={
-                !services.find(
-                  (service) => service.serviceIdentifier === "PAYOUT_SERVICE"
-                )?.active
-              }
-              labelPosition="left"
-            />
-          </AccountCard>
+          />
+
+          {payoutAccount && (
+            <AccountCard
+              currency="EUR"
+              bic="ARPYGB21XXX"
+              balance={payoutAccount?.accountBalance ?? 0}
+              iban={payoutAccount?.accountNumber ?? ""}
+              loading={loadingPayout}
+              badgeText="Payout Account"
+              link={`/admin/businesses/${params.id}/payout`}
+              business
+              disable
+            >
+              <Switch
+                readOnly
+                label="Disabled"
+                onChange={() => {}}
+                checked={
+                  !services.find(
+                    (service) => service.serviceIdentifier === "PAYOUT_SERVICE"
+                  )?.active
+                }
+                styles={{ label: { fontSize: "10px" } }}
+                size="xs"
+                labelPosition="left"
+              />
+            </AccountCard>
+          )}
         </SimpleGrid>
       </TabsPanel>
 

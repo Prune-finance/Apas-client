@@ -132,6 +132,41 @@ export function useBusinessDefaultAccount(id: string) {
   return { loading, account, revalidate };
 }
 
+export function useBusinessPayoutAccount(id: string) {
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${id}/payout-account`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccount();
+  }
+
+  useEffect(() => {
+    fetchAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+
 export function usePayoutAccount() {
   const [accounts, setAccounts] = useState<AccountData[] | null>(null);
   const [meta, setMeta] = useState<AccountMeta | null>(null);

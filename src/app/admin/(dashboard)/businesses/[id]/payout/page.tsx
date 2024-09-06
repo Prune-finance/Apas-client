@@ -2,12 +2,14 @@
 
 import {
   useBusinessDefaultAccount,
+  useBusinessPayoutAccount,
   useSingleAccount,
 } from "@/lib/hooks/accounts";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
   TransactionType,
   useBusinessTransactions,
+  usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
 
@@ -22,7 +24,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useParams } from "next/navigation";
 import React, { useState } from "react";
 
-export default function BusinessDefaultAccount() {
+export default function BusinessPayoutAccount() {
   const params = useParams<{ id: string }>();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
@@ -33,13 +35,9 @@ export default function BusinessDefaultAccount() {
     revalidate,
   } = useSingleBusiness(params.id);
 
-  const { account, loading } = useBusinessDefaultAccount(params.id);
+  const { account, loading } = useBusinessPayoutAccount(params.id);
 
-  const {
-    loading: loadingTrx,
-    transactions,
-    meta,
-  } = useBusinessTransactions(params.id);
+  const { loading: loadingTrx, transactions, meta } = usePayoutTransactions();
   return (
     <main>
       <Breadcrumbs
@@ -51,7 +49,7 @@ export default function BusinessDefaultAccount() {
             loading: !business?.name || loadingBiz,
           },
           {
-            title: "Own Account",
+            title: "Payout Account",
             href: `/admin/businesses/accounts/${params.id}/default`,
             loading: loading,
           },
@@ -75,7 +73,7 @@ export default function BusinessDefaultAccount() {
           setChartFrequency={setChartFrequency}
           business={business}
           admin
-          isDefault
+          payout
         />
       </Paper>
     </main>

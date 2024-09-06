@@ -508,7 +508,11 @@ const Services = () => {
           <GridCol span={4} className={styles.grid} key={service.id}>
             <Checkbox
               label={service.title}
-              checked={service.active}
+              checked={
+                service.serviceIdentifier === "ACCOUNT_SERVICE"
+                  ? true
+                  : service.active
+              }
               // onChange={() => handleServiceChange(service.id)}
               color="var(--prune-primary-700)"
               classNames={{

@@ -15,6 +15,7 @@ import {
   Stack,
   TableTd,
   TableTr,
+  TabsPanel,
   Text,
   TextInput,
   Title,
@@ -43,7 +44,12 @@ import Transaction from "@/lib/store/transaction";
 import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
-import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  useDefaultAccountTransactions,
+  usePayoutTransactions,
+  useTransactions,
+} from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import { Suspense, useRef, useState } from "react";
 import { filteredSearch } from "@/lib/search";
@@ -61,6 +67,7 @@ import { SearchInput } from "@/ui/components/Inputs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
 import Link from "next/link";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
+import TabsComponent from "@/ui/components/Tabs";
 
 function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -78,6 +85,11 @@ function TransactionForAccount() {
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status }),
   });
+
+  const { transactions: payoutTransactions, loading: loadingPayout } =
+    usePayoutTransactions();
+  const { transactions: defaultTransactions, loading: loadingDefault } =
+    useDefaultAccountTransactions();
 
   const [opened, { toggle }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();
@@ -110,6 +122,40 @@ function TransactionForAccount() {
     },
   ];
 
+  const defaultInfoDetails = [
+    {
+      title: "Total Balance",
+      value: defaultTransactions.reduce((acc, cur) => acc + cur.amount, 0),
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Money In",
+      value:
+        defaultTransactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((acc, cur) => acc + cur.amount, 0) || 0,
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Money Out",
+      value:
+        defaultTransactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((acc, cur) => acc + cur.amount, 0) || 0,
+      formatted: true,
+      currency: "EUR",
+      locale: "en-GB",
+    },
+    {
+      title: "Total Transactions",
+      value: payoutTransactions.length,
+    },
+  ];
+
   const form = useForm<FilterType>({
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
@@ -126,13 +172,29 @@ function TransactionForAccount() {
         ]}
       /> */}
 
-      <Paper p={20} mt={16}>
-        <Title c="var(--prune-text-gray-700)" fz={24} fw={600} my={28}>
-          Transactions
-        </Title>
+      <Paper p={20}>
+        <Stack gap={8}>
+          <Title c="var(--prune-text-gray-700)" fz={24} fw={600}>
+            Transactions
+          </Title>
 
-        <InfoCards title="Overview" details={infoDetails} loading={loading}>
-          {/* <Select
+          <Text fz={14} c="var(--prune-text-gray-500)">
+            Here’s an overview of all transactions{" "}
+          </Text>
+        </Stack>
+
+        <TabsComponent
+          tabs={tabs}
+          mt={28}
+          styles={{ list: { marginBottom: 28 } }}
+        >
+          <TabsPanel value={tabs[0].value}>
+            <InfoCards
+              title="Overview"
+              details={defaultInfoDetails}
+              loading={loading}
+            >
+              {/* <Select
             data={["Last Week", "Last Month"]}
             variant="filled"
             placeholder="Last Week"
@@ -147,54 +209,171 @@ function TransactionForAccount() {
               },
             }}
           /> */}
-        </InfoCards>
+            </InfoCards>
+            <Flex justify="space-between" align="center" mt={38}>
+              <SearchInput search={search} setSearch={setSearch} />
 
-        <Flex justify="space-between" align="center" mt={38}>
-          <SearchInput search={search} setSearch={setSearch} />
+              <Flex gap={12}>
+                <SecondaryBtn
+                  text="Filter"
+                  action={toggle}
+                  icon={IconListTree}
+                />
+                <SecondaryBtn
+                  text="Download Statement"
+                  // action={toggle}
+                  icon={IconCircleArrowDown}
+                />
+              </Flex>
+            </Flex>
 
-          <Flex gap={12}>
-            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-            <SecondaryBtn
-              text="Download Statement"
-              // action={toggle}
-              icon={IconCircleArrowDown}
+            <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+
+            <TableComponent
+              head={IssuedAccountTableHeaders}
+              rows={
+                <RowComponent
+                  data={defaultTransactions}
+                  id={params.id}
+                  search={debouncedSearch}
+                  active={active}
+                  limit={limit}
+                />
+              }
+              loading={loading}
             />
-          </Flex>
-        </Flex>
 
-        <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+            <EmptyTable
+              rows={defaultTransactions}
+              loading={loading}
+              text="Transactions will be shown here"
+              title="There are no transactions"
+            />
 
-        <TableComponent
-          head={IssuedAccountTableHeaders}
-          rows={
-            <RowComponent
-              data={transactions}
-              id={params.id}
-              search={debouncedSearch}
+            <PaginationComponent
               active={active}
+              setActive={setActive}
+              setLimit={setLimit}
               limit={limit}
+              total={Math.ceil(
+                filteredSearch(defaultTransactions, searchProps, search)
+                  .length / parseInt(limit ?? "10", 10)
+              )}
             />
-          }
-          loading={loading}
-        />
+          </TabsPanel>
 
-        <EmptyTable
-          rows={transactions}
-          loading={loading}
-          text="Transactions will be shown here"
-          title="There are no transactions"
-        />
+          <TabsPanel value={tabs[1].value}>
+            <InfoCards title="Overview" details={infoDetails} loading={loading}>
+              {/* <Select
+            data={["Last Week", "Last Month"]}
+            variant="filled"
+            placeholder="Last Week"
+            defaultValue={"Last Week"}
+            w={150}
+            // h={22}
+            color="var(--prune-text-gray-500)"
+            styles={{
+              input: {
+                outline: "none",
+                border: "none",
+              },
+            }}
+          /> */}
+            </InfoCards>
+            <Flex justify="space-between" align="center" mt={38}>
+              <SearchInput search={search} setSearch={setSearch} />
 
-        <PaginationComponent
-          active={active}
-          setActive={setActive}
-          setLimit={setLimit}
-          limit={limit}
-          total={Math.ceil(
-            filteredSearch(transactions, searchProps, search).length /
-              parseInt(limit ?? "10", 10)
-          )}
-        />
+              <Flex gap={12}>
+                <SecondaryBtn
+                  text="Filter"
+                  action={toggle}
+                  icon={IconListTree}
+                />
+                <SecondaryBtn
+                  text="Download Statement"
+                  // action={toggle}
+                  icon={IconCircleArrowDown}
+                />
+              </Flex>
+            </Flex>
+
+            <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+
+            <TableComponent
+              head={IssuedAccountTableHeaders}
+              rows={
+                <RowComponent
+                  data={transactions}
+                  id={params.id}
+                  search={debouncedSearch}
+                  active={active}
+                  limit={limit}
+                />
+              }
+              loading={loading}
+            />
+
+            <EmptyTable
+              rows={transactions}
+              loading={loading}
+              text="Transactions will be shown here"
+              title="There are no transactions"
+            />
+
+            <PaginationComponent
+              active={active}
+              setActive={setActive}
+              setLimit={setLimit}
+              limit={limit}
+              total={Math.ceil(
+                filteredSearch(transactions, searchProps, search).length /
+                  parseInt(limit ?? "10", 10)
+              )}
+            />
+          </TabsPanel>
+
+          <TabsPanel value={tabs[2].value}>
+            <Flex justify="space-between" align="center" mt={38}>
+              <SearchInput search={search} setSearch={setSearch} />
+
+              <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+            </Flex>
+
+            <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+
+            <TableComponent
+              head={IssuedAccountTableHeaders}
+              rows={
+                <RowComponent
+                  data={payoutTransactions}
+                  id={params.id}
+                  search={debouncedSearch}
+                  active={active}
+                  limit={limit}
+                />
+              }
+              loading={loadingPayout}
+            />
+
+            <EmptyTable
+              rows={payoutTransactions}
+              loading={loadingPayout}
+              text="Transactions will be shown here"
+              title="There are no transactions"
+            />
+
+            <PaginationComponent
+              active={active}
+              setActive={setActive}
+              setLimit={setLimit}
+              limit={limit}
+              total={Math.ceil(
+                filteredSearch(payoutTransactions, searchProps, search).length /
+                  parseInt(limit ?? "10", 10)
+              )}
+            />
+          </TabsPanel>
+        </TabsComponent>
 
         {data && (
           <TransactionDrawer
@@ -208,6 +387,12 @@ function TransactionForAccount() {
     </main>
   );
 }
+
+const tabs = [
+  { value: "Businesses Accounts" },
+  { value: "Issued Accounts" },
+  { value: "Payout Accounts" },
+];
 
 const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];
 

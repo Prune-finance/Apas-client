@@ -228,7 +228,7 @@ export default function Documents({
         />
       </div>
 
-      {business.documents && business.documents.length > 0 && (
+      {business.documents.some((doc) => Object.keys(doc).length > 0) && (
         <div className={styles.top__container} style={{ marginTop: "32px" }}>
           <Flex justify="space-between" align="center">
             <Text fz={12} fw={600} tt="uppercase">

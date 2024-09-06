@@ -482,6 +482,36 @@ export const validateDebitRequest = z
     return data;
   });
 
+export const sendMoneyIndividualValidate = z.object({
+  firstName: z.string().min(2, "First Name is required"),
+  lastName: z.string().min(2, "Last Name is required"),
+  destinationIBAN: z.string().min(3, "Destination account is required"),
+  destinationBIC: z.string().min(3, "BIC is required"),
+  destinationBank: z.string().min(2, "Bank is required"),
+  bankAddress: z.string().min(2, "Bank Address is required"),
+  destinationCountry: z.string().min(2, "Country is required"),
+  amount: z
+    .number({ invalid_type_error: "Amount is required" })
+    .positive("A positive amount is required"),
+  invoice: z.string(),
+  narration: z.string().min(2, "Narration is required"),
+  // accountBalance: z.number().positive("A positive amount is required"),
+});
+
+export const sendMoneyCompanyValidate = z.object({
+  companyName: z.string().min(2, "First Name is required"),
+  destinationIBAN: z.string().min(3, "Destination account is required"),
+  destinationBIC: z.string().min(3, "BIC is required"),
+  destinationBank: z.string().min(2, "Bank is required"),
+  bankAddress: z.string().min(2, "Bank Address is required"),
+  amount: z
+    .number({ invalid_type_error: "Amount is required" })
+    .positive("A positive amount is required"),
+  invoice: z.string(),
+  narration: z.string().min(2, "Narration is required"),
+  // accountBalance: z.number().positive("A positive amount is required"),
+});
+
 // .refine((data) => data.accountBalance < data.amount, {
 //   message: "Account balance must be greater than or equal to amount",
 //   path: ["accountBalance"],

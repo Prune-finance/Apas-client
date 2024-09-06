@@ -196,7 +196,7 @@ export default function Keys() {
               </Tooltip>
             </Group>
 
-            {!Boolean(meta?.hasLiveKey) && (
+            {/* {!Boolean(meta?.hasLiveKey) && (
               <PrimaryBtn
                 text={
                   Boolean(meta?.activeLKReq)
@@ -213,7 +213,7 @@ export default function Keys() {
                 justify="center"
                 action={openModal}
               />
-            )}
+            )} */}
           </Group>
 
           <Paper

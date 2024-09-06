@@ -144,4 +144,8 @@ export default function AccountTrxSuspense() {
   );
 }
 
-const tabs = [{ value: "Own Account" }, { value: "Issued Accounts" }];
+const tabs = [
+  { value: "Own Account" },
+  { value: "Issued Accounts" },
+  { value: "Payouts" },
+];

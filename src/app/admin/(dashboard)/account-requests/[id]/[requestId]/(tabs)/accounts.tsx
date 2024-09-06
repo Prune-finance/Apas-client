@@ -21,6 +21,7 @@ import styles from "./styles.module.scss";
 import { RequestData } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { getUserType } from "@/lib/utils";
+import dayjs from "dayjs";
 
 export default function Account({ request }: { request: RequestData | null }) {
   const { handleInfo } = useNotification();
@@ -98,6 +99,18 @@ export default function Account({ request }: { request: RequestData | null }) {
               }}
               label="Country of Operation"
               placeholder={request?.country}
+            />
+          </GridCol>
+
+          <GridCol span={4} className={styles.grid}>
+            <TextInput
+              readOnly
+              classNames={{
+                input: styles.input,
+                label: styles.label,
+              }}
+              label="Date Created"
+              placeholder={dayjs(request?.createdAt).format("DD MMMM, YYYY")}
             />
           </GridCol>
         </Grid>

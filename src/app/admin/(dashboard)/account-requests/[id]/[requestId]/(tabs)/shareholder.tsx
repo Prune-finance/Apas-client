@@ -1,29 +1,14 @@
 "use client";
 
-import {
-  Button,
-  Flex,
-  Grid,
-  GridCol,
-  Text,
-  TextInput,
-  UnstyledButton,
-} from "@mantine/core";
-import {
-  IconFileInfo,
-  IconPencilMinus,
-  IconPlus,
-  IconTrash,
-} from "@tabler/icons-react";
+import { Flex, Grid, GridCol, Text } from "@mantine/core";
+
 import { Fragment } from "react";
 
 import styles from "./styles.module.scss";
-// import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessData, Director } from "@/lib/hooks/businesses";
 import { RequestData } from "@/lib/hooks/requests";
-import { request } from "http";
-import useNotification from "@/lib/hooks/notification";
-import { notifications } from "@mantine/notifications";
+
+import { FileTextInput } from "../FileTextInput";
+import { camelCaseToTitleCase } from "@/lib/utils";
 
 export default function Shareholders({
   request,
@@ -56,7 +41,6 @@ const DirectorsForm = ({
   request: RequestData;
   index: number;
 }) => {
-  const { handleInfo } = useNotification();
   return (
     <div className={styles.top__container}>
       <Flex justify="space-between" align="center">
@@ -68,49 +52,15 @@ const DirectorsForm = ({
       <Grid mt={20} className={styles.grid__container}>
         {request.accountType === "CORPORATE" && (
           <GridCol span={4} className={styles.grid}>
-            <TextInput
-              readOnly
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-                section: styles.section,
-              }}
-              styles={{
-                input: {
-                  "&::placeholder": { textTransform: "uppercase" },
-                },
-              }}
-              leftSection={<IconFileInfo />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton
-                  className={styles.input__right__section}
-                  onClick={() => {
-                    notifications.clean();
-                    if (
-                      !request.documentData.shareholders[
-                        `shareholder_${index + 1}`
-                      ].idFile
-                    )
-                      return handleInfo("No Identity File provided", "");
-
-                    return window.open(
-                      request.documentData.shareholders[
-                        `shareholder_${index + 1}`
-                      ].idFile,
-                      "_blank"
-                    );
-                  }}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
+            <FileTextInput
               label="Identity Type"
-              placeholder={
+              placeholder={camelCaseToTitleCase(
                 request.documentData.shareholders[`shareholder_${index + 1}`]
                   .idType
+              )}
+              url={
+                request.documentData.shareholders[`shareholder_${index + 1}`]
+                  .idFile
               }
             />
           </GridCol>
@@ -118,44 +68,15 @@ const DirectorsForm = ({
 
         {request.accountType === "CORPORATE" && (
           <GridCol span={4} className={styles.grid}>
-            <TextInput
-              readOnly
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-                section: styles.section,
-              }}
-              leftSection={<IconFileInfo />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton
-                  className={styles.input__right__section}
-                  onClick={() => {
-                    notifications.clean();
-                    if (
-                      !request.documentData.shareholders[
-                        `shareholder_${index + 1}`
-                      ].poaFile
-                    )
-                      return handleInfo("No Proof of Address provided", "");
-
-                    return window.open(
-                      request.documentData.shareholders[
-                        `shareholder_${index + 1}`
-                      ].poaFile,
-                      "_blank"
-                    );
-                  }}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
+            <FileTextInput
               label="Proof of Address"
-              placeholder={
+              placeholder={camelCaseToTitleCase(
                 request.documentData.shareholders[`shareholder_${index + 1}`]
                   .poaType
+              )}
+              url={
+                request.documentData.shareholders[`shareholder_${index + 1}`]
+                  .poaFile
               }
             />
           </GridCol>

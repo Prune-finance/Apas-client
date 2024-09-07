@@ -416,7 +416,7 @@ export interface AccountData {
     name: string;
     id: string;
   };
-  type: string;
+  type: "USER" | "CORPORATE";
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
 }
 

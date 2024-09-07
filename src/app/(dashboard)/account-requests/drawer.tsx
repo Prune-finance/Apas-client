@@ -21,6 +21,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 import { notifications } from "@mantine/notifications";
 import useNotification from "@/lib/hooks/notification";
+import { camelCaseToTitleCase } from "@/lib/utils";
 
 dayjs.extend(advancedFormat);
 
@@ -203,11 +204,11 @@ export const AccountRequestsDrawer = ({
                           </Text>
                           <TextInputWithFile
                             label="ID"
-                            placeholder={
+                            placeholder={camelCaseToTitleCase(
                               selectedRequest.documentData.directors[
                                 `director_${index + 1}`
                               ].idType
-                            }
+                            )}
                             url={
                               selectedRequest.documentData.directors[
                                 `director_${index + 1}`
@@ -218,11 +219,11 @@ export const AccountRequestsDrawer = ({
 
                           <TextInputWithFile
                             label="Proof of Address"
-                            placeholder={
+                            placeholder={camelCaseToTitleCase(
                               selectedRequest.documentData.directors[
                                 `director_${index + 1}`
                               ].poaType
-                            }
+                            )}
                             url={
                               selectedRequest.documentData.directors[
                                 `director_${index + 1}`
@@ -261,11 +262,11 @@ export const AccountRequestsDrawer = ({
 
                           <TextInputWithFile
                             label="ID"
-                            placeholder={
+                            placeholder={camelCaseToTitleCase(
                               selectedRequest.documentData.shareholders[
                                 `shareholder_${index + 1}`
                               ].idType
-                            }
+                            )}
                             url={
                               selectedRequest.documentData.shareholders[
                                 `shareholder_${index + 1}`
@@ -277,11 +278,11 @@ export const AccountRequestsDrawer = ({
 
                           <TextInputWithFile
                             label="Proof of Address"
-                            placeholder={
+                            placeholder={camelCaseToTitleCase(
                               selectedRequest.documentData.shareholders[
                                 `shareholder_${index + 1}`
                               ].poaType
-                            }
+                            )}
                             url={
                               selectedRequest.documentData.shareholders[
                                 `shareholder_${index + 1}`

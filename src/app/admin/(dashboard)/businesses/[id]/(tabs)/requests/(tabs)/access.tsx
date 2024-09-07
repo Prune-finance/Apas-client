@@ -8,20 +8,46 @@ import { useState } from "react";
 import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { approvedBadgeColor } from "@/lib/utils";
+import {
+  useAllCompanyRequests,
+  useCompanyRequests,
+  usePayoutRequests,
+} from "@/lib/hooks/requests";
+import { useParams } from "next/navigation";
 
 export const Access = () => {
+  const { id } = useParams<{ id: string }>();
+  const { requests, revalidate } = useAllCompanyRequests(id, {
+    type: "ACCOUNT_ISSUANCE",
+    companyId: id,
+  });
+
+  const { requests: payoutRequests, revalidate: revalidatePR } =
+    usePayoutRequests({ companyId: id });
   return (
     <div className={styles.business__tab}>
-      <RequestAccess
-        title="Access Request"
-        date={new Date()}
-        status="PENDING"
-      />
-      <RequestAccess
-        title="Payout Request"
-        date={new Date()}
-        status="APPROVED"
-      />
+      {payoutRequests.length === 0 && requests.length === 0 && (
+        <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
+          No Access Request
+        </Text>
+      )}
+      {payoutRequests.map((req, index) => (
+        <RequestAccess
+          key={index}
+          title="Payout Account Request"
+          date={req.createdAt}
+          status={req.status}
+        />
+      ))}
+
+      {requests.map((req, index) => (
+        <RequestAccess
+          key={index}
+          title={"Issued Accounts Access Request"}
+          date={req.createdAt}
+          status={req.status}
+        />
+      ))}
     </div>
   );
 };
@@ -65,7 +91,6 @@ const RequestAccess = ({ title, date, status }: IProps) => {
               input: styles.input,
               label: styles.label,
             }}
-            color="green"
             label="Status"
             labelProps={{
               fz: 12,

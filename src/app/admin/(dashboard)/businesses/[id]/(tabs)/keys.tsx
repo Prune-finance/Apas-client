@@ -63,7 +63,7 @@ export default function Keys({
     <div className={styles.business__tab}>
       <Flex className={styles.api__container} gap={40}>
         <Flex flex={1} className={styles.api__key} direction="column">
-          <Badge
+          {/* <Badge
             leftSection={<IconInfoCircle />}
             tt="inherit"
             color="#D92D20"
@@ -73,11 +73,13 @@ export default function Keys({
           >
             Please do not use your test keys for production. They are only for
             test.
-          </Badge>
+          </Badge> */}
 
           <KeyComponent keyString={test?.key} keyType="Test Key" />
 
-          <KeyComponent keyString={live?.key} keyType="Live Key" />
+          {live && live.key && (
+            <KeyComponent keyString={live?.key} keyType="Live Key" />
+          )}
 
           {/* <KeyComponent keyString={live?.key} keyType="Test Webhook URL" /> */}
         </Flex>

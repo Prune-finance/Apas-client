@@ -102,19 +102,21 @@ export const AccountCard = ({
           )}
         </Group>
 
-        <CopyButton
-          value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
-        >
-          {({ copied, copy }) => (
-            <SecondaryBtn
-              icon={copied ? IconCheck : IconCopy}
-              text={copied ? "Copied" : "Copy"}
-              action={copy}
-              variant="transparent"
-              td="underline"
-            />
-          )}
-        </CopyButton>
+        <Box onClick={(e) => e.stopPropagation()}>
+          <CopyButton
+            value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
+          >
+            {({ copied, copy }) => (
+              <SecondaryBtn
+                icon={copied ? IconCheck : IconCopy}
+                text={copied ? "Copied" : "Copy"}
+                action={copy}
+                variant="transparent"
+                td="underline"
+              />
+            )}
+          </CopyButton>
+        </Box>
       </Group>
 
       {!loading ? (
@@ -191,19 +193,21 @@ export const AccountCard = ({
           )}
         </Group>
 
-        <CopyButton
-          value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
-        >
-          {({ copied, copy }) => (
-            <SecondaryBtn
-              icon={copied ? IconCheck : IconCopy}
-              text={copied ? "Copied" : "Copy"}
-              action={copy}
-              variant="transparent"
-              td="underline"
-            />
-          )}
-        </CopyButton>
+        <Box onClick={(e) => e.stopPropagation()}>
+          <CopyButton
+            value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
+          >
+            {({ copied, copy }) => (
+              <SecondaryBtn
+                icon={copied ? IconCheck : IconCopy}
+                text={copied ? "Copied" : "Copy"}
+                action={copy}
+                variant="transparent"
+                td="underline"
+              />
+            )}
+          </CopyButton>
+        </Box>
       </Group>
 
       {!loading ? (

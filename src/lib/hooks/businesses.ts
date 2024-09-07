@@ -268,7 +268,7 @@ export interface BusinessMeta {
 
 export interface SingleBizMeta {
   activationLinkCount: number;
-  activeActivationLink: ActiveActivationLink;
+  activeActivationLink: ActiveActivationLink | null;
   users: number;
 }
 
@@ -331,6 +331,7 @@ export interface BusinessData {
   contactPOAUrl: string;
   documents: Document[];
   lastLogin: Date;
+  contactSignup: Date | null;
 }
 
 export interface Document {

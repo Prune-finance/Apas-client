@@ -59,6 +59,8 @@ import { BackBtn, PrimaryBtn } from "@/ui/components/Buttons";
 import { Requests } from "./(tabs)/requests";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
 import { notifications } from "@mantine/notifications";
 
 dayjs.extend(duration);
@@ -203,32 +205,61 @@ export default function SingleBusiness() {
     }
   }, [business?.companyStatus]);
 
-  const activationLinkExpiringTime = dayjs(
-    meta?.activeActivationLink && meta?.activeActivationLink.createdAt
-  ).add(72, "h");
-  const isAfterExpiringTime = dayjs().isAfter(activationLinkExpiringTime);
-
-  const [remainingTime, setRemainingTime] = useState(
-    activationLinkExpiringTime.diff(dayjs(), "second")
-  );
-
-  const interval = useInterval(() => {
-    const now = dayjs();
-    const diffInSeconds = activationLinkExpiringTime.diff(now, "second");
-    if (diffInSeconds >= 0) {
-      setRemainingTime(diffInSeconds);
-    } else {
-      interval.stop(); // Stop the interval when time is up
-    }
-  }, 1000);
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [isExpired, setIsExpired] = useState(false);
 
   useEffect(() => {
-    if (meta && meta?.activationLinkCount > 0 && remainingTime > 0) {
-      interval.start(); // Start the interval if there's a valid link and time left
+    const activationLinkExpiringTime = meta?.activeActivationLink
+      ? dayjs(meta.activeActivationLink.createdAt).add(72, "hours")
+      : null;
+
+    if (!activationLinkExpiringTime) {
+      setRemainingTime(0);
+      setIsExpired(true); // Mark as expired if there's no valid link
+      return;
     }
 
-    return () => interval.stop(); // Clean up interval on unmount
-  }, [meta?.activationLinkCount, remainingTime]);
+    const initialRemainingTime = activationLinkExpiringTime.diff(
+      dayjs(),
+      "second"
+    );
+
+    if (initialRemainingTime > 0) {
+      setRemainingTime(initialRemainingTime);
+      setIsExpired(false); // Set to false if the countdown is valid
+
+      const interval = setInterval(() => {
+        const now = dayjs();
+
+        const diffInSeconds = activationLinkExpiringTime.diff(now, "second");
+
+        if (diffInSeconds >= 0) {
+          setRemainingTime(diffInSeconds);
+        } else {
+          setRemainingTime(0);
+          setIsExpired(true); // Mark as expired when the time is up
+          clearInterval(interval); // Stop the interval
+        }
+      }, 1000);
+
+      return () => clearInterval(interval); // Clean up the interval
+    } else {
+      setRemainingTime(0);
+      setIsExpired(true); // Time has already expired
+    }
+  }, [meta?.activeActivationLink]);
+
+  const formatDuration = (seconds: number) => {
+    const duration = dayjs.duration(seconds, "seconds");
+    return `${String(duration.days() * 24 + duration.hours()).padStart(
+      2,
+      "0"
+    )}:${String(duration.minutes()).padStart(2, "0")}:${String(
+      duration.seconds()
+    ).padStart(2, "0")}`;
+  };
+
+  console.log(services);
 
   return (
     <main className={styles.main}>
@@ -349,23 +380,20 @@ export default function SingleBusiness() {
                     <PrimaryBtn
                       text={
                         Boolean(meta?.activationLinkCount)
-                          ? isAfterExpiringTime
+                          ? isExpired
                             ? "Resend Activation Link"
-                            : `Link Expires in ${dayjs
-                                .duration(remainingTime, "seconds")
-                                .format("HH:mm:ss")}`
+                            : `Link Expires in ${formatDuration(remainingTime)}`
                           : "Send Activation Link"
                       }
                       action={() => {
-                        remainingTime > 0
-                          ? () => {
-                              notifications.clean();
-                              handleInfo(
-                                "A valid activation link has been sent to the business",
-                                ""
-                              );
-                            }
-                          : sendActivationLink();
+                        if (remainingTime && remainingTime > 0) {
+                          notifications.clean();
+                          return handleInfo(
+                            "A valid activation link has been sent to the business",
+                            ""
+                          );
+                        }
+                        return sendActivationLink();
                       }}
                       radius={4}
                       loading={processingLink}
@@ -406,7 +434,11 @@ export default function SingleBusiness() {
 
             <TabsPanel value="business">
               {business && (
-                <Business business={business} revalidate={revalidate} />
+                <Business
+                  business={business}
+                  revalidate={revalidate}
+                  services={services}
+                />
               )}
             </TabsPanel>
 

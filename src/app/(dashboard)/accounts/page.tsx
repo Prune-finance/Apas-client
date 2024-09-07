@@ -309,6 +309,8 @@ function Accounts() {
     );
   };
 
+  console.log(accounts);
+
   const rows = filteredSearch(
     accounts,
     ["accountName", "accountNumber", "Company.name"],
@@ -320,7 +322,14 @@ function Accounts() {
         className={styles.table__td}
         tt="capitalize"
       >
-        {element.accountName}
+        {/* {`${element.accountName}`}{" "} */}
+        <Text fz={12} inline>
+          {element.accountName}
+
+          <Text span inherit fz={12} c="#c6a700" fw={600}>
+            {element.staging === "TEST" ? " (TEST)" : ""}
+          </Text>
+        </Text>
       </TableTd>
       <TableTd
         onClick={() => router.push(`/accounts/${element.id}`)}

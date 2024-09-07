@@ -92,7 +92,10 @@ export const PrimaryBtn = ({
       fz={12}
       fw={500}
       leftSection={Icon && <Icon size={14} />}
-      onClick={action}
+      onClick={(e) => {
+        e.stopPropagation();
+        action && action();
+      }}
       {...props}
     >
       {text}
@@ -139,7 +142,10 @@ export const SecondaryBtn = ({
       fz={12}
       fw={500}
       leftSection={Icon && <Icon size={14} />}
-      onClick={action}
+      onClick={(e) => {
+        e.stopPropagation();
+        action && action();
+      }}
       type={type}
       {...props}
     >

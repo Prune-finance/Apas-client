@@ -16,7 +16,11 @@ import {
 import { IconPencilMinus } from "@tabler/icons-react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
+import {
+  BusinessData,
+  Service,
+  useBusinessServices,
+} from "@/lib/hooks/businesses";
 import { useState } from "react";
 import { useForm, UseFormReturnType } from "@mantine/form";
 import axios from "axios";
@@ -27,25 +31,20 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BasicInfoType } from "@/lib/schema";
 import { ContactDocumentTextInput } from "./utils";
 import { useParams } from "next/navigation";
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 
 export default function Business({
   business,
   revalidate,
+  services,
 }: {
   business: BusinessData;
   revalidate: () => void;
+  services: Service[];
 }) {
-  const [editingTop, setEditingTop] = useState(false);
-  const [editingBottom, setEditingBottom] = useState(false);
-  const [editingBizInfo, setEditingBizInfo] = useState(false);
-  const [processing, setProcessing] = useState(false);
-
-  const { pricingPlan } = usePricingPlan();
-  const pricingPlanOptions = pricingPlan.map((plan) => ({
-    label: plan.name,
-    value: plan.id,
-  }));
-
   const { handleSuccess, handleError } = useNotification();
 
   const initialValues = {
@@ -105,7 +104,7 @@ export default function Business({
         business={business}
       />
 
-      <Services />
+      <Services services={services} />
 
       <BusinessBio
         form={form as unknown as UseFormReturnType<BasicInfoType>}
@@ -415,6 +414,24 @@ const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
             business={business as BasicInfoType}
           />
         </GridCol>
+
+        {business.contactSignup && (
+          <GridCol span={4} className={styles.grid}>
+            <TextInput
+              readOnly
+              classNames={{
+                input: styles.input,
+                label: styles.label,
+              }}
+              // w={324}
+              label="Date & Time of Activation"
+              placeholder={dayjs(business.contactSignup).format(
+                "Do MMMM, YYYY - hh:mm A"
+              )}
+              // {...form.getInputProps("contactEmail")}
+            />
+          </GridCol>
+        )}
       </Grid>
     </div>
   );
@@ -489,10 +506,7 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
   );
 };
 
-const Services = () => {
-  const { id } = useParams<{ id: string }>();
-  const { services, meta, revalidate } = useBusinessServices(id);
-
+const Services = ({ services }: { services: Service[] }) => {
   const handleServiceChange = (id: string) => {
     console.log(id);
   };

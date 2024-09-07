@@ -15,6 +15,7 @@ interface IParams {
   query?: string;
   type?: string;
   page?: number;
+  companyId?: string;
 }
 
 export function useRequests(customParams: IParams = {}, id: string = "") {
@@ -142,6 +143,7 @@ export function useAllCompanyRequests(
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.companyId && { companyId: customParams.companyId }),
     };
   }, [customParams]);
 
@@ -178,7 +180,15 @@ export function useAllCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [
+    obj.createdAt,
+    obj.limit,
+    obj.sort,
+    obj.status,
+    obj.type,
+    obj.page,
+    obj.companyId,
+  ]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -361,6 +371,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
       ...(customParams.createdAt && { createdAt: customParams.createdAt }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.companyId && { companyId: customParams.companyId }),
     };
   }, [customParams]);
 
@@ -392,7 +403,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.companyId]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -542,7 +553,7 @@ export function useCompanyRequests(
 export interface IUserRequest {
   id: string;
   type: "FREEZE" | "UNFREEZE" | "ACTIVATE" | "DEACTIVATE";
-  status: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   reason: string;
   supportingDocumentName: null | string;
   supportingDocumentUrl: null;
@@ -739,7 +750,7 @@ export interface RequestMeta {
 
 export interface PayoutAccount {
   id: string;
-  status: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   companyName: string;
   documentData: PayoutDocumentData;
   createdAt: Date;

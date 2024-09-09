@@ -285,7 +285,6 @@ export const OwnAccountTableHeaders = [
 
 export const IssuedAccountTableHeaders = [
   "Sender Name",
-  "Business",
   "Beneficiary",
   "Type",
   "Amount",

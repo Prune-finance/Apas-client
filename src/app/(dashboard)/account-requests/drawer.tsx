@@ -13,15 +13,27 @@ import {
   UnstyledButton,
   Text,
   TabsPanel,
+  Alert,
+  FileButton,
 } from "@mantine/core";
-import { IconX, IconPdf, IconFileTypePdf } from "@tabler/icons-react";
+import {
+  IconX,
+  IconPdf,
+  IconFileTypePdf,
+  IconInfoCircle,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import TabsComponent from "@/ui/components/Tabs";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 import { notifications } from "@mantine/notifications";
 import useNotification from "@/lib/hooks/notification";
-import { camelCaseToTitleCase } from "@/lib/utils";
+import { camelCaseToTitleCase, getUserType } from "@/lib/utils";
+import { getNestedDocValue } from "@/lib/helpers/document-status";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { parseError } from "@/lib/actions/auth";
+import { Dispatch, SetStateAction, useState } from "react";
 
 dayjs.extend(advancedFormat);
 
@@ -29,12 +41,16 @@ type Props = {
   close: () => void;
   opened: boolean;
   selectedRequest: RequestData | null;
+  setSelectedRequest: Dispatch<SetStateAction<RequestData | null>>;
+  revalidate: () => void;
 };
 
 export const AccountRequestsDrawer = ({
   close,
   opened,
   selectedRequest,
+  setSelectedRequest,
+  revalidate,
 }: Props) => {
   const { business } = useUserBusiness();
 
@@ -51,7 +67,7 @@ export const AccountRequestsDrawer = ({
     },
     {
       label: "Account Type",
-      value: selectedRequest?.accountType.toLowerCase(),
+      value: getUserType(selectedRequest?.accountType ?? "USER"),
     },
     {
       label: "Date Created",
@@ -87,8 +103,24 @@ export const AccountRequestsDrawer = ({
       <Divider mb={20} />
 
       <Box px={28} pb={28}>
+        {selectedRequest?.status === "REJECTED" && (
+          <Alert
+            variant="light"
+            color="#B49800"
+            title=""
+            icon={<IconInfoCircle />}
+            styles={{ message: { color: "#B49800" } }}
+            mt={20}
+            mb={28}
+          >
+            This request has been rejected because it didn’t meet the criteria
+            or standards. Please review and make corrections or contact our
+            support team.
+          </Alert>
+        )}
+
         <Text
-          fz={16}
+          fz={14}
           mb={24}
           tt="uppercase"
           c="var(--prune-text-gray-800)"
@@ -100,14 +132,14 @@ export const AccountRequestsDrawer = ({
         <Stack gap={28}>
           {accountDetails.map((item, index) => (
             <Group justify="space-between" key={index}>
-              <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
-                {item.label}
+              <Text fz={12} fw={400} c="var(--prune-text-gray-500)">
+                {item.label}:
               </Text>
               {
                 <Text
-                  fz={14}
+                  fz={12}
                   fw={600}
-                  c="var(--prune-text-gray-600)"
+                  c="var(--prune-text-gray-700)"
                   tt="capitalize"
                 >
                   {item.value}
@@ -117,11 +149,38 @@ export const AccountRequestsDrawer = ({
           ))}
         </Stack>
 
+        {selectedRequest?.reason && (
+          <Box mt={24}>
+            <Divider mt={30} mb={24} />
+            <Text
+              fz={14}
+              fw={600}
+              c="var(--prune-text-gray-800)"
+              tt="uppercase"
+              mb={24}
+            >
+              Reason:
+            </Text>
+
+            <div
+              style={{
+                marginTop: "15px",
+                background: "#F9F9F9",
+                padding: "12px 16px",
+              }}
+            >
+              <Text fz={12} c="var(--prune-text-gray-600)">
+                {selectedRequest?.reason || ""}
+              </Text>
+            </div>
+          </Box>
+        )}
+
         {selectedRequest?.accountType === "USER" && (
           <Stack gap={28}>
             <Divider mt={30} />
             <Text
-              fz={16}
+              fz={14}
               // mb={24}
               tt="uppercase"
               c="var(--prune-text-gray-800)"
@@ -132,14 +191,26 @@ export const AccountRequestsDrawer = ({
 
             <TextInputWithFile
               label="ID"
-              placeholder={"Identification card"}
+              placeholder={camelCaseToTitleCase(
+                selectedRequest.documentData.idType
+              )}
               url={selectedRequest.documentData.idFileURL}
+              path="idFileURL"
+              revalidate={revalidate}
+              request={selectedRequest}
+              setRequest={setSelectedRequest}
             />
 
             <TextInputWithFile
               label="Proof of Address"
-              placeholder={"Utility Bill"}
+              placeholder={camelCaseToTitleCase(
+                selectedRequest.documentData.poaType
+              )}
               url={selectedRequest.documentData.poaFileURL}
+              path="poaFileURL"
+              request={selectedRequest}
+              revalidate={revalidate}
+              setRequest={setSelectedRequest}
             />
           </Stack>
         )}
@@ -148,7 +219,7 @@ export const AccountRequestsDrawer = ({
           <Box mt={28}>
             <Divider mb={20} />
             <Text
-              fz={16}
+              fz={14}
               tt="uppercase"
               c="var(--prune-text-gray-800)"
               fw={600}
@@ -162,8 +233,12 @@ export const AccountRequestsDrawer = ({
                   <Stack gap={28}>
                     <TextInputWithFile
                       label="Certificate of Incorporation"
-                      placeholder="File"
+                      placeholder="Certificate of Incorporation"
                       url={selectedRequest.documentData.certOfInc}
+                      path="certOfInc"
+                      request={selectedRequest}
+                      revalidate={revalidate}
+                      setRequest={setSelectedRequest}
                     />
                   </Stack>
                 ) : null}
@@ -172,8 +247,12 @@ export const AccountRequestsDrawer = ({
                   <Stack gap={28} mt={20}>
                     <TextInputWithFile
                       label="Mermat"
-                      placeholder="File"
+                      placeholder="Mermat"
                       url={selectedRequest.documentData.mermat}
+                      path={`mermat`}
+                      request={selectedRequest}
+                      revalidate={revalidate}
+                      setRequest={setSelectedRequest}
                     />
                   </Stack>
                 ) : null}
@@ -197,9 +276,9 @@ export const AccountRequestsDrawer = ({
                 0 ? (
                   <>
                     {Object.keys(selectedRequest.documentData.directors).map(
-                      (director, index) => (
+                      (director, index, arr) => (
                         <Stack gap={28} key={index} mt={28}>
-                          <Text fz={14} c="var(--prune-text-gray-800)">
+                          <Text fz={14} fw={600} c="var(--prune-text-gray-800)">
                             Director {index + 1}:
                           </Text>
                           <TextInputWithFile
@@ -214,8 +293,35 @@ export const AccountRequestsDrawer = ({
                                 `director_${index + 1}`
                               ].idFile
                             }
-                            // url={director.identityFileUrl}
+                            path={`directors.director_${index + 1}.idFile`}
+                            request={selectedRequest}
+                            revalidate={revalidate}
+                            setRequest={setSelectedRequest}
                           />
+
+                          {selectedRequest.documentData.directors[
+                            `director_${index + 1}`
+                          ].idFileBack && (
+                            <TextInputWithFile
+                              label="ID (Back)"
+                              placeholder={camelCaseToTitleCase(
+                                selectedRequest.documentData.directors[
+                                  `director_${index + 1}`
+                                ].idType
+                              )}
+                              url={
+                                selectedRequest.documentData.directors[
+                                  `director_${index + 1}`
+                                ].idFileBack ?? ""
+                              }
+                              path={`directors.director_${
+                                index + 1
+                              }.idFileBack`}
+                              revalidate={revalidate}
+                              request={selectedRequest}
+                              setRequest={setSelectedRequest}
+                            />
+                          )}
 
                           <TextInputWithFile
                             label="Proof of Address"
@@ -229,9 +335,13 @@ export const AccountRequestsDrawer = ({
                                 `director_${index + 1}`
                               ].poaFile
                             }
-                            // url={director.proofOfAddressFileUrl}
-                            // url={director.proofOfAddressFileUrl}
+                            path={`directors.director_${index + 1}.poaFile`}
+                            request={selectedRequest}
+                            revalidate={revalidate}
+                            setRequest={setSelectedRequest}
                           />
+
+                          {arr.length - 1 !== index && <Divider mt={20} />}
                         </Stack>
                       )
                     )}
@@ -254,9 +364,9 @@ export const AccountRequestsDrawer = ({
                 0 ? (
                   <>
                     {Object.keys(selectedRequest.documentData.shareholders).map(
-                      (shareholder, index) => (
+                      (shareholder, index, arr) => (
                         <Stack gap={28} key={index} mt={28}>
-                          <Text fz={14} c="var(--prune-text-gray-800)">
+                          <Text fz={14} fw={600} c="var(--prune-text-gray-800)">
                             Shareholder {index + 1}:
                           </Text>
 
@@ -272,9 +382,37 @@ export const AccountRequestsDrawer = ({
                                 `shareholder_${index + 1}`
                               ].idFile
                             }
-                            // url={shareholder.identityFileUrl}
-                            // url={shareholder.identityFileUrl}
+                            path={`shareholders.shareholder_${
+                              index + 1
+                            }.idFile`}
+                            request={selectedRequest}
+                            revalidate={revalidate}
+                            setRequest={setSelectedRequest}
                           />
+
+                          {selectedRequest.documentData.shareholders[
+                            `shareholder_${index + 1}`
+                          ].idFileBack && (
+                            <TextInputWithFile
+                              label="ID (Back)"
+                              placeholder={camelCaseToTitleCase(
+                                selectedRequest.documentData.shareholders[
+                                  `shareholder_${index + 1}`
+                                ].idType
+                              )}
+                              url={
+                                selectedRequest.documentData.shareholders[
+                                  `shareholder_${index + 1}`
+                                ].idFileBack ?? ""
+                              }
+                              path={`shareholders.shareholder_${
+                                index + 1
+                              }.idFileBack`}
+                              request={selectedRequest}
+                              revalidate={revalidate}
+                              setRequest={setSelectedRequest}
+                            />
+                          )}
 
                           <TextInputWithFile
                             label="Proof of Address"
@@ -288,9 +426,15 @@ export const AccountRequestsDrawer = ({
                                 `shareholder_${index + 1}`
                               ].poaFile
                             }
-                            // url={shareholder.proofOfAddressFileUrl}
-                            // url={shareholder.proofOfAddressFileUrl}
+                            path={`shareholders.shareholder_${
+                              index + 1
+                            }.poaFile`}
+                            request={selectedRequest}
+                            revalidate={revalidate}
+                            setRequest={setSelectedRequest}
                           />
+
+                          {arr.length - 1 !== index && <Divider mt={20} />}
                         </Stack>
                       )
                     )}
@@ -326,14 +470,77 @@ interface TextInputWithFileProps {
   label: string;
   placeholder: string;
   url: string;
+  path: string;
+  request: RequestData;
+  setRequest: Dispatch<SetStateAction<RequestData | null>>;
+  revalidate: () => void;
+  // status: string;
 }
 
 export const TextInputWithFile = ({
   label,
   url,
   placeholder,
+  path,
+  revalidate,
+  request,
+  setRequest,
 }: TextInputWithFileProps) => {
-  const { handleInfo } = useNotification();
+  const [processing, setProcessing] = useState(false);
+  const { handleError, handleInfo, handleSuccess } = useNotification();
+
+  const handleUpload = async (file: File | null) => {
+    // formKey: string;
+    // setProcessing(true);
+    try {
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/upload`,
+        formData,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      return data.data.url;
+
+      // if (formKey) {
+      //   form.setFieldValue(formKey, data.data.url);
+      // }
+      // setUploaded(true);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    }
+  };
+
+  const reUpload = async (file: File | null) => {
+    const url = await handleUpload(file);
+    if (!url) return;
+    setProcessing(true);
+    try {
+      const { data: res } = await axios.post(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/${request.id}/document/upload`,
+        {
+          path,
+          url,
+        },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+      handleSuccess(
+        "Upload Successful",
+        "You have successfully uploaded the document"
+      );
+      revalidate();
+      setRequest(res.data);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <TextInput
       readOnly
@@ -345,20 +552,42 @@ export const TextInputWithFile = ({
       }}
       leftSection={<IconFileTypePdf color="#475467" />}
       leftSectionPointerEvents="none"
+      rightSectionWidth={70}
       rightSection={
-        <UnstyledButton
-          onClick={() => {
-            notifications.clean();
-            if (!url) return handleInfo("No file provided", "");
-            return window.open(url, "_blank");
-          }}
-          className={styles.input__right__section}
-          mr={20}
-        >
-          <Text fw={600} fz={10} c="#475467">
-            View
-          </Text>
-        </UnstyledButton>
+        getNestedDocValue(request.documentApprovals, path) === false ? (
+          <FileButton
+            disabled={processing}
+            onChange={(file) => reUpload(file)}
+            accept="image/png, image/jpeg, application/pdf"
+          >
+            {(props) => (
+              <UnstyledButton
+                w={"100%"}
+                className={styles.input__right__section}
+                {...props}
+              >
+                <Text fw={600} fz={10} c="#475467">
+                  Re-upload
+                </Text>
+              </UnstyledButton>
+            )}
+          </FileButton>
+        ) : (
+          <UnstyledButton
+            onClick={() => {
+              notifications.clean();
+              if (!url) return handleInfo("No file provided", "");
+              return window.open(url, "_blank");
+            }}
+            className={styles.input__right__section}
+            mr={20}
+            w={"100%"}
+          >
+            <Text fw={600} fz={10} c="#475467">
+              View
+            </Text>
+          </UnstyledButton>
+        )
       }
       label={
         <Text fz={12} mb={2}>

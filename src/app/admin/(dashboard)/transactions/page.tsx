@@ -152,7 +152,7 @@ function TransactionForAccount() {
     },
     {
       title: "Total Transactions",
-      value: payoutTransactions.length,
+      value: defaultTransactions.length,
     },
   ];
 
@@ -449,10 +449,10 @@ const RowComponent = ({
         }}
       >
         <Link href={`/admin/transactions/${element.senderIban}`}>
-          {element.senderIban}
+          {element.senderName || "N/A"}
         </Link>
       </TableTd>
-      <TableTd>{"N/A"}</TableTd>
+      {/* <TableTd>{"N/A"}</TableTd> */}
       <TableTd className={styles.table__td}>
         {element.recipientName || element.recipientIban}
       </TableTd>

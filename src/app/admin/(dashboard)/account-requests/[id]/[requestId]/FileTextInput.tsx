@@ -1,19 +1,64 @@
 import { Group, Text, TextInput, UnstyledButton } from "@mantine/core";
-import React, { Fragment } from "react";
+import React, { Fragment, useState } from "react";
 import styles from "./(tabs)/styles.module.scss";
-import { IconFileInfo } from "@tabler/icons-react";
+import { IconCheck, IconFileInfo, IconX } from "@tabler/icons-react";
 import useNotification from "@/lib/hooks/notification";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { notifications } from "@mantine/notifications";
+import { parseError } from "@/lib/actions/auth";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 interface Props {
   url: string;
   label: string;
   placeholder: string;
+  path: string;
+  requestId: string;
+  revalidate: () => void;
+  status: "APPROVED" | "REJECTED" | "PENDING";
 }
 
-export const FileTextInput = ({ url, label, placeholder }: Props) => {
-  const { handleInfo } = useNotification();
+export const FileTextInput = ({
+  url,
+  label,
+  placeholder,
+  path,
+  requestId,
+  revalidate,
+  status,
+}: Props) => {
+  const { handleInfo, handleError, handleSuccess } = useNotification();
+  const [processing, setProcessing] = useState(false);
+  const [processingRejection, setProcessingRejection] = useState(false);
+
+  const approveOrRejectDocument = async (type: "approve" | "reject") => {
+    if (type === "approve") {
+      setProcessing(true);
+    }
+    if (type === "reject") {
+      setProcessingRejection(true);
+    }
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/${requestId}/document/${type}`,
+        { path },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      revalidate();
+      handleSuccess(
+        `Document ${type === "approve" ? "Approved" : "Rejected"}`,
+        ""
+      );
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+      setProcessingRejection(false);
+    }
+  };
+
   return (
     <Fragment>
       <TextInput
@@ -46,22 +91,37 @@ export const FileTextInput = ({ url, label, placeholder }: Props) => {
       />
 
       <Group mt={16}>
-        <PrimaryBtn
-          text="Approve"
-          color="#039855"
-          c="#039855"
-          variant="light"
-          h={22}
-          radius={8}
-        />
-        <PrimaryBtn
-          text="Reject"
-          color="#D92D20"
-          c="#D92D20"
-          variant="light"
-          h={22}
-          radius={8}
-        />
+        {(status === "PENDING" || status === "APPROVED") && (
+          <PrimaryBtn
+            text={status === "APPROVED" ? "Approved" : "Approve"}
+            color="#039855"
+            c="#039855"
+            variant="light"
+            h={22}
+            radius={8}
+            action={() => approveOrRejectDocument("approve")}
+            loading={processing}
+            loaderProps={{ type: "dots" }}
+            disabled={processingRejection}
+            {...(status === "APPROVED" && { icon: IconCheck })}
+          />
+        )}
+
+        {(status === "PENDING" || status === "REJECTED") && (
+          <PrimaryBtn
+            text={status === "REJECTED" ? "Rejected" : "Reject"}
+            color="#D92D20"
+            c="#D92D20"
+            variant="light"
+            h={22}
+            radius={8}
+            action={() => approveOrRejectDocument("reject")}
+            loaderProps={{ type: "dots" }}
+            loading={processingRejection}
+            disabled={processing}
+            {...(status === "REJECTED" && { icon: IconX })}
+          />
+        )}
       </Group>
     </Fragment>
   );

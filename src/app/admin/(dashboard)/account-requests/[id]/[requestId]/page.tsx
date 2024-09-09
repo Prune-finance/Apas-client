@@ -39,7 +39,7 @@ import { useSingleRequest } from "@/lib/hooks/requests";
 import Shareholders from "./(tabs)/shareholder";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
@@ -48,6 +48,8 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import Link from "next/link";
 import Documents from "./(tabs)/documents";
 import TabsComponent from "@/ui/components/Tabs";
+import { areAllDocumentsApproved } from "@/lib/helpers/document-status";
+import { notifications } from "@mantine/notifications";
 
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
@@ -55,8 +57,8 @@ export default function SingleRequest() {
   const { business, loading: loadingBiz } = useSingleBusiness(
     request?.Company.id ?? ""
   );
-  const { handleSuccess, handleError } = useNotification();
-  const { back } = useRouter();
+  const { handleSuccess, handleError, handleInfo } = useNotification();
+  const router = useRouter();
 
   const [opened, { open, close }] = useDisclosure(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
@@ -64,9 +66,47 @@ export default function SingleRequest() {
 
   const [processing, setProcessing] = useState(false);
   const [reason, setReason] = useState("");
+  const [isNavigating, setIsNavigating] = useState(false);
+
+  // useEffect(() => {
+  //   const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+  //     if (request && !areAllDocumentsApproved(request)) {
+  //       console.log("I ran here");
+  //       e.preventDefault();
+  //       e.returnValue = ""; // This shows the default browser alert
+  //       // setIsModalOpen(true); // Optionally trigger your custom modal
+  //       open();
+  //     }
+  //   };
+
+  //   // const handleRouteChangeStart = (url: string) => {
+  //   //   if (!isNavigating) {
+  //   //     open()
+  //   //     setIsModalOpen(true); // Open the custom modal on route change
+  //   //     router.events.emit("routeChangeError"); // Cancel the route change
+  //   //     throw "Navigation aborted"; // Prevents navigation
+  //   //   }
+  //   // };
+
+  //   window.addEventListener("beforeunload", handleBeforeUnload);
+  //   // router.events.on("routeChangeStart", handleRouteChangeStart);
+
+  //   return () => {
+  //     window.removeEventListener("beforeunload", handleBeforeUnload);
+  //     // router.events.off("routeChangeStart", handleRouteChangeStart);
+  //   };
+  // }, [request]);
 
   const handleApproval = async () => {
+    notifications.clean();
     if (processing) return;
+
+    if (request && !areAllDocumentsApproved(request))
+      return handleInfo(
+        "Please approve all documents or wait for business to re-upload rejected document(s)",
+        ""
+      );
+
     setProcessing(true);
     try {
       await axios.post(
@@ -90,6 +130,7 @@ export default function SingleRequest() {
 
   const handleRejection = async () => {
     if (processing) return;
+    if (!reason) return handleInfo("Please provide a reason", "");
     setProcessing(true);
     try {
       await axios.post(
@@ -207,7 +248,7 @@ export default function SingleRequest() {
           <div>
             <Account request={request} />
             {/* <Business request={request} /> */}
-            <Documents request={request} business={business} />
+            <Documents request={request} revalidate={revalidate} />
           </div>
         )}
 
@@ -215,13 +256,13 @@ export default function SingleRequest() {
           <TabsComponent tabs={tabs} tt="capitalize" fz={12} fw={500} mt={28}>
             <TabsPanel value={tabs[0].value}>
               <Account request={request} />
-              <Documents request={request} business={business} />
+              <Documents request={request} revalidate={revalidate} />
             </TabsPanel>
             <TabsPanel value={tabs[1].value}>
-              <Directors request={request} />
+              <Directors request={request} revalidate={revalidate} />
             </TabsPanel>
             <TabsPanel value={tabs[2].value}>
-              <Shareholders request={request} />
+              <Shareholders request={request} revalidate={revalidate} />
             </TabsPanel>
           </TabsComponent>
         )}
@@ -235,7 +276,7 @@ export default function SingleRequest() {
           icon={<IconX color="#D92D20" />}
           title="Reject This Account  Request?"
           text="This means you are rejecting the debit request of this business."
-          customApproveMessage="Yes, Deny"
+          customApproveMessage="Yes, Reject"
           addReason
           reason={reason}
           setReason={setReason}

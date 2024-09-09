@@ -26,12 +26,14 @@ import { request } from "http";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import { FileTextInput } from "../FileTextInput";
-import { camelCaseToTitleCase } from "@/lib/utils";
+import { camelCaseToTitleCase, getDocumentStatus } from "@/lib/utils";
 
 export default function Directors({
   request,
+  revalidate,
 }: {
   request: RequestData | null;
+  revalidate: () => void;
 }) {
   return (
     <div className={styles.business__tab}>
@@ -41,7 +43,11 @@ export default function Directors({
             (director, index) => {
               return (
                 <Fragment key={index}>
-                  <DirectorsForm request={request} index={index} />
+                  <DirectorsForm
+                    request={request}
+                    index={index}
+                    revalidate={revalidate}
+                  />
                 </Fragment>
               );
             }
@@ -55,9 +61,11 @@ export default function Directors({
 const DirectorsForm = ({
   request,
   index,
+  revalidate,
 }: {
   request: RequestData;
   index: number;
+  revalidate: () => void;
 }) => {
   const { handleInfo } = useNotification();
 
@@ -80,6 +88,15 @@ const DirectorsForm = ({
               url={
                 request.documentData.directors[`director_${index + 1}`].idFile
               }
+              path={`directors.director_${index + 1}.idFile`}
+              requestId={request.id}
+              revalidate={revalidate}
+              status={getDocumentStatus(
+                request,
+                "directors",
+                `director_${index + 1}`,
+                "idFile"
+              )}
             />
           </GridCol>
         )}
@@ -94,6 +111,15 @@ const DirectorsForm = ({
               url={
                 request.documentData.directors[`director_${index + 1}`].poaFile
               }
+              path={`directors.director_${index + 1}.poaFile`}
+              requestId={request.id}
+              revalidate={revalidate}
+              status={getDocumentStatus(
+                request,
+                "directors",
+                `director_${index + 1}`,
+                "poaFile"
+              )}
             />
           </GridCol>
         )}

@@ -46,7 +46,6 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
-  console.log(selectedRequest);
   const pdfRef = useRef<HTMLDivElement>(null);
 
   const { account: senderAccount, loading: loadingSenderAcct } =
@@ -64,7 +63,7 @@ export const TransactionDrawer = ({
     IBAN: selectedRequest?.recipientIban,
     BIC: selectedRequest?.recipientBic,
     "Bank Name": selectedRequest?.recipientBankAddress,
-    "Bank Address": "N/A",
+    "Bank Address": selectedRequest?.recipientBankAddress,
     Country: selectedRequest?.recipientBankCountry,
     "Reference 2": selectedRequest?.reference ?? "N/A",
   };
@@ -73,13 +72,20 @@ export const TransactionDrawer = ({
     "Account Name": loadingSenderAcct ? (
       <Skeleton h={10} w={100} />
     ) : (
-      senderAccount?.accountName ?? "N/A"
+      selectedRequest?.senderName
     ),
     IBAN: selectedRequest?.senderIban,
-    BIC: "ARPYGB21XXX",
-    Bank: "N/A",
-    "Bank Address": "N/A",
-    Country: "N/A",
+    BIC: selectedRequest?.senderBic,
+    Bank:
+      selectedRequest?.type === "DEBIT"
+        ? "Prune Payments LTD"
+        : "Prune Payments LTD",
+    "Bank Address":
+      selectedRequest?.type === "DEBIT"
+        ? "Office 7 35-37 Ludgate Hill, London"
+        : "Office 7 35-37 Ludgate Hill, London",
+    Country:
+      selectedRequest?.type === "DEBIT" ? "United Kingdom" : "United Kingdom",
   };
 
   const otherDetails = {
@@ -125,6 +131,7 @@ export const TransactionDrawer = ({
     { title: "Beneficiary Details", value: BeneficiaryDetails },
     { title: "Other Details", value: OtherDetails },
   ];
+
   return (
     <Drawer
       opened={opened}
@@ -163,7 +170,7 @@ export const TransactionDrawer = ({
 
         <Divider mt={30} mb={20} />
 
-        <Text
+        {/* <Text
           fz={16}
           mb={24}
           tt="uppercase"
@@ -186,7 +193,7 @@ export const TransactionDrawer = ({
             </Group>
           ))}
         </Stack>
-        <Divider mt={30} mb={20} />
+        <Divider mt={30} mb={20} /> */}
 
         <Text
           fz={16}

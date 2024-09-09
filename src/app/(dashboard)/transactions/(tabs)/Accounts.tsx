@@ -27,9 +27,10 @@ import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
 import { OwnAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "@/ui/components/AmountGroup";
+import { useSearchParams } from "next/navigation";
 
 export const AccountsTab = () => {
-  const { transactions, loading } = useUserDefaultTransactions();
+  const searchParams = useSearchParams();
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -40,6 +41,15 @@ export const AccountsTab = () => {
   const [limit, setLimit] = useState<string | null>("10");
   const [selectedRequest, setSelectedRequest] =
     useState<TransactionType | null>(null);
+
+  const { status, createdAt, sort } = Object.fromEntries(
+    searchParams.entries()
+  );
+  const { transactions, loading } = useUserDefaultTransactions({
+    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    page: active,
+  });
 
   const form = useForm<FilterType>({
     initialValues: filterValues,
@@ -55,13 +65,19 @@ export const AccountsTab = () => {
     },
     {
       title: "Money In",
-      value: 0,
+      value:
+        transactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value:
+        transactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
     },
@@ -113,7 +129,12 @@ export const AccountsTab = () => {
 
         <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
       </Group>
-      <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+      <Filter<FilterType>
+        opened={opened}
+        toggle={toggle}
+        form={form}
+        approvalStatus
+      />
 
       <TableComponent
         rows={rows}

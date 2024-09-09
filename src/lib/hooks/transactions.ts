@@ -385,6 +385,7 @@ export function useUserTransactionsByIBAN(
 
 export interface TrxData {
   id: string;
+  type: "DEBIT" | "CREDIT";
   senderIban: string;
   recipientIban: string;
   recipientBic: string;
@@ -411,6 +412,8 @@ export interface Meta {
 export interface TransactionType {
   id: string;
   senderIban: string;
+  senderName: string;
+  senderBic: string;
   recipientIban: string;
   recipientBic: string;
   recipientBankAddress: string;

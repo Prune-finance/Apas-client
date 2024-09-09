@@ -204,7 +204,12 @@ function AccountRequests() {
           </Button>
         </Group>
 
-        <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
+        <Filter<FilterType>
+          opened={openedFilter}
+          toggle={toggle}
+          form={form}
+          approvalStatus
+        />
 
         <TableScrollContainer minWidth={500}>
           <Table className={styles.table} verticalSpacing="md">

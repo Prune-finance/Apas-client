@@ -162,6 +162,8 @@ function Reactivate() {
     switch (selectedRequest?.type) {
       case "ACTIVATE":
         return "reactivate";
+      case "ACCOUNT_ISSUANCE":
+        return "account issuance";
       case "DEACTIVATE":
         return "deactivate";
       default:

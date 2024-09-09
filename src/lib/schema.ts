@@ -436,6 +436,7 @@ export const validateShareholder = z.object({
 export const debitRequest = {
   account: "",
   amount: "",
+  accountType: "",
   destinationIBAN: "",
   destinationBIC: "",
   destinationCountry: "",
@@ -450,6 +451,7 @@ export const debitRequest = {
 export const validateDebitRequest = z
   .object({
     account: z.string().min(3, "Account is required"),
+    accountType: z.string(),
     amount: z
       .number({ invalid_type_error: "Amount is required" })
       .positive("A positive amount is required"),
@@ -459,8 +461,8 @@ export const validateDebitRequest = z
     destinationBank: z.string().min(2, "Bank is required"),
     reference: z.string().min(2, "Reference number is required"),
     reason: z.string().min(2, "Narration is required"),
-    destinationFirstName: z.string().min(2, "Receiver First Name is required"),
-    destinationLastName: z.string().min(2, "Receiver Last Name is required"),
+    destinationFirstName: z.string(),
+    destinationLastName: z.string(),
     accountBalance: z.number().positive("A positive amount is required"),
   })
   .superRefine((data, ctx) => {

@@ -552,7 +552,7 @@ export function useCompanyRequests(
 
 export interface IUserRequest {
   id: string;
-  type: "FREEZE" | "UNFREEZE" | "ACTIVATE" | "DEACTIVATE";
+  type: "FREEZE" | "UNFREEZE" | "ACTIVATE" | "DEACTIVATE" | "ACCOUNT_ISSUANCE";
   status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   reason: string;
   supportingDocumentName: null | string;

@@ -63,10 +63,10 @@ export default function RequestDrawer({
 
   const accountDetails = {
     "Business Name": selectedRequest?.Company.name,
-    "Account Name": selectedRequest?.Account.accountName,
-    IBAN: selectedRequest?.Account.accountNumber,
+    "Account Name": selectedRequest?.Account?.accountName ?? "N/A",
+    IBAN: selectedRequest?.Account?.accountNumber ?? "N/A",
     "User Type":
-      selectedRequest?.Account.type === "CORPORATE"
+      selectedRequest?.Account?.type === "CORPORATE"
         ? "Corporate"
         : "Individual",
   };

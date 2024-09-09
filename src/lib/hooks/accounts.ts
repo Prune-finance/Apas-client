@@ -208,6 +208,10 @@ export function useUserAccounts(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [meta, setMeta] = useState<AccountMeta>();
   const [loading, setLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [issuanceRequests, setIssuanceRequests] = useState<
+    { id: string; status: "PENDING" | "APPROVED" | "REJECTED" }[]
+  >([]);
 
   const obj = useMemo(() => {
     return {
@@ -241,17 +245,42 @@ export function useUserAccounts(customParams: IParams = {}) {
     }
   }
 
+  const handleCheckRequestAccess = async () => {
+    setStatusLoading(true);
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/all?type=ACCOUNT_ISSUANCE&status=PENDING`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      console.log(res?.data);
+      setIssuanceRequests(res?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
   const revalidate = () => fetchAccounts();
 
   useEffect(() => {
     fetchAccounts();
+    handleCheckRequestAccess();
 
     return () => {
       // Any cleanup code can go here
     };
   }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
-  return { loading, accounts, revalidate, meta };
+  return {
+    loading,
+    accounts,
+    revalidate,
+    meta,
+    statusLoading,
+    issuanceRequests,
+  };
 }
 
 export function useSingleUserAccount(id: string) {

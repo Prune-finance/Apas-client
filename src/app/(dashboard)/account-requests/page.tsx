@@ -162,7 +162,12 @@ function AccountRequests() {
           <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
         </Group>
 
-        <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
+        <Filter<FilterType>
+          opened={openedFilter}
+          toggle={toggle}
+          form={form}
+          approvalStatus
+        />
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

@@ -2,11 +2,12 @@
 import dayjs from "dayjs";
 import Cookies from "js-cookie";
 
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
+  Box,
   Group,
   Menu,
   MenuDropdown,
@@ -32,6 +33,7 @@ import {
   IconArrowDownLeft,
   IconTrash,
   IconUsers,
+  IconExclamationCircle,
 } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -53,12 +55,13 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput } from "@/ui/components/Inputs";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import TabsComponent from "@/ui/components/Tabs";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import { parseError } from "@/lib/actions/auth";
 import { PendingAccounts } from "./PendingAccounts";
+import RequestModalComponent from "@/ui/components/Modal";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -71,7 +74,14 @@ function Accounts() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, accounts, revalidate, meta } = useUserAccounts({
+  const {
+    loading,
+    accounts,
+    revalidate,
+    meta,
+    statusLoading,
+    issuanceRequests,
+  } = useUserAccounts({
     ...(isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
@@ -94,6 +104,10 @@ function Accounts() {
     useDisclosure(false);
   const [debitOpened, { open: debitOpen, close: debitClose }] =
     useDisclosure(false);
+  const [
+    requestAccessOpened,
+    { open: requestAccessOpen, close: requestAccessClose },
+  ] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
@@ -107,6 +121,17 @@ function Accounts() {
     initialValues: { ...filterValues, type: null },
     validate: zodResolver(accountFilterSchema),
   });
+
+  const cannotRequestIssuance = useMemo(() => {
+    const hasPending = issuanceRequests.some(
+      (request) => request.status === "PENDING"
+    );
+    const hasApproved = issuanceRequests.some(
+      (request) => request.status === "APPROVED"
+    );
+
+    return hasPending || hasApproved;
+  }, [issuanceRequests]);
 
   const requestForm = useForm({
     initialValues: {
@@ -373,6 +398,25 @@ function Accounts() {
     </TableTr>
   ));
 
+  const handleRequestAccess = async () => {
+    setProcessing(true);
+    try {
+      await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/account-issuance`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+      handleSuccess(
+        "Request Sent",
+        "You will receive as notification once your request has been approved"
+      );
+      requestAccessClose();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <main className={styles.main}>
       {/* <Breadcrumbs items={[{ title: "Accounts", href: "/accounts" }]} /> */}
@@ -410,6 +454,7 @@ function Accounts() {
               mt={30}
               tt="capitalize"
               fz={12}
+              style={{ position: "relative" }}
             >
               <TabsPanel value={issuedAccountTabs[0].value}>
                 <Group justify="space-between" mt={30}>
@@ -456,6 +501,15 @@ function Accounts() {
               <TabsPanel value={issuedAccountTabs[1].value}>
                 <PendingAccounts />
               </TabsPanel>
+
+              <Box pos="absolute" top={-10} right={0}>
+                <PrimaryBtn
+                  text="Request Access"
+                  fw={600}
+                  action={requestAccessOpen}
+                  disabled={cannotRequestIssuance || statusLoading}
+                />
+              </Box>
             </TabsComponent>
           </TabsPanel>
         </TabsComponent>
@@ -473,6 +527,18 @@ function Accounts() {
             accountsData={accounts}
           />
         </Modal>
+
+        <RequestModalComponent
+          processing={processing}
+          color="#f9f6e6"
+          action={handleRequestAccess}
+          icon={<IconExclamationCircle color="#c6a700" />}
+          opened={requestAccessOpened}
+          close={requestAccessClose}
+          title="Requesting Access"
+          text="This means that all the data in your test environment will be cleared and you would have access to your Live Keys"
+          customApproveMessage="Yes, Proceed"
+        />
 
         <ModalComponent
           processing={processing}

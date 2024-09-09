@@ -19,8 +19,12 @@ dayjs.extend(advancedFormat);
 import { Fragment, useState } from "react";
 import { AccountRequestsDrawer } from "../account-requests/drawer";
 import { getUserType } from "@/lib/utils";
+import { useSearchParams } from "next/navigation";
 
 export const PendingAccounts = () => {
+  const searchParams = useSearchParams();
+  const { type, createdAt } = Object.fromEntries(searchParams.entries());
+
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
@@ -34,6 +38,8 @@ export const PendingAccounts = () => {
       ? { limit: 10 }
       : { limit: parseInt(limit ?? "10", 10) }),
     status: "PENDING",
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(type && { type: type.toUpperCase() }),
     page: active,
   });
 

@@ -52,7 +52,14 @@ export const IssuedAccountsTab = () => {
   //   page: active,
   // });
 
-  const { transactions, revalidate, loading } = useUserTransactions();
+  const { transactions, revalidate, loading } = useUserTransactions(undefined, {
+    ...(isNaN(Number(limit))
+      ? { limit: 10 }
+      : { limit: parseInt(limit ?? "10", 10) }),
+    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    page: active,
+  });
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -119,7 +126,12 @@ export const IssuedAccountsTab = () => {
 
         <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
       </Group>
-      <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+      <Filter<FilterType>
+        opened={opened}
+        toggle={toggle}
+        form={form}
+        approvalStatus
+      />
 
       <TableComponent
         rows={rows}

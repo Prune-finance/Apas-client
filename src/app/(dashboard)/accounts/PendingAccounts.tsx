@@ -126,6 +126,8 @@ export const PendingAccounts = () => {
         opened={drawerOpened}
         close={closeDrawer}
         selectedRequest={selectedRequest}
+        revalidate={revalidate}
+        setSelectedRequest={setSelectedRequest}
       />
     </Fragment>
   );

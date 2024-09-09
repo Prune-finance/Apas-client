@@ -169,7 +169,7 @@ export default function Home() {
   const rows = transactions.slice(0, 4).map((element) => (
     <TableTr key={element.id}>
       <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
-      <TableTd>{"N/A"}</TableTd>
+      {/* <TableTd>{"N/A"}</TableTd> */}
       <TableTd className={styles.table__td}>
         {element.recipientName || element.recipientIban}
       </TableTd>

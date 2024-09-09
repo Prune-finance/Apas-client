@@ -1,7 +1,7 @@
-import { TextInputWithFile } from "@/app/(dashboard)/account-requests/drawer";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import { splitCamelCase } from "@/lib/utils";
 import { Box, Paper, SimpleGrid, Stack, Text } from "@mantine/core";
+import { TextInputWithFile } from "../../TextInputWithFile";
 
 interface Props {
   account: DefaultAccount | null;

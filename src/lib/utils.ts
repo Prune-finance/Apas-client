@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { RequestData } from "./hooks/requests";
 
 export const formatNumber = (
   number: number,
@@ -84,3 +85,75 @@ export function camelCaseToTitleCase(text: string): string {
 
   return result.charAt(0).toUpperCase() + result.slice(1);
 }
+
+type Status = "APPROVED" | "REJECTED" | "PENDING";
+
+// export const getDocumentStatus = (
+//   request: RequestData,
+//   key: string
+// ): Status => {
+//   if (key in request.documentApprovals)
+//     return request.documentApprovals[key] ? "APPROVED" : "REJECTED";
+
+//   return "PENDING";
+// };
+
+// export const getDocumentStatus = (
+//   request: RequestData,
+//   key: string,
+//   subKey?: string
+// ): Status => {
+//   // If no subKey is provided, assume it's a top-level key (flat structure)
+//   if (!subKey) {
+//     if (key in request.documentApprovals)
+//       return request.documentApprovals[key] ? "APPROVED" : "REJECTED";
+
+//     return "PENDING";
+//   }
+
+//   // Handle the nested case
+//   const categoryData = request.documentApprovals[key];
+
+//   if (categoryData && subKey in categoryData)
+//     return categoryData[subKey] ? "APPROVED" : "REJECTED";
+
+//   return "PENDING";
+// };
+
+export const getDocumentStatus = (
+  request: RequestData,
+  key: string,
+  subKey?: string,
+  nestedKey?: string
+): Status => {
+  // If no subKey or nestedKey is provided, assume it's a top-level key (flat structure)
+  if (!subKey && !nestedKey) {
+    if (key in request.documentApprovals) {
+      if (request.documentApprovals[key] === null) return "PENDING";
+      return request.documentApprovals[key] ? "APPROVED" : "REJECTED";
+    }
+
+    return "PENDING";
+  }
+
+  // Handle the nested case (key -> subKey -> nestedKey)
+  const categoryData = request.documentApprovals[key];
+
+  // If only subKey is provided, treat it as a 2-level structure
+  if (categoryData && subKey && !nestedKey) {
+    if (subKey in categoryData)
+      return categoryData[subKey] ? "APPROVED" : "REJECTED";
+    return "PENDING";
+  }
+
+  // If both subKey and nestedKey are provided, treat it as a 3-level structure
+  if (categoryData && subKey && nestedKey) {
+    if (subKey in categoryData && nestedKey in categoryData[subKey]) {
+      if (categoryData[subKey][nestedKey] === null) return "PENDING";
+      return categoryData[subKey][nestedKey] ? "APPROVED" : "REJECTED";
+    }
+    return "PENDING";
+  }
+
+  return "PENDING";
+};

@@ -635,6 +635,7 @@ interface BaseData {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
+  reason: string | null;
   Company: {
     name: string;
     id: string;
@@ -643,6 +644,8 @@ interface BaseData {
     legalEntity: string;
     domain: string;
   };
+  documentApprovals: Record<string, any>;
+  country: string;
 }
 
 export interface DebitRequest {
@@ -699,15 +702,13 @@ export interface Meta {
   total: number;
 }
 
-interface UserRequestData extends BaseData {
+export interface UserRequestData extends BaseData {
   accountType: "USER";
-  country: string;
   documentData: Director;
 }
 
-interface CorporateRequestData extends BaseData {
+export interface CorporateRequestData extends BaseData {
   accountType: "CORPORATE";
-  country: string;
   documentData: DocumentData;
 }
 
@@ -736,6 +737,7 @@ export interface Director {
 }
 export interface CorporateDirector {
   idFile: string;
+  idFileBack?: string;
   idType: string;
   poaFile: string;
   poaType: string;

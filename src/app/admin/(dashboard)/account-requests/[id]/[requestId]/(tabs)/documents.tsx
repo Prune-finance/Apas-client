@@ -22,14 +22,15 @@ import { RequestData } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { BusinessData } from "@/lib/hooks/businesses";
 import { FileTextInput } from "../FileTextInput";
+import { camelCaseToTitleCase, getDocumentStatus } from "@/lib/utils";
 // import styles from "@/ui/styles/singlebusiness.module.scss";
 
 export default function Documents({
   request,
-  business,
+  revalidate,
 }: {
   request: RequestData | null;
-  business: BusinessData | null;
+  revalidate: () => void;
 }) {
   return (
     <div className={styles.document__tab}>
@@ -44,8 +45,12 @@ export default function Documents({
             <GridCol span={4} className={styles.grid}>
               <FileTextInput
                 label="Identity Type"
-                placeholder={request.documentData.idType}
+                placeholder={camelCaseToTitleCase(request.documentData.idType)}
                 url={request.documentData.idFileURL}
+                path={`idFileURL`}
+                requestId={request.id}
+                revalidate={revalidate}
+                status={getDocumentStatus(request, "idFileURL")}
               />
             </GridCol>
           )}
@@ -54,8 +59,12 @@ export default function Documents({
             <GridCol span={4} className={styles.grid}>
               <FileTextInput
                 label="Proof of Address"
-                placeholder={`${request.documentData.poaType}`}
+                placeholder={camelCaseToTitleCase(request.documentData.poaType)}
                 url={request.documentData.poaFileURL}
+                path={`poaFileURL`}
+                requestId={request.id}
+                revalidate={revalidate}
+                status={getDocumentStatus(request, "poaFileURL")}
               />
             </GridCol>
           )}
@@ -67,6 +76,10 @@ export default function Documents({
                   label="Certificate of Incorporation"
                   placeholder={`Certificate of Incorporation`}
                   url={request.documentData.certOfInc ?? ""}
+                  path={`certOfInc`}
+                  requestId={request.id}
+                  revalidate={revalidate}
+                  status={getDocumentStatus(request, "certOfInc")}
                 />
               </GridCol>
 
@@ -75,6 +88,10 @@ export default function Documents({
                   label="Mermat"
                   placeholder={`Mermat`}
                   url={request.documentData.mermat ?? ""}
+                  path={`mermat`}
+                  requestId={request.id}
+                  revalidate={revalidate}
+                  status={getDocumentStatus(request, "mermat")}
                 />
               </GridCol>
             </>

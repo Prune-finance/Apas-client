@@ -309,8 +309,6 @@ function Accounts() {
     );
   };
 
-  console.log(accounts);
-
   const rows = filteredSearch(
     accounts,
     ["accountName", "accountNumber", "Company.name"],

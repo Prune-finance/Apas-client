@@ -8,12 +8,14 @@ import styles from "./styles.module.scss";
 import { RequestData } from "@/lib/hooks/requests";
 
 import { FileTextInput } from "../FileTextInput";
-import { camelCaseToTitleCase } from "@/lib/utils";
+import { camelCaseToTitleCase, getDocumentStatus } from "@/lib/utils";
 
 export default function Shareholders({
   request,
+  revalidate,
 }: {
   request: RequestData | null;
+  revalidate: () => void;
 }) {
   return (
     <div className={styles.business__tab}>
@@ -23,7 +25,11 @@ export default function Shareholders({
             (director, index) => {
               return (
                 <Fragment key={index}>
-                  <DirectorsForm request={request} index={index} />
+                  <DirectorsForm
+                    request={request}
+                    index={index}
+                    revalidate={revalidate}
+                  />
                 </Fragment>
               );
             }
@@ -37,9 +43,11 @@ export default function Shareholders({
 const DirectorsForm = ({
   request,
   index,
+  revalidate,
 }: {
   request: RequestData;
   index: number;
+  revalidate: () => void;
 }) => {
   return (
     <div className={styles.top__container}>
@@ -62,6 +70,15 @@ const DirectorsForm = ({
                 request.documentData.shareholders[`shareholder_${index + 1}`]
                   .idFile
               }
+              path={`shareholders.shareholder_${index + 1}.idFile`}
+              requestId={request.id}
+              revalidate={revalidate}
+              status={getDocumentStatus(
+                request,
+                "shareholders",
+                `shareholder_${index + 1}`,
+                "idFile"
+              )}
             />
           </GridCol>
         )}
@@ -78,6 +95,15 @@ const DirectorsForm = ({
                 request.documentData.shareholders[`shareholder_${index + 1}`]
                   .poaFile
               }
+              path={`shareholders.shareholder_${index + 1}.poaFile`}
+              requestId={request.id}
+              revalidate={revalidate}
+              status={getDocumentStatus(
+                request,
+                "shareholders",
+                `shareholder_${index + 1}`,
+                "poaFile"
+              )}
             />
           </GridCol>
         )}

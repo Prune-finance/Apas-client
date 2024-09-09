@@ -1,4 +1,8 @@
-import { TransactionType, TrxData } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  TrxData,
+  useSingleTransactions,
+} from "@/lib/hooks/transactions";
 import { formatNumber } from "@/lib/utils";
 import {
   Drawer,
@@ -46,14 +50,19 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
-  console.log(selectedRequest);
   const pdfRef = useRef<HTMLDivElement>(null);
+
+  const { transaction, loading: loadingTransaction } = useSingleTransactions(
+    selectedRequest?.id ?? ""
+  );
+
+  console.log({ issued: transaction });
 
   const { account: senderAccount, loading: loadingSenderAcct } =
     useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
 
   const businessDetails = {
-    "Business Name": "N/A",
+    "Business Name": transaction?.company.name ?? "N/A",
     "Account Type": "N/A",
     IBAN: selectedRequest?.recipientIban,
     BIC: selectedRequest?.recipientBic,

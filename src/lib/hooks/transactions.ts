@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
+import { BusinessData } from "./businesses";
 
 interface IParams {
   limit?: number;
@@ -59,6 +60,55 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
   ]);
 
   return { loading, transactions, meta, revalidate };
+}
+
+export function useSingleTransactions(
+  id: string = "",
+  customParams: IParams = {}
+) {
+  const [transaction, setTransaction] = useState<TransactionType | null>(null);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+    try {
+      setLoading(true);
+      const path = id ? `${id}/transactions` : "transactions";
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/transactions/${id}/data?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransaction(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      setTransaction(null);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [id]);
+
+  return { loading, transaction, meta, revalidate };
 }
 
 export function useBusinessTransactions(
@@ -426,4 +476,5 @@ export interface TransactionType {
   destinationLastName: string;
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
+  company: BusinessData;
 }

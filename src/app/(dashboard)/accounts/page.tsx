@@ -116,6 +116,7 @@ function Accounts() {
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const [hideBtn, setHideBtn] = useState(false);
 
   const form = useForm<AccountFilterType>({
     initialValues: { ...filterValues, type: null },
@@ -130,6 +131,7 @@ function Accounts() {
       (request) => request.status === "APPROVED"
     );
 
+    hasApproved && setHideBtn(true);
     return hasPending || hasApproved;
   }, [issuanceRequests]);
 
@@ -503,16 +505,20 @@ function Accounts() {
                 <PendingAccounts />
               </TabsPanel>
 
-              <Box pos="absolute" top={-10} right={0}>
-                <PrimaryBtn
-                  text={
-                    cannotRequestIssuance ? "Request Sent ✓" : "Request Access"
-                  }
-                  fw={600}
-                  action={requestAccessOpen}
-                  disabled={cannotRequestIssuance || statusLoading}
-                />
-              </Box>
+              {!hideBtn && (
+                <Box pos="absolute" top={-10} right={0}>
+                  <PrimaryBtn
+                    text={
+                      cannotRequestIssuance
+                        ? "Request Sent ✓"
+                        : "Request Access"
+                    }
+                    fw={600}
+                    action={requestAccessOpen}
+                    disabled={cannotRequestIssuance || statusLoading}
+                  />
+                </Box>
+              )}
             </TabsComponent>
           </TabsPanel>
         </TabsComponent>

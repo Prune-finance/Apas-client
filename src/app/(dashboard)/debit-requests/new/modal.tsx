@@ -58,10 +58,16 @@ export default function DebitRequestModal({
   const form = useForm({
     initialValues: {
       ...debitRequest,
-      ...(selectedId && { account: selectedId }),
+      accountBalance:
+        accounts.find((item) => item.id === selectedId)?.accountBalance ?? 0,
+      ...(selectedId && {
+        account: selectedId,
+      }),
     },
     validate: zodResolver(validateDebitRequest),
   });
+
+  console.log(form.errors, form.values);
 
   useEffect(() => {
     form.setFieldValue(

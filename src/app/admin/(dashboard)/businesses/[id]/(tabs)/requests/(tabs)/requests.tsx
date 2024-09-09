@@ -188,10 +188,10 @@ export const OtherRequests = () => {
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{element.Account.accountName}</TableTd>
+      <TableTd>{element?.Account?.accountName ?? "N/A"}</TableTd>
 
       <TableTd tt="capitalize">
-        {getUserType(element.Account.type ?? "USER")}
+        {getUserType(element?.Account?.type ?? "USER")}
       </TableTd>
       <TableTd tt="capitalize">{element.type.toLowerCase()}</TableTd>
       <TableTd tt="capitalize">

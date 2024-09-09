@@ -83,6 +83,8 @@ export default function ModalComponent({
             color="var(--prune-text-gray-200)"
             c="var(--prune-text-gray-800)"
             fullWidth
+            fz={12}
+            fw={400}
           >
             Cancel
           </Button>
@@ -93,6 +95,8 @@ export default function ModalComponent({
             variant="filled"
             color="var(--prune-primary-600)"
             c="var(--prune-text-gray-800)"
+            fz={12}
+            fw={400}
             loading={processing}
             fullWidth
           >

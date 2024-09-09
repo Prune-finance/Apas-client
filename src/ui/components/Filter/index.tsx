@@ -124,6 +124,7 @@ export default function Filter<T>({
 
 const approvalOptions = [
   "Approved",
+  "Cancelled",
   "Pending",
   "Rejected",
   "Confirmed",

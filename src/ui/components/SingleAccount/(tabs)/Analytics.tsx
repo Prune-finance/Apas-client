@@ -39,8 +39,12 @@ export const Analytics = ({ setChartFrequency, transactions }: Props) => {
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
+      const creditBal = trx.type === "CREDIT" ? trx.amount : 0;
+      const debitBal = trx.type === "DEBIT" ? trx.amount : 0;
+
       // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
-      arr.push({ month, Inflow: 0, Outflow: trx.amount });
+      arr.push({ month, Inflow: creditBal, Outflow: debitBal });
+      // arr.push({ month, Inflow: 0, Outflow: trx.amount });
     });
 
     return arr;

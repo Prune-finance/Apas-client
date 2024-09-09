@@ -41,8 +41,24 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
       // currency: "EUR",
       // formatted: true,
     },
-    { title: "Money In", value: 0, currency: "EUR", formatted: true },
-    { title: "Money Out", value: totalBal, currency: "EUR", formatted: true },
+    {
+      title: "Money In",
+      value:
+        transactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      currency: "EUR",
+      formatted: true,
+    },
+    {
+      title: "Money Out",
+      value:
+        transactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      currency: "EUR",
+      formatted: true,
+    },
   ];
   return (
     <>
@@ -132,7 +148,7 @@ const RowComponent = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element.senderIban}</TableTd>
-      <TableTd>{"N/A"}</TableTd>
+      {/* <TableTd>{"N/A"}</TableTd> */}
       <TableTd>{element.recipientName || element.recipientIban}</TableTd>
       <TableTd>
         <AmountGroup type={element.type} fz={12} fw={400} />

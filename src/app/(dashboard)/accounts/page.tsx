@@ -409,6 +409,7 @@ function Accounts() {
         "Request Sent",
         "You will receive as notification once your request has been approved"
       );
+      revalidate();
       requestAccessClose();
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -504,7 +505,9 @@ function Accounts() {
 
               <Box pos="absolute" top={-10} right={0}>
                 <PrimaryBtn
-                  text="Request Access"
+                  text={
+                    cannotRequestIssuance ? "Request Sent ✓" : "Request Access"
+                  }
                   fw={600}
                   action={requestAccessOpen}
                   disabled={cannotRequestIssuance || statusLoading}

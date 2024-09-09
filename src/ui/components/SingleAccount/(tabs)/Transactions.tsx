@@ -148,7 +148,7 @@ const RowComponent = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element.senderIban}</TableTd>
-      <TableTd>{"N/A"}</TableTd>
+      {/* <TableTd>{"N/A"}</TableTd> */}
       <TableTd>{element.recipientName || element.recipientIban}</TableTd>
       <TableTd>
         <AmountGroup type={element.type} fz={12} fw={400} />

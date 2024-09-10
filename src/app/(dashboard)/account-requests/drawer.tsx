@@ -36,7 +36,6 @@ import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import { Dispatch, SetStateAction, useState } from "react";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { set } from "zod";
 
 dayjs.extend(advancedFormat);
 
@@ -457,6 +456,14 @@ export const AccountRequestsDrawer = ({
             </TabsComponent>
           </Box>
         )}
+
+        <PrimaryBtn
+          text="Re-Submit Request"
+          fw={600}
+          fullWidth
+          mt={28}
+          // disabled
+        />
       </Box>
     </Drawer>
   );

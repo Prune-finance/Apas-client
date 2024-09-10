@@ -15,6 +15,7 @@ import {
   TabsPanel,
   Alert,
   FileButton,
+  Button,
 } from "@mantine/core";
 import {
   IconX,
@@ -34,6 +35,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import { Dispatch, SetStateAction, useState } from "react";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { set } from "zod";
 
 dayjs.extend(advancedFormat);
 
@@ -487,11 +490,12 @@ export const TextInputWithFile = ({
   setRequest,
 }: TextInputWithFileProps) => {
   const [processing, setProcessing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const { handleError, handleInfo, handleSuccess } = useNotification();
 
   const handleUpload = async (file: File | null) => {
     // formKey: string;
-    // setProcessing(true);
+    setUploading(true);
     try {
       if (!file) return;
 
@@ -512,6 +516,8 @@ export const TextInputWithFile = ({
       // setUploaded(true);
     } catch (error) {
       handleError("An error occurred", parseError(error));
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -561,15 +567,19 @@ export const TextInputWithFile = ({
             accept="image/png, image/jpeg, application/pdf"
           >
             {(props) => (
-              <UnstyledButton
+              <Button
                 w={"100%"}
                 className={styles.input__right__section}
                 {...props}
+                bg="var(--prune-primary-600)"
+                h={25}
+                loading={uploading}
+                loaderProps={{ type: "dots" }}
               >
                 <Text fw={600} fz={10} c="#475467">
                   Re-upload
                 </Text>
-              </UnstyledButton>
+              </Button>
             )}
           </FileButton>
         ) : (

@@ -436,20 +436,20 @@ export const validateShareholder = z.object({
   proofOfAddressFileUrl: z.string(),
 });
 
-export const debitRequest = {
-  account: "",
-  amount: "",
-  accountType: "",
-  destinationIBAN: "",
-  destinationBIC: "",
-  destinationCountry: "",
-  destinationBank: "",
-  reference: crypto.randomUUID(),
-  reason: "",
-  destinationFirstName: "",
-  destinationLastName: "",
-  accountBalance: 0,
-};
+// export const debitRequest = {
+//   account: "",
+//   amount: "",
+//   accountType: "",
+//   destinationIBAN: "",
+//   destinationBIC: "",
+//   destinationCountry: "",
+//   destinationBank: "",
+//   reference: crypto.randomUUID(),
+//   reason: "",
+//   destinationFirstName: "",
+//   destinationLastName: "",
+//   accountBalance: 0,
+// };
 
 export const validateDebitRequest = z
   .object({
@@ -466,7 +466,7 @@ export const validateDebitRequest = z
     reason: z.string().min(2, "Narration is required"),
     destinationFirstName: z.string(),
     destinationLastName: z.string(),
-    accountBalance: z.number().positive("A positive amount is required"),
+    // accountBalance: z.number().positive("A positive amount is required"),
   })
   .superRefine((data, ctx) => {
     if (!data.amount) {
@@ -477,14 +477,14 @@ export const validateDebitRequest = z
       });
     }
 
-    if (data.amount > data.accountBalance) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Amount must be less than or equal to account balance",
-        path: ["amount"],
-      });
-    }
-    return data;
+    // if (data?.amount > data?.accountBalance) {
+    //   ctx.addIssue({
+    //     code: z.ZodIssueCode.custom,
+    //     message: "Amount must be less than or equal to account balance",
+    //     path: ["amount"],
+    //   });
+    // }
+    // return data;
   });
 
 export const sendMoneyIndividualValidate = z.object({

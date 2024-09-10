@@ -48,7 +48,7 @@ export default function Documents({
                 placeholder={camelCaseToTitleCase(request.documentData.idType)}
                 url={request.documentData.idFileURL}
                 path={`idFileURL`}
-                requestId={request.id}
+                request={request}
                 revalidate={revalidate}
                 status={getDocumentStatus(request, "idFileURL")}
               />
@@ -62,7 +62,7 @@ export default function Documents({
                 placeholder={camelCaseToTitleCase(request.documentData.poaType)}
                 url={request.documentData.poaFileURL}
                 path={`poaFileURL`}
-                requestId={request.id}
+                request={request}
                 revalidate={revalidate}
                 status={getDocumentStatus(request, "poaFileURL")}
               />
@@ -77,7 +77,7 @@ export default function Documents({
                   placeholder={`Certificate of Incorporation`}
                   url={request.documentData.certOfInc ?? ""}
                   path={`certOfInc`}
-                  requestId={request.id}
+                  request={request}
                   revalidate={revalidate}
                   status={getDocumentStatus(request, "certOfInc")}
                 />
@@ -89,7 +89,7 @@ export default function Documents({
                   placeholder={`Mermat`}
                   url={request.documentData.mermat ?? ""}
                   path={`mermat`}
-                  requestId={request.id}
+                  request={request}
                   revalidate={revalidate}
                   status={getDocumentStatus(request, "mermat")}
                 />

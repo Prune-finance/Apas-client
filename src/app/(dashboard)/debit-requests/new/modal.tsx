@@ -2,7 +2,7 @@
 import Cookies from "js-cookie";
 
 import axios from "axios";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
 
@@ -24,7 +24,7 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 
 import {
-  debitRequest,
+  // debitRequest,
   newBusiness,
   validateDebitRequest,
   validateNewBusiness,
@@ -41,13 +41,29 @@ export default function DebitRequestModal({
   close,
   selectedId,
   accountsData,
+  accountBalance,
   revalidate,
 }: {
   close: () => void;
   selectedId?: string;
   accountsData?: AccountData[];
+  accountBalance?: number;
   revalidate?: () => void;
 }) {
+  const debitRequest = {
+    account: "",
+    amount: "",
+    accountType: "",
+    destinationIBAN: "",
+    destinationBIC: "",
+    destinationCountry: "",
+    destinationBank: "",
+    reference: crypto.randomUUID(),
+    reason: "",
+    destinationFirstName: "",
+    destinationLastName: "",
+  };
+
   const router = useRouter();
   const { accounts } = useUserAccounts({ limit: 1000 });
   const [processing, setProcessing] = useState(false);
@@ -58,8 +74,6 @@ export default function DebitRequestModal({
   const form = useForm({
     initialValues: {
       ...debitRequest,
-      accountBalance:
-        accounts.find((item) => item.id === selectedId)?.accountBalance ?? 0,
       ...(selectedId && {
         account: selectedId,
       }),
@@ -67,15 +81,13 @@ export default function DebitRequestModal({
     validate: zodResolver(validateDebitRequest),
   });
 
-  console.log(form.errors, form.values);
-
-  useEffect(() => {
-    form.setFieldValue(
-      "accountBalance",
-      accounts.find((item) => item.id === form.values.account)
-        ?.accountBalance ?? 0
-    );
-  }, [form.values.account]);
+  // useEffect(() => {
+  //   form.setFieldValue(
+  //     "accountBalance",
+  //     accounts.find((item) => item.id === form.values.account)
+  //       ?.accountBalance ?? 0
+  //   );
+  // }, [form.values.account]);
 
   const createDebitRequest = async () => {
     setProcessing(true);
@@ -83,7 +95,17 @@ export default function DebitRequestModal({
     let lastName = "";
     try {
       const { hasErrors } = form.validate();
+
+      if (Number(form.values.amount) > Number(accountBalance)) {
+        console.log("true");
+        return form.setFieldError(
+          "amount",
+          "Amount must be less than or equal to account balance"
+        );
+      }
+
       if (hasErrors) return;
+
       if (form.values.accountType === "Corporate") {
         firstName = companyName.split(" ")[0];
         lastName = companyName.split(" ")[1];
@@ -91,7 +113,7 @@ export default function DebitRequestModal({
         console.log(firstName, lastName);
       }
 
-      const { accountBalance, accountType, ...rest } = form.values;
+      const { accountType, ...rest } = form.values;
 
       // console.log({
       //   ...rest,

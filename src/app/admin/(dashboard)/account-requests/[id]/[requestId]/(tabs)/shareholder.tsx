@@ -71,7 +71,7 @@ const DirectorsForm = ({
                   .idFile
               }
               path={`shareholders.shareholder_${index + 1}.idFile`}
-              requestId={request.id}
+              request={request}
               revalidate={revalidate}
               status={getDocumentStatus(
                 request,
@@ -96,7 +96,7 @@ const DirectorsForm = ({
                   .poaFile
               }
               path={`shareholders.shareholder_${index + 1}.poaFile`}
-              requestId={request.id}
+              request={request}
               revalidate={revalidate}
               status={getDocumentStatus(
                 request,

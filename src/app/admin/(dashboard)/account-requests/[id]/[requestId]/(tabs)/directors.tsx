@@ -89,7 +89,7 @@ const DirectorsForm = ({
                 request.documentData.directors[`director_${index + 1}`].idFile
               }
               path={`directors.director_${index + 1}.idFile`}
-              requestId={request.id}
+              request={request}
               revalidate={revalidate}
               status={getDocumentStatus(
                 request,
@@ -112,7 +112,7 @@ const DirectorsForm = ({
                 request.documentData.directors[`director_${index + 1}`].poaFile
               }
               path={`directors.director_${index + 1}.poaFile`}
-              requestId={request.id}
+              request={request}
               revalidate={revalidate}
               status={getDocumentStatus(
                 request,

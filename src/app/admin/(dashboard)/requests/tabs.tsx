@@ -55,9 +55,9 @@ const tabs = [
     icon: <IconCircleArrowUpRight size={16} />,
   },
   {
-    title: "Payout Account",
-    value: "payout-account",
-    icon: <IconMoneybag size={16} />,
+    title: "Services",
+    value: "services",
+    icon: <IconUserPlus size={16} />,
   },
   {
     title: "Live Keys",

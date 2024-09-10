@@ -80,7 +80,7 @@ export const TransactionDrawer = ({
     "Bank Name": selectedRequest?.recipientBankAddress,
     "Bank Address": selectedRequest?.recipientBankAddress,
     Country: selectedRequest?.recipientBankCountry,
-    "Reference 2": selectedRequest?.reference ?? "N/A",
+    "Transaction Ref (Reference 2)": selectedRequest?.reference ?? "N/A",
   };
 
   const senderDetails = {
@@ -104,7 +104,7 @@ export const TransactionDrawer = ({
   };
 
   const otherDetails = {
-    "Reference 1": "N/A",
+    "Prune (Reference 1)": "N/A",
     "Transaction ID": selectedRequest?.id,
     "Date and Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
@@ -124,7 +124,8 @@ export const TransactionDrawer = ({
   };
 
   const SenderDetails = {
-    "Account Name": senderAccount?.accountName ?? "N/A",
+    "Account Name":
+      senderAccount?.accountName ?? selectedRequest?.senderName ?? "N/A",
     "Account Number": selectedRequest?.senderIban ?? "",
     "Bank Name": "Prune Payments LTD",
     BIC: "ARPYGB21XXX",

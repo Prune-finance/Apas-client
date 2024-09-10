@@ -332,6 +332,7 @@ export interface BusinessData {
   documents: Document[];
   lastLogin: Date;
   contactSignup: Date | null;
+  contactCountryCode: string;
 }
 
 export interface Document {

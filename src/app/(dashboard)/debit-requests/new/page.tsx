@@ -22,7 +22,6 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 
 import {
-  debitRequest,
   newBusiness,
   validateDebitRequest,
   validateNewBusiness,
@@ -50,6 +49,21 @@ export default function DebitRequest() {
       };
     });
   }, [accounts]);
+
+  const debitRequest = {
+    account: "",
+    amount: "",
+    accountType: "",
+    destinationIBAN: "",
+    destinationBIC: "",
+    destinationCountry: "",
+    destinationBank: "",
+    reference: crypto.randomUUID(),
+    reason: "",
+    destinationFirstName: "",
+    destinationLastName: "",
+    accountBalance: 0,
+  };
 
   const form = useForm({
     initialValues: debitRequest,

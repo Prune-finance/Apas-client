@@ -2,10 +2,14 @@ import form from "@/app/auth/[id]/register/form";
 import {
   Avatar,
   Box,
+  Combobox,
   Divider,
   Flex,
   Group,
   Loader,
+  NativeSelect,
+  NumberInput,
+  rem,
   Select,
   Text,
   Textarea,
@@ -17,6 +21,12 @@ import { NewBusinessType } from "@/lib/schema";
 import { IconMail, IconPhone, IconWorldWww } from "@tabler/icons-react";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import DropzoneComponent from "@/ui/components/Dropzone";
+import {
+  countriesWithCode,
+  countryCodesWithFlags,
+} from "@/lib/countries-codes-flags";
+import Image from "next/image";
+import { useState } from "react";
 
 type Props = {
   form: UseFormReturnType<NewBusinessType>;
@@ -29,7 +39,27 @@ export default function BasicInfo({ form }: Props) {
     value: plan.id,
   }));
 
-  console.log(form.values);
+  const select = (
+    <NativeSelect
+      data={countriesWithCode}
+      rightSectionWidth={28}
+      {...form.getInputProps("contactCountryCode")}
+      styles={{
+        input: {
+          fontWeight: 500,
+          borderTopLeftRadius: 0,
+          borderBottomLeftRadius: 0,
+          width: rem(92),
+          marginRight: rem(-2),
+          // border: "1px solid var(--prune-primary-700)",
+          fontSize: rem(12),
+        },
+      }}
+      classNames={{
+        input: styles.input,
+      }}
+    />
+  );
 
   return (
     <Box>
@@ -148,7 +178,7 @@ export default function BasicInfo({ form }: Props) {
           {...form.getInputProps("contactEmail")}
           rightSection={<IconMail size={14} />}
         />
-        <TextInput
+        <NumberInput
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           withAsterisk
@@ -156,14 +186,16 @@ export default function BasicInfo({ form }: Props) {
           label="Contact Phone Number"
           placeholder="Enter Contact Phone Number"
           {...form.getInputProps("contactNumber")}
-          rightSection={<IconPhone size={14} />}
+          prefix={form.values.contactCountryCode}
+          // rightSection={<IconPhone size={14} />}
+          rightSection={select}
           //   rightSection={
           //     <Group>
           //       <Avatar />
           //       <Select data={["US"]} variant="unstyled" />
           //     </Group>
           //   }
-          //   rightSectionWidth={300}
+          rightSectionWidth={90}
         />
       </Flex>
 

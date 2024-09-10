@@ -15,6 +15,8 @@ import {
   TabsPanel,
   Alert,
   FileButton,
+  Modal,
+  Button,
 } from "@mantine/core";
 import {
   IconX,
@@ -34,6 +36,10 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import { Dispatch, SetStateAction, useState } from "react";
+import FileDisplay from "@/ui/components/DocumentViewer";
+import { useDisclosure } from "@mantine/hooks";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { useListState, UseListStateHandlers } from "@mantine/hooks";
 
 dayjs.extend(advancedFormat);
 
@@ -53,6 +59,9 @@ export const AccountRequestsDrawer = ({
   revalidate,
 }: Props) => {
   const { business } = useUserBusiness();
+  const [values, handlers] = useListState<UploadedFiles>([]);
+  const [processing, setProcessing] = useState(false);
+  const { handleError, handleInfo, handleSuccess } = useNotification();
 
   const accountDetails = [
     {
@@ -79,16 +88,35 @@ export const AccountRequestsDrawer = ({
     },
   ];
 
-  const contactPerson = {
-    Name: "N/A",
-    Email: business?.contactEmail,
-    "Phone Number": business?.contactNumber,
+  const reUpload = async () => {
+    setProcessing(true);
+    try {
+      const { data: res } = await axios.post(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/${selectedRequest?.id}/document/upload`,
+        values,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+      handleSuccess(
+        "Upload Successful",
+        "You have successfully uploaded the document(s)"
+      );
+      revalidate();
+      setSelectedRequest(res.data);
+      handlers.setState([]);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
     <Drawer
       opened={opened}
-      onClose={close}
+      onClose={() => {
+        close();
+        handlers.setState([]);
+      }}
       position="right"
       // withCloseButton={false}
       closeButtonProps={{ ...closeButtonProps, mr: 28 }}
@@ -149,7 +177,7 @@ export const AccountRequestsDrawer = ({
           ))}
         </Stack>
 
-        {selectedRequest?.reason && (
+        {selectedRequest?.reason && selectedRequest?.status === "REJECTED" && (
           <Box mt={24}>
             <Divider mt={30} mb={24} />
             <Text
@@ -199,6 +227,8 @@ export const AccountRequestsDrawer = ({
               revalidate={revalidate}
               request={selectedRequest}
               setRequest={setSelectedRequest}
+              handlers={handlers}
+              uploadedFiles={values}
             />
 
             <TextInputWithFile
@@ -211,6 +241,8 @@ export const AccountRequestsDrawer = ({
               request={selectedRequest}
               revalidate={revalidate}
               setRequest={setSelectedRequest}
+              handlers={handlers}
+              uploadedFiles={values}
             />
           </Stack>
         )}
@@ -239,6 +271,8 @@ export const AccountRequestsDrawer = ({
                       request={selectedRequest}
                       revalidate={revalidate}
                       setRequest={setSelectedRequest}
+                      handlers={handlers}
+                      uploadedFiles={values}
                     />
                   </Stack>
                 ) : null}
@@ -253,6 +287,8 @@ export const AccountRequestsDrawer = ({
                       request={selectedRequest}
                       revalidate={revalidate}
                       setRequest={setSelectedRequest}
+                      handlers={handlers}
+                      uploadedFiles={values}
                     />
                   </Stack>
                 ) : null}
@@ -297,6 +333,8 @@ export const AccountRequestsDrawer = ({
                             request={selectedRequest}
                             revalidate={revalidate}
                             setRequest={setSelectedRequest}
+                            handlers={handlers}
+                            uploadedFiles={values}
                           />
 
                           {selectedRequest.documentData.directors[
@@ -320,6 +358,8 @@ export const AccountRequestsDrawer = ({
                               revalidate={revalidate}
                               request={selectedRequest}
                               setRequest={setSelectedRequest}
+                              handlers={handlers}
+                              uploadedFiles={values}
                             />
                           )}
 
@@ -339,6 +379,8 @@ export const AccountRequestsDrawer = ({
                             request={selectedRequest}
                             revalidate={revalidate}
                             setRequest={setSelectedRequest}
+                            handlers={handlers}
+                            uploadedFiles={values}
                           />
 
                           {arr.length - 1 !== index && <Divider mt={20} />}
@@ -388,6 +430,8 @@ export const AccountRequestsDrawer = ({
                             request={selectedRequest}
                             revalidate={revalidate}
                             setRequest={setSelectedRequest}
+                            handlers={handlers}
+                            uploadedFiles={values}
                           />
 
                           {selectedRequest.documentData.shareholders[
@@ -411,6 +455,8 @@ export const AccountRequestsDrawer = ({
                               request={selectedRequest}
                               revalidate={revalidate}
                               setRequest={setSelectedRequest}
+                              handlers={handlers}
+                              uploadedFiles={values}
                             />
                           )}
 
@@ -432,6 +478,8 @@ export const AccountRequestsDrawer = ({
                             request={selectedRequest}
                             revalidate={revalidate}
                             setRequest={setSelectedRequest}
+                            handlers={handlers}
+                            uploadedFiles={values}
                           />
 
                           {arr.length - 1 !== index && <Divider mt={20} />}
@@ -454,6 +502,18 @@ export const AccountRequestsDrawer = ({
             </TabsComponent>
           </Box>
         )}
+
+        {selectedRequest?.status === "REJECTED" && (
+          <PrimaryBtn
+            text="Re-Submit Request"
+            fw={600}
+            fullWidth
+            mt={28}
+            action={reUpload}
+            loading={processing}
+            disabled={values.length === 0}
+          />
+        )}
       </Box>
     </Drawer>
   );
@@ -466,6 +526,11 @@ const tabs = [
   { value: "Shareholders" },
 ];
 
+interface UploadedFiles {
+  path: string;
+  url: string;
+}
+
 interface TextInputWithFileProps {
   label: string;
   placeholder: string;
@@ -474,6 +539,8 @@ interface TextInputWithFileProps {
   request: RequestData;
   setRequest: Dispatch<SetStateAction<RequestData | null>>;
   revalidate: () => void;
+  handlers: UseListStateHandlers<UploadedFiles>;
+  uploadedFiles: UploadedFiles[];
   // status: string;
 }
 
@@ -485,13 +552,17 @@ export const TextInputWithFile = ({
   revalidate,
   request,
   setRequest,
+  handlers,
+  uploadedFiles,
 }: TextInputWithFileProps) => {
   const [processing, setProcessing] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const { handleError, handleInfo, handleSuccess } = useNotification();
+  const [opened, { open, close }] = useDisclosure(false);
 
   const handleUpload = async (file: File | null) => {
     // formKey: string;
-    // setProcessing(true);
+    setUploading(true);
     try {
       if (!file) return;
 
@@ -504,97 +575,98 @@ export const TextInputWithFile = ({
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      return data.data.url;
+      // Check if the path already exists
+      const index = uploadedFiles.findIndex((file) => file.path === path);
 
-      // if (formKey) {
-      //   form.setFieldValue(formKey, data.data.url);
-      // }
-      // setUploaded(true);
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    }
-  };
+      // Update URL if path exists
+      if (index !== -1)
+        return handlers.setItem(index, { path, url: data.data.url });
 
-  const reUpload = async (file: File | null) => {
-    const url = await handleUpload(file);
-    if (!url) return;
-    setProcessing(true);
-    try {
-      const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/${request.id}/document/upload`,
-        {
-          path,
-          url,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
-      handleSuccess(
-        "Upload Successful",
-        "You have successfully uploaded the document"
-      );
-      revalidate();
-      setRequest(res.data);
+      // Add new file to uploadedFiles
+      handlers.append({ path, url: data.data.url });
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
-      setProcessing(false);
+      setUploading(false);
     }
   };
 
   return (
-    <TextInput
-      readOnly
-      classNames={{
-        input: styles.input,
-        label: styles.label,
-        section: styles.section,
-        root: styles.input__root2,
-      }}
-      leftSection={<IconFileTypePdf color="#475467" />}
-      leftSectionPointerEvents="none"
-      rightSectionWidth={70}
-      rightSection={
-        getNestedDocValue(request.documentApprovals, path) === false ? (
-          <FileButton
-            disabled={processing}
-            onChange={(file) => reUpload(file)}
-            accept="image/png, image/jpeg, application/pdf"
-          >
-            {(props) => (
-              <UnstyledButton
-                w={"100%"}
-                className={styles.input__right__section}
-                {...props}
-              >
-                <Text fw={600} fz={10} c="#475467">
-                  Re-upload
-                </Text>
-              </UnstyledButton>
-            )}
-          </FileButton>
-        ) : (
-          <UnstyledButton
-            onClick={() => {
-              notifications.clean();
-              if (!url) return handleInfo("No file provided", "");
-              return window.open(url, "_blank");
-            }}
-            className={styles.input__right__section}
-            mr={20}
-            w={"100%"}
-          >
-            <Text fw={600} fz={10} c="#475467">
-              View
-            </Text>
-          </UnstyledButton>
-        )
-      }
-      label={
-        <Text fz={12} mb={2}>
-          {label}
-        </Text>
-      }
-      placeholder={`${placeholder}`}
-    />
+    <>
+      <TextInput
+        readOnly
+        classNames={{
+          input: styles.input,
+          label: styles.label,
+          section: styles.section,
+          root: styles.input__root2,
+        }}
+        leftSection={<IconFileTypePdf color="#475467" />}
+        leftSectionPointerEvents="none"
+        rightSectionWidth={70}
+        rightSection={
+          getNestedDocValue(request.documentApprovals, path) === false ? (
+            <FileButton
+              disabled={processing}
+              onChange={(file) => handleUpload(file)}
+              accept="image/png, image/jpeg, application/pdf"
+            >
+              {(props) => (
+                <Button
+                  w={"100%"}
+                  className={styles.input__right__section}
+                  {...props}
+                  bg="var(--prune-primary-600)"
+                  h={25}
+                  loading={uploading}
+                  loaderProps={{ type: "dots" }}
+                >
+                  <Text fw={600} fz={10} c="#475467">
+                    Re-upload
+                  </Text>
+                </Button>
+              )}
+            </FileButton>
+          ) : (
+            <UnstyledButton
+              // onClick={() => {
+              //   notifications.clean();
+              //   if (!url) return handleInfo("No file provided", "");
+              //   return window.open(url, "_blank");
+              // }}
+              onClick={open}
+              className={styles.input__right__section}
+              mr={20}
+              w={"100%"}
+            >
+              <Text fw={600} fz={10} c="#475467">
+                View
+              </Text>
+            </UnstyledButton>
+          )
+        }
+        label={
+          <Text fz={12} mb={2}>
+            {label}
+          </Text>
+        }
+        placeholder={`${placeholder}`}
+      />
+      <Modal
+        opened={opened}
+        onClose={close}
+        size={"lg"}
+        centered
+        title={
+          <Text fz={18} fw={600}>
+            Document Preview
+          </Text>
+        }
+      >
+        <Box mah={500}>
+          <FileDisplay fileUrl={url} />
+        </Box>
+      </Modal>
+    </>
   );
 };

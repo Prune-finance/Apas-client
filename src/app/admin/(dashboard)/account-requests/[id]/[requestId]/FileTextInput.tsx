@@ -1,4 +1,11 @@
-import { Group, Text, TextInput, UnstyledButton } from "@mantine/core";
+import {
+  Box,
+  Group,
+  Modal,
+  Text,
+  TextInput,
+  UnstyledButton,
+} from "@mantine/core";
 import React, { Fragment, useState } from "react";
 import styles from "./(tabs)/styles.module.scss";
 import { IconCheck, IconFileInfo, IconX } from "@tabler/icons-react";
@@ -8,6 +15,8 @@ import { notifications } from "@mantine/notifications";
 import { parseError } from "@/lib/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
+import FileDisplay from "@/ui/components/DocumentViewer";
+import { useDisclosure } from "@mantine/hooks";
 
 interface Props {
   url: string;
@@ -31,6 +40,7 @@ export const FileTextInput = ({
   const { handleInfo, handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
   const [processingRejection, setProcessingRejection] = useState(false);
+  const [opened, { open, close }] = useDisclosure(false);
 
   const approveOrRejectDocument = async (type: "approve" | "reject") => {
     if (type === "approve") {
@@ -72,13 +82,15 @@ export const FileTextInput = ({
         leftSectionPointerEvents="none"
         rightSection={
           <UnstyledButton
-            onClick={() => {
-              if (!url) {
-                notifications.clean();
-                return handleInfo("No document was provided", "");
-              }
-              window.open(url || "", "_blank");
-            }}
+            // onClick={() => {
+            //   if (!url) {
+            //     notifications.clean();
+            //     return handleInfo("No document was provided", "");
+            //   }
+            //   window.open(url || "", "_blank");
+            // }}
+
+            onClick={open}
             className={styles.input__right__section}
           >
             <Text fw={600} fz={10} c="#475467">
@@ -123,6 +135,22 @@ export const FileTextInput = ({
           />
         )}
       </Group>
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        size={"lg"}
+        centered
+        title={
+          <Text fz={14} fw={500}>
+            Document Preview
+          </Text>
+        }
+      >
+        <Box mah={500}>
+          <FileDisplay fileUrl={url} />
+        </Box>
+      </Modal>
     </Fragment>
   );
 };

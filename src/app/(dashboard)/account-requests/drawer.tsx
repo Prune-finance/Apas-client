@@ -613,7 +613,7 @@ export const TextInputWithFile = ({
           </Text>
         }
       >
-        <Box mah={400}>
+        <Box mah={500}>
           <FileDisplay fileUrl={url} />
         </Box>
       </Modal>

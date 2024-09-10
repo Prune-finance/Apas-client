@@ -1,6 +1,6 @@
 import { Box, Button, Flex, Image, Modal, Skeleton, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconDownload } from "@tabler/icons-react";
+import { IconDownload, IconFile, IconFile3d } from "@tabler/icons-react";
 import React, { use, useEffect, useState } from "react";
 
 interface FileDisplayProps {
@@ -111,9 +111,13 @@ const FileDisplay = ({ fileUrl }: FileDisplayProps) => {
           </Flex>
         ) : (
           <Flex align="center" justify="center" gap={10} direction="column">
-            <Text fz={14} fw={500} ta="center">
-              Unsupported file Type
-            </Text>
+            {fileUrl ? (
+              <IconFile size={100} color="#888" />
+            ) : (
+              <Text fz={14} fw={500} ta="center">
+                No Document Provided
+              </Text>
+            )}
 
             {fileUrl && (
               <a href={fileUrl} download>

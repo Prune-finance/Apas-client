@@ -60,7 +60,7 @@ export const TransactionDrawer = ({
     useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
 
   const businessDetails = {
-    "Business Name": transaction?.company.name ?? "N/A",
+    "Business Name": transaction?.company?.name ?? "N/A",
     "Account Type": "N/A",
     IBAN: selectedRequest?.recipientIban,
     BIC: selectedRequest?.recipientBic,

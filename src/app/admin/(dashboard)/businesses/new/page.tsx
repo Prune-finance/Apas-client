@@ -100,7 +100,14 @@ export default function NewBusiness() {
     setProcessing(true);
     try {
       const { errors, hasErrors } = form.validate();
-      const { directors, shareholders, pricingPlan, ...rest } = form.values;
+      const {
+        directors,
+        shareholders,
+        pricingPlan,
+        contactCountryCode,
+        contactNumber,
+        ...rest
+      } = form.values;
 
       const initialDir = directors && directors[0];
       const initialShr = shareholders && shareholders[0];
@@ -122,6 +129,7 @@ export default function NewBusiness() {
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company`,
         {
           ...rest,
+          contactNumber: `${contactCountryCode}${contactNumber}`,
           pricingPlanId: pricingPlan,
           ...(initialDirEmpty ? { directors: [] } : { directors }),
           ...(initialShrEmpty ? { shareholders: [] } : { shareholders }),

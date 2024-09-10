@@ -187,6 +187,7 @@ export const newBusiness = {
   directorParticular: "",
   directors: [directorEtShareholderSchema],
   shareholders: [directorEtShareholderSchema],
+  contactCountryCode: "",
 };
 
 const emailSchema = z.string().email();
@@ -226,6 +227,7 @@ export const basicInfoSchema = z
     contactIdUrl: z.string(),
     contactIdUrlBack: z.string(),
     contactPOAUrl: z.string(),
+    contactCountryCode: z.string(),
   })
   .superRefine((data, ctx) => {
     if (!data.country) {
@@ -341,6 +343,7 @@ export const validateNewBusiness = z.object({
   contactIdUrl: z.string(),
   contactIdUrlBack: z.string(),
   contactPOAUrl: z.string(),
+  contactCountryCode: z.string(),
   cacCertificate: z.string().url("Cac certificate is required"),
   mermat: z.string().url("Memart document is required"),
   directorParticular: z

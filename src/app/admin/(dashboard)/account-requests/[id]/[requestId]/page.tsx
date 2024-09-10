@@ -48,7 +48,10 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import Link from "next/link";
 import Documents from "./(tabs)/documents";
 import TabsComponent from "@/ui/components/Tabs";
-import { areAllDocumentsApproved } from "@/lib/helpers/document-status";
+import {
+  areAllDocumentsApproved,
+  areSomeDocumentsNotApproved,
+} from "@/lib/helpers/document-status";
 import { notifications } from "@mantine/notifications";
 
 export default function SingleRequest() {
@@ -238,7 +241,11 @@ export default function SingleRequest() {
           {request && request.status === "PENDING" && (
             <div className={styles.header__right}>
               <SecondaryBtn text="Reject" action={open} />
-              <PrimaryBtn text="Approve" action={openApprove} />
+              <PrimaryBtn
+                text="Approve"
+                action={openApprove}
+                disabled={areSomeDocumentsNotApproved(request)}
+              />
             </div>
           )}
         </div>

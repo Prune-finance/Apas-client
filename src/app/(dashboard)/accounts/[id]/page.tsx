@@ -127,7 +127,11 @@ export default function Account() {
         centered
         withCloseButton={false}
       >
-        <DebitRequestModal close={close} selectedId={account?.id || ""} />
+        <DebitRequestModal
+          close={close}
+          selectedId={account?.id || ""}
+          accountBalance={account?.accountBalance}
+        />
       </Modal>
     </main>
   );

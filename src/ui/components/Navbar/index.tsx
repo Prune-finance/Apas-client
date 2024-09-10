@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { IconLogout } from "@tabler/icons-react";
+import { IconBook, IconLogout } from "@tabler/icons-react";
 
 import {
   AdminMainLinks,
@@ -243,6 +243,19 @@ export function UserNavbar() {
           </Stack>
         </div>
       </div>
+
+      <UnstyledButton
+        component={Link}
+        href="https://docs.prunepayments.net/"
+        target="_blank"
+        className={styles.nav__cta__container}
+      >
+        <Text fz={12}>API Documentation</Text>
+
+        <div className={styles.nav__cta}>
+          <IconBook size={16} />
+        </div>
+      </UnstyledButton>
 
       <UnstyledButton onClick={open} className={styles.nav__cta__container}>
         <Text fz={12}>Log out</Text>

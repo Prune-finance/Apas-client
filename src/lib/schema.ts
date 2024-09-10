@@ -433,20 +433,20 @@ export const validateShareholder = z.object({
   proofOfAddressFileUrl: z.string(),
 });
 
-export const debitRequest = {
-  account: "",
-  amount: "",
-  accountType: "",
-  destinationIBAN: "",
-  destinationBIC: "",
-  destinationCountry: "",
-  destinationBank: "",
-  reference: crypto.randomUUID(),
-  reason: "",
-  destinationFirstName: "",
-  destinationLastName: "",
-  accountBalance: 0,
-};
+// export const debitRequest = {
+//   account: "",
+//   amount: "",
+//   accountType: "",
+//   destinationIBAN: "",
+//   destinationBIC: "",
+//   destinationCountry: "",
+//   destinationBank: "",
+//   reference: crypto.randomUUID(),
+//   reason: "",
+//   destinationFirstName: "",
+//   destinationLastName: "",
+//   accountBalance: 0,
+// };
 
 export const validateDebitRequest = z
   .object({
@@ -474,14 +474,14 @@ export const validateDebitRequest = z
       });
     }
 
-    // if (data.amount > data.accountBalance) {
+    // if (data?.amount > data?.accountBalance) {
     //   ctx.addIssue({
     //     code: z.ZodIssueCode.custom,
     //     message: "Amount must be less than or equal to account balance",
     //     path: ["amount"],
     //   });
     // }
-    return data;
+    // return data;
   });
 
 export const sendMoneyIndividualValidate = z.object({

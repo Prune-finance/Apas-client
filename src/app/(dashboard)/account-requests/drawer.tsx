@@ -15,6 +15,7 @@ import {
   TabsPanel,
   Alert,
   FileButton,
+  Modal,
 } from "@mantine/core";
 import {
   IconX,
@@ -34,6 +35,8 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import { Dispatch, SetStateAction, useState } from "react";
+import FileDisplay from "@/ui/components/DocumentViewer";
+import { useDisclosure } from "@mantine/hooks";
 
 dayjs.extend(advancedFormat);
 
@@ -488,6 +491,7 @@ export const TextInputWithFile = ({
 }: TextInputWithFileProps) => {
   const [processing, setProcessing] = useState(false);
   const { handleError, handleInfo, handleSuccess } = useNotification();
+  const [opened, { open, close }] = useDisclosure(false);
 
   const handleUpload = async (file: File | null) => {
     // formKey: string;
@@ -542,59 +546,77 @@ export const TextInputWithFile = ({
   };
 
   return (
-    <TextInput
-      readOnly
-      classNames={{
-        input: styles.input,
-        label: styles.label,
-        section: styles.section,
-        root: styles.input__root2,
-      }}
-      leftSection={<IconFileTypePdf color="#475467" />}
-      leftSectionPointerEvents="none"
-      rightSectionWidth={70}
-      rightSection={
-        getNestedDocValue(request.documentApprovals, path) === false ? (
-          <FileButton
-            disabled={processing}
-            onChange={(file) => reUpload(file)}
-            accept="image/png, image/jpeg, application/pdf"
-          >
-            {(props) => (
-              <UnstyledButton
-                w={"100%"}
-                className={styles.input__right__section}
-                {...props}
-              >
-                <Text fw={600} fz={10} c="#475467">
-                  Re-upload
-                </Text>
-              </UnstyledButton>
-            )}
-          </FileButton>
-        ) : (
-          <UnstyledButton
-            onClick={() => {
-              notifications.clean();
-              if (!url) return handleInfo("No file provided", "");
-              return window.open(url, "_blank");
-            }}
-            className={styles.input__right__section}
-            mr={20}
-            w={"100%"}
-          >
-            <Text fw={600} fz={10} c="#475467">
-              View
-            </Text>
-          </UnstyledButton>
-        )
-      }
-      label={
-        <Text fz={12} mb={2}>
-          {label}
-        </Text>
-      }
-      placeholder={`${placeholder}`}
-    />
+    <>
+      <TextInput
+        readOnly
+        classNames={{
+          input: styles.input,
+          label: styles.label,
+          section: styles.section,
+          root: styles.input__root2,
+        }}
+        leftSection={<IconFileTypePdf color="#475467" />}
+        leftSectionPointerEvents="none"
+        rightSectionWidth={70}
+        rightSection={
+          getNestedDocValue(request.documentApprovals, path) === false ? (
+            <FileButton
+              disabled={processing}
+              onChange={(file) => reUpload(file)}
+              accept="image/png, image/jpeg, application/pdf"
+            >
+              {(props) => (
+                <UnstyledButton
+                  w={"100%"}
+                  className={styles.input__right__section}
+                  {...props}
+                >
+                  <Text fw={600} fz={10} c="#475467">
+                    Re-upload
+                  </Text>
+                </UnstyledButton>
+              )}
+            </FileButton>
+          ) : (
+            <UnstyledButton
+              // onClick={() => {
+              //   notifications.clean();
+              //   if (!url) return handleInfo("No file provided", "");
+              //   return window.open(url, "_blank");
+              // }}
+              onClick={open}
+              className={styles.input__right__section}
+              mr={20}
+              w={"100%"}
+            >
+              <Text fw={600} fz={10} c="#475467">
+                View
+              </Text>
+            </UnstyledButton>
+          )
+        }
+        label={
+          <Text fz={12} mb={2}>
+            {label}
+          </Text>
+        }
+        placeholder={`${placeholder}`}
+      />
+      <Modal
+        opened={opened}
+        onClose={close}
+        size={"lg"}
+        centered
+        title={
+          <Text fz={18} fw={600}>
+            Document Preview
+          </Text>
+        }
+      >
+        <Box mah={400}>
+          <FileDisplay fileUrl={url} />
+        </Box>
+      </Modal>
+    </>
   );
 };

@@ -505,20 +505,21 @@ function Accounts() {
                 <PendingAccounts />
               </TabsPanel>
 
-              {!hideBtn && (
-                <Box pos="absolute" top={-10} right={0}>
-                  <PrimaryBtn
-                    text={
-                      cannotRequestIssuance
-                        ? "Request Sent ✓"
-                        : "Request Access"
-                    }
-                    fw={600}
-                    action={requestAccessOpen}
-                    disabled={cannotRequestIssuance || statusLoading}
-                  />
-                </Box>
-              )}
+              {hideBtn === false ||
+                (issuanceRequests?.length > 0 && (
+                  <Box pos="absolute" top={-10} right={0}>
+                    <PrimaryBtn
+                      text={
+                        cannotRequestIssuance
+                          ? "Request Sent ✓"
+                          : "Request Access"
+                      }
+                      fw={600}
+                      action={requestAccessOpen}
+                      disabled={cannotRequestIssuance || statusLoading}
+                    />
+                  </Box>
+                ))}
             </TabsComponent>
           </TabsPanel>
         </TabsComponent>

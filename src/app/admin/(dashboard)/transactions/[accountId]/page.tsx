@@ -55,6 +55,7 @@ import { AmountGroup } from "@/ui/components/AmountGroup";
 import { useSingleBusiness, useUserBusiness } from "@/lib/hooks/businesses";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 import Link from "next/link";
+import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 
 export default function AccountTransactions() {
   const { accountId } = useParams<{ accountId: string }>();
@@ -225,7 +226,15 @@ export default function AccountTransactions() {
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
       <TableComponent
-        rows={rows}
+        rows={
+          <IssuedTransactionTableRows
+            data={transactions}
+            search={debouncedSearch}
+            active={active}
+            limit={limit}
+            searchProps={searchProps}
+          />
+        }
         loading={loading}
         head={IssuedAccountTableHeaders}
       />

@@ -22,7 +22,6 @@ import {
 import { UnstyledButton, rem, Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 import {
   IconDots,
@@ -35,7 +34,6 @@ import {
   IconUsers,
   IconExclamationCircle,
 } from "@tabler/icons-react";
-import Link from "next/link";
 
 import ModalComponent from "./modal";
 import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
@@ -110,14 +108,12 @@ function Accounts() {
     { open: requestAccessOpen, close: requestAccessClose },
   ] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
-  const [hideBtn, setHideBtn] = useState(false);
 
   const form = useForm<AccountFilterType>({
     initialValues: { ...filterValues, type: null },

@@ -84,6 +84,7 @@ function AccountPayout() {
 
   const { requests, revalidate, loading, meta } = useAllRequests({
     type: "ACCOUNT_ISSUANCE",
+    ...queryParams,
   });
 
   const { push } = useRouter();
@@ -266,6 +267,9 @@ function AccountPayout() {
         style={{ cursor: "pointer" }}
       >
         <TableTd>{element?.Company?.name ?? "N/A"}</TableTd>
+        <TableTd tt="capitalize">
+          {element?.type.toLowerCase() ?? "N/A"}
+        </TableTd>
         <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
 
         <TableTd className={`${styles.table__td}`}>
@@ -398,6 +402,7 @@ function AccountPayout() {
 
 const tableHeaders = [
   "Business Name",
+  "Request Type",
   "Requests Date",
   // "Contact Email",
   "Status",

@@ -18,7 +18,12 @@ import {
 import styles from "./styles.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { NewBusinessType } from "@/lib/schema";
-import { IconMail, IconPhone, IconWorldWww } from "@tabler/icons-react";
+import {
+  IconChevronDown,
+  IconMail,
+  IconPhone,
+  IconWorldWww,
+} from "@tabler/icons-react";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import DropzoneComponent from "@/ui/components/Dropzone";
 import {
@@ -42,17 +47,23 @@ export default function BasicInfo({ form }: Props) {
   const select = (
     <NativeSelect
       data={countriesWithCode}
-      rightSectionWidth={28}
+      // leftSectionWidth={28}
+
       {...form.getInputProps("contactCountryCode")}
       styles={{
         input: {
           fontWeight: 500,
-          borderTopLeftRadius: 0,
-          borderBottomLeftRadius: 0,
-          width: rem(92),
-          marginRight: rem(-2),
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0,
+          // borderRight: "none",
+          width: rem(50),
+          marginLeft: rem(-2),
           // border: "1px solid var(--prune-primary-700)",
           fontSize: rem(12),
+        },
+
+        section: {
+          width: rem(70),
         },
       }}
       classNames={{
@@ -188,14 +199,20 @@ export default function BasicInfo({ form }: Props) {
           {...form.getInputProps("contactNumber")}
           prefix={form.values.contactCountryCode}
           // rightSection={<IconPhone size={14} />}
-          rightSection={select}
+          leftSection={select}
+          hideControls
           //   rightSection={
           //     <Group>
           //       <Avatar />
           //       <Select data={["US"]} variant="unstyled" />
           //     </Group>
           //   }
-          rightSectionWidth={90}
+          leftSectionWidth={50}
+          styles={{
+            input: {
+              paddingLeft: rem(60),
+            },
+          }}
         />
       </Flex>
 

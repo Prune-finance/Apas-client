@@ -443,6 +443,7 @@ function Accounts() {
                 bic={"ARPYGB21XXX"}
                 loading={loadingDftAcct}
                 link={`/accounts/default`}
+                business={false}
               />
             </SimpleGrid>
           </TabsPanel>

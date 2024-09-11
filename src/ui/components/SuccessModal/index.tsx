@@ -9,6 +9,7 @@ interface successModalProps {
   image?: StaticImageData | string;
   desc?: any;
   title?: string;
+  style?: any;
 }
 
 function SuccessModal({
@@ -17,6 +18,7 @@ function SuccessModal({
   image,
   desc,
   title,
+  style,
 }: successModalProps) {
   return (
     <Modal
@@ -28,7 +30,7 @@ function SuccessModal({
       size={400}
     >
       <Flex align="center" justify="center" direction="column" mb={40} px={30}>
-        <Box>
+        <Box style={style}>
           <Image src={image} h="100%" w="100%" alt="success-modal-image" />
         </Box>
         <Text fz={16} fw={600} c="#000">

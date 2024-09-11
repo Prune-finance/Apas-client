@@ -64,10 +64,19 @@ import {
 } from "@/ui/components/TransactionReceipt";
 import { handlePdfDownload } from "@/lib/actions/auth";
 import { SearchInput } from "@/ui/components/Inputs";
-import { IssuedAccountTableHeaders } from "@/lib/static";
+import {
+  BusinessAccountTableHeaders,
+  IssuedAccountTableHeaders,
+  PayoutTableHeaders,
+} from "@/lib/static";
 import Link from "next/link";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 import TabsComponent from "@/ui/components/Tabs";
+import {
+  BusinessTransactionTableRows,
+  IssuedTransactionTableRows,
+  PayoutTransactionTableRows,
+} from "@/ui/components/TableRows";
 
 function TransactionForAccount() {
   const params = useParams<{ id: string }>();
@@ -230,14 +239,15 @@ function TransactionForAccount() {
             <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
             <TableComponent
-              head={IssuedAccountTableHeaders}
+              head={BusinessAccountTableHeaders}
               rows={
-                <RowComponent
+                <BusinessTransactionTableRows
                   data={defaultTransactions}
                   id={params.id}
                   search={debouncedSearch}
                   active={active}
                   limit={limit}
+                  searchProps={searchProps}
                 />
               }
               loading={loading}
@@ -302,12 +312,13 @@ function TransactionForAccount() {
             <TableComponent
               head={IssuedAccountTableHeaders}
               rows={
-                <RowComponent
+                <IssuedTransactionTableRows
                   data={transactions}
                   id={params.id}
                   search={debouncedSearch}
                   active={active}
                   limit={limit}
+                  searchProps={searchProps}
                 />
               }
               loading={loading}
@@ -342,14 +353,15 @@ function TransactionForAccount() {
             <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
             <TableComponent
-              head={IssuedAccountTableHeaders}
+              head={PayoutTableHeaders}
               rows={
-                <RowComponent
+                <PayoutTransactionTableRows
                   data={payoutTransactions}
                   id={params.id}
                   search={debouncedSearch}
                   active={active}
                   limit={limit}
+                  searchProps={searchProps}
                 />
               }
               loading={loadingPayout}
@@ -413,66 +425,6 @@ const trxTableHeaders = [
   "Date",
   "Status",
 ];
-
-const RowComponent = ({
-  data,
-  id,
-  search,
-  active,
-  limit,
-}: {
-  data: TransactionType[];
-  id: string;
-  search: string;
-  active: number;
-  limit: string | null;
-}) => {
-  const { open, setData } = Transaction();
-  return frontendPagination(
-    filteredSearch(data.reverse(), searchProps, search),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        open();
-        setData(element);
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd
-        className={styles.table__td}
-        td="underline"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        <Link href={`/admin/transactions/${element.senderIban}`}>
-          {element.senderName || "N/A"}
-        </Link>
-      </TableTd>
-      {/* <TableTd>{"N/A"}</TableTd> */}
-      <TableTd className={styles.table__td}>
-        {element.recipientName || element.recipientIban}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <AmountGroup type={element.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        {formatNumber(element.amount, true, "EUR")}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-
-      <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-};
 
 export default function TransactionForAccountSuspense() {
   return (

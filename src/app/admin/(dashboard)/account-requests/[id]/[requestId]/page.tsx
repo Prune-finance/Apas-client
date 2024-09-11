@@ -282,7 +282,7 @@ export default function SingleRequest() {
           color="#FEF3F2"
           icon={<IconX color="#D92D20" />}
           title="Reject This Account  Request?"
-          text="This means you are rejecting the debit request of this business."
+          text="This means you are rejecting this account request."
           customApproveMessage="Yes, Reject"
           addReason
           reason={reason}
@@ -297,7 +297,7 @@ export default function SingleRequest() {
           color="#ECFDF3"
           icon={<IconCheck color="#12B76A" />}
           title="Approve This Account Request?"
-          text="This means you are accepting the debit request of this business."
+          text="This means you are approving this account request"
           customApproveMessage="Yes, Approve"
         />
       </div>

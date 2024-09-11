@@ -406,7 +406,7 @@ const DocumentTextInput = ({
       <Modal
         opened={opened}
         onClose={close}
-        size={"lg"}
+        size={800}
         centered
         title={
           <Text fz={14} fw={500}>
@@ -414,7 +414,7 @@ const DocumentTextInput = ({
           </Text>
         }
       >
-        <Box mah={500}>
+        <Box>
           <FileDisplay fileUrl={url || (business[formKey] as string) || ""} />
         </Box>
       </Modal>

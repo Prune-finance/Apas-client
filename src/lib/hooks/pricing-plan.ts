@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 interface IParams {
   period?: string;
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   page?: number;
@@ -15,7 +15,7 @@ export function usePricingPlan(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -31,7 +31,7 @@ export function usePricingPlan(customParams: IParams = {}) {
   async function fetchPricingPlans() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -64,7 +64,7 @@ export function usePricingPlan(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.page, obj.type]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.page, obj.type]);
 
   return { loading, pricingPlan, meta };
 }

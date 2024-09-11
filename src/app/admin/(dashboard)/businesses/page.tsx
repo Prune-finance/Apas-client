@@ -73,18 +73,15 @@ function Businesses() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  // const limit = searchParams.get("rows")?.toLowerCase() || "10";
-  const status = searchParams.get("status")?.toUpperCase();
-  const createdAt = searchParams.get("createdAt");
-  const sort = searchParams.get("sort")?.toUpperCase();
+  const { status, createdAt } = Object.fromEntries(searchParams.entries());
 
   const { loading, businesses, meta } = useBusiness({
     ...(!limit || isNaN(Number(limit))
       ? { limit: 10 }
       : { limit: parseInt(limit, 10) }),
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status }),
-    ...(sort && { sort }),
+    ...(status && { status: status.toUpperCase() }),
+
     page: active,
   });
 

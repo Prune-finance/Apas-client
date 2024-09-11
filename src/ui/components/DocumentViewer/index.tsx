@@ -5,6 +5,7 @@ import React, { use, useEffect, useState } from "react";
 
 interface FileDisplayProps {
   fileUrl: string;
+  download?: boolean;
 }
 
 enum FileType {
@@ -21,7 +22,7 @@ const fileTypeMap: { [key: string]: FileType } = {
   jpg: FileType.JPEG,
 };
 
-const FileDisplay = ({ fileUrl }: FileDisplayProps) => {
+const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
   const getFileType = (url: string): FileType => {
     const extension = url.split(".").pop()?.toLowerCase();
     return fileTypeMap[extension || ""] || FileType.UNKNOWN;
@@ -44,7 +45,7 @@ const FileDisplay = ({ fileUrl }: FileDisplayProps) => {
           <Flex align="center" justify="center" direction="column" gap={10}>
             <PDFICON />
 
-            {fileUrl && (
+            {download && fileUrl && (
               <a href={fileUrl} download>
                 <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
                   Download
@@ -64,16 +65,24 @@ const FileDisplay = ({ fileUrl }: FileDisplayProps) => {
                     fit="contain"
                     alt="PNG preview"
                     w={"100%"}
-                    h={400}
+                    h={"100%"}
 
                     //   style={{ maxWidth: "100%", height: "auto" }}
                   />
                 </Box>
-                <a href={fileUrl} download>
-                  <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
-                    Download
-                  </Button>
-                </a>
+                {download && fileUrl && (
+                  <a href={fileUrl} download>
+                    <Button
+                      size="xs"
+                      radius={4}
+                      bg={"#97AD05"}
+                      c="#fff"
+                      fz={12}
+                    >
+                      Download
+                    </Button>
+                  </a>
+                )}
               </Flex>
             )}
           </Flex>
@@ -89,11 +98,11 @@ const FileDisplay = ({ fileUrl }: FileDisplayProps) => {
                     fit="contain"
                     alt="PNG preview"
                     w={"100%"}
-                    h={400}
+                    h={"100%"}
                     //   style={{ maxWidth: "100%", height: "auto" }}
                   />
                 </Box>
-                {fileUrl && (
+                {download && fileUrl && (
                   <a href={fileUrl} download>
                     <Button
                       size="xs"
@@ -119,7 +128,7 @@ const FileDisplay = ({ fileUrl }: FileDisplayProps) => {
               </Text>
             )}
 
-            {fileUrl && (
+            {download && fileUrl && (
               <a href={fileUrl} download>
                 <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
                   Download

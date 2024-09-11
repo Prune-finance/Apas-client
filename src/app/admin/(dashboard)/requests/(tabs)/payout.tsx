@@ -322,7 +322,7 @@ function AccountPayout() {
         size="30%"
         title={
           <Text fz={18} fw={600} c="#1D2939" ml={24}>
-            Payout Account Request Details
+            Account Issuance Request Details
           </Text>
         }
         closeButtonProps={{ ...closeButtonProps, mr: 24 }}

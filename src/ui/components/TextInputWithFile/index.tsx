@@ -62,7 +62,7 @@ export const TextInputWithFile = ({
       <Modal
         opened={opened}
         onClose={close}
-        size={"lg"}
+        size={800}
         centered
         title={
           <Text fz={14} fw={500}>
@@ -70,7 +70,7 @@ export const TextInputWithFile = ({
           </Text>
         }
       >
-        <Box mah={500}>
+        <Box>
           <FileDisplay fileUrl={url} />
         </Box>
       </Modal>

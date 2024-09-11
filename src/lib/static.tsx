@@ -278,7 +278,7 @@ export const OwnAccountTableHeaders = [
   "Beneficiary",
   "Type",
   "Amount",
-  "Reference",
+  "Prune Ref",
   "Date & Time",
   "Status",
 ];

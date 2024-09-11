@@ -81,6 +81,7 @@ function Accounts() {
     meta,
     statusLoading,
     issuanceRequests,
+    revalidateIssuance,
   } = useUserAccounts({
     ...(isNaN(Number(limit))
       ? { limit: 10 }
@@ -123,7 +124,7 @@ function Accounts() {
     validate: zodResolver(accountFilterSchema),
   });
 
-  const cannotRequestIssuance = useMemo(() => {
+  const { pendingRequest, approvedRequest } = useMemo(() => {
     const hasPending = issuanceRequests.some(
       (request) => request.status === "PENDING"
     );
@@ -131,8 +132,7 @@ function Accounts() {
       (request) => request.status === "APPROVED"
     );
 
-    hasApproved && setHideBtn(true);
-    return hasPending || hasApproved;
+    return { pendingRequest: hasPending, approvedRequest: hasApproved };
   }, [issuanceRequests]);
 
   const requestForm = useForm({
@@ -411,7 +411,7 @@ function Accounts() {
         "Request Sent",
         "You will receive as notification once your request has been approved"
       );
-      revalidate();
+      revalidateIssuance();
       requestAccessClose();
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -505,21 +505,16 @@ function Accounts() {
                 <PendingAccounts />
               </TabsPanel>
 
-              {hideBtn === false ||
-                (issuanceRequests?.length > 0 && (
-                  <Box pos="absolute" top={-10} right={0}>
-                    <PrimaryBtn
-                      text={
-                        cannotRequestIssuance
-                          ? "Request Sent ✓"
-                          : "Request Access"
-                      }
-                      fw={600}
-                      action={requestAccessOpen}
-                      disabled={cannotRequestIssuance || statusLoading}
-                    />
-                  </Box>
-                ))}
+              {!statusLoading && !approvedRequest && (
+                <Box pos="absolute" top={-10} right={0}>
+                  <PrimaryBtn
+                    text={pendingRequest ? "Request Sent ✓" : "Request Access"}
+                    fw={600}
+                    action={requestAccessOpen}
+                    disabled={pendingRequest || statusLoading}
+                  />
+                </Box>
+              )}
             </TabsComponent>
           </TabsPanel>
         </TabsComponent>

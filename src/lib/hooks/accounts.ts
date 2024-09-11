@@ -247,13 +247,13 @@ export function useUserAccounts(customParams: IParams = {}) {
 
   const handleCheckRequestAccess = async () => {
     setStatusLoading(true);
+    // &status=PENDING
     try {
       const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/all?type=ACCOUNT_ISSUANCE&status=PENDING`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/all?type=ACCOUNT_ISSUANCE`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      console.log(res?.data);
       setIssuanceRequests(res?.data);
     } catch (error) {
       console.log(error);
@@ -263,6 +263,7 @@ export function useUserAccounts(customParams: IParams = {}) {
   };
 
   const revalidate = () => fetchAccounts();
+  const revalidateIssuance = () => handleCheckRequestAccess();
 
   useEffect(() => {
     fetchAccounts();
@@ -277,6 +278,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     loading,
     accounts,
     revalidate,
+    revalidateIssuance,
     meta,
     statusLoading,
     issuanceRequests,

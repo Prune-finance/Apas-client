@@ -93,7 +93,7 @@ export const AccountRequestsDrawer = ({
     try {
       const { data: res } = await axios.post(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/${selectedRequest?.id}/document/upload`,
-        values,
+        { paths: values },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
       handleSuccess(

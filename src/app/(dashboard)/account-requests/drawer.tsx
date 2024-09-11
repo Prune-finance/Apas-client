@@ -701,7 +701,7 @@ export const TextInputWithFile = ({
         }
       >
         <Box>
-          <FileDisplay fileUrl={findFile ?? url} />
+          <FileDisplay fileUrl={findFile ?? url} download={false} />
         </Box>
       </Modal>
     </>

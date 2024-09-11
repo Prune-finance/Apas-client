@@ -87,7 +87,7 @@ function Accounts() {
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
-    ...(type && { type: type.toUpperCase() }),
+    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     page: active,
   });
 
@@ -467,7 +467,7 @@ function Accounts() {
                   <Select
                     placeholder="Type"
                     {...form.getInputProps("type")}
-                    data={["Corporate", "User"]}
+                    data={["Corporate", "Individual"]}
                     size="xs"
                     w={120}
                     h={36}

@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 interface IParams {
   period?: string;
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   page?: number;
@@ -22,7 +22,7 @@ export function useBusiness(
     return {
       ...(customParams.period && { period: customParams.period }),
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -40,7 +40,7 @@ export function useBusiness(
   async function fetchBusinesses() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -97,7 +97,7 @@ export function useBusiness(
       // Any cleanup code can go here
     };
   }, [
-    obj.createdAt,
+    obj.date,
     obj.limit,
     obj.period,
     obj.sort,
@@ -191,7 +191,7 @@ export function useUserBusiness(customParams: IParams = {}) {
   async function fetchBusinesses() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -245,7 +245,7 @@ export interface Director {
 //   apiCalls: number;
 //   contactEmail: string;
 //   contactNumber: string | null;
-//   createdAt: Date;
+//   date: Date;
 //   updatedAt: Date;
 //   deletedAt: null;
 //   domain: string;

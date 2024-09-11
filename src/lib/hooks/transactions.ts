@@ -5,7 +5,7 @@ import { BusinessData } from "./businesses";
 
 interface IParams {
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   page?: number;
@@ -19,7 +19,7 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -52,7 +52,7 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.createdAt,
+    customParams.date,
     customParams.limit,
     customParams.status,
     customParams.sort,
@@ -73,7 +73,7 @@ export function useSingleTransactions(
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -122,7 +122,7 @@ export function useSingleCompanyTransactions(
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -170,7 +170,7 @@ export function useBusinessTransactions(
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -203,7 +203,7 @@ export function useBusinessTransactions(
       // Any cleanup code can go here
     };
   }, [
-    customParams.createdAt,
+    customParams.date,
     customParams.limit,
     customParams.status,
     customParams.sort,
@@ -221,7 +221,7 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -255,7 +255,7 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.createdAt,
+    customParams.date,
     customParams.limit,
     customParams.status,
     customParams.sort,
@@ -273,7 +273,7 @@ export function usePayoutTransactions(customParams: IParams = {}) {
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -307,7 +307,7 @@ export function usePayoutTransactions(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.createdAt,
+    customParams.date,
     customParams.limit,
     customParams.status,
     customParams.sort,
@@ -341,7 +341,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -390,7 +390,7 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -441,7 +441,7 @@ export function useUserTransactionsByIBAN(
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };

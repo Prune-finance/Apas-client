@@ -48,8 +48,7 @@ export const FileTextInput = ({
       await axios.post(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${request?.id}`,
         {
-          reason:
-            "This account request has been rejected because of a document that is not approved. Re-upload the document(s) to approve this request.",
+          reason: "Re-upload the document(s) for this request to be approved.",
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -165,7 +164,7 @@ export const FileTextInput = ({
       <Modal
         opened={opened}
         onClose={close}
-        size={"lg"}
+        size={800}
         centered
         title={
           <Text fz={14} fw={500}>
@@ -173,7 +172,7 @@ export const FileTextInput = ({
           </Text>
         }
       >
-        <Box mah={500}>
+        <Box>
           <FileDisplay fileUrl={url} />
         </Box>
       </Modal>

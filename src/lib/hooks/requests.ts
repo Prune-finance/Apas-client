@@ -9,7 +9,7 @@ import { set } from "zod";
 interface IParams {
   period?: string;
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   query?: string;
@@ -26,7 +26,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
@@ -68,7 +68,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -81,7 +81,7 @@ export function useAllRequests(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
@@ -122,7 +122,7 @@ export function useAllRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -138,7 +138,7 @@ export function useAllCompanyRequests(
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
@@ -181,7 +181,7 @@ export function useAllCompanyRequests(
       // Any cleanup code can go here
     };
   }, [
-    obj.createdAt,
+    obj.date,
     obj.limit,
     obj.sort,
     obj.status,
@@ -236,7 +236,7 @@ export function useUserRequests(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
@@ -274,7 +274,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -322,7 +322,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -355,7 +355,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate };
 }
@@ -368,7 +368,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
@@ -403,7 +403,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.companyId]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.companyId]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -419,7 +419,7 @@ export function useCompanyDebitRequests(
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -453,7 +453,7 @@ export function useCompanyDebitRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -506,7 +506,7 @@ export function useCompanyRequests(
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -545,7 +545,7 @@ export function useCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -585,7 +585,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -622,7 +622,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }

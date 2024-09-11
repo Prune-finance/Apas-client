@@ -278,7 +278,7 @@ export const OwnAccountTableHeaders = [
   "Beneficiary",
   "Type",
   "Amount",
-  "Reference",
+  "Prune Ref",
   "Date & Time",
   "Status",
 ];
@@ -286,21 +286,31 @@ export const OwnAccountTableHeaders = [
 export const IssuedAccountTableHeaders = [
   "Sender Name",
   "Beneficiary",
+  "Prune Ref",
   "Type",
   "Amount",
-  "Reference",
+  "Transaction Ref",
   "Date",
   "Status",
 ];
 
-export const PayoutTableHeaders = [
-  "Holding Account",
-  "Senders Name",
-  "our Reference",
+export const BusinessAccountTableHeaders = [
+  "Sender Name",
   "Beneficiary",
   "Type",
   "Amount",
-  "Reference",
+  "Prune Ref",
+  "Date & Time",
+  "Status",
+];
+
+export const PayoutTableHeaders = [
+  "Senders Name",
+  "Prune Ref",
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Transaction Ref",
   "Date",
   "Status",
 ];

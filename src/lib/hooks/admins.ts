@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 interface IParams {
   period?: string;
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   type?: string;
@@ -23,7 +23,7 @@ export function useAdmins(customParams: IAdmins = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -59,7 +59,7 @@ export function useAdmins(customParams: IAdmins = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.page, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.page, obj.sort, obj.status]);
 
   return { loading, users, revalidate, meta };
 }
@@ -107,7 +107,7 @@ export function useUsers(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -143,7 +143,7 @@ export function useUsers(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.page, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.page, obj.sort, obj.status]);
 
   return { loading, users, revalidate, meta };
 }

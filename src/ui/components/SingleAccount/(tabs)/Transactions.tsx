@@ -23,6 +23,11 @@ import { PayoutDrawer } from "@/app/(dashboard)/payouts/drawer";
 import { IssuedAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "../../AmountGroup";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
+import { IssuedTransactionTableRows } from "../../TableRows";
+import { useState } from "react";
+import { useDebouncedValue } from "@mantine/hooks";
+import { filteredSearch } from "@/lib/search";
+import PaginationComponent from "../../Pagination";
 
 interface Props {
   transactions: TransactionType[];
@@ -33,6 +38,10 @@ interface Props {
 export const Transactions = ({ transactions, loading, payout }: Props) => {
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
   const { data, opened, close } = Transaction();
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const overviewDetails = [
     {
@@ -79,7 +88,13 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
           payout ? (
             <PayoutRowComponent data={transactions} />
           ) : (
-            <RowComponent data={transactions} />
+            <IssuedTransactionTableRows
+              data={transactions}
+              active={active}
+              limit={limit}
+              searchProps={searchProps}
+              search={debouncedSearch}
+            />
           )
         }
         head={payout ? payoutTableHeaders : IssuedAccountTableHeaders}
@@ -91,6 +106,17 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         rows={transactions}
         title="There are no transactions for this account"
         text="When a transaction is recorded, it will appear here"
+      />
+
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={Math.ceil(
+          filteredSearch(transactions, searchProps, search).length /
+            parseInt(limit ?? "10", 10)
+        )}
       />
 
       {!payout && (
@@ -123,6 +149,8 @@ const payoutTableHeaders = [
   "Date & Time",
   "Status",
 ];
+
+const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];
 
 const RowComponent = ({
   data,

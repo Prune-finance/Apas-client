@@ -37,7 +37,7 @@ export default function Account() {
   const { loading, account, revalidate } = useSingleAccount(params.id);
 
   const { business } = useSingleBusiness(account?.companyId ?? "");
-  console.log(account);
+
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
 

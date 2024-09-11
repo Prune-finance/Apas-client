@@ -34,7 +34,7 @@ import {
 
 // import ModalComponent from "@/ui/components/Modal";
 import { AccountData, useAccounts } from "@/lib/hooks/accounts";
-import { activeBadgeColor } from "@/lib/utils";
+import { activeBadgeColor, getUserType } from "@/lib/utils";
 
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
@@ -55,6 +55,7 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import ModalComponent from "./modal";
 import { validateRequest } from "@/lib/schema";
 import { SearchInput } from "@/ui/components/Inputs";
+import { get } from "http";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -77,7 +78,7 @@ function Accounts() {
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
-    ...(type && { type: type.toUpperCase() }),
+    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     page: activePage,
   });
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -272,7 +273,7 @@ function Accounts() {
         >
           <Select
             placeholder="Type"
-            data={["Corporate", "User"]}
+            data={["Corporate", "Individual"]}
             {...form.getInputProps("type")}
             size="xs"
             w={120}
@@ -423,7 +424,8 @@ const RowComponent = ({
         {formatNumber(element.accountBalance, true, "EUR")}
       </TableTd> */}
       <TableTd className={styles.table__td} tt="capitalize">
-        {element.type.toLowerCase()}
+        {/* element.type.toLowerCase() */}
+        {getUserType(element.type)}
       </TableTd>
       <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
       <TableTd className={`${styles.table__td}`}>

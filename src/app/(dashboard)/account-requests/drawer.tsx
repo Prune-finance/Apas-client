@@ -591,6 +591,9 @@ export const TextInputWithFile = ({
     }
   };
 
+  const reUploaded = uploadedFiles.some((file) => file.path === path);
+  const findFile = uploadedFiles.find((file) => file.path === path)?.url;
+
   return (
     <>
       <TextInput
@@ -603,9 +606,48 @@ export const TextInputWithFile = ({
         }}
         leftSection={<IconFileTypePdf color="#475467" />}
         leftSectionPointerEvents="none"
-        rightSectionWidth={70}
+        rightSectionWidth={reUploaded ? 150 : 70}
         rightSection={
-          getNestedDocValue(request.documentApprovals, path) === false ? (
+          reUploaded ? (
+            <Flex>
+              <UnstyledButton
+                onClick={open}
+                className={styles.input__right__section}
+                mr={20}
+                w={"100%"}
+                flex={1}
+              >
+                <Text fw={600} fz={10} c="#475467">
+                  View
+                </Text>
+              </UnstyledButton>
+
+              <FileButton
+                disabled={processing}
+                onChange={(file) => handleUpload(file)}
+                accept="image/png, image/jpeg, application/pdf"
+              >
+                {(props) => (
+                  <Button
+                    w={"100%"}
+                    className={styles.input__right__section}
+                    {...props}
+                    bg="var(--prune-primary-600)"
+                    h={25}
+                    loading={uploading}
+                    loaderProps={{ type: "dots" }}
+                    flex={1}
+                    fw={600}
+                    fz={10}
+                    c="#475467"
+                    px={15}
+                  >
+                    Re-upload
+                  </Button>
+                )}
+              </FileButton>
+            </Flex>
+          ) : getNestedDocValue(request.documentApprovals, path) === false ? (
             <FileButton
               disabled={processing}
               onChange={(file) => handleUpload(file)}
@@ -629,11 +671,6 @@ export const TextInputWithFile = ({
             </FileButton>
           ) : (
             <UnstyledButton
-              // onClick={() => {
-              //   notifications.clean();
-              //   if (!url) return handleInfo("No file provided", "");
-              //   return window.open(url, "_blank");
-              // }}
               onClick={open}
               className={styles.input__right__section}
               mr={20}
@@ -655,7 +692,7 @@ export const TextInputWithFile = ({
       <Modal
         opened={opened}
         onClose={close}
-        size={"lg"}
+        size={800}
         centered
         title={
           <Text fz={18} fw={600}>
@@ -663,8 +700,8 @@ export const TextInputWithFile = ({
           </Text>
         }
       >
-        <Box mah={500}>
-          <FileDisplay fileUrl={url} />
+        <Box>
+          <FileDisplay fileUrl={findFile ?? url} download={false} />
         </Box>
       </Modal>
     </>

@@ -104,6 +104,7 @@ function Reactivate() {
 
   const { requests, revalidate, loading, meta } = useAllRequests({
     ...(type === "All" || !type ? {} : { type }),
+    ...queryParams,
   });
 
   const handleRejectRequest = async () => {

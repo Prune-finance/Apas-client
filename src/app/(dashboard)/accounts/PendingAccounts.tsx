@@ -39,7 +39,7 @@ export const PendingAccounts = () => {
       : { limit: parseInt(limit ?? "10", 10) }),
     status: "PENDING",
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(type && { type: type.toUpperCase() }),
+    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     page: active,
   });
 
@@ -98,7 +98,7 @@ export const PendingAccounts = () => {
         <Select
           placeholder="Type"
           {...form.getInputProps("type")}
-          data={["Corporate", "User"]}
+          data={["Corporate", "Individual"]}
           size="xs"
           w={120}
           h={36}

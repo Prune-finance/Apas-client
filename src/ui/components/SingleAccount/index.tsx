@@ -78,7 +78,8 @@ import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
 import SendMoneyModal from "./sendMoneyModal";
 import PreviewState from "./previewState";
 import SuccessModal from "../SuccessModal";
-import SuccessModalImage from "@/assets/success-modal-image.png";
+// import SuccessModalImage from "@/assets/success-modal-image.png";
+import PendingModalImage from "@/assets/pending-image.png";
 
 type Param = { id: string };
 interface Props {
@@ -1061,7 +1062,6 @@ export const DefaultAccountHead = ({
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
         </Flex>
       </Flex>
-
       <Modal
         opened={opened}
         onClose={closeMoney}
@@ -1077,7 +1077,6 @@ export const DefaultAccountHead = ({
           setSectionState={setSectionState}
         />
       </Modal>
-
       <Modal
         opened={openedPreview}
         onClose={closePreview}
@@ -1094,7 +1093,6 @@ export const DefaultAccountHead = ({
           sectionState={sectionState}
         />
       </Modal>
-
       <Modal
         opened={openedPreview}
         onClose={closePreview}
@@ -1120,17 +1118,19 @@ export const DefaultAccountHead = ({
       <SuccessModal
         openedSuccess={openedSuccess}
         handleCloseSuccessModal={handleCloseSuccessModal}
-        image={SuccessModalImage.src}
+        image={PendingModalImage.src}
+        style={{ height: 120, width: 120, marginBottom: 10 }}
         desc={
           <Text fz={12}>
-            You have successfully sent.{" "}
+            Your transfer of{" "}
             <Text inherit span fw={600} c="#97AD05">
               {formatNumber(moneySent, true, "EUR")}
             </Text>{" "}
-            to {receiverName} Its will be credited within 10 minutes
+            to {receiverName} is in progress. It should be completed within the
+            next 10 minutes. Please wait for confirm.
           </Text>
         }
-        title="Transaction Successful"
+        title="Transaction Processing"
       />
     </>
   );

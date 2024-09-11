@@ -14,14 +14,16 @@ import {
 import { AccountData, useUserAccounts } from "@/lib/hooks/accounts";
 import { filteredSearch } from "@/lib/search";
 import styles from "./styles.module.scss";
+import { formatNumber } from "@/lib/utils";
 
 interface Item {
   name: string;
   iban: string;
   bic: string;
+  acc: string;
 }
 
-function SelectOption({ name, iban, bic }: Item) {
+function SelectOption({ name, iban, bic, acc }: Item) {
   return (
     <Flex
       // c="var(--prune-primary-900)"
@@ -47,6 +49,12 @@ function SelectOption({ name, iban, bic }: Item) {
             BIC:{" "}
             <Text span inherit fw={400}>
               {bic}
+            </Text>
+          </Text>
+          <Text inline fw={700} fz={11}>
+            Account Balance:{" "}
+            <Text span inherit fw={400}>
+              {formatNumber(Number(acc), true, "EUR")}
             </Text>
           </Text>
         </Group>
@@ -102,9 +110,10 @@ export function SelectDropdownSearch({
   ).map((item) => (
     <Combobox.Option value={item.id} key={item.id}>
       <SelectOption
-        name={item.accountName}
-        iban={item.accountNumber}
-        bic={String(item.accountId)}
+        name={item?.accountName}
+        iban={item?.accountNumber}
+        bic={String(item?.accountId)}
+        acc={String(item?.accountBalance)}
       />
     </Combobox.Option>
   ));

@@ -14,7 +14,15 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { Flex, Group, TableTd, TableTr, TabsPanel } from "@mantine/core";
+import {
+  Flex,
+  Group,
+  Stack,
+  TableTd,
+  TableTr,
+  TabsPanel,
+  Text,
+} from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
@@ -103,16 +111,32 @@ export const AccountsTab = () => {
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>
-        {element.recipientName || element.recipientIban}
+        <Stack>
+          <Text fz={12} fw={400}>
+            {element.recipientName}
+          </Text>
+          <Text fz={10} fw={400}>
+            {element.recipientIban}
+          </Text>
+        </Stack>
       </TableTd>
       <TableTd className={styles.table__td}>
         <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
       <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+      <TableTd w="20%" className={styles.table__td}>
+        {element.reference}
+      </TableTd>
 
       <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+          </Text>
+          <Text fz={10} fw={400}>
+            {dayjs(element.createdAt).format("hh:mm a")}
+          </Text>
+        </Stack>
       </TableTd>
       <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />

@@ -62,7 +62,7 @@ export const AccountCard = ({
     >
       <CardSection px={19} py={13} c="#fff">
         <Group justify="space-between">
-          <Group gap={12} justify={business ? "" : "space-between"}>
+          <Group w="100%" gap={12} justify={business ? "" : "space-between"}>
             <Group gap={8}>
               <ThemeIcon color="#0052B4" radius="xl">
                 <GiEuropeanFlag />

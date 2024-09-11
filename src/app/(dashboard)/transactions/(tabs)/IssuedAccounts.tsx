@@ -31,6 +31,7 @@ import { useUserAccounts } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { IssuedAccountTableHeaders } from "@/lib/static";
+import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
@@ -134,7 +135,16 @@ export const IssuedAccountsTab = () => {
       />
 
       <TableComponent
-        rows={rows}
+        rows={
+          <IssuedTransactionTableRows
+            data={transactions}
+            search={debouncedSearch}
+            active={active}
+            limit={limit}
+            searchProps={searchProps}
+          />
+        }
+        // rows={rows}
         loading={loading}
         head={IssuedAccountTableHeaders}
       />

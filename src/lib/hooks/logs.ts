@@ -5,7 +5,7 @@ import Cookies from "js-cookie";
 
 interface IParams {
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   type?: string;
@@ -22,7 +22,7 @@ export function useLogs(customParams: ILogs = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
     };
@@ -56,7 +56,7 @@ export function useLogs(customParams: ILogs = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.limit, obj.createdAt, obj.sort, obj.page]);
+  }, [obj.limit, obj.date, obj.sort, obj.page]);
 
   return { loading, logs, revalidate, meta };
 }

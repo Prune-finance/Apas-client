@@ -87,14 +87,13 @@ export const BusinessTransactionTableRows = ({
 
 export const IssuedTransactionTableRows = ({
   data,
-  id,
+
   search,
   active,
   limit,
   searchProps,
 }: {
   data: TransactionType[];
-  id: string;
   search: string;
   active: number;
   limit: string | null;

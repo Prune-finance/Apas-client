@@ -314,7 +314,6 @@ function TransactionForAccount() {
               rows={
                 <IssuedTransactionTableRows
                   data={transactions}
-                  id={params.id}
                   search={debouncedSearch}
                   active={active}
                   limit={limit}

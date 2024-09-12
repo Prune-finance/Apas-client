@@ -236,6 +236,7 @@ function Individual({
 
           <Flex gap={20} mt={24}>
             <Select
+              searchable
               placeholder="Select Country"
               classNames={{ input: styles.input, label: styles.label }}
               flex={1}
@@ -247,7 +248,7 @@ function Individual({
 
           <Flex gap={20} mt={24} direction="column">
             <Text fz={14} c="#667085" m={0} p={0}>
-              Upload Invoice (Optional)
+              Upload supporting document (Optional)
             </Text>
             <DropzoneComponent<typeof sendMoneyIndividualRequest>
               style={{ flex: 1 }}

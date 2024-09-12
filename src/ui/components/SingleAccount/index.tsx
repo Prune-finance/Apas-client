@@ -1062,6 +1062,7 @@ export const DefaultAccountHead = ({
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
         </Flex>
       </Flex>
+
       <Modal
         opened={opened}
         onClose={closeMoney}
@@ -1077,6 +1078,7 @@ export const DefaultAccountHead = ({
           setSectionState={setSectionState}
         />
       </Modal>
+
       <Modal
         opened={openedPreview}
         onClose={closePreview}
@@ -1093,6 +1095,7 @@ export const DefaultAccountHead = ({
           sectionState={sectionState}
         />
       </Modal>
+
       <Modal
         opened={openedPreview}
         onClose={closePreview}

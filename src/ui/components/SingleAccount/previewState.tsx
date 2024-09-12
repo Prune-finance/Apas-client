@@ -33,7 +33,7 @@ function PreviewState({
     Bank: requestForm?.destinationBank,
     "Bank Address": requestForm?.bankAddress,
     Country: requestForm?.destinationCountry,
-    invoice: requestForm?.invoice,
+    "Upload supporting document": requestForm?.invoice || "N/A",
     // Amount: requestForm?.amount,
     narration: requestForm?.narration,
   };
@@ -45,7 +45,7 @@ function PreviewState({
     Bank: companyRequestForm?.destinationBank,
     "Bank Address": companyRequestForm?.bankAddress,
     // amount: companyRequestForm?.amount,
-    invoice: companyRequestForm?.invoice || "",
+    "Upload supporting document": companyRequestForm?.invoice || "N/A",
     narration: companyRequestForm?.narration,
   };
 

@@ -10,11 +10,13 @@ import {
   Stack,
   ScrollArea,
   Flex,
+  rem,
 } from "@mantine/core";
 import { AccountData, useUserAccounts } from "@/lib/hooks/accounts";
 import { filteredSearch } from "@/lib/search";
 import styles from "./styles.module.scss";
 import { formatNumber } from "@/lib/utils";
+import { countriesWithCode } from "@/lib/countries-codes-flags";
 
 interface Item {
   name: string;
@@ -164,6 +166,91 @@ export function SelectDropdownSearch({
             )}
           </ScrollArea>
         </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
+  );
+}
+
+export function SelectCountryDialCode({ value, setValue }: Props) {
+  const [search, setSearch] = useState("");
+  const combobox = useCombobox({
+    onDropdownClose: () => {
+      combobox.resetSelectedOption();
+      combobox.focusTarget();
+      setSearch("");
+    },
+
+    onDropdownOpen: () => {
+      combobox.focusSearchInput();
+    },
+  });
+
+  // const [value, setValue] = useState<string | null>(null);
+
+  const options = countriesWithCode
+    .filter((item) =>
+      item.label.toLowerCase().includes(search.toLowerCase().trim())
+    )
+    .map((item) => (
+      <Combobox.Option value={item.value} key={item.value}>
+        {item.label}
+      </Combobox.Option>
+    ));
+
+  return (
+    <Combobox
+      width={300}
+      store={combobox}
+      withinPortal={false}
+      onOptionSubmit={(val) => {
+        setValue(val);
+        combobox.closeDropdown();
+      }}
+    >
+      <Combobox.Target>
+        <InputBase
+          component="button"
+          type="button"
+          pointer
+          rightSection={<Combobox.Chevron />}
+          onClick={() => combobox.toggleDropdown()}
+          rightSectionPointerEvents="none"
+          styles={{
+            input: {
+              fontWeight: 500,
+              borderTopRightRadius: 0,
+              borderBottomRightRadius: 0,
+              // borderRight: "none",
+              width: rem(50),
+              marginLeft: rem(-2),
+              // border: "1px solid var(--prune-primary-700)",
+              fontSize: rem(12),
+            },
+
+            section: {
+              width: rem(70),
+            },
+          }}
+          classNames={{ input: styles.input_country_code }}
+        >
+          {countriesWithCode
+            .find((val) => val.value === value)
+            ?.label.split(" ")[0] || (
+            <Input.Placeholder>{""}</Input.Placeholder>
+          )}
+        </InputBase>
+      </Combobox.Target>
+
+      <Combobox.Dropdown>
+        <Combobox.Search
+          value={search}
+          onChange={(event) => setSearch(event.currentTarget.value)}
+          placeholder="Search groceries"
+        />
+
+        <ScrollArea.Autosize type="scroll" mah={200}>
+          {options}
+        </ScrollArea.Autosize>
       </Combobox.Dropdown>
     </Combobox>
   );

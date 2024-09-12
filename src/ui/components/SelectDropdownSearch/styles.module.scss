@@ -1,3 +1,9 @@
 .input:focus {
   border: 1px solid var(--prune-text-gray-400);
 }
+
+.input_country_code {
+  &:focus {
+    border: 1px solid var(--prune-primary-700);
+  }
+}

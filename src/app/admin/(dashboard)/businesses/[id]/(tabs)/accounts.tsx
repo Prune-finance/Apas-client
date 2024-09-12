@@ -26,7 +26,12 @@ import {
   useBusinessPayoutAccount,
 } from "@/lib/hooks/accounts";
 
-import { activeBadgeColor, formatNumber, serialNumber } from "@/lib/utils";
+import {
+  activeBadgeColor,
+  formatNumber,
+  getUserType,
+  serialNumber,
+} from "@/lib/utils";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -188,11 +193,12 @@ export default function Accounts({
       </TableTd>
       <TableTd className={styles.table__td}>{element.accountName}</TableTd>
       <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
-      <TableTd className={styles.table__td}>{element.type}</TableTd>
+      <TableTd className={styles.table__td}>
+        {getUserType(element.type)}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
-      {/* <TableTd>{element.accountBalance}</TableTd> */}
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
@@ -208,10 +214,6 @@ export default function Accounts({
       </TableTd>
     </TableTr>
   ));
-  console.log(
-    services.find((service) => service.serviceIdentifier === "PAYOUT_SERVICE")
-      ?.active
-  );
 
   return (
     <TabsComponent tabs={tabs} mt={24}>

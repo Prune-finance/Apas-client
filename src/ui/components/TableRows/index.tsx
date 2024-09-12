@@ -65,7 +65,7 @@ export const BusinessTransactionTableRows = ({
 
       <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
 
-      <TableTd w="15%">{element.reference}</TableTd>
+      <TableTd w="15%">{element.centrolinkRef}</TableTd>
 
       <TableTd>
         <Stack gap={0}>
@@ -202,7 +202,7 @@ export const PayoutTransactionTableRows = ({
         {element.senderName || "N/A"}
         {/* </Link> */}
       </TableTd>
-      <TableTd w="15%">{element.reference}</TableTd>
+      <TableTd w="15%">{element.centrolinkRef}</TableTd>
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>

@@ -79,7 +79,11 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         <Group gap={12}>
           <SecondaryBtn text="Filter" icon={IconListTree} />
           {/* <SecondaryBtn text="Filter" icon={IconArrowUpRight} /> */}
-          <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+          <SecondaryBtn
+            text="Download Statement"
+            icon={IconCircleArrowDown}
+            style={{ cursor: "not-allowed" }}
+          />
         </Group>
       </Group>
 

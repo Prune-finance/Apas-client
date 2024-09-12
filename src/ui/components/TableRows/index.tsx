@@ -106,7 +106,7 @@ export const IssuedTransactionTableRows = ({
     parseInt(limit ?? "10", 10)
   ).map((element) => (
     <TableTr
-      key={element.id}
+      key={element?.id}
       onClick={() => {
         open();
         setData(element);
@@ -120,44 +120,44 @@ export const IssuedTransactionTableRows = ({
         }}
       >
         <Link href={`/admin/transactions/${element.senderIban}`}>
-          {element.senderName || "N/A"}
+          {element?.senderName || "N/A"}
         </Link>
       </TableTd>
 
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {element.recipientName}
+            {element?.recipientName}
           </Text>
           <Text fz={10} fw={400}>
-            {element.recipientIban}
+            {element?.recipientIban}
           </Text>
         </Stack>
       </TableTd>
 
-      <TableTd w="15%">{element.reference}</TableTd>
+      <TableTd w="15%">{element?.centrolinkRef}</TableTd>
 
       <TableTd>
-        <AmountGroup type={element.type} fz={12} fw={400} />
+        <AmountGroup type={element?.type} fz={12} fw={400} />
       </TableTd>
 
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>{formatNumber(element?.amount, true, "EUR")}</TableTd>
 
-      <TableTd w="15%">{element.reference}</TableTd>
+      <TableTd w="15%">{element?.reference}</TableTd>
 
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+            {dayjs(element?.createdAt).format("Do MMMM, YYYY")}
           </Text>
           <Text fz={10} fw={400}>
-            {dayjs(element.createdAt).format("hh:mm a")}
+            {dayjs(element?.createdAt).format("hh:mm a")}
           </Text>
         </Stack>
       </TableTd>
 
       <TableTd>
-        <BadgeComponent status={element.status} />
+        <BadgeComponent status={element?.status} />
       </TableTd>
     </TableTr>
   ));

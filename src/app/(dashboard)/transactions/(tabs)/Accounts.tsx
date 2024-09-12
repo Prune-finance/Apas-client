@@ -103,7 +103,7 @@ export const AccountsTab = () => {
     parseInt(limit ?? "10", 10)
   ).map((element) => (
     <TableTr
-      key={element.id}
+      key={element?.id}
       onClick={() => {
         setSelectedRequest(element);
         openDrawer();
@@ -113,7 +113,7 @@ export const AccountsTab = () => {
       <TableTd className={styles.table__td}>
         <Stack>
           <Text fz={12} fw={400}>
-            {element.recipientName}
+            {element?.recipientName}
           </Text>
           <Text fz={10} fw={400}>
             {element.recipientIban}
@@ -121,25 +121,25 @@ export const AccountsTab = () => {
         </Stack>
       </TableTd>
       <TableTd className={styles.table__td}>
-        <AmountGroup type={element.type} fz={12} fw={400} />
+        <AmountGroup type={element?.type} fz={12} fw={400} />
       </TableTd>
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>{formatNumber(element?.amount, true, "EUR")}</TableTd>
       <TableTd w="20%" className={styles.table__td}>
-        {element.reference}
+        {element?.centrolinkRef}
       </TableTd>
 
       <TableTd className={styles.table__td}>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+            {dayjs(element?.createdAt).format("Do MMMM, YYYY")}
           </Text>
           <Text fz={10} fw={400}>
-            {dayjs(element.createdAt).format("hh:mm a")}
+            {dayjs(element?.createdAt).format("hh:mm a")}
           </Text>
         </Stack>
       </TableTd>
       <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
+        <BadgeComponent status={element?.status} />
       </TableTd>
     </TableTr>
   ));

@@ -104,7 +104,7 @@ export const TransactionDrawer = ({
   };
 
   const otherDetails = {
-    "Prune (Reference 1)": "N/A",
+    "Prune (Reference 1)": selectedRequest?.centrolinkRef ?? "N/A",
     "Transaction ID": selectedRequest?.id,
     "Date and Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"

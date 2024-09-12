@@ -1,13 +1,7 @@
-import form from "@/app/auth/[id]/register/form";
 import {
-  Avatar,
   Box,
-  Combobox,
-  Divider,
   Flex,
-  Group,
   Loader,
-  NativeSelect,
   NumberInput,
   rem,
   Select,
@@ -18,20 +12,11 @@ import {
 import styles from "./styles.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import { NewBusinessType } from "@/lib/schema";
-import {
-  IconChevronDown,
-  IconMail,
-  IconPhone,
-  IconWorldWww,
-} from "@tabler/icons-react";
+import { IconMail, IconWorldWww } from "@tabler/icons-react";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import DropzoneComponent from "@/ui/components/Dropzone";
-import {
-  countriesWithCode,
-  countryCodesWithFlags,
-} from "@/lib/countries-codes-flags";
-import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { SelectCountryDialCode } from "@/ui/components/SelectDropdownSearch";
 
 type Props = {
   form: UseFormReturnType<NewBusinessType>;
@@ -45,32 +30,43 @@ export default function BasicInfo({ form }: Props) {
   }));
 
   const select = (
-    <NativeSelect
-      data={countriesWithCode}
-      // leftSectionWidth={28}
-
-      {...form.getInputProps("contactCountryCode")}
-      styles={{
-        input: {
-          fontWeight: 500,
-          borderTopRightRadius: 0,
-          borderBottomRightRadius: 0,
-          // borderRight: "none",
-          width: rem(50),
-          marginLeft: rem(-2),
-          // border: "1px solid var(--prune-primary-700)",
-          fontSize: rem(12),
-        },
-
-        section: {
-          width: rem(70),
-        },
-      }}
-      classNames={{
-        input: styles.input,
-      }}
+    <SelectCountryDialCode
+      value={form.values.contactCountryCode}
+      setValue={(value) => form.setFieldValue("contactCountryCode", value)}
     />
   );
+
+  //   <NativeSelect
+  //     data={countriesWithCode}
+  //     {...form.getInputProps("contactCountryCode")}
+  //     styles={{
+  //       input: {
+  //         fontWeight: 500,
+  //         borderTopRightRadius: 0,
+  //         borderBottomRightRadius: 0,
+  //         // borderRight: "none",
+  //         width: rem(50),
+  //         marginLeft: rem(-2),
+  //         // border: "1px solid var(--prune-primary-700)",
+  //         fontSize: rem(12),
+  //       },
+
+  //       section: {
+  //         width: rem(70),
+  //       },
+  //     }}
+  //     classNames={{
+  //       input: styles.input,
+  //     }}
+  //   />
+  // );
+
+  useEffect(() => {
+    if (form.values.contactCountryCode) {
+      const [code] = form.values.contactCountryCode.split("-");
+      form.setFieldValue("contactNumber", `${code}`);
+    }
+  }, [form.values.contactCountryCode]);
 
   return (
     <Box>
@@ -189,6 +185,7 @@ export default function BasicInfo({ form }: Props) {
           {...form.getInputProps("contactEmail")}
           rightSection={<IconMail size={14} />}
         />
+
         <NumberInput
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
@@ -196,17 +193,15 @@ export default function BasicInfo({ form }: Props) {
           type="tel"
           label="Contact Phone Number"
           placeholder="Enter Contact Phone Number"
-          {...form.getInputProps("contactNumber")}
-          prefix={form.values.contactCountryCode}
-          // rightSection={<IconPhone size={14} />}
+          // {...form.getInputProps("contactNumber")}
+          value={form.values.contactNumber}
+          onChange={(value) =>
+            form.setFieldValue("contactNumber", String(`+${value}`))
+          }
+          error={form.errors.contactNumber}
+          prefix={"+"}
           leftSection={select}
           hideControls
-          //   rightSection={
-          //     <Group>
-          //       <Avatar />
-          //       <Select data={["US"]} variant="unstyled" />
-          //     </Group>
-          //   }
           leftSectionWidth={50}
           styles={{
             input: {

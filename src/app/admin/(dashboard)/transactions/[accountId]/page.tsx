@@ -100,14 +100,20 @@ export default function AccountTransactions() {
     },
     {
       title: "Money In",
-      value: 0,
+      value:
+        transactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
       loading: loading,
     },
     {
       title: "Money Out",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value:
+        transactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
       loading: loading,

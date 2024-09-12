@@ -75,6 +75,37 @@ export const IssuedAccountsTab = () => {
     validate: zodResolver(filterSchema),
   });
 
+  const infoDetails = [
+    {
+      title: "Total Balance",
+      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money In",
+      value:
+        transactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Money Out",
+      value:
+        transactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      formatted: true,
+      currency: "EUR",
+    },
+    {
+      title: "Total Transactions",
+      value: transactions.length,
+    },
+  ];
+
   const searchProps = ["senderIban", "recipientIban", "amount"];
 
   const rows = filteredSearch(transactions, searchProps, debouncedSearch).map(
@@ -122,6 +153,7 @@ export const IssuedAccountsTab = () => {
 
   return (
     <TabsPanel value="Issued Accounts">
+      <InfoCards details={infoDetails} title="Overview" />
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
 

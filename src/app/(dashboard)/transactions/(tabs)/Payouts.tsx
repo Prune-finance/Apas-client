@@ -1,4 +1,3 @@
-import form from "@/app/auth/login/form";
 import { useUserTransactions } from "@/lib/hooks/transactions";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 
@@ -21,10 +20,10 @@ import { useState } from "react";
 
 import { useSearchParams } from "next/navigation";
 
-import { IssuedAccountTableHeaders } from "@/lib/static";
-import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
+import { PayoutTableHeaders } from "@/lib/static";
+import { PayoutTransactionTableRows } from "@/ui/components/TableRows";
 
-export const IssuedAccountsTab = () => {
+export const PayoutsTab = () => {
   const searchParams = useSearchParams();
   const { status, createdAt, sort, type } = Object.fromEntries(
     searchParams.entries()
@@ -55,38 +54,63 @@ export const IssuedAccountsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money In",
-      value:
-        transactions
-          .filter((trx) => trx.type === "CREDIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value:
-        transactions
-          .filter((trx) => trx.type === "DEBIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: [].length,
     },
   ];
+
+  // const infoDetails = [
+  //   {
+  //     title: "Total Balance",
+  //     value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+  //     formatted: true,
+  //     currency: "EUR",
+  //   },
+  //   {
+  //     title: "Money In",
+  //     value:
+  //       transactions
+  //         .filter((trx) => trx.type === "CREDIT")
+  //         .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+  //     formatted: true,
+  //     currency: "EUR",
+  //   },
+  //   {
+  //     title: "Money Out",
+  //     value:
+  //       transactions
+  //         .filter((trx) => trx.type === "DEBIT")
+  //         .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+  //     formatted: true,
+  //     currency: "EUR",
+  //   },
+  //   {
+  //     title: "Total Transactions",
+  //     value: transactions.length,
+  //   },
+  // ];
 
   const searchProps = ["senderIban", "recipientIban", "amount"];
 
   return (
-    <TabsPanel value="Issued Accounts">
+    <TabsPanel value="Payouts">
       <InfoCards details={infoDetails} title="Overview" />
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
@@ -102,26 +126,28 @@ export const IssuedAccountsTab = () => {
 
       <TableComponent
         rows={
-          <IssuedTransactionTableRows
-            data={transactions}
+          <PayoutTransactionTableRows
+            data={[]}
             search={debouncedSearch}
             active={active}
             limit={limit}
             searchProps={searchProps}
+            id=""
           />
         }
+        // rows={rows}
         loading={loading}
-        head={IssuedAccountTableHeaders}
+        head={PayoutTableHeaders}
       />
 
       <EmptyTable
-        rows={transactions}
+        rows={[]}
         loading={loading}
         title="There are no transactions"
         text="When a transaction is made, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
+        total={Math.ceil([].length / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

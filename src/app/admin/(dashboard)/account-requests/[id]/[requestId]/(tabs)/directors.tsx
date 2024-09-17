@@ -6,6 +6,7 @@ import {
   Flex,
   Grid,
   GridCol,
+  Stack,
   Text,
   TextInput,
   UnstyledButton,
@@ -25,7 +26,7 @@ import { RequestData } from "@/lib/hooks/requests";
 import { request } from "http";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
-import { FileTextInput } from "../FileTextInput";
+import { FileRows, FileTextInput } from "../FileTextInput";
 import { camelCaseToTitleCase, getDocumentStatus } from "@/lib/utils";
 
 export default function Directors({
@@ -70,60 +71,60 @@ const DirectorsForm = ({
   const { handleInfo } = useNotification();
 
   return (
-    <div className={styles.top__container}>
-      <Flex justify="space-between" align="center">
-        <Text fz={12} fw={600} tt="uppercase">
+    <div
+    //  className={styles.top__container}
+    >
+      <Flex justify="space-between" align="center" bg="#F9F9F9" p={20} mt={28}>
+        <Text fz={12} fw={800} tt="uppercase" c="var(--prune-text-gray-800)">
           Director {index + 1}
         </Text>
       </Flex>
 
-      <Grid mt={20} className={styles.grid__container}>
+      <Stack mt={20} className={styles.grid__container}>
         {request.accountType === "CORPORATE" && (
-          <GridCol span={4} className={styles.grid}>
-            <FileTextInput
-              label="Identity Type"
-              placeholder={camelCaseToTitleCase(
-                request.documentData.directors[`director_${index + 1}`].idType
-              )}
-              url={
-                request.documentData.directors[`director_${index + 1}`].idFile
-              }
-              path={`directors.director_${index + 1}.idFile`}
-              request={request}
-              revalidate={revalidate}
-              status={getDocumentStatus(
-                request,
-                "directors",
-                `director_${index + 1}`,
-                "idFile"
-              )}
-            />
-          </GridCol>
+          // <GridCol span={4} className={styles.grid}>
+          <FileRows
+            label="Identity Type"
+            placeholder={camelCaseToTitleCase(
+              request.documentData.directors[`director_${index + 1}`].idType
+            )}
+            url={request.documentData.directors[`director_${index + 1}`].idFile}
+            path={`directors.director_${index + 1}.idFile`}
+            request={request}
+            revalidate={revalidate}
+            status={getDocumentStatus(
+              request,
+              "directors",
+              `director_${index + 1}`,
+              "idFile"
+            )}
+          />
+          // </GridCol>
         )}
 
         {request.accountType === "CORPORATE" && (
-          <GridCol span={4} className={styles.grid}>
-            <FileTextInput
-              label="Proof of Address"
-              placeholder={camelCaseToTitleCase(
-                request.documentData.directors[`director_${index + 1}`].poaType
-              )}
-              url={
-                request.documentData.directors[`director_${index + 1}`].poaFile
-              }
-              path={`directors.director_${index + 1}.poaFile`}
-              request={request}
-              revalidate={revalidate}
-              status={getDocumentStatus(
-                request,
-                "directors",
-                `director_${index + 1}`,
-                "poaFile"
-              )}
-            />
-          </GridCol>
+          // <GridCol span={4} className={styles.grid}>
+          <FileRows
+            label="Proof of Address"
+            placeholder={camelCaseToTitleCase(
+              request.documentData.directors[`director_${index + 1}`].poaType
+            )}
+            url={
+              request.documentData.directors[`director_${index + 1}`].poaFile
+            }
+            path={`directors.director_${index + 1}.poaFile`}
+            request={request}
+            revalidate={revalidate}
+            status={getDocumentStatus(
+              request,
+              "directors",
+              `director_${index + 1}`,
+              "poaFile"
+            )}
+          />
+          // </GridCol>
         )}
-      </Grid>
+      </Stack>
     </div>
   );
 };

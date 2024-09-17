@@ -10,18 +10,18 @@ import { BadgeComponent } from "../Badge";
 
 export const BusinessTransactionTableRows = ({
   data,
-  id,
   search,
   active,
   limit,
   searchProps,
+  business,
 }: {
   data: TransactionType[];
-  id: string;
   search: string;
   active: number;
   limit: string | null;
   searchProps: string[];
+  business?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
@@ -37,16 +37,18 @@ export const BusinessTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd
-        td="underline"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        <Link href={`/admin/transactions/${element.senderIban}`}>
-          {element.senderName || "N/A"}
-        </Link>
-      </TableTd>
+      {!business && (
+        <TableTd
+          td="underline"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <Link href={`/admin/transactions/${element.senderIban}`}>
+            {element.senderName || "N/A"}
+          </Link>
+        </TableTd>
+      )}
 
       <TableTd>
         <Stack gap={0}>

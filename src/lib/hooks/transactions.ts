@@ -383,7 +383,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
 }
 
 export function useUserDefaultTransactions(customParams: ITrx = {}) {
-  const [transactions, setTransactions] = useState<TrxData[]>([]);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 

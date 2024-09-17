@@ -36,6 +36,8 @@ import { TransactionDrawer } from "../drawer";
 import { OwnAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { useSearchParams } from "next/navigation";
+import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
+import Transaction from "@/lib/store/transaction";
 
 export const AccountsTab = () => {
   const searchParams = useSearchParams();
@@ -161,13 +163,22 @@ export const AccountsTab = () => {
       />
 
       <TableComponent
-        rows={rows}
+        rows={
+          <BusinessTransactionTableRows
+            data={transactions}
+            search={debouncedSearch}
+            active={active}
+            limit={limit}
+            searchProps={searchProps}
+            business
+          />
+        }
         loading={loading}
         head={OwnAccountTableHeaders}
       />
 
       <EmptyTable
-        rows={rows}
+        rows={transactions}
         loading={loading}
         title="There are no transactions"
         text="When a transaction is recorded, it will appear here"
@@ -179,21 +190,6 @@ export const AccountsTab = () => {
         limit={limit}
         setLimit={setLimit}
       />
-
-      <TransactionDrawer
-        opened={openedDrawer}
-        close={closeDrawer}
-        selectedRequest={selectedRequest}
-      />
     </TabsPanel>
   );
 };
-
-// const tableHeaders = [
-//   "Recipient IBAN",
-//   "Bank",
-//   "Reference",
-//   "Amount",
-//   "Date Created",
-//   "Status",
-// ];

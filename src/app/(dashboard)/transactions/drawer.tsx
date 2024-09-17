@@ -1,6 +1,5 @@
 import {
   TransactionType,
-  TrxData,
   useSingleCompanyTransactions,
   useSingleTransactions,
 } from "@/lib/hooks/transactions";
@@ -11,17 +10,11 @@ import {
   Box,
   Divider,
   Text,
-  Badge,
   Stack,
   Group,
   Skeleton,
 } from "@mantine/core";
-import {
-  IconX,
-  IconArrowUpRight,
-  IconPointFilled,
-  IconCircleArrowDown,
-} from "@tabler/icons-react";
+import { IconCircleArrowDown } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -37,8 +30,8 @@ import {
 import { useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
-import { send } from "process";
 import { AmountGroup } from "@/ui/components/AmountGroup";
+import Transaction from "@/lib/store/transaction";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
@@ -56,6 +49,8 @@ export const TransactionDrawer = ({
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.id ?? ""
   );
+
+  const { clearData } = Transaction();
 
   const {
     transaction: defaultTransaction,
@@ -151,7 +146,10 @@ export const TransactionDrawer = ({
   return (
     <Drawer
       opened={opened}
-      onClose={close}
+      onClose={() => {
+        close();
+        // clearData();
+      }}
       position="right"
       title={
         <Text fz={18} fw={600} c="#1D2939" ml={28}>

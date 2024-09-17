@@ -167,14 +167,14 @@ export const IssuedTransactionTableRows = ({
 
 export const PayoutTransactionTableRows = ({
   data,
-  id,
+
   search,
   active,
   limit,
   searchProps,
 }: {
   data: TransactionType[];
-  id: string;
+
   search: string;
   active: number;
   limit: string | null;
@@ -194,16 +194,8 @@ export const PayoutTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd
-        td="underline"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        {/* <Link href={`/admin/transactions/${element.senderIban}`}> */}
-        {element.senderName || "N/A"}
-        {/* </Link> */}
-      </TableTd>
+      <TableTd>{element.senderName || "N/A"}</TableTd>
+
       <TableTd w="15%">{element.centrolinkRef}</TableTd>
       <TableTd>
         <Stack gap={0}>

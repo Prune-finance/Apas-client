@@ -55,6 +55,7 @@ import { IssuedAccountTableHeaders } from "@/lib/static";
 import { useTransactions } from "@/lib/hooks/transactions";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 
 export default function Home() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
@@ -335,14 +336,23 @@ export default function Home() {
 
                       <TableComponent
                         head={IssuedAccountTableHeaders}
-                        rows={rows}
+                        // rows={rows}
+                        rows={
+                          <IssuedTransactionTableRows
+                            data={transactions.slice(0, 4)}
+                            active={1}
+                            limit={null}
+                            search=""
+                            searchProps={["senderIban"]}
+                          />
+                        }
                         loading={loadingTrx}
                         noBg
                       />
 
                       <EmptyTable
                         loading={loadingTrx}
-                        rows={rows}
+                        rows={transactions}
                         title="There is no transaction"
                         text="When a transaction is created it will appear here"
                       />

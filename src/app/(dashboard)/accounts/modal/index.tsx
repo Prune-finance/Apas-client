@@ -1,13 +1,5 @@
-import {
-  Text,
-  Modal,
-  Flex,
-  Button,
-  Stack,
-  Select,
-  Textarea,
-} from "@mantine/core";
-import { IconTrash, IconX } from "@tabler/icons-react";
+import { Text, Modal, Flex, Textarea } from "@mantine/core";
+import { IconX } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
 import { UseFormReturnType } from "@mantine/form";

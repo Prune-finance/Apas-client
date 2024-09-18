@@ -105,7 +105,6 @@ export default function NewBusiness() {
         shareholders,
         pricingPlan,
         contactCountryCode,
-        contactNumber,
         ...rest
       } = form.values;
 
@@ -129,7 +128,6 @@ export default function NewBusiness() {
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company`,
         {
           ...rest,
-          contactNumber: `${contactCountryCode}${contactNumber}`,
           pricingPlanId: pricingPlan,
           ...(initialDirEmpty ? { directors: [] } : { directors }),
           ...(initialShrEmpty ? { shareholders: [] } : { shareholders }),

@@ -7,6 +7,7 @@ import Link from "next/link";
 import { AmountGroup } from "../AmountGroup";
 import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
+import { InquiryData } from "@/lib/static";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -227,6 +228,44 @@ export const PayoutTransactionTableRows = ({
       </TableTd>
       <TableTd>
         <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+};
+
+export const InquiryTableRows = ({
+  data,
+  business,
+  search,
+  searchProps,
+}: {
+  data: InquiryData[];
+  business?: boolean;
+  search: string;
+  searchProps: string[];
+}) => {
+  const { open, setData } = Transaction();
+  return filteredSearch(data.reverse(), searchProps, search).map((element) => (
+    <TableTr
+      key={element.dateRequested}
+      onClick={() => {
+        open();
+        // setData(element);
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      {!business && <TableTd>{element.businessName || "N/A"}</TableTd>}
+
+      <TableTd>{element.pruneReference}</TableTd>
+
+      <TableTd tt="capitalize">{element.inquiryType.toLowerCase()}</TableTd>
+
+      <TableTd>
+        {dayjs(element.dateRequested).format("Do MMMM, YYYY - hh:mma")}
+      </TableTd>
+
+      <TableTd>
+        <BadgeComponent status={element.status} w={100} />
       </TableTd>
     </TableTr>
   ));

@@ -26,6 +26,7 @@ export function TableComponent({ loading, rows, head, noBg, ...props }: Props) {
         className={styles.table}
         verticalSpacing="md"
         borderColor="#F5F5F5"
+        layout="fixed"
       >
         <TableThead bg={noBg ? "transparent" : "#F9F9F9"}>
           <TableTr>

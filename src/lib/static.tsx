@@ -322,3 +322,47 @@ export const debitTableHeaders = [
   "Status",
   // "Action",
 ];
+
+export const InquiriesTableHeaders = [
+  "Business Name",
+  "Prune Reference",
+  "Inquiry Type",
+  "Date Requested",
+  "Status",
+];
+
+export interface InquiryData {
+  id: string;
+  businessName: string;
+  pruneReference: string;
+  inquiryType: "QUERY" | "TRACE" | "RECALL";
+  dateRequested: string;
+  status: "CLOSED" | "PROCESSING";
+}
+
+export const inquiriesData: InquiryData[] = [
+  {
+    id: "1",
+    businessName: "Tech Solutions",
+    pruneReference: "PRN12345",
+    inquiryType: "QUERY",
+    dateRequested: "2024-09-15",
+    status: "PROCESSING",
+  },
+  {
+    id: "2",
+    businessName: "Green Industries",
+    pruneReference: "PRN67890",
+    inquiryType: "RECALL",
+    dateRequested: "2024-09-10",
+    status: "CLOSED",
+  },
+  {
+    id: "3",
+    businessName: "Creative Studio",
+    pruneReference: "PRN11223",
+    inquiryType: "TRACE",
+    dateRequested: "2024-09-12",
+    status: "PROCESSING",
+  },
+];

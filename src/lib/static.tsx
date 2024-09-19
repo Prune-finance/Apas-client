@@ -539,7 +539,7 @@ export const inquiry: Inquiry = {
     {
       type: "file",
       file: "transaction_details.pdf",
-      extension: "pdf",
+      extension: "application/pdf",
       createdAt: new Date("2023-09-10T10:00:00Z"),
       senderType: "admin",
     },
@@ -565,7 +565,7 @@ export const inquiry: Inquiry = {
       type: "file-text",
       body: "Here is a copy of the agreement for your records.",
       file: "agreement.pdf",
-      extension: "pdf",
+      extension: "application/pdf",
       createdAt: new Date("2023-09-10T10:30:00Z"),
       senderType: "admin",
     },
@@ -580,6 +580,14 @@ export const inquiry: Inquiry = {
       body: "No further steps needed from your side. We'll notify you once the transaction is complete.",
       createdAt: new Date("2023-09-10T11:00:00Z"),
       senderType: "admin",
+    },
+    {
+      type: "file-text",
+      file: "agreement.jpg",
+      extension: "image/jpeg",
+      body: "Per your last message, I've attached the agreement for your records to fast-track the process. It already looks like the process has been elongated more than expected.",
+      createdAt: new Date("2023-09-10T11:00:00Z"),
+      senderType: "user",
     },
   ],
 };

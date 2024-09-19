@@ -1,10 +1,15 @@
+"use client";
+
 import TabsComponent from "@/ui/components/Tabs";
 import { Paper, TabsPanel, Text } from "@mantine/core";
 import { Users } from "./(tabs)/Users";
 import { PayoutTransactions } from "./(tabs)/PayoutTransactions";
 import { InquiriesTab } from "./(tabs)/Inquiries";
+import { useSearchParams } from "next/navigation";
 
 export default function AdminPayout() {
+  const searchParams = useSearchParams();
+  const _tab = searchParams.get("tab");
   return (
     <main>
       <Paper>
@@ -14,7 +19,14 @@ export default function AdminPayout() {
           </Text>
         </div>
 
-        <TabsComponent tabs={tabs} mt={32} fz={12}>
+        <TabsComponent
+          defaultValue={
+            tabs.find((tab) => tab.value === _tab)?.value ?? tabs[0].value
+          }
+          tabs={tabs}
+          mt={32}
+          fz={12}
+        >
           <TabsPanel value={tabs[0].value}>
             <Users />
           </TabsPanel>

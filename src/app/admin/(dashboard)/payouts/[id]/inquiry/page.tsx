@@ -1,18 +1,21 @@
 "use client";
 
-import { inquiry, Message } from "@/lib/static";
+import { inquiry } from "@/lib/static";
 import { formatNumber, getInitials } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+
+import { TicketChatComponent } from "@/ui/components/TicketChat";
 import {
   ActionIcon,
   Avatar,
   Box,
   Collapse,
   Divider,
+  FileButton,
+  Flex,
   Group,
-  Paper,
   rem,
   ScrollArea,
   SimpleGrid,
@@ -21,6 +24,13 @@ import {
   TextInput,
   ThemeIcon,
 } from "@mantine/core";
+import {
+  IMAGE_MIME_TYPE,
+  MS_EXCEL_MIME_TYPE,
+  MS_WORD_MIME_TYPE,
+  PDF_MIME_TYPE,
+  MIME_TYPES,
+} from "@mantine/dropzone";
 import { useDisclosure } from "@mantine/hooks";
 import {
   IconChevronDown,
@@ -30,8 +40,6 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import { color } from "framer-motion";
-import { get } from "http";
 
 dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
@@ -51,7 +59,7 @@ export default function InquiryPage() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Payouts", href: "/admin/payouts" },
+          { title: "Payouts", href: "/admin/payouts?tab=Inquiries" },
           {
             title: "Inquiry",
             href: `/admin/payouts/${id}/inquiry`,
@@ -59,161 +67,142 @@ export default function InquiryPage() {
           },
         ]}
       />
-      <Group mt={28} justify="space-between">
-        <Group>
-          <Avatar
-            size={40}
-            color="var(--prune-primary-700)"
-            variant="filled"
-            radius="xl"
-          >
-            {getInitials(inquiry.transaction.company.name)}
-          </Avatar>
+      <Flex direction="column" h="calc(100vh - 350px)">
+        <Box flex={1}>
+          {/* Chat Header */}
+          <Group mt={28} justify="space-between">
+            <Group>
+              <Avatar
+                size={40}
+                color="var(--prune-primary-700)"
+                variant="filled"
+                radius="xl"
+              >
+                {getInitials(inquiry.transaction.company.name)}
+              </Avatar>
 
-          <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
-            Query: {inquiry.transaction.centrolinkRef}
-          </Text>
-
-          <BadgeComponent status={inquiry.status} w={100} />
-        </Group>
-
-        <PrimaryBtn text="Close Ticket" fw={600} h={40} />
-      </Group>
-      <Divider mb={20} mt={27} color="#EEF0F2" />
-
-      <Group gap={5}>
-        <Text fz={12} fw={600} c="var(--prune-text-gray-800)">
-          Transaction Details:
-        </Text>
-
-        <SecondaryBtn
-          text={opened ? "Hide" : "Show"}
-          action={toggle}
-          variant="transparent"
-          td="underline"
-          fz={10}
-          px={0}
-          m={0}
-          rightSection={
-            opened ? <IconChevronDown size={10} /> : <IconChevronUp size={10} />
-          }
-        />
-      </Group>
-
-      <Collapse in={opened} mt={16}>
-        <SimpleGrid cols={4} w="60%">
-          {Object.entries(trxDetails).map(([title, value]) => (
-            <Stack key={title} gap={0}>
-              <Text fz={10} fw={500} c="var(--prune-text-gray-400)" key={title}>
-                {title}
+              <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
+                Query: {inquiry.transaction.centrolinkRef}
               </Text>
-              <Text fz={12} fw={600} c="var(--prune-text-gray-700)" key={title}>
-                {value}
-              </Text>
-            </Stack>
-          ))}
-        </SimpleGrid>
-      </Collapse>
 
-      <Divider mt={20} mb={27} color="#EEF0F2" />
+              <BadgeComponent status={inquiry.status} w={100} />
+            </Group>
 
-      <ScrollArea h={`calc(100vh - ${opened ? "450px" : "400px"})`}>
-        <Stack gap={40}>
-          {inquiry.messages.map((mes, index) => (
-            <ChatComponent guest={mes.senderType === "user"} key={index} />
-          ))}
-        </Stack>
-      </ScrollArea>
+            <PrimaryBtn text="Close Ticket" fw={600} h={40} />
+          </Group>
+          <Divider mb={20} mt={27} color="#EEF0F2" />
 
-      <Divider mt={20} mb={27} color="#EEF0F2" />
+          <Group gap={5}>
+            <Text fz={12} fw={600} c="var(--prune-text-gray-800)">
+              Transaction Details:
+            </Text>
 
-      <Group>
-        <ThemeIcon variant="transparent" color="var(--prune-primary-600)">
-          <IconPaperclip />
-        </ThemeIcon>
-
-        <TextInput
-          placeholder="Reply..."
-          variant="filled"
-          flex={1}
-          rightSection={
-            <ActionIcon
-              size={32}
-              radius="xl"
-              color="var(--prune-primary-600)"
+            <SecondaryBtn
+              text={opened ? "Hide" : "Show"}
+              action={toggle}
               variant="transparent"
-            >
-              <IconSend
-                style={{ width: rem(18), height: rem(18) }}
-                stroke={2}
-              />
-            </ActionIcon>
-          }
-        />
-      </Group>
+              td="underline"
+              fz={10}
+              px={0}
+              m={0}
+              rightSection={
+                opened ? (
+                  <IconChevronDown size={10} />
+                ) : (
+                  <IconChevronUp size={10} />
+                )
+              }
+            />
+          </Group>
+
+          <Collapse in={opened} mt={16}>
+            <SimpleGrid cols={4} w="60%">
+              {Object.entries(trxDetails).map(([title, value]) => (
+                <Stack key={title} gap={0}>
+                  <Text
+                    fz={10}
+                    fw={500}
+                    c="var(--prune-text-gray-400)"
+                    key={title}
+                  >
+                    {title}
+                  </Text>
+                  <Text
+                    fz={12}
+                    fw={600}
+                    c="var(--prune-text-gray-700)"
+                    key={title}
+                  >
+                    {value}
+                  </Text>
+                </Stack>
+              ))}
+            </SimpleGrid>
+          </Collapse>
+
+          <Divider mt={20} mb={27} color="#EEF0F2" />
+
+          <ScrollArea h={`calc(100vh - ${!opened ? "400px" : "450px"})`}>
+            <Stack gap={40}>
+              {inquiry.messages.map((mes, index) => (
+                <TicketChatComponent
+                  guest={mes.senderType === "user"}
+                  key={index}
+                  message={mes}
+                  companyName={inquiry.transaction.company.name}
+                />
+              ))}
+            </Stack>
+          </ScrollArea>
+        </Box>
+
+        {/* New Chat Starts Here */}
+        <Divider mt={20} mb={27} color="#EEF0F2" />
+        <Group>
+          <FileButton
+            onChange={() => {}}
+            // onChange={setFile}
+            //   accept="image/png,image/jpeg"
+            accept={[
+              ...IMAGE_MIME_TYPE,
+              ...PDF_MIME_TYPE,
+              ...MS_WORD_MIME_TYPE,
+              ...MS_EXCEL_MIME_TYPE,
+              MIME_TYPES.csv,
+            ].join(",")}
+          >
+            {(props) => (
+              <ThemeIcon
+                {...props}
+                style={{ cursor: "pointer" }}
+                variant="transparent"
+                color="var(--prune-primary-600)"
+              >
+                <IconPaperclip />
+              </ThemeIcon>
+            )}
+          </FileButton>
+
+          <TextInput
+            placeholder="Reply..."
+            variant="filled"
+            flex={1}
+            rightSection={
+              <ActionIcon
+                size={32}
+                radius="xl"
+                color="var(--prune-primary-600)"
+                variant="transparent"
+              >
+                <IconSend
+                  style={{ width: rem(18), height: rem(18) }}
+                  stroke={2}
+                />
+              </ActionIcon>
+            }
+          />
+        </Group>
+      </Flex>
     </main>
   );
 }
-
-interface ChatProps {
-  guest?: boolean;
-}
-
-const ChatComponent = ({ guest }: ChatProps) => {
-  return (
-    <Group
-      align="flex-start"
-      w="50%"
-      style={{ alignSelf: guest ? "start" : "end" }}
-    >
-      <Avatar
-        color="var(--prune-text-gray-100)"
-        radius="xl"
-        variant="filled"
-        styles={{ placeholder: { color: "var(--prune-text-gray-800)" } }}
-        display={guest ? "block" : "none"}
-        size={40}
-      >
-        {getInitials(inquiry.transaction.company.name)}
-      </Avatar>
-
-      <Stack gap={0} flex={1}>
-        <Text
-          //   lh={0}
-          fz={14}
-          fw={600}
-          c="var(--prune-text-gray-800)"
-          display={guest ? "block" : "none"}
-        >
-          {inquiry.transaction.company.name}
-        </Text>
-
-        <Paper
-          bg={guest ? "var(--prune-text-gray-100)" : "#F2FBB2"}
-          px={15}
-          py={10}
-          radius={guest ? "0px 10px 10px 10px" : "10px 0px 10px 10px"}
-        >
-          <Text fz={12} c="var(--prune-text-gray-800)">
-            The transaction has been pending for a while now. I want to know if
-            its is going to go through, and if i will be debited if it does not.
-          </Text>
-        </Paper>
-        <Text
-          lh={0}
-          fz={10}
-          fw={600}
-          mt={10}
-          c="var(--prune-text-gray-400)"
-          style={{ alignSelf: guest ? "end" : "start" }}
-        >
-          {dayjs(inquiry.transaction.createdAt).format(
-            "Do MMMM, YYYY - hh:mmA"
-          )}
-        </Text>
-      </Stack>
-    </Group>
-  );
-};
-
-// { message }: { message: Message }

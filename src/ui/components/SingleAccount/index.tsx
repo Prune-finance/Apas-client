@@ -22,6 +22,7 @@ import {
   ThemeIcon,
   Avatar,
   Modal,
+  Switch,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -1060,6 +1061,26 @@ export const DefaultAccountHead = ({
             <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
+          {payout && (
+            <Button
+              // onClick={openTrust}
+              color="#f6f6f6"
+              c="var(--prune-text-gray-700)"
+              fz={12}
+              fw={600}
+              h={32}
+              radius={4}
+            >
+              <Switch
+                label="Trust this User"
+                checked={business?.kycTrusted}
+                labelPosition="left"
+                fz={12}
+                size="xs"
+                color="var(--prune-success-500)"
+              />
+            </Button>
+          )}
         </Flex>
       </Flex>
 

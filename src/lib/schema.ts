@@ -166,7 +166,7 @@ export const newBusiness = {
   country: null,
   legalEntity: null,
   pricingPlan: null,
-  contactNumber: "",
+  contactNumber: "+234",
   contactEmail: "",
   businessBio: "",
   contactFirstName: "",

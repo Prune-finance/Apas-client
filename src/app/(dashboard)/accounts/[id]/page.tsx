@@ -176,7 +176,12 @@ export default function Account() {
         </Group>
 
         <Flex gap={10}>
-          <PrimaryBtn text="Debit Account" fw={600} action={open} />
+          <PrimaryBtn
+            text="Debit Account"
+            fw={600}
+            action={open}
+            display={account?.status === "ACTIVE" ? "" : "none"}
+          />
 
           {account?.status !== "FROZEN" && (
             <PrimaryBtn

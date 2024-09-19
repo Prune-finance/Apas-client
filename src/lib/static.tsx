@@ -393,7 +393,7 @@ interface FileTextMessage extends MessageBase {
   extension: string;
 }
 
-type Message = TextMessage | FileMessage | FileTextMessage;
+export type Message = TextMessage | FileMessage | FileTextMessage;
 
 export interface Inquiry {
   transaction: TransactionType;
@@ -404,7 +404,7 @@ export interface Inquiry {
   status: "CLOSED" | "PROCESSING";
 }
 
-const inquiry: Inquiry = {
+export const inquiry: Inquiry = {
   transaction: {
     id: "T003",
     senderIban: "US12345678901234567890",

@@ -244,13 +244,13 @@ export const InquiryTableRows = ({
   search: string;
   searchProps: string[];
 }) => {
-  const { open, setData } = Transaction();
   return filteredSearch(data.reverse(), searchProps, search).map((element) => (
     <TableTr
       key={element.dateRequested}
       onClick={() => {
-        open();
-        // setData(element);
+        window.open(
+          `${!business ? "/admin" : ""}/payouts/${crypto.randomUUID()}/inquiry`
+        );
       }}
       style={{ cursor: "pointer" }}
     >

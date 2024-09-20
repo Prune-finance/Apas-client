@@ -5,6 +5,7 @@ import { formatNumber, getInitials } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import ModalComponent from "@/ui/components/Modal";
 
 import { TicketChatComponent } from "@/ui/components/TicketChat";
 import {
@@ -37,16 +38,20 @@ import {
   IconChevronUp,
   IconPaperclip,
   IconSend,
+  IconX,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
+import { useState } from "react";
 
 export default function InquiryPage() {
   const { id } = useParams<{ id: string }>();
   const [opened, { toggle }] = useDisclosure(true);
+  const [closeOpened, { open, close }] = useDisclosure(false);
+  const [processing, setProcessing] = useState(false);
 
   const trxDetails = {
     "Sender Name": inquiry.transaction.senderName,
@@ -88,7 +93,7 @@ export default function InquiryPage() {
               <BadgeComponent status={inquiry.status} w={100} />
             </Group>
 
-            <PrimaryBtn text="Close Ticket" fw={600} h={40} />
+            <PrimaryBtn text="Close Ticket" fw={600} h={40} action={open} />
           </Group>
           <Divider mb={20} mt={27} color="#EEF0F2" />
 
@@ -203,6 +208,18 @@ export default function InquiryPage() {
           />
         </Group>
       </Flex>
+
+      <ModalComponent
+        processing={processing}
+        action={() => {}}
+        color="#FEF3F2"
+        icon={<IconX color="#D92D20" />}
+        opened={closeOpened}
+        close={close}
+        title="Close this query Ticket?"
+        text="By closing this query ticket, it means your transaction has been completed"
+        customApproveMessage="Yes, Close"
+      />
     </main>
   );
 }

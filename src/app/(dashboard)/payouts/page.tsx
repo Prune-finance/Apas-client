@@ -1,7 +1,15 @@
 "use client";
 import dayjs from "dayjs";
 
-import { Center, Group, Paper, SimpleGrid, Stack } from "@mantine/core";
+import {
+  Center,
+  Group,
+  Paper,
+  SimpleGrid,
+  Stack,
+  Tabs,
+  TabsPanel,
+} from "@mantine/core";
 
 import { Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
@@ -52,6 +60,9 @@ import { parseError } from "@/lib/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useUserBusiness } from "@/lib/hooks/businesses";
+import TabsComponent from "@/ui/components/Tabs";
+import { PayoutAccount } from "./(tabs)/Account";
+import { InquiriesTab } from "./(tabs)/Inquiries";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
@@ -59,24 +70,14 @@ function PayoutTrx() {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
 
-  const { status, createdAt, sort } = Object.fromEntries(
+  const { status, createdAt, sort, tab } = Object.fromEntries(
     searchParams.entries()
   );
-
-  const router = useRouter();
-  const params = useParams<{ id: string }>();
-
-  const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
-  const [chartFrequency, setChartFrequency] = useState<string>("monthly");
 
   const [processing, setProcessing] = useState(false);
 
   const { handleError, handleInfo, handleSuccess } = useNotification();
 
-  const [openedDebit, { open, close }] = useDisclosure(false);
-
-  const { loading: loadingAcct, account } = useUserDefaultPayoutAccount();
   const { business, meta, revalidate, loading } = useUserBusiness();
 
   const requestPayoutAccount = async () => {
@@ -132,49 +133,19 @@ function PayoutTrx() {
         )}
       </Group>
 
-      {Boolean(meta?.hasPayoutAccount) && (
-        <SimpleGrid cols={3} mt={32}>
-          <AccountCard
-            balance={account?.accountBalance ?? 0}
-            currency="EUR"
-            companyName={account?.accountName ?? "No Default Account"}
-            badgeText="Payout Account"
-            iban={account?.accountNumber ?? "No Default Account"}
-            bic={"ARPYGB21XXX"}
-            loading={loadingAcct}
-            link={`/payouts/${account?.id}`}
-          />
-        </SimpleGrid>
-      )}
+      <TabsComponent
+        defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
+        tabs={tabs}
+        mt={28}
+      >
+        <TabsPanel value={tabs[0].value}>
+          <PayoutAccount loading={loading} meta={meta} />
+        </TabsPanel>
 
-      {!Boolean(meta?.hasPayoutAccount) && (
-        <Center h="calc(100vh - 10px)">
-          <Stack>
-            <EmptyTable
-              rows={[]}
-              loading={loading}
-              title="You do not have a payout account now."
-              text="Request for a payout account and  it would appear here."
-            />
-
-            <PrimaryBtn
-              fw={600}
-              text={
-                Boolean(meta?.activePAReq)
-                  ? "Request Sent"
-                  : "Request Payout Account"
-              }
-              {...(Boolean(meta?.activePAReq) && {
-                icon: IconCheck,
-              })}
-              loading={loading || processing}
-              loaderProps={{ type: "dots" }}
-              disabled={Boolean(meta?.activePAReq)}
-              action={requestPayoutAccount}
-            />
-          </Stack>
-        </Center>
-      )}
+        <TabsPanel value={tabs[1].value}>
+          <InquiriesTab />
+        </TabsPanel>
+      </TabsComponent>
     </main>
   );
 }
@@ -187,11 +158,4 @@ export default function AccountTrxSuspense() {
   );
 }
 
-const tableHeaders = [
-  "Beneficiary Name",
-  "Destination Account",
-  "Bank",
-  "Amount",
-  "Date Created",
-  "Status",
-];
+const tabs = [{ value: "Account" }, { value: "Inquiries" }];

@@ -64,6 +64,7 @@ export default function BusinessPayoutAccount() {
           business={business}
           loadingBiz={loadingBiz}
           payout
+          admin
         />
 
         <SingleDefaultAccountBody

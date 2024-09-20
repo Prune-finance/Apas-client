@@ -53,7 +53,6 @@ export default function SingleUserPayoutAccount() {
         loading={loading}
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
-        admin
         business={business}
         payout
       />

@@ -29,7 +29,7 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             iban={account?.accountNumber ?? "No Default Account"}
             bic={"ARPYGB21XXX"}
             loading={loadingAcct}
-            link={`/payouts/${account?.id}`}
+            link={`/payouts/${account?.id}/account`}
           />
         </SimpleGrid>
       )}

@@ -870,6 +870,7 @@ export const DefaultAccountHead = ({
   payout,
   business,
   loadingBiz,
+  admin,
 }: DefaultAccountHeadProps) => {
   const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
@@ -1061,7 +1062,7 @@ export const DefaultAccountHead = ({
             <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
-          {payout && (
+          {payout && admin && (
             <Button
               // onClick={openTrust}
               color="#f6f6f6"

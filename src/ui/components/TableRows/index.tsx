@@ -8,6 +8,7 @@ import { AmountGroup } from "../AmountGroup";
 import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
 import { InquiryData } from "@/lib/static";
+import { useRouter } from "next/navigation";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -244,11 +245,12 @@ export const InquiryTableRows = ({
   search: string;
   searchProps: string[];
 }) => {
+  const { push } = useRouter();
   return filteredSearch(data.reverse(), searchProps, search).map((element) => (
     <TableTr
       key={element.dateRequested}
       onClick={() => {
-        window.open(
+        push(
           `${!business ? "/admin" : ""}/payouts/${crypto.randomUUID()}/inquiry`
         );
       }}

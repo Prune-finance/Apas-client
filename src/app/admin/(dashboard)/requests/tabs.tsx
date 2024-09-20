@@ -25,10 +25,19 @@ import PayoutAccount from "./(tabs)/payout";
 import Unfreeze from "./(tabs)/live-key";
 import TabsComponent from "@/ui/components/Tabs";
 import LiveKeySuspense from "./(tabs)/live-key";
+import { useSearchParams } from "next/navigation";
 
 export default function TabsContainer() {
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
   return (
-    <TabsComponent tabs={tabs} mt={24} tt="capitalize" fz={12}>
+    <TabsComponent
+      defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
+      tabs={tabs}
+      mt={24}
+      tt="capitalize"
+      fz={12}
+    >
       <TabsPanel value={tabs[0].value}>
         <Debit />
       </TabsPanel>

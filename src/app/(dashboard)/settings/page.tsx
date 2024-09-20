@@ -26,7 +26,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import styles from "./styles.module.scss";
 
@@ -50,6 +50,8 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 export default function Users() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
 
   const { revalidate } = useUsers();
   const { handleSuccess, handleError } = useNotification();
@@ -164,7 +166,9 @@ export default function Users() {
 
         <Tabs
           mt={32}
-          defaultValue={tabs[0].value}
+          defaultValue={
+            tabs.find((t) => t.value === tab)?.value ?? tabs[0].value
+          }
           variant="pills"
           classNames={{
             root: styles.tabs,

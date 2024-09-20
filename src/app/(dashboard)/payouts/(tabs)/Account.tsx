@@ -35,12 +35,12 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
       )}
 
       {!Boolean(meta?.hasPayoutAccount) && (
-        <Center h="calc(100vh - 10px)">
+        <Center h="calc(100vh - 250px)">
           <EmptyTable
             rows={[]}
             loading={loading}
             title="You do not have a payout account now."
-            text="Request for a payout account and  it would appear here."
+            text="Your payout account would appear here once your request is approved."
           />
         </Center>
       )}

@@ -1,5 +1,3 @@
-import { randomUUID } from "crypto";
-import { features } from "process";
 import { z } from "zod";
 
 export const loginValues = {
@@ -168,7 +166,7 @@ export const newBusiness = {
   country: null,
   legalEntity: null,
   pricingPlan: null,
-  contactNumber: "",
+  contactNumber: "+234",
   contactEmail: "",
   businessBio: "",
   contactFirstName: "",
@@ -187,7 +185,7 @@ export const newBusiness = {
   directorParticular: "",
   directors: [directorEtShareholderSchema],
   shareholders: [directorEtShareholderSchema],
-  contactCountryCode: "",
+  contactCountryCode: "+234",
 };
 
 const emailSchema = z.string().email();

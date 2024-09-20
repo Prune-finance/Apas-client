@@ -8,6 +8,7 @@ import {
   Skeleton,
   Text,
   TextInput,
+  Tooltip,
   UnstyledButton,
 } from "@mantine/core";
 import { IconAB2, IconInfoCircle } from "@tabler/icons-react";
@@ -155,14 +156,18 @@ const KeyComponent = ({
               </Text>
             </UnstyledButton>
 
-            <UnstyledButton
-              onClick={() => clipboard.copy(keyString)}
-              className={styles.input__right__section}
-            >
-              <Text fw={600} fz={10} c="#475467">
-                {clipboard.copied ? "Copied" : "Copy"}
-              </Text>
-            </UnstyledButton>
+            <Tooltip label="No key found" withArrow disabled={!!keyString}>
+              <UnstyledButton
+                onClick={() => clipboard.copy(keyString)}
+                className={styles.input__right__section}
+                style={{ cursor: !keyString ? "not-allowed" : "pointer" }}
+                disabled={!keyString}
+              >
+                <Text fw={600} fz={10} c="#475467">
+                  {clipboard.copied ? "Copied" : "Copy"}
+                </Text>
+              </UnstyledButton>
+            </Tooltip>
           </Flex>
         }
         // label="Test Key"

@@ -14,7 +14,7 @@ import {
   Text,
 } from "@mantine/core";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useSingleUserAccount } from "@/lib/hooks/accounts";
 import { TransactionType, useUserTransactions } from "@/lib/hooks/transactions";
@@ -23,24 +23,101 @@ import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "../../debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SingleAccountBody } from "@/ui/components/SingleAccount";
-import { PrimaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import ModalComponent from "../modal";
+import useNotification from "@/lib/hooks/notification";
+import { useForm, zodResolver } from "@mantine/form";
+import { validateRequest } from "@/lib/schema";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { parseError } from "@/lib/actions/auth";
+import { IconBrandLinktree, IconCheck, IconX } from "@tabler/icons-react";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
-  const { account, loading } = useSingleUserAccount(params.id);
+  const { account, loading, revalidate } = useSingleUserAccount(params.id);
+  const { handleSuccess, handleError } = useNotification();
   const { loading: trxLoading, transactions } = useUserTransactions(params.id);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
+  const [processing, setProcessing] = useState(false);
 
   const [opened, { open, close }] = useDisclosure(false);
+  const [activateOpened, { open: activateOpen, close: activateClose }] =
+    useDisclosure(false);
+  const [deactivateOpened, { open: deactivateOpen, close: deactivateClose }] =
+    useDisclosure(false);
+  const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
+    useDisclosure(false);
+  const [unfreezeOpened, { open: unfreezeOpen, close: unfreezeClose }] =
+    useDisclosure(false);
 
-  console.log({ account });
+  const requestForm = useForm({
+    initialValues: {
+      reason: "",
+      supportingDocumentName: "",
+      supportingDocumentUrl: "",
+    },
+    validate: zodResolver(validateRequest),
+  });
+
+  const requestFunc = async (
+    type: "freeze" | "unfreeze" | "deactivate" | "activate"
+  ) => {
+    setProcessing(true);
+    try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+      const { hasErrors } = requestForm.validate();
+      if (hasErrors) return;
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${params.id}/${type}`,
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      const message =
+        type === "freeze"
+          ? "Freeze account request submitted"
+          : type === "unfreeze"
+          ? "Unfreeze account request submitted"
+          : type === "deactivate"
+          ? "Deactivate account request submitted"
+          : "Activate account request submitted";
+
+      revalidate();
+      handleSuccess("Action Completed", message);
+
+      if (type === "freeze") freezeClose();
+      if (type === "unfreeze") unfreezeClose();
+      if (type === "deactivate") deactivateClose();
+      if (type === "activate") activateClose();
+
+      requestForm.reset();
+    } catch (error) {
+      const message =
+        type === "freeze"
+          ? "Freeze account request failed"
+          : type === "unfreeze"
+          ? "Unfreeze account request failed"
+          : type === "deactivate"
+          ? "Deactivate account request failed"
+          : "Activate account request failed";
+      handleError(message, parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <main className={styles.main}>
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
-          { title: "Issued Accounts", href: "/accounts" },
+          { title: "Issued Accounts", href: "/accounts?tab=Issued Accounts" },
           {
             title: account?.accountName || "",
             href: `/accounts/${params.id}`,
@@ -99,16 +176,37 @@ export default function Account() {
         </Group>
 
         <Flex gap={10}>
-          {/* <Button
-            fz={12}
-            className={styles.main__cta}
-            variant="filled"
-            color="#C1DD06"
-          >
-            Freeze Account
-          </Button> */}
+          <PrimaryBtn
+            text="Debit Account"
+            fw={600}
+            action={open}
+            display={account?.status === "ACTIVE" ? "" : "none"}
+          />
 
-          <PrimaryBtn text="Debit Account" fw={600} action={open} />
+          {account?.status !== "FROZEN" && (
+            <PrimaryBtn
+              text={account?.status === "ACTIVE" ? "Deactivate" : "Reactivate"}
+              fw={600}
+              action={
+                account?.status === "ACTIVE" ? deactivateOpen : activateOpen
+              }
+              color={account?.status === "ACTIVE" ? "#D92D20" : "#027A48"}
+              c="#fff"
+              loading={loading}
+            />
+          )}
+
+          {account?.status === "ACTIVE" && (
+            <SecondaryBtn text="Freeze Account" fw={600} action={freezeOpen} />
+          )}
+
+          {account?.status === "FROZEN" && (
+            <SecondaryBtn
+              text="Unfreeze Account"
+              fw={600}
+              action={unfreezeOpen}
+            />
+          )}
         </Flex>
       </Flex>
 
@@ -133,304 +231,54 @@ export default function Account() {
           accountBalance={account?.accountBalance}
         />
       </Modal>
+
+      <ModalComponent
+        processing={processing}
+        action={() => requestFunc("freeze")}
+        color="#F2F4F7"
+        icon={<IconBrandLinktree color="#344054" />}
+        opened={freezeOpened}
+        close={freezeClose}
+        title="Freeze this Account?"
+        form={requestForm}
+        text="You are about to request for this account to be frozen. This means no activity can be carried out in the account anymore. Please state your reason below"
+      />
+
+      <ModalComponent
+        processing={processing}
+        action={() => requestFunc("unfreeze")}
+        color="#F2F4F7"
+        icon={<IconBrandLinktree color="#344054" />}
+        opened={unfreezeOpened}
+        close={unfreezeClose}
+        form={requestForm}
+        title="Unfreeze this Account?"
+        text="You are about to request for this account to be unfrozen. This means full activity can be carried out in the account again. Please state your reason below"
+      />
+
+      <ModalComponent
+        processing={processing}
+        action={() => requestFunc("deactivate")}
+        color="#FEF3F2"
+        icon={<IconX color="#D92D20" />}
+        opened={deactivateOpened}
+        close={deactivateClose}
+        form={requestForm}
+        title="Deactivate This Account?"
+        text="You are about to request for this account to be deactivated. This means the account will be inactive. Please state your reason below"
+      />
+
+      <ModalComponent
+        processing={processing}
+        action={() => requestFunc("activate")}
+        color="#ECFDF3"
+        icon={<IconCheck color="#12B76A" />}
+        opened={activateOpened}
+        close={activateClose}
+        form={requestForm}
+        title="Activate This Account?"
+        text="You are about to request for this account to be activated. This means the account will become active. Please state your reason below"
+      />
     </main>
   );
 }
-
-//  <div className={styles.grid__container}>
-//    <Grid>
-//      <GridCol span={9}>
-//        <Flex className={styles.overview__container} direction="column">
-//          <Flex className={styles.container__header}>
-//            <Text fz={16} c="#1A1B20">
-//              Account Overview
-//            </Text>
-//          </Flex>
-
-//          <Flex className={styles.container__body} gap={30}>
-//            <Flex flex={1} direction="column" gap={10}>
-//              <Flex gap={10} align="center">
-//                <Text className={styles.body__text__header}>Euro Account</Text>
-//              </Flex>
-
-//              <Text className={styles.body__text} fz={24} fw={600}>
-//                {formatNumber(account?.accountBalance || 0, true, "EUR")}
-//              </Text>
-//            </Flex>
-
-//            <Flex flex={1} direction="column" gap={10}>
-//              <Flex gap={10} align="center">
-//                <Text className={styles.body__text__header}>
-//                  Dollar Accounts
-//                </Text>
-//              </Flex>
-
-//              <Text className={styles.body__text} fz={24} fw={600}>
-//                {formatNumber(0, true, "EUR")}
-//              </Text>
-//            </Flex>
-
-//            <Flex flex={1} direction="column" gap={10}>
-//              <Flex gap={10} align="center">
-//                <Text className={styles.body__text__header}>Pound Accounts</Text>
-//              </Flex>
-
-//              <Text className={styles.body__text} fz={24} fw={600}>
-//                {formatNumber(0, true, "EUR")}
-//              </Text>
-//            </Flex>
-//          </Flex>
-//        </Flex>
-//      </GridCol>
-
-//      <GridCol span={3}>
-//        <Grid>
-//          <GridCol span={12}>
-//            <Paper className={styles.card__one__container}>
-//              <Flex direction="column" className={styles.card__one}>
-//                <Flex className={styles.card__one__header} align="center">
-//                  <Text fw={600} fz={16}>
-//                    Bank Details
-//                  </Text>
-//                </Flex>
-
-//                <Flex
-//                  className={styles.card__one__body}
-//                  direction="column"
-//                  gap={20}
-//                >
-//                  <Flex justify="space-between">
-//                    <Text className={styles.body__title}>Account Name</Text>
-//                    {loading ? (
-//                      <Skeleton h={10} w={100} />
-//                    ) : (
-//                      <Text className={styles.body__text}>
-//                        {account?.accountName || ""}
-//                      </Text>
-//                    )}
-//                  </Flex>
-
-//                  {/* <Divider my="sm" /> */}
-
-//                  <Flex justify="space-between">
-//                    <Text className={styles.body__title}>Account Number</Text>
-//                    {loading ? (
-//                      <Skeleton h={10} w={100} />
-//                    ) : (
-//                      <Text className={styles.body__text}>
-//                        {account?.accountNumber || ""}
-//                      </Text>
-//                    )}
-//                  </Flex>
-//                </Flex>
-//              </Flex>
-//              {/* <Button
-//                     fz={11}
-//                     td="underline"
-//                     variant="transparent"
-//                     rightSection={<IconArrowRight size={14} />}
-//                     color="#97AD05"
-//                   >
-//                     View Documents
-//                   </Button> */}
-//            </Paper>
-//          </GridCol>
-//        </Grid>
-//      </GridCol>
-
-//      <GridCol span={8} mih={300}>
-//        <Paper style={{ border: "1px solid #f5f5f5" }} py={20} h="100%" px={14}>
-//          <Flex px={10} justify="space-between" align="center">
-//            <Text fz={16} fw={600}>
-//              Transaction Statistics
-//            </Text>
-
-//            <Flex gap={22}>
-//              <Flex align="center" gap={5} p={5} px={8}>
-//                <IconSquareFilled color="#D92D20" size={14} />
-//                <Text fz={12}>Outflow</Text>
-//              </Flex>
-
-//              <Flex align="center" gap={5} p={5} px={8}>
-//                <IconSquareFilled color="#D5E855" size={14} />
-//                <Text fz={12}>Inflow</Text>
-//              </Flex>
-
-//              <NativeSelect
-//                classNames={{
-//                  wrapper: styles.select__wrapper,
-//                  input: styles.select__input,
-//                }}
-//                onChange={(event) =>
-//                  setChartFrequency(event.currentTarget.value)
-//                }
-//                data={["Monthly"]}
-//              />
-//            </Flex>
-//          </Flex>
-
-//          {lineData.length > 0 ? (
-//            // <BarChart
-//            //   pr={20}
-//            //   mt={31}
-//            //   h={300}
-//            //   data={chartFrequency === "Monthly" ? lineData : weekData}
-//            //   dataKey={chartFrequency === "Monthly" ? "month" : "day"}
-//            //   barProps={{ barSize: 10, radius: 3 }}
-//            //   series={[
-//            //     { name: "failed", color: "#039855" },
-//            //     { name: "successful", color: "#D92D20" },
-//            //     { name: "pending", color: "#F79009" },
-//            //   ]}
-//            //   tickLine="y"
-//            // />
-
-//            <AreaChart
-//              h={250}
-//              mt={30}
-//              curveType="bump"
-//              data={lineData}
-//              dataKey="date"
-//              series={[
-//                { name: "inflow", color: "#D5E855" },
-//                { name: "outflow", color: "#D92D20" },
-//              ]}
-//            />
-//          ) : (
-//            <Flex direction="column" align="center" mt={70}>
-//              <Image
-//                src={EmptyImage}
-//                alt="no content"
-//                width={156}
-//                height={126}
-//              />
-//              <Text mt={14} fz={14} c="#1D2939">
-//                There are no transactions.
-//              </Text>
-//              <Text fz={10} c="#667085">
-//                When a transaction is recorded, it will appear here
-//              </Text>
-//            </Flex>
-//          )}
-//        </Paper>
-//      </GridCol>
-
-//      <GridCol span={4}>
-//        <Paper style={{ border: "1px solid #f5f5f5" }} py={20} h="100%" px={16}>
-//          <Flex px={10} justify="space-between" align="center">
-//            <Text fz={16} fw={600}>
-//              Transaction Volume
-//            </Text>
-
-//            <Flex>
-//              <NativeSelect
-//                classNames={{
-//                  wrapper: styles.select__wrapper,
-//                  input: styles.select__input,
-//                }}
-//                onChange={(event) =>
-//                  setChartFrequency(event.currentTarget.value)
-//                }
-//                data={["Monthly", "Weekly"]}
-//              />
-//            </Flex>
-//          </Flex>
-
-//          <Flex justify="center" my={37}>
-//            <DonutChart
-//              startAngle={180}
-//              endAngle={0}
-//              // paddingAngle={4}
-//              data={donutData}
-//              chartLabel={donutData.reduce((prv, cur) => {
-//                return cur.value + prv;
-//              }, 0)}
-//              size={200}
-//              thickness={20}
-//            />
-//          </Flex>
-
-//          <Flex px={10} gap={15} mt={-50}>
-//            {donutData.map((item, index) => {
-//              return (
-//                <Flex
-//                  style={{ borderLeft: `3px solid ${item.color}` }}
-//                  flex={1}
-//                  key={index}
-//                  direction="column"
-//                  pl={10}
-//                >
-//                  <Flex align="center" gap={5}>
-//                    {/* <IconSquareFilled color={item.color} size={14} /> */}
-//                    <Text fz={12} c="#98A2B3">
-//                      {item.name}
-//                    </Text>
-//                  </Flex>
-
-//                  <Text fz={12} fw={600}>
-//                    {formatNumber(item.value, true, "EUR")}
-//                  </Text>
-//                </Flex>
-//              );
-//            })}
-//          </Flex>
-//        </Paper>
-//      </GridCol>
-
-//      <GridCol span={12}>
-//        <Paper
-//          style={{ border: "1px solid #f5f5f5" }}
-//          className={styles.payout__table}
-//        >
-//          <Flex justify="space-between" align="center">
-//            <Text className={styles.table__text} fz={16} fw={600}>
-//              Recent Transactions
-//            </Text>
-
-//            <Link href={`/accounts/${account?.id}/transactions`}>
-//              <Text td="underline" c="#758604" fz={12} fw={600}>
-//                See All Transactions
-//              </Text>
-//            </Link>
-//          </Flex>
-
-//          <TableScrollContainer
-//            className={styles.table__container}
-//            minWidth={500}
-//          >
-//            <Table className={styles.table} verticalSpacing="md">
-//              {/* <TableTbody>{rows}</TableTbody> */}
-//              <TableThead>
-//                <TableTr>
-//                  <TableTh className={styles.table__th}>Recipient IBAN</TableTh>
-//                  <TableTh className={styles.table__th}>Bank</TableTh>
-//                  <TableTh className={styles.table__th}>Date Created</TableTh>
-//                  <TableTh className={styles.table__th}>Amount</TableTh>
-//                  <TableTh className={styles.table__th}>Reference</TableTh>
-//                  <TableTh className={styles.table__th}>Status</TableTh>
-//                </TableTr>
-//              </TableThead>
-//              <TableTbody>{loading ? DynamicSkeleton(1) : rows}</TableTbody>
-//            </Table>
-
-//            {!loading && !!!rows.length && (
-//              <Flex direction="column" align="center" mt={50}>
-//                <Image
-//                  src={EmptyImage}
-//                  alt="no content"
-//                  width={126}
-//                  height={96}
-//                />
-//                <Text mt={14} fz={14} c="#1D2939">
-//                  There are no transactions.
-//                </Text>
-//                <Text fz={10} c="#667085">
-//                  When a transaction is recorded, it will appear here
-//                </Text>
-//              </Flex>
-//            )}
-//          </TableScrollContainer>
-//        </Paper>
-//      </GridCol>
-//    </Grid>
-//  </div>;

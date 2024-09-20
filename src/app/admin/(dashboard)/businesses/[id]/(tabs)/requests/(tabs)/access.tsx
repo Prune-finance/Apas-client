@@ -28,7 +28,7 @@ export const Access = () => {
     <div className={styles.business__tab}>
       {payoutRequests.length === 0 && requests.length === 0 && (
         <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
-          No Access Request
+          No Service Request
         </Text>
       )}
       {payoutRequests.map((req, index) => (

@@ -65,7 +65,7 @@ function Accounts() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { status, createdAt, sort, type } = Object.fromEntries(
+  const { status, createdAt, sort, type, tab } = Object.fromEntries(
     searchParams.entries()
   );
 
@@ -258,79 +258,79 @@ function Accounts() {
     }
   };
 
-  const MenuComponent = ({ id, status }: { id: string; status: string }) => {
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
-          </UnstyledButton>
-        </MenuTarget>
+  // const MenuComponent = ({ id, status }: { id: string; status: string }) => {
+  //   return (
+  //     <Menu shadow="md" width={150}>
+  //       <MenuTarget>
+  //         <UnstyledButton>
+  //           <IconDots size={17} />
+  //         </UnstyledButton>
+  //       </MenuTarget>
 
-        <MenuDropdown>
-          {/* <Link href={`/accounts/${id}`}>
-            <MenuItem
-              fz={10}
-              c="#667085"
-              leftSection={
-                <IconEye style={{ width: rem(14), height: rem(14) }} />
-              }
-            >
-              View
-            </MenuItem>
-          </Link> */}
+  //       <MenuDropdown>
+  //         {/* <Link href={`/accounts/${id}`}>
+  //           <MenuItem
+  //             fz={10}
+  //             c="#667085"
+  //             leftSection={
+  //               <IconEye style={{ width: rem(14), height: rem(14) }} />
+  //             }
+  //           >
+  //             View
+  //           </MenuItem>
+  //         </Link> */}
 
-          {status === "ACTIVE" && (
-            <MenuItem
-              onClick={() => {
-                setRowId(id);
-                debitOpen();
-              }}
-              fz={10}
-              c="#667085"
-              leftSection={
-                <IconArrowDownLeft
-                  style={{ width: rem(14), height: rem(14) }}
-                />
-              }
-            >
-              Debit Account
-            </MenuItem>
-          )}
+  //         {status === "ACTIVE" && (
+  //           <MenuItem
+  //             onClick={() => {
+  //               setRowId(id);
+  //               debitOpen();
+  //             }}
+  //             fz={10}
+  //             c="#667085"
+  //             leftSection={
+  //               <IconArrowDownLeft
+  //                 style={{ width: rem(14), height: rem(14) }}
+  //               />
+  //             }
+  //           >
+  //             Debit Account
+  //           </MenuItem>
+  //         )}
 
-          <MenuItem
-            onClick={() => {
-              setRowId(id);
-              if (status === "FROZEN") return unfreezeOpen();
-              freezeOpen();
-            }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconBrandLinktree style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            {status === "FROZEN" ? "Unfreeze" : "Freeze"}
-          </MenuItem>
+  //         <MenuItem
+  //           onClick={() => {
+  //             setRowId(id);
+  //             if (status === "FROZEN") return unfreezeOpen();
+  //             freezeOpen();
+  //           }}
+  //           fz={10}
+  //           c="#667085"
+  //           leftSection={
+  //             <IconBrandLinktree style={{ width: rem(14), height: rem(14) }} />
+  //           }
+  //         >
+  //           {status === "FROZEN" ? "Unfreeze" : "Freeze"}
+  //         </MenuItem>
 
-          <MenuItem
-            onClick={() => {
-              setRowId(id);
-              if (status === "INACTIVE") return activateOpen();
-              open();
-            }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconTrash style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            {status === "INACTIVE" ? "Activate" : "Deactivate"}
-          </MenuItem>
-        </MenuDropdown>
-      </Menu>
-    );
-  };
+  //         <MenuItem
+  //           onClick={() => {
+  //             setRowId(id);
+  //             if (status === "INACTIVE") return activateOpen();
+  //             open();
+  //           }}
+  //           fz={10}
+  //           c="#667085"
+  //           leftSection={
+  //             <IconTrash style={{ width: rem(14), height: rem(14) }} />
+  //           }
+  //         >
+  //           {status === "INACTIVE" ? "Activate" : "Deactivate"}
+  //         </MenuItem>
+  //       </MenuDropdown>
+  //     </Menu>
+  //   );
+  // };
 
   const rows = filteredSearch(
     accounts,
@@ -432,7 +432,13 @@ function Accounts() {
           </Text>
         </div>
 
-        <TabsComponent tabs={tabs} mt={32}>
+        <TabsComponent
+          tabs={tabs}
+          mt={32}
+          defaultValue={
+            tabs.find((_tab) => _tab.value === tab)?.value ?? tabs[0].value
+          }
+        >
           <TabsPanel value={tabs[0].value}>
             <SimpleGrid cols={3} mt={32}>
               <AccountCard

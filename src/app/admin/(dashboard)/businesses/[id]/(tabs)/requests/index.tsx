@@ -16,7 +16,7 @@ export const Requests = ({ business }: { business: BusinessData | null }) => {
       mt={32}
       styles={{ list: { marginBottom: 28 } }}
     >
-      <TabsPanel value="access">
+      <TabsPanel value="services">
         <Access />
       </TabsPanel>
 
@@ -32,7 +32,7 @@ export const Requests = ({ business }: { business: BusinessData | null }) => {
 };
 
 const tabs = [
-  { value: "access" },
+  { value: "services" },
   { value: "debit" },
   { value: "other requests" },
 ];

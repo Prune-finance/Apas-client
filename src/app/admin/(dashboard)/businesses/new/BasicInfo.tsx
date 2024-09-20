@@ -15,7 +15,7 @@ import { NewBusinessType } from "@/lib/schema";
 import { IconMail, IconWorldWww } from "@tabler/icons-react";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import DropzoneComponent from "@/ui/components/Dropzone";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { SelectCountryDialCode } from "@/ui/components/SelectDropdownSearch";
 
 type Props = {
@@ -28,6 +28,7 @@ export default function BasicInfo({ form }: Props) {
     label: plan.name,
     value: plan.id,
   }));
+  const [firstLoad, setFirstLoad] = useState(true);
 
   const select = (
     <SelectCountryDialCode
@@ -62,6 +63,11 @@ export default function BasicInfo({ form }: Props) {
   // );
 
   useEffect(() => {
+    if (firstLoad) {
+      setFirstLoad(false);
+      return;
+    }
+
     if (form.values.contactCountryCode) {
       const [code] = form.values.contactCountryCode.split("-");
       form.setFieldValue("contactNumber", `${code}`);

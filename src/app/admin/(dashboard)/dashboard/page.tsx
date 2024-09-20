@@ -303,20 +303,6 @@ export default function Home() {
 
                       <TableComponent
                         head={IssuedAccountTableHeaders}
-                        // rows={rows}
-                        rows={
-                          <IssuedTransactionTableRows
-                            data={transactions.slice(0, 4)}
-                            active={1}
-                            limit={null}
-                            searchProps={[
-                              "senderIban",
-                              "recipientIban",
-                              "reference",
-                            ]}
-                            search=""
-                          />
-                        }
                         loading={loadingTrx}
                         noBg
                       />

@@ -682,7 +682,7 @@ export const SingleDefaultAccountBody = ({
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
     "No. of Transaction": transactions.length,
     Currency: "EUR",
-    ...(business && { "Created By": business?.name }),
+    ...(business && !payout && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
     [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
       business?.lastLogin

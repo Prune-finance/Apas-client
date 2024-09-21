@@ -14,9 +14,11 @@ import {
   Group,
   Skeleton,
   ScrollArea,
+  Alert,
 } from "@mantine/core";
 import {
   IconCircleArrowDown,
+  IconInfoCircleFilled,
   IconReload,
   IconReportSearch,
   IconX,
@@ -33,11 +35,14 @@ import {
   ReceiptDetails,
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import Transaction from "@/lib/store/transaction";
+import { InquiryModal } from "./InquiryModal";
+import { useDisclosure } from "@mantine/hooks";
+import ModalComponent from "@/ui/components/Modal";
 
 interface TransactionDrawerProps {
   data: TransactionType | null;
@@ -48,6 +53,15 @@ interface TransactionDrawerProps {
 export const PayoutTransactionDrawer = () => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const { data, close, opened, clearData } = Transaction();
+  const [openedModal, { open, close: closeModal }] = useDisclosure(false);
+  const [openedCancel, { open: openCancel, close: closeCancel }] =
+    useDisclosure(false);
+
+  const [inquiryType, setInquiryType] = useState<
+    "recall" | "query" | "trace"
+  >();
+  const [cancelReason, setCancelReason] = useState("");
+  const [processing, setProcessing] = useState(false);
 
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     data?.id ?? ""
@@ -142,14 +156,7 @@ export const PayoutTransactionDrawer = () => {
     const diff = now.diff(dayjs(createdAt), "hour");
 
     return diff > 24;
-
-    // const now = new Date();
-    // const diff = now.getTime() - createdAt.getTime();
-    // const hours = Math.floor(diff / (1000 * 60 * 60));
-    // return hours > 12;
   };
-
-  console.log(isAfter24Hours(data?.createdAt ?? new Date()));
 
   return (
     <Drawer
@@ -172,6 +179,18 @@ export const PayoutTransactionDrawer = () => {
       <Divider mb={20} />
       <Box px={28} pb={28}>
         <ScrollArea h="calc(100vh - 145px)" scrollbars="y" scrollbarSize={1}>
+          {data?.status === "CANCELLED" && (
+            <Alert
+              title="This transaction has been  cancelled. The money has been reverted"
+              icon={<IconInfoCircleFilled />}
+              color="#D92D20"
+              variant="light"
+              mb={28}
+              radius={8}
+              styles={{ title: { fontSize: "12px" } }}
+              style={{ border: "1px solid #d92d20" }}
+            ></Alert>
+          )}
           <Flex align="center" justify="space-between">
             <Flex direction="column">
               <Text c="var(--prune-text-gray-500)" fz={12}>
@@ -304,11 +323,32 @@ export const PayoutTransactionDrawer = () => {
         <Flex wrap="nowrap" gap={10} justify="space-between">
           {data && isAfter24Hours(data?.createdAt) && (
             <>
-              <SecondaryBtn text="Query" icon={IconReportSearch} />
+              <SecondaryBtn
+                text="Query"
+                icon={IconReportSearch}
+                action={() => {
+                  setInquiryType("query");
+                  open();
+                }}
+              />
 
-              <SecondaryBtn text="Run Trace" icon={IconReportSearch} />
+              <SecondaryBtn
+                text="Run Trace"
+                icon={IconReportSearch}
+                action={() => {
+                  setInquiryType("trace");
+                  open();
+                }}
+              />
 
-              <SecondaryBtn text="Recall" icon={IconReload} />
+              <SecondaryBtn
+                text="Recall"
+                icon={IconReload}
+                action={() => {
+                  setInquiryType("recall");
+                  open();
+                }}
+              />
             </>
           )}
 
@@ -319,7 +359,7 @@ export const PayoutTransactionDrawer = () => {
               color="#D92D20"
               c="#fff"
               fw={600}
-              action={() => handlePdfDownload(pdfRef)}
+              action={openCancel}
             />
           ) : (
             <PrimaryBtn
@@ -334,6 +374,28 @@ export const PayoutTransactionDrawer = () => {
           )}
         </Flex>
       </Box>
+
+      <InquiryModal
+        pruneRef={data?.centrolinkRef ?? ""}
+        opened={openedModal}
+        close={closeModal}
+        type={inquiryType}
+      />
+
+      <ModalComponent
+        opened={openedCancel}
+        close={closeCancel}
+        title="Cancel This Transaction"
+        text="By cancelling this transaction, the money will be reverted back to the holding account. Please give your reason below."
+        addReason
+        setReason={setCancelReason}
+        reason={cancelReason}
+        action={() => {}}
+        icon={<IconX color="#D92D20" />}
+        color="#FEF3F2"
+        processing={processing}
+        customApproveMessage="Submit"
+      />
 
       <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
         <TransactionReceipt

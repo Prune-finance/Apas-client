@@ -528,4 +528,5 @@ export interface TransactionType {
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
   company: BusinessData;
+  narration?: string;
 }

@@ -20,14 +20,18 @@ import { BadgeComponent } from "../../Badge";
 import Transaction from "@/lib/store/transaction";
 import { AccountTransactionDrawer } from "./drawer";
 import { PayoutDrawer } from "@/app/(dashboard)/payouts/drawer";
-import { IssuedAccountTableHeaders } from "@/lib/static";
+import { IssuedAccountTableHeaders, PayoutTableHeaders } from "@/lib/static";
 import { AmountGroup } from "../../AmountGroup";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
-import { IssuedTransactionTableRows } from "../../TableRows";
+import {
+  IssuedTransactionTableRows,
+  PayoutTransactionTableRows,
+} from "../../TableRows";
 import { useState } from "react";
 import { useDebouncedValue } from "@mantine/hooks";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "../../Pagination";
+import { PayoutTransactionDrawer } from "@/app/(dashboard)/payouts/PayoutDrawer";
 
 interface Props {
   transactions: TransactionType[];
@@ -90,7 +94,13 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
       <TableComponent
         rows={
           payout ? (
-            <PayoutRowComponent data={transactions} />
+            <PayoutTransactionTableRows
+              data={transactions}
+              active={active}
+              limit={limit}
+              searchProps={searchProps}
+              search={debouncedSearch}
+            />
           ) : (
             <IssuedTransactionTableRows
               data={transactions}
@@ -101,7 +111,7 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
             />
           )
         }
-        head={payout ? payoutTableHeaders : IssuedAccountTableHeaders}
+        head={payout ? PayoutTableHeaders : IssuedAccountTableHeaders}
         loading={loading}
       />
 
@@ -131,116 +141,9 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         />
       )}
 
-      {payout && <PayoutDrawer />}
+      {payout && <PayoutTransactionDrawer />}
     </>
   );
 };
 
-const tableHeaders = [
-  "Beneficiary",
-  "IBAN",
-  // "Account Number",
-  "Amount",
-  "Date",
-  "Status",
-];
-
-const payoutTableHeaders = [
-  "Beneficiary Name",
-  "Destination Account",
-  "Ultimate Debtor",
-  "Amount",
-  "Date & Time",
-  "Status",
-];
-
 const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];
-
-const RowComponent = ({
-  data,
-}: // id,
-{
-  data: TransactionType[];
-  // id: string;
-}) => {
-  const { push } = useRouter();
-  const handleRowClick = (id: string) => {
-    push(`/admin/accounts/${id}/transactions`);
-  };
-
-  const { setData, open } = Transaction();
-  return data.map((element) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        // handleRowClick(element.id);
-        setData(element);
-        open();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd>{element.senderIban}</TableTd>
-      {/* <TableTd>{"N/A"}</TableTd> */}
-      <TableTd>{element.recipientName || element.recipientIban}</TableTd>
-      <TableTd>
-        <AmountGroup type={element.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
-      <TableTd>{element.reference}</TableTd>
-
-      <TableTd>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-};
-
-const PayoutRowComponent = ({
-  data,
-}: // id,
-{
-  data: TransactionType[];
-  // id: string;
-}) => {
-  const { push } = useRouter();
-  const handleRowClick = (id: string) => {
-    push(`/admin/accounts/${id}/transactions`);
-  };
-
-  const { setData, open } = Transaction();
-  return data?.reverse().map((element) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        // handleRowClick(element.id);
-        setData(element);
-        open();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd>
-        {element.destinationFirstName && element.destinationLastName
-          ? `${element.destinationFirstName} ${element.destinationLastName}`
-          : "N/A"}
-      </TableTd>
-      <TableTd>{element.recipientIban}</TableTd>
-      <TableTd>{element.intermediary ?? "N/A"}</TableTd>
-      <TableTd>
-        <Group gap={3}>
-          <IconArrowUpRight color="#D92D20" size={16} />
-          {formatNumber(element.amount, true, "EUR")}
-          {/* <Text fz={12}></Text> */}
-        </Group>
-      </TableTd>
-      <TableTd>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-};

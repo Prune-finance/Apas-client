@@ -21,7 +21,8 @@ export default function SingleUserPayoutAccount() {
 
   const { business, loading: loadingBiz } = useUserBusiness();
 
-  const { transactions, loading: trxLoading } = useUserTransactions(params.id);
+  const { transactions, loading: trxLoading } = useUserTransactions();
+  // const { transactions, loading: trxLoading } = useUserTransactions(params.id);
 
   return (
     <main>

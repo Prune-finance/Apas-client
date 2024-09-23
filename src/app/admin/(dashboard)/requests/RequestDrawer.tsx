@@ -9,6 +9,7 @@ import {
   Divider,
   Drawer,
   Flex,
+  Modal,
   Stack,
   Text,
   TextInput,
@@ -32,6 +33,7 @@ import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
+import FileDisplay from "@/ui/components/DocumentViewer";
 
 type Props = {
   opened: boolean;
@@ -247,34 +249,55 @@ interface DocumentInputProps {
 
 const DocumentInput = ({ url, label, placeholder }: DocumentInputProps) => {
   const { handleInfo } = useNotification();
-  return (
-    <TextInput
-      readOnly
-      classNames={{
-        input: styles.input,
-        label: styles.label,
-        section: styles.section,
-      }}
-      leftSection={<IconPdf />}
-      leftSectionPointerEvents="none"
-      rightSectionPointerEvents="auto"
-      rightSection={
-        <UnstyledButton
-          onClick={() => {
-            notifications.clean();
-            if (!url) return handleInfo("No supporting document found", "");
+  const [opened, { open, close }] = useDisclosure(false);
 
-            window.open(url || "", "_blank");
-          }}
-          className={styles.input__right__section}
-        >
-          <Text fw={600} fz={10} c="#475467">
-            View
+  return (
+    <>
+      <TextInput
+        readOnly
+        classNames={{
+          input: styles.input,
+          label: styles.label,
+          section: styles.section,
+        }}
+        leftSection={<IconPdf />}
+        leftSectionPointerEvents="none"
+        rightSectionPointerEvents="auto"
+        rightSection={
+          <UnstyledButton
+            // onClick={() => {
+            //   notifications.clean();
+            //   if (!url) return handleInfo("No supporting document found", "");
+
+            //   window.open(url || "", "_blank");
+            // }}
+            onClick={open}
+            className={styles.input__right__section}
+          >
+            <Text fw={600} fz={10} c="#475467">
+              View
+            </Text>
+          </UnstyledButton>
+        }
+        label={label}
+        placeholder={placeholder}
+      />
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        size={800}
+        centered
+        title={
+          <Text fz={14} fw={500}>
+            Document Preview
           </Text>
-        </UnstyledButton>
-      }
-      label={label}
-      placeholder={placeholder}
-    />
+        }
+      >
+        <Box>
+          <FileDisplay fileUrl={(url as string) || ""} />
+        </Box>
+      </Modal>
+    </>
   );
 };

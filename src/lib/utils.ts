@@ -19,6 +19,7 @@ export const formatNumber = (
 export const activeBadgeColor = (status: string) => {
   if (status === "ACTIVE") return "#12B76A";
   if (status === "FROZEN") return "#344054";
+  if (status === "PENDING") return "#C6A700";
   return "#D92D20";
 };
 
@@ -39,8 +40,10 @@ export const approvedBadgeColor = (status: string) => {
       return "#12B76A";
     case status === "REJECTED" || status === "CANCELLED" || status === "FAILED":
       return "#FF4D4F";
-    case status === "PENDING":
+    case status === "PENDING" || status === "PROCESSING":
       return "#C6A700";
+    case status === "CLOSED":
+      return "#0065FF";
     case status === "FROZEN":
       return "#344054";
     default:

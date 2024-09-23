@@ -1,37 +1,32 @@
-import {
-  DebitRequest,
-  IUserRequest,
-  useCompanyDebitRequests,
-} from "@/lib/hooks/requests";
+import { IUserRequest } from "@/lib/hooks/requests";
 import {
   Box,
-  Button,
   Divider,
   Drawer,
   Flex,
+  Modal,
   Stack,
   Text,
   TextInput,
   UnstyledButton,
 } from "@mantine/core";
-import { IconCheck, IconPdf, IconX } from "@tabler/icons-react";
+import { IconCheck, IconFileTypePdf, IconX } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import styles from "@/ui/styles/accounts.module.scss";
+// import styles from "@/ui/styles/singlebusiness.module.scss";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
-import { useState } from "react";
-import { formatNumber } from "@/lib/utils";
+
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
-import { parseError } from "@/lib/actions/auth";
-import axios from "axios";
+
 import useNotification from "@/lib/hooks/notification";
-import Cookies from "js-cookie";
-import { notifications } from "@mantine/notifications";
+
+import FileDisplay from "@/ui/components/DocumentViewer";
 
 type Props = {
   opened: boolean;
@@ -186,19 +181,19 @@ export default function RequestDrawer({
             </Text>
           ))}
 
-        <Stack>
-          {selectedRequest?.adminSupportingDocumentName && (
+        <Stack mt={20}>
+          {selectedRequest?.adminSupportingDocumentUrl && (
             <DocumentInput
               url={selectedRequest.adminSupportingDocumentUrl}
-              placeholder={selectedRequest.adminSupportingDocumentName}
+              placeholder={`${selectedRequest.Account.accountName} - Admin Supporting Document`}
               label="Admin Supporting Document"
             />
           )}
 
-          {selectedRequest?.supportingDocumentName && (
+          {selectedRequest?.supportingDocumentUrl && (
             <DocumentInput
               url={selectedRequest.supportingDocumentUrl}
-              placeholder={selectedRequest.supportingDocumentName}
+              placeholder={`${selectedRequest.Account.accountName} - Supporting Document`}
               label="Supporting Document"
             />
           )}
@@ -247,34 +242,56 @@ interface DocumentInputProps {
 
 const DocumentInput = ({ url, label, placeholder }: DocumentInputProps) => {
   const { handleInfo } = useNotification();
-  return (
-    <TextInput
-      readOnly
-      classNames={{
-        input: styles.input,
-        label: styles.label,
-        section: styles.section,
-      }}
-      leftSection={<IconPdf />}
-      leftSectionPointerEvents="none"
-      rightSectionPointerEvents="auto"
-      rightSection={
-        <UnstyledButton
-          onClick={() => {
-            notifications.clean();
-            if (!url) return handleInfo("No supporting document found", "");
+  const [opened, { open, close }] = useDisclosure(false);
 
-            window.open(url || "", "_blank");
-          }}
-          className={styles.input__right__section}
-        >
-          <Text fw={600} fz={10} c="#475467">
-            View
+  return (
+    <>
+      <TextInput
+        readOnly
+        classNames={{
+          input: styles.input,
+          label: styles.label,
+          section: styles.section,
+        }}
+        leftSection={<IconFileTypePdf />}
+        leftSectionPointerEvents="none"
+        rightSectionPointerEvents="auto"
+        rightSectionWidth={70}
+        rightSection={
+          <UnstyledButton
+            // onClick={() => {
+            //   notifications.clean();
+            //   if (!url) return handleInfo("No supporting document found", "");
+
+            //   window.open(url || "", "_blank");
+            // }}
+            onClick={open}
+            className={styles.input__right__section}
+          >
+            <Text fw={600} fz={10} c="#475467">
+              View
+            </Text>
+          </UnstyledButton>
+        }
+        label={label}
+        placeholder={placeholder}
+      />
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        size={800}
+        centered
+        title={
+          <Text fz={14} fw={500}>
+            Document Preview
           </Text>
-        </UnstyledButton>
-      }
-      label={label}
-      placeholder={placeholder}
-    />
+        }
+      >
+        <Box>
+          <FileDisplay fileUrl={(url as string) || ""} />
+        </Box>
+      </Modal>
+    </>
   );
 };

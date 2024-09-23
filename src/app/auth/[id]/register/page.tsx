@@ -8,7 +8,6 @@ import { CardOne, CardThree, CardTwo } from "./cards";
 
 import FormComponent from "./form";
 import { checkToken } from "@/lib/actions/server";
-import Link from "next/link";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 
 type Props = {
@@ -154,7 +153,8 @@ export default async function Register({ params }: Props) {
                 p={0}
                 m={0}
                 c="var(--prune-primary-800)"
-                link="https://app.prunepayments.com/docs/termsofService.pdf"
+                link="https://prunepayments.com/terms-and-conditions"
+                // link="https://app.prunepayments.com/docs/termsofService.pdf"
                 h={"auto"}
               />
             </Flex>

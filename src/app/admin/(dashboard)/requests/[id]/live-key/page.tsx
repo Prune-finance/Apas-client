@@ -11,6 +11,7 @@ import {
   Group,
   Select,
   SimpleGrid,
+  Skeleton,
   Stack,
   TableTd,
   TableTr,
@@ -42,6 +43,8 @@ import ModalComponent from "@/ui/components/Modal";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import Cookies from "js-cookie";
+import { useLiveKeyRequests } from "@/lib/hooks/requests";
+import { useSingleBusiness } from "@/lib/hooks/businesses";
 
 export default function SingleLiveKey() {
   const { id } = useParams<{ id: string }>();
@@ -56,6 +59,11 @@ export default function SingleLiveKey() {
     useDisclosure(false);
   const [openedReject, { open: openReject, close: closeReject }] =
     useDisclosure(false);
+
+  const { requests, revalidate, meta, loading } = useLiveKeyRequests(id);
+  const { business, loading: loadingBiz } = useSingleBusiness(
+    requests[0]?.companyId
+  );
 
   //   const { loading, requests, revalidate, meta } = useSingleLiveKeyRequest(id);
 
@@ -85,10 +93,15 @@ export default function SingleLiveKey() {
     initialValues: businessFilterValues,
     validate: zodResolver(businessFilterSchema),
   });
+
   const info = {
     Service: "Payout Service",
-    "Go Live Date": dayjs().format("Do MMMM, YYYY"),
-    "Request Date": dayjs().format("Do MMMM, YYYY"),
+    "Go Live Date": loading
+      ? dayjs().format("Do MMMM, YYYY")
+      : dayjs(requests[0].date).format("Do MMMM, YYYY"),
+    "Request Date": loading
+      ? dayjs().format("Do MMMM, YYYY")
+      : dayjs(requests[0].createdAt).format("Do MMMM, YYYY"),
   };
 
   const completeRequest = async (type: "approve" | "reject") => {
@@ -121,28 +134,46 @@ export default function SingleLiveKey() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Requests", href: "/admin/requests" },
+          { title: "Requests", href: "/admin/requests?tab=live-keys" },
           { title: "Live Keys", href: `/admin/requests/${id}live-key` },
         ]}
       />
 
       <Group justify="space-between" mt={28}>
         <Group>
-          <Avatar color="var(--prune-primary-700)" variant="filled" size={39}>
-            {getInitials("Emmanuel Okoye")}
-          </Avatar>
+          {loadingBiz && !business ? (
+            <Skeleton circle h={39} w={39} />
+          ) : (
+            <Avatar color="var(--prune-primary-700)" variant="filled" size={39}>
+              {getInitials(business?.name ?? "")}
+            </Avatar>
+          )}
 
           <Stack gap={0}>
-            <Text>Emmanuel Okoye</Text>
-            <Text fz={10} tt="lowercase">
-              emmanuel.okoye@gmail.com
-            </Text>
+            {loadingBiz && !business ? (
+              <Skeleton h={20} w={100} />
+            ) : (
+              <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
+                {business?.name}
+              </Text>
+            )}
+            {loadingBiz && !business ? (
+              <Skeleton h={10} w={100} mt={10} />
+            ) : (
+              <Text fz={10} fw={400} c="var(--prune-text-gray-500)">
+                {business?.contactEmail}
+              </Text>
+            )}
           </Stack>
 
-          <BadgeComponent status="PENDING" />
+          {loading ? (
+            <Skeleton h={20} w={100} />
+          ) : (
+            <BadgeComponent status={requests[0].status} />
+          )}
         </Group>
 
-        {!["PENDING"].includes("REJECTED") && (
+        {requests && requests[0]?.status === "PENDING" && (
           <Group>
             <SecondaryBtn text="Reject" fw={600} action={openReject} />
             <PrimaryBtn text="Approve" fw={600} action={openApprove} />

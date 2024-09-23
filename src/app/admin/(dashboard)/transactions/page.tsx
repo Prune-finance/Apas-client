@@ -311,7 +311,6 @@ function TransactionForAccount() {
               rows={
                 <PayoutTransactionTableRows
                   data={payoutTransactions}
-                  id={params.id}
                   search={debouncedSearch}
                   active={active}
                   limit={limit}

@@ -13,6 +13,7 @@ import {
   Stack,
   Group,
   Skeleton,
+  ScrollArea,
 } from "@mantine/core";
 import { IconCircleArrowDown } from "@tabler/icons-react";
 import dayjs from "dayjs";
@@ -75,7 +76,7 @@ export const TransactionDrawer = ({
     "Bank Name": selectedRequest?.recipientBankAddress,
     "Bank Address": selectedRequest?.recipientBankAddress,
     Country: selectedRequest?.recipientBankCountry,
-    "Transaction Ref (Reference 2)": selectedRequest?.reference ?? "N/A",
+    "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
   const senderDetails = {
@@ -99,9 +100,9 @@ export const TransactionDrawer = ({
   };
 
   const otherDetails = {
-    "Prune (Reference 1)": selectedRequest?.centrolinkRef ?? "N/A",
-    "Transaction ID": selectedRequest?.id,
-    "Date and Time": dayjs(selectedRequest?.createdAt).format(
+    "Prune Reference": selectedRequest?.centrolinkRef ?? "N/A",
+    "C-L Reference": selectedRequest?.id,
+    "Date & Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
     ),
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
@@ -132,7 +133,7 @@ export const TransactionDrawer = ({
       "hh:mm A Do MMM YYYY"
     ),
     Reference: selectedRequest?.reference ?? "N/A",
-    "Transaction ID": selectedRequest?.id ?? "",
+    "C-L Reference": selectedRequest?.id ?? "",
   };
   const details: ReceiptDetails[] = [
     {
@@ -162,130 +163,107 @@ export const TransactionDrawer = ({
     >
       <Divider mb={20} />
       <Box px={28} pb={28}>
-        <Flex align="center" justify="space-between">
-          <Flex direction="column">
-            <Text c="var(--prune-text-gray-500)" fz={12}>
-              {selectedRequest?.type === "DEBIT"
-                ? "Amount Sent"
-                : "Amount Received"}
-            </Text>
+        <ScrollArea h="calc(100vh - 145px)" scrollbars="y" scrollbarSize={1}>
+          <Flex align="center" justify="space-between">
+            <Flex direction="column">
+              <Text c="var(--prune-text-gray-500)" fz={12}>
+                {selectedRequest?.type === "DEBIT"
+                  ? "Amount Sent"
+                  : "Amount Received"}
+              </Text>
 
-            <Text c="#97AD05" fz={32} fw={600}>
-              {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-            </Text>
+              <Text c="#97AD05" fz={32} fw={600}>
+                {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
+              </Text>
+            </Flex>
+
+            <AmountGroup
+              type={selectedRequest?.type as "DEBIT" | "CREDIT"}
+              colored
+              fz={12}
+            />
           </Flex>
 
-          <AmountGroup
-            type={selectedRequest?.type as "DEBIT" | "CREDIT"}
-            colored
-            fz={12}
-          />
-        </Flex>
+          <Divider mt={30} mb={20} />
 
-        <Divider mt={30} mb={20} />
+          <Text
+            fz={16}
+            mb={24}
+            tt="uppercase"
+            c="var(--prune-text-gray-800)"
+            fw={600}
+          >
+            Sender Details
+          </Text>
 
-        {/* <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Business Details
-        </Text>
+          <Stack gap={24}>
+            {Object.entries(senderDetails).map(([key, value]) => (
+              <Group justify="space-between" key={key}>
+                <Text fz={12} c="var(--prune-text-gray-500)">
+                  {key}:
+                </Text>
 
-        <Stack gap={24}>
-          {Object.entries(businessDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
+                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                  {value}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
 
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
-        <Divider mt={30} mb={20} /> */}
+          <Divider mt={30} mb={20} />
 
-        <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Sender Details
-        </Text>
+          <Text
+            fz={16}
+            mb={24}
+            tt="uppercase"
+            c="var(--prune-text-gray-800)"
+            fw={600}
+          >
+            Beneficiary Details
+          </Text>
 
-        <Stack gap={24}>
-          {Object.entries(senderDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
+          <Stack gap={24}>
+            {Object.entries(beneficiaryDetails).map(([key, value]) => (
+              <Group justify="space-between" key={key}>
+                <Text fz={12} c="var(--prune-text-gray-500)">
+                  {key}:
+                </Text>
 
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
+                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                  {value}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
 
-        <Divider mt={30} mb={20} />
+          <Divider mt={30} mb={20} />
 
-        <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Beneficiary Details
-        </Text>
+          <Text
+            fz={16}
+            mb={24}
+            tt="uppercase"
+            c="var(--prune-text-gray-800)"
+            fw={600}
+          >
+            Other Details
+          </Text>
 
-        <Stack gap={24}>
-          {Object.entries(beneficiaryDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
+          <Stack gap={24}>
+            {Object.entries(otherDetails).map(([key, value]) => (
+              <Group justify="space-between" key={key}>
+                <Text fz={12} c="var(--prune-text-gray-500)">
+                  {key}:
+                </Text>
 
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
+                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                  {value}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
 
-        <Divider mt={30} mb={20} />
-
-        <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Other Details
-        </Text>
-
-        <Stack gap={24}>
-          {Object.entries(otherDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
-
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
-
-        <Divider mt={30} mb={20} />
+          <Divider mt={30} mb={20} />
+        </ScrollArea>
 
         <PrimaryBtn
           icon={IconCircleArrowDown}

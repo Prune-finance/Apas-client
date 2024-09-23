@@ -22,6 +22,7 @@ import {
   ThemeIcon,
   Avatar,
   Modal,
+  Switch,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -681,7 +682,7 @@ export const SingleDefaultAccountBody = ({
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
     "No. of Transaction": transactions.length,
     Currency: "EUR",
-    ...(business && { "Created By": business?.name }),
+    ...(business && !payout && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
     [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
       business?.lastLogin
@@ -701,7 +702,7 @@ export const SingleDefaultAccountBody = ({
     { value: "Account Details" },
     { value: "Transactions" },
     { value: "Statistics" },
-    { value: "Documents" },
+    ...(!payout ? [{ value: "Documents" }] : []),
   ];
 
   return (
@@ -744,9 +745,11 @@ export const SingleDefaultAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
-        <TabsPanel value={tabs[3].value} mt={28}>
-          <DefaultDocuments account={account} isDefault={isDefault} />
-        </TabsPanel>
+        {!payout && (
+          <TabsPanel value={tabs[3].value} mt={28}>
+            <DefaultDocuments account={account} isDefault={isDefault} />
+          </TabsPanel>
+        )}
       </TabsComponent>
     </Box>
   );
@@ -869,6 +872,7 @@ export const DefaultAccountHead = ({
   payout,
   business,
   loadingBiz,
+  admin,
 }: DefaultAccountHeadProps) => {
   const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
@@ -1060,6 +1064,26 @@ export const DefaultAccountHead = ({
             <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
+          {payout && admin && (
+            <Button
+              // onClick={openTrust}
+              color="#f6f6f6"
+              c="var(--prune-text-gray-700)"
+              fz={12}
+              fw={600}
+              h={32}
+              radius={4}
+            >
+              <Switch
+                label="Trust this User"
+                checked={business?.kycTrusted}
+                labelPosition="left"
+                fz={12}
+                size="xs"
+                color="var(--prune-success-500)"
+              />
+            </Button>
+          )}
         </Flex>
       </Flex>
 

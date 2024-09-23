@@ -7,6 +7,8 @@ import Link from "next/link";
 import { AmountGroup } from "../AmountGroup";
 import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
+import { InquiryData } from "@/lib/static";
+import { useRouter } from "next/navigation";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -167,14 +169,14 @@ export const IssuedTransactionTableRows = ({
 
 export const PayoutTransactionTableRows = ({
   data,
-  id,
+
   search,
   active,
   limit,
   searchProps,
 }: {
   data: TransactionType[];
-  id: string;
+
   search: string;
   active: number;
   limit: string | null;
@@ -194,16 +196,8 @@ export const PayoutTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd
-        td="underline"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
-        {/* <Link href={`/admin/transactions/${element.senderIban}`}> */}
-        {element.senderName || "N/A"}
-        {/* </Link> */}
-      </TableTd>
+      <TableTd>{element.senderName || "N/A"}</TableTd>
+
       <TableTd w="15%">{element.centrolinkRef}</TableTd>
       <TableTd>
         <Stack gap={0}>
@@ -235,6 +229,45 @@ export const PayoutTransactionTableRows = ({
       </TableTd>
       <TableTd>
         <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+};
+
+export const InquiryTableRows = ({
+  data,
+  business,
+  search,
+  searchProps,
+}: {
+  data: InquiryData[];
+  business?: boolean;
+  search: string;
+  searchProps: string[];
+}) => {
+  const { push } = useRouter();
+  return filteredSearch(data.reverse(), searchProps, search).map((element) => (
+    <TableTr
+      key={element.dateRequested}
+      onClick={() => {
+        push(
+          `${!business ? "/admin" : ""}/payouts/${crypto.randomUUID()}/inquiry`
+        );
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      {!business && <TableTd>{element.businessName || "N/A"}</TableTd>}
+
+      <TableTd>{element.pruneReference}</TableTd>
+
+      <TableTd tt="capitalize">{element.inquiryType.toLowerCase()}</TableTd>
+
+      <TableTd>
+        {dayjs(element.dateRequested).format("Do MMMM, YYYY - hh:mma")}
+      </TableTd>
+
+      <TableTd>
+        <BadgeComponent status={element.status} w={100} />
       </TableTd>
     </TableTr>
   ));

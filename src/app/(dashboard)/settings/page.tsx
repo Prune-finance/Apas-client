@@ -26,7 +26,7 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import styles from "./styles.module.scss";
 
@@ -42,14 +42,16 @@ import {
   validatePasswordChange,
 } from "@/lib/schema";
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Keys from "./(tabs)/keys";
 import useNotification from "@/lib/hooks/notification";
 import Pricing from "./(tabs)/pricing";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
-export default function Users() {
+function Users() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
 
   const { revalidate } = useUsers();
   const { handleSuccess, handleError } = useNotification();
@@ -164,7 +166,9 @@ export default function Users() {
 
         <Tabs
           mt={32}
-          defaultValue={tabs[0].value}
+          defaultValue={
+            tabs.find((t) => t.value === tab)?.value ?? tabs[0].value
+          }
           variant="pills"
           classNames={{
             root: styles.tabs,
@@ -298,5 +302,13 @@ export default function Users() {
         form={form}
       />
     </main>
+  );
+}
+
+export default function UserSuspense() {
+  return (
+    <Suspense>
+      <Users />
+    </Suspense>
   );
 }

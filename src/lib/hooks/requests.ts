@@ -458,7 +458,7 @@ export function useCompanyDebitRequests(
   return { loading, requests, revalidate, meta };
 }
 
-export function useLiveKeyRequests() {
+export function useLiveKeyRequests(id: string = "") {
   const [requests, setRequests] = useState<LiveKeyRequest[]>([]);
   const [meta, setMeta] = useState<Meta>();
   const [loading, setLoading] = useState(true);
@@ -466,8 +466,9 @@ export function useLiveKeyRequests() {
   async function fetchAccounts() {
     setLoading(true);
     try {
+      const filtered = id ? `/${id}` : "";
       const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests${filtered}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 

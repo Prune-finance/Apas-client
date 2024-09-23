@@ -9,7 +9,7 @@ import { parseError } from "@/lib/actions/auth";
 import { formatNumber } from "@/lib/utils";
 import Cookies from "js-cookie";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { TableTr, TableTd, Box } from "@mantine/core";
+import { TableTr, TableTd, Box, Group } from "@mantine/core";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -20,6 +20,8 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import DebitDrawer from "@/app/admin/(dashboard)/requests/drawer";
 import PaginationComponent from "@/ui/components/Pagination";
 import { debitTableHeaders } from "@/lib/static";
+import { SearchInput } from "@/ui/components/Inputs";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 
 export const Debit = () => {
   const { id } = useParams<{ id: string }>();
@@ -111,6 +113,26 @@ export const Debit = () => {
   ));
   return (
     <Box>
+      <Group mt={32} justify="space-between">
+        <SearchInput search={search} setSearch={setSearch} />
+
+        {/* <Group>
+          <Select
+            placeholder="Type"
+            data={["All", "Freeze", "Unfreeze", "Activate", "Deactivate"]}
+            w={120}
+            styles={{ option: { fontSize: 12 }, input: { fontSize: 12 } }}
+            value={type}
+            onChange={(e) => setType(e)}
+          />
+          <SecondaryBtn
+            icon={IconListTree}
+            action={toggle}
+            text="Filter"
+            fw={600}
+          />
+        </Group> */}
+      </Group>
       <TableComponent head={debitTableHeaders} rows={rows} loading={loading} />
 
       <EmptyTable

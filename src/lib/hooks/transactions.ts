@@ -520,7 +520,7 @@ export interface TransactionType {
   amount: number;
   reference: string;
   centrolinkRef: string;
-  status: "PENDING" | "COMPLETED" | "REJECTED";
+  status: "PENDING" | "COMPLETED" | "REJECTED" | "CANCELLED";
   createdAt: Date;
   updatedAt: Date;
   destinationFirstName: string;
@@ -528,4 +528,5 @@ export interface TransactionType {
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
   company: BusinessData;
+  narration?: string;
 }

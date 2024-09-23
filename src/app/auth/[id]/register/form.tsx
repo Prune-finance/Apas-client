@@ -61,7 +61,7 @@ export default function FormComponent({ email }: { email: string }) {
         size="xs"
         flex={1}
         disabled
-        placeholder="jane.zi@prune.io"
+        placeholder="Enter Email"
         {...form.getInputProps("email")}
       />
 

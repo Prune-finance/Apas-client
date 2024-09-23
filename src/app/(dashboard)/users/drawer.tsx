@@ -38,7 +38,14 @@ export default function UserDrawer({ user, opened, close }: UserDrawerProps) {
     },
     {
       label: "Status",
-      placeholder: <BadgeComponent status={user?.status ?? ""} active />,
+      placeholder: (
+        <BadgeComponent
+          status={
+            user?.status === "INVITE_PENDING" ? "PENDING" : user?.status || ""
+          }
+          active
+        />
+      ),
     },
   ];
 

@@ -65,7 +65,7 @@ export default function LoginForm() {
         label="Email"
         size="xs"
         flex={1}
-        placeholder="jane.zi@prune.io"
+        placeholder="Enter Email"
         {...form.getInputProps("email")}
       />
 

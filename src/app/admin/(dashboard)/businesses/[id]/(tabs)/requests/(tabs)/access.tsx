@@ -1,4 +1,4 @@
-import { Grid, GridCol, Text, TextInput } from "@mantine/core";
+import { Center, Grid, GridCol, Text, TextInput } from "@mantine/core";
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData } from "@/lib/hooks/businesses";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
@@ -14,6 +14,7 @@ import {
   usePayoutRequests,
 } from "@/lib/hooks/requests";
 import { useParams } from "next/navigation";
+import EmptyTable from "@/ui/components/EmptyTable";
 
 export const Access = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,9 +28,17 @@ export const Access = () => {
   return (
     <div className={styles.business__tab}>
       {payoutRequests.length === 0 && requests.length === 0 && (
-        <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
-          No Service Request
-        </Text>
+        // <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
+        //   No Service Request
+        // </Text>
+        <Center w="100%" h="100%">
+          <EmptyTable
+            rows={[]}
+            loading={false}
+            title="No Service Request"
+            text="When a service request is made, it will appear here"
+          />
+        </Center>
       )}
       {payoutRequests.map((req, index) => (
         <RequestAccess

@@ -702,7 +702,7 @@ export const SingleDefaultAccountBody = ({
     { value: "Account Details" },
     { value: "Transactions" },
     { value: "Statistics" },
-    { value: "Documents" },
+    ...(!payout ? [{ value: "Documents" }] : []),
   ];
 
   return (
@@ -745,9 +745,11 @@ export const SingleDefaultAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
-        <TabsPanel value={tabs[3].value} mt={28}>
-          <DefaultDocuments account={account} isDefault={isDefault} />
-        </TabsPanel>
+        {!payout && (
+          <TabsPanel value={tabs[3].value} mt={28}>
+            <DefaultDocuments account={account} isDefault={isDefault} />
+          </TabsPanel>
+        )}
       </TabsComponent>
     </Box>
   );

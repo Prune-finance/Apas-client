@@ -1,4 +1,13 @@
-import { Box, Button, Flex, Image, Modal, Skeleton, Text } from "@mantine/core";
+import {
+  Box,
+  Button,
+  Flex,
+  Image,
+  Loader,
+  Modal,
+  Skeleton,
+  Text,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconDownload, IconFile, IconFile3d } from "@tabler/icons-react";
 import React, { use, useEffect, useState } from "react";
@@ -34,7 +43,7 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, [fileUrl]);
 
@@ -56,7 +65,7 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
         ) : fileType === FileType.JPEG ? (
           <Flex align="center" justify="center">
             {loading ? (
-              <Skeleton h={400} w="100%" />
+              <Loader size="100px" color="var(--prune-primary-600)" />
             ) : (
               <Flex align="center" justify="center" direction="column" gap={10}>
                 <Box w="100%" h="100%">
@@ -89,7 +98,7 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
         ) : fileType === FileType.PNG ? (
           <Flex align="center" justify="center">
             {loading ? (
-              <Skeleton h={400} w="100%" />
+              <Loader size="100px" color="var(--prune-primary-600)" />
             ) : (
               <Flex align="center" justify="center" direction="column" gap={10}>
                 <Box w="100%" h="100%">

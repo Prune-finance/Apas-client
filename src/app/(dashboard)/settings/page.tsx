@@ -42,13 +42,13 @@ import {
   validatePasswordChange,
 } from "@/lib/schema";
 import axios from "axios";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Keys from "./(tabs)/keys";
 import useNotification from "@/lib/hooks/notification";
 import Pricing from "./(tabs)/pricing";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
-export default function Users() {
+function Users() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
@@ -302,5 +302,13 @@ export default function Users() {
         form={form}
       />
     </main>
+  );
+}
+
+export default function UserSuspense() {
+  return (
+    <Suspense>
+      <Users />
+    </Suspense>
   );
 }

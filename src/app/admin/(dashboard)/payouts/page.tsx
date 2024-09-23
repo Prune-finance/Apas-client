@@ -6,8 +6,9 @@ import { Users } from "./(tabs)/Users";
 import { PayoutTransactions } from "./(tabs)/PayoutTransactions";
 import { InquiriesTab } from "./(tabs)/Inquiries";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function AdminPayout() {
+function AdminPayout() {
   const searchParams = useSearchParams();
   const _tab = searchParams.get("tab");
   return (
@@ -49,3 +50,11 @@ const tabs = [
   { value: "Transactions" },
   { value: "Inquiries" },
 ];
+
+export default function AdminPayoutSuspense() {
+  return (
+    <Suspense>
+      <AdminPayout />
+    </Suspense>
+  );
+}

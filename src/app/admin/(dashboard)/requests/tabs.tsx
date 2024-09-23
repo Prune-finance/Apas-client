@@ -26,8 +26,9 @@ import Unfreeze from "./(tabs)/live-key";
 import TabsComponent from "@/ui/components/Tabs";
 import LiveKeySuspense from "./(tabs)/live-key";
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function TabsContainer() {
+function TabsContainer() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   return (
@@ -94,3 +95,11 @@ const tabs = [
   //   icon: IconSnowflakeOff,
   // },
 ];
+
+export default function TabsContainerSuspense() {
+  return (
+    <Suspense>
+      <TabsContainer />
+    </Suspense>
+  );
+}

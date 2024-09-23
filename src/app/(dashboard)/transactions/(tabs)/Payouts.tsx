@@ -132,7 +132,6 @@ export const PayoutsTab = () => {
             active={active}
             limit={limit}
             searchProps={searchProps}
-            id=""
           />
         }
         // rows={rows}

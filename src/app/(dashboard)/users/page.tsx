@@ -214,7 +214,12 @@ function Users() {
         </TableTd>
 
         <TableTd>
-          <BadgeComponent status={element.status} active />
+          <BadgeComponent
+            status={
+              element.status === "INVITE_PENDING" ? "PENDING" : element.status
+            }
+            active
+          />
         </TableTd>
 
         <TableTd

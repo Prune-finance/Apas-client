@@ -10,7 +10,8 @@ export async function checkToken(id: string) {
     );
     return data.data;
   } catch (error) {
-    redirect("/404");
+    redirect("/auth/login");
+    // redirect("/404");
     return {
       status: false,
     };

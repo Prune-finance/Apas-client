@@ -19,6 +19,7 @@ export const formatNumber = (
 export const activeBadgeColor = (status: string) => {
   if (status === "ACTIVE") return "#12B76A";
   if (status === "FROZEN") return "#344054";
+  if (status === "PENDING") return "#C6A700";
   return "#D92D20";
 };
 

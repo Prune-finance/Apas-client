@@ -61,7 +61,7 @@ export const PendingAccounts = () => {
         openDrawer();
       }}
     >
-      <TableTd>{`${element.firstName} ${element.lastName}`}</TableTd>
+      <TableTd tt="capitalize">{`${element.firstName} ${element.lastName}`}</TableTd>
       <TableTd tt="capitalize">{element?.country}</TableTd>
       <TableTd tt="capitalize">
         {getUserType(element.accountType ?? "USER")}

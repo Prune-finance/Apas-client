@@ -17,13 +17,15 @@ import {
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
 import styles from "@/ui/styles/auth.module.scss";
 import classes from "@/ui/styles/containedInput.module.scss";
+import { useSearchParams } from "next/navigation";
 
-export default function LoginForm() {
-  //   const searchParams = useSearchParams();
+function LoginForm() {
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
   const [processing, setProcessing] = useState(false);
   const { setUser } = User();
 
@@ -49,7 +51,7 @@ export default function LoginForm() {
 
       Cookies.set("auth", data.meta.token, { expires: 0.25 });
       handleSuccess("Authentication Successful", "Welcome back");
-      window.location.replace("/");
+      window.location.replace(redirect ? redirect : "/");
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -142,6 +144,10 @@ export default function LoginForm() {
   );
 }
 
-// <Text fz={14} span className={styles.register__rdr}>
-//   Learn how to sign up
-// </Text>
+export default function LoginFormSuspense() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
+  );
+}

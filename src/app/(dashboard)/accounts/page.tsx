@@ -344,7 +344,7 @@ function Accounts() {
         tt="capitalize"
       >
         {/* {`${element.accountName}`}{" "} */}
-        <Text fz={12} inline>
+        <Text fz={12} inline tt="capitalize">
           {element.accountName}
 
           <Text span inherit fz={12} c="#c6a700" fw={600}>

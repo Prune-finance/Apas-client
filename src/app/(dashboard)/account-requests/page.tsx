@@ -120,6 +120,7 @@ function AccountRequests() {
     >
       <TableTd
         className={styles.table__td}
+        tt="capitalize"
       >{`${element.firstName} ${element.lastName}`}</TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
         {element?.country}

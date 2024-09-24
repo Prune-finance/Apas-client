@@ -1,16 +1,17 @@
 import {
+  ActionIcon,
   Box,
   Button,
   Flex,
+  Group,
   Image,
   Loader,
-  Modal,
-  Skeleton,
+  LoadingOverlay,
+  Stack,
   Text,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
-import { IconDownload, IconFile, IconFile3d } from "@tabler/icons-react";
-import React, { use, useEffect, useState } from "react";
+import { IconFile, IconMinus, IconPlus } from "@tabler/icons-react";
+import React, { useEffect, useState } from "react";
 
 interface FileDisplayProps {
   fileUrl: string;
@@ -39,6 +40,7 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
 
   const fileType = getFileType(fileUrl);
   const [loading, setLoading] = useState(true);
+  const [size, setSize] = useState(70);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -48,7 +50,25 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
   }, [fileUrl]);
 
   return (
-    <>
+    <Box
+    // pos="relative"
+    >
+      {/* <Stack pos="sticky" top={50} left={10} style={{ zIndex: 1000 }} gap={0}>
+        <ActionIcon
+          onClick={() => setSize((size) => size + 10)}
+          variant="transparent"
+          color="var(--prune-primary-700)"
+        >
+          <IconPlus />
+        </ActionIcon>
+        <ActionIcon
+          onClick={() => setSize((size) => size - 10)}
+          variant="transparent"
+          color="var(--prune-primary-700)"
+        >
+          <IconMinus />
+        </ActionIcon>
+      </Stack> */}
       <div>
         {fileType === FileType.PDF ? (
           <Flex align="center" justify="center" direction="column" gap={10}>
@@ -63,9 +83,39 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
             )}
           </Flex>
         ) : fileType === FileType.JPEG ? (
-          <Flex align="center" justify="center">
-            {loading ? (
-              <Loader size="100px" color="var(--prune-primary-600)" />
+          <Flex align="center" justify="center" pos="relative">
+            <LoadingOverlay
+              visible={loading}
+              zIndex={1000}
+              overlayProps={{ radius: "sm", blur: 10 }}
+              loaderProps={{
+                color: "var(--prune-primary-700)",
+                type: "oval",
+                size: "50px",
+              }}
+            />
+            <Flex align="center" justify="center" direction="column" gap={10}>
+              <Box w="100%" h="100%">
+                <Image
+                  src={fileUrl}
+                  fit="contain"
+                  alt="PNG preview"
+                  w={"100%"}
+                  h={`${size}vh`}
+                  //   style={{ maxWidth: "100%", height: "auto" }}
+                />
+              </Box>
+              {download && fileUrl && (
+                <a href={fileUrl} download>
+                  <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
+                    Download
+                  </Button>
+                </a>
+              )}
+            </Flex>
+
+            {/* {loading ? (
+              <Loader size="50px" color="var(--prune-primary-600)" />
             ) : (
               <Flex align="center" justify="center" direction="column" gap={10}>
                 <Box w="100%" h="100%">
@@ -93,12 +143,42 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
                   </a>
                 )}
               </Flex>
-            )}
+            )} */}
           </Flex>
         ) : fileType === FileType.PNG ? (
-          <Flex align="center" justify="center">
-            {loading ? (
-              <Loader size="100px" color="var(--prune-primary-600)" />
+          <Flex align="center" justify="center" pos="relative">
+            <LoadingOverlay
+              visible={loading}
+              zIndex={1000}
+              overlayProps={{ radius: "sm", blur: 10 }}
+              loaderProps={{
+                color: "var(--prune-primary-700)",
+                type: "oval",
+                size: "50px",
+              }}
+            />
+            <Flex align="center" justify="center" direction="column" gap={10}>
+              <Box w="100%" h="100%">
+                <Image
+                  src={fileUrl}
+                  fit="contain"
+                  alt="PNG preview"
+                  w={"100%"}
+                  h={`${size}vh`}
+                  //   style={{ maxWidth: "100%", height: "auto" }}
+                />
+              </Box>
+              {download && fileUrl && (
+                <a href={fileUrl} download>
+                  <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
+                    Download
+                  </Button>
+                </a>
+              )}
+            </Flex>
+
+            {/* {loading ? (
+              <Loader size="50px" color="var(--prune-primary-600)" />
             ) : (
               <Flex align="center" justify="center" direction="column" gap={10}>
                 <Box w="100%" h="100%">
@@ -125,7 +205,7 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
                   </a>
                 )}
               </Flex>
-            )}
+            )} */}
           </Flex>
         ) : (
           <Flex align="center" justify="center" gap={10} direction="column">
@@ -147,7 +227,7 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
           </Flex>
         )}
       </div>
-    </>
+    </Box>
   );
 };
 

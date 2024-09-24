@@ -50,7 +50,7 @@ export default function Navbar() {
     }
   };
 
-  const idle = useIdle(1000 * 60 * 30);
+  const idle = useIdle(1000 * 60 * 30, { initialState: false });
   useEffect(() => {
     if (idle) {
       handleAdminLogout(pathname);
@@ -181,7 +181,7 @@ export function UserNavbar() {
     }
   };
 
-  const idle = useIdle(1000 * 60 * 30);
+  const idle = useIdle(1000 * 60 * 30, { initialState: false });
   useEffect(() => {
     if (idle) {
       handleUserLogout(pathname);

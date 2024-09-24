@@ -12,7 +12,33 @@
   padding-top: 18px;
 
   &::placeholder {
-    font-size: 10px;
+    font-size: 12px;
+  }
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-background-clip: text;
+    transition: background-color 5000s ease-in-out 0s;
+    background: transparent !important;
+  }
+}
+
+.innerInput {
+  &::placeholder {
+    font-size: 12px;
+  }
+
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-background-clip: text;
+    transition: background-color 5000s ease-in-out 0s;
+    background: transparent !important;
   }
 }
 

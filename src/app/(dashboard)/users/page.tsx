@@ -224,38 +224,53 @@ function Users() {
             <MenuDropdown>
               {(() => {
                 const menuItems = [
-                  ...(element.status === "INVITE_PENDING"
-                    ? [
-                        {
-                          text: "Update Details",
-                          icon: (
-                            <IconUserEdit
-                              style={{ width: rem(14), height: rem(14) }}
-                            />
-                          ),
-                        },
-                      ]
-                    : []),
-                  ...(element.status !== "INVITE_PENDING"
-                    ? [
-                        {
-                          text:
-                            element.status === "INACTIVE"
-                              ? "Activate"
-                              : "Deactivate",
-                          icon:
-                            element.status === "INACTIVE" ? (
-                              <IconUserCheck
-                                style={{ width: rem(14), height: rem(14) }}
-                              />
-                            ) : (
-                              <IconUserX
-                                style={{ width: rem(14), height: rem(14) }}
-                              />
-                            ),
-                        },
-                      ]
-                    : []),
+                  {
+                    text:
+                      element.status === "INACTIVE" ? "Activate" : "Deactivate",
+                    disabled: element.status === "INVITE_PENDING",
+                    icon:
+                      element.status === "INACTIVE" ? (
+                        <IconUserCheck
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      ) : (
+                        <IconUserX
+                          style={{ width: rem(14), height: rem(14) }}
+                        />
+                      ),
+                  },
+                  // ...(element.status === "INVITE_PENDING"
+                  //   ? [
+                  //       {
+                  //         text: "Update Details",
+                  //         icon: (
+                  //           <IconUserEdit
+                  //             style={{ width: rem(14), height: rem(14) }}
+                  //           />
+                  //         ),
+                  //       },
+                  //     ]
+                  //   : []),
+                  // ...(element.status !== "INVITE_PENDING"
+                  //   ? [
+                  //       {
+                  //         text:
+                  //           element.status === "INACTIVE"
+                  //             ? "Activate"
+                  //             : "Deactivate",
+                  //         icon:
+                  //           element.status === "INACTIVE" ? (
+                  //             <IconUserCheck
+                  //               style={{ width: rem(14), height: rem(14) }}
+                  //             />
+                  //           ) : (
+                  //             <IconUserX
+                  //               style={{ width: rem(14), height: rem(14) }}
+                  //             />
+                  //           ),
+                  //       },
+                  //     ]
+                  //   : []),
                 ];
 
                 return menuItems.map((item, index) => (
@@ -264,6 +279,7 @@ function Users() {
                     fz={10}
                     c="#667085"
                     leftSection={item.icon}
+                    disabled={item.disabled}
                     onClick={() => {
                       if (item.text === "Update Details")
                         return handleEdit({

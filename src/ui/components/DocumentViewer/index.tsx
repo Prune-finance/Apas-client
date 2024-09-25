@@ -12,6 +12,13 @@ import {
 } from "@mantine/core";
 import { IconFile, IconMinus, IconPlus } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
+import RenderPdf from "./renderPdf";
+import dynamic from "next/dynamic";
+import PdfRenderer from "./PdfRenderer";
+
+// const RenderPdf = dynamic(() => import("./renderPdf"), {
+//   ssr: false,
+// });
 
 interface FileDisplayProps {
   fileUrl: string;
@@ -72,7 +79,9 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
       <div>
         {fileType === FileType.PDF ? (
           <Flex align="center" justify="center" direction="column" gap={10}>
-            <PDFICON />
+            {/* <PDFICON /> */}
+            <RenderPdf pdfUrl={fileUrl} />
+            {/* <PdfRenderer fileUrl={fileUrl} /> */}
 
             {download && fileUrl && (
               <a href={fileUrl} download>

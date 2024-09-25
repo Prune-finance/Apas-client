@@ -151,9 +151,9 @@ function BusinessAccountRequests() {
       </Menu>
     );
   };
-
+  console.log(requests);
   const handleRowClick = (id: string, status: string) => {
-    if (status === "APPROVED") return push(`/admin/accounts/${params.id}`);
+    if (status === "APPROVED") return push(`/admin/accounts/${id}`);
 
     push(`/admin/account-requests/${params.id}/${id}`);
   };

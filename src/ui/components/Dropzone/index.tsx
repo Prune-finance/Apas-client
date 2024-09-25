@@ -32,6 +32,7 @@ interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   removeDirectorForm?: UseFormReturnType<RemoveDirectorType>;
   otherDocumentForm?: UseFormReturnType<OtherDocumentType>;
   formKey?: string;
+  extensionKey?: string;
   uploadedFileUrl?: string;
   otherForm?: UseFormReturnType<T>;
   isUser?: boolean;
@@ -44,6 +45,7 @@ export default function DropzoneComponent<T>(
   const { handleError } = useNotification();
   const form = props.form;
   const formKey = props.formKey;
+  const extensionKey = props.extensionKey;
   const uploadedFileUrl = props.uploadedFileUrl;
   const isUser = props.isUser;
 
@@ -97,6 +99,9 @@ export default function DropzoneComponent<T>(
       if (props.otherForm) {
         if (!formKey) return;
         props.otherForm.setFieldValue(formKey, data.data.url);
+        if (extensionKey) {
+          props.otherForm.setFieldValue(extensionKey, file.type as any);
+        }
       }
 
       setUploaded(true);

@@ -56,6 +56,7 @@ import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
 import DebitDrawer from "../drawer";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
+import { debitTableHeaders } from "@/lib/static";
 
 function CompanyRequestType() {
   const searchParams = useSearchParams();
@@ -448,14 +449,6 @@ const tableHeaders = [
   "Date Created",
   "Status",
   "Action",
-];
-
-const debitTableHeaders = [
-  "Account Name",
-  "Amount",
-  "Date Created",
-  "Status",
-  // "Action",
 ];
 
 export default function BusinessDebitSuspense() {

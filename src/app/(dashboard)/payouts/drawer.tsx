@@ -1,4 +1,3 @@
-import { TrxData } from "@/lib/hooks/transactions";
 import { formatNumber } from "@/lib/utils";
 import {
   Badge,
@@ -24,6 +23,7 @@ import styles from "./styles.module.scss";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import Transaction from "@/lib/store/transaction";
+import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 
 type Props = {
   close?: () => void;
@@ -89,9 +89,9 @@ Props) => {
           Transaction Details
         </Text>
       }
-      closeButtonProps={{ mr: 28 }}
+      closeButtonProps={{ ...closeButtonProps, mr: 28 }}
       //   withCloseButton={false}
-      size="520px"
+      size="30%"
       padding={0}
     >
       <Divider mb={20} />

@@ -1,7 +1,7 @@
-import { TextInputWithFile } from "@/app/(dashboard)/account-requests/drawer";
 import { Account } from "@/lib/hooks/accounts";
-import { splitCamelCase } from "@/lib/utils";
+import { camelCaseToTitleCase, splitCamelCase } from "@/lib/utils";
 import { Box, Paper, SimpleGrid, Stack, Text } from "@mantine/core";
+import { TextInputWithFile } from "../../TextInputWithFile";
 
 interface Props {
   account: Account | null;
@@ -43,19 +43,19 @@ export const Documents = ({ account }: Props) => {
             </Text>
             {Object.values(account.accountDocuments.directors).map(
               (director, index) => (
-                <Box mb={20}>
+                <Box mb={20} key={index}>
                   <Text fz={12} fw={500} c="dimmed" mb={20}>
                     Director {index + 1}
                   </Text>
                   <SimpleGrid cols={3}>
                     <TextInputWithFile
                       url={director.idFile}
-                      placeholder={splitCamelCase(director.idType ?? "")}
+                      placeholder={camelCaseToTitleCase(director.idType ?? "")}
                       label={"Identity Type"}
                     />
                     <TextInputWithFile
                       url={director.poaFile}
-                      placeholder={splitCamelCase(director.poaType ?? "")}
+                      placeholder={camelCaseToTitleCase(director.poaType ?? "")}
                       label={"Proof of Address"}
                     />
                   </SimpleGrid>
@@ -87,12 +87,12 @@ export const Documents = ({ account }: Props) => {
                   <SimpleGrid cols={3}>
                     <TextInputWithFile
                       url={director.idFile}
-                      placeholder={splitCamelCase(director.idType ?? "")}
+                      placeholder={camelCaseToTitleCase(director.idType ?? "")}
                       label={"Identity Type"}
                     />
                     <TextInputWithFile
                       url={director.poaFile}
-                      placeholder={splitCamelCase(director.poaType ?? "")}
+                      placeholder={camelCaseToTitleCase(director.poaType ?? "")}
                       label={"Proof of Address"}
                     />
                   </SimpleGrid>

@@ -5,6 +5,7 @@ import {
   Flex,
   Grid,
   GridCol,
+  Stack,
   Text,
   TextInput,
   UnstyledButton,
@@ -21,235 +22,90 @@ import styles from "./styles.module.scss";
 import { RequestData } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { BusinessData } from "@/lib/hooks/businesses";
+import { FileRows, FileTextInput } from "../FileTextInput";
+import { camelCaseToTitleCase, getDocumentStatus } from "@/lib/utils";
 // import styles from "@/ui/styles/singlebusiness.module.scss";
 
 export default function Documents({
   request,
-  business,
+  revalidate,
 }: {
   request: RequestData | null;
-  business: BusinessData | null;
+  revalidate: () => void;
 }) {
-  const { handleInfo } = useNotification();
-  console.log(request);
   return (
     <div className={styles.document__tab}>
-      <div className={styles.top__container}>
-        <Flex justify="space-between" align="center">
-          <Text fz={12} fw={600} tt="uppercase">
+      <div
+      // className={styles.top__container}
+      >
+        <Flex
+          justify="space-between"
+          align="center"
+          bg="#F9F9F9"
+          p={20}
+          mt={28}
+        >
+          <Text fz={12} fw={800} tt="uppercase" c="var(--prune-text-gray-800)">
             Documents
           </Text>
         </Flex>
-        <Grid mt={20} className={styles.grid__container}>
+        <Stack mt={20} className={styles.grid__container}>
           {request?.accountType === "USER" && (
-            <GridCol span={4} className={styles.grid}>
-              <TextInput
-                classNames={{
-                  input: styles.input,
-                  label: styles.label,
-                  section: styles.section,
-                }}
-                leftSection={<IconFileInfo />}
-                leftSectionPointerEvents="none"
-                rightSection={
-                  <UnstyledButton
-                    onClick={() => {
-                      if (!request.documentData.idFileURL)
-                        return handleInfo("No document was provided", "");
-                      window.open(
-                        request.documentData.idFileURL || "",
-                        "_blank"
-                      );
-                    }}
-                    className={styles.input__right__section}
-                  >
-                    <Text fw={600} fz={10} c="#475467">
-                      View
-                    </Text>
-                  </UnstyledButton>
-                }
-                label="Identity Type"
-                placeholder={`${request.documentData.idType}-${request.firstName} ${request.lastName}`}
-              />
-            </GridCol>
+            // <GridCol span={4} className={styles.grid}>
+            <FileRows
+              label="Identity Type"
+              placeholder={camelCaseToTitleCase(request.documentData.idType)}
+              url={request.documentData.idFileURL}
+              path={`idFileURL`}
+              request={request}
+              revalidate={revalidate}
+              status={getDocumentStatus(request, "idFileURL")}
+            />
+            // </GridCol>
           )}
 
           {request?.accountType === "USER" && (
-            <GridCol span={4} className={styles.grid}>
-              <TextInput
-                classNames={{
-                  input: styles.input,
-                  label: styles.label,
-                  section: styles.section,
-                }}
-                leftSection={<IconFileInfo />}
-                leftSectionPointerEvents="none"
-                rightSection={
-                  <UnstyledButton
-                    onClick={() => {
-                      if (!request.documentData.poaFileURL)
-                        return handleInfo("No document was provided", "");
-                      window.open(
-                        request.documentData.poaFileURL || "",
-                        "_blank"
-                      );
-                    }}
-                    className={styles.input__right__section}
-                  >
-                    <Text fw={600} fz={10} c="#475467">
-                      View
-                    </Text>
-                  </UnstyledButton>
-                }
-                label="Proof of Address"
-                placeholder={`${request.documentData.poaType}-${request.firstName} ${request.lastName}`}
-              />
-            </GridCol>
+            // <GridCol span={4} className={styles.grid}>
+            <FileRows
+              label="Proof of Address"
+              placeholder={camelCaseToTitleCase(request.documentData.poaType)}
+              url={request.documentData.poaFileURL}
+              path={`poaFileURL`}
+              request={request}
+              revalidate={revalidate}
+              status={getDocumentStatus(request, "poaFileURL")}
+            />
+            // </GridCol>
           )}
 
           {request?.accountType === "CORPORATE" && (
             <>
-              <GridCol span={4} className={styles.grid}>
-                <TextInput
-                  classNames={{
-                    input: styles.input,
-                    label: styles.label,
-                    section: styles.section,
-                  }}
-                  leftSection={<IconFileInfo />}
-                  leftSectionPointerEvents="none"
-                  rightSection={
-                    <UnstyledButton
-                      onClick={() => {
-                        if (!business?.cacCertificate)
-                          return handleInfo("No document was provided", "");
-                        window.open(business.cacCertificate || "", "_blank");
-                      }}
-                      className={styles.input__right__section}
-                    >
-                      <Text fw={600} fz={10} c="#475467">
-                        View
-                      </Text>
-                    </UnstyledButton>
-                  }
-                  label="Certificate of Incorporation"
-                  placeholder={`Certificate of Incorporation-${request.firstName} ${request.lastName}`}
-                />
-              </GridCol>
+              {/* <GridCol span={4} className={styles.grid}> */}
+              <FileRows
+                label="Certificate of Incorporation"
+                placeholder={`Certificate of Incorporation`}
+                url={request.documentData.certOfInc ?? ""}
+                path={`certOfInc`}
+                request={request}
+                revalidate={revalidate}
+                status={getDocumentStatus(request, "certOfInc")}
+              />
+              {/* </GridCol> */}
 
-              <GridCol span={4} className={styles.grid}>
-                <TextInput
-                  classNames={{
-                    input: styles.input,
-                    label: styles.label,
-                    section: styles.section,
-                  }}
-                  leftSection={<IconFileInfo />}
-                  leftSectionPointerEvents="none"
-                  rightSection={
-                    <UnstyledButton
-                      onClick={() => {
-                        if (!business?.mermat)
-                          return handleInfo("No document was provided", "");
-                        window.open(business.mermat || "", "_blank");
-                      }}
-                      className={styles.input__right__section}
-                    >
-                      <Text fw={600} fz={10} c="#475467">
-                        View
-                      </Text>
-                    </UnstyledButton>
-                  }
-                  label="Mermat"
-                  placeholder={`Mermat-${request.firstName} ${request.lastName}`}
-                />
-              </GridCol>
+              {/* <GridCol span={4} className={styles.grid}> */}
+              <FileRows
+                label="Mermat"
+                placeholder={`Mermat`}
+                url={request.documentData.mermat ?? ""}
+                path={`mermat`}
+                request={request}
+                revalidate={revalidate}
+                status={getDocumentStatus(request, "mermat")}
+              />
+              {/* </GridCol> */}
             </>
           )}
-        </Grid>
-
-        {/* <Grid mt={20} className={styles.grid__container}>
-          <GridCol span={4} className={styles.grid}>
-            <TextInput
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-                section: styles.section,
-              }}
-              leftSection={<IconPdf />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton className={styles.input__right__section}>
-                  <Text fw={600} fz={10} c="##475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
-              label="CAC Document"
-              placeholder="CAC-doc.pdf"
-            />
-          </GridCol>
-
-          <GridCol span={4} className={styles.grid}>
-            <TextInput
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-              }}
-              leftSection={<IconJpg />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton className={styles.input__right__section}>
-                  <Text fw={600} fz={10} c="##475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
-              label="Directors"
-              placeholder="Dir-backup-img.jpg"
-            />
-          </GridCol>
-
-          <GridCol span={4} className={styles.grid}>
-            <TextInput
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-              }}
-              leftSection={<IconJpg />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton className={styles.input__right__section}>
-                  <Text fw={600} fz={10} c="##475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
-              label="Shareholders"
-              placeholder="sharhld.jpg"
-            />
-          </GridCol>
-
-          <GridCol span={4} className={styles.grid}>
-            <TextInput
-              classNames={{
-                input: styles.input,
-                label: styles.label,
-              }}
-              leftSection={<IconPdf />}
-              leftSectionPointerEvents="none"
-              rightSection={
-                <UnstyledButton className={styles.input__right__section}>
-                  <Text fw={600} fz={10} c="##475467">
-                    View
-                  </Text>
-                </UnstyledButton>
-              }
-              label="MerMat Document"
-              placeholder="File.pdf"
-            />
-          </GridCol>
-        </Grid> */}
+        </Stack>
       </div>
     </div>
   );

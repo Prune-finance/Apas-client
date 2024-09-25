@@ -25,34 +25,63 @@ import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import { formatNumber } from "@/lib/utils";
 import { DefaultAccount } from "@/lib/hooks/accounts";
-import DropzoneComponent from "../Modal/dropzone";
+import DropzoneComponent from "../Dropzone";
 import TabsComponent from "../Tabs";
+import { sendMoneyCompanyValidate } from "@/lib/schema";
+import { countries } from "@/lib/static";
 
 interface CompanyProps {
   account: DefaultAccount | null;
   close: () => void;
+  setCompanyRequestForm: any;
+  openPreview: () => void;
+  setSectionState: any;
 }
 
 export const sendMoneyRequest = {
-  account: "",
   amount: "",
+  companyName: "",
   destinationIBAN: "",
   destinationBIC: "",
-  destinationCountry: "",
   destinationBank: "",
+  bankAddress: "",
+  destinationCountry: "",
+  invoice: "",
   reference: crypto.randomUUID(),
-  reason: "",
-  destinationFirstName: "",
-  destinationLastName: "",
-  accountBalance: 0,
+  narration: "",
 };
 
-function Company({ account, close }: CompanyProps) {
-  const form = useForm({
+function Company({
+  account,
+  close,
+  openPreview,
+  setCompanyRequestForm,
+  setSectionState,
+}: CompanyProps) {
+  const form2 = useForm({
     initialValues: {
       ...sendMoneyRequest,
     },
+    validate: zodResolver(sendMoneyCompanyValidate),
   });
+
+  const handlePreviewState = () => {
+    const { hasErrors } = form2.validate();
+    if (hasErrors) return;
+    if (
+      account?.accountBalance &&
+      account?.accountBalance < Number(form2.values.amount)
+    )
+      return form2.setFieldError(
+        "amount",
+        `Insufficient funds: The amount entered exceeds your balance`
+      );
+
+    close();
+    setCompanyRequestForm(form2.values);
+    setSectionState("Company");
+    openPreview();
+  };
 
   return (
     <TabsPanel value="To A Company">
@@ -68,6 +97,10 @@ function Company({ account, close }: CompanyProps) {
               </Text>
             }
             placeholder="Enter company Name"
+            {...form2.getInputProps("companyName")}
+            errorProps={{
+              fz: 12,
+            }}
           />
         </Flex>
         <Flex gap={20} mt={24}>
@@ -81,6 +114,10 @@ function Company({ account, close }: CompanyProps) {
               </Text>
             }
             placeholder="Enter IBAN"
+            {...form2.getInputProps("destinationIBAN")}
+            errorProps={{
+              fz: 12,
+            }}
           />
 
           <TextInput
@@ -93,6 +130,10 @@ function Company({ account, close }: CompanyProps) {
               </Text>
             }
             placeholder="Enter BIC"
+            {...form2.getInputProps("destinationBIC")}
+            errorProps={{
+              fz: 12,
+            }}
           />
         </Flex>
 
@@ -107,6 +148,10 @@ function Company({ account, close }: CompanyProps) {
                 Bank
               </Text>
             }
+            {...form2.getInputProps("destinationBank")}
+            errorProps={{
+              fz: 12,
+            }}
           />
         </Flex>
 
@@ -121,6 +166,22 @@ function Company({ account, close }: CompanyProps) {
               </Text>
             }
             placeholder="Bank Address"
+            {...form2.getInputProps("bankAddress")}
+            errorProps={{
+              fz: 12,
+            }}
+          />
+        </Flex>
+
+        <Flex gap={20} mt={24}>
+          <Select
+            searchable
+            placeholder="Select Country"
+            classNames={{ input: styles.input, label: styles.label }}
+            flex={1}
+            label="Country"
+            data={countries}
+            {...form2.getInputProps("destinationCountry")}
           />
         </Flex>
 
@@ -130,7 +191,7 @@ function Company({ account, close }: CompanyProps) {
             classNames={{ input: styles.input, label: styles.label }}
             description={
               <Text fz={12}>
-                {Number(form.values.amount) > Number(account?.accountBalance)
+                {Number(form2.values.amount) > Number(account?.accountBalance)
                   ? `Insufficient Balance`
                   : ""}
               </Text>
@@ -141,7 +202,7 @@ function Company({ account, close }: CompanyProps) {
               },
               input: {
                 border:
-                  Number(form.values.amount) > Number(account?.accountBalance)
+                  Number(form2.values.amount) > Number(account?.accountBalance)
                     ? "1px solid red"
                     : "1px solid #eaecf0",
               },
@@ -154,15 +215,24 @@ function Company({ account, close }: CompanyProps) {
             hideControls
             size="lg"
             placeholder="Enter amount"
-            {...form.getInputProps("amount")}
+            {...form2.getInputProps("amount")}
+            errorProps={{
+              fz: 12,
+            }}
           />
         </Flex>
 
         <Flex gap={20} mt={24} direction="column">
           <Text fz={14} c="#667085" m={0} p={0}>
-            Upload Invoice (Optional)
+            Upload supporting document (Optional)
           </Text>
-          <DropzoneComponent style={{ flex: 1 }} />
+          <DropzoneComponent<typeof sendMoneyRequest>
+            style={{ flex: 1 }}
+            otherForm={form2}
+            formKey="invoice"
+            uploadedFileUrl={form2.values.invoice}
+            isUser
+          />
         </Flex>
 
         <Flex gap={20} mt={24}>
@@ -178,6 +248,10 @@ function Company({ account, close }: CompanyProps) {
               </Text>
             }
             placeholder="Enter narration"
+            {...form2.getInputProps("narration")}
+            errorProps={{
+              fz: 12,
+            }}
           />
         </Flex>
 
@@ -191,7 +265,7 @@ function Company({ account, close }: CompanyProps) {
             }}
           />
           <PrimaryBtn
-            // action={createDebitRequest}
+            action={handlePreviewState}
             // loading={processing}
             text="Submit"
             fw={600}

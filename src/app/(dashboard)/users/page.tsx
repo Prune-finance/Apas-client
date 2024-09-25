@@ -117,8 +117,8 @@ function Users() {
       if (hasErrors) {
         return;
       }
-
-      await axios.post(
+      const method = isEdit ? "patch" : "post";
+      await axios[method](
         `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
         { email: form.values.email },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
@@ -175,17 +175,6 @@ function Users() {
     }
   };
 
-  const menuItems = [
-    {
-      text: "Update Details",
-      icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
-    },
-    // {
-    //   text: "Deactivate",
-    //   icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
-    // },
-  ];
-
   const handleRowClick = (user: AdminData) => {
     setUser(user);
     openDrawer();
@@ -214,7 +203,12 @@ function Users() {
         </TableTd>
 
         <TableTd>
-          <BadgeComponent status={element.status} active />
+          <BadgeComponent
+            status={
+              element.status === "INVITE_PENDING" ? "PENDING" : element.status
+            }
+            active
+          />
         </TableTd>
 
         <TableTd
@@ -231,16 +225,9 @@ function Users() {
               {(() => {
                 const menuItems = [
                   {
-                    text: "Update Details",
-                    icon: (
-                      <IconUserEdit
-                        style={{ width: rem(14), height: rem(14) }}
-                      />
-                    ),
-                  },
-                  {
                     text:
                       element.status === "INACTIVE" ? "Activate" : "Deactivate",
+                    disabled: element.status === "INVITE_PENDING",
                     icon:
                       element.status === "INACTIVE" ? (
                         <IconUserCheck
@@ -252,6 +239,38 @@ function Users() {
                         />
                       ),
                   },
+                  // ...(element.status === "INVITE_PENDING"
+                  //   ? [
+                  //       {
+                  //         text: "Update Details",
+                  //         icon: (
+                  //           <IconUserEdit
+                  //             style={{ width: rem(14), height: rem(14) }}
+                  //           />
+                  //         ),
+                  //       },
+                  //     ]
+                  //   : []),
+                  // ...(element.status !== "INVITE_PENDING"
+                  //   ? [
+                  //       {
+                  //         text:
+                  //           element.status === "INACTIVE"
+                  //             ? "Activate"
+                  //             : "Deactivate",
+                  //         icon:
+                  //           element.status === "INACTIVE" ? (
+                  //             <IconUserCheck
+                  //               style={{ width: rem(14), height: rem(14) }}
+                  //             />
+                  //           ) : (
+                  //             <IconUserX
+                  //               style={{ width: rem(14), height: rem(14) }}
+                  //             />
+                  //           ),
+                  //       },
+                  //     ]
+                  //   : []),
                 ];
 
                 return menuItems.map((item, index) => (
@@ -260,6 +279,7 @@ function Users() {
                     fz={10}
                     c="#667085"
                     leftSection={item.icon}
+                    disabled={item.disabled}
                     onClick={() => {
                       if (item.text === "Update Details")
                         return handleEdit({

@@ -2,7 +2,7 @@
 import Cookies from "js-cookie";
 
 import axios from "axios";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
 
@@ -24,7 +24,7 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 
 import {
-  debitRequest,
+  // debitRequest,
   newBusiness,
   validateDebitRequest,
   validateNewBusiness,
@@ -41,44 +41,98 @@ export default function DebitRequestModal({
   close,
   selectedId,
   accountsData,
+  accountBalance,
   revalidate,
 }: {
   close: () => void;
   selectedId?: string;
   accountsData?: AccountData[];
+  accountBalance?: number;
   revalidate?: () => void;
 }) {
+  const debitRequest = {
+    account: "",
+    amount: "",
+    accountType: "",
+    destinationIBAN: "",
+    destinationBIC: "",
+    destinationCountry: "",
+    destinationBank: "",
+    reference: crypto.randomUUID(),
+    reason: "",
+    destinationFirstName: "",
+    destinationLastName: "",
+  };
+
   const router = useRouter();
   const { accounts } = useUserAccounts({ limit: 1000 });
   const [processing, setProcessing] = useState(false);
   const { handleSuccess, handleError } = useNotification();
+  // const [accountType, setAccountType] = useState<string>("");
+  const [companyName, setCompanyName] = useState<string>("");
 
   const form = useForm({
     initialValues: {
       ...debitRequest,
-      ...(selectedId && { account: selectedId }),
+      ...(selectedId && {
+        account: selectedId,
+      }),
     },
     validate: zodResolver(validateDebitRequest),
   });
 
-  useEffect(() => {
-    form.setFieldValue(
-      "accountBalance",
-      accounts.find((item) => item.id === form.values.account)
-        ?.accountBalance ?? 0
-    );
-  }, [form.values.account]);
+  // useEffect(() => {
+  //   form.setFieldValue(
+  //     "accountBalance",
+  //     accounts.find((item) => item.id === form.values.account)
+  //       ?.accountBalance ?? 0
+  //   );
+  // }, [form.values.account]);
 
   const createDebitRequest = async () => {
     setProcessing(true);
+    let firstName = "";
+    let lastName = "";
     try {
       const { hasErrors } = form.validate();
 
+      if (Number(form.values.amount) > Number(accountBalance)) {
+        console.log("true");
+        return form.setFieldError(
+          "amount",
+          "Amount must be less than or equal to account balance"
+        );
+      }
+
       if (hasErrors) return;
-      const { accountBalance, ...rest } = form.values;
+
+      if (form.values.accountType === "Corporate") {
+        firstName = companyName.split(" ")[0];
+        lastName = companyName.split(" ")[1] || "";
+
+        console.log(firstName, lastName);
+      }
+
+      const { accountType, ...rest } = form.values;
+
+      // console.log({
+      //   ...rest,
+      //   ...(form.values.accountType === "Corporate" && {
+      //     destinationFirstName: firstName,
+      //     destinationLastName: lastName,
+      //   }),
+      // });
+      // return;
+
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/request`,
-        { ...rest },
+        {
+          ...rest,
+          ...(form.values.accountType === "Corporate" && {
+            destinationFirstName: firstName,
+            destinationLastName: lastName,
+          }),
+        },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -195,30 +249,58 @@ export default function DebitRequestModal({
             </Text>
 
             <Flex gap={20} mt={24}>
-              <TextInput
+              <Select
+                placeholder="Select destination account type"
                 classNames={{ input: styles.input, label: styles.label }}
                 flex={1}
-                withAsterisk
-                label="First Name"
-                placeholder="Enter first name"
-                {...form.getInputProps("destinationFirstName")}
+                label="Account Type"
+                data={["Corporate", "Individual"]}
+                // value={accountType}
+                // onChange={(value) => setAccountType(value!)}
+                {...form.getInputProps("accountType")}
               />
+            </Flex>
 
-              <TextInput
-                classNames={{ input: styles.input, label: styles.label }}
-                flex={1}
-                withAsterisk
-                label="Last Name"
-                placeholder="Enter last name"
-                {...form.getInputProps("destinationLastName")}
-              />
+            <Flex gap={20} mt={24}>
+              {form.values.accountType === "Corporate" ? (
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  withAsterisk
+                  label="Company Name"
+                  placeholder="Enter company name"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.currentTarget.value)}
+                  // {...form.getInputProps("destinationFirstName")}
+                />
+              ) : (
+                <>
+                  <TextInput
+                    classNames={{ input: styles.input, label: styles.label }}
+                    flex={1}
+                    withAsterisk
+                    label="First Name"
+                    placeholder="Enter first name"
+                    {...form.getInputProps("destinationFirstName")}
+                  />
+
+                  <TextInput
+                    classNames={{ input: styles.input, label: styles.label }}
+                    flex={1}
+                    withAsterisk
+                    label="Last Name"
+                    placeholder="Enter last name"
+                    {...form.getInputProps("destinationLastName")}
+                  />
+                </>
+              )}
             </Flex>
             <Flex gap={20} mt={24}>
               <TextInput
                 classNames={{ input: styles.input, label: styles.label }}
                 flex={1}
                 withAsterisk
-                label="Receiver IBAN"
+                label="IBAN"
                 placeholder="Enter IBAN"
                 {...form.getInputProps("destinationIBAN")}
               />
@@ -227,7 +309,7 @@ export default function DebitRequestModal({
                 classNames={{ input: styles.input, label: styles.label }}
                 flex={1}
                 withAsterisk
-                label="Receiver BIC"
+                label="BIC"
                 placeholder="Enter BIC"
                 {...form.getInputProps("destinationBIC")}
               />

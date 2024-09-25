@@ -27,6 +27,7 @@ import DropzoneComponent from "@/ui/components/Dropzone";
 import { useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
+import FileDisplay from "@/ui/components/DocumentViewer";
 
 interface IDirector {
   name: string;
@@ -73,6 +74,8 @@ export const DocumentTextInput = ({
   title,
 }: DocumentTextInputProps) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedFile, { open: openFile, close: closeFile }] =
+    useDisclosure(false);
   const { handleInfo } = useNotification();
 
   return (
@@ -96,13 +99,14 @@ export const DocumentTextInput = ({
         rightSection={
           !editing ? (
             <UnstyledButton
-              onClick={() => {
-                notifications.clean();
-                if (!director[documentKey])
-                  return handleInfo("Please upload the document first", "");
+              // onClick={() => {
+              //   notifications.clean();
+              //   if (!director[documentKey])
+              //     return handleInfo("Please upload the document first", "");
 
-                window.open(director[documentKey] || "", "_blank");
-              }}
+              //   window.open(director[documentKey] || "", "_blank");
+              // }}
+              onClick={openFile}
               className={styles.input__right__section}
             >
               <Text fw={600} fz={10} c="#475467">
@@ -132,6 +136,22 @@ export const DocumentTextInput = ({
         form={form}
         documentKey={documentKey}
       />
+
+      <Modal
+        opened={openedFile}
+        onClose={closeFile}
+        size={800}
+        centered
+        title={
+          <Text fz={14} fw={500}>
+            Document Preview
+          </Text>
+        }
+      >
+        <Box>
+          <FileDisplay fileUrl={(director[documentKey] as string) || ""} />
+        </Box>
+      </Modal>
     </Box>
   );
 };
@@ -349,6 +369,8 @@ export const ContactDocumentTextInput = ({
   title,
 }: ContactDocumentTextInputProps) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedFile, { open: openFile, close: closeFile }] =
+    useDisclosure(false);
   const { handleInfo } = useNotification();
 
   return (
@@ -372,13 +394,14 @@ export const ContactDocumentTextInput = ({
         rightSection={
           !editing ? (
             <UnstyledButton
-              onClick={() => {
-                notifications.clean();
-                if (!business[documentKey])
-                  return handleInfo("Please upload the document first", "");
+              onClick={openFile}
+              // onClick={() => {
+              //   notifications.clean();
+              //   if (!business[documentKey])
+              //     return handleInfo("Please upload the document first", "");
 
-                window.open(business[documentKey] || "", "_blank");
-              }}
+              //   window.open(business[documentKey] || "", "_blank");
+              // }}
               className={styles.input__right__section}
             >
               <Text fw={600} fz={10} c="#475467">
@@ -463,13 +486,21 @@ export const ContactDocumentTextInput = ({
         </Box>
       </Modal>
 
-      {/* <ReUploadDocsModal
-        opened={opened}
-        close={close}
-        formKey={formKey}
-        form={form}
-        documentKey={documentKey}
-      /> */}
+      <Modal
+        opened={openedFile}
+        onClose={closeFile}
+        size={800}
+        centered
+        title={
+          <Text fz={14} fw={500}>
+            Document Preview
+          </Text>
+        }
+      >
+        <Box>
+          <FileDisplay fileUrl={(business[documentKey] as string) || ""} />
+        </Box>
+      </Modal>
     </Box>
   );
 };

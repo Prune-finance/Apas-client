@@ -5,37 +5,15 @@ import Cookies from "js-cookie";
 
 dayjs.extend(advancedFormat);
 
-import Link from "next/link";
-import Image from "next/image";
-
 // Mantine Imports
-import { useDisclosure } from "@mantine/hooks";
-import {
-  Badge,
-  Box,
-  Divider,
-  Drawer,
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  Paper,
-  Stack,
-} from "@mantine/core";
-import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
-import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
-import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { Group, Paper } from "@mantine/core";
+
+import { Text, Pagination } from "@mantine/core";
+import { TableTr, TableTd } from "@mantine/core";
 
 // Tabler Imports
-import {
-  IconPointFilled,
-  IconDots,
-  IconEye,
-  IconX,
-  IconPdf,
-} from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
@@ -44,11 +22,6 @@ import {
   useRequests,
   useUserRequests,
 } from "@/lib/hooks/requests";
-import {
-  AllBusinessSkeleton,
-  DynamicSkeleton,
-  DynamicSkeleton2,
-} from "@/lib/static";
 
 // UI Imports
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -56,7 +29,6 @@ import ModalComponent from "@/ui/components/Modal";
 import styles from "./styles.module.scss";
 
 // Asset Imports
-import EmptyImage from "@/assets/empty.png";
 import { Suspense, useState } from "react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
@@ -64,12 +36,15 @@ import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
-import { activeBadgeColor, approvedBadgeColor } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import Account from "../accounts/[id]/page";
 import { AccountRequestsDrawer } from "./drawer";
+import { SearchInput } from "@/ui/components/Inputs";
+import { filteredSearch } from "@/lib/search";
+import { TableComponent } from "@/ui/components/Table";
+import { SecondaryBtn } from "@/ui/components/Buttons";
+import { getUserType } from "@/lib/utils";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -94,7 +69,8 @@ function AccountRequests() {
   const [opened, { open, close }] = useDisclosure(false);
   const [cancelOpened, { open: cancelOpen, close: cancelClose }] =
     useDisclosure(false);
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
@@ -129,7 +105,11 @@ function AccountRequests() {
     }
   };
 
-  const rows = requests.map((element, index) => (
+  const rows = filteredSearch(
+    requests,
+    ["firstName", "lastName", "country"],
+    debouncedSearch
+  ).map((element, index) => (
     <TableTr
       style={{ cursor: "pointer" }}
       key={index}
@@ -140,23 +120,20 @@ function AccountRequests() {
     >
       <TableTd
         className={styles.table__td}
+        tt="capitalize"
       >{`${element.firstName} ${element.lastName}`}</TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
         {element?.country}
       </TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
-        {element.accountType.toLowerCase()}
+        {getUserType(element.accountType)}
       </TableTd>
-      {/* <TableTd className={styles.table__td}>{element.Company.name}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />
       </TableTd>
-      {/* <TableTd>
-        {element.}
-      </TableTd> */}
 
       {/* <TableTd className={`${styles.table__td}`}>
         <MenuComponent id={element.id} status={element.status} />
@@ -181,47 +158,19 @@ function AccountRequests() {
         </div>
 
         <Group justify="space-between" mt={30}>
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            w={324}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+          <SearchInput search={search} setSearch={setSearch} />
 
-          <Button
-            // className={styles.filter__cta}
-            rightSection={<IconListTree size={14} />}
-            fz={12}
-            fw={500}
-            onClick={toggle}
-            variant="outline"
-            c="var(--prune-text-gray-800)"
-            color="var(--prune-text-gray-200)"
-          >
-            Filter
-          </Button>
+          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
         </Group>
 
-        <Filter<FilterType> opened={openedFilter} toggle={toggle} form={form} />
+        <Filter<FilterType>
+          opened={openedFilter}
+          toggle={toggle}
+          form={form}
+          approvalStatus
+        />
 
-        <TableScrollContainer minWidth={500}>
-          <Table className={styles.table} verticalSpacing="md">
-            <TableThead>
-              <TableTr>
-                <TableTh className={styles.table__th}>Account Name</TableTh>
-                <TableTh className={styles.table__th}>Country</TableTh>
-                <TableTh className={styles.table__th}>Type</TableTh>
-                {/* <TableTh className={styles.table__th}>Business</TableTh> */}
-                <TableTh className={styles.table__th}>Date Created</TableTh>
-                <TableTh className={styles.table__th}>Status</TableTh>
-                {/* <TableTh className={styles.table__th}>Action</TableTh> */}
-              </TableTr>
-            </TableThead>
-            <TableTbody>{loading ? DynamicSkeleton2(5) : rows}</TableTbody>
-          </Table>
-        </TableScrollContainer>
+        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
         <EmptyTable
           rows={rows}
@@ -263,10 +212,20 @@ function AccountRequests() {
         opened={drawerOpened}
         close={closeDrawer}
         selectedRequest={selectedRequest}
+        revalidate={revalidate}
+        setSelectedRequest={setSelectedRequest}
       />
     </main>
   );
 }
+
+const tableHeaders = [
+  "Account Name",
+  "Country(short)",
+  "Type",
+  "Date Created",
+  "Status",
+];
 
 export default function AccountRequestsSus() {
   return (

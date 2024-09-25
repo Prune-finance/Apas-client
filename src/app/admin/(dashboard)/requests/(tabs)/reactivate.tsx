@@ -104,6 +104,7 @@ function Reactivate() {
 
   const { requests, revalidate, loading, meta } = useAllRequests({
     ...(type === "All" || !type ? {} : { type }),
+    ...queryParams,
   });
 
   const handleRejectRequest = async () => {
@@ -162,6 +163,8 @@ function Reactivate() {
     switch (selectedRequest?.type) {
       case "ACTIVATE":
         return "reactivate";
+      case "ACCOUNT_ISSUANCE":
+        return "account issuance";
       case "DEACTIVATE":
         return "deactivate";
       default:
@@ -225,13 +228,13 @@ function Reactivate() {
     >
       <TableTd>{element.Company.name}</TableTd>
       <TableTd className={styles.table__td}>
-        {element.Account.accountName}
+        {element?.Account?.accountName ?? "N/A"}
       </TableTd>
       <TableTd className={styles.table__td}>
-        {element.Account.accountNumber}
+        {element?.Account?.accountNumber ?? "N/A"}
       </TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
-        {getUserType(element.Account.type ?? "USER")}
+        {getUserType(element?.Account?.type ?? "USER")}
       </TableTd>
       <TableTd tt="capitalize" className={styles.table__td}>
         {element.type.toLowerCase()}

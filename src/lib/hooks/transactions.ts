@@ -1,10 +1,11 @@
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
+import { BusinessData } from "./businesses";
 
 interface IParams {
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   page?: number;
@@ -18,7 +19,7 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -51,7 +52,7 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.createdAt,
+    customParams.date,
     customParams.limit,
     customParams.status,
     customParams.sort,
@@ -59,6 +60,103 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
   ]);
 
   return { loading, transactions, meta, revalidate };
+}
+
+export function useSingleTransactions(
+  id: string = "",
+  customParams: IParams = {}
+) {
+  const [transaction, setTransaction] = useState<TransactionType | null>(null);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+    try {
+      setLoading(true);
+      const path = id ? `${id}/transactions` : "transactions";
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/transactions/${id}/data?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransaction(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      setTransaction(null);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [id]);
+
+  return { loading, transaction, meta, revalidate };
+}
+
+export function useSingleCompanyTransactions(
+  trxId: string = "",
+  customParams: IParams = {}
+) {
+  const [transaction, setTransaction] = useState<TransactionType | null>(null);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/businesses/transactions/${trxId}/data?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransaction(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      setTransaction(null);
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [trxId]);
+
+  return { loading, transaction, meta, revalidate };
 }
 
 export function useBusinessTransactions(
@@ -72,7 +170,7 @@ export function useBusinessTransactions(
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -105,7 +203,7 @@ export function useBusinessTransactions(
       // Any cleanup code can go here
     };
   }, [
-    customParams.createdAt,
+    customParams.date,
     customParams.limit,
     customParams.status,
     customParams.sort,
@@ -115,7 +213,7 @@ export function useBusinessTransactions(
   return { loading, transactions, meta, revalidate };
 }
 
-export function usePayoutTransactions(customParams: IParams = {}) {
+export function useDefaultAccountTransactions(customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
   const [loading, setLoading] = useState(true);
@@ -123,7 +221,7 @@ export function usePayoutTransactions(customParams: IParams = {}) {
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -135,11 +233,11 @@ export function usePayoutTransactions(customParams: IParams = {}) {
       setLoading(true);
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout/trx?${params}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/businesses/transactions?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
-      setTransactions(data.data.data);
+      setTransactions(data.data);
       setMeta(data.meta);
     } catch (error) {
       console.log(error);
@@ -157,7 +255,59 @@ export function usePayoutTransactions(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.createdAt,
+    customParams.date,
+    customParams.limit,
+    customParams.status,
+    customParams.sort,
+    customParams.page,
+  ]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
+export function usePayoutTransactions(customParams: IParams = {}) {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+
+    // {{account-srv}}/v1/admin/accounts/payout/trx
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+    try {
+      setLoading(true);
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout/trx?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    customParams.date,
     customParams.limit,
     customParams.status,
     customParams.sort,
@@ -191,7 +341,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -233,14 +383,14 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
 }
 
 export function useUserDefaultTransactions(customParams: ITrx = {}) {
-  const [transactions, setTransactions] = useState<TrxData[]>([]);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -291,7 +441,7 @@ export function useUserTransactionsByIBAN(
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -333,6 +483,7 @@ export function useUserTransactionsByIBAN(
 
 export interface TrxData {
   id: string;
+  type: "DEBIT" | "CREDIT";
   senderIban: string;
   recipientIban: string;
   recipientBic: string;
@@ -359,6 +510,8 @@ export interface Meta {
 export interface TransactionType {
   id: string;
   senderIban: string;
+  senderName: string;
+  senderBic: string;
   recipientIban: string;
   recipientBic: string;
   recipientBankAddress: string;
@@ -367,11 +520,13 @@ export interface TransactionType {
   amount: number;
   reference: string;
   centrolinkRef: string;
-  status: "PENDING" | "COMPLETED" | "REJECTED";
+  status: "PENDING" | "COMPLETED" | "REJECTED" | "CANCELLED";
   createdAt: Date;
   updatedAt: Date;
   destinationFirstName: string;
   destinationLastName: string;
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
+  company: BusinessData;
+  narration?: string;
 }

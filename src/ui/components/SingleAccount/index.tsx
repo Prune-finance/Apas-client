@@ -22,6 +22,7 @@ import {
   ThemeIcon,
   Avatar,
   Modal,
+  Switch,
 } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
@@ -41,7 +42,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber, getUserType } from "@/lib/utils";
 import Link from "next/link";
 import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
@@ -76,6 +77,10 @@ import { Documents } from "./(tabs)/Documents";
 import DefaultAccountDetails from "./(defaultTabs)/DefaultAccountDetails";
 import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
 import SendMoneyModal from "./sendMoneyModal";
+import PreviewState from "./previewState";
+import SuccessModal from "../SuccessModal";
+// import SuccessModalImage from "@/assets/success-modal-image.png";
+import PendingModalImage from "@/assets/pending-image.png";
 
 type Param = { id: string };
 interface Props {
@@ -677,7 +682,7 @@ export const SingleDefaultAccountBody = ({
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
     "No. of Transaction": transactions.length,
     Currency: "EUR",
-    ...(business && { "Created By": business?.name }),
+    ...(business && !payout && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
     [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
       business?.lastLogin
@@ -686,8 +691,10 @@ export const SingleDefaultAccountBody = ({
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
       </Text>
+    ) : isDefault ? (
+      "Main Account"
     ) : (
-      account?.type
+      getUserType(account?.type ?? "USER")
     ),
   };
 
@@ -695,7 +702,7 @@ export const SingleDefaultAccountBody = ({
     { value: "Account Details" },
     { value: "Transactions" },
     { value: "Statistics" },
-    { value: "Documents" },
+    ...(!payout ? [{ value: "Documents" }] : []),
   ];
 
   return (
@@ -738,9 +745,11 @@ export const SingleDefaultAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
-        <TabsPanel value={tabs[3].value} mt={28}>
-          <DefaultDocuments account={account} isDefault={isDefault} />
-        </TabsPanel>
+        {!payout && (
+          <TabsPanel value={tabs[3].value} mt={28}>
+            <DefaultDocuments account={account} isDefault={isDefault} />
+          </TabsPanel>
+        )}
       </TabsComponent>
     </Box>
   );
@@ -842,6 +851,20 @@ interface DefaultAccountHeadProps
   loadingBiz: boolean;
 }
 
+export interface RequestForm {
+  amount: string;
+  destinationIBAN: string;
+  destinationBIC: string;
+  destinationBank: string;
+  bankAddress: string;
+  destinationCountry: string;
+  reference: string; // generated using crypto.randomUUID()
+  firstName: string;
+  lastName: string;
+  invoice: string;
+  narration: string;
+}
+
 export const DefaultAccountHead = ({
   loading,
   account,
@@ -849,8 +872,143 @@ export const DefaultAccountHead = ({
   payout,
   business,
   loadingBiz,
+  admin,
 }: DefaultAccountHeadProps) => {
   const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
+  const [openedPreview, { open: openPreview, close: closePreview }] =
+    useDisclosure(false);
+  const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
+    useDisclosure(false);
+  const { handleError, handleSuccess } = useNotification();
+  const [processing, setProcessing] = useState(false);
+  const [sectionState, setSectionState] = useState("");
+  const [moneySent, setMoneySent] = useState(0);
+  const [receiverName, setReceiverName] = useState("");
+
+  const [requestForm, setRequestForm] = useState<RequestForm>({
+    firstName: "",
+    lastName: "",
+    amount: "",
+    destinationIBAN: "",
+    destinationBIC: "",
+    destinationBank: "",
+    bankAddress: "",
+    destinationCountry: "",
+    reference: crypto.randomUUID(),
+    invoice: "",
+    narration: "",
+  });
+
+  const [companyRequestForm, setCompanyRequestForm] = useState({
+    amount: "",
+    companyName: "",
+    destinationIBAN: "",
+    destinationBIC: "",
+    destinationBank: "",
+    bankAddress: "",
+    destinationCountry: "",
+    invoice: "",
+    reference: crypto.randomUUID(),
+    narration: "",
+  });
+
+  const sendMoneyRequest = async () => {
+    setProcessing(true);
+    try {
+      const {
+        firstName,
+        lastName,
+        destinationIBAN,
+        destinationBIC,
+        destinationBank,
+        bankAddress,
+        destinationCountry,
+        amount,
+        invoice,
+        narration,
+      } = requestForm;
+
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/send-money`,
+        {
+          amount,
+          destinationIBAN,
+          destinationBIC,
+          destinationBank,
+          bankAddress,
+          destinationCountry,
+          reference: crypto.randomUUID(),
+          beneficiaryFullName: `${firstName} ${lastName}`,
+          invoice,
+          narration,
+        },
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
+        }
+      );
+      setMoneySent(Number(amount));
+      setReceiverName(`${firstName} ${lastName}`);
+      closePreview();
+      openSuccess();
+      // handleSuccess("Action Completed", "You have successfully sent money");
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const sendMoneyCompanyRequest = async () => {
+    setProcessing(true);
+    try {
+      const {
+        companyName,
+        destinationIBAN,
+        destinationBIC,
+        destinationBank,
+        bankAddress,
+        destinationCountry,
+        amount,
+        invoice,
+        narration,
+        reference,
+      } = companyRequestForm;
+      const { data } = await axios.post(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/send-money`,
+        {
+          amount,
+          destinationIBAN,
+          destinationBIC,
+          destinationBank,
+          bankAddress,
+          destinationCountry,
+          reference: crypto.randomUUID(),
+          beneficiaryFullName: companyName,
+          invoice,
+          narration,
+        },
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
+        }
+      );
+      setMoneySent(Number(amount));
+      setReceiverName(companyName);
+      closePreview();
+      openSuccess();
+      // handleSuccess("Action Completed", "You have successfully sent money");
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+      close();
+    }
+  };
+
+  const handleCloseSuccessModal = () => {
+    // router.push("/admin/businesses");
+    closeSuccess();
+  };
+
   return (
     <>
       <Flex
@@ -906,6 +1064,26 @@ export const DefaultAccountHead = ({
             <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
+          {payout && admin && (
+            <Button
+              // onClick={openTrust}
+              color="#f6f6f6"
+              c="var(--prune-text-gray-700)"
+              fz={12}
+              fw={600}
+              h={32}
+              radius={4}
+            >
+              <Switch
+                label="Trust this User"
+                checked={business?.kycTrusted}
+                labelPosition="left"
+                fz={12}
+                size="xs"
+                color="var(--prune-success-500)"
+              />
+            </Button>
+          )}
         </Flex>
       </Flex>
 
@@ -915,8 +1093,72 @@ export const DefaultAccountHead = ({
         size={"35%"}
         withCloseButton={false}
       >
-        <SendMoneyModal account={account} close={closeMoney} />
+        <SendMoneyModal
+          account={account}
+          close={closeMoney}
+          openPreview={openPreview}
+          setRequestForm={setRequestForm}
+          setCompanyRequestForm={setCompanyRequestForm}
+          setSectionState={setSectionState}
+        />
       </Modal>
+
+      <Modal
+        opened={openedPreview}
+        onClose={closePreview}
+        size={"35%"}
+        centered
+        withCloseButton={false}
+      >
+        <PreviewState
+          requestForm={requestForm}
+          account={account}
+          closePreview={closePreview}
+          sendMoneyRequest={sendMoneyRequest}
+          processing={processing}
+          sectionState={sectionState}
+        />
+      </Modal>
+
+      <Modal
+        opened={openedPreview}
+        onClose={closePreview}
+        size={"35%"}
+        centered
+        withCloseButton={false}
+      >
+        <PreviewState
+          requestForm={requestForm}
+          companyRequestForm={companyRequestForm}
+          account={account}
+          closePreview={closePreview}
+          sendMoneyRequest={
+            sectionState === "Company"
+              ? sendMoneyCompanyRequest
+              : sendMoneyRequest
+          }
+          processing={processing}
+          sectionState={sectionState}
+        />
+      </Modal>
+
+      <SuccessModal
+        openedSuccess={openedSuccess}
+        handleCloseSuccessModal={handleCloseSuccessModal}
+        image={PendingModalImage.src}
+        style={{ height: 120, width: 120, marginBottom: 10 }}
+        desc={
+          <Text fz={12}>
+            Your transfer of{" "}
+            <Text inherit span fw={600} c="#97AD05">
+              {formatNumber(moneySent, true, "EUR")}
+            </Text>{" "}
+            to {receiverName} is in progress. It should be completed within the
+            next 10 minutes. Please wait for confirm.
+          </Text>
+        }
+        title="Transaction Processing"
+      />
     </>
   );
 };

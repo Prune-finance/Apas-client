@@ -1,11 +1,13 @@
 import {
   Badge,
+  Box,
   Card,
   CardProps,
   CardSection,
   CopyButton,
   Group,
   Skeleton,
+  Switch,
   Text,
   ThemeIcon,
 } from "@mantine/core";
@@ -26,6 +28,9 @@ interface Props extends CardProps {
   link?: string;
   loading: boolean;
   badgeText?: string;
+  business?: boolean;
+  disable?: boolean;
+  children?: React.ReactNode;
 }
 
 export const AccountCard = ({
@@ -37,6 +42,9 @@ export const AccountCard = ({
   link,
   loading,
   badgeText,
+  business,
+  disable,
+  children,
   ...props
 }: Props) => {
   return link ? (
@@ -54,23 +62,29 @@ export const AccountCard = ({
     >
       <CardSection px={19} py={13} c="#fff">
         <Group justify="space-between">
-          <Group>
-            <ThemeIcon color="#0052B4" radius="xl">
-              <GiEuropeanFlag />
-            </ThemeIcon>
+          <Group w="100%" gap={12} justify={business ? "" : "space-between"}>
+            <Group gap={8}>
+              <ThemeIcon color="#0052B4" radius="xl">
+                <GiEuropeanFlag />
+              </ThemeIcon>
 
-            {!loading ? (
-              <Text>{`${currency} ${
-                companyName ? "- " + companyName : ""
-              }`}</Text>
-            ) : (
-              <Skeleton h={10} w={100} />
-            )}
+              {!loading ? (
+                <Text>{`${currency} ${
+                  companyName ? "- " + companyName : ""
+                }`}</Text>
+              ) : (
+                <Skeleton h={10} w={100} />
+              )}
+            </Group>
+
+            <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
+              {badgeText ? badgeText : "Account"}
+            </Badge>
           </Group>
 
-          <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
-            {badgeText ? badgeText : "Account"}
-          </Badge>
+          {disable && (
+            <Box onClick={(e) => e.stopPropagation()}>{children}</Box>
+          )}
         </Group>
       </CardSection>
 
@@ -88,19 +102,21 @@ export const AccountCard = ({
           )}
         </Group>
 
-        <CopyButton
-          value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
-        >
-          {({ copied, copy }) => (
-            <SecondaryBtn
-              icon={copied ? IconCheck : IconCopy}
-              text={copied ? "Copied" : "Copy"}
-              action={copy}
-              variant="transparent"
-              td="underline"
-            />
-          )}
-        </CopyButton>
+        <Box onClick={(e) => e.stopPropagation()}>
+          <CopyButton
+            value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
+          >
+            {({ copied, copy }) => (
+              <SecondaryBtn
+                icon={copied ? IconCheck : IconCopy}
+                text={copied ? "Copied" : "Copy"}
+                action={copy}
+                variant="transparent"
+                td="underline"
+              />
+            )}
+          </CopyButton>
+        </Box>
       </Group>
 
       {!loading ? (
@@ -177,19 +193,21 @@ export const AccountCard = ({
           )}
         </Group>
 
-        <CopyButton
-          value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
-        >
-          {({ copied, copy }) => (
-            <SecondaryBtn
-              icon={copied ? IconCheck : IconCopy}
-              text={copied ? "Copied" : "Copy"}
-              action={copy}
-              variant="transparent"
-              td="underline"
-            />
-          )}
-        </CopyButton>
+        <Box onClick={(e) => e.stopPropagation()}>
+          <CopyButton
+            value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
+          >
+            {({ copied, copy }) => (
+              <SecondaryBtn
+                icon={copied ? IconCheck : IconCopy}
+                text={copied ? "Copied" : "Copy"}
+                action={copy}
+                variant="transparent"
+                td="underline"
+              />
+            )}
+          </CopyButton>
+        </Box>
       </Group>
 
       {!loading ? (

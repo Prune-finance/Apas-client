@@ -70,11 +70,11 @@ function AccountRequests() {
   } = Object.fromEntries(searchParams.entries());
 
   const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
+  const [limit, setLimit] = useState<string | null>("100");
 
   const queryParams = {
     page: active,
-    limit: parseInt(limit ?? "10", 10),
+    limit: parseInt(limit ?? "100", 10),
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),

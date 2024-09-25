@@ -100,7 +100,13 @@ export default function NewBusiness() {
     setProcessing(true);
     try {
       const { errors, hasErrors } = form.validate();
-      const { directors, shareholders, pricingPlan, ...rest } = form.values;
+      const {
+        directors,
+        shareholders,
+        pricingPlan,
+        contactCountryCode,
+        ...rest
+      } = form.values;
 
       const initialDir = directors && directors[0];
       const initialShr = shareholders && shareholders[0];

@@ -7,12 +7,18 @@ interface successModalProps {
   openedSuccess: boolean;
   handleCloseSuccessModal: () => void;
   image?: StaticImageData | string;
+  desc?: any;
+  title?: string;
+  style?: any;
 }
 
 function SuccessModal({
   openedSuccess,
   handleCloseSuccessModal,
   image,
+  desc,
+  title,
+  style,
 }: successModalProps) {
   return (
     <Modal
@@ -21,17 +27,17 @@ function SuccessModal({
       centered
       bg="#fff"
       title=""
-      size={460}
+      size={400}
     >
-      <Flex align="center" justify="center" direction="column" mb={40}>
-        <Box>
+      <Flex align="center" justify="center" direction="column" mb={40} px={30}>
+        <Box style={style}>
           <Image src={image} h="100%" w="100%" alt="success-modal-image" />
         </Box>
         <Text fz={16} fw={600} c="#000">
-          Business Creation Successful
+          {title ? title : "Business Creation Successful"}
         </Text>
-        <Text fz={12} c="#667085">
-          You have successfully created a new business
+        <Text fz={14} c="#667085" ta="center" mt={10}>
+          {desc ? desc : "You have successfully created a new business"}
         </Text>
       </Flex>
     </Modal>

@@ -5,7 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 
 interface IParams {
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   type?: string;
@@ -20,7 +20,7 @@ export function useAccounts(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
@@ -57,7 +57,7 @@ export function useAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, accounts, revalidate, meta };
 }
@@ -132,6 +132,41 @@ export function useBusinessDefaultAccount(id: string) {
   return { loading, account, revalidate };
 }
 
+export function useBusinessPayoutAccount(id: string) {
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${id}/payout-account`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccount();
+  }
+
+  useEffect(() => {
+    fetchAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+
 export function usePayoutAccount() {
   const [accounts, setAccounts] = useState<AccountData[] | null>(null);
   const [meta, setMeta] = useState<AccountMeta | null>(null);
@@ -173,11 +208,15 @@ export function useUserAccounts(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
   const [meta, setMeta] = useState<AccountMeta>();
   const [loading, setLoading] = useState(true);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [issuanceRequests, setIssuanceRequests] = useState<
+    { id: string; status: "PENDING" | "APPROVED" | "REJECTED" }[]
+  >([]);
 
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
@@ -206,17 +245,44 @@ export function useUserAccounts(customParams: IParams = {}) {
     }
   }
 
+  const handleCheckRequestAccess = async () => {
+    setStatusLoading(true);
+    // &status=PENDING
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/all?type=ACCOUNT_ISSUANCE`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setIssuanceRequests(res?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setStatusLoading(false);
+    }
+  };
+
   const revalidate = () => fetchAccounts();
+  const revalidateIssuance = () => handleCheckRequestAccess();
 
   useEffect(() => {
     fetchAccounts();
+    handleCheckRequestAccess();
 
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
-  return { loading, accounts, revalidate, meta };
+  return {
+    loading,
+    accounts,
+    revalidate,
+    revalidateIssuance,
+    meta,
+    statusLoading,
+    issuanceRequests,
+  };
 }
 
 export function useSingleUserAccount(id: string) {
@@ -381,7 +447,8 @@ export interface AccountData {
     name: string;
     id: string;
   };
-  type: string;
+  staging: "TEST" | "LIVE";
+  type: "USER" | "CORPORATE";
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
 }
 

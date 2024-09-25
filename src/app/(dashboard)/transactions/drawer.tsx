@@ -1,4 +1,8 @@
-import { TransactionType, TrxData } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  useSingleCompanyTransactions,
+  useSingleTransactions,
+} from "@/lib/hooks/transactions";
 import { formatNumber } from "@/lib/utils";
 import {
   Drawer,
@@ -6,17 +10,12 @@ import {
   Box,
   Divider,
   Text,
-  Badge,
   Stack,
   Group,
   Skeleton,
+  ScrollArea,
 } from "@mantine/core";
-import {
-  IconX,
-  IconArrowUpRight,
-  IconPointFilled,
-  IconCircleArrowDown,
-} from "@tabler/icons-react";
+import { IconCircleArrowDown } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -32,8 +31,8 @@ import {
 import { useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
-import { send } from "process";
 import { AmountGroup } from "@/ui/components/AmountGroup";
+import Transaction from "@/lib/store/transaction";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
@@ -46,14 +45,25 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
-  console.log(selectedRequest);
   const pdfRef = useRef<HTMLDivElement>(null);
+
+  const { transaction, loading: loadingTransaction } = useSingleTransactions(
+    selectedRequest?.id ?? ""
+  );
+
+  const { clearData } = Transaction();
+
+  const {
+    transaction: defaultTransaction,
+    loading: loadingDefaultTransaction,
+  } = useSingleCompanyTransactions(selectedRequest?.id ?? "");
 
   const { account: senderAccount, loading: loadingSenderAcct } =
     useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
 
   const businessDetails = {
-    "Business Name": "N/A",
+    "Business Name":
+      transaction?.company?.name ?? defaultTransaction?.company?.name ?? "N/A",
     "Account Type": "N/A",
     IBAN: selectedRequest?.recipientIban,
     BIC: selectedRequest?.recipientBic,
@@ -64,28 +74,35 @@ export const TransactionDrawer = ({
     IBAN: selectedRequest?.recipientIban,
     BIC: selectedRequest?.recipientBic,
     "Bank Name": selectedRequest?.recipientBankAddress,
-    "Bank Address": "N/A",
+    "Bank Address": selectedRequest?.recipientBankAddress,
     Country: selectedRequest?.recipientBankCountry,
-    "Reference 2": selectedRequest?.reference ?? "N/A",
+    "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
   const senderDetails = {
     "Account Name": loadingSenderAcct ? (
       <Skeleton h={10} w={100} />
     ) : (
-      senderAccount?.accountName ?? "N/A"
+      selectedRequest?.senderName
     ),
     IBAN: selectedRequest?.senderIban,
-    BIC: "ARPYGB21XXX",
-    Bank: "N/A",
-    "Bank Address": "N/A",
-    Country: "N/A",
+    BIC: selectedRequest?.senderBic,
+    Bank:
+      selectedRequest?.type === "DEBIT"
+        ? "Prune Payments LTD"
+        : "Prune Payments LTD",
+    "Bank Address":
+      selectedRequest?.type === "DEBIT"
+        ? "Office 7 35-37 Ludgate Hill, London"
+        : "Office 7 35-37 Ludgate Hill, London",
+    Country:
+      selectedRequest?.type === "DEBIT" ? "United Kingdom" : "United Kingdom",
   };
 
   const otherDetails = {
-    "Reference 1": "N/A",
-    "Transaction ID": selectedRequest?.id,
-    "Date and Time": dayjs(selectedRequest?.createdAt).format(
+    "Prune Reference": selectedRequest?.centrolinkRef ?? "N/A",
+    "C-L Reference": selectedRequest?.id,
+    "Date & Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
     ),
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
@@ -103,7 +120,8 @@ export const TransactionDrawer = ({
   };
 
   const SenderDetails = {
-    "Account Name": senderAccount?.accountName ?? "N/A",
+    "Account Name":
+      senderAccount?.accountName ?? selectedRequest?.senderName ?? "N/A",
     "Account Number": selectedRequest?.senderIban ?? "",
     "Bank Name": "Prune Payments LTD",
     BIC: "ARPYGB21XXX",
@@ -115,7 +133,7 @@ export const TransactionDrawer = ({
       "hh:mm A Do MMM YYYY"
     ),
     Reference: selectedRequest?.reference ?? "N/A",
-    "Transaction ID": selectedRequest?.id ?? "",
+    "C-L Reference": selectedRequest?.id ?? "",
   };
   const details: ReceiptDetails[] = [
     {
@@ -125,10 +143,14 @@ export const TransactionDrawer = ({
     { title: "Beneficiary Details", value: BeneficiaryDetails },
     { title: "Other Details", value: OtherDetails },
   ];
+
   return (
     <Drawer
       opened={opened}
-      onClose={close}
+      onClose={() => {
+        close();
+        // clearData();
+      }}
       position="right"
       title={
         <Text fz={18} fw={600} c="#1D2939" ml={28}>
@@ -141,130 +163,107 @@ export const TransactionDrawer = ({
     >
       <Divider mb={20} />
       <Box px={28} pb={28}>
-        <Flex align="center" justify="space-between">
-          <Flex direction="column">
-            <Text c="var(--prune-text-gray-500)" fz={12}>
-              {selectedRequest?.type === "DEBIT"
-                ? "Amount Sent"
-                : "Amount Received"}
-            </Text>
+        <ScrollArea h="calc(100vh - 145px)" scrollbars="y" scrollbarSize={1}>
+          <Flex align="center" justify="space-between">
+            <Flex direction="column">
+              <Text c="var(--prune-text-gray-500)" fz={12}>
+                {selectedRequest?.type === "DEBIT"
+                  ? "Amount Sent"
+                  : "Amount Received"}
+              </Text>
 
-            <Text c="#97AD05" fz={32} fw={600}>
-              {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
-            </Text>
+              <Text c="#97AD05" fz={32} fw={600}>
+                {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
+              </Text>
+            </Flex>
+
+            <AmountGroup
+              type={selectedRequest?.type as "DEBIT" | "CREDIT"}
+              colored
+              fz={12}
+            />
           </Flex>
 
-          <AmountGroup
-            type={selectedRequest?.type as "DEBIT" | "CREDIT"}
-            colored
-            fz={12}
-          />
-        </Flex>
+          <Divider mt={30} mb={20} />
 
-        <Divider mt={30} mb={20} />
+          <Text
+            fz={16}
+            mb={24}
+            tt="uppercase"
+            c="var(--prune-text-gray-800)"
+            fw={600}
+          >
+            Sender Details
+          </Text>
 
-        <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Business Details
-        </Text>
+          <Stack gap={24}>
+            {Object.entries(senderDetails).map(([key, value]) => (
+              <Group justify="space-between" key={key}>
+                <Text fz={12} c="var(--prune-text-gray-500)">
+                  {key}:
+                </Text>
 
-        <Stack gap={24}>
-          {Object.entries(businessDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
+                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                  {value}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
 
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
-        <Divider mt={30} mb={20} />
+          <Divider mt={30} mb={20} />
 
-        <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Sender Details
-        </Text>
+          <Text
+            fz={16}
+            mb={24}
+            tt="uppercase"
+            c="var(--prune-text-gray-800)"
+            fw={600}
+          >
+            Beneficiary Details
+          </Text>
 
-        <Stack gap={24}>
-          {Object.entries(senderDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
+          <Stack gap={24}>
+            {Object.entries(beneficiaryDetails).map(([key, value]) => (
+              <Group justify="space-between" key={key}>
+                <Text fz={12} c="var(--prune-text-gray-500)">
+                  {key}:
+                </Text>
 
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
+                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                  {value}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
 
-        <Divider mt={30} mb={20} />
+          <Divider mt={30} mb={20} />
 
-        <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Beneficiary Details
-        </Text>
+          <Text
+            fz={16}
+            mb={24}
+            tt="uppercase"
+            c="var(--prune-text-gray-800)"
+            fw={600}
+          >
+            Other Details
+          </Text>
 
-        <Stack gap={24}>
-          {Object.entries(beneficiaryDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
+          <Stack gap={24}>
+            {Object.entries(otherDetails).map(([key, value]) => (
+              <Group justify="space-between" key={key}>
+                <Text fz={12} c="var(--prune-text-gray-500)">
+                  {key}:
+                </Text>
 
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
+                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
+                  {value}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
 
-        <Divider mt={30} mb={20} />
-
-        <Text
-          fz={16}
-          mb={24}
-          tt="uppercase"
-          c="var(--prune-text-gray-800)"
-          fw={600}
-        >
-          Other Details
-        </Text>
-
-        <Stack gap={24}>
-          {Object.entries(otherDetails).map(([key, value]) => (
-            <Group justify="space-between" key={key}>
-              <Text fz={12} c="var(--prune-text-gray-500)">
-                {key}:
-              </Text>
-
-              <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                {value}
-              </Text>
-            </Group>
-          ))}
-        </Stack>
-
-        <Divider mt={30} mb={20} />
+          <Divider mt={30} mb={20} />
+        </ScrollArea>
 
         <PrimaryBtn
           icon={IconCircleArrowDown}

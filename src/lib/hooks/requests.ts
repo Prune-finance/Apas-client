@@ -9,12 +9,13 @@ import { set } from "zod";
 interface IParams {
   period?: string;
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   query?: string;
   type?: string;
   page?: number;
+  companyId?: string;
 }
 
 export function useRequests(customParams: IParams = {}, id: string = "") {
@@ -25,7 +26,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
@@ -67,7 +68,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -80,7 +81,7 @@ export function useAllRequests(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
@@ -121,7 +122,73 @@ export function useAllRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+
+  return { loading, requests, meta, revalidate };
+}
+
+export function useAllCompanyRequests(
+  businessId: string,
+  customParams: IParams = {}
+) {
+  const [requests, setRequests] = useState<IUserRequest[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type.toUpperCase() }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.companyId && { companyId: customParams.companyId }),
+    };
+  }, [customParams]);
+
+  async function fetchAccounts() {
+    //  `${id}/requests`;: fetch all requests for a specific business
+    setLoading(true);
+    try {
+      // const status = query ? `?status=${query}` : "";
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${businessId}/requests/all?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setRequests(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccounts();
+  }
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    obj.date,
+    obj.limit,
+    obj.sort,
+    obj.status,
+    obj.type,
+    obj.page,
+    obj.companyId,
+  ]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -169,7 +236,7 @@ export function useUserRequests(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
@@ -207,7 +274,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -255,7 +322,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -288,7 +355,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate };
 }
@@ -301,9 +368,10 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.companyId && { companyId: customParams.companyId }),
     };
   }, [customParams]);
 
@@ -335,7 +403,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.companyId]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -351,7 +419,7 @@ export function useCompanyDebitRequests(
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
     };
@@ -385,12 +453,12 @@ export function useCompanyDebitRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.sort, obj.status]);
 
   return { loading, requests, revalidate, meta };
 }
 
-export function useLiveKeyRequests() {
+export function useLiveKeyRequests(id: string = "") {
   const [requests, setRequests] = useState<LiveKeyRequest[]>([]);
   const [meta, setMeta] = useState<Meta>();
   const [loading, setLoading] = useState(true);
@@ -398,8 +466,9 @@ export function useLiveKeyRequests() {
   async function fetchAccounts() {
     setLoading(true);
     try {
+      const filtered = id ? `/${id}` : "";
       const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests${filtered}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -438,7 +507,7 @@ export function useCompanyRequests(
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -477,15 +546,15 @@ export function useCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }
 
 export interface IUserRequest {
   id: string;
-  type: "FREEZE" | "UNFREEZE" | "ACTIVATE" | "DEACTIVATE";
-  status: string;
+  type: "FREEZE" | "UNFREEZE" | "ACTIVATE" | "DEACTIVATE" | "ACCOUNT_ISSUANCE";
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   reason: string;
   supportingDocumentName: null | string;
   supportingDocumentUrl: null;
@@ -517,7 +586,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -554,7 +623,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.createdAt, obj.limit, obj.sort, obj.status, obj.page]);
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -567,6 +636,7 @@ interface BaseData {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
+  reason: string | null;
   Company: {
     name: string;
     id: string;
@@ -575,6 +645,8 @@ interface BaseData {
     legalEntity: string;
     domain: string;
   };
+  documentApprovals: Record<string, any>;
+  country: string;
 }
 
 export interface DebitRequest {
@@ -631,23 +703,21 @@ export interface Meta {
   total: number;
 }
 
-interface UserRequestData extends BaseData {
+export interface UserRequestData extends BaseData {
   accountType: "USER";
-  country: string;
   documentData: Director;
 }
 
-interface CorporateRequestData extends BaseData {
+export interface CorporateRequestData extends BaseData {
   accountType: "CORPORATE";
-  country: string;
   documentData: DocumentData;
 }
 
 export type RequestData = UserRequestData | CorporateRequestData;
 
 export interface DocumentData {
-  certOfInc: string;
   mermat: string;
+  certOfInc: string;
   directors: Directors;
   shareholders: Shareholder;
 }
@@ -668,6 +738,7 @@ export interface Director {
 }
 export interface CorporateDirector {
   idFile: string;
+  idFileBack?: string;
   idType: string;
   poaFile: string;
   poaType: string;
@@ -682,7 +753,7 @@ export interface RequestMeta {
 
 export interface PayoutAccount {
   id: string;
-  status: string;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   companyName: string;
   documentData: PayoutDocumentData;
   createdAt: Date;

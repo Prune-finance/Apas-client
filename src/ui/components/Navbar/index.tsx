@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { IconLogout } from "@tabler/icons-react";
+import { IconBook, IconLogout } from "@tabler/icons-react";
 
 import {
   AdminMainLinks,
@@ -19,10 +19,10 @@ import {
 import PruneLogo from "@/assets/logo.png";
 import PruneTintLogo from "@/assets/logo-tint.png";
 import styles from "./styles.module.scss";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useIdle } from "@mantine/hooks";
 import ModalComponent from "../Modal";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { clearSession } from "@/lib/actions/checkToken";
 import path from "path";
 
@@ -32,7 +32,7 @@ export default function Navbar() {
 
   const [processing, setProcessing] = useState(false);
 
-  const handleAdminLogout = async () => {
+  const handleAdminLogout = async (redirect?: string) => {
     setProcessing(true);
     try {
       await axios.get(`/api/auth/admin/logout`);
@@ -40,13 +40,22 @@ export default function Navbar() {
       // await clearSession();
 
       Cookies.remove("auth");
-      window.location.replace("/auth/admin/login");
+      window.location.replace(
+        `/auth/admin/login${redirect ? `?redirect=${redirect}` : ""}`
+      );
     } catch (error) {
       console.log(error);
     } finally {
       setProcessing(false);
     }
   };
+
+  const idle = useIdle(1000 * 60 * 30, { initialState: false });
+  useEffect(() => {
+    if (idle) {
+      handleAdminLogout(pathname);
+    }
+  }, [idle]);
 
   return (
     <nav className={styles.nav}>
@@ -152,7 +161,7 @@ export function UserNavbar() {
 
   const [processing, setProcessing] = useState(false);
 
-  const handleUserLogout = async () => {
+  const handleUserLogout = async (redirect?: string) => {
     setProcessing(true);
     try {
       await axios.get(`/api/auth/logout`, {
@@ -162,13 +171,22 @@ export function UserNavbar() {
       // await clearSession();
 
       Cookies.remove("auth");
-      window.location.replace("/auth/login");
+      window.location.replace(
+        `/auth/login${redirect ? `?redirect=${redirect}` : ""}`
+      );
     } catch (error) {
       console.log(error);
     } finally {
       setProcessing(false);
     }
   };
+
+  const idle = useIdle(1000 * 60 * 30, { initialState: false });
+  useEffect(() => {
+    if (idle) {
+      handleUserLogout(pathname);
+    }
+  }, [idle]);
 
   const isActive = (link: string): boolean => {
     return (
@@ -243,6 +261,19 @@ export function UserNavbar() {
           </Stack>
         </div>
       </div>
+
+      <UnstyledButton
+        component={Link}
+        href="https://docs.prunepayments.net/"
+        target="_blank"
+        className={styles.nav__cta__container}
+      >
+        <Text fz={12}>API Documentation</Text>
+
+        <div className={styles.nav__cta}>
+          <IconBook size={16} />
+        </div>
+      </UnstyledButton>
 
       <UnstyledButton onClick={open} className={styles.nav__cta__container}>
         <Text fz={12}>Log out</Text>

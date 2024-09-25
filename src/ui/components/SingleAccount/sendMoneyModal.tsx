@@ -32,29 +32,20 @@ import Company from "./company";
 interface SendMoneyModalProps {
   account: DefaultAccount | null;
   close: () => void;
+  openPreview: () => void;
+  setRequestForm: any;
+  setCompanyRequestForm: any;
+  setSectionState: any;
 }
 
-export const sendMoneyRequest = {
-  account: "",
-  amount: "",
-  destinationIBAN: "",
-  destinationBIC: "",
-  destinationCountry: "",
-  destinationBank: "",
-  reference: crypto.randomUUID(),
-  reason: "",
-  destinationFirstName: "",
-  destinationLastName: "",
-  accountBalance: 0,
-};
-
-function SendMoneyModal({ account, close }: SendMoneyModalProps) {
-  const form = useForm({
-    initialValues: {
-      ...sendMoneyRequest,
-    },
-  });
-
+function SendMoneyModal({
+  account,
+  close,
+  openPreview,
+  setRequestForm,
+  setCompanyRequestForm,
+  setSectionState,
+}: SendMoneyModalProps) {
   return (
     <main className={styles.main}>
       <Paper className={styles.form__container} px={30} pt={0} pb={10}>
@@ -91,8 +82,20 @@ function SendMoneyModal({ account, close }: SendMoneyModalProps) {
         </Box>
 
         <TabsComponent tabs={tabs} mt={32}>
-          <Individual account={account} close={close} />
-          <Company account={account} close={close} />
+          <Individual
+            account={account}
+            close={close}
+            openPreview={openPreview}
+            setRequestForm={setRequestForm}
+            setSectionState={setSectionState}
+          />
+          <Company
+            account={account}
+            close={close}
+            openPreview={openPreview}
+            setCompanyRequestForm={setCompanyRequestForm}
+            setSectionState={setSectionState}
+          />
         </TabsComponent>
       </Paper>
     </main>

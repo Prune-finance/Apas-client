@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 
 import {
   Button,
+  Checkbox,
   Flex,
   Grid,
   GridCol,
@@ -15,7 +16,11 @@ import {
 import { IconPencilMinus } from "@tabler/icons-react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessData } from "@/lib/hooks/businesses";
+import {
+  BusinessData,
+  Service,
+  useBusinessServices,
+} from "@/lib/hooks/businesses";
 import { useState } from "react";
 import { useForm, UseFormReturnType } from "@mantine/form";
 import axios from "axios";
@@ -25,25 +30,21 @@ import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BasicInfoType } from "@/lib/schema";
 import { ContactDocumentTextInput } from "./utils";
+import { useParams } from "next/navigation";
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 
 export default function Business({
   business,
   revalidate,
+  services,
 }: {
   business: BusinessData;
   revalidate: () => void;
+  services: Service[];
 }) {
-  const [editingTop, setEditingTop] = useState(false);
-  const [editingBottom, setEditingBottom] = useState(false);
-  const [editingBizInfo, setEditingBizInfo] = useState(false);
-  const [processing, setProcessing] = useState(false);
-
-  const { pricingPlan } = usePricingPlan();
-  const pricingPlanOptions = pricingPlan.map((plan) => ({
-    label: plan.name,
-    value: plan.id,
-  }));
-
   const { handleSuccess, handleError } = useNotification();
 
   const initialValues = {
@@ -103,11 +104,7 @@ export default function Business({
         business={business}
       />
 
-      <Services
-        form={form as unknown as UseFormReturnType<BasicInfoType>}
-        handleBusinessUpdate={handleBusinessUpdate}
-        business={business}
-      />
+      <Services services={services} />
 
       <BusinessBio
         form={form as unknown as UseFormReturnType<BasicInfoType>}
@@ -417,6 +414,24 @@ const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
             business={business as BasicInfoType}
           />
         </GridCol>
+
+        {business.contactSignup && (
+          <GridCol span={4} className={styles.grid}>
+            <TextInput
+              readOnly
+              classNames={{
+                input: styles.input,
+                label: styles.label,
+              }}
+              // w={324}
+              label="Date & Time of Activation"
+              placeholder={dayjs(business.contactSignup).format(
+                "Do MMMM, YYYY - hh:mm A"
+              )}
+              // {...form.getInputProps("contactEmail")}
+            />
+          </GridCol>
+        )}
       </Grid>
     </div>
   );
@@ -491,18 +506,9 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
   );
 };
 
-const Services = ({ business, form, handleBusinessUpdate }: IProps) => {
-  const [editingBizInfo, setEditingBizInfo] = useState(false);
-  const [processing, setProcessing] = useState(false);
-
-  const handleSubmit = async () => {
-    setProcessing(true);
-    try {
-      await handleBusinessUpdate();
-      setEditingBizInfo(false);
-    } finally {
-      setProcessing(false);
-    }
+const Services = ({ services }: { services: Service[] }) => {
+  const handleServiceChange = (id: string) => {
+    console.log(id);
   };
 
   return (
@@ -512,21 +518,45 @@ const Services = ({ business, form, handleBusinessUpdate }: IProps) => {
       </Text>
 
       <Grid mt={20} className={styles.grid__container}>
-        <GridCol span={12} className={styles.grid}>
-          <Textarea
-            readOnly={!editingBizInfo}
+        {services.map((service) => (
+          <GridCol span={4} className={styles.grid} key={service.id}>
+            <Checkbox
+              label={service.title}
+              checked={
+                service.serviceIdentifier === "ACCOUNT_SERVICE"
+                  ? true
+                  : service.active
+              }
+              // onChange={() => handleServiceChange(service.id)}
+              color="var(--prune-primary-700)"
+              classNames={{
+                root: styles.input,
+                label: styles.label,
+              }}
+              styles={{
+                root: {
+                  padding: "12px 16px",
+                },
+              }}
+            />
+          </GridCol>
+        ))}
+        {/* <GridCol span={4} className={styles.grid}>
+          <Checkbox
+            label={"Account Service"}
+            // checked={true}
+            // onChange={() => handleServiceChange("service.id")}
             classNames={{
-              input: styles.input,
+              root: styles.input,
               label: styles.label,
             }}
-            minRows={6}
-            maxRows={6}
-            autosize
-            label="Business Bio"
-            placeholder={business?.businessBio || ""}
-            {...form.getInputProps("businessBio")}
+            styles={{
+              root: {
+                padding: "12px 16px",
+              },
+            }}
           />
-        </GridCol>
+        </GridCol> */}
       </Grid>
     </div>
   );

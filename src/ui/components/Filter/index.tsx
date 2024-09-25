@@ -78,7 +78,7 @@ export default function Filter<T>({
                 ? approvalOptions
                 : frozenStatus
                 ? frozenActiveOptions
-                : ["Active", "Inactive"]
+                : ["Active", "Inactive", "Frozen", "Deactivated"]
             }
             size="xs"
             w={120}
@@ -124,6 +124,7 @@ export default function Filter<T>({
 
 const approvalOptions = [
   "Approved",
+  "Cancelled",
   "Pending",
   "Rejected",
   "Confirmed",

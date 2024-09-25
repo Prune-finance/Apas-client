@@ -33,6 +33,7 @@ import {
   IconAlertTriangle,
   IconShieldCheck,
   IconRosetteDiscountCheckFilled,
+  IconCreditCardPay,
 } from "@tabler/icons-react";
 
 import ActiveBadge from "@/assets/active-badge.svg";
@@ -46,28 +47,41 @@ import Shareholders from "./(tabs)/shareholder";
 import Accounts from "./(tabs)/accounts";
 import Keys from "./(tabs)/keys";
 
-import { useSingleBusiness } from "@/lib/hooks/businesses";
+import { useBusinessServices, useSingleBusiness } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { activeBadgeColor } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useInterval } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 import { BackBtn, PrimaryBtn } from "@/ui/components/Buttons";
+import { Requests } from "./(tabs)/requests";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+
+dayjs.extend(duration);
+import { notifications } from "@mantine/notifications";
+
+dayjs.extend(duration);
 
 export default function SingleBusiness() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { loading, business, revalidate } = useSingleBusiness(params.id);
+  const { loading, business, revalidate, meta } = useSingleBusiness(params.id);
 
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab")?.toLowerCase() || "business";
 
-  const { handleSuccess, handleError } = useNotification();
+  const { services, revalidate: revalidateServices } = useBusinessServices(
+    params.id
+  );
+
+  const { handleSuccess, handleError, handleInfo } = useNotification();
   const [processingLink, setProcessingLink] = useState(false);
   const [processingActive, setProcessingActive] = useState(false);
   const [processingTrust, setProcessingTrust] = useState(false);
+  const [processingAccounts, setProcessingAccounts] = useState(false);
   // const [trusted, setTrusted] = useState(business ? business.kycTrusted : false);
 
   const [activeTab, setActiveTab] = useState<string | null>(tab);
@@ -110,10 +124,34 @@ export default function SingleBusiness() {
       );
 
       handleSuccess("Action Completed", `Activation Link sent`);
+      revalidate();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
       setProcessingLink(false);
+    }
+  };
+
+  const enableIssuedAccount = async () => {
+    setProcessingAccounts(true);
+
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business/${params.id}/account-issuance/enable`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess(
+        "Successful",
+        `You have successfully enabled issued accounts service for this business.`
+      );
+      revalidate();
+      revalidateServices();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessingAccounts(false);
     }
   };
 
@@ -166,6 +204,62 @@ export default function SingleBusiness() {
         };
     }
   }, [business?.companyStatus]);
+
+  const [remainingTime, setRemainingTime] = useState(0);
+  const [isExpired, setIsExpired] = useState(false);
+
+  useEffect(() => {
+    const activationLinkExpiringTime = meta?.activeActivationLink
+      ? dayjs(meta.activeActivationLink.createdAt).add(72, "hours")
+      : null;
+
+    if (!activationLinkExpiringTime) {
+      setRemainingTime(0);
+      setIsExpired(true); // Mark as expired if there's no valid link
+      return;
+    }
+
+    const initialRemainingTime = activationLinkExpiringTime.diff(
+      dayjs(),
+      "second"
+    );
+
+    if (initialRemainingTime > 0) {
+      setRemainingTime(initialRemainingTime);
+      setIsExpired(false); // Set to false if the countdown is valid
+
+      const interval = setInterval(() => {
+        const now = dayjs();
+
+        const diffInSeconds = activationLinkExpiringTime.diff(now, "second");
+
+        if (diffInSeconds >= 0) {
+          setRemainingTime(diffInSeconds);
+        } else {
+          setRemainingTime(0);
+          setIsExpired(true); // Mark as expired when the time is up
+          clearInterval(interval); // Stop the interval
+        }
+      }, 1000);
+
+      return () => clearInterval(interval); // Clean up the interval
+    } else {
+      setRemainingTime(0);
+      setIsExpired(true); // Time has already expired
+    }
+  }, [meta?.activeActivationLink]);
+
+  const formatDuration = (seconds: number) => {
+    const duration = dayjs.duration(seconds, "seconds");
+    return `${String(duration.days() * 24 + duration.hours()).padStart(
+      2,
+      "0"
+    )}:${String(duration.minutes()).padStart(2, "0")}:${String(
+      duration.seconds()
+    ).padStart(2, "0")}`;
+  };
+
+  console.log(services);
 
   return (
     <main className={styles.main}>
@@ -262,14 +356,53 @@ export default function SingleBusiness() {
                 />
               </Button>
 
-              <PrimaryBtn
-                text="Send Activation Link"
-                action={sendActivationLink}
-                radius={4}
-                loading={processingLink}
-                h={32}
-                fw={600}
-              />
+              {loading ? (
+                <Skeleton h={30} w={100} />
+              ) : (
+                <>
+                  {Boolean(meta?.users) ? (
+                    <>
+                      {!services.find(
+                        (service) =>
+                          service.serviceIdentifier === "ISSUED_ACCOUNT_SERVICE"
+                      )?.active && (
+                        <PrimaryBtn
+                          text="Enable Issued Accounts"
+                          action={enableIssuedAccount}
+                          radius={4}
+                          loading={processingAccounts}
+                          h={32}
+                          fw={600}
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <PrimaryBtn
+                      text={
+                        Boolean(meta?.activationLinkCount)
+                          ? isExpired
+                            ? "Resend Activation Link"
+                            : `Link Expires in ${formatDuration(remainingTime)}`
+                          : "Send Activation Link"
+                      }
+                      action={() => {
+                        if (remainingTime && remainingTime > 0) {
+                          notifications.clean();
+                          return handleInfo(
+                            "A valid activation link has been sent to the business",
+                            ""
+                          );
+                        }
+                        return sendActivationLink();
+                      }}
+                      radius={4}
+                      loading={processingLink}
+                      h={32}
+                      fw={600}
+                    />
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -301,7 +434,11 @@ export default function SingleBusiness() {
 
             <TabsPanel value="business">
               {business && (
-                <Business business={business} revalidate={revalidate} />
+                <Business
+                  business={business}
+                  revalidate={revalidate}
+                  services={services}
+                />
               )}
             </TabsPanel>
 
@@ -329,6 +466,10 @@ export default function SingleBusiness() {
 
             <TabsPanel value="keys">
               <Keys business={business} loading={loading} />
+            </TabsPanel>
+
+            <TabsPanel value="requests">
+              <Requests business={business} />
             </TabsPanel>
           </Tabs>
         </div>
@@ -390,4 +531,5 @@ const tabs = [
   { title: "Key Shareholders", value: "shareholders", icon: IconUsersGroup },
   { value: "accounts", icon: IconCurrencyEuro },
   { title: "API Keys", value: "keys", icon: IconKey },
+  { value: "requests", icon: IconCreditCardPay },
 ];

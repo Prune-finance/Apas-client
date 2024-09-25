@@ -25,10 +25,20 @@ import PayoutAccount from "./(tabs)/payout";
 import Unfreeze from "./(tabs)/live-key";
 import TabsComponent from "@/ui/components/Tabs";
 import LiveKeySuspense from "./(tabs)/live-key";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function TabsContainer() {
+function TabsContainer() {
+  const searchParams = useSearchParams();
+  const tab = searchParams.get("tab");
   return (
-    <TabsComponent tabs={tabs} mt={24} tt="capitalize" fz={12}>
+    <TabsComponent
+      defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
+      tabs={tabs}
+      mt={24}
+      tt="capitalize"
+      fz={12}
+    >
       <TabsPanel value={tabs[0].value}>
         <Debit />
       </TabsPanel>
@@ -55,9 +65,9 @@ const tabs = [
     icon: <IconCircleArrowUpRight size={16} />,
   },
   {
-    title: "Payout Account",
-    value: "payout-account",
-    icon: <IconMoneybag size={16} />,
+    title: "Services",
+    value: "services",
+    icon: <IconUserPlus size={16} />,
   },
   {
     title: "Live Keys",
@@ -85,3 +95,11 @@ const tabs = [
   //   icon: IconSnowflakeOff,
   // },
 ];
+
+export default function TabsContainerSuspense() {
+  return (
+    <Suspense>
+      <TabsContainer />
+    </Suspense>
+  );
+}

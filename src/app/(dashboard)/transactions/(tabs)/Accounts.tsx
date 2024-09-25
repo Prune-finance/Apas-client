@@ -14,7 +14,15 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { Flex, Group, TableTd, TableTr, TabsPanel } from "@mantine/core";
+import {
+  Flex,
+  Group,
+  Stack,
+  TableTd,
+  TableTr,
+  TabsPanel,
+  Text,
+} from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
@@ -27,9 +35,12 @@ import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
 import { OwnAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "@/ui/components/AmountGroup";
+import { useSearchParams } from "next/navigation";
+import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
+import Transaction from "@/lib/store/transaction";
 
 export const AccountsTab = () => {
-  const { transactions, loading } = useUserDefaultTransactions();
+  const searchParams = useSearchParams();
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -40,6 +51,15 @@ export const AccountsTab = () => {
   const [limit, setLimit] = useState<string | null>("10");
   const [selectedRequest, setSelectedRequest] =
     useState<TransactionType | null>(null);
+
+  const { status, createdAt, sort } = Object.fromEntries(
+    searchParams.entries()
+  );
+  const { transactions, loading } = useUserDefaultTransactions({
+    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toLowerCase() }),
+    page: active,
+  });
 
   const form = useForm<FilterType>({
     initialValues: filterValues,
@@ -55,13 +75,19 @@ export const AccountsTab = () => {
     },
     {
       title: "Money In",
-      value: 0,
+      value:
+        transactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value:
+        transactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
     },
@@ -79,7 +105,7 @@ export const AccountsTab = () => {
     parseInt(limit ?? "10", 10)
   ).map((element) => (
     <TableTr
-      key={element.id}
+      key={element?.id}
       onClick={() => {
         setSelectedRequest(element);
         openDrawer();
@@ -87,19 +113,35 @@ export const AccountsTab = () => {
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>
-        {element.recipientName || element.recipientIban}
+        <Stack>
+          <Text fz={12} fw={400}>
+            {element?.recipientName}
+          </Text>
+          <Text fz={10} fw={400}>
+            {element.recipientIban}
+          </Text>
+        </Stack>
       </TableTd>
       <TableTd className={styles.table__td}>
-        <AmountGroup type={element.type} fz={12} fw={400} />
+        <AmountGroup type={element?.type} fz={12} fw={400} />
       </TableTd>
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
+      <TableTd>{formatNumber(element?.amount, true, "EUR")}</TableTd>
+      <TableTd w="20%" className={styles.table__td}>
+        {element?.centrolinkRef}
+      </TableTd>
 
       <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {dayjs(element?.createdAt).format("Do MMMM, YYYY")}
+          </Text>
+          <Text fz={10} fw={400}>
+            {dayjs(element?.createdAt).format("hh:mm a")}
+          </Text>
+        </Stack>
       </TableTd>
       <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
+        <BadgeComponent status={element?.status} />
       </TableTd>
     </TableTr>
   ));
@@ -113,16 +155,30 @@ export const AccountsTab = () => {
 
         <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
       </Group>
-      <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+      <Filter<FilterType>
+        opened={opened}
+        toggle={toggle}
+        form={form}
+        approvalStatus
+      />
 
       <TableComponent
-        rows={rows}
+        rows={
+          <BusinessTransactionTableRows
+            data={transactions}
+            search={debouncedSearch}
+            active={active}
+            limit={limit}
+            searchProps={searchProps}
+            business
+          />
+        }
         loading={loading}
         head={OwnAccountTableHeaders}
       />
 
       <EmptyTable
-        rows={rows}
+        rows={transactions}
         loading={loading}
         title="There are no transactions"
         text="When a transaction is recorded, it will appear here"
@@ -134,21 +190,6 @@ export const AccountsTab = () => {
         limit={limit}
         setLimit={setLimit}
       />
-
-      <TransactionDrawer
-        opened={openedDrawer}
-        close={closeDrawer}
-        selectedRequest={selectedRequest}
-      />
     </TabsPanel>
   );
 };
-
-// const tableHeaders = [
-//   "Recipient IBAN",
-//   "Bank",
-//   "Reference",
-//   "Amount",
-//   "Date Created",
-//   "Status",
-// ];

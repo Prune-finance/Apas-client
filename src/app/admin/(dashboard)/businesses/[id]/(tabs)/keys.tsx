@@ -8,6 +8,7 @@ import {
   Skeleton,
   Text,
   TextInput,
+  Tooltip,
   UnstyledButton,
 } from "@mantine/core";
 import { IconAB2, IconInfoCircle } from "@tabler/icons-react";
@@ -63,7 +64,7 @@ export default function Keys({
     <div className={styles.business__tab}>
       <Flex className={styles.api__container} gap={40}>
         <Flex flex={1} className={styles.api__key} direction="column">
-          <Badge
+          {/* <Badge
             leftSection={<IconInfoCircle />}
             tt="inherit"
             color="#D92D20"
@@ -73,11 +74,13 @@ export default function Keys({
           >
             Please do not use your test keys for production. They are only for
             test.
-          </Badge>
+          </Badge> */}
 
           <KeyComponent keyString={test?.key} keyType="Test Key" />
 
-          <KeyComponent keyString={live?.key} keyType="Live Key" />
+          {live && live.key && (
+            <KeyComponent keyString={live?.key} keyType="Live Key" />
+          )}
 
           {/* <KeyComponent keyString={live?.key} keyType="Test Webhook URL" /> */}
         </Flex>
@@ -153,14 +156,18 @@ const KeyComponent = ({
               </Text>
             </UnstyledButton>
 
-            <UnstyledButton
-              onClick={() => clipboard.copy(keyString)}
-              className={styles.input__right__section}
-            >
-              <Text fw={600} fz={10} c="#475467">
-                {clipboard.copied ? "Copied" : "Copy"}
-              </Text>
-            </UnstyledButton>
+            <Tooltip label="No key found" withArrow disabled={!!keyString}>
+              <UnstyledButton
+                onClick={() => clipboard.copy(keyString)}
+                className={styles.input__right__section}
+                style={{ cursor: !keyString ? "not-allowed" : "pointer" }}
+                disabled={!keyString}
+              >
+                <Text fw={600} fz={10} c="#475467">
+                  {clipboard.copied ? "Copied" : "Copy"}
+                </Text>
+              </UnstyledButton>
+            </Tooltip>
           </Flex>
         }
         // label="Test Key"

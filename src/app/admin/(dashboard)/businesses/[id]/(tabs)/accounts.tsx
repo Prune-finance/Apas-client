@@ -12,16 +12,26 @@ import {
   TableTr,
   TabsPanel,
   SimpleGrid,
+  Switch,
 } from "@mantine/core";
 import { IconBrandLinktree, IconDots, IconEye } from "@tabler/icons-react";
 import Link from "next/link";
 import localFont from "next/font/local";
 import axios from "axios";
-import { BusinessData } from "@/lib/hooks/businesses";
+import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect, useMemo } from "react";
-import { AccountData, useBusinessDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  AccountData,
+  useBusinessDefaultAccount,
+  useBusinessPayoutAccount,
+} from "@/lib/hooks/accounts";
 
-import { activeBadgeColor, formatNumber, serialNumber } from "@/lib/utils";
+import {
+  activeBadgeColor,
+  formatNumber,
+  getUserType,
+  serialNumber,
+} from "@/lib/utils";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -87,7 +97,11 @@ export default function Accounts({
     meta: bizTrxMeta,
   } = useBusinessTransactions(params.id, customParams);
 
-  const { account: defaultAccount } = useBusinessDefaultAccount(params.id);
+  const { account: defaultAccount, loading: loadingDefault } =
+    useBusinessDefaultAccount(params.id);
+  const { account: payoutAccount, loading: loadingPayout } =
+    useBusinessPayoutAccount(params.id);
+  const { services } = useBusinessServices(params.id);
 
   const form = useForm<FilterType>({
     initialValues: filterValues,
@@ -179,11 +193,12 @@ export default function Accounts({
       </TableTd>
       <TableTd className={styles.table__td}>{element.accountName}</TableTd>
       <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
-      <TableTd className={styles.table__td}>{element.type}</TableTd>
+      <TableTd className={styles.table__td}>
+        {getUserType(element.type)}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>
-      {/* <TableTd>{element.accountBalance}</TableTd> */}
       <TableTd className={styles.table__td}>
         <Badge
           tt="capitalize"
@@ -209,10 +224,39 @@ export default function Accounts({
             bic="ARPYGB21XXX"
             balance={defaultAccount?.accountBalance ?? 0}
             iban={defaultAccount?.accountNumber ?? ""}
-            loading={loading}
+            loading={loadingDefault}
             badgeText="Main Account"
             link={`/admin/businesses/${params.id}/default`}
+            business
           />
+
+          {payoutAccount && (
+            <AccountCard
+              currency="EUR"
+              bic="ARPYGB21XXX"
+              balance={payoutAccount?.accountBalance ?? 0}
+              iban={payoutAccount?.accountNumber ?? ""}
+              loading={loadingPayout}
+              badgeText="Payout Account"
+              link={`/admin/businesses/${params.id}/payout`}
+              business
+              disable
+            >
+              <Switch
+                readOnly
+                label="Disabled"
+                onChange={() => {}}
+                checked={
+                  !services.find(
+                    (service) => service.serviceIdentifier === "PAYOUT_SERVICE"
+                  )?.active
+                }
+                styles={{ label: { fontSize: "10px" } }}
+                size="xs"
+                labelPosition="left"
+              />
+            </AccountCard>
+          )}
         </SimpleGrid>
       </TabsPanel>
 

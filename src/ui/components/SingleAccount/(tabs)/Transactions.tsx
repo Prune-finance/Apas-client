@@ -20,9 +20,18 @@ import { BadgeComponent } from "../../Badge";
 import Transaction from "@/lib/store/transaction";
 import { AccountTransactionDrawer } from "./drawer";
 import { PayoutDrawer } from "@/app/(dashboard)/payouts/drawer";
-import { IssuedAccountTableHeaders } from "@/lib/static";
+import { IssuedAccountTableHeaders, PayoutTableHeaders } from "@/lib/static";
 import { AmountGroup } from "../../AmountGroup";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
+import {
+  IssuedTransactionTableRows,
+  PayoutTransactionTableRows,
+} from "../../TableRows";
+import { useState } from "react";
+import { useDebouncedValue } from "@mantine/hooks";
+import { filteredSearch } from "@/lib/search";
+import PaginationComponent from "../../Pagination";
+import { PayoutTransactionDrawer } from "@/app/(dashboard)/payouts/PayoutDrawer";
 
 interface Props {
   transactions: TransactionType[];
@@ -33,6 +42,10 @@ interface Props {
 export const Transactions = ({ transactions, loading, payout }: Props) => {
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
   const { data, opened, close } = Transaction();
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const overviewDetails = [
     {
@@ -41,8 +54,24 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
       // currency: "EUR",
       // formatted: true,
     },
-    { title: "Money In", value: 0, currency: "EUR", formatted: true },
-    { title: "Money Out", value: totalBal, currency: "EUR", formatted: true },
+    {
+      title: "Money In",
+      value:
+        transactions
+          .filter((trx) => trx.type === "CREDIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      currency: "EUR",
+      formatted: true,
+    },
+    {
+      title: "Money Out",
+      value:
+        transactions
+          .filter((trx) => trx.type === "DEBIT")
+          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      currency: "EUR",
+      formatted: true,
+    },
   ];
   return (
     <>
@@ -54,19 +83,35 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         <Group gap={12}>
           <SecondaryBtn text="Filter" icon={IconListTree} />
           {/* <SecondaryBtn text="Filter" icon={IconArrowUpRight} /> */}
-          <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+          <SecondaryBtn
+            text="Download Statement"
+            icon={IconCircleArrowDown}
+            style={{ cursor: "not-allowed" }}
+          />
         </Group>
       </Group>
 
       <TableComponent
         rows={
           payout ? (
-            <PayoutRowComponent data={transactions} />
+            <PayoutTransactionTableRows
+              data={transactions}
+              active={active}
+              limit={limit}
+              searchProps={searchProps}
+              search={debouncedSearch}
+            />
           ) : (
-            <RowComponent data={transactions} />
+            <IssuedTransactionTableRows
+              data={transactions}
+              active={active}
+              limit={limit}
+              searchProps={searchProps}
+              search={debouncedSearch}
+            />
           )
         }
-        head={payout ? payoutTableHeaders : IssuedAccountTableHeaders}
+        head={payout ? PayoutTableHeaders : IssuedAccountTableHeaders}
         loading={loading}
       />
 
@@ -77,6 +122,17 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         text="When a transaction is recorded, it will appear here"
       />
 
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={Math.ceil(
+          filteredSearch(transactions, searchProps, search).length /
+            parseInt(limit ?? "10", 10)
+        )}
+      />
+
       {!payout && (
         <TransactionDrawer
           opened={opened}
@@ -85,114 +141,9 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         />
       )}
 
-      {payout && <PayoutDrawer />}
+      {payout && <PayoutTransactionDrawer />}
     </>
   );
 };
 
-const tableHeaders = [
-  "Beneficiary",
-  "IBAN",
-  // "Account Number",
-  "Amount",
-  "Date",
-  "Status",
-];
-
-const payoutTableHeaders = [
-  "Beneficiary Name",
-  "Destination Account",
-  "Ultimate Debtor",
-  "Amount",
-  "Date & Time",
-  "Status",
-];
-
-const RowComponent = ({
-  data,
-}: // id,
-{
-  data: TransactionType[];
-  // id: string;
-}) => {
-  const { push } = useRouter();
-  const handleRowClick = (id: string) => {
-    push(`/admin/accounts/${id}/transactions`);
-  };
-
-  const { setData, open } = Transaction();
-  return data.map((element) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        // handleRowClick(element.id);
-        setData(element);
-        open();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd>{element.senderIban}</TableTd>
-      <TableTd>{"N/A"}</TableTd>
-      <TableTd>{element.recipientName || element.recipientIban}</TableTd>
-      <TableTd>
-        <AmountGroup type={element.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
-      <TableTd>{element.reference}</TableTd>
-
-      <TableTd>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-};
-
-const PayoutRowComponent = ({
-  data,
-}: // id,
-{
-  data: TransactionType[];
-  // id: string;
-}) => {
-  const { push } = useRouter();
-  const handleRowClick = (id: string) => {
-    push(`/admin/accounts/${id}/transactions`);
-  };
-
-  const { setData, open } = Transaction();
-  return data?.reverse().map((element) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        // handleRowClick(element.id);
-        setData(element);
-        open();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd>
-        {element.destinationFirstName && element.destinationLastName
-          ? `${element.destinationFirstName} ${element.destinationLastName}`
-          : "N/A"}
-      </TableTd>
-      <TableTd>{element.recipientIban}</TableTd>
-      <TableTd>{element.intermediary ?? "N/A"}</TableTd>
-      <TableTd>
-        <Group gap={3}>
-          <IconArrowUpRight color="#D92D20" size={16} />
-          {formatNumber(element.amount, true, "EUR")}
-          {/* <Text fz={12}></Text> */}
-        </Group>
-      </TableTd>
-      <TableTd>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-};
+const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];

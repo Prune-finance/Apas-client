@@ -1,4 +1,4 @@
-import { Fragment, Suspense } from "react";
+import { Fragment, Suspense, useMemo } from "react";
 
 import Cookies from "js-cookie";
 import dayjs from "dayjs";
@@ -32,7 +32,9 @@ import styles from "@/ui/styles/accounts.module.scss";
 import { formatNumber } from "@/lib/utils";
 import {
   DebitRequest,
+  IUserRequest,
   PayoutAccount,
+  useAllRequests,
   usePayoutRequests,
 } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
@@ -77,11 +79,20 @@ function AccountPayout() {
     // ...(type && { type: type.toLowerCase() }),
   };
 
-  const { requests, loading, revalidate, meta } =
-    usePayoutRequests(queryParams);
+  // const { requests, loading, revalidate, meta } =
+  //   usePayoutRequests(queryParams);
+
+  const { requests, revalidate, loading, meta } = useAllRequests({
+    type: "ACCOUNT_ISSUANCE",
+    ...queryParams,
+  });
 
   const { push } = useRouter();
-  const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
+  // const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
+  //   null
+  // );
+
+  const [selectedRequest, setSelectedRequest] = useState<IUserRequest | null>(
     null
   );
   const [processing, setProcessing] = useState(false);
@@ -104,12 +115,67 @@ function AccountPayout() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
+  // const handleRejectRequest = async () => {
+  //   if (!selectedRequest) return;
+  //   setProcessing(true);
+  //   try {
+  //     await axios.patch(
+  //       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/reject`,
+  //       {},
+  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+  //     );
+
+  //     revalidate();
+  //     close();
+  //     closeDrawer();
+  //     handleSuccess("Action Completed", `Payout Request Denied`);
+  //   } catch (error) {
+  //     handleError("An error occurred", parseError(error));
+  //   } finally {
+  //     setProcessing(false);
+  //   }
+  // };
+
+  // const handleAcceptRequest = async () => {
+  //   if (!selectedRequest) return;
+  //   setProcessing(true);
+  //   try {
+  //     await axios.patch(
+  //       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/approve`,
+  //       {},
+  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+  //     );
+
+  //     revalidate();
+  //     closeApprove();
+  //     closeDrawer();
+  //     handleSuccess("Action Completed", `Payout Request Approved`);
+  //   } catch (error) {
+  //     handleError("An error occurred", parseError(error));
+  //   } finally {
+  //     setProcessing(false);
+  //   }
+  // };
+
+  const requestType = useMemo(() => {
+    switch (selectedRequest?.type) {
+      case "ACTIVATE":
+        return "reactivate";
+      case "ACCOUNT_ISSUANCE":
+        return "account issuance";
+      case "DEACTIVATE":
+        return "deactivate";
+      default:
+        return selectedRequest?.type.toLowerCase();
+    }
+  }, [selectedRequest]);
+
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/reject`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/reject`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -117,7 +183,12 @@ function AccountPayout() {
       revalidate();
       close();
       closeDrawer();
-      handleSuccess("Action Completed", `Payout Request Denied`);
+      handleSuccess(
+        "Action Completed",
+        `${(requestType ?? "").replace(/^./, (letter) =>
+          letter.toUpperCase()
+        )} Request Denied`
+      );
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -130,7 +201,7 @@ function AccountPayout() {
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/approve`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/approve`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -138,15 +209,19 @@ function AccountPayout() {
       revalidate();
       closeApprove();
       closeDrawer();
-      handleSuccess("Action Completed", `Payout Request Approved`);
+      handleSuccess(
+        "Action Completed",
+        `${(requestType ?? "").replace(/^./, (letter) =>
+          letter.toUpperCase()
+        )} Request Approved`
+      );
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }
   };
-
-  const MenuComponent = ({ request }: { request: PayoutAccount }) => {
+  const MenuComponent = ({ request }: { request: IUserRequest }) => {
     return (
       <Menu shadow="md" width={150}>
         <MenuTarget>
@@ -191,7 +266,10 @@ function AccountPayout() {
         }}
         style={{ cursor: "pointer" }}
       >
-        <TableTd>{element.companyName}</TableTd>
+        <TableTd>{element?.Company?.name ?? "N/A"}</TableTd>
+        <TableTd tt="capitalize">
+          {element?.type.toLowerCase() ?? "N/A"}
+        </TableTd>
         <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
 
         <TableTd className={`${styles.table__td}`}>
@@ -248,7 +326,7 @@ function AccountPayout() {
         size="30%"
         title={
           <Text fz={18} fw={600} c="#1D2939" ml={24}>
-            Payout Account Request Details
+            Account Issuance Request Details
           </Text>
         }
         closeButtonProps={{ ...closeButtonProps, mr: 24 }}
@@ -302,8 +380,8 @@ function AccountPayout() {
         close={close}
         action={handleRejectRequest}
         processing={processing}
-        title="Reject This Payout Account Request?"
-        text="This means you are rejecting the payout account request of this business."
+        title="Reject This Account Issuance Request?"
+        text="This means you are rejecting the account issuance request of this business."
         customApproveMessage="Yes, Reject It"
       />
 
@@ -314,8 +392,8 @@ function AccountPayout() {
         close={closeApprove}
         action={handleAcceptRequest}
         processing={processing}
-        title="Approve This Payout Account Request?"
-        text="This means you are accepting the payout account request of this business"
+        title="Approve This Account Issuance Request?"
+        text="This means you are accepting the  account issuance request of this business"
         customApproveMessage="Yes, Approve It"
       />
     </Fragment>
@@ -324,6 +402,7 @@ function AccountPayout() {
 
 const tableHeaders = [
   "Business Name",
+  "Request Type",
   "Requests Date",
   // "Contact Email",
   "Status",

@@ -7,7 +7,7 @@ import Cookies from "js-cookie";
 interface IParams {
   period?: string;
   limit?: number;
-  createdAt?: string | null;
+  date?: string | null;
   status?: string;
   sort?: string;
   page?: number;
@@ -22,7 +22,7 @@ export function useBusiness(
     return {
       ...(customParams.period && { period: customParams.period }),
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -40,7 +40,7 @@ export function useBusiness(
   async function fetchBusinesses() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -97,7 +97,7 @@ export function useBusiness(
       // Any cleanup code can go here
     };
   }, [
-    obj.createdAt,
+    obj.date,
     obj.limit,
     obj.period,
     obj.sort,
@@ -111,6 +111,7 @@ export function useBusiness(
 
 export function useSingleBusiness(id: string) {
   const [business, setBusiness] = useState<BusinessData | null>(null);
+  const [meta, setMeta] = useState<SingleBizMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchBusiness() {
@@ -122,6 +123,7 @@ export function useSingleBusiness(id: string) {
       );
 
       setBusiness(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -141,7 +143,43 @@ export function useSingleBusiness(id: string) {
     };
   }, [id]);
 
-  return { loading, business, revalidate };
+  return { loading, business, revalidate, meta };
+}
+
+export function useBusinessServices(id: string) {
+  const [services, setServices] = useState<Service[]>([]);
+  const [meta, setMeta] = useState<BusinessMeta>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchServices() {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/services/business/${id}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setServices(data.data);
+    } catch (error) {
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchServices();
+
+  useEffect(() => {
+    fetchServices();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [id]);
+
+  return { loading, services, meta, revalidate };
 }
 
 export function useUserBusiness(customParams: IParams = {}) {
@@ -153,7 +191,7 @@ export function useUserBusiness(customParams: IParams = {}) {
   async function fetchBusinesses() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.createdAt && { createdAt: customParams.createdAt }),
+      ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
@@ -207,7 +245,7 @@ export interface Director {
 //   apiCalls: number;
 //   contactEmail: string;
 //   contactNumber: string | null;
-//   createdAt: Date;
+//   date: Date;
 //   updatedAt: Date;
 //   deletedAt: null;
 //   domain: string;
@@ -226,6 +264,19 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
+}
+
+export interface SingleBizMeta {
+  activationLinkCount: number;
+  activeActivationLink: ActiveActivationLink | null;
+  users: number;
+}
+
+export interface ActiveActivationLink {
+  id: string;
+  status: string;
+  token: string;
+  createdAt: Date;
 }
 
 export interface UserBusinessMeta {
@@ -280,6 +331,8 @@ export interface BusinessData {
   contactPOAUrl: string;
   documents: Document[];
   lastLogin: Date;
+  contactSignup: Date | null;
+  contactCountryCode: string;
 }
 
 export interface Document {
@@ -326,4 +379,5 @@ export interface Service {
   title: string;
   serviceCode: string;
   serviceIdentifier: string;
+  active: boolean;
 }

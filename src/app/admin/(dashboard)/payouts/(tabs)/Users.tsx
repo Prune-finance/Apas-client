@@ -36,6 +36,8 @@ export const Users = () => {
     validate: zodResolver(filterSchema),
   });
 
+  console.log(accounts);
+
   const tableData: TableData = {
     head: tableHeaders,
     body: filteredSearch(
@@ -57,6 +59,9 @@ export const Users = () => {
     <TableTr
       key={index}
       //    onClick={() => handleRowClick(element.id)}
+      onClick={() =>
+        window.open(`/admin/payouts/${element.Company.id}/account`)
+      }
       style={{ cursor: "pointer" }}
     >
       <TableTd>{`${element.Company.name}`}</TableTd>

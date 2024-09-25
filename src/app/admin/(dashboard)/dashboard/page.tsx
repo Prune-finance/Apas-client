@@ -55,6 +55,7 @@ import { IssuedAccountTableHeaders } from "@/lib/static";
 import { useTransactions } from "@/lib/hooks/transactions";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 
 export default function Home() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
@@ -104,39 +105,6 @@ export default function Home() {
     });
   }, [requests]);
 
-  const tableData = [
-    {
-      AccName: "Matthew Philips",
-      Biz: "C80 Limited",
-      Amount: 200000,
-      Status: "successful",
-    },
-    {
-      AccName: "Agatha Goldie",
-      Biz: "TechNexus",
-      Amount: 300000,
-      Status: "successful",
-    },
-    {
-      AccName: "Omar Zeeda",
-      Biz: "Fusion Works",
-      Amount: 250000,
-      Status: "successful",
-    },
-    {
-      AccName: "Sharon Akindele",
-      Biz: "Azure Wave",
-      Amount: 400000,
-      Status: "successful",
-    },
-    {
-      AccName: "Bethel Teddy",
-      Biz: "NanoSphere",
-      Amount: 150000,
-      Status: "successful",
-    },
-  ];
-
   const cardTwoItems = useMemo(() => {
     if (debitLoading) return [];
 
@@ -169,7 +137,7 @@ export default function Home() {
   const rows = transactions.slice(0, 4).map((element) => (
     <TableTr key={element.id}>
       <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
-      <TableTd>{"N/A"}</TableTd>
+      {/* <TableTd>{"N/A"}</TableTd> */}
       <TableTd className={styles.table__td}>
         {element.recipientName || element.recipientIban}
       </TableTd>
@@ -335,14 +303,26 @@ export default function Home() {
 
                       <TableComponent
                         head={IssuedAccountTableHeaders}
-                        rows={rows}
+                        rows={
+                          <IssuedTransactionTableRows
+                            data={transactions.slice(0, 4)}
+                            active={1}
+                            limit={null}
+                            searchProps={[
+                              "senderIban",
+                              "recipientIban",
+                              "reference",
+                            ]}
+                            search=""
+                          />
+                        }
                         loading={loadingTrx}
                         noBg
                       />
 
                       <EmptyTable
                         loading={loadingTrx}
-                        rows={rows}
+                        rows={transactions}
                         title="There is no transaction"
                         text="When a transaction is created it will appear here"
                       />

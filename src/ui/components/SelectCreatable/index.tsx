@@ -30,13 +30,12 @@ export function MultiSelectCreatable({
   });
 
   const [search, setSearch] = useState("");
-  const [data, setData] = useState(groceries);
+  const [data, setData] = useState<string[]>([]);
   // const [value, setValue] = useState<string[]>([]);
   // const [selectedValues, setSelectedValues] = useState<string[]>([]);
 
   useMemo(
-    () =>
-      multiSelectData?.length && setData([...multiSelectData, ...groceries]),
+    () => multiSelectData?.length && setData([...multiSelectData]),
     [multiSelectData]
   );
 

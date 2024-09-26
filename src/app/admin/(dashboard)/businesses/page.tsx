@@ -59,7 +59,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 
-import ActiveBadge from "@/assets/active-badge.svg";
 import { activeBadgeColor, serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -164,8 +163,9 @@ function Businesses() {
           {element.name}
         </Group>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
-      {/* <TableTd className={styles.table__td}>{50}</TableTd> */}
+      <TableTd className={styles.table__td} style={{ wordBreak: "break-word" }}>
+        {element.contactEmail}
+      </TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
       </TableTd>

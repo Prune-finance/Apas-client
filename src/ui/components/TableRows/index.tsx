@@ -246,7 +246,7 @@ export const InquiryTableRows = ({
   searchProps: string[];
 }) => {
   const { push } = useRouter();
-  return filteredSearch(data.reverse(), searchProps, search).map((element) => (
+  return filteredSearch(data, searchProps, search).map((element) => (
     <TableTr
       key={element.dateRequested}
       onClick={() => {

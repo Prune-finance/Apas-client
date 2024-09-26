@@ -55,7 +55,8 @@ export const InquiriesTab = () => {
         head={InquiriesTableHeaders.slice(1)}
         rows={
           <InquiryTableRows
-            data={inquiriesData}
+            data={[]}
+            // data={inquiriesData}
             searchProps={["pruneReference", "inquiryType"]}
             search={debouncedSearch}
             business
@@ -65,7 +66,7 @@ export const InquiriesTab = () => {
       />
 
       <EmptyTable
-        rows={inquiriesData}
+        rows={[]}
         loading={false}
         title="There are no inquiry"
         text="When an inquiry is made, it will appear here."
@@ -76,7 +77,7 @@ export const InquiriesTab = () => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil(1 / parseInt(limit ?? "10", 10))}
+        total={Math.ceil(0 / parseInt(limit ?? "10", 10))}
       />
     </Box>
   );

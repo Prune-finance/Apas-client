@@ -1,4 +1,4 @@
-import { Box, Divider, Flex, Group, List, Stack, Text } from "@mantine/core";
+import { Box, Divider, Flex, List, Paper, Stack, Text } from "@mantine/core";
 import React from "react";
 
 import dayjs from "dayjs";
@@ -13,7 +13,6 @@ export default function PlanDrawer({ data }: { data: PricingPlan | null }) {
   const senderDetails = [
     { title: "Plan Name", value: data?.name },
     { title: "Cycle", value: data?.cycle },
-    { title: "Description", value: data?.description },
     {
       title: "Date Created",
       value: dayjs(data?.createdAt).format("Do MMM YYYY"),
@@ -48,6 +47,18 @@ export default function PlanDrawer({ data }: { data: PricingPlan | null }) {
             </Flex>
           ))}
         </Stack>
+      </Box>
+
+      <Box px={20} mt={28} mb={24}>
+        <Text fz={16} fw={600} c="var(--prune-text-gray-800)" mb={20}>
+          Description
+        </Text>
+
+        <Paper bg="#F9F9F9" p="12px 25px 21px 16px">
+          <Text fz={12} fw={600} c="var(--prune-text-gray-700)">
+            {data?.description}
+          </Text>
+        </Paper>
       </Box>
 
       <Divider mt={28} mb={24} />

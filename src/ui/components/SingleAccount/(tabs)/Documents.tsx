@@ -9,7 +9,6 @@ interface Props {
 }
 
 export const Documents = ({ account, admin = false }: Props) => {
-  console.log("admin: ", admin);
   return (
     <Box>
       {account?.type === "USER" && (

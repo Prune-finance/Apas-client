@@ -28,7 +28,7 @@ export default function PlanDrawer({ data }: { data: PricingPlan | null }) {
           Amount
         </Text>
         <Text fz={32} fw={600} c="var(--prune-primary-700)">
-          {formatNumber(data?.cost ?? 0)}
+          {formatNumber(data?.cost ?? 0, true, "EUR")}
         </Text>
       </Stack>
 

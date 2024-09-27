@@ -14,12 +14,14 @@ interface TextInputWithFileProps {
   label: string;
   placeholder: string;
   url: string;
+  admin?: boolean;
 }
 
 export const TextInputWithFile = ({
   label,
   url,
   placeholder,
+  admin,
 }: TextInputWithFileProps) => {
   const { handleInfo } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
@@ -71,7 +73,7 @@ export const TextInputWithFile = ({
         }
       >
         <Box>
-          <FileDisplay fileUrl={url} />
+          <FileDisplay fileUrl={url} download={admin} />
         </Box>
       </Modal>
     </>

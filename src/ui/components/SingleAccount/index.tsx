@@ -603,7 +603,7 @@ export const SingleAccountBody = ({
         Payout Account
       </Text>
     ) : (
-      account?.type
+      getUserType(account?.type as "USER" | "CORPORATE")
     ),
   };
 
@@ -655,7 +655,7 @@ export const SingleAccountBody = ({
           />
         </TabsPanel>
         <TabsPanel value={tabs[3].value} mt={28}>
-          <Documents account={account} />
+          <Documents account={account} admin={admin} />
         </TabsPanel>
       </TabsComponent>
     </Box>

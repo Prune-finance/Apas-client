@@ -2,7 +2,11 @@
 
 import { useUserDefaultPayoutAccount } from "@/lib/hooks/accounts";
 import { useUserBusiness } from "@/lib/hooks/businesses";
-import { TransactionType, useUserTransactions } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  useUserPayoutTransactions,
+  useUserTransactions,
+} from "@/lib/hooks/transactions";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import {
   DefaultAccountHead,
@@ -21,7 +25,7 @@ export default function SingleUserPayoutAccount() {
 
   const { business, loading: loadingBiz } = useUserBusiness();
 
-  const { transactions, loading: trxLoading } = useUserTransactions();
+  const { transactions, loading: trxLoading } = useUserPayoutTransactions();
   // const { transactions, loading: trxLoading } = useUserTransactions(params.id);
 
   return (

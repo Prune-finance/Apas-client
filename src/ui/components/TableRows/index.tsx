@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
 import { InquiryData } from "@/lib/static";
 import { useRouter } from "next/navigation";
+import { Inquiry } from "@/lib/hooks/inquiries";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -240,7 +241,7 @@ export const InquiryTableRows = ({
   search,
   searchProps,
 }: {
-  data: InquiryData[];
+  data: Inquiry[];
   business?: boolean;
   search: string;
   searchProps: string[];
@@ -248,22 +249,20 @@ export const InquiryTableRows = ({
   const { push } = useRouter();
   return filteredSearch(data, searchProps, search).map((element) => (
     <TableTr
-      key={element.dateRequested}
+      key={element.id}
       onClick={() => {
-        push(
-          `${!business ? "/admin" : ""}/payouts/${crypto.randomUUID()}/inquiry`
-        );
+        push(`${!business ? "/admin" : ""}/payouts/${element.id}/inquiry`);
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && <TableTd>{element.businessName || "N/A"}</TableTd>}
+      {!business && <TableTd>{element.Company.name || "N/A"}</TableTd>}
 
-      <TableTd>{element.pruneReference}</TableTd>
+      <TableTd>{element.pruneRef ?? "N/A"}</TableTd>
 
-      <TableTd tt="capitalize">{element.inquiryType.toLowerCase()}</TableTd>
+      <TableTd tt="capitalize">{element.type.toLowerCase()}</TableTd>
 
       <TableTd>
-        {dayjs(element.dateRequested).format("Do MMMM, YYYY - hh:mma")}
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
       </TableTd>
 
       <TableTd>

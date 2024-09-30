@@ -71,7 +71,7 @@ function TransactionForAccount() {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: meta?.total || 0,
+      value: meta?.totalAmount || 0,
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
@@ -92,7 +92,7 @@ function TransactionForAccount() {
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: meta?.total || 0,
     },
   ];
 

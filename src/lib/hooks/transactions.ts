@@ -555,6 +555,7 @@ export interface Meta {
   out: number;
   total: number;
   in: number;
+  totalAmount: number;
 }
 
 export interface TransactionType {

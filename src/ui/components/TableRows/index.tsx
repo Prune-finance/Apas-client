@@ -257,7 +257,7 @@ export const InquiryTableRows = ({
     >
       {!business && <TableTd>{element.Company.name || "N/A"}</TableTd>}
 
-      <TableTd>{element.pruneRef ?? "N/A"}</TableTd>
+      <TableTd>{element.Transaction.centrolinkRef ?? "N/A"}</TableTd>
 
       <TableTd tt="capitalize">{element.type.toLowerCase()}</TableTd>
 

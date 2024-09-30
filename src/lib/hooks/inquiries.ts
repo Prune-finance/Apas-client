@@ -14,6 +14,58 @@ interface IParams {
   companyId?: string;
 }
 
+export function useInquiries(customParams: IParams = {}) {
+  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
+  const [meta, setMeta] = useState<{ total: number }>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+  }, [customParams]);
+
+  async function fetchInquiries() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/inquiries?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setInquiries(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchInquiries();
+  }
+
+  useEffect(() => {
+    fetchInquiries();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+
+  return { loading, inquiries, meta, revalidate };
+}
+
 export function useUserInquiries(customParams: IParams = {}) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [meta, setMeta] = useState<{ total: number }>();
@@ -64,6 +116,56 @@ export function useUserInquiries(customParams: IParams = {}) {
   }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
 
   return { loading, inquiries, meta, revalidate };
+}
+
+export function useSingleInquiry(id: string, customParams: IParams = {}) {
+  const [inquiry, setInquiry] = useState<Inquiry>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+  }, [customParams]);
+
+  async function fetchInquiries() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/inquiries/${id}?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setInquiry(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchInquiries();
+  }
+
+  useEffect(() => {
+    fetchInquiries();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+
+  return { loading, inquiry, revalidate };
 }
 
 export function useUserSingleInquiry(id: string, customParams: IParams = {}) {

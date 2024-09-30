@@ -7,8 +7,8 @@ import Link from "next/link";
 import { AmountGroup } from "../AmountGroup";
 import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
-import { InquiryData } from "@/lib/static";
 import { useRouter } from "next/navigation";
+import { Inquiry } from "@/lib/hooks/inquiries";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -240,7 +240,7 @@ export const InquiryTableRows = ({
   search,
   searchProps,
 }: {
-  data: InquiryData[];
+  data: Inquiry[];
   business?: boolean;
   search: string;
   searchProps: string[];
@@ -248,26 +248,90 @@ export const InquiryTableRows = ({
   const { push } = useRouter();
   return filteredSearch(data, searchProps, search).map((element) => (
     <TableTr
-      key={element.dateRequested}
+      key={element.id}
       onClick={() => {
-        push(
-          `${!business ? "/admin" : ""}/payouts/${crypto.randomUUID()}/inquiry`
-        );
+        push(`${!business ? "/admin" : ""}/payouts/${element.id}/inquiry`);
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && <TableTd>{element.businessName || "N/A"}</TableTd>}
+      {!business && <TableTd>{element.Company.name || "N/A"}</TableTd>}
 
-      <TableTd>{element.pruneReference}</TableTd>
+      <TableTd>{element.Transaction.centrolinkRef ?? "N/A"}</TableTd>
 
-      <TableTd tt="capitalize">{element.inquiryType.toLowerCase()}</TableTd>
+      <TableTd tt="capitalize">{element.type.toLowerCase()}</TableTd>
 
       <TableTd>
-        {dayjs(element.dateRequested).format("Do MMMM, YYYY - hh:mma")}
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
       </TableTd>
 
       <TableTd>
         <BadgeComponent status={element.status} w={100} />
+      </TableTd>
+    </TableTr>
+  ));
+};
+
+export const PayoutTrxReqTableRows = ({
+  data,
+  search,
+  active,
+  limit,
+  searchProps,
+}: {
+  data: TransactionType[];
+  search: string;
+  active: number;
+  limit: string | null;
+  searchProps: string[];
+}) => {
+  const { open, setData } = Transaction();
+  return frontendPagination(
+    filteredSearch(data.reverse(), searchProps, search),
+    active,
+    parseInt(limit ?? "10", 10)
+  ).map((element: TransactionType) => (
+    <TableTr
+      key={element.id}
+      onClick={() => {
+        open();
+        setData(element);
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      {/* <TableTd>{element.senderName || "N/A"}</TableTd> */}
+
+      {/* <TableTd w="15%">{element.centrolinkRef}</TableTd> */}
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {element.recipientName}
+          </Text>
+          <Text fz={10} fw={400}>
+            {element.recipientIban}
+          </Text>
+        </Stack>
+      </TableTd>
+
+      <TableTd>{element.senderIban}</TableTd>
+
+      <TableTd>{element.recipientBankAddress}</TableTd>
+
+      <TableTd w="15%">{element.reference}</TableTd>
+
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+          </Text>
+          <Text fz={10} fw={400}>
+            {dayjs(element.createdAt).format("hh:mm a")}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
   ));

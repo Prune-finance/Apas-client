@@ -28,13 +28,17 @@ import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 import {
+  IconAlertTriangle,
   IconArrowLeft,
   IconArrowUpRight,
   IconBrandLinktree,
   IconCheck,
   IconCircleArrowDown,
   IconCopy,
+  IconExclamationCircle,
+  IconInfoCircle,
   IconListTree,
+  IconShieldCheck,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
@@ -65,6 +69,7 @@ import { validateRequest } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
+import OriginalModalComponent from "../Modal";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import TabsComponent from "../Tabs";
 import { GiEuropeanFlag } from "react-icons/gi";
@@ -879,8 +884,11 @@ export const DefaultAccountHead = ({
     useDisclosure(false);
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
     useDisclosure(false);
+  const [openedTrust, { open: openTrust, close: closeTrust }] =
+    useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
+  const [processingTrust, setProcessingTrust] = useState(false);
   const [sectionState, setSectionState] = useState("");
   const [moneySent, setMoneySent] = useState(0);
   const [receiverName, setReceiverName] = useState("");
@@ -1066,7 +1074,7 @@ export const DefaultAccountHead = ({
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
           {payout && admin && (
             <Button
-              // onClick={openTrust}
+              onClick={openTrust}
               color="#f6f6f6"
               c="var(--prune-text-gray-700)"
               fz={12}
@@ -1086,6 +1094,24 @@ export const DefaultAccountHead = ({
           )}
         </Flex>
       </Flex>
+
+      <OriginalModalComponent
+        opened={openedTrust}
+        close={closeTrust}
+        title="Trust This User?"
+        text="By trusting this business, you're granting them the ability to automatically disburse funds from their Payout accounts."
+        // action={handleBusinessTrust}
+        customApproveMessage="Yes, Proceed"
+        icon={
+          business?.kycTrusted ? (
+            <IconExclamationCircle color="#C6A700" />
+          ) : (
+            <IconShieldCheck color="#12B76A" />
+          )
+        }
+        processing={processingTrust}
+        color={business?.kycTrusted ? "#F9F6E6" : "#ECFDF3"}
+      />
 
       <Modal
         opened={opened}

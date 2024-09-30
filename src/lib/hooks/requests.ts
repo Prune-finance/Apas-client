@@ -1,8 +1,7 @@
-import axios, { all } from "axios";
+import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import { AccountData } from "./accounts";
+
 import Cookies from "js-cookie";
-import { set } from "zod";
 
 // query: string = "";
 

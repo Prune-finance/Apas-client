@@ -1,9 +1,9 @@
 "use client";
 
-import { TransactionType } from "@/lib/hooks/transactions";
+import { useUserInquiries } from "@/lib/hooks/inquiries";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 
-import { inquiriesData, InquiriesTableHeaders } from "@/lib/static";
+import { InquiriesTableHeaders } from "@/lib/static";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -22,11 +22,6 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 import { useState } from "react";
 
-interface Props {
-  transactions: TransactionType[];
-  loading: boolean;
-}
-
 export const InquiriesTab = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -35,6 +30,11 @@ export const InquiriesTab = () => {
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
+
+  const { inquiries, loading, meta } = useUserInquiries({
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
+  });
 
   const form = useForm<FilterType>({
     initialValues: filterValues,
@@ -55,19 +55,19 @@ export const InquiriesTab = () => {
         head={InquiriesTableHeaders.slice(1)}
         rows={
           <InquiryTableRows
-            data={[]}
+            data={inquiries}
             // data={inquiriesData}
             searchProps={["pruneReference", "inquiryType"]}
             search={debouncedSearch}
             business
           />
         }
-        loading={false}
+        loading={loading}
       />
 
       <EmptyTable
-        rows={[]}
-        loading={false}
+        rows={inquiries}
+        loading={loading}
         title="There are no inquiry"
         text="When an inquiry is made, it will appear here."
       />
@@ -77,7 +77,7 @@ export const InquiriesTab = () => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil(0 / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
       />
     </Box>
   );

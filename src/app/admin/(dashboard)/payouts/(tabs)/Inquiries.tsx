@@ -1,9 +1,10 @@
 "use client";
 
+import { useInquiries } from "@/lib/hooks/inquiries";
 import { TransactionType } from "@/lib/hooks/transactions";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 
-import { inquiriesData, InquiriesTableHeaders } from "@/lib/static";
+import { InquiriesTableHeaders } from "@/lib/static";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -36,6 +37,11 @@ export const InquiriesTab = () => {
 
   const [opened, { toggle }] = useDisclosure(false);
 
+  const { inquiries, loading, meta } = useInquiries({
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
+  });
+
   const form = useForm<FilterType>({
     initialValues: filterValues,
     validate: zodResolver(filterSchema),
@@ -55,17 +61,17 @@ export const InquiriesTab = () => {
         head={InquiriesTableHeaders}
         rows={
           <InquiryTableRows
-            data={[]}
-            searchProps={["businessName", "pruneReference", "inquiryType"]}
+            data={inquiries}
+            searchProps={["Company.name", "Transaction.centrolinkRef", "type"]}
             search={debouncedSearch}
           />
         }
-        loading={false}
+        loading={loading}
       />
 
       <EmptyTable
-        rows={[]}
-        loading={false}
+        rows={inquiries}
+        loading={loading}
         title="There are no inquiry"
         text="When an inquiry is made, it will appear here."
       />
@@ -75,7 +81,7 @@ export const InquiriesTab = () => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil(0 / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
       />
     </Box>
   );

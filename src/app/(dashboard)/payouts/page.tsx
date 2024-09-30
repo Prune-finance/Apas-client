@@ -84,8 +84,6 @@ function PayoutTrx() {
     }
   };
 
-  console.log(meta, !Boolean(meta?.hasLiveKey));
-
   return (
     <main
     // className={styles.main}

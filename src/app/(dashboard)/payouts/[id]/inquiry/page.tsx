@@ -1,6 +1,5 @@
 "use client";
 
-import { inquiry } from "@/lib/static";
 import { camelCaseToTitleCase, formatNumber, getInitials } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -36,7 +35,6 @@ import {
 } from "@mantine/dropzone";
 import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
 import {
-  IconCheck,
   IconChevronDown,
   IconChevronUp,
   IconPaperclip,
@@ -56,7 +54,7 @@ import Cookies from "js-cookie";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import { set, z } from "zod";
+import { z } from "zod";
 import { FileUploadModal } from "@/ui/components/TicketChat/FileUploadModal";
 
 export default function InquiryPage() {

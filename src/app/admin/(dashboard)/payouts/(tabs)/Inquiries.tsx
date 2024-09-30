@@ -4,7 +4,7 @@ import { useInquiries } from "@/lib/hooks/inquiries";
 import { TransactionType } from "@/lib/hooks/transactions";
 import { filterSchema, FilterType, filterValues } from "@/lib/schema";
 
-import { inquiriesData, InquiriesTableHeaders } from "@/lib/static";
+import { InquiriesTableHeaders } from "@/lib/static";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";

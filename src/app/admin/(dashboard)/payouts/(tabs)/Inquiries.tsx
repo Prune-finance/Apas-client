@@ -37,7 +37,10 @@ export const InquiriesTab = () => {
 
   const [opened, { toggle }] = useDisclosure(false);
 
-  const { inquiries, loading, meta } = useInquiries();
+  const { inquiries, loading, meta } = useInquiries({
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
+  });
 
   const form = useForm<FilterType>({
     initialValues: filterValues,

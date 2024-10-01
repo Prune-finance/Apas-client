@@ -320,6 +320,42 @@ export function useSingleUserAccount(id: string) {
   return { loading, account, revalidate };
 }
 
+export function useSingleAccountByIBAN(iban: string) {
+  const [account, setAccount] = useState<Account | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccount() {
+    setLoading(true);
+
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/number/${iban}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccount();
+  }
+
+  useEffect(() => {
+    fetchAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [iban]);
+
+  return { loading, account, revalidate };
+}
+
 export function useSingleUserAccountByIBAN(iban: string) {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);

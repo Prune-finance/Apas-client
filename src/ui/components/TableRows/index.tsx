@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
 import { useRouter } from "next/navigation";
 import { Inquiry } from "@/lib/hooks/inquiries";
+import { boolean } from "zod";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -39,18 +40,7 @@ export const BusinessTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && (
-        <TableTd
-          td="underline"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <Link href={`/admin/transactions/${element.senderIban}`}>
-            {element.senderName || "N/A"}
-          </Link>
-        </TableTd>
-      )}
+      {!business && <TableTd>{element.senderName || "N/A"}</TableTd>}
 
       <TableTd>
         <Stack gap={0}>
@@ -91,7 +81,7 @@ export const BusinessTransactionTableRows = ({
 
 export const IssuedTransactionTableRows = ({
   data,
-
+  noLink,
   search,
   active,
   limit,
@@ -102,6 +92,7 @@ export const IssuedTransactionTableRows = ({
   active: number;
   limit: string | null;
   searchProps: string[];
+  noLink?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
@@ -118,10 +109,11 @@ export const IssuedTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd
-        td="underline"
+        td={noLink ? "none" : "underline"}
         onClick={(e) => {
           e.stopPropagation();
         }}
+        style={{ pointerEvents: noLink ? "none" : "auto" }}
       >
         <Link href={`/admin/transactions/${element.senderIban}`}>
           {element?.senderName || "N/A"}

@@ -124,11 +124,14 @@ export const PendingPayoutRequests = () => {
         head={PayoutRequestsTableHeaders}
         rows={
           <PayoutTrxReqTableRows
-            active={active}
-            limit={limit}
             search={debouncedSearch}
             data={requests}
-            searchProps={["Transaction.centrolinkRef", "type"]}
+            searchProps={[
+              "beneficiaryFullName",
+              "destinationIBAN",
+              "destinationCountry",
+              "destinationBank",
+            ]}
           />
         }
         loading={loading}
@@ -142,7 +145,7 @@ export const PendingPayoutRequests = () => {
       />
 
       <PaginationComponent
-        total={Math.ceil(0 / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

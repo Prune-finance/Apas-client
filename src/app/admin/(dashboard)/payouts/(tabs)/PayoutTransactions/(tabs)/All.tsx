@@ -59,7 +59,7 @@ export const AllPayoutTransactions = ({ transactions, loading }: Props) => {
         // rows={rows}
         rows={
           <PayoutTransactionTableRows
-            data={transactions}
+            data={transactions.toReversed()}
             searchProps={[
               "senderIban",
               "recipientIban",
@@ -86,7 +86,7 @@ export const AllPayoutTransactions = ({ transactions, loading }: Props) => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil(1 / parseInt(limit ?? "10", 10))}
+        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
       />
     </Box>
   );

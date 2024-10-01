@@ -23,7 +23,7 @@ export const PayoutTransactions = () => {
 
   return (
     <Fragment>
-      <TabsComponent tabs={tabs} mt={25} tt="capitalize">
+      <TabsComponent tabs={tabs} mt={25} tt="capitalize" keepMounted={false}>
         <TabsPanel value={tabs[0].value}>
           <AllPayoutTransactions
             transactions={transactions.filter(

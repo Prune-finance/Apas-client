@@ -528,6 +528,7 @@ export interface BaseAccount {
   companyId: string;
   companyName?: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
+  isTrusted?: boolean;
 }
 
 export interface UserAccount extends BaseAccount {

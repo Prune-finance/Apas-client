@@ -10,6 +10,8 @@ import { BadgeComponent } from "../Badge";
 import { useRouter } from "next/navigation";
 import { Inquiry } from "@/lib/hooks/inquiries";
 import { boolean } from "zod";
+import { PayoutTransactionRequest } from "@/lib/hooks/requests";
+import { BusinessData } from "@/lib/hooks/businesses";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -270,7 +272,7 @@ export const PayoutTrxReqTableRows = ({
   limit,
   searchProps,
 }: {
-  data: TransactionType[];
+  data: PayoutTransactionRequest[];
   search: string;
   active: number;
   limit: string | null;
@@ -281,32 +283,55 @@ export const PayoutTrxReqTableRows = ({
     filteredSearch(data.reverse(), searchProps, search),
     active,
     parseInt(limit ?? "10", 10)
-  ).map((element: TransactionType) => (
+  ).map((element: PayoutTransactionRequest) => (
     <TableTr
       key={element.id}
       onClick={() => {
         open();
-        setData(element);
+        // setData(element);
+        setData({
+          recipientName: element.beneficiaryFullName,
+          recipientIban: element.destinationIBAN,
+          senderIban: element?.PayoutAccount?.accountNumber || "N/A",
+          senderName: element?.PayoutAccount?.accountName || "N/A",
+          recipientBankAddress: element.destinationBank,
+          recipientBic: element.destinationBIC,
+          destinationFirstName: "",
+          destinationLastName: "",
+          centrolinkRef: "",
+          recipientBankCountry: element.destinationCountry,
+          senderBic: "",
+          type: "DEBIT",
+          narration: element.reason,
+
+          company: {
+            id: "",
+            name: "",
+          } as BusinessData,
+          ...element,
+          status: element.status as unknown as
+            | "PENDING"
+            | "REJECTED"
+            | "COMPLETED"
+            | "CANCELLED",
+        });
       }}
       style={{ cursor: "pointer" }}
     >
-      {/* <TableTd>{element.senderName || "N/A"}</TableTd> */}
-
-      {/* <TableTd w="15%">{element.centrolinkRef}</TableTd> */}
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {element.recipientName}
+            {element.beneficiaryFullName}
           </Text>
           <Text fz={10} fw={400}>
-            {element.recipientIban}
+            {element.destinationIBAN}
           </Text>
         </Stack>
       </TableTd>
 
-      <TableTd>{element.senderIban}</TableTd>
+      <TableTd>{element?.PayoutAccount?.accountNumber || "N/A"}</TableTd>
 
-      <TableTd>{element.recipientBankAddress}</TableTd>
+      <TableTd>{element.destinationBank}</TableTd>
 
       <TableTd w="15%">{element.reference}</TableTd>
 

@@ -36,8 +36,6 @@ export const Users = () => {
     validate: zodResolver(filterSchema),
   });
 
-  console.log(accounts);
-
   const tableData: TableData = {
     head: tableHeaders,
     body: filteredSearch(
@@ -125,21 +123,3 @@ export const Users = () => {
 };
 
 const tableHeaders = ["Business Name", "Date Created", "Status"];
-
-const data = [
-  {
-    name: "John Doe",
-    createdAt: new Date(),
-    status: "ACTIVE",
-  },
-  {
-    name: "John Jane",
-    createdAt: new Date(),
-    status: "INACTIVE",
-  },
-  {
-    name: "John Doe",
-    createdAt: new Date(),
-    status: "ACTIVE",
-  },
-];

@@ -10,6 +10,7 @@ interface IParams {
   limit?: number;
   date?: string | null;
   status?: string;
+  not?: string;
   sort?: string;
   query?: string;
   type?: string;
@@ -187,6 +188,69 @@ export function useAllCompanyRequests(
     obj.type,
     obj.page,
     obj.companyId,
+  ]);
+
+  return { loading, requests, meta, revalidate };
+}
+
+export function usePayoutTransactionRequests(customParams: IParams = {}) {
+  const [requests, setRequests] = useState<PayoutTransactionRequest[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.not && { not: customParams.not }),
+      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.type && { type: customParams.type.toUpperCase() }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.companyId && { companyId: customParams.companyId }),
+    };
+  }, [customParams]);
+
+  async function fetchAccounts() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/transaction/requests?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setRequests(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccounts();
+  }
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    obj.date,
+    obj.limit,
+    obj.sort,
+    obj.status,
+    obj.type,
+    obj.page,
+    obj.companyId,
+    obj.not,
   ]);
 
   return { loading, requests, meta, revalidate };
@@ -841,4 +905,24 @@ export interface LiveKeyDirector {
 export interface Document {
   title?: string;
   documentURL?: string;
+}
+
+export interface PayoutTransactionRequest {
+  id: string;
+  beneficiaryFullName: string;
+  destinationIBAN: string;
+  destinationBIC: string;
+  destinationCountry: string;
+  destinationBank: string;
+  reference: string;
+  amount: number;
+  reason: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  PayoutAccount: {
+    accountName: string;
+    accountNumber: string;
+  };
 }

@@ -18,6 +18,7 @@ import LiveKeySuspense from "./(tabs)/live-key";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import PayoutRequests from "./(tabs)/payouts";
+import PayoutAccountServiceSuspense from "./(tabs)/PayoutAccount";
 
 // import PayoutRequestsSuspense from "./(tabs)/payouts";
 
@@ -37,18 +38,21 @@ function TabsContainer() {
       </TabsPanel>
 
       <TabsPanel value={tabs[1].value}>
+        <PayoutAccountServiceSuspense />
+      </TabsPanel>
+      <TabsPanel value={tabs[2].value}>
         <Services />
       </TabsPanel>
 
-      <TabsPanel value={tabs[2].value}>
+      <TabsPanel value={tabs[3].value}>
         <LiveKeySuspense />
       </TabsPanel>
 
-      <TabsPanel value={tabs[3].value}>
+      <TabsPanel value={tabs[4].value}>
         <PayoutRequests />
       </TabsPanel>
 
-      <TabsPanel value={tabs[4].value}>
+      <TabsPanel value={tabs[5].value}>
         <Reactivate />
       </TabsPanel>
     </TabsComponent>
@@ -62,8 +66,13 @@ const tabs = [
     icon: <IconCircleArrowUpRight size={16} />,
   },
   {
-    title: "Services",
-    value: "services",
+    title: "Payout Account",
+    value: "payout-account",
+    icon: <IconUserPlus size={16} />,
+  },
+  {
+    title: "Account Issuance",
+    value: "account-issuance",
     icon: <IconUserPlus size={16} />,
   },
   {

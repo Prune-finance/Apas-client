@@ -2,14 +2,14 @@
 
 import { useInquiries } from "@/lib/hooks/inquiries";
 import { TransactionType } from "@/lib/hooks/transactions";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 import { InquiriesTableHeaders } from "@/lib/static";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { InquiryTableRows } from "@/ui/components/TableRows";
@@ -43,8 +43,8 @@ export const InquiriesTab = () => {
   });
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -55,7 +55,19 @@ export const InquiriesTab = () => {
         <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
       </Group>
 
-      <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
+      <Filter<FilterType>
+        opened={opened}
+        form={form}
+        toggle={toggle}
+        customStatusOption={["Processing", "Closed"]}
+      >
+        <TextBox placeholder="Business Name" {...form.getInputProps("name")} />
+        <SelectBox
+          data={["QUERY", "RECALL", "TRACE"]}
+          placeholder="Type"
+          {...form.getInputProps("type")}
+        />
+      </Filter>
 
       <TableComponent
         head={InquiriesTableHeaders}

@@ -10,17 +10,9 @@ import { useState } from "react";
 
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
-import {
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  TableTd,
-} from "@mantine/core";
-import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
+import { TableTd } from "@mantine/core";
 import { TableTr } from "@mantine/core";
 
-import { IconDots, IconEye } from "@tabler/icons-react";
 import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
 import { IconListTree } from "@tabler/icons-react";
 
@@ -31,20 +23,17 @@ import { LiveKeyRequest, useLiveKeyRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../businesses/schema";
+
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 function LiveKey() {
   const searchParams = useSearchParams();
@@ -148,9 +137,9 @@ function LiveKey() {
     )
   );
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -161,11 +150,14 @@ function LiveKey() {
         <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
       </div>
 
-      <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      />
+        customStatusOption={["Approved", "Rejected", "Pending"]}
+      >
+        <TextBox placeholder="Business Name" {...form.getInputProps("name")} />
+      </Filter>
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

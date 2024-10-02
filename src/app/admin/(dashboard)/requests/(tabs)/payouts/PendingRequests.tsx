@@ -9,17 +9,14 @@ import { Group } from "@mantine/core";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
 import { Fragment, useState } from "react";
-import {
-  businessFilterSchema,
-  BusinessFilterType,
-  businessFilterValues,
-} from "../../../businesses/schema";
+
 import { parseError } from "@/lib/actions/auth";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import Cookies from "js-cookie";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 export const PendingPayoutRequests = () => {
   const [search, setSearch] = useState("");
@@ -32,9 +29,9 @@ export const PendingPayoutRequests = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const handleRejectRequest = async () => {

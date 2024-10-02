@@ -1,13 +1,13 @@
 "use client";
 
 import { usePayoutAccount } from "@/lib/hooks/accounts";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { Box, Group, Table, TableData, TableTd, TableTr } from "@mantine/core";
@@ -16,14 +16,27 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
-import { useState } from "react";
+import { Suspense, use, useMemo, useState } from "react";
 
-export const Users = () => {
+const UsersComponent = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
+
+  const searchParams = useSearchParams();
+  const { status, createdAt } = Object.fromEntries(searchParams.entries());
+
+  const param = useMemo(() => {
+    return {
+      ...(status && { status }),
+      ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+      page: active,
+      limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, createdAt, active, limit]);
 
   const { accounts, revalidate, meta, loading } = usePayoutAccount();
 
@@ -32,11 +45,9 @@ export const Users = () => {
   const [opened, { toggle }] = useDisclosure(false);
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
-
-  console.log(accounts);
 
   const tableData: TableData = {
     head: tableHeaders,
@@ -81,7 +92,14 @@ export const Users = () => {
         <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
       </Group>
 
-      <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
+      <Filter<FilterType>
+        opened={opened}
+        form={form}
+        toggle={toggle}
+        customStatusOption={["Active", "Inactive"]}
+      >
+        <TextBox placeholder="Business Name" {...form.getInputProps("name")} />
+      </Filter>
 
       {/* <Table
         data={tableData}
@@ -143,3 +161,11 @@ const data = [
     status: "ACTIVE",
   },
 ];
+
+export const Users = () => {
+  return (
+    <Suspense>
+      <UsersComponent />
+    </Suspense>
+  );
+};

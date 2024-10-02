@@ -55,13 +55,9 @@ function AccountRequests() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  const {
-  
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, sort, type } = Object.fromEntries(
+    searchParams.entries()
+  );
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("100");
@@ -151,62 +147,13 @@ function AccountRequests() {
     );
   };
 
-  // const handleRowClick = (id: string) => {
-  //   push(`/admin/account-requests/${id}`);
-  // };
-
-  // const rows = filteredSearch(
-  //   requests,
-  //   ["firstName", "lastName", "Company.name"],
-  //   debouncedSearch
-  // ).map((element, index) => (
-  //   <TableTr
-  //     key={index}
-  //     onClick={() => handleRowClick(element.id)}
-  //     style={{ cursor: "pointer" }}
-  //   >
-  //     <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
-  //     <TableTd className={styles.table__td}>{20}</TableTd>
-  //     <TableTd
-  //       tt="lowercase"
-  //       // className={styles.table__td}
-  //     >{`${element.firstName}${element.lastName}.example.com`}</TableTd>
-  //     {/* <TableTd className={styles.table__td} tt="capitalize">
-  //       {element.accountType.toLowerCase()}
-  //     </TableTd>
-  //     <TableTd className={`${styles.table__td}`}>
-  //       {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-  //     </TableTd> */}
-  //     <TableTd className={styles.table__td}>
-  //       <Badge
-  //         tt="capitalize"
-  //         variant="light"
-  //         color={approvedBadgeColor(element.status)}
-  //         w={82}
-  //         h={24}
-  //         fw={400}
-  //         fz={12}
-  //       >
-  //         {element.status.toLowerCase()}
-  //       </Badge>
-  //     </TableTd>
-
-  //     {/* <TableTd
-  //       className={`${styles.table__td}`}
-  //       onClick={(e) => e.stopPropagation()}
-  //     >
-  //       <MenuComponent id={element.id} />
-  //     </TableTd> */}
-  //   </TableTr>
-  // ));
-
   const handleRowClick = (id: string) => {
     push(`/admin/account-requests/${id}`);
   };
 
   const rows = filteredSearch(
     businesses.filter((biz) => Boolean(biz._count.AccountRequests)),
-    ["name", "legalEntity"],
+    ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -279,21 +226,18 @@ function AccountRequests() {
         >
           <SearchInput search={search} setSearch={setSearch} />
 
-          <Group gap={12}>
+          {/* <Group gap={12}>
             <SecondaryBtn text="Filter" icon={IconListTree} action={toggle} />
-          </Group>
+          </Group> */}
         </Group>
 
-        <Filter<FilterT> opened={opened} form={form} toggle={toggle}>
-          <Select
-            placeholder="Type"
-            data={["Corporate", "User"]}
-            {...form.getInputProps("type")}
-            size="xs"
-            w={120}
-            h={36}
-          />
-        </FilterT>
+        <Filter<FilterType>
+          opened={opened}
+          form={form}
+          toggle={toggle}
+          noDate
+          isStatus
+        ></Filter>
 
         <TableComponent
           head={tableHeaders}

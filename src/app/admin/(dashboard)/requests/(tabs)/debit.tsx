@@ -36,19 +36,16 @@ import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../businesses/schema";
+
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 function Debit() {
   const searchParams = useSearchParams();
@@ -204,9 +201,9 @@ function Debit() {
     </TableTr>
   ));
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -222,11 +219,15 @@ function Debit() {
         />
       </Group>
 
-      <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      />
+        noDate
+        customStatusOption={["Active", "Inactive"]}
+      >
+        <TextBox placeholder="Business Name" {...form.getInputProps("name")} />
+      </Filter>
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

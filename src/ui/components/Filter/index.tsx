@@ -16,6 +16,7 @@ type Props<T> = {
   approvalStatus?: boolean;
   frozenStatus?: boolean;
   customStatusOption?: string[];
+  noDate?: boolean;
 };
 
 export default function Filter<T>({
@@ -27,6 +28,7 @@ export default function Filter<T>({
   approvalStatus,
   frozenStatus,
   customStatusOption,
+  noDate,
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
@@ -51,24 +53,24 @@ export default function Filter<T>({
     const filteredValues = Object.fromEntries(
       Object.entries(form.values as Record<string, unknown>)
         .filter(([key, value]) => value)
-        .map(([key, val]) => {
-          // Format the createdAt field if it exists and is valid
+        .flatMap(([key, val]) => {
+          // Format and return startDate and endDate separately if the key is "createdAt"
           if (key === "createdAt" && Array.isArray(val) && val.length === 2) {
             const [startDate, endDate] = val as [Date | null, Date | null];
-            const formattedCreatedAt = `${dayjs(startDate).format(
-              "YYYY-MM-DD"
-            )} - ${dayjs(endDate).format("YYYY-MM-DD")}`;
-            return [key, formattedCreatedAt];
+            return [
+              ["date", dayjs(startDate).format("YYYY-MM-DD")],
+              ["endDate", dayjs(endDate).format("YYYY-MM-DD")],
+            ];
           }
 
           // Format the status field if it exists and is valid, turning it to uppercase
           if (key === "status" && typeof val === "string") {
             const status = val.toUpperCase();
-            return [key, status];
+            return [[key, status]];
           }
 
           // Return other fields as they are
-          return [key, val];
+          return [[key, val]];
         })
     ) as Record<string, string>;
 
@@ -86,38 +88,26 @@ export default function Filter<T>({
 
         <SecondaryBtn icon={IconX} action={toggle} text="Close" p={10} />
       </Group>
-      <Flex gap={12} align="center" h={40}>
-        {/* <Select
-          placeholder="Sort"
-          data={["Asc", "Desc"]}
-          {...form.getInputProps("sort")}
-          size="xs"
-          w={120}
-          h={36}
-        /> */}
-        {/* <Select
-          placeholder="Rows"
-          data={["10", "20", "50"]}
-          {...form.getInputProps("rows")}
-          size="xs"
-          w={120}
-          h={36}
-        /> */}
+      <Group gap={12} align="center" h={40}>
         {children}
 
-        <DatePickerInput
-          placeholder="Date Range"
-          valueFormat="YYYY-MM-DD"
-          {...form.getInputProps("createdAt")}
-          size="xs"
-          w={210}
-          h={36}
-          type="range"
-          allowSingleDateInRange
-          leftSection={<IconCalendarMonth size={14} />}
-          numberOfColumns={2}
-          clearable
-        />
+        {!noDate && (
+          <DatePickerInput
+            placeholder="Date Range"
+            valueFormat="YYYY-MM-DD"
+            {...form.getInputProps("createdAt")}
+            size="xs"
+            w={210}
+            h={36}
+            styles={{ input: { height: "30px" } }}
+            type="range"
+            allowSingleDateInRange
+            leftSection={<IconCalendarMonth size={12} />}
+            numberOfColumns={2}
+            clearable
+          />
+        )}
+
         {!isStatus && (
           <Select
             placeholder="Status"
@@ -134,6 +124,7 @@ export default function Filter<T>({
             size="xs"
             w={120}
             h={36}
+            clearable
           />
         )}
 
@@ -168,7 +159,7 @@ export default function Filter<T>({
             Clear
           </Button>
         </Flex>
-      </Flex>
+      </Group>
     </Collapse>
   );
 }

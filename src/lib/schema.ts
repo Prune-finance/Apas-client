@@ -528,6 +528,12 @@ export const FilterValues = {
   accountName: null,
   accountNumber: null,
   type: null,
+  accountType: null,
+  country: null,
+  senderName: null,
+  recipientName: null,
+  recipientIban: null,
+  amount: null,
 };
 
 export const FilterSchema = z.object({
@@ -538,6 +544,12 @@ export const FilterSchema = z.object({
   accountName: z.string().nullable(),
   accountNumber: z.string().nullable(),
   type: z.string().nullable(),
+  accountType: z.string().nullable(),
+  country: z.string().nullable(),
+  senderName: z.string().nullable(),
+  recipientName: z.string().nullable(),
+  recipientIban: z.string().nullable(),
+  amount: z.number().nullable(),
 });
 
 export type FilterType = z.infer<typeof FilterSchema>;

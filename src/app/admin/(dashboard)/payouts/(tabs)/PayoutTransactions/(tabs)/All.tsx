@@ -4,14 +4,14 @@ import {
   TransactionType,
   usePayoutTransactions,
 } from "@/lib/hooks/transactions";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 import { PayoutTableHeaders } from "@/lib/static";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { PayoutTransactionTableRows } from "@/ui/components/TableRows";
@@ -23,16 +23,25 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 interface Props {
   transactions: TransactionType[];
   loading: boolean;
+  setLimit: Dispatch<SetStateAction<string | null>>;
+  limit: string | null;
+  active: number;
+  setActive: Dispatch<SetStateAction<number>>;
 }
 
-export const AllPayoutTransactions = ({ transactions, loading }: Props) => {
-  const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
+export const AllPayoutTransactions = ({
+  transactions,
+  loading,
+  setActive,
+  setLimit,
+  active,
+  limit,
+}: Props) => {
   const [search, setSearch] = useState("");
 
   const [debouncedSearch] = useDebouncedValue(search, 500);
@@ -40,8 +49,8 @@ export const AllPayoutTransactions = ({ transactions, loading }: Props) => {
   const [opened, { toggle }] = useDisclosure(false);
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -49,10 +58,38 @@ export const AllPayoutTransactions = ({ transactions, loading }: Props) => {
       <Group justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
 
-      <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
+      <Filter<FilterType>
+        opened={opened}
+        toggle={toggle}
+        form={form}
+        customStatusOption={["PENDING", "COMPLETED", "REJECTED"]}
+      >
+        <TextBox
+          placeholder="Sender Name"
+          {...form.getInputProps("senderName")}
+        />
+        <TextBox
+          placeholder="Beneficiary Name"
+          {...form.getInputProps("recipientName")}
+        />
+        <TextBox
+          placeholder="Beneficiary IBAN"
+          {...form.getInputProps("recipientIban")}
+        />
+        <SelectBox
+          placeholder="Type"
+          {...form.getInputProps("type")}
+          data={["DEBIT", "CREDIT"]}
+        />
+      </Filter>
 
       <TableComponent
         head={PayoutTableHeaders}

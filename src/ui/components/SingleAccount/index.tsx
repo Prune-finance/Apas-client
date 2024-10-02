@@ -1121,9 +1121,7 @@ export const DefaultAccountHead = ({
               radius={4}
             >
               <Switch
-                label={`${
-                  account?.isTrusted ? "Untrust this User" : "Trust this User"
-                } this User`}
+                label={`${account?.isTrusted ? "Untrust" : "Trust"} this User`}
                 checked={account?.isTrusted}
                 onChange={(e) => {
                   openTrust();

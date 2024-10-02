@@ -486,6 +486,7 @@ export interface AccountData {
   staging: "TEST" | "LIVE";
   type: "USER" | "CORPORATE";
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
+  isTrusted?: boolean;
 }
 
 export interface AccountDocuments {

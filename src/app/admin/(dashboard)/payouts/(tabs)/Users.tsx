@@ -13,7 +13,10 @@ import { TableComponent } from "@/ui/components/Table";
 import { Box, Group, Table, TableData, TableTd, TableTr } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconListTree } from "@tabler/icons-react";
+import {
+  IconListTree,
+  IconRosetteDiscountCheckFilled,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -62,7 +65,17 @@ export const Users = () => {
       }
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{`${element.Company.name}`}</TableTd>
+      <TableTd>
+        <Group gap={5}>
+          {element?.isTrusted && (
+            <IconRosetteDiscountCheckFilled
+              size={25}
+              color="var(--prune-primary-700)"
+            />
+          )}
+          {`${element.Company.name}`}
+        </Group>
+      </TableTd>
 
       <TableTd>{dayjs(element.createdAt).format("Do MMM, YYYY")}</TableTd>
       <TableTd>

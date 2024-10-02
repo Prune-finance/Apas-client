@@ -38,6 +38,7 @@ import {
   IconExclamationCircle,
   IconInfoCircle,
   IconListTree,
+  IconRosetteDiscountCheckFilled,
   IconShieldCheck,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
@@ -854,6 +855,7 @@ interface DefaultAccountHeadProps
   account: DefaultAccount | null;
   business: BusinessData | null;
   loadingBiz: boolean;
+  revalidate?: () => void;
 }
 
 export interface RequestForm {
@@ -878,6 +880,7 @@ export const DefaultAccountHead = ({
   business,
   loadingBiz,
   admin,
+  revalidate,
 }: DefaultAccountHeadProps) => {
   const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
@@ -1017,6 +1020,32 @@ export const DefaultAccountHead = ({
     closeSuccess();
   };
 
+  const handleAccountTrust = async () => {
+    if (!account) return;
+    setProcessingTrust(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/payout/account/${account?.id}/trust`,
+        {
+          isTrusted: account?.isTrusted ? false : true,
+        },
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
+        }
+      );
+      revalidate && revalidate();
+      handleSuccess(
+        "Action Completed",
+        `Payout account is ${account.isTrusted ? "untrusted" : "trusted"}`
+      );
+      closeTrust();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessingTrust(false);
+    }
+  };
+
   return (
     <>
       <Flex
@@ -1038,9 +1067,18 @@ export const DefaultAccountHead = ({
 
           <Stack gap={2}>
             {!loading ? (
-              <Text fz={24} className={styles.main__header__text} m={0} p={0}>
-                {account?.accountName}
-              </Text>
+              <Group gap={15}>
+                <Text fz={24} className={styles.main__header__text} m={0} p={0}>
+                  {account?.accountName}
+                </Text>
+
+                {account?.isTrusted && (
+                  <IconRosetteDiscountCheckFilled
+                    size={25}
+                    color="var(--prune-primary-700)"
+                  />
+                )}
+              </Group>
             ) : (
               <Skeleton h={10} w={100} />
             )}
@@ -1083,8 +1121,13 @@ export const DefaultAccountHead = ({
               radius={4}
             >
               <Switch
-                label="Trust this User"
-                checked={business?.kycTrusted}
+                label={`${
+                  account?.isTrusted ? "Untrust this User" : "Trust this User"
+                } this User`}
+                checked={account?.isTrusted}
+                onChange={(e) => {
+                  openTrust();
+                }}
                 labelPosition="left"
                 fz={12}
                 size="xs"
@@ -1098,9 +1141,13 @@ export const DefaultAccountHead = ({
       <OriginalModalComponent
         opened={openedTrust}
         close={closeTrust}
-        title="Trust This User?"
-        text="By trusting this business, you're granting them the ability to automatically disburse funds from their Payout accounts."
-        // action={handleBusinessTrust}
+        title={`${account?.isTrusted ? "Untrust" : "Trust"} This User?`}
+        text={`${
+          account?.isTrusted
+            ? "By untrusting this business, you're revoking their ability to automatically disburse funds from their Payout accounts."
+            : "By trusting this business, you're granting them the ability to automatically disburse funds from their Payout accounts."
+        }`}
+        action={handleAccountTrust}
         customApproveMessage="Yes, Proceed"
         icon={
           business?.kycTrusted ? (

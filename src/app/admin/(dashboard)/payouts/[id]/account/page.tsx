@@ -29,13 +29,9 @@ export default function BusinessPayoutAccount() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
 
-  const {
-    loading: loadingBiz,
-    business,
-    revalidate,
-  } = useSingleBusiness(params.id);
+  const { loading: loadingBiz, business } = useSingleBusiness(params.id);
 
-  const { account, loading } = useBusinessPayoutAccount(params.id);
+  const { account, loading, revalidate } = useBusinessPayoutAccount(params.id);
 
   const { loading: loadingTrx, transactions, meta } = usePayoutTransactions();
   return (
@@ -65,6 +61,7 @@ export default function BusinessPayoutAccount() {
           loadingBiz={loadingBiz}
           payout
           admin
+          revalidate={revalidate}
         />
 
         <SingleDefaultAccountBody

@@ -1,4 +1,4 @@
-import { Fragment, Suspense, useMemo } from "react";
+import { Fragment, Suspense } from "react";
 
 import Cookies from "js-cookie";
 import dayjs from "dayjs";
@@ -10,33 +10,17 @@ import { useState } from "react";
 
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
-import {
-  Badge,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  Stack,
-  TableTd,
-} from "@mantine/core";
-import { Flex, Box, Divider, Button, TextInput } from "@mantine/core";
-import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
+import { Stack, TableTd } from "@mantine/core";
+import { Flex, Box, Divider } from "@mantine/core";
+import { Text, Drawer } from "@mantine/core";
 import { TableTr } from "@mantine/core";
 
-import { IconDots, IconEye } from "@tabler/icons-react";
 import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
 
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import { formatNumber } from "@/lib/utils";
-import {
-  DebitRequest,
-  IUserRequest,
-  PayoutAccount,
-  useAllRequests,
-  usePayoutRequests,
-} from "@/lib/hooks/requests";
+import { PayoutAccount, usePayoutRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -79,20 +63,10 @@ function AccountPayout() {
     // ...(type && { type: type.toLowerCase() }),
   };
 
-  // const { requests, loading, revalidate, meta } =
-  //   usePayoutRequests(queryParams);
+  const { requests, revalidate, meta, loading } =
+    usePayoutRequests(queryParams);
 
-  const { requests, revalidate, loading, meta } = useAllRequests({
-    type: "ACCOUNT_ISSUANCE",
-    ...queryParams,
-  });
-
-  const { push } = useRouter();
-  // const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
-  //   null
-  // );
-
-  const [selectedRequest, setSelectedRequest] = useState<IUserRequest | null>(
+  const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
     null
   );
   const [processing, setProcessing] = useState(false);
@@ -104,8 +78,6 @@ function AccountPayout() {
     useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
 
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-
   const BusinessDetails = {
     "Business Name": selectedRequest?.Company.name,
     "Request Date": dayjs(selectedRequest?.createdAt).format("DD MMM, YYYY"),
@@ -115,67 +87,12 @@ function AccountPayout() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  // const handleRejectRequest = async () => {
-  //   if (!selectedRequest) return;
-  //   setProcessing(true);
-  //   try {
-  //     await axios.patch(
-  //       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/reject`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-  //     );
-
-  //     revalidate();
-  //     close();
-  //     closeDrawer();
-  //     handleSuccess("Action Completed", `Payout Request Denied`);
-  //   } catch (error) {
-  //     handleError("An error occurred", parseError(error));
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
-
-  // const handleAcceptRequest = async () => {
-  //   if (!selectedRequest) return;
-  //   setProcessing(true);
-  //   try {
-  //     await axios.patch(
-  //       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/approve`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-  //     );
-
-  //     revalidate();
-  //     closeApprove();
-  //     closeDrawer();
-  //     handleSuccess("Action Completed", `Payout Request Approved`);
-  //   } catch (error) {
-  //     handleError("An error occurred", parseError(error));
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
-
-  const requestType = useMemo(() => {
-    switch (selectedRequest?.type) {
-      case "ACTIVATE":
-        return "reactivate";
-      case "ACCOUNT_ISSUANCE":
-        return "account issuance";
-      case "DEACTIVATE":
-        return "deactivate";
-      default:
-        return selectedRequest?.type.toLowerCase();
-    }
-  }, [selectedRequest]);
-
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/reject`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/reject`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -183,12 +100,7 @@ function AccountPayout() {
       revalidate();
       close();
       closeDrawer();
-      handleSuccess(
-        "Action Completed",
-        `${(requestType ?? "").replace(/^./, (letter) =>
-          letter.toUpperCase()
-        )} Request Denied`
-      );
+      handleSuccess("Action Completed", `Payout Request Rejected`);
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -201,7 +113,7 @@ function AccountPayout() {
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/approve`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/approve`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -209,51 +121,12 @@ function AccountPayout() {
       revalidate();
       closeApprove();
       closeDrawer();
-      handleSuccess(
-        "Action Completed",
-        `${(requestType ?? "").replace(/^./, (letter) =>
-          letter.toUpperCase()
-        )} Request Approved`
-      );
+      handleSuccess("Action Completed", `Payout Request Approved`);
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
       setProcessing(false);
     }
-  };
-  const MenuComponent = ({ request }: { request: IUserRequest }) => {
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          <MenuItem
-            onClick={() => {
-              setSelectedRequest(request);
-              openDrawer();
-            }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            View
-          </MenuItem>
-        </MenuDropdown>
-      </Menu>
-    );
-  };
-
-  const handleRowClick = (id: string) => {
-    push(`/admin/requests/${id}/freeze`);
   };
 
   const rows = filteredSearch(requests, ["companyName"], debouncedSearch).map(
@@ -267,18 +140,12 @@ function AccountPayout() {
         style={{ cursor: "pointer" }}
       >
         <TableTd>{element?.Company?.name ?? "N/A"}</TableTd>
-        <TableTd tt="capitalize">
-          {element?.type.split("_").join(" ").toLowerCase() ?? "N/A"}
-        </TableTd>
+        <TableTd tt="capitalize">{"Payout Account"}</TableTd>
         <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
 
         <TableTd className={`${styles.table__td}`}>
           <BadgeComponent status={element.status} />
         </TableTd>
-
-        {/* <TableTd className={`${styles.table__td}`}>
-          <MenuComponent request={element} />
-        </TableTd> */}
       </TableTr>
     )
   );
@@ -293,7 +160,7 @@ function AccountPayout() {
       <div className={`${styles.container__search__filter}`}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} />
+        {/* <SecondaryBtn text="Filter" action={toggle} /> */}
       </div>
 
       <Filter<BusinessFilterType>
@@ -326,7 +193,7 @@ function AccountPayout() {
         size="30%"
         title={
           <Text fz={18} fw={600} c="#1D2939" ml={24}>
-            Account Issuance Request Details
+            Payout Account Request Details
           </Text>
         }
         closeButtonProps={{ ...closeButtonProps, mr: 24 }}
@@ -380,8 +247,8 @@ function AccountPayout() {
         close={close}
         action={handleRejectRequest}
         processing={processing}
-        title="Reject This Account Issuance Request?"
-        text="This means you are rejecting the account issuance request of this business."
+        title="Reject This Payout Account Request?"
+        text="This means you are rejecting the payout account request of this business."
         customApproveMessage="Yes, Reject It"
       />
 
@@ -392,8 +259,8 @@ function AccountPayout() {
         close={closeApprove}
         action={handleAcceptRequest}
         processing={processing}
-        title="Approve This Account Issuance Request?"
-        text="This means you are accepting the  account issuance request of this business"
+        title="Approve This Payout Account Request?"
+        text="This means you are accepting the payout account request of this business"
         customApproveMessage="Yes, Approve It"
       />
     </Fragment>
@@ -409,7 +276,7 @@ const tableHeaders = [
   // "Action",
 ];
 
-export default function PayoutAccountSuspense() {
+export default function PayoutAccountServiceSuspense() {
   return (
     <Suspense>
       <AccountPayout />

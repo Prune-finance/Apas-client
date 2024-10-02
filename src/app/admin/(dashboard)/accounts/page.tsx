@@ -41,11 +41,6 @@ import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  accountFilterSchema,
-  AccountFilterType,
-  accountFilterValues,
-} from "./schema";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
@@ -53,21 +48,21 @@ import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import ModalComponent from "./modal";
-import { validateRequest } from "@/lib/schema";
-import { SearchInput } from "@/ui/components/Inputs";
+import {
+  FilterSchema,
+  FilterType,
+  FilterValues,
+  validateRequest,
+} from "@/lib/schema";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { get } from "http";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 
 function Accounts() {
   const searchParams = useSearchParams();
 
-  const {
-    rows = "10",
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, accountName, accountNumber, type } =
+    Object.fromEntries(searchParams.entries());
 
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
@@ -78,8 +73,9 @@ function Accounts() {
       : { limit: parseInt(limit, 10) }),
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
+    ...(accountName && { accountName }),
+    ...(accountNumber && { accountNumber }),
     page: activePage,
   });
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -200,9 +196,9 @@ function Accounts() {
     }
   };
 
-  const form = useForm<AccountFilterType>({
-    initialValues: accountFilterValues,
-    validate: zodResolver(accountFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const requestForm = useForm({
@@ -248,18 +244,19 @@ function Accounts() {
           </Group>
         </Group>
 
-        <Filter<AccountFilterType>
-          opened={filterOpened}
-          toggle={toggle}
-          form={form}
-        >
-          <Select
+        <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form}>
+          <TextBox
+            placeholder="Account Name"
+            {...form.getInputProps("accountName")}
+          />
+          <TextBox
+            placeholder="Account Number"
+            {...form.getInputProps("accountNumber")}
+          />
+          <SelectBox
             placeholder="Type"
-            data={["Corporate", "Individual"]}
             {...form.getInputProps("type")}
-            size="xs"
-            w={120}
-            h={36}
+            data={["Corporate", "Individual"]}
           />
         </Filter>
 

@@ -64,6 +64,8 @@ import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import { useTransactions } from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { TextBox } from "@/ui/components/Inputs";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -72,7 +74,9 @@ function Businesses() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { status, createdAt } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, name, contactEmail } = Object.fromEntries(
+    searchParams.entries()
+  );
 
   const { loading, businesses, meta } = useBusiness({
     ...(!limit || isNaN(Number(limit))
@@ -96,9 +100,9 @@ function Businesses() {
 
   const { push } = useRouter();
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const infoDetails = [
@@ -296,11 +300,19 @@ function Businesses() {
             </Button>
           </Flex>
         </div>
-        <Filter<BusinessFilterType>
+        <Filter<FilterType>
           opened={opened}
           toggle={toggle}
           form={form}
-        />
+          customStatusOption={["Active", "Inactive"]}
+        >
+          <TextBox placeholder="Business" {...form.getInputProps("name")} />
+
+          <TextBox
+            placeholder="Email"
+            {...form.getInputProps("contactEmail")}
+          />
+        </Filter>
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

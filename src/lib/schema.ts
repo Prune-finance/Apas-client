@@ -520,21 +520,27 @@ export const sendMoneyCompanyValidate = z.object({
 //   path: ["accountBalance"],
 // })
 
-export const filterValues = {
-  rows: null,
-  sort: null,
-  createdAt: null,
+export const FilterValues = {
+  createdAt: [null, null] as [Date | null, Date | null] | null,
   status: null,
+  contactEmail: null,
+  name: null,
+  accountName: null,
+  accountNumber: null,
+  type: null,
 };
 
-export const filterSchema = z.object({
-  rows: z.string().nullable(),
-  sort: z.string().nullable(),
-  createdAt: z.date().nullable(),
+export const FilterSchema = z.object({
+  createdAt: z.tuple([z.date().nullable(), z.date().nullable()]).nullable(),
   status: z.string().nullable(),
+  contactEmail: z.string().nullable(),
+  name: z.string().nullable(),
+  accountName: z.string().nullable(),
+  accountNumber: z.string().nullable(),
+  type: z.string().nullable(),
 });
 
-export type FilterType = z.infer<typeof filterSchema>;
+export type FilterType = z.infer<typeof FilterSchema>;
 
 export const removeDirectorValues = {
   reason: "",

@@ -14,7 +14,7 @@ import {
   MenuTarget,
   Select,
 } from "@mantine/core";
-import { Button, TextInput } from "@mantine/core";
+
 import { UnstyledButton, rem, Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
@@ -32,7 +32,6 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 import { useRequests } from "@/lib/hooks/requests";
 
 // UI Imports
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
@@ -40,14 +39,8 @@ import styles from "@/ui/styles/accounts.module.scss";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  AccountFilterType,
-  accountFilterValues,
-  accountFilterSchema,
-} from "./schema";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
-import { activeBadgeColor } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
@@ -56,13 +49,14 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
   const {
-    rows: _limit = "10",
+  
     status,
     createdAt,
     sort,
@@ -256,9 +250,9 @@ function AccountRequests() {
     </TableTr>
   ));
 
-  const form = useForm<AccountFilterType>({
-    initialValues: accountFilterValues,
-    validate: zodResolver(accountFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -290,7 +284,7 @@ function AccountRequests() {
           </Group>
         </Group>
 
-        <Filter<AccountFilterType> opened={opened} form={form} toggle={toggle}>
+        <Filter<FilterT> opened={opened} form={form} toggle={toggle}>
           <Select
             placeholder="Type"
             data={["Corporate", "User"]}
@@ -299,7 +293,7 @@ function AccountRequests() {
             w={120}
             h={36}
           />
-        </Filter>
+        </FilterT>
 
         <TableComponent
           head={tableHeaders}

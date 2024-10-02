@@ -1,16 +1,12 @@
 import { z } from "zod";
 
 export const businessFilterValues = {
-  rows: null,
-  sort: null,
-  createdAt: null,
+  createdAt: [null, null] as [Date | null, Date | null] | null,
   status: null,
 };
 
 export const businessFilterSchema = z.object({
-  rows: z.string().nullable(),
-  sort: z.string().nullable(),
-  createdAt: z.date().nullable(),
+  createdAt: z.tuple([z.date().nullable(), z.date().nullable()]).nullable(),
   status: z.string().nullable(),
 });
 

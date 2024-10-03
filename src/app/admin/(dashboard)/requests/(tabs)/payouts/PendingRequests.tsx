@@ -7,8 +7,8 @@ import { TableComponent } from "@/ui/components/Table";
 import { PayoutTrxReqTableRows } from "@/ui/components/TableRows";
 import { Group } from "@mantine/core";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconListTree } from "@tabler/icons-react";
-import { Fragment, useState } from "react";
+import { IconCheck, IconListTree, IconX } from "@tabler/icons-react";
+import { Dispatch, Fragment, SetStateAction, useState } from "react";
 
 import { parseError } from "@/lib/actions/auth";
 import Filter from "@/ui/components/Filter";
@@ -25,6 +25,7 @@ import { PayoutTransactionRequestDrawer } from "./drawer";
 import Transaction from "@/lib/store/transaction";
 import ModalComponent from "@/ui/components/Modal";
 import { notifications } from "@mantine/notifications";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 interface Props {
   requests: PayoutTransactionRequest[];
@@ -36,7 +37,6 @@ interface Props {
   limit: string | null;
   revalidate: () => void;
 }
-import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 export const PendingPayoutRequests = () => {
   const [active, setActive] = useState(1);

@@ -11,7 +11,6 @@ import { useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import {
-  Badge,
   Menu,
   MenuDropdown,
   MenuItem,
@@ -19,7 +18,7 @@ import {
   Stack,
   TableTd,
 } from "@mantine/core";
-import { Flex, Box, Divider, Button, TextInput } from "@mantine/core";
+import { Flex, Box, Divider } from "@mantine/core";
 import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
 import { TableTr } from "@mantine/core";
 
@@ -29,14 +28,7 @@ import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import { formatNumber } from "@/lib/utils";
-import {
-  DebitRequest,
-  IUserRequest,
-  PayoutAccount,
-  useAllRequests,
-  usePayoutRequests,
-} from "@/lib/hooks/requests";
+import { IUserRequest, useAllRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -79,20 +71,12 @@ function AccountIssuance() {
     // ...(type && { type: type.toLowerCase() }),
   };
 
-  // const { requests, loading, revalidate, meta } =
-  //   usePayoutRequests(queryParams);
-
   const { requests, revalidate, loading, meta } = useAllRequests({
     type: "ACCOUNT_ISSUANCE",
     ...queryParams,
   });
 
-  console.log(requests, loading);
-
   const { push } = useRouter();
-  // const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
-  //   null
-  // );
 
   const [selectedRequest, setSelectedRequest] = useState<IUserRequest | null>(
     null
@@ -116,48 +100,6 @@ function AccountIssuance() {
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
-
-  // const handleRejectRequest = async () => {
-  //   if (!selectedRequest) return;
-  //   setProcessing(true);
-  //   try {
-  //     await axios.patch(
-  //       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/reject`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-  //     );
-
-  //     revalidate();
-  //     close();
-  //     closeDrawer();
-  //     handleSuccess("Action Completed", `Payout Request Denied`);
-  //   } catch (error) {
-  //     handleError("An error occurred", parseError(error));
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
-
-  // const handleAcceptRequest = async () => {
-  //   if (!selectedRequest) return;
-  //   setProcessing(true);
-  //   try {
-  //     await axios.patch(
-  //       `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/approve`,
-  //       {},
-  //       { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-  //     );
-
-  //     revalidate();
-  //     closeApprove();
-  //     closeDrawer();
-  //     handleSuccess("Action Completed", `Payout Request Approved`);
-  //   } catch (error) {
-  //     handleError("An error occurred", parseError(error));
-  //   } finally {
-  //     setProcessing(false);
-  //   }
-  // };
 
   const requestType = useMemo(() => {
     switch (selectedRequest?.type) {
@@ -223,40 +165,6 @@ function AccountIssuance() {
       setProcessing(false);
     }
   };
-  const MenuComponent = ({ request }: { request: IUserRequest }) => {
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          <MenuItem
-            onClick={() => {
-              setSelectedRequest(request);
-              openDrawer();
-            }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            View
-          </MenuItem>
-        </MenuDropdown>
-      </Menu>
-    );
-  };
-
-  const handleRowClick = (id: string) => {
-    push(`/admin/requests/${id}/freeze`);
-  };
 
   const rows = filteredSearch(requests, ["companyName"], debouncedSearch).map(
     (element, index) => (
@@ -277,10 +185,6 @@ function AccountIssuance() {
         <TableTd className={`${styles.table__td}`}>
           <BadgeComponent status={element.status} />
         </TableTd>
-
-        {/* <TableTd className={`${styles.table__td}`}>
-          <MenuComponent request={element} />
-        </TableTd> */}
       </TableTr>
     )
   );

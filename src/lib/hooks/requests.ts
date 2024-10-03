@@ -557,6 +557,40 @@ export function useLiveKeyRequests(id: string = "") {
   return { loading, requests, revalidate, meta };
 }
 
+export function useSingleLiveKeyRequests(id: string) {
+  const [requests, setRequests] = useState<LiveKeyRequest>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccounts() {
+    setLoading(true);
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests/${id}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setRequests(res.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, requests, revalidate };
+}
+
 interface ICompanyRequest extends Omit<IParams, "query"> {}
 export function useCompanyRequests(
   customParams: ICompanyRequest = {},

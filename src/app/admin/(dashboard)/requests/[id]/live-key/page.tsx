@@ -43,7 +43,7 @@ import ModalComponent from "@/ui/components/Modal";
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import Cookies from "js-cookie";
-import { useLiveKeyRequests } from "@/lib/hooks/requests";
+import { useSingleLiveKeyRequests } from "@/lib/hooks/requests";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 
 export default function SingleLiveKey() {
@@ -60,9 +60,9 @@ export default function SingleLiveKey() {
   const [openedReject, { open: openReject, close: closeReject }] =
     useDisclosure(false);
 
-  const { requests, revalidate, meta, loading } = useLiveKeyRequests(id);
+  const { requests, revalidate, loading } = useSingleLiveKeyRequests(id);
   const { business, loading: loadingBiz } = useSingleBusiness(
-    requests[0]?.companyId
+    requests?.companyId ?? ""
   );
 
   //   const { loading, requests, revalidate, meta } = useSingleLiveKeyRequest(id);
@@ -98,10 +98,10 @@ export default function SingleLiveKey() {
     Service: "Payout Service",
     "Go Live Date": loading
       ? dayjs().format("Do MMMM, YYYY")
-      : dayjs(requests[0].date).format("Do MMMM, YYYY"),
+      : dayjs(requests?.date || new Date()).format("Do MMMM, YYYY"),
     "Request Date": loading
       ? dayjs().format("Do MMMM, YYYY")
-      : dayjs(requests[0].createdAt).format("Do MMMM, YYYY"),
+      : dayjs(requests?.createdAt).format("Do MMMM, YYYY"),
   };
 
   const completeRequest = async (type: "approve" | "reject") => {
@@ -169,11 +169,11 @@ export default function SingleLiveKey() {
           {loading ? (
             <Skeleton h={20} w={100} />
           ) : (
-            <BadgeComponent status={requests[0].status} />
+            <BadgeComponent status={requests?.status ?? ""} />
           )}
         </Group>
 
-        {requests && requests[0]?.status === "PENDING" && (
+        {requests && requests?.status === "PENDING" && (
           <Group>
             <SecondaryBtn text="Reject" fw={600} action={openReject} />
             <PrimaryBtn text="Approve" fw={600} action={openApprove} />

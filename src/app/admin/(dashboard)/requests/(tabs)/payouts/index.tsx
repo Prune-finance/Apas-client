@@ -5,11 +5,12 @@ import { PendingPayoutRequests } from "./PendingRequests";
 
 export default function PayoutRequests() {
   return (
-    <TabsComponent tabs={tabs} mt={28}>
-      <TabsPanel value={tabs[0].value} mt={28}>
+    <TabsComponent tabs={tabs} mt={28} keepMounted={false}>
+      <TabsPanel value="All" mt={28}>
         <AllPayoutRequests />
       </TabsPanel>
-      <TabsPanel value={tabs[1].value} mt={28}>
+
+      <TabsPanel value="Pending" mt={28}>
         <PendingPayoutRequests />
       </TabsPanel>
     </TabsComponent>

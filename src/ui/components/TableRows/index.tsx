@@ -9,6 +9,9 @@ import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
 import { useRouter } from "next/navigation";
 import { Inquiry } from "@/lib/hooks/inquiries";
+import { boolean } from "zod";
+import { PayoutTransactionRequest } from "@/lib/hooks/requests";
+import { BusinessData } from "@/lib/hooks/businesses";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -39,18 +42,7 @@ export const BusinessTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && (
-        <TableTd
-          td="underline"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <Link href={`/admin/transactions/${element.senderIban}`}>
-            {element.senderName || "N/A"}
-          </Link>
-        </TableTd>
-      )}
+      {!business && <TableTd>{element.senderName || "N/A"}</TableTd>}
 
       <TableTd>
         <Stack gap={0}>
@@ -91,7 +83,7 @@ export const BusinessTransactionTableRows = ({
 
 export const IssuedTransactionTableRows = ({
   data,
-
+  noLink,
   search,
   active,
   limit,
@@ -102,6 +94,7 @@ export const IssuedTransactionTableRows = ({
   active: number;
   limit: string | null;
   searchProps: string[];
+  noLink?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
@@ -118,10 +111,11 @@ export const IssuedTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd
-        td="underline"
+        td={noLink ? "none" : "underline"}
         onClick={(e) => {
           e.stopPropagation();
         }}
+        style={{ pointerEvents: noLink ? "none" : "auto" }}
       >
         <Link href={`/admin/transactions/${element.senderIban}`}>
           {element?.senderName || "N/A"}
@@ -274,65 +268,81 @@ export const InquiryTableRows = ({
 export const PayoutTrxReqTableRows = ({
   data,
   search,
-  active,
-  limit,
   searchProps,
 }: {
-  data: TransactionType[];
+  data: PayoutTransactionRequest[];
   search: string;
-  active: number;
-  limit: string | null;
   searchProps: string[];
 }) => {
   const { open, setData } = Transaction();
-  return frontendPagination(
-    filteredSearch(data.reverse(), searchProps, search),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element: TransactionType) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        open();
-        setData(element);
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      {/* <TableTd>{element.senderName || "N/A"}</TableTd> */}
+  return filteredSearch(data.toReversed(), searchProps, search).map(
+    (element: PayoutTransactionRequest) => (
+      <TableTr
+        key={element.id}
+        onClick={() => {
+          open();
+          setData({
+            recipientName: element.beneficiaryFullName,
+            recipientIban: element.destinationIBAN,
+            senderIban: element?.PayoutAccount?.accountNumber || "N/A",
+            senderName: element?.PayoutAccount?.accountName || "N/A",
+            recipientBankAddress: element.destinationBank,
+            recipientBic: element.destinationBIC,
+            destinationFirstName: "",
+            destinationLastName: "",
+            centrolinkRef: "",
+            recipientBankCountry: element.destinationCountry,
+            senderBic: "",
+            type: "DEBIT",
+            narration: element.reason,
 
-      {/* <TableTd w="15%">{element.centrolinkRef}</TableTd> */}
-      <TableTd>
-        <Stack gap={0}>
-          <Text fz={12} fw={400}>
-            {element.recipientName}
-          </Text>
-          <Text fz={10} fw={400}>
-            {element.recipientIban}
-          </Text>
-        </Stack>
-      </TableTd>
+            company: {
+              id: "",
+              name: "",
+            } as BusinessData,
+            ...element,
+            status: element.status as unknown as
+              | "PENDING"
+              | "REJECTED"
+              | "COMPLETED"
+              | "CANCELLED",
+          });
+        }}
+        style={{ cursor: "pointer" }}
+      >
+        <TableTd>
+          <Stack gap={0}>
+            <Text fz={12} fw={400}>
+              {element.beneficiaryFullName}
+            </Text>
+            <Text fz={10} fw={400}>
+              {element.destinationIBAN}
+            </Text>
+          </Stack>
+        </TableTd>
 
-      <TableTd>{element.senderIban}</TableTd>
+        <TableTd>{element?.PayoutAccount?.accountNumber || "N/A"}</TableTd>
 
-      <TableTd>{element.recipientBankAddress}</TableTd>
+        <TableTd>{element.destinationBank}</TableTd>
 
-      <TableTd w="15%">{element.reference}</TableTd>
+        <TableTd w="15%">{element.reference}</TableTd>
 
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+        <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
 
-      <TableTd>
-        <Stack gap={0}>
-          <Text fz={12} fw={400}>
-            {dayjs(element.createdAt).format("Do MMMM, YYYY")}
-          </Text>
-          <Text fz={10} fw={400}>
-            {dayjs(element.createdAt).format("hh:mm a")}
-          </Text>
-        </Stack>
-      </TableTd>
-      <TableTd>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
+        <TableTd>
+          <Stack gap={0}>
+            <Text fz={12} fw={400}>
+              {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+            </Text>
+            <Text fz={10} fw={400}>
+              {dayjs(element.createdAt).format("hh:mm a")}
+            </Text>
+          </Stack>
+        </TableTd>
+        <TableTd>
+          <BadgeComponent status={element.status} />
+        </TableTd>
+      </TableTr>
+    )
+  );
 };

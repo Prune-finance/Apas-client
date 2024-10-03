@@ -13,7 +13,10 @@ import { TableComponent } from "@/ui/components/Table";
 import { Box, Group, Table, TableData, TableTd, TableTr } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconListTree } from "@tabler/icons-react";
+import {
+  IconListTree,
+  IconRosetteDiscountCheckFilled,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useSearchParams } from "next/navigation";
@@ -75,7 +78,17 @@ const UsersComponent = () => {
       }
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{`${element.Company.name}`}</TableTd>
+      <TableTd>
+        <Group gap={5}>
+          {element?.isTrusted && (
+            <IconRosetteDiscountCheckFilled
+              size={25}
+              color="var(--prune-primary-700)"
+            />
+          )}
+          {`${element.Company.name}`}
+        </Group>
+      </TableTd>
 
       <TableTd>{dayjs(element.createdAt).format("Do MMM, YYYY")}</TableTd>
       <TableTd>
@@ -143,29 +156,3 @@ const UsersComponent = () => {
 };
 
 const tableHeaders = ["Business Name", "Date Created", "Status"];
-
-const data = [
-  {
-    name: "John Doe",
-    createdAt: new Date(),
-    status: "ACTIVE",
-  },
-  {
-    name: "John Jane",
-    createdAt: new Date(),
-    status: "INACTIVE",
-  },
-  {
-    name: "John Doe",
-    createdAt: new Date(),
-    status: "ACTIVE",
-  },
-];
-
-export const Users = () => {
-  return (
-    <Suspense>
-      <UsersComponent />
-    </Suspense>
-  );
-};

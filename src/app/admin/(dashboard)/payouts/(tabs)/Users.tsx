@@ -156,3 +156,11 @@ const UsersComponent = () => {
 };
 
 const tableHeaders = ["Business Name", "Date Created", "Status"];
+
+export const Users = () => {
+  return (
+    <Suspense>
+      <UsersComponent />
+    </Suspense>
+  );
+};

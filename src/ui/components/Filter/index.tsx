@@ -1,9 +1,11 @@
+"use client";
+
 import { Button, Collapse, Flex, Group, Select, Text } from "@mantine/core";
 import { DateInput, DatePickerInput } from "@mantine/dates";
 import { UseFormReturnType } from "@mantine/form";
 import { IconCalendarMonth, IconX } from "@tabler/icons-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { SecondaryBtn } from "../Buttons";
 import dayjs from "dayjs";
 
@@ -32,51 +34,57 @@ export default function Filter<T>({
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
+  const [processing, setProcessing] = useState(false);
 
-  // const handleApply = () => {
-  //   const filteredValues = Object.fromEntries(
-  //     Object.entries(form.values as Record<string, unknown>).filter(
-  //       ([key, value]) => value !== null
-  //     ).map(([key, val]) => ({
-  //       createdAt: val[0].
-  //       ...val
-  //     }))
-  //   ) as Record<string, string>;
+  const handleApply = async () => {
+    setProcessing(true);
+    try {
+      console.time("filtering");
+      const filteredValues = Object.fromEntries(
+        Object.entries(form.values as Record<string, unknown>)
+          .filter(([key, value]) => value)
+          .flatMap(([key, val]) => {
+            // Format and return startDate and endDate separately if the key is "createdAt"
+            if (key === "createdAt" && Array.isArray(val) && val.length === 2) {
+              const [startDate, endDate] = val as [Date | null, Date | null];
 
-  //   const params = new URLSearchParams(filteredValues).toString();
+              // Only include dates if they are valid
+              const formattedStartDate = startDate
+                ? dayjs(startDate).format("YYYY-MM-DD")
+                : null;
+              const formattedEndDate = endDate
+                ? dayjs(endDate).format("YYYY-MM-DD")
+                : null;
 
-  //   replace(`${pathname}?${params}`);
-  //   toggle();
-  // };
+              // Return dates only if both are valid, otherwise return an empty array
+              return formattedStartDate && formattedEndDate
+                ? [
+                    ["date", formattedStartDate],
+                    ["endDate", formattedEndDate],
+                  ]
+                : [];
+            }
 
-  const handleApply = () => {
-    const filteredValues = Object.fromEntries(
-      Object.entries(form.values as Record<string, unknown>)
-        .filter(([key, value]) => value)
-        .flatMap(([key, val]) => {
-          // Format and return startDate and endDate separately if the key is "createdAt"
-          if (key === "createdAt" && Array.isArray(val) && val.length === 2) {
-            const [startDate, endDate] = val as [Date | null, Date | null];
-            return [
-              ["date", dayjs(startDate).format("YYYY-MM-DD")],
-              ["endDate", dayjs(endDate).format("YYYY-MM-DD")],
-            ];
-          }
+            // Format the status field if it exists and is valid, turning it to uppercase
+            if (key === "status" && typeof val === "string") {
+              const status = val.toUpperCase();
+              return [[key, status]];
+            }
 
-          // Format the status field if it exists and is valid, turning it to uppercase
-          if (key === "status" && typeof val === "string") {
-            const status = val.toUpperCase();
-            return [[key, status]];
-          }
+            // Return other fields as they are
+            return [[key, val]];
+          })
+      ) as Record<string, string>;
 
-          // Return other fields as they are
-          return [[key, val]];
-        })
-    ) as Record<string, string>;
+      const params = new URLSearchParams(filteredValues).toString();
 
-    const params = new URLSearchParams(filteredValues).toString();
+      const newUrl = `${pathname}?${params}`;
 
-    replace(`${pathname}?${params}`);
+      // push(`${pathname}?${params}`);
+      window.history.pushState({}, "", newUrl);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -97,7 +105,7 @@ export default function Filter<T>({
             valueFormat="YYYY-MM-DD"
             {...form.getInputProps("createdAt")}
             size="xs"
-            w={210}
+            maw={250}
             h={36}
             styles={{ input: { height: "30px" } }}
             type="range"
@@ -140,6 +148,8 @@ export default function Filter<T>({
             fz={12}
             size="xs"
             onClick={handleApply}
+            loading={processing}
+            loaderProps={{ type: "dots" }}
           >
             Apply
           </Button>
@@ -148,7 +158,8 @@ export default function Filter<T>({
             color="var(--prune-text-gray-700)"
             onClick={() => {
               form.reset();
-              replace(pathname);
+              // push(pathname);
+              window.history.pushState({}, "", pathname);
             }}
             // w={62}
             // h={36}

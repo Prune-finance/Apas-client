@@ -523,7 +523,7 @@ export const sendMoneyCompanyValidate = z.object({
 export const FilterValues = {
   createdAt: [null, null] as [Date | null, Date | null] | null,
   status: null,
-  contactEmail: null,
+  contactEmail: "",
   name: null,
   accountName: null,
   accountNumber: null,
@@ -553,6 +553,27 @@ export const FilterSchema = z.object({
 });
 
 export type FilterType = z.infer<typeof FilterSchema>;
+
+export interface IParams {
+  limit?: number;
+  date?: string | null;
+  endDate?: string | null;
+  status?: string;
+  business?: string;
+  email?: string;
+  name?: string;
+  period?: string;
+  accountName?: string;
+  accountNumber?: string;
+  accountType?: string;
+  country?: string;
+  senderName?: string;
+  recipientName?: string;
+  recipientIban?: string;
+  amount?: number;
+  type?: string;
+  page?: number;
+}
 
 export const removeDirectorValues = {
   reason: "",

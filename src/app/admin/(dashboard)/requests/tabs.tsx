@@ -18,7 +18,6 @@ import LiveKeySuspense from "./(tabs)/live-key";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import PayoutRequests from "./(tabs)/payouts";
-import PayoutAccountServiceSuspense from "./(tabs)/PayoutAccount";
 
 // import PayoutRequestsSuspense from "./(tabs)/payouts";
 
@@ -32,27 +31,25 @@ function TabsContainer() {
       mt={24}
       tt="capitalize"
       fz={12}
+      // keepMounted={false}
     >
       <TabsPanel value={tabs[0].value}>
         <Debit />
       </TabsPanel>
 
       <TabsPanel value={tabs[1].value}>
-        <PayoutAccountServiceSuspense />
-      </TabsPanel>
-      <TabsPanel value={tabs[2].value}>
         <Services />
       </TabsPanel>
 
-      <TabsPanel value={tabs[3].value}>
+      <TabsPanel value={tabs[2].value}>
         <LiveKeySuspense />
       </TabsPanel>
 
-      <TabsPanel value={tabs[4].value}>
+      <TabsPanel value={tabs[3].value}>
         <PayoutRequests />
       </TabsPanel>
 
-      <TabsPanel value={tabs[5].value}>
+      <TabsPanel value={tabs[4].value}>
         <Reactivate />
       </TabsPanel>
     </TabsComponent>
@@ -66,15 +63,11 @@ const tabs = [
     icon: <IconCircleArrowUpRight size={16} />,
   },
   {
-    title: "Payout Account",
-    value: "payout-account",
+    title: "Services",
+    value: "services",
     icon: <IconUserPlus size={16} />,
   },
-  {
-    title: "Account Issuance",
-    value: "account-issuance",
-    icon: <IconUserPlus size={16} />,
-  },
+
   {
     title: "Live Keys",
     value: "live-keys",

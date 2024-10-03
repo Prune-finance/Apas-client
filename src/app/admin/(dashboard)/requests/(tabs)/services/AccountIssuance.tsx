@@ -44,7 +44,7 @@ import {
   BusinessFilterType,
   businessFilterValues,
   businessFilterSchema,
-} from "../../businesses/schema";
+} from "../../../businesses/schema";
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
@@ -54,9 +54,9 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { closeButtonProps } from "../../businesses/[id]/(tabs)/utils";
+import { closeButtonProps } from "../../../businesses/[id]/(tabs)/utils";
 
-function AccountPayout() {
+function AccountIssuance() {
   const searchParams = useSearchParams();
 
   const {
@@ -86,6 +86,8 @@ function AccountPayout() {
     type: "ACCOUNT_ISSUANCE",
     ...queryParams,
   });
+
+  console.log(requests, loading);
 
   const { push } = useRouter();
   // const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
@@ -409,10 +411,10 @@ const tableHeaders = [
   // "Action",
 ];
 
-export default function PayoutAccountSuspense() {
+export default function AccountIssuanceComponent() {
   return (
     <Suspense>
-      <AccountPayout />
+      <AccountIssuance />
     </Suspense>
   );
 }

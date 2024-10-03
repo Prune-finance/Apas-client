@@ -9,6 +9,10 @@ interface IParams {
   period?: string;
   limit?: number;
   date?: string | null;
+  endDate?: string | null;
+  accountName?: string;
+  country?: string;
+  accountType?: string;
   status?: string;
   not?: string;
   sort?: string;
@@ -27,12 +31,29 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.country && { country: customParams.country }),
+      ...(customParams.accountType && {
+        accountType: customParams.accountType,
+      }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
-      ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    accountName,
+    country,
+    accountType,
+    status,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     //  `${id}/requests`;: fetch all requests for a specific business
@@ -68,7 +89,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [date, endDate, page, limit, accountName, country, accountType, status]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -744,6 +765,7 @@ interface BaseData {
   };
   documentApprovals: Record<string, any>;
   country: string;
+  Account?: Account;
 }
 
 export interface DebitRequest {

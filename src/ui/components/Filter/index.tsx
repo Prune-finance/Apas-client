@@ -39,7 +39,6 @@ export default function Filter<T>({
   const handleApply = async () => {
     setProcessing(true);
     try {
-      console.time("filtering");
       const filteredValues = Object.fromEntries(
         Object.entries(form.values as Record<string, unknown>)
           .filter(([key, value]) => value)
@@ -55,6 +54,15 @@ export default function Filter<T>({
               const formattedEndDate = endDate
                 ? dayjs(endDate).format("YYYY-MM-DD")
                 : null;
+
+              // If both dates are valid and equal, return only "date"
+              if (
+                formattedStartDate &&
+                formattedEndDate &&
+                formattedStartDate === formattedEndDate
+              ) {
+                return [["date", formattedStartDate]];
+              }
 
               // Return dates only if both are valid, otherwise return an empty array
               return formattedStartDate && formattedEndDate

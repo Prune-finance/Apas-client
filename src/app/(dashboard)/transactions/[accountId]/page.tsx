@@ -7,7 +7,7 @@ import {
   useUserTransactions,
   useUserTransactionsByIBAN,
 } from "@/lib/hooks/transactions";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
 import { frontendPagination, formatNumber } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
@@ -68,8 +68,8 @@ export default function AccountTransactions() {
     useState<TransactionType | null>(null);
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const infoDetails = [

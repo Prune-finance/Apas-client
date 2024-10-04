@@ -1,5 +1,5 @@
 import form from "@/app/auth/[id]/register/form";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
 import {
   Paper,
@@ -92,8 +92,8 @@ export default function SingleAccountTransaction({
   ];
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (

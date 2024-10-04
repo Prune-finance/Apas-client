@@ -480,6 +480,54 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
   return { loading, transactions, meta, revalidate };
 }
 
+export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.sort && { sort: customParams.sort }),
+    };
+  }, [customParams]);
+
+  async function fetchTrx() {
+    setLoading(true);
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/number/${iban}/transactions?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, transactions, meta, revalidate };
+}
+
 export function useUserTransactionsByIBAN(
   iban: string,
   customParams: ITrx = {}

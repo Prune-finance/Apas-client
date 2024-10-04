@@ -4,6 +4,7 @@ import {
   TransactionType,
   TrxData,
   useTransactions,
+  useTransactionsByIBAN,
   useUserDefaultTransactions,
   useUserTransactions,
   useUserTransactionsByIBAN,
@@ -44,11 +45,7 @@ import { useState } from "react";
 import styles from "../styles.module.scss";
 
 import { useParams } from "next/navigation";
-import {
-  useSingleAccount,
-  useSingleUserAccount,
-  useSingleUserAccountByIBAN,
-} from "@/lib/hooks/accounts";
+import { useSingleAccountByIBAN } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "@/ui/components/AmountGroup";
@@ -63,17 +60,9 @@ export default function AccountTransactions() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { transactions, loading, meta } = useTransactions(
-    "db38e61f-9a99-44cd-be99-e97a01db45b8"
-  );
+  const { transactions, loading, meta } = useTransactionsByIBAN(accountId);
 
-  // const { transactions, loading, meta } = useUserTransactionsByIBAN(accountId);
-
-  // const { account, loading: loadingAcct } =
-  //   useSingleUserAccountByIBAN(accountId);
-  const { account, loading: loadingAcct } = useSingleAccount(
-    "db38e61f-9a99-44cd-be99-e97a01db45b8"
-  );
+  const { account, loading: loadingAcct } = useSingleAccountByIBAN(accountId);
 
   const { business } = useSingleBusiness(account?.companyId ?? "");
 
@@ -239,6 +228,7 @@ export default function AccountTransactions() {
             active={active}
             limit={limit}
             searchProps={searchProps}
+            noLink
           />
         }
         loading={loading}
@@ -267,14 +257,3 @@ export default function AccountTransactions() {
     </main>
   );
 }
-
-const tableHeaders = [
-  "Recipient IBAN",
-  "Bank",
-  "Reference",
-  "Amount",
-  "Date Created",
-  "Status",
-];
-
-const tableHeader = ["Name", "Amount", "Date", "Status"];

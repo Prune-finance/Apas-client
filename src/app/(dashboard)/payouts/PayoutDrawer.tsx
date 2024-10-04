@@ -211,8 +211,15 @@ export const PayoutTransactionDrawer = () => {
       padding={0}
     >
       <Divider mb={20} />
-      <Box px={28} pb={28}>
-        <ScrollArea h="calc(100vh - 145px)" scrollbars="y" scrollbarSize={1}>
+      <Flex direction="column" pl={28} pb={20} h="calc(100vh - 90px)">
+        <ScrollArea
+          // h="calc(100vh - 145px)"
+          h="100%"
+          flex={1}
+          scrollbars="y"
+          scrollbarSize={1}
+          pr={28}
+        >
           {data?.status === "CANCELLED" && (
             <Alert
               title="This transaction has been  cancelled. The money has been reverted"
@@ -354,7 +361,7 @@ export const PayoutTransactionDrawer = () => {
           <Divider mt={30} mb={20} />
         </ScrollArea>
 
-        <Flex wrap="nowrap" gap={10} justify="space-between">
+        <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
           {data &&
             (isAfter24Hours(data?.createdAt) || data.status === "PENDING") && (
               <>
@@ -408,7 +415,7 @@ export const PayoutTransactionDrawer = () => {
             />
           )}
         </Flex>
-      </Box>
+      </Flex>
 
       <InquiryModal
         pruneRef={data?.centrolinkRef ?? ""}

@@ -14,10 +14,8 @@ import {
   ToolbarProps,
   ToolbarSlot,
 } from "@react-pdf-viewer/default-layout";
-import { Flex, Text } from "@mantine/core";
-// import Verification from "@/store/verification.store";
+
 import { useMediaQuery } from "@mantine/hooks";
-// import AgrtImage from "@/assets/images/tenancyAgrt.png";
 
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
@@ -216,8 +214,10 @@ const PdfRenderer: React.FC<PdfRendererProps> = ({ fileUrl }) => {
 
   return (
     <Worker
-      workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js"
-      //   workerUrl="/pdf.worker.min.mjs"
+      workerUrl="https://unpkg.com/pdfjs-dist@4.6.82/build/pdf.worker.min.js"
+      // workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js"
+      // workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js"
+      // workerUrl="/pdf.worker.min.mjs"
     >
       <div
         style={{
@@ -229,7 +229,7 @@ const PdfRenderer: React.FC<PdfRendererProps> = ({ fileUrl }) => {
           fileUrl={
             "https://s3.amazonaws.com/re.current/1721346312%20%281%29.pdf"
           }
-          //   fileUrl={fileUrl}
+          // fileUrl={fileUrl}
           //   plugins={[defaultLayoutPluginInstance]}
           //   renderPage={renderPage}
           //   pageLayout={pageLayout}

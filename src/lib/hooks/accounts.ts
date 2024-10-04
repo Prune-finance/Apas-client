@@ -177,16 +177,33 @@ export function useBusinessPayoutAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function usePayoutAccount() {
+export function usePayoutAccount(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[] | null>(null);
   const [meta, setMeta] = useState<AccountMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.business && { business: customParams.business }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+  }, [customParams]);
+
+  const { limit, date, endDate, status, business, page } = obj;
+
   async function fetchAccount() {
     setLoading(true);
     try {
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -209,7 +226,7 @@ export function usePayoutAccount() {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [limit, date, endDate, status, business, page]);
 
   return { loading, accounts, revalidate, meta };
 }

@@ -19,6 +19,7 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
 import { useState } from "react";
@@ -32,15 +33,27 @@ export const InquiriesTab = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
+  const searchParams = useSearchParams();
+
+  const { status, date, endDate, type, business } = Object.fromEntries(
+    searchParams.entries()
+  );
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(type && { type: type }),
+    ...(business && { business }),
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
 
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
 
-  const { inquiries, loading, meta } = useInquiries({
-    limit: parseInt(limit ?? "10", 10),
-    page: active,
-  });
+  const { inquiries, loading, meta } = useInquiries(queryParams);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -52,7 +65,12 @@ export const InquiriesTab = () => {
       <Group justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
 
       <Filter<FilterType>
@@ -61,11 +79,15 @@ export const InquiriesTab = () => {
         toggle={toggle}
         customStatusOption={["Processing", "Closed"]}
       >
-        <TextBox placeholder="Business Name" {...form.getInputProps("name")} />
+        <TextBox
+          placeholder="Business Name"
+          {...form.getInputProps("business")}
+        />
         <SelectBox
           data={["QUERY", "RECALL", "TRACE"]}
           placeholder="Type"
           {...form.getInputProps("type")}
+          clearable
         />
       </Filter>
 

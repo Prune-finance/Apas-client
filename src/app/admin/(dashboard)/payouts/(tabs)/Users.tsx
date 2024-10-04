@@ -30,18 +30,20 @@ const UsersComponent = () => {
   const [search, setSearch] = useState("");
 
   const searchParams = useSearchParams();
-  const { status, createdAt } = Object.fromEntries(searchParams.entries());
+  const { status, endDate, date, business } = Object.fromEntries(
+    searchParams.entries()
+  );
 
-  const param = useMemo(() => {
-    return {
-      ...(status && { status }),
-      ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-      page: active,
-      limit: parseInt(limit ?? "10", 10),
-    };
-  }, [status, createdAt, active, limit]);
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(business && { business }),
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
 
-  const { accounts, revalidate, meta, loading } = usePayoutAccount();
+  const { accounts, revalidate, meta, loading } = usePayoutAccount(queryParams);
 
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
@@ -102,7 +104,12 @@ const UsersComponent = () => {
       <Group justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
 
       <Filter<FilterType>
@@ -111,7 +118,10 @@ const UsersComponent = () => {
         toggle={toggle}
         customStatusOption={["Active", "Inactive"]}
       >
-        <TextBox placeholder="Business Name" {...form.getInputProps("name")} />
+        <TextBox
+          placeholder="Business Name"
+          {...form.getInputProps("business")}
+        />
       </Filter>
 
       {/* <Table

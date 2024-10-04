@@ -351,12 +351,18 @@ export function useUserRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.country && { country: customParams.country }),
     };
   }, [customParams]);
-
+  const { date, limit, accountName, country, endDate, status, type, page } =
+    obj;
   async function fetchAccounts() {
     const params = new URLSearchParams(
       obj as Record<string, string>
@@ -387,7 +393,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status, obj.type, obj.page]);
+  }, [date, limit, accountName, country, endDate, status, type, page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -747,10 +753,16 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const { limit, date, endDate, status, page, accountName } = obj;
 
   async function fetchRequests() {
     const params = new URLSearchParams(
@@ -782,7 +794,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status, obj.page]);
+  }, [limit, date, endDate, status, page, accountName]);
 
   return { loading, requests, revalidate, meta };
 }

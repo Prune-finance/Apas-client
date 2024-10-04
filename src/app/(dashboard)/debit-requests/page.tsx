@@ -28,13 +28,13 @@ import EmptyImage from "@/assets/empty.png";
 import { Suspense, useState } from "react";
 import { formatNumber } from "@/lib/utils";
 import { useForm, zodResolver } from "@mantine/form";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { useSearchParams } from "next/navigation";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import DebitRequestModal from "./new/modal";
@@ -43,7 +43,7 @@ import { DebitRequestDrawer } from "./drawer";
 function DebitRequests() {
   const searchParams = useSearchParams();
 
-  const { status, createdAt, sort } = Object.fromEntries(
+  const { status, date, endDate, accountName } = Object.fromEntries(
     searchParams.entries()
   );
 
@@ -51,23 +51,17 @@ function DebitRequests() {
   const [limit, setLimit] = useState<string | null>("10");
 
   const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(accountName && { accountName: accountName }),
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
     // ...(type && { type: type.toLowerCase() }),
   };
 
-  const { loading, requests, meta, revalidate } = useUserDebitRequests({
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-    page: active,
-  });
+  const { loading, requests, meta, revalidate } =
+    useUserDebitRequests(queryParams);
 
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
@@ -79,8 +73,8 @@ function DebitRequests() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const rows = requests.map((element, index) => (
@@ -134,6 +128,7 @@ function DebitRequests() {
               text="Filter"
               icon={IconAlignCenter}
               action={toggle}
+              fw={600}
             />
             <PrimaryBtn icon={IconPlus} text="New Request" action={open} />
           </Group>
@@ -144,7 +139,12 @@ function DebitRequests() {
           toggle={toggle}
           form={form}
           approvalStatus
-        />
+        >
+          <TextBox
+            placeholder="Account Name"
+            {...form.getInputProps("accountName")}
+          />
+        </Filter>
 
         <TableComponent rows={rows} head={tableHeaders} loading={loading} />
 

@@ -101,10 +101,14 @@ export function useUsers(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.email && { email: customParams.email }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const { limit, page, date, endDate, status, email } = obj;
 
   async function fetchUsers() {
     const params = new URLSearchParams(
@@ -135,7 +139,7 @@ export function useUsers(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.page, obj.status]);
+  }, [limit, page, date, endDate, status, email]);
 
   return { loading, users, revalidate, meta };
 }

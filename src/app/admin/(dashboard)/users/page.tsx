@@ -44,7 +44,13 @@ import { useAdmins } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import ModalComponent from "./modal";
 import { useForm, zodResolver } from "@mantine/form";
-import { newAdmin, validateNewAdmin } from "@/lib/schema";
+import {
+  FilterSchema,
+  FilterType,
+  FilterValues,
+  newAdmin,
+  validateNewAdmin,
+} from "@/lib/schema";
 import axios from "axios";
 import { Suspense, useState } from "react";
 import useNotification from "@/lib/hooks/notification";
@@ -61,7 +67,7 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import TabsComponent from "@/ui/components/Tabs";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { BadgeComponent } from "@/ui/components/Badge";
 
 function Users() {
@@ -70,25 +76,22 @@ function Users() {
   const { handleError, handleSuccess } = useNotification();
   const [tab, setTab] = useState<string | null>("Users");
 
-  const {
-    rows: _rows,
-    status,
-    createdAt,
-    sort,
-  } = Object.fromEntries(searchParams.entries());
+  const { email, name, status, date, endDate } = Object.fromEntries(
+    searchParams.entries()
+  );
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
   const router = useRouter();
   const { loading, users, revalidate, meta } = useAdmins({
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(email && { email }),
+    ...(name && { name }),
     page: active,
+    limit: parseInt(limit ?? "10", 10),
   });
 
   const [opened, { open, close }] = useDisclosure(false);
@@ -107,9 +110,9 @@ function Users() {
     validate: zodResolver(validateNewAdmin),
   });
 
-  const filterForm = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const filterForm = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const addAdmin = async () => {
@@ -209,7 +212,12 @@ function Users() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td} tt="lowercase">
+      <TableTd
+        className={styles.table__td}
+        tt="lowercase"
+        style={{ wordBreak: "break-word" }}
+        w="20%"
+      >
         {element.email}
       </TableTd>
       <TableTd
@@ -315,6 +323,7 @@ function Users() {
                     text="Filter"
                     action={toggle}
                     icon={IconListTree}
+                    fw={600}
                   />
                   <PrimaryBtn
                     text="Invite New User"
@@ -326,15 +335,28 @@ function Users() {
                   />
                 </Group>
               </Group>
-              <Filter<BusinessFilterType>
+
+              <Filter<FilterType>
                 opened={openedFilter}
                 toggle={toggle}
                 form={filterForm}
-              />
+                customStatusOption={["Active", "Inactive"]}
+              >
+                <TextBox
+                  placeholder="Email"
+                  {...filterForm.getInputProps("email")}
+                />
+                <TextBox
+                  placeholder="Name"
+                  {...filterForm.getInputProps("name")}
+                />
+              </Filter>
+
               <TableComponent
                 head={tableHeaders}
                 rows={rows}
                 loading={loading}
+                layout="auto"
               />
               <EmptyTable
                 loading={loading}

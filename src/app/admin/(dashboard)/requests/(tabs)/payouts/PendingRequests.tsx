@@ -1,7 +1,7 @@
 import { PayoutRequestsTableHeaders } from "@/lib/static";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { PayoutTrxReqTableRows } from "@/ui/components/TableRows";
@@ -27,6 +27,8 @@ import Transaction from "@/lib/store/transaction";
 import ModalComponent from "@/ui/components/Modal";
 import { notifications } from "@mantine/notifications";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { useSearchParams } from "next/navigation";
+import dayjs from "dayjs";
 
 interface Props {
   requests: PayoutTransactionRequest[];
@@ -54,11 +56,33 @@ export const PendingPayoutRequests = () => {
   const [openedReject, { open: openReject, close: closeReject }] =
     useDisclosure(false);
 
-  const { requests, loading, meta, revalidate } = usePayoutTransactionRequests({
-    limit: parseInt(limit ?? "10", 10),
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    endDate,
+    date,
+    recipientName,
+    recipientIban,
+    senderName,
+    senderIban,
+    bank,
+  } = Object.fromEntries(searchParams.entries());
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(recipientName && { recipientName }),
+    ...(recipientIban && { recipientIban }),
+    ...(bank && { bank }),
+    ...(senderIban && { senderIban }),
+    limit: parseInt(limit ?? "100", 10),
     page: active,
     status: "PENDING",
-  });
+  };
+
+  const { requests, loading, meta, revalidate } =
+    usePayoutTransactionRequests(queryParams);
 
   const { data, opened, close } = Transaction();
 
@@ -109,14 +133,37 @@ export const PendingPayoutRequests = () => {
       <Group justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
 
-      {/* <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      /> */}
+        isStatus
+      >
+        <TextBox
+          placeholder="Beneficiary Name"
+          {...form.getInputProps("recipientName")}
+        />
+
+        <TextBox
+          placeholder="Beneficiary IBAN"
+          {...form.getInputProps("recipientIban")}
+        />
+
+        <TextBox
+          placeholder="Sender IBAN"
+          {...form.getInputProps("senderIban")}
+        />
+
+        <TextBox placeholder="Bank" {...form.getInputProps("bank")} />
+      </Filter>
 
       <TableComponent
         head={PayoutRequestsTableHeaders}

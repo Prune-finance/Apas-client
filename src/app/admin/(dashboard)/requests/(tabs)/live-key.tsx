@@ -37,19 +37,25 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 function LiveKey() {
   const searchParams = useSearchParams();
-
-  const {
-    rows: _limit = "10",
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
-  const { handleError, handleSuccess } = useNotification();
-  const { requests, revalidate, meta, loading } = useLiveKeyRequests();
-
-  const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [active, setActive] = useState(1);
+
+  const { status, date, endDate, business } = Object.fromEntries(
+    searchParams.entries()
+  );
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(business && { business }),
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
+  };
+
+  const { handleError, handleSuccess } = useNotification();
+  const { requests, revalidate, meta, loading } =
+    useLiveKeyRequests(queryParams);
 
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<LiveKeyRequest | null>(
@@ -156,7 +162,10 @@ function LiveKey() {
         form={form}
         customStatusOption={["Approved", "Rejected", "Pending"]}
       >
-        <TextBox placeholder="Business Name" {...form.getInputProps("name")} />
+        <TextBox
+          placeholder="Business Name"
+          {...form.getInputProps("business")}
+        />
       </Filter>
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />

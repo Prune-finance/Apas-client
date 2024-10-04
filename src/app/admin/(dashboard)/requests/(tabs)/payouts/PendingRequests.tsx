@@ -16,12 +16,28 @@ import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import Cookies from "js-cookie";
-import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { usePayoutTransactionRequests } from "@/lib/hooks/requests";
-import Transaction from "@/lib/store/transaction";
-import { notifications } from "@mantine/notifications";
+
+import {
+  Meta,
+  PayoutTransactionRequest,
+  usePayoutTransactionRequests,
+} from "@/lib/hooks/requests";
 import { PayoutTransactionRequestDrawer } from "./drawer";
+import Transaction from "@/lib/store/transaction";
 import ModalComponent from "@/ui/components/Modal";
+import { notifications } from "@mantine/notifications";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+
+interface Props {
+  requests: PayoutTransactionRequest[];
+  loading: boolean;
+  meta?: Meta;
+  active: number;
+  setActive: Dispatch<SetStateAction<number>>;
+  setLimit: Dispatch<SetStateAction<string | null>>;
+  limit: string | null;
+  revalidate: () => void;
+}
 
 export const PendingPayoutRequests = () => {
   const [active, setActive] = useState(1);

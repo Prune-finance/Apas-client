@@ -62,32 +62,27 @@ function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
 
   const searchParams = useSearchParams();
-  const {
-    status,
-    createdAt,
-
-    accountType,
-    country,
-    accountName,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, endDate, date, accountType, country, accountName } =
+    Object.fromEntries(searchParams.entries());
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("DD-MM-YYYY") }),
+    ...(endDate && { endDate: dayjs(endDate).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(accountType && {
+      accountType: accountType === "Individual" ? "USER" : "CORPORATE",
+    }),
+    ...(country && { country: country.toUpperCase() }),
+    ...(accountName && { accountName }),
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
+
   const { loading, requests, meta, revalidate } = useRequests(
-    {
-      ...(isNaN(Number(limit))
-        ? { limit: 10 }
-        : { limit: parseInt(limit ?? "10", 10) }),
-      ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
-      ...(status && { status: status.toUpperCase() }),
-      ...(accountType && {
-        accountType: accountType === "Individual" ? "USER" : "CORPORATE",
-      }),
-      ...(country && { country: country.toUpperCase() }),
-      ...(accountName && { accountName }),
-      page: active,
-    },
+    queryParams,
     params.id
   );
 
@@ -235,7 +230,7 @@ function BusinessAccountRequests() {
         <Group gap={9}>
           {!loading ? (
             <Avatar color="var(--prune-primary-700)" size={39} variant="filled">
-              {getInitials(requests[0]?.Company.name)}
+              {getInitials(requests[0]?.Company.name || "")}
             </Avatar>
           ) : (
             <Skeleton circle h={39} w={39} />
@@ -274,11 +269,11 @@ function BusinessAccountRequests() {
             {...form.getInputProps("accountName")}
           />
 
-          <SelectBox
+          {/* <SelectBox
             placeholder="User Type"
             {...form.getInputProps("accountType")}
             data={["Individual", "Corporate"]}
-          />
+          /> */}
 
           <TextBox placeholder="Country" {...form.getInputProps("country")} />
         </Filter>

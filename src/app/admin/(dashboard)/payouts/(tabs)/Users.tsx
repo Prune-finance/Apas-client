@@ -157,24 +157,6 @@ const UsersComponent = () => {
 
 const tableHeaders = ["Business Name", "Date Created", "Status"];
 
-const data = [
-  {
-    name: "John Doe",
-    createdAt: new Date(),
-    status: "ACTIVE",
-  },
-  {
-    name: "John Jane",
-    createdAt: new Date(),
-    status: "INACTIVE",
-  },
-  {
-    name: "John Doe",
-    createdAt: new Date(),
-    status: "ACTIVE",
-  },
-];
-
 export const Users = () => {
   return (
     <Suspense>

@@ -2,15 +2,8 @@ import { Meta } from "./transactions";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
-
-interface IParams {
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  sort?: string;
-  type?: string;
-  page?: number;
-}
+import { IParams } from "../schema";
+import { custom } from "zod";
 
 export function useAccounts(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
@@ -21,12 +14,29 @@ export function useAccounts(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.accountNumber && {
+        accountNumber: customParams.accountNumber,
+      }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    status,
+    type,
+    page,
+    accountName,
+    accountNumber,
+  } = obj;
 
   async function fetchAccounts() {
     setLoading(true);
@@ -57,7 +67,7 @@ export function useAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [date, limit, status, type, page, accountName, accountNumber, endDate]);
 
   return { loading, accounts, revalidate, meta };
 }
@@ -218,7 +228,6 @@ export function useUserAccounts(customParams: IParams = {}) {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
     };
@@ -272,7 +281,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.status, obj.type, obj.page]);
 
   return {
     loading,

@@ -33,6 +33,7 @@ import {
   IconTrash,
   IconUsers,
   IconExclamationCircle,
+  IconListTree,
 } from "@tabler/icons-react";
 
 import ModalComponent from "./modal";
@@ -42,9 +43,12 @@ import { formatNumber, getUserType } from "@/lib/utils";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useForm, zodResolver } from "@mantine/form";
-import { filterValues, validateRequest } from "@/lib/schema";
-import { accountFilterSchema } from "@/app/admin/(dashboard)/account-requests/schema";
-import { AccountFilterType } from "@/app/admin/(dashboard)/accounts/schema";
+import {
+  FilterValues,
+  FilterSchema,
+  FilterType,
+  validateRequest,
+} from "@/lib/schema";
 import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { filteredSearch } from "@/lib/search";
@@ -52,7 +56,7 @@ import DebitRequestModal from "../debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import TabsComponent from "@/ui/components/Tabs";
@@ -65,12 +69,22 @@ function Accounts() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const { status, createdAt, sort, type, tab } = Object.fromEntries(
-    searchParams.entries()
-  );
+  const { status, date, endDate, accountName, accountNumber, type, tab } =
+    Object.fromEntries(searchParams.entries());
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(accountName && { accountName }),
+    ...(accountNumber && { accountNumber }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
 
   const {
     loading,
@@ -80,16 +94,7 @@ function Accounts() {
     statusLoading,
     issuanceRequests,
     revalidateIssuance,
-  } = useUserAccounts({
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
-    page: active,
-  });
+  } = useUserAccounts(queryParams);
 
   const { account, loading: loadingDftAcct } = useUserDefaultAccount();
 
@@ -115,9 +120,9 @@ function Accounts() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const form = useForm<AccountFilterType>({
-    initialValues: { ...filterValues, type: null },
-    validate: zodResolver(accountFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: { ...FilterValues, type: null },
+    validate: zodResolver(FilterSchema),
   });
 
   const { pendingRequest, approvedRequest } = useMemo(() => {
@@ -466,17 +471,34 @@ function Accounts() {
                 <Group justify="space-between" mt={30}>
                   <SearchInput search={search} setSearch={setSearch} />
 
-                  <SecondaryBtn text="Filter" action={toggle} />
+                  <SecondaryBtn
+                    text="Filter"
+                    action={toggle}
+                    icon={IconListTree}
+                    fw={600}
+                  />
                 </Group>
 
-                <Filter opened={openedFilter} toggle={toggle} form={form}>
-                  <Select
+                <Filter<FilterType>
+                  opened={openedFilter}
+                  toggle={toggle}
+                  form={form}
+                >
+                  <TextBox
+                    placeholder="Account Name"
+                    {...form.getInputProps("accountName")}
+                  />
+
+                  <TextBox
+                    placeholder="Account Number"
+                    {...form.getInputProps("accountNumber")}
+                  />
+
+                  <SelectBox
                     placeholder="Type"
                     {...form.getInputProps("type")}
                     data={["Corporate", "Individual"]}
-                    size="xs"
-                    w={120}
-                    h={36}
+                    clearable
                   />
                 </Filter>
 

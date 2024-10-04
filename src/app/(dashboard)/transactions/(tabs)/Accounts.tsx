@@ -3,7 +3,7 @@ import {
   TrxData,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
 import { frontendPagination, formatNumber } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
@@ -11,7 +11,7 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import {
@@ -52,18 +52,25 @@ export const AccountsTab = () => {
   const [selectedRequest, setSelectedRequest] =
     useState<TransactionType | null>(null);
 
-  const { status, createdAt, sort } = Object.fromEntries(
-    searchParams.entries()
-  );
-  const { transactions, loading } = useUserDefaultTransactions({
-    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
+  const { status, date, endDate, type, recipientName, recipientIban } =
+    Object.fromEntries(searchParams.entries());
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(recipientIban && { recipientIban }),
+    ...(recipientName && { recipientName }),
+    ...(type && { type: type.toUpperCase() }),
     page: active,
-  });
+    limit: parseInt(limit ?? "10", 10),
+  };
+
+  const { transactions, loading } = useUserDefaultTransactions(queryParams);
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const infoDetails = [
@@ -147,20 +154,49 @@ export const AccountsTab = () => {
   ));
 
   return (
-    <TabsPanel value="Own Account">
+    <>
       <InfoCards details={infoDetails} title="Overview" />
 
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
       <Filter<FilterType>
         opened={opened}
         toggle={toggle}
         form={form}
         approvalStatus
-      />
+        customStatusOption={[
+          "Confirmed",
+          "Pending",
+          "Failed",
+          "Rejected",
+          "Cancelled",
+        ]}
+      >
+        <TextBox
+          placeholder="Beneficiary Name"
+          {...form.getInputProps("recipientName")}
+        />
+
+        <TextBox
+          placeholder="Beneficiary IBAN"
+          {...form.getInputProps("recipientIban")}
+        />
+
+        <SelectBox
+          placeholder="Type"
+          {...form.getInputProps("type")}
+          data={["Debit", "Credit"]}
+          clearable
+        />
+      </Filter>
 
       <TableComponent
         rows={
@@ -190,6 +226,6 @@ export const AccountsTab = () => {
         limit={limit}
         setLimit={setLimit}
       />
-    </TabsPanel>
+    </>
   );
 };

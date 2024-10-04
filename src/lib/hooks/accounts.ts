@@ -244,11 +244,29 @@ export function useUserAccounts(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.accountNumber && {
+        accountNumber: customParams.accountNumber,
+      }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    status,
+    date,
+    endDate,
+    accountName,
+    type,
+    accountNumber,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     const params = new URLSearchParams(
@@ -298,7 +316,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status, obj.type, obj.page]);
+  }, [limit, status, date, endDate, accountName, type, accountNumber, page]);
 
   return {
     loading,

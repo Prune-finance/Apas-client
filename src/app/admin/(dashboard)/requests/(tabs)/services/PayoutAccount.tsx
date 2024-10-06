@@ -24,11 +24,7 @@ import { PayoutAccount, usePayoutRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../businesses/schema";
+
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
@@ -38,7 +34,12 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { closeButtonProps } from "../../businesses/[id]/(tabs)/utils";
+import {
+  businessFilterSchema,
+  BusinessFilterType,
+  businessFilterValues,
+} from "../../../businesses/schema";
+import { closeButtonProps } from "../../../businesses/[id]/(tabs)/utils";
 
 function AccountPayout() {
   const searchParams = useSearchParams();
@@ -276,7 +277,7 @@ const tableHeaders = [
   // "Action",
 ];
 
-export default function PayoutAccountServiceSuspense() {
+export default function PayoutAccountService() {
   return (
     <Suspense>
       <AccountPayout />

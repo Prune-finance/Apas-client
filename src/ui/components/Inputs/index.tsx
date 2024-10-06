@@ -4,7 +4,15 @@ import {
   RegisterType,
   registerValues,
 } from "@/lib/schema";
-import { TextInput, PasswordInput, Text, InputBaseProps } from "@mantine/core";
+import {
+  TextInput,
+  PasswordInput,
+  Text,
+  InputBaseProps,
+  TextInputProps,
+  Select,
+  SelectProps,
+} from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
 import styles from "@/ui/styles/auth.module.scss";
 import { IconSearch } from "@tabler/icons-react";
@@ -161,4 +169,16 @@ export const SearchInput = ({ search, setSearch }: SearchInputProps) => {
       onChange={(e) => setSearch && setSearch(e.currentTarget.value)}
     />
   );
+};
+
+interface TextBoxProps extends TextInputProps {}
+
+export const TextBox = ({ ...props }: TextBoxProps) => {
+  return <TextInput size="xs" w={120} h={36} {...props} />;
+};
+
+interface SelectBoxProps extends SelectProps {}
+
+export const SelectBox = ({ ...props }: SelectBoxProps) => {
+  return <Select size="xs" w={120} h={36} {...props} />;
 };

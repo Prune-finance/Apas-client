@@ -34,18 +34,17 @@ import {
 
 // import ModalComponent from "@/ui/components/Modal";
 import { AccountData, useAccounts } from "@/lib/hooks/accounts";
-import { activeBadgeColor, getUserType } from "@/lib/utils";
+import {
+  activeBadgeColor,
+  camelCaseToTitleCase,
+  getUserType,
+} from "@/lib/utils";
 
 import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  accountFilterSchema,
-  AccountFilterType,
-  accountFilterValues,
-} from "./schema";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
@@ -53,34 +52,36 @@ import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import ModalComponent from "./modal";
-import { validateRequest } from "@/lib/schema";
-import { SearchInput } from "@/ui/components/Inputs";
+import {
+  FilterSchema,
+  FilterType,
+  FilterValues,
+  validateRequest,
+} from "@/lib/schema";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { get } from "http";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import * as XLSX from "xlsx";
+import { parse } from "path";
 
 function Accounts() {
   const searchParams = useSearchParams();
 
-  const {
-    rows = "10",
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, date, endDate, accountName, accountNumber, type } =
+    Object.fromEntries(searchParams.entries());
 
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
 
   const { loading, accounts, revalidate, meta } = useAccounts({
-    ...(!limit || isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
+    ...(accountName && { accountName }),
+    ...(accountNumber && { accountNumber }),
     page: activePage,
+    limit: parseInt(limit ?? "10", 10),
   });
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -95,6 +96,7 @@ function Accounts() {
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [processingCSV, setProcessingCSV] = useState(false);
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -200,9 +202,9 @@ function Accounts() {
     }
   };
 
-  const form = useForm<AccountFilterType>({
-    initialValues: accountFilterValues,
-    validate: zodResolver(accountFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const requestForm = useForm({
@@ -214,15 +216,73 @@ function Accounts() {
     validate: zodResolver(validateRequest),
   });
 
+  const fetchAccounts = async (limit: number) => {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts?limit=${limit}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      return data.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+  const handleExportCsv = async () => {
+    setProcessingCSV(true);
+    // fetch data
+    try {
+      const response = await fetchAccounts(meta?.total ?? 0);
+
+      [
+        "Account Name",
+        "Account Number",
+        "Type",
+        "Business",
+        "Date Created",
+        "Status",
+        "Action",
+      ];
+
+      const data = response.map((account: AccountData) => ({
+        "Account Name": account.accountName,
+        "Account Number": account.accountNumber,
+        Type: getUserType(account.type),
+        Business: account.Company.name,
+        "Date Created": dayjs(account.createdAt).format("ddd DD MMM YYYY"),
+        Status: camelCaseToTitleCase(account.status),
+      }));
+
+      //convert data to worksheet
+      const worksheet = XLSX.utils.json_to_sheet(data);
+
+      //convert worksheet to CSV
+      const csv = XLSX.utils.sheet_to_csv(worksheet);
+
+      //download CSV
+      const downloadCSV = (csvData: string) => {
+        const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", "Issued Accounts.csv");
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      downloadCSV(csv);
+    } catch (err) {
+      handleError("An error occurred", parseError(err));
+    } finally {
+      setProcessingCSV(false);
+    }
+  };
+
   return (
     <main className={styles.main}>
-      {/* <Breadcrumbs
-        items={[
-          // { title: "Dashboard", href: "/admin/dashboard" },
-          { title: "Accounts", href: "/admin/accounts" },
-        ]}
-      /> */}
-
       <div className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
@@ -242,24 +302,33 @@ function Accounts() {
             <SecondaryBtn
               text="Export CSV"
               icon={IconArrowUpRight}
-              style={{ cursor: "not-allowed" }}
+              // style={{ cursor: "not-allowed" }}
+              action={handleExportCsv}
+              loading={processingCSV}
+              fw={600}
             />
-            <SecondaryBtn text="Filter" icon={IconListTree} action={toggle} />
+            <SecondaryBtn
+              text="Filter"
+              icon={IconListTree}
+              action={toggle}
+              fw={600}
+            />
           </Group>
         </Group>
 
-        <Filter<AccountFilterType>
-          opened={filterOpened}
-          toggle={toggle}
-          form={form}
-        >
-          <Select
+        <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form}>
+          <TextBox
+            placeholder="Account Name"
+            {...form.getInputProps("accountName")}
+          />
+          <TextBox
+            placeholder="Account Number"
+            {...form.getInputProps("accountNumber")}
+          />
+          <SelectBox
             placeholder="Type"
-            data={["Corporate", "Individual"]}
             {...form.getInputProps("type")}
-            size="xs"
-            w={120}
-            h={36}
+            data={["Corporate", "Individual"]}
           />
         </Filter>
 
@@ -402,11 +471,7 @@ const RowComponent = ({
         {element.accountName}
       </TableTd>
       <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
-      {/* <TableTd className={styles.table__td}>
-        {formatNumber(element.accountBalance, true, "EUR")}
-      </TableTd> */}
       <TableTd className={styles.table__td} tt="capitalize">
-        {/* element.type.toLowerCase() */}
         {getUserType(element.type)}
       </TableTd>
       <TableTd className={styles.table__td}>{element.Company.name}</TableTd>

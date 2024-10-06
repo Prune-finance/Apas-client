@@ -2,21 +2,9 @@ import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 
 import Cookies from "js-cookie";
+import { IParams } from "../schema";
 
 // query: string = "";
-
-interface IParams {
-  period?: string;
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  not?: string;
-  sort?: string;
-  query?: string;
-  type?: string;
-  page?: number;
-  companyId?: string;
-}
 
 export function useRequests(customParams: IParams = {}, id: string = "") {
   const [requests, setRequests] = useState<RequestData[]>([]);
@@ -27,12 +15,29 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.country && { country: customParams.country }),
+      ...(customParams.accountType && {
+        accountType: customParams.accountType,
+      }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
-      ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    accountName,
+    country,
+    accountType,
+    status,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     //  `${id}/requests`;: fetch all requests for a specific business
@@ -68,7 +73,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [date, endDate, page, limit, accountName, country, accountType, status]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -82,12 +87,35 @@ export function useAllRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.accountNumber && {
+        accountNumber: customParams.accountNumber,
+      }),
+      ...(customParams.accountType && {
+        accountType: customParams.accountType,
+      }),
+      ...(customParams.business && { business: customParams.business }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    status,
+    type,
+    accountName,
+    accountNumber,
+    business,
+    accountType,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     //  `${id}/requests`;: fetch all requests for a specific business
@@ -122,7 +150,18 @@ export function useAllRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [
+    limit,
+    date,
+    endDate,
+    status,
+    type,
+    accountName,
+    accountNumber,
+    business,
+    accountType,
+    page,
+  ]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -140,7 +179,6 @@ export function useAllCompanyRequests(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
@@ -180,15 +218,7 @@ export function useAllCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [
-    obj.date,
-    obj.limit,
-    obj.sort,
-    obj.status,
-    obj.type,
-    obj.page,
-    obj.companyId,
-  ]);
+  }, [obj.date, obj.limit, obj.status, obj.type, obj.page, obj.companyId]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -202,14 +232,33 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.not && { not: customParams.not }),
-      ...(customParams.sort && { sort: customParams.sort }),
-      ...(customParams.type && { type: customParams.type.toUpperCase() }),
+      ...(customParams.bank && { bank: customParams.bank }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderIban && { senderIban: customParams.senderIban }),
       ...(customParams.page && { page: customParams.page }),
-      ...(customParams.companyId && { companyId: customParams.companyId }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    status,
+    not,
+    recipientIban,
+    recipientName,
+    senderIban,
+    bank,
+    date,
+    endDate,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     setLoading(true);
@@ -243,14 +292,16 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    obj.date,
-    obj.limit,
-    obj.sort,
-    obj.status,
-    obj.type,
-    obj.page,
-    obj.companyId,
-    obj.not,
+    limit,
+    status,
+    not,
+    recipientIban,
+    recipientName,
+    senderIban,
+    bank,
+    date,
+    endDate,
+    page,
   ]);
 
   return { loading, requests, meta, revalidate };
@@ -300,13 +351,18 @@ export function useUserRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.country && { country: customParams.country }),
     };
   }, [customParams]);
-
+  const { date, limit, accountName, country, endDate, status, type, page } =
+    obj;
   async function fetchAccounts() {
     const params = new URLSearchParams(
       obj as Record<string, string>
@@ -337,7 +393,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [date, limit, accountName, country, endDate, status, type, page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -386,8 +442,9 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.business && { business: customParams.business }),
     };
   }, [customParams]);
 
@@ -418,7 +475,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.endDate, obj.limit, obj.status]);
 
   return { loading, requests, revalidate };
 }
@@ -433,7 +490,6 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
     };
   }, [customParams]);
@@ -466,7 +522,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.companyId]);
+  }, [obj.date, obj.limit, obj.status, obj.companyId]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -484,7 +540,6 @@ export function useCompanyDebitRequests(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
     };
   }, [customParams]);
 
@@ -516,22 +571,37 @@ export function useCompanyDebitRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.status]);
 
   return { loading, requests, revalidate, meta };
 }
 
-export function useLiveKeyRequests(id: string = "") {
+export function useLiveKeyRequests(customParams: IParams = {}) {
   const [requests, setRequests] = useState<LiveKeyRequest[]>([]);
   const [meta, setMeta] = useState<Meta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.business && { business: customParams.business }),
+    };
+  }, [customParams]);
+
+  const { limit, page, date, endDate, business, status } = obj;
   async function fetchAccounts() {
     setLoading(true);
     try {
-      const filtered = id ? `/${id}` : "";
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
       const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests${filtered}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -552,7 +622,7 @@ export function useLiveKeyRequests(id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [limit, page, date, endDate, business, status]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -606,7 +676,6 @@ export function useCompanyRequests(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
     };
@@ -643,7 +712,7 @@ export function useCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.status, obj.type, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -684,11 +753,16 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const { limit, date, endDate, status, page, accountName } = obj;
 
   async function fetchRequests() {
     const params = new URLSearchParams(
@@ -720,7 +794,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.page]);
+  }, [limit, date, endDate, status, page, accountName]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -744,6 +818,7 @@ interface BaseData {
   };
   documentApprovals: Record<string, any>;
   country: string;
+  Account?: Account;
 }
 
 export interface DebitRequest {

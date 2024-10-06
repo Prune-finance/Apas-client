@@ -2,15 +2,8 @@ import { Meta } from "./transactions";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
-
-interface IParams {
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  sort?: string;
-  type?: string;
-  page?: number;
-}
+import { IParams } from "../schema";
+import { custom } from "zod";
 
 export function useAccounts(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
@@ -21,12 +14,29 @@ export function useAccounts(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.accountNumber && {
+        accountNumber: customParams.accountNumber,
+      }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    status,
+    type,
+    page,
+    accountName,
+    accountNumber,
+  } = obj;
 
   async function fetchAccounts() {
     setLoading(true);
@@ -57,7 +67,7 @@ export function useAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [date, limit, status, type, page, accountName, accountNumber, endDate]);
 
   return { loading, accounts, revalidate, meta };
 }
@@ -167,16 +177,33 @@ export function useBusinessPayoutAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function usePayoutAccount() {
+export function usePayoutAccount(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[] | null>(null);
   const [meta, setMeta] = useState<AccountMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.business && { business: customParams.business }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+  }, [customParams]);
+
+  const { limit, date, endDate, status, business, page } = obj;
+
   async function fetchAccount() {
     setLoading(true);
     try {
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -199,7 +226,7 @@ export function usePayoutAccount() {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [limit, date, endDate, status, business, page]);
 
   return { loading, accounts, revalidate, meta };
 }
@@ -217,12 +244,29 @@ export function useUserAccounts(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.accountNumber && {
+        accountNumber: customParams.accountNumber,
+      }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    status,
+    date,
+    endDate,
+    accountName,
+    type,
+    accountNumber,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     const params = new URLSearchParams(
@@ -272,7 +316,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [limit, status, date, endDate, accountName, type, accountNumber, page]);
 
   return {
     loading,

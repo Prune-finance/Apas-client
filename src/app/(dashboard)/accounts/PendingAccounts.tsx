@@ -1,12 +1,12 @@
 import form from "@/app/auth/login/form";
 import { RequestData, useUserRequests } from "@/lib/hooks/requests";
-import { filterSchema, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { Group, Select, TableTd, TableTr } from "@mantine/core";
@@ -20,10 +20,13 @@ import { Fragment, useState } from "react";
 import { AccountRequestsDrawer } from "../account-requests/drawer";
 import { getUserType } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
+import { IconListTree } from "@tabler/icons-react";
+import { date } from "zod";
 
 export const PendingAccounts = () => {
   const searchParams = useSearchParams();
-  const { type, createdAt } = Object.fromEntries(searchParams.entries());
+  const { type, date, endDate, status, country, accountName } =
+    Object.fromEntries(searchParams.entries());
 
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
@@ -33,23 +36,27 @@ export const PendingAccounts = () => {
   const [limit, setLimit] = useState<string | null>("10");
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
-  const { loading, requests, revalidate, meta } = useUserRequests({
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
+
+  const queryParams = {
+    ...(accountName && { accountName }),
+    ...(country && { country }),
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     status: "PENDING",
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     page: active,
-  });
+    limit: parseInt(limit ?? "10", 10),
+  };
+
+  const { loading, requests, revalidate, meta } = useUserRequests(queryParams);
 
   const [selectedRequest, setSelectedRequest] = useState<RequestData | null>(
     null
   );
 
-  const form = useForm({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const rows = requests.map((element, index) => (
@@ -85,16 +92,27 @@ export const PendingAccounts = () => {
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
 
-      <Filter
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
         approvalStatus
         isStatus
       >
+        <TextBox
+          placeholder="Account Name"
+          {...form.getInputProps("accountName")}
+        />
+
+        <TextBox placeholder="Country" {...form.getInputProps("country")} />
         <Select
           placeholder="Type"
           {...form.getInputProps("type")}

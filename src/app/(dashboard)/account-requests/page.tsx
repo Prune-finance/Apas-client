@@ -34,13 +34,13 @@ import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { AccountRequestsDrawer } from "./drawer";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { SecondaryBtn } from "@/ui/components/Buttons";
@@ -52,19 +52,21 @@ function AccountRequests() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { status, createdAt, sort } = Object.fromEntries(
-    searchParams.entries()
-  );
+  const { status, date, endDate, accountName, country, type } =
+    Object.fromEntries(searchParams.entries());
 
-  const { loading, requests, revalidate, meta } = useUserRequests({
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(accountName && { accountName }),
+    ...(country && { country }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     page: active,
-  });
+    limit: parseInt(limit ?? "10", 10),
+  };
+
+  const { loading, requests, revalidate, meta } = useUserRequests(queryParams);
   const { handleSuccess } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
   const [cancelOpened, { open: cancelOpen, close: cancelClose }] =
@@ -83,8 +85,8 @@ function AccountRequests() {
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const cancelRequest = async (id: string) => {
@@ -160,7 +162,12 @@ function AccountRequests() {
         <Group justify="space-between" mt={30}>
           <SearchInput search={search} setSearch={setSearch} />
 
-          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+          <SecondaryBtn
+            text="Filter"
+            action={toggle}
+            icon={IconListTree}
+            fw={600}
+          />
         </Group>
 
         <Filter<FilterType>
@@ -168,7 +175,22 @@ function AccountRequests() {
           toggle={toggle}
           form={form}
           approvalStatus
-        />
+          customStatusOption={["Approved", "Pending", "Rejected"]}
+        >
+          <TextBox
+            placeholder="Account Name"
+            {...form.getInputProps("accountName")}
+          />
+
+          <TextBox placeholder="Country" {...form.getInputProps("country")} />
+
+          <SelectBox
+            placeholder="Type"
+            {...form.getInputProps("type")}
+            data={["Corporate", "Individual"]}
+            clearable
+          />
+        </Filter>
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

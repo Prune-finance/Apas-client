@@ -39,7 +39,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useForm, zodResolver } from "@mantine/form";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import Filter from "@/ui/components/Filter";
 import { useRequests } from "@/lib/hooks/requests";
@@ -54,34 +54,35 @@ import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import { BackBtn } from "@/ui/components/Buttons";
+import { BackBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
 
   const searchParams = useSearchParams();
-  const {
-    rows: _limit = "10",
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, endDate, date, accountType, country, accountName } =
+    Object.fromEntries(searchParams.entries());
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("DD-MM-YYYY") }),
+    ...(endDate && { endDate: dayjs(endDate).format("DD-MM-YYYY") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(accountType && {
+      accountType: accountType === "Individual" ? "USER" : "CORPORATE",
+    }),
+    ...(country && { country: country.toUpperCase() }),
+    ...(accountName && { accountName }),
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
+
   const { loading, requests, meta, revalidate } = useRequests(
-    {
-      ...(isNaN(Number(limit))
-        ? { limit: 10 }
-        : { limit: parseInt(limit ?? "10", 10) }),
-      ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
-      ...(status && { status: status.toUpperCase() }),
-      ...(sort && { sort: sort.toLowerCase() }),
-      ...(type && { type: type.toUpperCase() }),
-      page: active,
-    },
+    queryParams,
     params.id
   );
 
@@ -92,8 +93,8 @@ function BusinessAccountRequests() {
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const MenuComponent = ({ id }: { id: string }) => {
@@ -180,17 +181,7 @@ function BusinessAccountRequests() {
         {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={approvedBadgeColor(element.status)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          {element.status.toLowerCase()}
-        </Badge>
+        <BadgeComponent status={element.status} />
       </TableTd>
 
       {/* <TableTd
@@ -239,7 +230,7 @@ function BusinessAccountRequests() {
         <Group gap={9}>
           {!loading ? (
             <Avatar color="var(--prune-primary-700)" size={39} variant="filled">
-              {getInitials(requests[0]?.Company.name)}
+              {getInitials(requests[0]?.Company.name || "")}
             </Avatar>
           ) : (
             <Skeleton circle h={39} w={39} />
@@ -259,32 +250,33 @@ function BusinessAccountRequests() {
           mt={24}
           // className={styles.container__search__filter}
         >
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
-            // classNames={{ wrapper: styles.search, input: styles.input__search }}
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            color="var(--prune-text-gray-200)"
-            styles={{ input: { border: "1px solid #f5f5f5" } }}
-            w={324}
+          <SearchInput search={search} setSearch={setSearch} />
+          <SecondaryBtn
+            text="Filter"
+            icon={IconListTree}
+            action={toggle}
+            fw={600}
+          />
+        </Group>
+        <Filter<FilterType>
+          opened={opened}
+          form={form}
+          toggle={toggle}
+          customStatusOption={["Approved", "Rejected", "Pending"]}
+        >
+          <TextBox
+            placeholder="Account Name"
+            {...form.getInputProps("accountName")}
           />
 
-          <Button
-            variant="outline"
-            color="var(--prune-text-gray-200)"
-            c="var(--prune-text-gray-800)"
-            leftSection={<IconListTree size={14} />}
-            fz={12}
-            fw={500}
-            onClick={toggle}
-          >
-            Filter
-          </Button>
-        </Group>
+          {/* <SelectBox
+            placeholder="User Type"
+            {...form.getInputProps("accountType")}
+            data={["Individual", "Corporate"]}
+          /> */}
 
-        <Filter<FilterType> opened={opened} form={form} toggle={toggle} />
+          <TextBox placeholder="Country" {...form.getInputProps("country")} />
+        </Filter>
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

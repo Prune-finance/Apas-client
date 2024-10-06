@@ -1,7 +1,7 @@
 import { PayoutRequestsTableHeaders } from "@/lib/static";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { PayoutTrxReqTableRows } from "@/ui/components/TableRows";
@@ -24,6 +24,9 @@ import {
 import Transaction from "@/lib/store/transaction";
 
 import { PayoutTransactionRequestDrawer } from "./drawer";
+import { useSearchParams } from "next/navigation";
+import dayjs from "dayjs";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 interface Props {
   requests: PayoutTransactionRequest[];
@@ -36,23 +39,49 @@ interface Props {
 }
 
 export const AllPayoutRequests = () => {
+  const searchParams = useSearchParams();
+  const [limit, setLimit] = useState<string | null>("100");
   const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
+
+  const {
+    status,
+    endDate,
+    date,
+    recipientName,
+    recipientIban,
+    senderName,
+    senderIban,
+    bank,
+  } = Object.fromEntries(searchParams.entries());
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(recipientName && { recipientName }),
+    ...(recipientIban && { recipientIban }),
+    ...(bank && { bank }),
+    ...(senderIban && { senderIban }),
+    limit: parseInt(limit ?? "100", 10),
+    page: active,
+    not: "PENDING",
+  };
+
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const [openedFilter, { toggle }] = useDisclosure(false);
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
-
-  const { requests, loading, meta } = usePayoutTransactionRequests({
-    limit: parseInt(limit ?? "10", 10),
-    page: active,
-    not: "PENDING",
-  });
+  // {
+  //     limit: parseInt(limit ?? "10", 10),
+  //     page: active,
+  //     not: "PENDING",
+  //   }
+  const { requests, loading, meta } = usePayoutTransactionRequests(queryParams);
 
   const { data, opened, close } = Transaction();
 
@@ -61,14 +90,37 @@ export const AllPayoutRequests = () => {
       <Group justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
 
-      {/* <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      /> */}
+        customStatusOption={["Approved", "Rejected"]}
+      >
+        <TextBox
+          placeholder="Beneficiary Name"
+          {...form.getInputProps("recipientName")}
+        />
+
+        <TextBox
+          placeholder="Beneficiary IBAN"
+          {...form.getInputProps("recipientIban")}
+        />
+
+        <TextBox
+          placeholder="Sender IBAN"
+          {...form.getInputProps("senderIban")}
+        />
+
+        <TextBox placeholder="Bank" {...form.getInputProps("bank")} />
+      </Filter>
 
       <TableComponent
         head={PayoutRequestsTableHeaders}

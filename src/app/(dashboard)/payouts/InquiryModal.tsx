@@ -44,7 +44,13 @@ export const InquiryModal = ({
       const { reason, file, extension } = form.values;
       await axios.post(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions/${trxId}/${type}`,
-        { reason, supportingDocument: file, extension },
+        {
+          reason,
+          ...(file && {
+            supportingDocument: file,
+            extension,
+          }),
+        },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 

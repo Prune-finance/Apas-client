@@ -47,7 +47,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useUserSingleInquiry } from "@/lib/hooks/inquiries";
 import axios from "axios";
 import Cookies from "js-cookie";
@@ -68,6 +68,7 @@ export default function InquiryPage() {
   const [file, setFile] = useState<File | null>(null);
   const { inquiry, loading, revalidate } = useUserSingleInquiry(id);
   const { handleError, handleSuccess } = useNotification();
+  const resetFileInputRef = useRef<() => void>(null);
 
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLDivElement,
@@ -263,14 +264,9 @@ export default function InquiryPage() {
 
           <Collapse in={opened} mt={16}>
             <SimpleGrid cols={4} w="60%">
-              {Object.entries(trxDetails).map(([title, value]) => (
-                <Stack key={title} gap={0}>
-                  <Text
-                    fz={10}
-                    fw={500}
-                    c="var(--prune-text-gray-400)"
-                    key={title}
-                  >
+              {Object.entries(trxDetails).map(([title, value], index) => (
+                <Stack key={index} gap={0}>
+                  <Text fz={10} fw={500} c="var(--prune-text-gray-400)">
                     {title}
                   </Text>
 
@@ -321,6 +317,7 @@ export default function InquiryPage() {
                   setFile(file);
                   handleUpload(file);
                 }}
+                resetRef={resetFileInputRef}
                 accept={[
                   ...IMAGE_MIME_TYPE,
                   ...PDF_MIME_TYPE,
@@ -390,7 +387,9 @@ export default function InquiryPage() {
         icon={<PiClockClockwiseBold color="#C6A700" size={25} />}
         opened={reOpened}
         close={reClose}
-        title="Reopen Query Ticket?"
+        title={`Reopen ${camelCaseToTitleCase(
+          inquiry?.type?.toLowerCase() ?? ""
+        )} Ticket?`}
         text="Do you wish to reopen this ticket?"
         customApproveMessage="Yes, Reopen"
       />
@@ -403,8 +402,8 @@ export default function InquiryPage() {
         icon={<IconX color="#D92D20" />}
         opened={closeOpened}
         close={close}
-        title="Close this query Ticket?"
-        text="By closing this query ticket, it means your transaction has been completed"
+        title={`Close this ${inquiry?.type.toLowerCase()} Ticket?`}
+        text={`By closing this ${inquiry?.type.toLowerCase()} ticket, it means your transaction has been completed`}
         customApproveMessage="Yes, Close"
       />
 
@@ -414,6 +413,9 @@ export default function InquiryPage() {
         close={() => {
           setFile(null);
           form.setFieldValue("file", "");
+          if (resetFileInputRef.current) {
+            resetFileInputRef.current(); // Call the reset function
+          }
         }}
         processing={processing}
         processingMsg={processingMsg}
@@ -433,7 +435,7 @@ const schema = z
     extension: z.string().optional(),
   })
   .refine((data) => data.text || data.file, {
-    message: "Message is required",
+    message: "Either add a message or a file.",
     path: ["text"],
   });
 

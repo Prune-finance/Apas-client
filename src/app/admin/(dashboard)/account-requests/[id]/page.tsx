@@ -153,8 +153,8 @@ function BusinessAccountRequests() {
     );
   };
 
-  const handleRowClick = (id: string, status: string) => {
-    if (status === "APPROVED") return push(`/admin/accounts/${params.id}`);
+  const handleRowClick = (id: string, status: string, accountId: string) => {
+    if (status === "APPROVED") return push(`/admin/accounts/${accountId}`);
 
     push(`/admin/account-requests/${params.id}/${id}`);
   };
@@ -166,7 +166,9 @@ function BusinessAccountRequests() {
   ).map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id, element.status)}
+      onClick={() =>
+        handleRowClick(element.id, element.status, element.Account?.id ?? "")
+      }
       style={{ cursor: "pointer" }}
     >
       <TableTd
@@ -199,7 +201,7 @@ function BusinessAccountRequests() {
         items={[
           { title: "Account Creation", href: "/admin/account-requests" },
           {
-            title: requests[0]?.Company.name,
+            title: meta?.companyName ?? "",
             href: `/admin/account-requests/${params.id}`,
             loading: loading,
           },
@@ -230,14 +232,14 @@ function BusinessAccountRequests() {
         <Group gap={9}>
           {!loading ? (
             <Avatar color="var(--prune-primary-700)" size={39} variant="filled">
-              {getInitials(requests[0]?.Company.name || "")}
+              {getInitials(meta?.companyName || "")}
             </Avatar>
           ) : (
             <Skeleton circle h={39} w={39} />
           )}
           {!loading ? (
             <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
-              {requests[0]?.Company.name}
+              {meta?.companyName}
             </Text>
           ) : (
             <Skeleton h={10} w={100} />

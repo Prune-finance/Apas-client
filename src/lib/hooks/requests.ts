@@ -921,6 +921,7 @@ export interface RequestMeta {
   pendingRequests: number;
   inactiveAccounts: number;
   total: number;
+  companyName: string;
 }
 
 export interface PayoutAccount {

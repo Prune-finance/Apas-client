@@ -538,6 +538,9 @@ export const FilterValues = {
   amount: null,
   business: "",
   bank: "",
+  beneficiaryName: "",
+  destinationIban: "",
+  destinationBank: "",
 };
 
 export const FilterSchema = z.object({
@@ -558,6 +561,9 @@ export const FilterSchema = z.object({
   amount: z.number().nullable(),
   business: z.string().nullable(),
   bank: z.string().nullable(),
+  beneficiaryName: z.string().nullable(),
+  destinationIban: z.string().nullable(),
+  destinationBank: z.string().nullable(),
 });
 
 export type FilterType = z.infer<typeof FilterSchema>;
@@ -586,6 +592,9 @@ export interface IParams {
   not?: string;
   query?: string;
   bank?: string;
+  beneficiaryName?: string;
+  destinationIban?: string;
+  destinationBank?: string;
 }
 
 export const removeDirectorValues = {

@@ -59,22 +59,20 @@ export const PendingPayoutRequests = () => {
   const searchParams = useSearchParams();
 
   const {
-    status,
     endDate,
     date,
-    recipientName,
-    recipientIban,
-    senderName,
+    beneficiaryName,
+    destinationIban,
     senderIban,
-    bank,
+    destinationBank,
   } = Object.fromEntries(searchParams.entries());
 
   const queryParams = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(recipientName && { recipientName }),
-    ...(recipientIban && { recipientIban }),
-    ...(bank && { bank }),
+    ...(beneficiaryName && { beneficiaryName }),
+    ...(destinationIban && { destinationIban }),
+    ...(destinationBank && { destinationBank }),
     ...(senderIban && { senderIban }),
     limit: parseInt(limit ?? "100", 10),
     page: active,
@@ -149,12 +147,12 @@ export const PendingPayoutRequests = () => {
       >
         <TextBox
           placeholder="Beneficiary Name"
-          {...form.getInputProps("recipientName")}
+          {...form.getInputProps("beneficiaryName")}
         />
 
         <TextBox
           placeholder="Beneficiary IBAN"
-          {...form.getInputProps("recipientIban")}
+          {...form.getInputProps("destinationIban")}
         />
 
         <TextBox
@@ -162,7 +160,10 @@ export const PendingPayoutRequests = () => {
           {...form.getInputProps("senderIban")}
         />
 
-        <TextBox placeholder="Bank" {...form.getInputProps("bank")} />
+        <TextBox
+          placeholder="Bank"
+          {...form.getInputProps("destinationBank")}
+        />
       </Filter>
 
       <TableComponent

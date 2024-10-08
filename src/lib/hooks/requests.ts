@@ -235,12 +235,14 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.not && { not: customParams.not }),
-      ...(customParams.bank && { bank: customParams.bank }),
-      ...(customParams.recipientIban && {
-        recipientIban: customParams.recipientIban,
+      ...(customParams.destinationBank && {
+        bank: customParams.destinationBank,
       }),
-      ...(customParams.recipientName && {
-        recipientName: customParams.recipientName,
+      ...(customParams.destinationIban && {
+        recipientIban: customParams.destinationIban,
+      }),
+      ...(customParams.beneficiaryName && {
+        recipientName: customParams.beneficiaryName,
       }),
       ...(customParams.senderIban && { senderIban: customParams.senderIban }),
       ...(customParams.page && { page: customParams.page }),
@@ -921,6 +923,7 @@ export interface RequestMeta {
   pendingRequests: number;
   inactiveAccounts: number;
   total: number;
+  companyName: string;
 }
 
 export interface PayoutAccount {

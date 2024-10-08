@@ -52,7 +52,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { z } from "zod";
 import Cookies from "js-cookie";
 import { useForm, zodResolver } from "@mantine/form";
@@ -66,6 +66,7 @@ export default function InquiryPage() {
   const [file, setFile] = useState<File | null>(null);
   const { inquiry, loading, revalidate } = useSingleInquiry(id);
   const { handleError, handleSuccess } = useNotification();
+  const resetFileInputRef = useRef<() => void>(null);
 
   const form = useForm<FormValues>({
     initialValues,
@@ -264,12 +265,7 @@ export default function InquiryPage() {
                   </Text>
 
                   {value ? (
-                    <Text
-                      fz={12}
-                      fw={600}
-                      c="var(--prune-text-gray-700)"
-                      key={title}
-                    >
+                    <Text fz={12} fw={600} c="var(--prune-text-gray-700)">
                       {value}
                     </Text>
                   ) : (
@@ -306,6 +302,7 @@ export default function InquiryPage() {
                   setFile(file);
                   handleUpload(file);
                 }}
+                resetRef={resetFileInputRef}
                 accept={[
                   ...IMAGE_MIME_TYPE,
                   ...PDF_MIME_TYPE,
@@ -373,8 +370,8 @@ export default function InquiryPage() {
         icon={<IconX color="#D92D20" />}
         opened={closeOpened}
         close={close}
-        title="Close this query Ticket?"
-        text="By closing this query ticket, it means your transaction has been completed"
+        title={`Close this ${inquiry?.type.toLowerCase()} Ticket?`}
+        text={`By closing this ${inquiry?.type.toLowerCase()} ticket, it means your transaction has been completed`}
         customApproveMessage="Yes, Close"
       />
 
@@ -384,6 +381,9 @@ export default function InquiryPage() {
         close={() => {
           setFile(null);
           form.setFieldValue("file", "");
+          if (resetFileInputRef.current) {
+            resetFileInputRef.current(); // Call the reset function
+          }
         }}
         processing={processing}
         processingMsg={processingMsg}
@@ -403,7 +403,7 @@ const schema = z
     extension: z.string().optional(),
   })
   .refine((data) => data.text || data.file, {
-    message: "Message is required",
+    message: "Either add a message or a file.",
     path: ["text"],
   });
 

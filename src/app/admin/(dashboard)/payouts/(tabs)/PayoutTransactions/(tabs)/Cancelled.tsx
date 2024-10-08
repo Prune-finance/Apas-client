@@ -91,7 +91,7 @@ export const CancelledPayoutTransactions = ({
         // rows={rows}
         rows={
           <PayoutTransactionTableRows
-            data={transactions.toReversed()}
+            data={transactions}
             searchProps={[
               "senderIban",
               "recipientIban",

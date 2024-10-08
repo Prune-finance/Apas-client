@@ -47,7 +47,12 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
-import { approvedBadgeColor, formatNumber, getUserType } from "@/lib/utils";
+import {
+  approvedBadgeColor,
+  formatNumber,
+  getInitials,
+  getUserType,
+} from "@/lib/utils";
 import Link from "next/link";
 import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
@@ -1056,10 +1061,7 @@ export const DefaultAccountHead = ({
         <Group gap={12} align="center">
           {!loading ? (
             <Avatar size="lg" color="var(--prune-primary-700)" variant="filled">
-              {account?.accountName
-                .split(" ")
-                .map((item) => item.charAt(0))
-                .join("")}
+              {getInitials(account?.accountName ?? "")}
             </Avatar>
           ) : (
             <Skeleton circle h={50} w={50} />
@@ -1067,7 +1069,7 @@ export const DefaultAccountHead = ({
 
           <Stack gap={2}>
             {!loading ? (
-              <Group gap={15}>
+              <Group gap={5}>
                 <Text fz={24} className={styles.main__header__text} m={0} p={0}>
                   {account?.accountName}
                 </Text>
@@ -1148,14 +1150,14 @@ export const DefaultAccountHead = ({
         action={handleAccountTrust}
         customApproveMessage="Yes, Proceed"
         icon={
-          business?.kycTrusted ? (
+          account?.isTrusted ? (
             <IconExclamationCircle color="#C6A700" />
           ) : (
             <IconShieldCheck color="#12B76A" />
           )
         }
         processing={processingTrust}
-        color={business?.kycTrusted ? "#F9F6E6" : "#ECFDF3"}
+        color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
       <Modal

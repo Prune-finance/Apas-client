@@ -1,9 +1,13 @@
-import { Button, Collapse, Flex, Select } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+"use client";
+
+import { Button, Collapse, Flex, Group, Select, Text } from "@mantine/core";
+import { DateInput, DatePickerInput } from "@mantine/dates";
 import { UseFormReturnType } from "@mantine/form";
-import { IconCalendarMonth } from "@tabler/icons-react";
+import { IconCalendarMonth, IconX } from "@tabler/icons-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
+import { SecondaryBtn } from "../Buttons";
+import dayjs from "dayjs";
 
 type Props<T> = {
   opened: boolean;
@@ -13,6 +17,8 @@ type Props<T> = {
   isStatus?: boolean;
   approvalStatus?: boolean;
   frozenStatus?: boolean;
+  customStatusOption?: string[];
+  noDate?: boolean;
 };
 
 export default function Filter<T>({
@@ -23,58 +29,109 @@ export default function Filter<T>({
   isStatus,
   approvalStatus,
   frozenStatus,
+  customStatusOption,
+  noDate,
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
+  const [processing, setProcessing] = useState(false);
 
-  const handleApply = () => {
-    const filteredValues = Object.fromEntries(
-      Object.entries(form.values as Record<string, unknown>).filter(
-        ([key, value]) => value !== null
-      )
-    ) as Record<string, string>;
+  const handleApply = async () => {
+    setProcessing(true);
+    try {
+      const filteredValues = Object.fromEntries(
+        Object.entries(form.values as Record<string, unknown>)
+          .filter(([key, value]) => value)
+          .flatMap(([key, val]) => {
+            // Format and return startDate and endDate separately if the key is "createdAt"
+            if (key === "createdAt" && Array.isArray(val) && val.length === 2) {
+              const [startDate, endDate] = val as [Date | null, Date | null];
 
-    const params = new URLSearchParams(filteredValues).toString();
+              // Only include dates if they are valid
+              const formattedStartDate = startDate
+                ? dayjs(startDate).format("YYYY-MM-DD")
+                : null;
+              const formattedEndDate = endDate
+                ? dayjs(endDate).format("YYYY-MM-DD")
+                : null;
 
-    replace(`${pathname}?${params}`);
-    toggle();
+              // If both dates are valid and equal, return only "date"
+              if (
+                formattedStartDate &&
+                formattedEndDate &&
+                formattedStartDate === formattedEndDate
+              ) {
+                return [["date", formattedStartDate]];
+              }
+
+              // Return dates only if both are valid, otherwise return an empty array
+              return formattedStartDate && formattedEndDate
+                ? [
+                    ["date", formattedStartDate],
+                    ["endDate", formattedEndDate],
+                  ]
+                : [];
+            }
+
+            // Format the status field if it exists and is valid, turning it to uppercase
+            if (key === "status" && typeof val === "string") {
+              const status = val.toUpperCase();
+              return [[key, status]];
+            }
+
+            // Return other fields as they are
+            return [[key, val]];
+          })
+      ) as Record<string, string>;
+
+      const params = new URLSearchParams(filteredValues).toString();
+
+      const newUrl = `${pathname}?${params}`;
+
+      // push(`${pathname}?${params}`);
+      window.history.pushState({}, "", newUrl);
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
     <Collapse in={opened}>
-      <Flex mt={24} gap={12} align="center" h={40}>
-        {/* <Select
-          placeholder="Sort"
-          data={["Asc", "Desc"]}
-          {...form.getInputProps("sort")}
-          size="xs"
-          w={120}
-          h={36}
-        /> */}
-        {/* <Select
-          placeholder="Rows"
-          data={["10", "20", "50"]}
-          {...form.getInputProps("rows")}
-          size="xs"
-          w={120}
-          h={36}
-        /> */}
+      <Group justify="space-between" align="center" mt={24} mb={20}>
+        <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
+          Filter By
+        </Text>
+
+        <SecondaryBtn icon={IconX} action={toggle} text="Close" p={10} />
+      </Group>
+      <Group gap={12} align="center" h={40}>
         {children}
 
-        <DateInput
-          placeholder="Date Created"
-          {...form.getInputProps("createdAt")}
-          size="xs"
-          w={120}
-          h={36}
-          rightSection={<IconCalendarMonth size={14} />}
-        />
+        {!noDate && (
+          <DatePickerInput
+            placeholder="Date Range"
+            valueFormat="YYYY-MM-DD"
+            {...form.getInputProps("createdAt")}
+            size="xs"
+            maw={250}
+            h={36}
+            styles={{ input: { height: "30px" } }}
+            type="range"
+            allowSingleDateInRange
+            leftSection={<IconCalendarMonth size={12} />}
+            numberOfColumns={2}
+            clearable
+          />
+        )}
+
         {!isStatus && (
           <Select
             placeholder="Status"
             {...form.getInputProps("status")}
             data={
-              approvalStatus
+              customStatusOption && customStatusOption?.length > 0
+                ? customStatusOption
+                : approvalStatus
                 ? approvalOptions
                 : frozenStatus
                 ? frozenActiveOptions
@@ -83,6 +140,7 @@ export default function Filter<T>({
             size="xs"
             w={120}
             h={36}
+            clearable
           />
         )}
 
@@ -98,6 +156,8 @@ export default function Filter<T>({
             fz={12}
             size="xs"
             onClick={handleApply}
+            loading={processing}
+            loaderProps={{ type: "dots" }}
           >
             Apply
           </Button>
@@ -106,7 +166,8 @@ export default function Filter<T>({
             color="var(--prune-text-gray-700)"
             onClick={() => {
               form.reset();
-              replace(pathname);
+              // push(pathname);
+              window.history.pushState({}, "", pathname);
             }}
             // w={62}
             // h={36}
@@ -117,7 +178,7 @@ export default function Filter<T>({
             Clear
           </Button>
         </Flex>
-      </Flex>
+      </Group>
     </Collapse>
   );
 }

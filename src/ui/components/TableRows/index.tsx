@@ -7,8 +7,11 @@ import Link from "next/link";
 import { AmountGroup } from "../AmountGroup";
 import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
-import { InquiryData } from "@/lib/static";
 import { useRouter } from "next/navigation";
+import { Inquiry } from "@/lib/hooks/inquiries";
+import { boolean } from "zod";
+import { PayoutTransactionRequest } from "@/lib/hooks/requests";
+import { BusinessData } from "@/lib/hooks/businesses";
 
 export const BusinessTransactionTableRows = ({
   data,
@@ -39,18 +42,7 @@ export const BusinessTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && (
-        <TableTd
-          td="underline"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-        >
-          <Link href={`/admin/transactions/${element.senderIban}`}>
-            {element.senderName || "N/A"}
-          </Link>
-        </TableTd>
-      )}
+      {!business && <TableTd>{element.senderName || "N/A"}</TableTd>}
 
       <TableTd>
         <Stack gap={0}>
@@ -91,7 +83,7 @@ export const BusinessTransactionTableRows = ({
 
 export const IssuedTransactionTableRows = ({
   data,
-
+  noLink,
   search,
   active,
   limit,
@@ -102,6 +94,7 @@ export const IssuedTransactionTableRows = ({
   active: number;
   limit: string | null;
   searchProps: string[];
+  noLink?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
@@ -118,10 +111,11 @@ export const IssuedTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd
-        td="underline"
+        td={noLink ? "none" : "underline"}
         onClick={(e) => {
           e.stopPropagation();
         }}
+        style={{ pointerEvents: noLink ? "none" : "auto" }}
       >
         <Link href={`/admin/transactions/${element.senderIban}`}>
           {element?.senderName || "N/A"}
@@ -240,30 +234,28 @@ export const InquiryTableRows = ({
   search,
   searchProps,
 }: {
-  data: InquiryData[];
+  data: Inquiry[];
   business?: boolean;
   search: string;
   searchProps: string[];
 }) => {
   const { push } = useRouter();
-  return filteredSearch(data.reverse(), searchProps, search).map((element) => (
+  return filteredSearch(data, searchProps, search).map((element) => (
     <TableTr
-      key={element.dateRequested}
+      key={element.id}
       onClick={() => {
-        push(
-          `${!business ? "/admin" : ""}/payouts/${crypto.randomUUID()}/inquiry`
-        );
+        push(`${!business ? "/admin" : ""}/payouts/${element.id}/inquiry`);
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && <TableTd>{element.businessName || "N/A"}</TableTd>}
+      {!business && <TableTd>{element.Company.name || "N/A"}</TableTd>}
 
-      <TableTd>{element.pruneReference}</TableTd>
+      <TableTd>{element.Transaction.centrolinkRef ?? "N/A"}</TableTd>
 
-      <TableTd tt="capitalize">{element.inquiryType.toLowerCase()}</TableTd>
+      <TableTd tt="capitalize">{element.type.toLowerCase()}</TableTd>
 
       <TableTd>
-        {dayjs(element.dateRequested).format("Do MMMM, YYYY - hh:mma")}
+        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mma")}
       </TableTd>
 
       <TableTd>
@@ -271,4 +263,86 @@ export const InquiryTableRows = ({
       </TableTd>
     </TableTr>
   ));
+};
+
+export const PayoutTrxReqTableRows = ({
+  data,
+  search,
+  searchProps,
+}: {
+  data: PayoutTransactionRequest[];
+  search: string;
+  searchProps: string[];
+}) => {
+  const { open, setData } = Transaction();
+  return filteredSearch(data.toReversed(), searchProps, search).map(
+    (element: PayoutTransactionRequest) => (
+      <TableTr
+        key={element.id}
+        onClick={() => {
+          open();
+          setData({
+            recipientName: element.beneficiaryFullName,
+            recipientIban: element.destinationIBAN,
+            senderIban: element?.PayoutAccount?.accountNumber || "N/A",
+            senderName: element?.PayoutAccount?.accountName || "N/A",
+            recipientBankAddress: element.destinationBank,
+            recipientBic: element.destinationBIC,
+            destinationFirstName: "",
+            destinationLastName: "",
+            centrolinkRef: "",
+            recipientBankCountry: element.destinationCountry,
+            senderBic: "",
+            type: "DEBIT",
+            narration: element.reason,
+
+            company: {
+              id: "",
+              name: "",
+            } as BusinessData,
+            ...element,
+            status: element.status as unknown as
+              | "PENDING"
+              | "REJECTED"
+              | "COMPLETED"
+              | "CANCELLED",
+          });
+        }}
+        style={{ cursor: "pointer" }}
+      >
+        <TableTd>
+          <Stack gap={0}>
+            <Text fz={12} fw={400}>
+              {element.beneficiaryFullName}
+            </Text>
+            <Text fz={10} fw={400}>
+              {element.destinationIBAN}
+            </Text>
+          </Stack>
+        </TableTd>
+
+        <TableTd>{element?.PayoutAccount?.accountNumber || "N/A"}</TableTd>
+
+        <TableTd>{element.destinationBank}</TableTd>
+
+        <TableTd w="15%">{element.reference}</TableTd>
+
+        <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+
+        <TableTd>
+          <Stack gap={0}>
+            <Text fz={12} fw={400}>
+              {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+            </Text>
+            <Text fz={10} fw={400}>
+              {dayjs(element.createdAt).format("hh:mm a")}
+            </Text>
+          </Stack>
+        </TableTd>
+        <TableTd>
+          <BadgeComponent status={element.status} />
+        </TableTd>
+      </TableTr>
+    )
+  );
 };

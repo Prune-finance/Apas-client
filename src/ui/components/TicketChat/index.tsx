@@ -1,5 +1,4 @@
 import { getFileIcon, getFileType } from "@/lib/helpers/file-type";
-import { Message } from "@/lib/static";
 import { getInitials } from "@/lib/utils";
 import {
   Group,
@@ -19,6 +18,7 @@ dayjs.extend(advancedFormat);
 import { Fragment } from "react";
 import { SecondaryBtn } from "../Buttons";
 import FileDisplay from "../DocumentViewer";
+import { Message } from "@/lib/hooks/inquiries";
 
 interface ChatProps {
   guest?: boolean;
@@ -68,7 +68,7 @@ export const TicketChatComponent = ({
           >
             {message.type === "text" && (
               <Text fz={12} c="var(--prune-text-gray-800)">
-                {message.body}
+                {message.text}
               </Text>
             )}
 
@@ -97,7 +97,7 @@ export const TicketChatComponent = ({
               </Group>
             )}
 
-            {message.type === "file-text" && (
+            {message.type === "text-file" && (
               <Stack gap={0}>
                 <Group justify="space-between">
                   <Group gap={8}>
@@ -123,7 +123,7 @@ export const TicketChatComponent = ({
                 </Group>
 
                 <Text fz={12} c="var(--prune-text-gray-800)">
-                  {message.body}
+                  {message.text}
                 </Text>
               </Stack>
             )}
@@ -141,7 +141,7 @@ export const TicketChatComponent = ({
         </Stack>
       </Group>
 
-      {(message.type === "file" || message.type === "file-text") && (
+      {(message.type === "file" || message.type === "text-file") && (
         <Modal
           opened={opened}
           onClose={close}

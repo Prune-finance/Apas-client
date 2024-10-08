@@ -36,39 +36,40 @@ import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../businesses/schema";
+
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Debit() {
   const searchParams = useSearchParams();
+  const [limit, setLimit] = useState<string | null>("100");
+  const [active, setActive] = useState(1);
 
-  const {
-    rows: limit = "10",
-    status,
-    createdAt,
-    sort,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, endDate, date, business } = Object.fromEntries(
+    searchParams.entries()
+  );
   const { handleError, handleSuccess } = useNotification();
 
-  const { requests, revalidate } = useDebitRequests({
-    ...(isNaN(Number(limit)) ? { limit: 10 } : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-  });
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(business && { business }),
+    limit: parseInt(limit ?? "100", 10),
+    page: active,
+  };
 
-  const { businesses, loading } = useBusiness({ limit: 100 }, undefined, true);
+  const { requests, revalidate } = useDebitRequests(queryParams);
+
+  const { businesses, loading } = useBusiness(queryParams, undefined, true);
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
@@ -81,8 +82,6 @@ function Debit() {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
-
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -148,37 +147,6 @@ function Debit() {
     }
   };
 
-  const MenuComponent = ({ request }: { request: DebitRequest }) => {
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDots size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          <MenuItem
-            onClick={() => {
-              setSelectedRequest(request);
-              openDrawer();
-            }}
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            View
-          </MenuItem>
-        </MenuDropdown>
-      </Menu>
-    );
-  };
-
   const handleRowClick = (id: string) => {
     push(`/admin/requests/${id}/debit`);
   };
@@ -195,7 +163,11 @@ function Debit() {
     >
       <TableTd>{element.name}</TableTd>
       <TableTd className={styles.table__td}>{element.debitCount}</TableTd>
-      <TableTd className={styles.table__td} tt="lowercase">
+      <TableTd
+        className={styles.table__td}
+        tt="lowercase"
+        style={{ wordBreak: "break-word" }}
+      >
         {element.contactEmail}
       </TableTd>
       <TableTd>
@@ -204,9 +176,9 @@ function Debit() {
     </TableTr>
   ));
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -222,11 +194,18 @@ function Debit() {
         />
       </Group>
 
-      <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      />
+        noDate
+        customStatusOption={["Active", "Inactive"]}
+      >
+        <TextBox
+          placeholder="Business Name"
+          {...form.getInputProps("business")}
+        />
+      </Filter>
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
@@ -242,7 +221,7 @@ function Debit() {
         </Flex>
       )}
 
-      <div className={styles.pagination__container}>
+      {/* <div className={styles.pagination__container}>
         <Group gap={9}>
           <Text fz={14}>Showing:</Text>
 
@@ -261,7 +240,15 @@ function Debit() {
           total={1}
           classNames={{ control: styles.control, root: styles.pagination }}
         />
-      </div>
+      </div> */}
+
+      <PaginationComponent
+        active={active}
+        limit={limit}
+        setActive={setActive}
+        setLimit={setLimit}
+        total={1}
+      />
 
       <Drawer
         opened={drawerOpened}

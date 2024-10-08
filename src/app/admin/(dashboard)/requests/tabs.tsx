@@ -1,32 +1,25 @@
 "use client";
 
 import {
-  IconPointFilled,
-  IconFiles,
-  IconKey,
   IconUserPlus,
-  IconUserX,
-  IconSnowflake,
-  IconSnowflakeOff,
-  IconArrowUpRightCircle,
   IconCircleArrowUpRight,
   IconCircleKey,
-  IconMoneybag,
+  IconArrowUpRight,
 } from "@tabler/icons-react";
-import { IconBuildingSkyscraper, IconCurrencyEuro } from "@tabler/icons-react";
-import { IconListTree, IconUsers, IconUsersGroup } from "@tabler/icons-react";
 
-import styles from "@/ui/styles/accounts.module.scss";
-import { TabsList, TabsTab, Tabs, TabsPanel } from "@mantine/core";
+import { TabsPanel } from "@mantine/core";
 import Debit from "./(tabs)/debit";
 import Reactivate from "./(tabs)/reactivate";
-import Deactivate from "./(tabs)/deactivate";
-import PayoutAccount from "./(tabs)/payout";
-import Unfreeze from "./(tabs)/live-key";
+
+import Services from "./(tabs)/services";
+
 import TabsComponent from "@/ui/components/Tabs";
 import LiveKeySuspense from "./(tabs)/live-key";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import PayoutRequests from "./(tabs)/payouts";
+
+// import PayoutRequestsSuspense from "./(tabs)/payouts";
 
 function TabsContainer() {
   const searchParams = useSearchParams();
@@ -38,13 +31,14 @@ function TabsContainer() {
       mt={24}
       tt="capitalize"
       fz={12}
+      // keepMounted={false}
     >
       <TabsPanel value={tabs[0].value}>
         <Debit />
       </TabsPanel>
 
       <TabsPanel value={tabs[1].value}>
-        <PayoutAccount />
+        <Services />
       </TabsPanel>
 
       <TabsPanel value={tabs[2].value}>
@@ -52,6 +46,10 @@ function TabsContainer() {
       </TabsPanel>
 
       <TabsPanel value={tabs[3].value}>
+        <PayoutRequests />
+      </TabsPanel>
+
+      <TabsPanel value={tabs[4].value}>
         <Reactivate />
       </TabsPanel>
     </TabsComponent>
@@ -69,10 +67,16 @@ const tabs = [
     value: "services",
     icon: <IconUserPlus size={16} />,
   },
+
   {
     title: "Live Keys",
     value: "live-keys",
     icon: <IconCircleKey size={16} />,
+  },
+  {
+    title: "Payout Requests",
+    value: "payout-requests",
+    icon: <IconArrowUpRight size={16} />,
   },
   {
     title: "Other Requests",

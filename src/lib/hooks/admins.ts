@@ -1,20 +1,9 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
+import { IParams } from "../schema";
 
-interface IParams {
-  period?: string;
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  sort?: string;
-  type?: string;
-  page?: number;
-}
-
-interface IAdmins extends Omit<IParams, "type"> {}
-
-export function useAdmins(customParams: IAdmins = {}) {
+export function useAdmins(customParams: IParams = {}) {
   const [users, setUsers] = useState<AdminData[]>([]);
   const [meta, setMeta] = useState<{ total: number }>();
 
@@ -24,11 +13,15 @@ export function useAdmins(customParams: IAdmins = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.name && { name: customParams.name }),
+      ...(customParams.email && { email: customParams.email }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const { limit, date, endDate, status, name, email, page } = obj;
 
   async function fetchUsers() {
     const params = new URLSearchParams(
@@ -59,7 +52,7 @@ export function useAdmins(customParams: IAdmins = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.page, obj.sort, obj.status]);
+  }, [limit, date, endDate, status, name, email, page]);
 
   return { loading, users, revalidate, meta };
 }
@@ -108,11 +101,14 @@ export function useUsers(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.email && { email: customParams.email }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const { limit, page, date, endDate, status, email } = obj;
 
   async function fetchUsers() {
     const params = new URLSearchParams(
@@ -143,7 +139,7 @@ export function useUsers(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.page, obj.sort, obj.status]);
+  }, [limit, page, date, endDate, status, email]);
 
   return { loading, users, revalidate, meta };
 }

@@ -1,18 +1,9 @@
-import { otherDocumentSchema } from "./../schema";
+import { IParams, otherDocumentSchema } from "./../schema";
 import { DebitRequest } from "./requests";
 import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 
-interface IParams {
-  period?: string;
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  sort?: string;
-  page?: number;
-  type?: string;
-}
 export function useBusiness(
   customParams: IParams = {},
   reqCount: boolean = false,
@@ -23,8 +14,11 @@ export function useBusiness(
       ...(customParams.period && { period: customParams.period }),
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.email && { email: customParams.email }),
+      ...(customParams.business && { business: customParams.business }),
+      ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
     };
@@ -41,8 +35,10 @@ export function useBusiness(
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.email && { email: customParams.email }),
+      ...(customParams.business && { business: customParams.business }),
       ...(customParams.page && { page: customParams.page }),
       ...(reqCount && { reqCount: "true" }),
       ...(otherReq && { otherReq: "true" }),
@@ -98,9 +94,11 @@ export function useBusiness(
     };
   }, [
     obj.date,
+    obj.endDate,
+    obj.business,
+    obj.email,
     obj.limit,
     obj.period,
-    obj.sort,
     obj.status,
     obj.page,
     obj.type,
@@ -193,7 +191,6 @@ export function useUserBusiness(customParams: IParams = {}) {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
     };

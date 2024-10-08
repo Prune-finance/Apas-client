@@ -78,7 +78,7 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
       <InfoCards title="Overview" details={overviewDetails} />
 
       <Group mt={32} justify="space-between">
-        <SearchInput />
+        <SearchInput search={search} setSearch={setSearch} />
 
         <Group gap={12}>
           <SecondaryBtn text="Filter" icon={IconListTree} />
@@ -146,4 +146,10 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
   );
 };
 
-const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];
+const searchProps = [
+  "senderIban",
+  "recipientIban",
+  "recipientBankAddress",
+  "senderName",
+  "recipientName",
+];

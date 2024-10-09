@@ -22,12 +22,12 @@ import {
   Text,
   Space,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useUserBusiness } from "@/lib/hooks/businesses";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 
-export default function DefaultAccount() {
+function Account() {
   const searchParams = useSearchParams();
 
   const {
@@ -150,5 +150,13 @@ export default function DefaultAccount() {
         setChartFrequency={setChartFrequency}
       />
     </main>
+  );
+}
+
+export default function DefaultAccount() {
+  return (
+    <Suspense>
+      <Account />
+    </Suspense>
   );
 }

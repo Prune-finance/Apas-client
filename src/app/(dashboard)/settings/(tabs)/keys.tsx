@@ -411,7 +411,7 @@ const KeyComponent = ({
         placeholder={
           !view
             ? `${keyString ? keyString.slice(0, 15) : ""}****************`
-            : `${keyString ? keyString.slice(0, 50) : ""}....`
+            : `${keyString}`
         }
       />
     </Box>

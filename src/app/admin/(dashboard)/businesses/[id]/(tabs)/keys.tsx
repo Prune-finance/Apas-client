@@ -21,6 +21,7 @@ import { BusinessData } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useClipboard } from "@mantine/hooks";
+import Cookies from "js-cookie";
 
 export default function Keys({
   business,
@@ -47,7 +48,8 @@ export default function Keys({
   const fetchBusinessSecrets = async () => {
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${params.id}/secrets`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${params.id}/secrets`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       setKeys(data.data);

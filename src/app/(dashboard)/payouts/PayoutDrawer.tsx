@@ -173,7 +173,7 @@ export const PayoutTransactionDrawer = () => {
       );
     setProcessing(true);
     try {
-      const { data: res } = await axios.post(
+      const { data: res } = await axios.patch(
         `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions/${data?.id}/cancel`,
         { reason: cancelReason },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }

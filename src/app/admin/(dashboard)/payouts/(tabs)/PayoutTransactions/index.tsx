@@ -16,28 +16,39 @@ import { CancelledPayoutTransactions } from "./(tabs)/Cancelled";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 import Transaction from "@/lib/store/transaction";
 import { useSearchParams } from "next/navigation";
+import { PayoutTransactionDrawer } from "@/app/(dashboard)/payouts/PayoutDrawer";
 
 const PayoutTrx = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const searchParams = useSearchParams();
 
-  const { status, createdAt, type, senderName, recipientName, recipientIban } =
-    Object.fromEntries(searchParams.entries());
+  const {
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
     return {
-      ...(status && { status }),
-      ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-      ...(type && { type }),
-      ...(senderName && { senderName }),
-      ...(recipientName && { recipientName }),
-      ...(recipientIban && { recipientIban }),
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type: type }),
+      ...(senderName && { senderName: senderName }),
+      ...(recipientName && { recipientName: recipientName }),
+      ...(recipientIban && { recipientIban: recipientIban }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, createdAt, type, senderName, recipientName, recipientIban]);
-  const { transactions, loading, meta, revalidate } = usePayoutTransactions();
+  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+
+  const { transactions, loading, meta, revalidate } =
+    usePayoutTransactions(param);
 
   const { data, opened, close } = Transaction();
 
@@ -70,7 +81,8 @@ const PayoutTrx = () => {
         </TabsPanel>
       </TabsComponent>
 
-      <TransactionDrawer opened={opened} close={close} selectedRequest={data} />
+      {/* <TransactionDrawer opened={opened} close={close} selectedRequest={data} /> */}
+      <PayoutTransactionDrawer isAdmin />
     </Fragment>
   );
 };

@@ -1,10 +1,10 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useSingleAccount } from "@/lib/hooks/accounts";
 
@@ -25,9 +25,36 @@ import { IconBrandLinktree } from "@tabler/icons-react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import Cookies from "js-cookie";
+import dayjs from "dayjs";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
+
+  const customParams = useMemo(() => {
+    return {
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type: type }),
+      ...(senderName && { senderName: senderName }),
+      ...(recipientName && { recipientName: recipientName }),
+      ...(recipientIban && { recipientIban: recipientIban }),
+      // page: active,
+      // limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFreeze, { open: openFreeze, close: closeFreeze }] =
     useDisclosure(false);
@@ -36,7 +63,7 @@ export default function Account() {
     loading: loadingTrx,
     transactions,
     meta,
-  } = useTransactions(params.id);
+  } = useTransactions(params.id, customParams);
 
   const {
     loading,

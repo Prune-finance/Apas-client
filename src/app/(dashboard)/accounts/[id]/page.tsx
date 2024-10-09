@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
@@ -32,12 +32,43 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import { IconBrandLinktree, IconCheck, IconX } from "@tabler/icons-react";
+import dayjs from "dayjs";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
+
+  const customParams = useMemo(() => {
+    return {
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type: type }),
+      ...(senderName && { senderName: senderName }),
+      ...(recipientName && { recipientName: recipientName }),
+      ...(recipientIban && { recipientIban: recipientIban }),
+      // page: active,
+      // limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+
   const { account, loading, revalidate } = useSingleUserAccount(params.id);
   const { handleSuccess, handleError } = useNotification();
-  const { loading: trxLoading, transactions } = useUserTransactions(params.id);
+  const { loading: trxLoading, transactions } = useUserTransactions(
+    params.id,
+    customParams
+  );
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
 

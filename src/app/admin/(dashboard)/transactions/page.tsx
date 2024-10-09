@@ -52,13 +52,22 @@ function TransactionForAccount() {
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const searchParams = useSearchParams();
 
-  const { status, createdAt, type, senderName, recipientName, recipientIban } =
-    Object.fromEntries(searchParams.entries());
+  const {
+    status,
+    createdAt,
+    type,
+    senderName,
+    date,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
     return {
       ...(status && { status }),
-      ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+      ...(createdAt && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
       ...(type && { type }),
       ...(senderName && { senderName }),
       ...(recipientName && { recipientName }),

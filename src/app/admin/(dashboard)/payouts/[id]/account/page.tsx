@@ -21,19 +21,50 @@ import {
 } from "@/ui/components/SingleAccount";
 import { Paper } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import dayjs from "dayjs";
+import { useParams, useSearchParams } from "next/navigation";
+import React, { useMemo, useState } from "react";
 
 export default function BusinessPayoutAccount() {
   const params = useParams<{ id: string }>();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
 
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
+
+  const param = useMemo(() => {
+    return {
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type: type }),
+      ...(senderName && { senderName: senderName }),
+      ...(recipientName && { recipientName: recipientName }),
+      ...(recipientIban && { recipientIban: recipientIban }),
+      // page: active,
+      // limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+
   const { loading: loadingBiz, business } = useSingleBusiness(params.id);
 
   const { account, loading, revalidate } = useBusinessPayoutAccount(params.id);
 
-  const { loading: loadingTrx, transactions, meta } = usePayoutTransactions();
+  const {
+    loading: loadingTrx,
+    transactions,
+    meta,
+  } = usePayoutTransactions(param);
   return (
     <main>
       <Breadcrumbs

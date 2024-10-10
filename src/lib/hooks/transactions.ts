@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { BusinessData } from "./businesses";
 import { IParams } from "../schema";
+import { custom } from "zod";
 
 export function useTransactions(id: string = "", customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
@@ -13,9 +14,17 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -48,7 +57,11 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     customParams.date,
     customParams.limit,
     customParams.status,
-
+    customParams.endDate,
+    customParams.type,
+    customParams.senderName,
+    customParams.recipientName,
+    customParams.recipientIban,
     customParams.page,
   ]);
 
@@ -162,8 +175,17 @@ export function useBusinessTransactions(
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -196,7 +218,11 @@ export function useBusinessTransactions(
     customParams.date,
     customParams.limit,
     customParams.status,
-
+    customParams.endDate,
+    customParams.type,
+    customParams.senderName,
+    customParams.recipientName,
+    customParams.recipientIban,
     customParams.page,
   ]);
 
@@ -247,7 +273,6 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
     customParams.date,
     customParams.limit,
     customParams.status,
-
     customParams.page,
   ]);
 
@@ -263,8 +288,17 @@ export function usePayoutTransactions(customParams: IParams = {}) {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     // {{account-srv}}/v1/admin/accounts/payout/trx
@@ -298,7 +332,11 @@ export function usePayoutTransactions(customParams: IParams = {}) {
     customParams.date,
     customParams.limit,
     customParams.status,
-
+    customParams.endDate,
+    customParams.type,
+    customParams.senderName,
+    customParams.recipientName,
+    customParams.recipientIban,
     customParams.page,
   ]);
 

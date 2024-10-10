@@ -1,5 +1,6 @@
 "use client";
 
+import { PayoutTransactionDrawer } from "@/app/(dashboard)/payouts/PayoutDrawer";
 import {
   TransactionType,
   usePayoutTransactions,
@@ -21,9 +22,11 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import { useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { date } from "zod";
 
 interface Props {
   transactions: TransactionType[];
@@ -34,19 +37,43 @@ interface Props {
   setActive: Dispatch<SetStateAction<number>>;
 }
 
-export const AllPayoutTransactions = ({
-  transactions,
-  loading,
-  setActive,
-  setLimit,
-  active,
-  limit,
-}: Props) => {
+export const AllPayoutTransactions = () => {
   const [search, setSearch] = useState("");
 
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    date,
+    endDate,
+    type,
+    senderName,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
+
+  const param = useMemo(() => {
+    return {
+      not: "CANCELLED",
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type }),
+      ...(senderName && { senderName }),
+      ...(recipientName && { recipientName }),
+      ...(recipientIban && { recipientIban }),
+      page: active,
+      limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, date, endDate, type, senderName, recipientName, recipientIban]);
+  const { transactions, loading, meta, revalidate } =
+    usePayoutTransactions(param);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -123,8 +150,12 @@ export const AllPayoutTransactions = ({
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
+        total={Math.ceil(
+          (meta?.total || transactions.length) / parseInt(limit ?? "10", 10)
+        )}
       />
+
+      <PayoutTransactionDrawer revalidate={revalidate} />
     </Box>
   );
 };

@@ -49,12 +49,12 @@ import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
 
 interface TransactionDrawerProps {
-  data: TransactionType | null;
-  close: () => void;
-  opened: boolean;
+  revalidate?: () => void;
 }
 
-export const PayoutTransactionDrawer = () => {
+export const PayoutTransactionDrawer = ({
+  revalidate,
+}: TransactionDrawerProps) => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const { data, close, opened, setData } = Transaction();
   const [openedModal, { open, close: closeModal }] = useDisclosure(false);
@@ -178,6 +178,8 @@ export const PayoutTransactionDrawer = () => {
         { reason: cancelReason },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
+
+      revalidate && revalidate();
 
       handleSuccess(
         "Payout Transaction Cancelled",

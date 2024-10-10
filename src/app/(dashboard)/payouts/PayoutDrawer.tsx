@@ -52,9 +52,14 @@ interface TransactionDrawerProps {
   revalidate?: () => void;
 }
 
+interface PayoutTransactionDrawer {
+  isAdmin?: boolean;
+  revalidate?: () => void;
+}
 export const PayoutTransactionDrawer = ({
   revalidate,
-}: TransactionDrawerProps) => {
+  isAdmin,
+}: PayoutTransactionDrawer) => {
   const pdfRef = useRef<HTMLDivElement>(null);
   const { data, close, opened, setData } = Transaction();
   const [openedModal, { open, close: closeModal }] = useDisclosure(false);
@@ -72,6 +77,8 @@ export const PayoutTransactionDrawer = ({
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     data?.id ?? ""
   );
+
+  console.log(transaction);
 
   const {
     transaction: defaultTransaction,
@@ -363,60 +370,77 @@ export const PayoutTransactionDrawer = ({
           <Divider mt={30} mb={20} />
         </ScrollArea>
 
-        <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
-          {data &&
-            (isAfter24Hours(data?.createdAt) || data.status === "PENDING") && (
-              <>
-                <SecondaryBtn
-                  text="Query"
-                  icon={IconReportSearch}
-                  action={() => {
-                    setInquiryType("query");
-                    open();
-                  }}
-                />
+        {!isAdmin && (
+          <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
+            {data &&
+              (isAfter24Hours(data?.createdAt) ||
+                data.status === "PENDING") && (
+                <>
+                  <SecondaryBtn
+                    text="Query"
+                    icon={IconReportSearch}
+                    action={() => {
+                      setInquiryType("query");
+                      open();
+                    }}
+                  />
 
-                <SecondaryBtn
-                  text="Run Trace"
-                  icon={IconReportSearch}
-                  action={() => {
-                    setInquiryType("trace");
-                    open();
-                  }}
-                />
+                  <SecondaryBtn
+                    text="Run Trace"
+                    icon={IconReportSearch}
+                    action={() => {
+                      setInquiryType("trace");
+                      open();
+                    }}
+                  />
 
-                <SecondaryBtn
-                  text="Recall"
-                  icon={IconReload}
-                  action={() => {
-                    setInquiryType("recall");
-                    open();
-                  }}
-                />
-              </>
+                  <SecondaryBtn
+                    text="Recall"
+                    icon={IconReload}
+                    action={() => {
+                      setInquiryType("recall");
+                      open();
+                    }}
+                  />
+                </>
+              )}
+
+            {data?.status === "PENDING" ? (
+              <PrimaryBtn
+                icon={IconX}
+                text="Cancel"
+                color="#D92D20"
+                c="#fff"
+                fw={600}
+                action={openCancel}
+              />
+            ) : (
+              <PrimaryBtn
+                icon={IconCircleArrowDown}
+                text={`Download ${
+                  !isAfter24Hours(data?.createdAt ?? new Date())
+                    ? "Receipt"
+                    : ""
+                }`}
+                fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
+                fw={600}
+                action={() => handlePdfDownload(pdfRef)}
+              />
             )}
+          </Flex>
+        )}
 
-          {data?.status === "PENDING" ? (
-            <PrimaryBtn
-              icon={IconX}
-              text="Cancel"
-              color="#D92D20"
-              c="#fff"
-              fw={600}
-              action={openCancel}
-            />
-          ) : (
-            <PrimaryBtn
-              icon={IconCircleArrowDown}
-              text={`Download ${
-                !isAfter24Hours(data?.createdAt ?? new Date()) ? "Receipt" : ""
-              }`}
-              fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
-              fw={600}
-              action={() => handlePdfDownload(pdfRef)}
-            />
-          )}
-        </Flex>
+        {isAdmin && (
+          <PrimaryBtn
+            icon={IconCircleArrowDown}
+            text={`Download ${
+              !isAfter24Hours(data?.createdAt ?? new Date()) ? "Receipt" : ""
+            }`}
+            fullWidth
+            fw={600}
+            action={() => handlePdfDownload(pdfRef)}
+          />
+        )}
       </Flex>
 
       <InquiryModal

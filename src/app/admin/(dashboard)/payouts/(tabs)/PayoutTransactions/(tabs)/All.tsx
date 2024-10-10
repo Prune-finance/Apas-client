@@ -115,6 +115,7 @@ export const AllPayoutTransactions = () => {
           placeholder="Type"
           {...form.getInputProps("type")}
           data={["DEBIT", "CREDIT"]}
+          clearable
         />
       </Filter>
 

@@ -21,6 +21,7 @@ import { notifications } from "@mantine/notifications";
 import { useDisclosure } from "@mantine/hooks";
 import { LiveDateModal } from "../settings/LiveDateModal";
 import { AlertStore } from "@/lib/store/alert";
+import { PayoutTransactions } from "./(tabs)/PayoutTransactions";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
@@ -177,6 +178,12 @@ function PayoutTrx() {
         </TabsPanel>
 
         <TabsPanel value={tabs[1].value}>
+          <PayoutTransactions
+          // loading={loading} meta={meta}
+          />
+        </TabsPanel>
+
+        <TabsPanel value={tabs[2].value}>
           <InquiriesTab />
         </TabsPanel>
       </TabsComponent>
@@ -201,4 +208,8 @@ export default function AccountTrxSuspense() {
   );
 }
 
-const tabs = [{ value: "Account" }, { value: "Inquiries" }];
+const tabs = [
+  { value: "Account" },
+  { value: "Transactions" },
+  { value: "Inquiries" },
+];

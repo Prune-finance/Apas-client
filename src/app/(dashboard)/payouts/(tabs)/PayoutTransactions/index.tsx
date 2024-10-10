@@ -3,7 +3,7 @@
 import TabsComponent from "@/ui/components/Tabs";
 import { TabsPanel } from "@mantine/core";
 
-import { IconArrowsSort, IconListTree, icons } from "@tabler/icons-react";
+import { IconArrowsSort } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -11,6 +11,8 @@ dayjs.extend(advancedFormat);
 import { Fragment, Suspense } from "react";
 import { AllPayoutTransactions } from "./(tabs)/All";
 import { CancelledPayoutTransactions } from "./(tabs)/Cancelled";
+
+import { PayoutTransactionDrawer } from "../../PayoutDrawer";
 
 const PayoutTrx = () => {
   return (

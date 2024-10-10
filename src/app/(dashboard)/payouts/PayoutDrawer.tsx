@@ -49,15 +49,15 @@ import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
 
 interface TransactionDrawerProps {
-  data: TransactionType | null;
-  close: () => void;
-  opened: boolean;
+  revalidate?: () => void;
 }
 
 interface PayoutTransactionDrawer {
   isAdmin?: boolean;
+  revalidate?: () => void;
 }
 export const PayoutTransactionDrawer = ({
+  revalidate,
   isAdmin,
 }: PayoutTransactionDrawer) => {
   const pdfRef = useRef<HTMLDivElement>(null);
@@ -185,6 +185,8 @@ export const PayoutTransactionDrawer = ({
         { reason: cancelReason },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
+
+      revalidate && revalidate();
 
       handleSuccess(
         "Payout Transaction Cancelled",

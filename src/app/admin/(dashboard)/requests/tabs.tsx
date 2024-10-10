@@ -27,6 +27,9 @@ function TabsContainer() {
   return (
     <TabsComponent
       defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
+      onChange={(value) => {
+        window.history.pushState({}, "", "?tab=" + value);
+      }}
       tabs={tabs}
       mt={24}
       tt="capitalize"

@@ -10,12 +10,17 @@ import { useState } from "react";
 
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
-import { Stack, TableTd } from "@mantine/core";
+import { Group, Stack, TableTd } from "@mantine/core";
 import { Flex, Box, Divider } from "@mantine/core";
 import { Text, Drawer } from "@mantine/core";
 import { TableTr } from "@mantine/core";
 
-import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
+import {
+  IconX,
+  IconCheck,
+  IconSearch,
+  IconListTree,
+} from "@tabler/icons-react";
 
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
@@ -32,7 +37,7 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import {
   businessFilterSchema,
@@ -40,16 +45,14 @@ import {
   businessFilterValues,
 } from "../../../businesses/schema";
 import { closeButtonProps } from "../../../businesses/[id]/(tabs)/utils";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 function AccountPayout() {
   const searchParams = useSearchParams();
 
-  const {
-    rows: _limit = "10",
-    status,
-    createdAt,
-    sort,
-  } = Object.fromEntries(searchParams.entries());
+  const { business, status, endDate, date } = Object.fromEntries(
+    searchParams.entries()
+  );
   const { handleError, handleSuccess } = useNotification();
 
   const [active, setActive] = useState(1);
@@ -58,10 +61,10 @@ function AccountPayout() {
   const queryParams = {
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
-    // ...(type && { type: type.toLowerCase() }),
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(business && { business }),
   };
 
   const { requests, revalidate, meta, loading } =
@@ -151,24 +154,35 @@ function AccountPayout() {
     )
   );
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
     <Fragment>
-      <div className={`${styles.container__search__filter}`}>
+      <Group justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        {/* <SecondaryBtn text="Filter" action={toggle} /> */}
-      </div>
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
+      </Group>
 
-      <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      />
+        customStatusOption={["Approved", "Rejected", "Pending"]}
+      >
+        <TextBox
+          placeholder="Business Name"
+          {...form.getInputProps("business")}
+        />
+      </Filter>
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

@@ -86,7 +86,7 @@ export const PayoutTransactionDrawer = () => {
       transaction?.company?.name ?? defaultTransaction?.company?.name ?? "N/A",
     "Account Type": "Payout Account",
     IBAN: data?.recipientIban,
-    BIC: data?.recipientBic,
+    BIC: "ARPYGB21XXX",
   };
 
   const beneficiaryDetails = {

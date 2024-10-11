@@ -69,7 +69,12 @@ export const IssuedAccountsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value:
+        transactions.reduce(
+          (prv, curr) =>
+            curr.type === "CREDIT" ? prv + curr.amount : prv - curr.amount,
+          0
+        ) || 0,
       formatted: true,
       currency: "EUR",
     },

@@ -113,6 +113,7 @@ export default function CreateNewPlan() {
               }
               placeholder="Enter Plan Name"
               {...form.getInputProps("name")}
+              errorProps={{ fz: 12 }}
             />
 
             <Select
@@ -130,6 +131,7 @@ export default function CreateNewPlan() {
               }
               placeholder="Select Billing Cycle"
               {...form.getInputProps("cycle")}
+              errorProps={{ fz: 12 }}
             />
           </Group>
 
@@ -148,6 +150,7 @@ export default function CreateNewPlan() {
             min={0}
             allowNegative={false}
             {...form.getInputProps("cost")}
+            errorProps={{ fz: 12 }}
           />
 
           <Textarea
@@ -192,6 +195,7 @@ export default function CreateNewPlan() {
           <Flex align="center" gap={10} mt={20}>
             {selectedValues.map((item) => (
               <Flex
+                key={item}
                 align="center"
                 gap={18}
                 p={10}

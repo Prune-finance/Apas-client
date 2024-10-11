@@ -11,7 +11,7 @@ import InfoCards from "@/ui/components/Cards/InfoCards";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 import Transaction from "@/lib/store/transaction";
 import { TableComponent } from "@/ui/components/Table";
@@ -23,12 +23,12 @@ import {
   useTransactions,
 } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useMemo, useRef, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "@/ui/components/Pagination";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import {
   BusinessAccountTableHeaders,
   IssuedAccountTableHeaders,
@@ -52,26 +52,47 @@ function TransactionForAccount() {
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const searchParams = useSearchParams();
 
-  const status = searchParams.get("status")?.toUpperCase();
-  const createdAt = searchParams.get("createdAt");
+  const {
+    status,
+    createdAt,
+    type,
+    senderName,
+    date,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
 
-  const { loading, transactions, meta } = useTransactions(undefined, {
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status }),
-  });
+  const param = useMemo(() => {
+    return {
+      ...(status && { status }),
+      ...(createdAt && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type }),
+      ...(senderName && { senderName }),
+      ...(recipientName && { recipientName }),
+      ...(recipientIban && { recipientIban }),
+      page: active,
+      limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, createdAt, type, senderName, recipientName, recipientIban]);
+
+  const { loading, transactions, meta } = useTransactions(undefined, param);
 
   const { transactions: payoutTransactions, loading: loadingPayout } =
-    usePayoutTransactions();
+    usePayoutTransactions(param);
   const { transactions: defaultTransactions, loading: loadingDefault } =
-    useDefaultAccountTransactions();
+    useDefaultAccountTransactions(param);
 
   const [opened, { toggle }] = useDisclosure(false);
+  const [openedIssued, { toggle: toggleIssuedFilter }] = useDisclosure(false);
+  const [openedPayout, { toggle: togglePayoutFilter }] = useDisclosure(false);
   const { data, close, opened: openedDrawer } = Transaction();
 
   const infoDetails = [
     {
       title: "Total Balance",
-      value: meta?.total || 0,
+      value: meta?.totalAmount || 0,
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
@@ -92,7 +113,7 @@ function TransactionForAccount() {
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: meta?.total || 0,
     },
   ];
 
@@ -130,9 +151,11 @@ function TransactionForAccount() {
     },
   ];
 
+  const customStatusOption = ["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"];
+
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -152,6 +175,7 @@ function TransactionForAccount() {
           tabs={tabs}
           mt={28}
           styles={{ list: { marginBottom: 28 } }}
+          keepMounted={false}
         >
           <TabsPanel value={tabs[0].value}>
             <InfoCards
@@ -192,8 +216,30 @@ function TransactionForAccount() {
               </Flex>
             </Flex>
 
-            <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
-
+            <Filter<FilterType>
+              opened={opened}
+              toggle={toggle}
+              form={form}
+              customStatusOption={customStatusOption}
+            >
+              <TextBox
+                placeholder="Sender Name"
+                {...form.getInputProps("senderName")}
+              />
+              <TextBox
+                placeholder="Beneficiary Name"
+                {...form.getInputProps("recipientName")}
+              />
+              <TextBox
+                placeholder="Beneficiary IBAN"
+                {...form.getInputProps("recipientIban")}
+              />
+              <SelectBox
+                placeholder="Type"
+                {...form.getInputProps("type")}
+                data={["DEBIT", "CREDIT"]}
+              />
+            </Filter>
             <TableComponent
               head={BusinessAccountTableHeaders}
               rows={
@@ -207,14 +253,12 @@ function TransactionForAccount() {
               }
               loading={loading}
             />
-
             <EmptyTable
               rows={defaultTransactions}
               loading={loading}
               text="Transactions will be shown here"
               title="There are no transactions"
             />
-
             <PaginationComponent
               active={active}
               setActive={setActive}
@@ -251,7 +295,7 @@ function TransactionForAccount() {
               <Flex gap={12}>
                 <SecondaryBtn
                   text="Filter"
-                  action={toggle}
+                  action={toggleIssuedFilter}
                   icon={IconListTree}
                 />
                 <SecondaryBtn
@@ -262,7 +306,30 @@ function TransactionForAccount() {
               </Flex>
             </Flex>
 
-            <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+            <Filter<FilterType>
+              opened={openedIssued}
+              toggle={toggleIssuedFilter}
+              form={form}
+              customStatusOption={customStatusOption}
+            >
+              <TextBox
+                placeholder="Sender Name"
+                {...form.getInputProps("senderName")}
+              />
+              <TextBox
+                placeholder="Beneficiary Name"
+                {...form.getInputProps("recipientName")}
+              />
+              <TextBox
+                placeholder="Beneficiary IBAN"
+                {...form.getInputProps("recipientIban")}
+              />
+              <SelectBox
+                placeholder="Type"
+                {...form.getInputProps("type")}
+                data={["DEBIT", "CREDIT"]}
+              />
+            </Filter>
 
             <TableComponent
               head={IssuedAccountTableHeaders}
@@ -301,10 +368,37 @@ function TransactionForAccount() {
             <Flex justify="space-between" align="center" mt={38}>
               <SearchInput search={search} setSearch={setSearch} />
 
-              <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+              <SecondaryBtn
+                text="Filter"
+                action={togglePayoutFilter}
+                icon={IconListTree}
+              />
             </Flex>
 
-            <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
+            <Filter<FilterType>
+              opened={openedPayout}
+              toggle={togglePayoutFilter}
+              form={form}
+              customStatusOption={customStatusOption}
+            >
+              <TextBox
+                placeholder="Sender Name"
+                {...form.getInputProps("senderName")}
+              />
+              <TextBox
+                placeholder="Beneficiary Name"
+                {...form.getInputProps("recipientName")}
+              />
+              <TextBox
+                placeholder="Beneficiary IBAN"
+                {...form.getInputProps("recipientIban")}
+              />
+              <SelectBox
+                placeholder="Type"
+                {...form.getInputProps("type")}
+                data={["DEBIT", "CREDIT"]}
+              />
+            </Filter>
 
             <TableComponent
               head={PayoutTableHeaders}

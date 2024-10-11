@@ -1,17 +1,14 @@
-import {
-  ActionIcon,
-  Box,
-  Button,
-  Flex,
-  Group,
-  Image,
-  Loader,
-  LoadingOverlay,
-  Stack,
-  Text,
-} from "@mantine/core";
+"use client";
+
+import { Box, Button, Flex, Image, LoadingOverlay, Text } from "@mantine/core";
 import { IconFile, IconMinus, IconPlus } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
+// import RenderPdf from "./renderPdf";
+import dynamic from "next/dynamic";
+
+const RenderPdf = dynamic(() => import("./renderPdf"), {
+  ssr: false,
+});
 
 interface FileDisplayProps {
   fileUrl: string;
@@ -72,7 +69,8 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
       <div>
         {fileType === FileType.PDF ? (
           <Flex align="center" justify="center" direction="column" gap={10}>
-            <PDFICON />
+            {/* <PDFICON /> */}
+            <RenderPdf pdfUrl={fileUrl} />
 
             {download && fileUrl && (
               <a href={fileUrl} download>

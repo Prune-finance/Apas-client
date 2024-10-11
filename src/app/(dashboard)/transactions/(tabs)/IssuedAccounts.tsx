@@ -1,12 +1,12 @@
 import form from "@/app/auth/login/form";
 import { useUserTransactions } from "@/lib/hooks/transactions";
-import { filterSchema, FilterType, filterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { Group, TabsPanel } from "@mantine/core";
@@ -26,21 +26,35 @@ import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
-  const { status, createdAt, sort, type } = Object.fromEntries(
-    searchParams.entries()
-  );
+  const {
+    status,
+    date,
+    endDate,
+    type,
+    recipientName,
+    recipientIban,
+    senderName,
+  } = Object.fromEntries(searchParams.entries());
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { transactions, revalidate, loading } = useUserTransactions(undefined, {
-    ...(isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit ?? "10", 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
+    ...(recipientIban && { recipientIban }),
+    ...(recipientName && { recipientName }),
+    ...(senderName && { senderName }),
+    ...(type && { type: type.toUpperCase() }),
     page: active,
-  });
+    limit: parseInt(limit ?? "10", 10),
+  };
+
+  const { transactions, revalidate, loading, meta } = useUserTransactions(
+    undefined,
+    queryParams
+  );
 
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -48,57 +62,85 @@ export const IssuedAccountsTab = () => {
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const form = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const infoDetails = [
     {
       title: "Total Balance",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: (meta?.in || 0) - (meta?.out || 0),
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money In",
-      value:
-        transactions
-          .filter((trx) => trx.type === "CREDIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value:
-        transactions
-          .filter((trx) => trx.type === "DEBIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: transactions?.length,
     },
   ];
 
   const searchProps = ["senderIban", "recipientIban", "amount"];
 
   return (
-    <TabsPanel value="Issued Accounts">
+    <>
       <InfoCards details={infoDetails} title="Overview" />
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          fw={600}
+        />
       </Group>
       <Filter<FilterType>
         opened={opened}
         toggle={toggle}
         form={form}
         approvalStatus
-      />
+        customStatusOption={[
+          "Confirmed",
+          "Pending",
+          "Failed",
+          "Rejected",
+          "Cancelled",
+        ]}
+      >
+        <TextBox
+          placeholder="Sender Name"
+          {...form.getInputProps("senderName")}
+        />
+
+        <TextBox
+          placeholder="Beneficiary Name"
+          {...form.getInputProps("recipientName")}
+        />
+
+        <TextBox
+          placeholder="Beneficiary IBAN"
+          {...form.getInputProps("recipientIban")}
+        />
+
+        <SelectBox
+          placeholder="Type"
+          {...form.getInputProps("type")}
+          data={["Debit", "Credit"]}
+          clearable
+        />
+      </Filter>
 
       <TableComponent
         rows={
@@ -127,6 +169,6 @@ export const IssuedAccountsTab = () => {
         limit={limit}
         setLimit={setLimit}
       />
-    </TabsPanel>
+    </>
   );
 };

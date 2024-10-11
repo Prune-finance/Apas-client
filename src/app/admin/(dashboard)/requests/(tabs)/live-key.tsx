@@ -10,17 +10,9 @@ import { useState } from "react";
 
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
-import {
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  TableTd,
-} from "@mantine/core";
-import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
+import { TableTd } from "@mantine/core";
 import { TableTr } from "@mantine/core";
 
-import { IconDots, IconEye } from "@tabler/icons-react";
 import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
 import { IconListTree } from "@tabler/icons-react";
 
@@ -31,36 +23,39 @@ import { LiveKeyRequest, useLiveKeyRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../businesses/schema";
+
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 function LiveKey() {
   const searchParams = useSearchParams();
-
-  const {
-    rows: _limit = "10",
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
-  const { handleError, handleSuccess } = useNotification();
-  const { requests, revalidate, meta, loading } = useLiveKeyRequests();
-
-  const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [active, setActive] = useState(1);
+
+  const { status, date, endDate, business } = Object.fromEntries(
+    searchParams.entries()
+  );
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(business && { business }),
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
+  };
+
+  const { handleError, handleSuccess } = useNotification();
+  const { requests, revalidate, meta, loading } =
+    useLiveKeyRequests(queryParams);
 
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<LiveKeyRequest | null>(
@@ -148,9 +143,9 @@ function LiveKey() {
     )
   );
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -161,11 +156,17 @@ function LiveKey() {
         <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
       </div>
 
-      <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      />
+        customStatusOption={["Approved", "Rejected", "Pending"]}
+      >
+        <TextBox
+          placeholder="Business Name"
+          {...form.getInputProps("business")}
+        />
+      </Filter>
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

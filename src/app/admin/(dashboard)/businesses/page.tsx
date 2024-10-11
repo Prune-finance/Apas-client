@@ -59,12 +59,13 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 
-import ActiveBadge from "@/assets/active-badge.svg";
 import { activeBadgeColor, serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import { useTransactions } from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { TextBox } from "@/ui/components/Inputs";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -73,17 +74,21 @@ function Businesses() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { status, createdAt } = Object.fromEntries(searchParams.entries());
+  const { status, date, endDate, name, contactEmail } = Object.fromEntries(
+    searchParams.entries()
+  );
 
-  const { loading, businesses, meta } = useBusiness({
-    ...(!limit || isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
-
+    ...(name && { business: name }),
+    ...(contactEmail && { email: contactEmail }),
+    limit: parseInt(limit ?? "10", 10),
     page: active,
-  });
+  };
+
+  const { loading, businesses, meta } = useBusiness(queryParams);
 
   const {
     loading: loadingTrx,
@@ -97,9 +102,9 @@ function Businesses() {
 
   const { push } = useRouter();
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const infoDetails = [
@@ -150,11 +155,11 @@ function Businesses() {
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td}>
+      <TableTd w="10%">
         {serialNumber(active, index, parseInt(limit ?? "10", 10))}
       </TableTd>
-      <TableTd className={styles.table__td}>
-        <Group gap={9}>
+      <TableTd w="30%">
+        <Flex wrap="nowrap" gap={9} align="center">
           {element.kycTrusted && (
             <IconRosetteDiscountCheckFilled
               size={25}
@@ -162,14 +167,13 @@ function Businesses() {
             />
           )}
           {element.name}
-        </Group>
+        </Flex>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.contactEmail}</TableTd>
-      {/* <TableTd className={styles.table__td}>{50}</TableTd> */}
-      <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+      <TableTd style={{ wordBreak: "break-word" }}>
+        {element.contactEmail}
       </TableTd>
-      <TableTd className={styles.table__td}>
+      <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
+      <TableTd>
         <Badge
           tt="capitalize"
           variant="light"
@@ -183,10 +187,7 @@ function Businesses() {
         </Badge>
       </TableTd>
 
-      <TableTd
-        className={`${styles.table__td}`}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <TableTd onClick={(e) => e.stopPropagation()}>
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>
@@ -296,13 +297,26 @@ function Businesses() {
             </Button>
           </Flex>
         </div>
-        <Filter<BusinessFilterType>
+        <Filter<FilterType>
           opened={opened}
           toggle={toggle}
           form={form}
-        />
+          customStatusOption={["Active", "Inactive"]}
+        >
+          <TextBox placeholder="Business" {...form.getInputProps("name")} />
 
-        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+          <TextBox
+            placeholder="Email"
+            {...form.getInputProps("contactEmail")}
+          />
+        </Filter>
+
+        <TableComponent
+          head={tableHeaders}
+          rows={rows}
+          loading={loading}
+          layout="auto"
+        />
 
         {!loading && !!!rows.length && (
           <Flex direction="column" align="center" mt={70}>

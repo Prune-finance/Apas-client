@@ -1,0 +1,13 @@
+.container {
+  margin: "0 auto";
+  overflow: "hidden";
+}
+
+.pages {
+  box-shadow: "5px 5px 15px rgba(0, 0, 0, 0.1)";
+  margin-bottom: "10px";
+
+  &:last-of-type {
+    margin-bottom: "0";
+  }
+}

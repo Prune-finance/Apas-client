@@ -162,8 +162,15 @@ export const TransactionDrawer = ({
       padding={0}
     >
       <Divider mb={20} />
-      <Box px={28} pb={28}>
-        <ScrollArea h="calc(100vh - 145px)" scrollbars="y" scrollbarSize={1}>
+      <Flex direction="column" pl={28} pb={20} h="calc(100vh - 90px)">
+        <ScrollArea
+          // h="calc(100vh - 145px)"
+          h="100%"
+          flex={1}
+          scrollbars="y"
+          scrollbarSize={1}
+          pr={28}
+        >
           <Flex align="center" justify="space-between">
             <Flex direction="column">
               <Text c="var(--prune-text-gray-500)" fz={12}>
@@ -265,14 +272,17 @@ export const TransactionDrawer = ({
           <Divider mt={30} mb={20} />
         </ScrollArea>
 
-        <PrimaryBtn
-          icon={IconCircleArrowDown}
-          text="Download Receipt"
-          fullWidth
-          fw={600}
-          action={() => handlePdfDownload(pdfRef)}
-        />
-      </Box>
+        <Box mr={28}>
+          <PrimaryBtn
+            icon={IconCircleArrowDown}
+            text="Download Receipt"
+            fullWidth
+            fw={600}
+            action={() => handlePdfDownload(pdfRef)}
+            mt={20}
+          />
+        </Box>
+      </Flex>
 
       <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
         <TransactionReceipt

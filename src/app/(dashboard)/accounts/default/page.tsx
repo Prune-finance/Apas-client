@@ -22,12 +22,41 @@ import {
   Text,
   Space,
 } from "@mantine/core";
-import { useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useUserBusiness } from "@/lib/hooks/businesses";
+import { useSearchParams } from "next/navigation";
+import dayjs from "dayjs";
 
-export default function DefaultAccount() {
+function Account() {
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
+
+  const param = useMemo(() => {
+    return {
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type: type }),
+      ...(senderName && { senderName: senderName }),
+      ...(recipientName && { recipientName: recipientName }),
+      ...(recipientIban && { recipientIban: recipientIban }),
+      // page: active,
+      // limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+
   const { account, loading } = useUserDefaultAccount();
-  const { transactions, loading: loadingTrx } = useUserDefaultTransactions();
+  const { transactions, loading: loadingTrx } =
+    useUserDefaultTransactions(param);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
@@ -121,5 +150,13 @@ export default function DefaultAccount() {
         setChartFrequency={setChartFrequency}
       />
     </main>
+  );
+}
+
+export default function DefaultAccount() {
+  return (
+    <Suspense>
+      <Account />
+    </Suspense>
   );
 }

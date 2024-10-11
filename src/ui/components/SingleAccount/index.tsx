@@ -28,13 +28,18 @@ import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 import {
+  IconAlertTriangle,
   IconArrowLeft,
   IconArrowUpRight,
   IconBrandLinktree,
   IconCheck,
   IconCircleArrowDown,
   IconCopy,
+  IconExclamationCircle,
+  IconInfoCircle,
   IconListTree,
+  IconRosetteDiscountCheckFilled,
+  IconShieldCheck,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
@@ -42,7 +47,12 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
-import { approvedBadgeColor, formatNumber, getUserType } from "@/lib/utils";
+import {
+  approvedBadgeColor,
+  formatNumber,
+  getInitials,
+  getUserType,
+} from "@/lib/utils";
 import Link from "next/link";
 import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
@@ -65,6 +75,7 @@ import { validateRequest } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
+import OriginalModalComponent from "../Modal";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import TabsComponent from "../Tabs";
 import { GiEuropeanFlag } from "react-icons/gi";
@@ -603,7 +614,7 @@ export const SingleAccountBody = ({
         Payout Account
       </Text>
     ) : (
-      account?.type
+      getUserType(account?.type as "USER" | "CORPORATE")
     ),
   };
 
@@ -655,7 +666,7 @@ export const SingleAccountBody = ({
           />
         </TabsPanel>
         <TabsPanel value={tabs[3].value} mt={28}>
-          <Documents account={account} />
+          <Documents account={account} admin={admin} />
         </TabsPanel>
       </TabsComponent>
     </Box>
@@ -849,6 +860,7 @@ interface DefaultAccountHeadProps
   account: DefaultAccount | null;
   business: BusinessData | null;
   loadingBiz: boolean;
+  revalidate?: () => void;
 }
 
 export interface RequestForm {
@@ -873,14 +885,18 @@ export const DefaultAccountHead = ({
   business,
   loadingBiz,
   admin,
+  revalidate,
 }: DefaultAccountHeadProps) => {
   const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
     useDisclosure(false);
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
     useDisclosure(false);
+  const [openedTrust, { open: openTrust, close: closeTrust }] =
+    useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
+  const [processingTrust, setProcessingTrust] = useState(false);
   const [sectionState, setSectionState] = useState("");
   const [moneySent, setMoneySent] = useState(0);
   const [receiverName, setReceiverName] = useState("");
@@ -1009,6 +1025,32 @@ export const DefaultAccountHead = ({
     closeSuccess();
   };
 
+  const handleAccountTrust = async () => {
+    if (!account) return;
+    setProcessingTrust(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/payout/account/${account?.id}/trust`,
+        {
+          isTrusted: account?.isTrusted ? false : true,
+        },
+        {
+          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
+        }
+      );
+      revalidate && revalidate();
+      handleSuccess(
+        "Action Completed",
+        `Payout account is ${account.isTrusted ? "untrusted" : "trusted"}`
+      );
+      closeTrust();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessingTrust(false);
+    }
+  };
+
   return (
     <>
       <Flex
@@ -1019,10 +1061,7 @@ export const DefaultAccountHead = ({
         <Group gap={12} align="center">
           {!loading ? (
             <Avatar size="lg" color="var(--prune-primary-700)" variant="filled">
-              {account?.accountName
-                .split(" ")
-                .map((item) => item.charAt(0))
-                .join("")}
+              {getInitials(account?.accountName ?? "")}
             </Avatar>
           ) : (
             <Skeleton circle h={50} w={50} />
@@ -1030,9 +1069,18 @@ export const DefaultAccountHead = ({
 
           <Stack gap={2}>
             {!loading ? (
-              <Text fz={24} className={styles.main__header__text} m={0} p={0}>
-                {account?.accountName}
-              </Text>
+              <Group gap={5}>
+                <Text fz={24} className={styles.main__header__text} m={0} p={0}>
+                  {account?.accountName}
+                </Text>
+
+                {account?.isTrusted && (
+                  <IconRosetteDiscountCheckFilled
+                    size={25}
+                    color="var(--prune-primary-700)"
+                  />
+                )}
+              </Group>
             ) : (
               <Skeleton h={10} w={100} />
             )}
@@ -1066,7 +1114,7 @@ export const DefaultAccountHead = ({
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
           {payout && admin && (
             <Button
-              // onClick={openTrust}
+              onClick={openTrust}
               color="#f6f6f6"
               c="var(--prune-text-gray-700)"
               fz={12}
@@ -1075,8 +1123,11 @@ export const DefaultAccountHead = ({
               radius={4}
             >
               <Switch
-                label="Trust this User"
-                checked={business?.kycTrusted}
+                label={`${account?.isTrusted ? "Untrust" : "Trust"} this User`}
+                checked={account?.isTrusted}
+                onChange={(e) => {
+                  openTrust();
+                }}
                 labelPosition="left"
                 fz={12}
                 size="xs"
@@ -1086,6 +1137,28 @@ export const DefaultAccountHead = ({
           )}
         </Flex>
       </Flex>
+
+      <OriginalModalComponent
+        opened={openedTrust}
+        close={closeTrust}
+        title={`${account?.isTrusted ? "Untrust" : "Trust"} This User?`}
+        text={`${
+          account?.isTrusted
+            ? "By untrusting this business, you're revoking their ability to automatically disburse funds from their Payout accounts."
+            : "By trusting this business, you're granting them the ability to automatically disburse funds from their Payout accounts."
+        }`}
+        action={handleAccountTrust}
+        customApproveMessage="Yes, Proceed"
+        icon={
+          account?.isTrusted ? (
+            <IconExclamationCircle color="#C6A700" />
+          ) : (
+            <IconShieldCheck color="#12B76A" />
+          )
+        }
+        processing={processingTrust}
+        color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
+      />
 
       <Modal
         opened={opened}

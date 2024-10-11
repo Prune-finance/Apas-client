@@ -1,6 +1,6 @@
 "use client";
 
-import { Paper, Stack } from "@mantine/core";
+import { Paper, Stack, TabsPanel } from "@mantine/core";
 import { Text } from "@mantine/core";
 
 import styles from "./styles.module.scss";
@@ -30,10 +30,16 @@ function AccountTrx() {
           </Stack>
         </div>
 
-        <TabsComponent tabs={tabs} mt={32}>
-          <AccountsTab />
-          <IssuedAccountsTab />
-          <PayoutsTab />
+        <TabsComponent tabs={tabs} mt={32} keepMounted={false}>
+          <TabsPanel value="Own Account">
+            <AccountsTab />
+          </TabsPanel>
+          <TabsPanel value="Issued Accounts">
+            <IssuedAccountsTab />
+          </TabsPanel>
+          <TabsPanel value="Payouts">
+            <PayoutsTab />
+          </TabsPanel>
         </TabsComponent>
       </Paper>
 

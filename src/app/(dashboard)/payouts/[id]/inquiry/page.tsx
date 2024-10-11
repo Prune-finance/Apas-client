@@ -1,7 +1,6 @@
 "use client";
 
-import { inquiry } from "@/lib/static";
-import { formatNumber, getInitials } from "@/lib/utils";
+import { camelCaseToTitleCase, formatNumber, getInitials } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
@@ -17,9 +16,11 @@ import {
   FileButton,
   Flex,
   Group,
+  Loader,
   rem,
   ScrollArea,
   SimpleGrid,
+  Skeleton,
   Stack,
   Text,
   TextInput,
@@ -32,9 +33,8 @@ import {
   PDF_MIME_TYPE,
   MIME_TYPES,
 } from "@mantine/dropzone";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useScrollIntoView } from "@mantine/hooks";
 import {
-  IconCheck,
   IconChevronDown,
   IconChevronUp,
   IconPaperclip,
@@ -47,7 +47,15 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useUserSingleInquiry } from "@/lib/hooks/inquiries";
+import axios from "axios";
+import Cookies from "js-cookie";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import { useForm, zodResolver } from "@mantine/form";
+import { z } from "zod";
+import { FileUploadModal } from "@/ui/components/TicketChat/FileUploadModal";
 
 export default function InquiryPage() {
   const { id } = useParams<{ id: string }>();
@@ -56,12 +64,109 @@ export default function InquiryPage() {
   const [closeOpened, { open, close }] = useDisclosure(false);
 
   const [processing, setProcessing] = useState(false);
+  const [processingMsg, setProcessingMsg] = useState(false);
+  const [file, setFile] = useState<File | null>(null);
+  const { inquiry, loading, revalidate } = useUserSingleInquiry(id);
+  const { handleError, handleSuccess } = useNotification();
+  const resetFileInputRef = useRef<() => void>(null);
+
+  const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
+    HTMLDivElement,
+    HTMLDivElement
+  >();
+
+  const form = useForm<FormValues>({
+    initialValues,
+    validate: zodResolver(schema),
+  });
 
   const trxDetails = {
-    "Sender Name": inquiry.transaction.senderName,
-    "Beneficiary Name": inquiry.transaction.recipientName,
-    Amount: formatNumber(inquiry.transaction.amount, true, "EUR"),
-    "Date Requested": dayjs(inquiry.createdAt).format("Do MMMM, YYYY"),
+    "Sender Name": inquiry?.Transaction?.senderName,
+    "Beneficiary Name": inquiry?.Transaction?.recipientName,
+    Amount: formatNumber(inquiry?.Transaction?.amount ?? 0, true, "EUR"),
+    "Date Requested": dayjs(inquiry?.createdAt).format("Do MMMM, YYYY"),
+  };
+
+  const getMsgType = (text?: string, file?: string) => {
+    if (file && text) return "text-file";
+    if (file && !text) return "file";
+    return "text";
+  };
+
+  const sendMessage = async () => {
+    if (form.validate().hasErrors) return;
+    setProcessingMsg(true);
+    try {
+      const { text, file, extension } = form.values;
+      const type = getMsgType(text, file);
+
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/inquiries/${id}/message`,
+        {
+          type,
+          ...(file && { file }),
+          ...(extension && { extension }),
+          ...(text && { text }),
+        },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      form.reset();
+      setFile(null);
+      revalidate();
+      scrollIntoView();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessingMsg(false);
+    }
+  };
+
+  const handleInquiryStatus = async (type: "close" | "open") => {
+    setProcessing(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/inquiries/${id}/${type}`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      const title = `${camelCaseToTitleCase(
+        inquiry?.type.toLowerCase() ?? ""
+      )} ${type === "close" ? "closed" : "reopened"} successfully`;
+
+      handleSuccess(title, "");
+      revalidate();
+      if (type === "close") return close();
+      if (type === "open") return reClose();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleUpload = async (file: File | null) => {
+    setProcessing(true);
+    try {
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const { data: res } = await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/upload`,
+        formData,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      form.setFieldValue("file", res.data.url);
+      form.setFieldValue("extension", file.type);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -81,24 +186,56 @@ export default function InquiryPage() {
           {/* Chat Header */}
           <Group mt={28} justify="space-between">
             <Group>
-              <Avatar
-                size={40}
-                color="var(--prune-primary-700)"
-                variant="filled"
-                radius="xl"
-              >
-                {getInitials(inquiry.transaction.company.name)}
-              </Avatar>
+              {inquiry?.Company?.name ? (
+                <Avatar
+                  size={40}
+                  color="var(--prune-primary-700)"
+                  variant="filled"
+                  radius="xl"
+                >
+                  {getInitials(inquiry?.Company.name ?? "")}
+                </Avatar>
+              ) : (
+                <Skeleton circle w={40} h={40} />
+              )}
 
-              <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
-                Query: {inquiry.transaction.centrolinkRef}
-              </Text>
+              {inquiry?.type ? (
+                <Text
+                  fz={20}
+                  fw={600}
+                  c="var(--prune-text-gray-700)"
+                  tt="capitalize"
+                >
+                  {inquiry?.type.toLowerCase()}:{" "}
+                  {inquiry?.Transaction.centrolinkRef}
+                </Text>
+              ) : (
+                <Skeleton w={100} h={10} />
+              )}
 
-              <BadgeComponent status={inquiry.status} w={100} />
+              {inquiry?.status ? (
+                <BadgeComponent status={inquiry?.status ?? ""} w={100} />
+              ) : (
+                <Skeleton w={100} h={20} />
+              )}
             </Group>
 
-            <PrimaryBtn text="Close Ticket" fw={600} h={40} action={open} />
-            {/* <PrimaryBtn text="Reopen Ticket" fw={600} h={40} action={reOpen} /> */}
+            {inquiry?.status ? (
+              <PrimaryBtn
+                text={
+                  inquiry?.status === "PROCESSING"
+                    ? "Close Ticket"
+                    : "Reopen Ticket"
+                }
+                fw={600}
+                h={40}
+                action={inquiry?.status === "PROCESSING" ? open : reOpen}
+                loading={loading}
+                loaderProps={{ type: "dots" }}
+              />
+            ) : (
+              <Skeleton w={100} h={40} />
+            )}
           </Group>
           <Divider mb={20} mt={27} color="#EEF0F2" />
 
@@ -127,24 +264,24 @@ export default function InquiryPage() {
 
           <Collapse in={opened} mt={16}>
             <SimpleGrid cols={4} w="60%">
-              {Object.entries(trxDetails).map(([title, value]) => (
-                <Stack key={title} gap={0}>
-                  <Text
-                    fz={10}
-                    fw={500}
-                    c="var(--prune-text-gray-400)"
-                    key={title}
-                  >
+              {Object.entries(trxDetails).map(([title, value], index) => (
+                <Stack key={index} gap={0}>
+                  <Text fz={10} fw={500} c="var(--prune-text-gray-400)">
                     {title}
                   </Text>
-                  <Text
-                    fz={12}
-                    fw={600}
-                    c="var(--prune-text-gray-700)"
-                    key={title}
-                  >
-                    {value}
-                  </Text>
+
+                  {value ? (
+                    <Text
+                      fz={12}
+                      fw={600}
+                      c="var(--prune-text-gray-700)"
+                      key={title}
+                    >
+                      {value}
+                    </Text>
+                  ) : (
+                    <Skeleton h={10} w={100} mt={10} />
+                  )}
                 </Stack>
               ))}
             </SimpleGrid>
@@ -152,14 +289,18 @@ export default function InquiryPage() {
 
           <Divider mt={20} mb={27} color="#EEF0F2" />
 
-          <ScrollArea h={`calc(100vh - ${!opened ? "400px" : "450px"})`}>
+          <ScrollArea
+            h={`calc(100vh - ${!opened ? "400px" : "450px"})`}
+            ref={scrollableRef}
+          >
             <Stack gap={40}>
-              {inquiry.messages.map((mes, index) => (
+              {inquiry?.Messages.map((mes, index, arr) => (
                 <TicketChatComponent
                   guest={mes.senderType === "admin"}
                   key={index}
                   message={mes}
                   companyName="Prune Admin"
+                  {...(arr.length === index + 1 && { ref: targetRef })}
                 />
               ))}
             </Stack>
@@ -167,61 +308,88 @@ export default function InquiryPage() {
         </Box>
 
         {/* New Chat Starts Here */}
-        <Divider mt={20} mb={27} color="#EEF0F2" />
-        <Group>
-          <FileButton
-            onChange={() => {}}
-            // onChange={setFile}
-            //   accept="image/png,image/jpeg"
-            accept={[
-              ...IMAGE_MIME_TYPE,
-              ...PDF_MIME_TYPE,
-              ...MS_WORD_MIME_TYPE,
-              ...MS_EXCEL_MIME_TYPE,
-              MIME_TYPES.csv,
-            ].join(",")}
-          >
-            {(props) => (
-              <ThemeIcon
-                {...props}
-                style={{ cursor: "pointer" }}
-                variant="transparent"
-                color="var(--prune-primary-600)"
+        {inquiry?.status === "PROCESSING" && (
+          <>
+            <Divider mt={20} mb={27} color="#EEF0F2" />
+            <Group align="center">
+              <FileButton
+                onChange={(file) => {
+                  setFile(file);
+                  handleUpload(file);
+                }}
+                resetRef={resetFileInputRef}
+                accept={[
+                  ...IMAGE_MIME_TYPE,
+                  ...PDF_MIME_TYPE,
+                  ...MS_WORD_MIME_TYPE,
+                  ...MS_EXCEL_MIME_TYPE,
+                  MIME_TYPES.csv,
+                ].join(",")}
               >
-                <IconPaperclip />
-              </ThemeIcon>
-            )}
-          </FileButton>
+                {(props) => (
+                  <ThemeIcon
+                    {...props}
+                    style={{ cursor: "pointer" }}
+                    variant="transparent"
+                    color="var(--prune-primary-600)"
+                  >
+                    <IconPaperclip />
+                  </ThemeIcon>
+                )}
+              </FileButton>
 
-          <TextInput
-            placeholder="Reply..."
-            variant="filled"
-            flex={1}
-            rightSection={
-              <ActionIcon
-                size={32}
-                radius="xl"
-                color="var(--prune-primary-600)"
-                variant="transparent"
+              <Box
+                component="form"
+                // px={28}
+
+                onSubmit={form.onSubmit(() => sendMessage())}
+                flex={1}
               >
-                <IconSend
-                  style={{ width: rem(18), height: rem(18) }}
-                  stroke={2}
+                <TextInput
+                  placeholder="Reply..."
+                  variant="filled"
+                  flex={1}
+                  {...form.getInputProps("text")}
+                  rightSection={
+                    processingMsg ? (
+                      <Loader
+                        type="dots"
+                        color="var(--prune-primary-600)"
+                        size="sm"
+                      />
+                    ) : (
+                      <ActionIcon
+                        size={32}
+                        radius="xl"
+                        color="var(--prune-primary-600)"
+                        variant="transparent"
+                        component="button"
+                        type="submit"
+                      >
+                        <IconSend
+                          style={{ width: rem(18), height: rem(18) }}
+                          stroke={2}
+                        />
+                      </ActionIcon>
+                    )
+                  }
                 />
-              </ActionIcon>
-            }
-          />
-        </Group>
+              </Box>
+            </Group>
+          </>
+        )}
       </Flex>
 
       <ModalComponent
         processing={processing}
-        action={() => {}}
+        action={() => handleInquiryStatus("open")}
         color="#F9F6E6"
         icon={<PiClockClockwiseBold color="#C6A700" size={25} />}
         opened={reOpened}
         close={reClose}
-        title="Reopen Query Ticket?"
+        title={`Reopen ${camelCaseToTitleCase(
+          inquiry?.type?.toLowerCase() ?? ""
+        )} Ticket?`}
         text="Do you wish to reopen this ticket?"
         customApproveMessage="Yes, Reopen"
       />
@@ -229,15 +397,46 @@ export default function InquiryPage() {
       {/* TODO: Add type of inquiry  */}
       <ModalComponent
         processing={processing}
-        action={() => {}}
+        action={() => handleInquiryStatus("close")}
         color="#FEF3F2"
         icon={<IconX color="#D92D20" />}
         opened={closeOpened}
         close={close}
-        title="Close this query Ticket?"
-        text="By closing this query ticket, it means your transaction has been completed"
+        title={`Close this ${inquiry?.type.toLowerCase()} Ticket?`}
+        text={`By closing this ${inquiry?.type.toLowerCase()} ticket, it means your transaction has been completed`}
         customApproveMessage="Yes, Close"
+      />
+
+      <FileUploadModal
+        file={file}
+        opened={!!file}
+        close={() => {
+          setFile(null);
+          form.setFieldValue("file", "");
+          if (resetFileInputRef.current) {
+            resetFileInputRef.current(); // Call the reset function
+          }
+        }}
+        processing={processing}
+        processingMsg={processingMsg}
+        sendMessage={sendMessage}
+        form={form}
       />
     </main>
   );
 }
+
+const initialValues = { text: "", file: "", extension: "" };
+
+const schema = z
+  .object({
+    text: z.string(),
+    file: z.string().optional(),
+    extension: z.string().optional(),
+  })
+  .refine((data) => data.text || data.file, {
+    message: "Either add a message or a file.",
+    path: ["text"],
+  });
+
+export type FormValues = z.infer<typeof schema>;

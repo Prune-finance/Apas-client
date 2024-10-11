@@ -1,8 +1,15 @@
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import { parseError } from "@/lib/actions/auth";
+import useNotification from "@/lib/hooks/notification";
+import { camelCaseToTitleCase } from "@/lib/utils";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import DropzoneComponent from "@/ui/components/Dropzone";
 import { Group, Modal, Paper, Stack, Text, Textarea } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { z } from "zod";
 
 interface Props {
@@ -10,15 +17,62 @@ interface Props {
   close: () => void;
   type?: "recall" | "query" | "trace";
   pruneRef: string;
+  trxId: string;
 }
 
-export const InquiryModal = ({ opened, close, type, pruneRef }: Props) => {
+export const InquiryModal = ({
+  opened,
+  close,
+  type,
+  pruneRef,
+  trxId,
+}: Props) => {
+  const { handleError, handleSuccess, handleInfo } = useNotification();
+  const { push } = useRouter();
+  const [processing, setProcessing] = useState(false);
   type FormValues = z.infer<typeof schema>;
 
   const form = useForm<FormValues>({
     initialValues,
     validate: zodResolver(schema),
   });
+
+  const handleInquiry = async () => {
+    if (form.validate().hasErrors) return;
+    setProcessing(true);
+    try {
+      const { reason, file, extension } = form.values;
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions/${trxId}/${type}`,
+        {
+          reason,
+          ...(file && {
+            supportingDocument: file,
+            extension,
+          }),
+        },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      const title =
+        type === "query"
+          ? "Query Created"
+          : `${camelCaseToTitleCase(type ?? "")} Initiated`;
+
+      const msg = `You have successfully ${
+        type === "query" ? "created" : "initiated"
+      } a ${type}. Check under inquiries tab to  track the ${type} status.`;
+
+      push(`/payouts?tab=Inquiries`);
+      handleSuccess(title, msg);
+      close();
+      form.reset();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <Modal
@@ -67,7 +121,14 @@ export const InquiryModal = ({ opened, close, type, pruneRef }: Props) => {
         {...form.getInputProps("reason")}
       />
 
-      <PrimaryBtn text="Submit" fw={600} fullWidth mt={24} />
+      <PrimaryBtn
+        text="Submit"
+        fw={600}
+        fullWidth
+        mt={24}
+        loading={processing}
+        action={handleInquiry}
+      />
     </Modal>
   );
 };

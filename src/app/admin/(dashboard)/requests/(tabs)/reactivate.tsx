@@ -59,18 +59,22 @@ import { useBusiness } from "@/lib/hooks/businesses";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import RequestDrawer from "../RequestDrawer";
+import { FilterType, FilterValues, FilterSchema } from "@/lib/schema";
 
 function Reactivate() {
   const searchParams = useSearchParams();
 
   const {
-    rows: _limit = "10",
     status,
-    createdAt,
-    sort,
+    date,
+    endDate,
+    business,
+    accountName,
+    accountNumber,
+    accountType,
   } = Object.fromEntries(searchParams.entries());
   const { handleError, handleSuccess } = useNotification();
 
@@ -97,9 +101,16 @@ function Reactivate() {
   const queryParams = {
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    ...(createdAt && { date: dayjs(createdAt).format("DD-MM-YYYY") }),
-    ...(status && { status: status.toLowerCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && { status: status.toUpperCase() }),
+    ...(business && { business }),
+    ...(accountName && { accountName }),
+    ...(accountNumber && { accountNumber }),
+    ...(accountType && {
+      accountType:
+        accountType.toLowerCase() === "individual" ? "USER" : "CORPORATE",
+    }),
   };
 
   const { requests, revalidate, loading, meta } = useAllRequests({
@@ -230,7 +241,7 @@ function Reactivate() {
       <TableTd className={styles.table__td}>
         {element?.Account?.accountName ?? "N/A"}
       </TableTd>
-      <TableTd className={styles.table__td}>
+      <TableTd className={styles.table__td} style={{ wordBreak: "break-word" }}>
         {element?.Account?.accountNumber ?? "N/A"}
       </TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
@@ -255,24 +266,27 @@ function Reactivate() {
     </TableTr>
   ));
 
-  const form = useForm<BusinessFilterType>({
-    initialValues: businessFilterValues,
-    validate: zodResolver(businessFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
     <Fragment>
-      <Group mt={32} justify="space-between">
+      <Group mt={32} justify="space-between" align="center">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <Group>
-          <Select
-            placeholder="Type"
+        <Flex align="center" gap={20}>
+          <SelectBox
             data={["All", "Freeze", "Unfreeze", "Activate", "Deactivate"]}
-            w={120}
-            styles={{ option: { fontSize: 12 }, input: { fontSize: 12 } }}
+            placeholder="Type"
             value={type}
             onChange={(e) => setType(e)}
+            clearable
+            styles={{
+              input: { height: rem(36), fontSize: 12 },
+              option: { fontSize: 12 },
+            }}
           />
           <SecondaryBtn
             icon={IconListTree}
@@ -280,14 +294,34 @@ function Reactivate() {
             text="Filter"
             fw={600}
           />
-        </Group>
+        </Flex>
       </Group>
 
-      <Filter<BusinessFilterType>
+      <Filter<FilterType>
         opened={openedFilter}
         toggle={toggle}
         form={form}
-      />
+        customStatusOption={["Approved", "Rejected", "Pending"]}
+      >
+        <TextBox
+          placeholder="Business Name"
+          {...form.getInputProps("business")}
+        />
+
+        <TextBox
+          placeholder="Account Name"
+          {...form.getInputProps("accountName")}
+        />
+
+        <TextBox placeholder="IBAN" {...form.getInputProps("accountNumber")} />
+
+        <SelectBox
+          placeholder="User Type"
+          data={["Individual", "Corporate"]}
+          {...form.getInputProps("accountType")}
+          clearable
+        />
+      </Filter>
 
       <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

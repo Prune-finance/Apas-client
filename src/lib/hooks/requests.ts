@@ -1,22 +1,10 @@
-import axios, { all } from "axios";
+import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import { AccountData } from "./accounts";
+
 import Cookies from "js-cookie";
-import { set } from "zod";
+import { IParams } from "../schema";
 
 // query: string = "";
-
-interface IParams {
-  period?: string;
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  sort?: string;
-  query?: string;
-  type?: string;
-  page?: number;
-  companyId?: string;
-}
 
 export function useRequests(customParams: IParams = {}, id: string = "") {
   const [requests, setRequests] = useState<RequestData[]>([]);
@@ -27,12 +15,29 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.country && { country: customParams.country }),
+      ...(customParams.accountType && {
+        accountType: customParams.accountType,
+      }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
-      ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    accountName,
+    country,
+    accountType,
+    status,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     //  `${id}/requests`;: fetch all requests for a specific business
@@ -68,7 +73,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [date, endDate, page, limit, accountName, country, accountType, status]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -82,12 +87,35 @@ export function useAllRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.accountNumber && {
+        accountNumber: customParams.accountNumber,
+      }),
+      ...(customParams.accountType && {
+        accountType: customParams.accountType,
+      }),
+      ...(customParams.business && { business: customParams.business }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    status,
+    type,
+    accountName,
+    accountNumber,
+    business,
+    accountType,
+    page,
+  } = obj;
 
   async function fetchAccounts() {
     //  `${id}/requests`;: fetch all requests for a specific business
@@ -122,7 +150,18 @@ export function useAllRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [
+    limit,
+    date,
+    endDate,
+    status,
+    type,
+    accountName,
+    accountNumber,
+    business,
+    accountType,
+    page,
+  ]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -140,7 +179,6 @@ export function useAllCompanyRequests(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
@@ -180,14 +218,92 @@ export function useAllCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
+  }, [obj.date, obj.limit, obj.status, obj.type, obj.page, obj.companyId]);
+
+  return { loading, requests, meta, revalidate };
+}
+
+export function usePayoutTransactionRequests(customParams: IParams = {}) {
+  const [requests, setRequests] = useState<PayoutTransactionRequest[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.not && { not: customParams.not }),
+      ...(customParams.destinationBank && {
+        bank: customParams.destinationBank,
+      }),
+      ...(customParams.destinationIban && {
+        recipientIban: customParams.destinationIban,
+      }),
+      ...(customParams.beneficiaryName && {
+        recipientName: customParams.beneficiaryName,
+      }),
+      ...(customParams.senderIban && { senderIban: customParams.senderIban }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+  }, [customParams]);
+
+  const {
+    limit,
+    status,
+    not,
+    recipientIban,
+    recipientName,
+    senderIban,
+    bank,
+    date,
+    endDate,
+    page,
+  } = obj;
+
+  async function fetchAccounts() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/transaction/requests?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setMeta(data.meta);
+      setRequests(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchAccounts();
+  }
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
   }, [
-    obj.date,
-    obj.limit,
-    obj.sort,
-    obj.status,
-    obj.type,
-    obj.page,
-    obj.companyId,
+    limit,
+    status,
+    not,
+    recipientIban,
+    recipientName,
+    senderIban,
+    bank,
+    date,
+    endDate,
+    page,
   ]);
 
   return { loading, requests, meta, revalidate };
@@ -237,13 +353,18 @@ export function useUserRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.country && { country: customParams.country }),
     };
   }, [customParams]);
-
+  const { date, limit, accountName, country, endDate, status, type, page } =
+    obj;
   async function fetchAccounts() {
     const params = new URLSearchParams(
       obj as Record<string, string>
@@ -274,7 +395,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [date, limit, accountName, country, endDate, status, type, page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -323,8 +444,9 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.business && { business: customParams.business }),
     };
   }, [customParams]);
 
@@ -355,7 +477,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.endDate, obj.limit, obj.status]);
 
   return { loading, requests, revalidate };
 }
@@ -369,8 +491,9 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.business && { business: customParams.business }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
     };
   }, [customParams]);
@@ -403,7 +526,14 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.companyId]);
+  }, [
+    obj.date,
+    obj.limit,
+    obj.status,
+    obj.companyId,
+    obj.endDate,
+    obj.business,
+  ]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -421,7 +551,6 @@ export function useCompanyDebitRequests(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
     };
   }, [customParams]);
 
@@ -453,22 +582,37 @@ export function useCompanyDebitRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status]);
+  }, [obj.date, obj.limit, obj.status]);
 
   return { loading, requests, revalidate, meta };
 }
 
-export function useLiveKeyRequests(id: string = "") {
+export function useLiveKeyRequests(customParams: IParams = {}) {
   const [requests, setRequests] = useState<LiveKeyRequest[]>([]);
   const [meta, setMeta] = useState<Meta>();
   const [loading, setLoading] = useState(true);
 
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.business && { business: customParams.business }),
+    };
+  }, [customParams]);
+
+  const { limit, page, date, endDate, business, status } = obj;
   async function fetchAccounts() {
     setLoading(true);
     try {
-      const filtered = id ? `/${id}` : "";
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
       const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests${filtered}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -489,9 +633,43 @@ export function useLiveKeyRequests(id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, []);
+  }, [limit, page, date, endDate, business, status]);
 
   return { loading, requests, revalidate, meta };
+}
+
+export function useSingleLiveKeyRequests(id: string) {
+  const [requests, setRequests] = useState<LiveKeyRequest>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchAccounts() {
+    setLoading(true);
+    try {
+      const { data: res } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests/${id}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setRequests(res.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchAccounts();
+
+  useEffect(() => {
+    fetchAccounts();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, requests, revalidate };
 }
 
 interface ICompanyRequest extends Omit<IParams, "query"> {}
@@ -509,7 +687,6 @@ export function useCompanyRequests(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
     };
@@ -546,7 +723,7 @@ export function useCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.type, obj.page]);
+  }, [obj.date, obj.limit, obj.status, obj.type, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -587,11 +764,16 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
+
+  const { limit, date, endDate, status, page, accountName } = obj;
 
   async function fetchRequests() {
     const params = new URLSearchParams(
@@ -623,7 +805,7 @@ export function useUserDebitRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.page]);
+  }, [limit, date, endDate, status, page, accountName]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -647,6 +829,7 @@ interface BaseData {
   };
   documentApprovals: Record<string, any>;
   country: string;
+  Account?: Account;
 }
 
 export interface DebitRequest {
@@ -749,6 +932,7 @@ export interface RequestMeta {
   pendingRequests: number;
   inactiveAccounts: number;
   total: number;
+  companyName: string;
 }
 
 export interface PayoutAccount {
@@ -842,4 +1026,24 @@ export interface LiveKeyDirector {
 export interface Document {
   title?: string;
   documentURL?: string;
+}
+
+export interface PayoutTransactionRequest {
+  id: string;
+  beneficiaryFullName: string;
+  destinationIBAN: string;
+  destinationBIC: string;
+  destinationCountry: string;
+  destinationBank: string;
+  reference: string;
+  amount: number;
+  reason: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date | null;
+  status: "PENDING" | "APPROVED" | "REJECTED";
+  PayoutAccount: {
+    accountName: string;
+    accountNumber: string;
+  };
 }

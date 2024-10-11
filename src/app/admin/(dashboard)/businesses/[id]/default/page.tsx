@@ -19,13 +19,40 @@ import {
 } from "@/ui/components/SingleAccount";
 import { Paper } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useParams } from "next/navigation";
-import React, { useState } from "react";
+import dayjs from "dayjs";
+import { useParams, useSearchParams } from "next/navigation";
+import React, { useMemo, useState } from "react";
 
 export default function BusinessDefaultAccount() {
   const params = useParams<{ id: string }>();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
+
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
+
+  const customParams = useMemo(() => {
+    return {
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type: type }),
+      ...(senderName && { senderName: senderName }),
+      ...(recipientName && { recipientName: recipientName }),
+      ...(recipientIban && { recipientIban: recipientIban }),
+      // page: active,
+      // limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
 
   const {
     loading: loadingBiz,
@@ -39,7 +66,7 @@ export default function BusinessDefaultAccount() {
     loading: loadingTrx,
     transactions,
     meta,
-  } = useBusinessTransactions(params.id);
+  } = useBusinessTransactions(params.id, customParams);
   return (
     <main>
       <Breadcrumbs

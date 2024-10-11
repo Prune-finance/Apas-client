@@ -411,7 +411,7 @@ const KeyComponent = ({
         placeholder={
           !view
             ? `${keyString ? keyString.slice(0, 15) : ""}****************`
-            : `${keyString ? keyString.slice(0, 50) : ""}....`
+            : `${keyString}`
         }
       />
     </Box>
@@ -469,15 +469,24 @@ const WebHookComponent = ({
                 {!view ? "View" : "Hide"}
               </Text>
             </UnstyledButton> */}
-
-            <UnstyledButton
-              onClick={() => clipboard.copy(form.values[formKey])}
-              className={styles.input__right__section}
+            <Tooltip
+              label="No web hook found"
+              withArrow
+              disabled={!!form.values[formKey]}
             >
-              <Text fw={600} fz={10} c="#475467">
-                {clipboard.copied ? "Copied" : "Copy"}
-              </Text>
-            </UnstyledButton>
+              <UnstyledButton
+                onClick={() => clipboard.copy(form.values[formKey])}
+                className={styles.input__right__section}
+                style={{
+                  cursor: !form.values[formKey] ? "not-allowed" : "pointer",
+                }}
+                disabled={!form.values[formKey]}
+              >
+                <Text fw={600} fz={10} c="#475467">
+                  {clipboard.copied ? "Copied" : "Copy"}
+                </Text>
+              </UnstyledButton>
+            </Tooltip>
           </Flex>
         }
         placeholder={`Enter ${webHookType}`}

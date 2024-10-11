@@ -7,7 +7,7 @@ import {
 import { SecondaryBtn } from "../../Buttons";
 import InfoCards from "../../Cards/InfoCards";
 import EmptyTable from "../../EmptyTable";
-import { SearchInput } from "../../Inputs";
+import { SearchInput, SelectBox, TextBox } from "../../Inputs";
 import { TableComponent } from "../../Table";
 import { TransactionType } from "@/lib/hooks/transactions";
 import { formatNumber } from "@/lib/utils";
@@ -28,10 +28,14 @@ import {
   PayoutTransactionTableRows,
 } from "../../TableRows";
 import { useState } from "react";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "../../Pagination";
 import { PayoutTransactionDrawer } from "@/app/(dashboard)/payouts/PayoutDrawer";
+import form from "@/app/auth/login/form";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import Filter from "../../Filter";
+import { useForm, zodResolver } from "@mantine/form";
 
 interface Props {
   transactions: TransactionType[];
@@ -46,6 +50,12 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
+  const [openedFilter, { toggle }] = useDisclosure(false);
+
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
+  });
 
   const overviewDetails = [
     {
@@ -78,18 +88,50 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
       <InfoCards title="Overview" details={overviewDetails} />
 
       <Group mt={32} justify="space-between">
-        <SearchInput />
+        <SearchInput search={search} setSearch={setSearch} />
 
         <Group gap={12}>
-          <SecondaryBtn text="Filter" icon={IconListTree} />
-          {/* <SecondaryBtn text="Filter" icon={IconArrowUpRight} /> */}
+          <SecondaryBtn
+            action={toggle}
+            text="Filter"
+            icon={IconListTree}
+            fw={600}
+          />
+
           <SecondaryBtn
             text="Download Statement"
             icon={IconCircleArrowDown}
             style={{ cursor: "not-allowed" }}
+            fw={600}
           />
         </Group>
       </Group>
+
+      <Filter<FilterType>
+        opened={openedFilter}
+        toggle={toggle}
+        form={form}
+        customStatusOption={["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"]}
+      >
+        <TextBox
+          placeholder="Sender Name"
+          {...form.getInputProps("senderName")}
+        />
+        <TextBox
+          placeholder="Beneficiary Name"
+          {...form.getInputProps("recipientName")}
+        />
+        <TextBox
+          placeholder="Beneficiary IBAN"
+          {...form.getInputProps("recipientIban")}
+        />
+        <SelectBox
+          placeholder="Type"
+          {...form.getInputProps("type")}
+          data={["DEBIT", "CREDIT"]}
+          clearable
+        />
+      </Filter>
 
       <TableComponent
         rows={
@@ -146,4 +188,10 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
   );
 };
 
-const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];
+const searchProps = [
+  "senderIban",
+  "recipientIban",
+  "recipientBankAddress",
+  "senderName",
+  "recipientName",
+];

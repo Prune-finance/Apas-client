@@ -38,9 +38,9 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import { useForm, zodResolver } from "@mantine/form";
 import {
-  filterSchema,
+  FilterSchema,
   FilterType,
-  filterValues,
+  FilterValues,
   newAdmin,
   validateNewAdmin,
 } from "@/lib/schema";
@@ -55,7 +55,7 @@ import { TableComponent } from "@/ui/components/Table";
 import MainModalComponent from "./modal";
 import UserDrawer from "./drawer";
 import PaginationComponent from "@/ui/components/Pagination";
-import { SearchInput } from "@/ui/components/Inputs";
+import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { BadgeComponent } from "@/ui/components/Badge";
@@ -67,20 +67,26 @@ function Users() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { status, createdAt, sort } = Object.fromEntries(
+  const { status, date, endDate, email } = Object.fromEntries(
     searchParams.entries()
   );
 
   const router = useRouter();
-  const { loading, users, revalidate, meta } = useUsers({
-    ...(!limit || isNaN(Number(limit))
-      ? { limit: 10 }
-      : { limit: parseInt(limit, 10) }),
-    ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(sort && { sort: sort.toLowerCase() }),
+
+  const queryParams = {
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(status && {
+      status:
+        status.toLowerCase() === "pending"
+          ? "INVITE_PENDING"
+          : status.toUpperCase(),
+    }),
+    ...(email && { email }),
     page: active,
-  });
+    limit: parseInt(limit ?? "10", 10),
+  };
+  const { loading, users, revalidate, meta } = useUsers(queryParams);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -105,8 +111,8 @@ function Users() {
   });
 
   const filterForm = useForm<FilterType>({
-    initialValues: filterValues,
-    validate: zodResolver(filterSchema),
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const addAdmin = async () => {
@@ -319,7 +325,12 @@ function Users() {
           <SearchInput search={search} setSearch={setSearch} />
 
           <Group gap={12}>
-            <SecondaryBtn text="Filter" icon={IconListTree} action={toggle} />
+            <SecondaryBtn
+              text="Filter"
+              icon={IconListTree}
+              action={toggle}
+              fw={600}
+            />
 
             <PrimaryBtn
               text="Invite New User"
@@ -336,7 +347,10 @@ function Users() {
           opened={openedFilter}
           toggle={toggle}
           form={filterForm}
-        />
+          customStatusOption={["Active", "Inactive", "Pending"]}
+        >
+          <TextBox placeholder="Email" {...filterForm.getInputProps("email")} />
+        </Filter>
 
         <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 

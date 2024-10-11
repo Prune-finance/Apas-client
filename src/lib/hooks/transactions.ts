@@ -2,14 +2,8 @@ import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { BusinessData } from "./businesses";
-
-interface IParams {
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  sort?: string;
-  page?: number;
-}
+import { IParams } from "../schema";
+import { custom } from "zod";
 
 export function useTransactions(id: string = "", customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
@@ -20,9 +14,17 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -55,7 +57,11 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     customParams.date,
     customParams.limit,
     customParams.status,
-    customParams.sort,
+    customParams.endDate,
+    customParams.type,
+    customParams.senderName,
+    customParams.recipientName,
+    customParams.recipientIban,
     customParams.page,
   ]);
 
@@ -75,7 +81,6 @@ export function useSingleTransactions(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
     };
 
@@ -124,7 +129,6 @@ export function useSingleCompanyTransactions(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
     };
 
@@ -171,9 +175,17 @@ export function useBusinessTransactions(
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -206,7 +218,11 @@ export function useBusinessTransactions(
     customParams.date,
     customParams.limit,
     customParams.status,
-    customParams.sort,
+    customParams.endDate,
+    customParams.type,
+    customParams.senderName,
+    customParams.recipientName,
+    customParams.recipientIban,
     customParams.page,
   ]);
 
@@ -223,7 +239,6 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
     };
 
@@ -258,7 +273,6 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
     customParams.date,
     customParams.limit,
     customParams.status,
-    customParams.sort,
     customParams.page,
   ]);
 
@@ -270,17 +284,45 @@ export function usePayoutTransactions(customParams: IParams = {}) {
   const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function fetchTrx() {
-    const queryParams = {
+  const obj = useMemo(() => {
+    return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.not && { not: customParams.not }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
     };
+  }, [customParams]);
 
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  } = obj;
+
+  async function fetchTrx() {
     // {{account-srv}}/v1/admin/accounts/payout/trx
-    const params = new URLSearchParams(queryParams as Record<string, string>);
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
     try {
       setLoading(true);
 
@@ -307,11 +349,16 @@ export function usePayoutTransactions(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.date,
-    customParams.limit,
-    customParams.status,
-    customParams.sort,
-    customParams.page,
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
   ]);
 
   return { loading, transactions, meta, revalidate };
@@ -341,11 +388,32 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
     };
   }, [customParams]);
+
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+  } = obj;
 
   async function fetchTrx() {
     setLoading(true);
@@ -377,7 +445,18 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [id]);
+  }, [
+    id,
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+  ]);
 
   return { loading, transactions, meta, revalidate };
 }
@@ -390,9 +469,158 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+    };
+  }, [customParams]);
+
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+  } = obj;
+
+  async function fetchTrx() {
+    setLoading(true);
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/company/transactions?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [limit, page, date, endDate, status, type, recipientIban, recipientName]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
+export function useUserPayoutTransactions(customParams: ITrx = {}) {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.not && { not: customParams.not }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+    };
+  }, [customParams]);
+
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  } = obj;
+  async function fetchTrx() {
+    setLoading(true);
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
+    // {{payout-srv}}/v1/payout/transactions
+
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  ]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
+export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.status && { status: customParams.status }),
     };
   }, [customParams]);
 
@@ -404,7 +632,7 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
 
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/company/transactions?${params}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/number/${iban}/transactions?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -443,7 +671,6 @@ export function useUserTransactionsByIBAN(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
     };
   }, [customParams]);
 
@@ -505,6 +732,7 @@ export interface Meta {
   out: number;
   total: number;
   in: number;
+  totalAmount: number;
 }
 
 export interface TransactionType {
@@ -520,7 +748,7 @@ export interface TransactionType {
   amount: number;
   reference: string;
   centrolinkRef: string;
-  status: "PENDING" | "COMPLETED" | "REJECTED" | "CANCELLED";
+  status: "PENDING" | "CONFIRMED" | "REJECTED" | "CANCELLED";
   createdAt: Date;
   updatedAt: Date;
   destinationFirstName: string;

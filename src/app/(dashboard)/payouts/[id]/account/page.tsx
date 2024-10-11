@@ -2,7 +2,11 @@
 
 import { useUserDefaultPayoutAccount } from "@/lib/hooks/accounts";
 import { useUserBusiness } from "@/lib/hooks/businesses";
-import { TransactionType, useUserTransactions } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  useUserPayoutTransactions,
+  useUserTransactions,
+} from "@/lib/hooks/transactions";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import {
   DefaultAccountHead,
@@ -10,18 +14,47 @@ import {
 } from "@/ui/components/SingleAccount";
 import { Space } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { useParams } from "next/navigation";
-import { useState } from "react";
+import dayjs from "dayjs";
+import { useParams, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 
 export default function SingleUserPayoutAccount() {
   const params = useParams<{ id: string }>();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
+
+  const searchParams = useSearchParams();
+
+  const {
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
+
+  const param = useMemo(() => {
+    return {
+      ...(status && { status: status.toUpperCase() }),
+      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+      ...(type && { type: type }),
+      ...(senderName && { senderName: senderName }),
+      ...(recipientName && { recipientName: recipientName }),
+      ...(recipientIban && { recipientIban: recipientIban }),
+      // page: active,
+      // limit: parseInt(limit ?? "10", 10),
+    };
+  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+
   const { loading, account } = useUserDefaultPayoutAccount();
 
   const { business, loading: loadingBiz } = useUserBusiness();
 
-  const { transactions, loading: trxLoading } = useUserTransactions();
+  const { transactions, loading: trxLoading } =
+    useUserPayoutTransactions(param);
   // const { transactions, loading: trxLoading } = useUserTransactions(params.id);
 
   return (

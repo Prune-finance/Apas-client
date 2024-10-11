@@ -36,23 +36,32 @@ import {
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
 import { useRef, useState } from "react";
-import { handlePdfDownload } from "@/lib/actions/auth";
+import { handlePdfDownload, parseError } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import Transaction from "@/lib/store/transaction";
 import { InquiryModal } from "./InquiryModal";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
+import useNotification from "@/lib/hooks/notification";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { notifications } from "@mantine/notifications";
 
 interface TransactionDrawerProps {
-  data: TransactionType | null;
-  close: () => void;
-  opened: boolean;
+  revalidate?: () => void;
 }
 
-export const PayoutTransactionDrawer = () => {
+interface PayoutTransactionDrawer {
+  isAdmin?: boolean;
+  revalidate?: () => void;
+}
+export const PayoutTransactionDrawer = ({
+  revalidate,
+  isAdmin,
+}: PayoutTransactionDrawer) => {
   const pdfRef = useRef<HTMLDivElement>(null);
-  const { data, close, opened, clearData } = Transaction();
+  const { data, close, opened, setData } = Transaction();
   const [openedModal, { open, close: closeModal }] = useDisclosure(false);
   const [openedCancel, { open: openCancel, close: closeCancel }] =
     useDisclosure(false);
@@ -62,6 +71,8 @@ export const PayoutTransactionDrawer = () => {
   >();
   const [cancelReason, setCancelReason] = useState("");
   const [processing, setProcessing] = useState(false);
+
+  const { handleError, handleSuccess, handleInfo } = useNotification();
 
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     data?.id ?? ""
@@ -80,7 +91,7 @@ export const PayoutTransactionDrawer = () => {
       transaction?.company?.name ?? defaultTransaction?.company?.name ?? "N/A",
     "Account Type": "Payout Account",
     IBAN: data?.recipientIban,
-    BIC: data?.recipientBic,
+    BIC: "ARPYGB21XXX",
   };
 
   const beneficiaryDetails = {
@@ -158,6 +169,37 @@ export const PayoutTransactionDrawer = () => {
     return diff > 24;
   };
 
+  const handleCancel = async () => {
+    notifications.clean();
+    if (!cancelReason)
+      return handleInfo(
+        "Payout Transaction Cancellation Failed",
+        "Please enter a reason for cancelling this payout transaction."
+      );
+    setProcessing(true);
+    try {
+      const { data: res } = await axios.patch(
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions/${data?.id}/cancel`,
+        { reason: cancelReason },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      revalidate && revalidate();
+
+      handleSuccess(
+        "Payout Transaction Cancelled",
+        "You have successfully cancelled the transaction."
+      );
+
+      setData(res.data);
+      closeCancel();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <Drawer
       opened={opened}
@@ -177,8 +219,15 @@ export const PayoutTransactionDrawer = () => {
       padding={0}
     >
       <Divider mb={20} />
-      <Box px={28} pb={28}>
-        <ScrollArea h="calc(100vh - 145px)" scrollbars="y" scrollbarSize={1}>
+      <Flex direction="column" pl={28} pb={20} h="calc(100vh - 90px)">
+        <ScrollArea
+          // h="calc(100vh - 145px)"
+          h="100%"
+          flex={1}
+          scrollbars="y"
+          scrollbarSize={1}
+          pr={28}
+        >
           {data?.status === "CANCELLED" && (
             <Alert
               title="This transaction has been  cancelled. The money has been reverted"
@@ -320,66 +369,85 @@ export const PayoutTransactionDrawer = () => {
           <Divider mt={30} mb={20} />
         </ScrollArea>
 
-        <Flex wrap="nowrap" gap={10} justify="space-between">
-          {data && isAfter24Hours(data?.createdAt) && (
-            <>
-              <SecondaryBtn
-                text="Query"
-                icon={IconReportSearch}
-                action={() => {
-                  setInquiryType("query");
-                  open();
-                }}
-              />
+        {!isAdmin && (
+          <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
+            {data &&
+              (isAfter24Hours(data?.createdAt) ||
+                data.status === "PENDING") && (
+                <>
+                  <SecondaryBtn
+                    text="Query"
+                    icon={IconReportSearch}
+                    action={() => {
+                      setInquiryType("query");
+                      open();
+                    }}
+                  />
 
-              <SecondaryBtn
-                text="Run Trace"
-                icon={IconReportSearch}
-                action={() => {
-                  setInquiryType("trace");
-                  open();
-                }}
-              />
+                  <SecondaryBtn
+                    text="Run Trace"
+                    icon={IconReportSearch}
+                    action={() => {
+                      setInquiryType("trace");
+                      open();
+                    }}
+                  />
 
-              <SecondaryBtn
-                text="Recall"
-                icon={IconReload}
-                action={() => {
-                  setInquiryType("recall");
-                  open();
-                }}
-              />
-            </>
-          )}
+                  <SecondaryBtn
+                    text="Recall"
+                    icon={IconReload}
+                    action={() => {
+                      setInquiryType("recall");
+                      open();
+                    }}
+                  />
+                </>
+              )}
 
-          {data?.status === "PENDING" ? (
-            <PrimaryBtn
-              icon={IconX}
-              text="Cancel"
-              color="#D92D20"
-              c="#fff"
-              fw={600}
-              action={openCancel}
-            />
-          ) : (
-            <PrimaryBtn
-              icon={IconCircleArrowDown}
-              text={`Download ${
-                !isAfter24Hours(data?.createdAt ?? new Date()) ? "Receipt" : ""
-              }`}
-              fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
-              fw={600}
-              action={() => handlePdfDownload(pdfRef)}
-            />
-          )}
-        </Flex>
-      </Box>
+            {data?.status === "PENDING" ? (
+              <PrimaryBtn
+                icon={IconX}
+                text="Cancel"
+                color="#D92D20"
+                c="#fff"
+                fw={600}
+                action={openCancel}
+              />
+            ) : (
+              <PrimaryBtn
+                icon={IconCircleArrowDown}
+                text={`Download ${
+                  !isAfter24Hours(data?.createdAt ?? new Date())
+                    ? "Receipt"
+                    : ""
+                }`}
+                fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
+                fw={600}
+                action={() => handlePdfDownload(pdfRef)}
+              />
+            )}
+          </Flex>
+        )}
+
+        {isAdmin && (
+          <PrimaryBtn
+            icon={IconCircleArrowDown}
+            text={`Download ${
+              !isAfter24Hours(data?.createdAt ?? new Date()) ? "Receipt" : ""
+            }`}
+            fullWidth
+            fw={600}
+            action={() => handlePdfDownload(pdfRef)}
+          />
+        )}
+      </Flex>
 
       <InquiryModal
         pruneRef={data?.centrolinkRef ?? ""}
         opened={openedModal}
         close={closeModal}
         type={inquiryType}
+        trxId={data?.id ?? ""}
       />
 
       <ModalComponent
@@ -390,7 +458,7 @@ export const PayoutTransactionDrawer = () => {
         addReason
         setReason={setCancelReason}
         reason={cancelReason}
-        action={() => {}}
+        action={() => handleCancel()}
         icon={<IconX color="#D92D20" />}
         color="#FEF3F2"
         processing={processing}

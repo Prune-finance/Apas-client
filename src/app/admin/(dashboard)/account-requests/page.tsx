@@ -14,7 +14,7 @@ import {
   MenuTarget,
   Select,
 } from "@mantine/core";
-import { Button, TextInput } from "@mantine/core";
+
 import { UnstyledButton, rem, Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
@@ -32,7 +32,6 @@ import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 import { useRequests } from "@/lib/hooks/requests";
 
 // UI Imports
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
@@ -40,14 +39,8 @@ import styles from "@/ui/styles/accounts.module.scss";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  AccountFilterType,
-  accountFilterValues,
-  accountFilterSchema,
-} from "./schema";
 import { Suspense, useState } from "react";
 import { filteredSearch } from "@/lib/search";
-import { activeBadgeColor } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
@@ -56,18 +49,15 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  const {
-    rows: _limit = "10",
-    status,
-    createdAt,
-    sort,
-    type,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, createdAt, sort, type } = Object.fromEntries(
+    searchParams.entries()
+  );
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("100");
@@ -157,62 +147,13 @@ function AccountRequests() {
     );
   };
 
-  // const handleRowClick = (id: string) => {
-  //   push(`/admin/account-requests/${id}`);
-  // };
-
-  // const rows = filteredSearch(
-  //   requests,
-  //   ["firstName", "lastName", "Company.name"],
-  //   debouncedSearch
-  // ).map((element, index) => (
-  //   <TableTr
-  //     key={index}
-  //     onClick={() => handleRowClick(element.id)}
-  //     style={{ cursor: "pointer" }}
-  //   >
-  //     <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
-  //     <TableTd className={styles.table__td}>{20}</TableTd>
-  //     <TableTd
-  //       tt="lowercase"
-  //       // className={styles.table__td}
-  //     >{`${element.firstName}${element.lastName}.example.com`}</TableTd>
-  //     {/* <TableTd className={styles.table__td} tt="capitalize">
-  //       {element.accountType.toLowerCase()}
-  //     </TableTd>
-  //     <TableTd className={`${styles.table__td}`}>
-  //       {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-  //     </TableTd> */}
-  //     <TableTd className={styles.table__td}>
-  //       <Badge
-  //         tt="capitalize"
-  //         variant="light"
-  //         color={approvedBadgeColor(element.status)}
-  //         w={82}
-  //         h={24}
-  //         fw={400}
-  //         fz={12}
-  //       >
-  //         {element.status.toLowerCase()}
-  //       </Badge>
-  //     </TableTd>
-
-  //     {/* <TableTd
-  //       className={`${styles.table__td}`}
-  //       onClick={(e) => e.stopPropagation()}
-  //     >
-  //       <MenuComponent id={element.id} />
-  //     </TableTd> */}
-  //   </TableTr>
-  // ));
-
   const handleRowClick = (id: string) => {
     push(`/admin/account-requests/${id}`);
   };
 
   const rows = filteredSearch(
     businesses.filter((biz) => Boolean(biz._count.AccountRequests)),
-    ["name", "legalEntity"],
+    ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -256,9 +197,9 @@ function AccountRequests() {
     </TableTr>
   ));
 
-  const form = useForm<AccountFilterType>({
-    initialValues: accountFilterValues,
-    validate: zodResolver(accountFilterSchema),
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   return (
@@ -285,21 +226,18 @@ function AccountRequests() {
         >
           <SearchInput search={search} setSearch={setSearch} />
 
-          <Group gap={12}>
+          {/* <Group gap={12}>
             <SecondaryBtn text="Filter" icon={IconListTree} action={toggle} />
-          </Group>
+          </Group> */}
         </Group>
 
-        <Filter<AccountFilterType> opened={opened} form={form} toggle={toggle}>
-          <Select
-            placeholder="Type"
-            data={["Corporate", "User"]}
-            {...form.getInputProps("type")}
-            size="xs"
-            w={120}
-            h={36}
-          />
-        </Filter>
+        <Filter<FilterType>
+          opened={opened}
+          form={form}
+          toggle={toggle}
+          noDate
+          isStatus
+        ></Filter>
 
         <TableComponent
           head={tableHeaders}

@@ -5,9 +5,10 @@ import { TextInputWithFile } from "../../TextInputWithFile";
 
 interface Props {
   account: Account | null;
+  admin?: boolean;
 }
 
-export const Documents = ({ account }: Props) => {
+export const Documents = ({ account, admin = false }: Props) => {
   return (
     <Box>
       {account?.type === "USER" && (
@@ -17,6 +18,7 @@ export const Documents = ({ account }: Props) => {
               url={account.accountDocuments.idFileURL}
               placeholder={account.accountDocuments.idType}
               label="Identity Type"
+              admin={admin}
             />
             <TextInputWithFile
               url={account.accountDocuments.poaFileURL}
@@ -24,6 +26,7 @@ export const Documents = ({ account }: Props) => {
                 account.accountDocuments.poaType ?? ""
               )}
               label="Proof of Address"
+              admin={admin}
             />
           </SimpleGrid>
         </Paper>
@@ -52,11 +55,13 @@ export const Documents = ({ account }: Props) => {
                       url={director.idFile}
                       placeholder={camelCaseToTitleCase(director.idType ?? "")}
                       label={"Identity Type"}
+                      admin={admin}
                     />
                     <TextInputWithFile
                       url={director.poaFile}
                       placeholder={camelCaseToTitleCase(director.poaType ?? "")}
                       label={"Proof of Address"}
+                      admin={admin}
                     />
                   </SimpleGrid>
                 </Box>
@@ -89,11 +94,13 @@ export const Documents = ({ account }: Props) => {
                       url={director.idFile}
                       placeholder={camelCaseToTitleCase(director.idType ?? "")}
                       label={"Identity Type"}
+                      admin={admin}
                     />
                     <TextInputWithFile
                       url={director.poaFile}
                       placeholder={camelCaseToTitleCase(director.poaType ?? "")}
                       label={"Proof of Address"}
+                      admin={admin}
                     />
                   </SimpleGrid>
                 </Box>

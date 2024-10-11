@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { BusinessData } from "./businesses";
 import { IParams } from "../schema";
+import { custom } from "zod";
 
 export function useTransactions(id: string = "", customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
@@ -13,9 +14,17 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -48,7 +57,11 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     customParams.date,
     customParams.limit,
     customParams.status,
-
+    customParams.endDate,
+    customParams.type,
+    customParams.senderName,
+    customParams.recipientName,
+    customParams.recipientIban,
     customParams.page,
   ]);
 
@@ -162,8 +175,17 @@ export function useBusinessTransactions(
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -196,7 +218,11 @@ export function useBusinessTransactions(
     customParams.date,
     customParams.limit,
     customParams.status,
-
+    customParams.endDate,
+    customParams.type,
+    customParams.senderName,
+    customParams.recipientName,
+    customParams.recipientIban,
     customParams.page,
   ]);
 
@@ -247,7 +273,6 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
     customParams.date,
     customParams.limit,
     customParams.status,
-
     customParams.page,
   ]);
 
@@ -259,16 +284,45 @@ export function usePayoutTransactions(customParams: IParams = {}) {
   const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function fetchTrx() {
-    const queryParams = {
+  const obj = useMemo(() => {
+    return {
       ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.not && { not: customParams.not }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
     };
+  }, [customParams]);
 
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  } = obj;
+
+  async function fetchTrx() {
     // {{account-srv}}/v1/admin/accounts/payout/trx
-    const params = new URLSearchParams(queryParams as Record<string, string>);
+    const params = new URLSearchParams(
+      obj as Record<string, string>
+    ).toString();
+
     try {
       setLoading(true);
 
@@ -295,11 +349,16 @@ export function usePayoutTransactions(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.date,
-    customParams.limit,
-    customParams.status,
-
-    customParams.page,
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
   ]);
 
   return { loading, transactions, meta, revalidate };
@@ -477,6 +536,7 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.not && { not: customParams.not }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
@@ -502,6 +562,7 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
     recipientIban,
     recipientName,
     senderName,
+    not,
   } = obj;
   async function fetchTrx() {
     setLoading(true);
@@ -544,6 +605,7 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
     recipientIban,
     recipientName,
     senderName,
+    not,
   ]);
 
   return { loading, transactions, meta, revalidate };

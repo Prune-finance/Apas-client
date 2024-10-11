@@ -273,17 +273,20 @@ function Reactivate() {
 
   return (
     <Fragment>
-      <Group mt={32} justify="space-between">
+      <Group mt={32} justify="space-between" align="center">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <Group>
-          <Select
-            placeholder="Type"
+        <Flex align="center" gap={20}>
+          <SelectBox
             data={["All", "Freeze", "Unfreeze", "Activate", "Deactivate"]}
-            w={120}
-            styles={{ option: { fontSize: 12 }, input: { fontSize: 12 } }}
+            placeholder="Type"
             value={type}
             onChange={(e) => setType(e)}
+            clearable
+            styles={{
+              input: { height: rem(36), fontSize: 12 },
+              option: { fontSize: 12 },
+            }}
           />
           <SecondaryBtn
             icon={IconListTree}
@@ -291,7 +294,7 @@ function Reactivate() {
             text="Filter"
             fw={600}
           />
-        </Group>
+        </Flex>
       </Group>
 
       <Filter<FilterType>

@@ -1,40 +1,20 @@
 import Cookies from "js-cookie";
 
-import {
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  UnstyledButton,
-  rem,
-  Badge,
-  TableTd,
-  TableTr,
-  TabsPanel,
-  SimpleGrid,
-  Switch,
-} from "@mantine/core";
-import { IconBrandLinktree, IconDots, IconEye } from "@tabler/icons-react";
-import Link from "next/link";
+import { Badge, TableTd, TableTr, TabsPanel, SimpleGrid } from "@mantine/core";
 import localFont from "next/font/local";
 import axios from "axios";
 import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import {
   AccountData,
   useBusinessDefaultAccount,
   useBusinessPayoutAccount,
 } from "@/lib/hooks/accounts";
 
-import {
-  activeBadgeColor,
-  formatNumber,
-  getUserType,
-  serialNumber,
-} from "@/lib/utils";
+import { activeBadgeColor, getUserType, serialNumber } from "@/lib/utils";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
@@ -240,9 +220,9 @@ export default function Accounts({
               badgeText="Payout Account"
               link={`/admin/businesses/${params.id}/payout`}
               business
-              disable
+              // disable
             >
-              <Switch
+              {/* <Switch
                 readOnly
                 label="Disabled"
                 onChange={() => {}}
@@ -254,7 +234,7 @@ export default function Accounts({
                 styles={{ label: { fontSize: "10px" } }}
                 size="xs"
                 labelPosition="left"
-              />
+              /> */}
             </AccountCard>
           )}
         </SimpleGrid>
@@ -295,47 +275,3 @@ const tableHead = [
   // "Transactions",
   "Status",
 ];
-
-const MenuComponent = (props: any) => {
-  return (
-    <Menu shadow="md" width={150}>
-      <MenuTarget>
-        <UnstyledButton>
-          <IconDots size={17} />
-        </UnstyledButton>
-      </MenuTarget>
-
-      <MenuDropdown>
-        <Link
-          href={`/admin/businesses/accounts/${props.data["ACCOUNT NUMBER"]}`}
-        >
-          <MenuItem
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye
-                color="#667085"
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-          >
-            View
-          </MenuItem>
-        </Link>
-
-        <MenuItem
-          fz={10}
-          c="#667085"
-          leftSection={
-            <IconBrandLinktree
-              color="#667085"
-              style={{ width: rem(14), height: rem(14) }}
-            />
-          }
-        >
-          Freeze
-        </MenuItem>
-      </MenuDropdown>
-    </Menu>
-  );
-};

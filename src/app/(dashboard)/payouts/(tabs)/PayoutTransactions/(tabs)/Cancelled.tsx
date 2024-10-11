@@ -1,7 +1,6 @@
 "use client";
 
-import { PayoutTransactionDrawer } from "@/app/(dashboard)/payouts/PayoutDrawer";
-import { usePayoutTransactions } from "@/lib/hooks/transactions";
+import { useUserPayoutTransactions } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 import { PayoutTableHeaders } from "@/lib/static";
@@ -23,16 +22,17 @@ import { useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
 import { useMemo, useState } from "react";
+import { PayoutTransactionDrawer } from "../../../PayoutDrawer";
 
 export const CancelledPayoutTransactions = () => {
   const [search, setSearch] = useState("");
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
 
-  const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
   const searchParams = useSearchParams();
 
   const { date, endDate, type, senderName, recipientName, recipientIban } =
@@ -51,8 +51,10 @@ export const CancelledPayoutTransactions = () => {
       limit: parseInt(limit ?? "10", 10),
     };
   }, [date, endDate, type, senderName, recipientName, recipientIban]);
-  const { transactions, loading, meta, revalidate } =
-    usePayoutTransactions(param);
+  // const { transactions, loading, meta, revalidate } = usePayoutTransactions();
+
+  const { transactions, revalidate, loading, meta } =
+    useUserPayoutTransactions(param);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,

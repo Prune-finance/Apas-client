@@ -491,6 +491,8 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.business && { business: customParams.business }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
     };
@@ -524,7 +526,14 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status, obj.companyId]);
+  }, [
+    obj.date,
+    obj.limit,
+    obj.status,
+    obj.companyId,
+    obj.endDate,
+    obj.business,
+  ]);
 
   return { loading, requests, revalidate, meta };
 }

@@ -111,7 +111,7 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         opened={openedFilter}
         toggle={toggle}
         form={form}
-        customStatusOption={["PENDING", "COMPLETED", "REJECTED", "CANCELLED"]}
+        customStatusOption={["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"]}
       >
         <TextBox
           placeholder="Sender Name"

@@ -304,7 +304,7 @@ export const PayoutTrxReqTableRows = ({
             status: element.status as unknown as
               | "PENDING"
               | "REJECTED"
-              | "COMPLETED"
+              | "CONFIRMED"
               | "CANCELLED",
           });
         }}

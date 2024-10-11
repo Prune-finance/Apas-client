@@ -86,7 +86,7 @@ export const AllPayoutTransactions = () => {
         opened={opened}
         toggle={toggle}
         form={form}
-        customStatusOption={["PENDING", "COMPLETED", "REJECTED"]}
+        customStatusOption={["PENDING", "CONFIRMED", "REJECTED"]}
       >
         <TextBox
           placeholder="Sender Name"

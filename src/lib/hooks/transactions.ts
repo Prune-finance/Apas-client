@@ -748,7 +748,7 @@ export interface TransactionType {
   amount: number;
   reference: string;
   centrolinkRef: string;
-  status: "PENDING" | "COMPLETED" | "REJECTED" | "CANCELLED";
+  status: "PENDING" | "CONFIRMED" | "REJECTED" | "CANCELLED";
   createdAt: Date;
   updatedAt: Date;
   destinationFirstName: string;

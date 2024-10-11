@@ -151,7 +151,7 @@ function TransactionForAccount() {
     },
   ];
 
-  const customStatusOption = ["PENDING", "COMPLETED", "REJECTED", "CANCELLED"];
+  const customStatusOption = ["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"];
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,

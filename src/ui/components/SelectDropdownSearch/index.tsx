@@ -245,7 +245,7 @@ export function SelectCountryDialCode({ value, setValue }: Props) {
         <Combobox.Search
           value={search}
           onChange={(event) => setSearch(event.currentTarget.value)}
-          placeholder="Search groceries"
+          placeholder="Search country code"
         />
 
         <ScrollArea.Autosize type="scroll" mah={200}>

@@ -51,7 +51,7 @@ export const IssuedAccountsTab = () => {
     limit: parseInt(limit ?? "10", 10),
   };
 
-  const { transactions, revalidate, loading } = useUserTransactions(
+  const { transactions, revalidate, loading, meta } = useUserTransactions(
     undefined,
     queryParams
   );
@@ -69,36 +69,25 @@ export const IssuedAccountsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value:
-        transactions.reduce(
-          (prv, curr) =>
-            curr.type === "CREDIT" ? prv + curr.amount : prv - curr.amount,
-          0
-        ) || 0,
+      value: (meta?.in || 0) - (meta?.out || 0),
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money In",
-      value:
-        transactions
-          .filter((trx) => trx.type === "CREDIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value:
-        transactions
-          .filter((trx) => trx.type === "DEBIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: transactions?.length,
     },
   ];
 

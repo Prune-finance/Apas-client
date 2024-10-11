@@ -50,7 +50,7 @@ export const PayoutsTab = () => {
     limit: parseInt(limit ?? "10", 10),
   };
 
-  const { transactions, revalidate, loading } =
+  const { transactions, revalidate, loading, meta } =
     useUserPayoutTransactions(queryParams);
 
   const [opened, { toggle }] = useDisclosure(false);
@@ -66,25 +66,25 @@ export const PayoutsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: 0,
+      value: (meta?.in || 0) - (meta?.out || 0),
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money In",
-      value: 0,
+      value: meta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value: 0,
+      value: meta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: [].length,
+      value: transactions?.length,
     },
   ];
 

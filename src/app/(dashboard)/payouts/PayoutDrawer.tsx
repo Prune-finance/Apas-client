@@ -78,8 +78,6 @@ export const PayoutTransactionDrawer = ({
     data?.id ?? ""
   );
 
-  console.log(transaction);
-
   const {
     transaction: defaultTransaction,
     loading: loadingDefaultTransaction,
@@ -194,6 +192,7 @@ export const PayoutTransactionDrawer = ({
       );
 
       setData(res.data);
+      closeCancel();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {

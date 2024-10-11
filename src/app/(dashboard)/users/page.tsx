@@ -199,7 +199,14 @@ function Users() {
         onClick={() => handleRowClick(element)}
         style={{ cursor: "pointer" }}
       >
-        <TableTd className={styles.table__td}>{element.email}</TableTd>
+        <TableTd
+          className={styles.table__td}
+          tt="lowercase"
+          style={{ wordBreak: "break-word" }}
+          w="20%"
+        >
+          {element.email}
+        </TableTd>
         <TableTd className={`${styles.table__td}`}>
           {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
         </TableTd>
@@ -352,7 +359,12 @@ function Users() {
           <TextBox placeholder="Email" {...filterForm.getInputProps("email")} />
         </Filter>
 
-        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+        <TableComponent
+          head={tableHeaders}
+          rows={rows}
+          loading={loading}
+          layout="auto"
+        />
 
         <EmptyTable
           rows={rows}

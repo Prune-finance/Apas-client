@@ -104,7 +104,7 @@ export default function Filter<T>({
 
         <SecondaryBtn icon={IconX} action={toggle} text="Close" p={10} />
       </Group>
-      <Group gap={12} align="center" h={40}>
+      <Flex gap={12} align="center" mih={40} wrap="wrap">
         {children}
 
         {!noDate && (
@@ -178,7 +178,7 @@ export default function Filter<T>({
             Clear
           </Button>
         </Flex>
-      </Group>
+      </Flex>
     </Collapse>
   );
 }

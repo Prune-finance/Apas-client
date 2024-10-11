@@ -51,7 +51,7 @@ export default function RenderPdf({ pdfUrl }: { pdfUrl: string }) {
           <IconMinus />
         </ThemeIcon>
       </Flex>
-      <ScrollArea h="calc(100vh - 200px)" p={10} bg="dark.3">
+      <ScrollArea h="calc(100vh - 250px)" p={10} bg="dark.3">
         <Document
           // file={"https://s3.amazonaws.com/re.current/1721346312%20%281%29.pdf"}
           file={pdfUrl}

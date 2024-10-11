@@ -30,7 +30,7 @@ export const BusinessTransactionTableRows = ({
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
-    filteredSearch(data.reverse(), searchProps, search),
+    filteredSearch(data, searchProps, search),
     active,
     parseInt(limit ?? "10", 10)
   ).map((element) => (
@@ -98,7 +98,7 @@ export const IssuedTransactionTableRows = ({
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
-    filteredSearch(data.reverse(), searchProps, search),
+    filteredSearch(data, searchProps, search),
     active,
     parseInt(limit ?? "10", 10)
   ).map((element) => (
@@ -178,7 +178,7 @@ export const PayoutTransactionTableRows = ({
 }) => {
   const { open, setData } = Transaction();
   return frontendPagination(
-    filteredSearch(data.reverse(), searchProps, search),
+    filteredSearch(data, searchProps, search),
     active,
     parseInt(limit ?? "10", 10)
   ).map((element) => (
@@ -275,7 +275,7 @@ export const PayoutTrxReqTableRows = ({
   searchProps: string[];
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data.toReversed(), searchProps, search).map(
+  return filteredSearch(data, searchProps, search).map(
     (element: PayoutTransactionRequest) => (
       <TableTr
         key={element.id}

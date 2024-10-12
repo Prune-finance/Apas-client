@@ -134,6 +134,7 @@ export const TransactionDrawer = ({
     ),
     Reference: selectedRequest?.reference ?? "N/A",
     "C-L Reference": selectedRequest?.id ?? "",
+    "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
   const details: ReceiptDetails[] = [
     {

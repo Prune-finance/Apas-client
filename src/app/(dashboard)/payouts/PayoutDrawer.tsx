@@ -151,6 +151,7 @@ export const PayoutTransactionDrawer = ({
     "Payment Date": dayjs(data?.createdAt).format("hh:mm A Do MMM YYYY"),
     Reference: data?.reference ?? "N/A",
     "C-L Reference": data?.id ?? "",
+    "Status:": <BadgeComponent status={data?.status ?? ""} />,
   };
   const details: ReceiptDetails[] = [
     {

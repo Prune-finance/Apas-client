@@ -17,4 +17,11 @@ export default function PayoutRequests() {
   );
 }
 
+export const PayoutReqSearchProps = [
+  "beneficiaryFullName",
+  "destinationIBAN",
+  "PayoutAccount.accountNumber",
+  "destinationBank",
+  "reference",
+];
 const tabs = [{ value: "All" }, { value: "Pending" }];

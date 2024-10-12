@@ -266,7 +266,7 @@ export const AccountRequestsDrawer = ({
                     <TextInputWithFile
                       label="Certificate of Incorporation"
                       placeholder="Certificate of Incorporation"
-                      url={selectedRequest.documentData.certOfInc}
+                      url={selectedRequest?.documentData?.certOfInc}
                       path="certOfInc"
                       request={selectedRequest}
                       revalidate={revalidate}
@@ -282,7 +282,7 @@ export const AccountRequestsDrawer = ({
                     <TextInputWithFile
                       label="Mermat"
                       placeholder="Mermat"
-                      url={selectedRequest.documentData.mermat}
+                      url={selectedRequest?.documentData?.mermat}
                       path={`mermat`}
                       request={selectedRequest}
                       revalidate={revalidate}
@@ -647,7 +647,8 @@ export const TextInputWithFile = ({
                 )}
               </FileButton>
             </Flex>
-          ) : getNestedDocValue(request.documentApprovals, path) === false ? (
+          ) : request.documentApprovals &&
+            getNestedDocValue(request?.documentApprovals, path) === false ? (
             <FileButton
               disabled={processing}
               onChange={(file) => handleUpload(file)}

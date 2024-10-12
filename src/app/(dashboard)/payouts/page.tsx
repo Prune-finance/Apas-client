@@ -22,6 +22,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { LiveDateModal } from "../settings/LiveDateModal";
 import { AlertStore } from "@/lib/store/alert";
 import { PayoutTransactions } from "./(tabs)/PayoutTransactions";
+import PayoutRequests from "./(tabs)/Requests";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
@@ -187,6 +188,10 @@ function PayoutTrx() {
         <TabsPanel value={tabs[2].value}>
           <InquiriesTab />
         </TabsPanel>
+
+        <TabsPanel value={tabs[3].value}>
+          <PayoutRequests />
+        </TabsPanel>
       </TabsComponent>
 
       <LiveDateModal
@@ -213,4 +218,5 @@ const tabs = [
   { value: "Account" },
   { value: "Transactions" },
   { value: "Inquiries" },
+  { value: "Requests" },
 ];

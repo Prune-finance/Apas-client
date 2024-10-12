@@ -161,7 +161,7 @@ function BusinessAccountRequests() {
 
   const rows = filteredSearch(
     requests,
-    ["firstName", "lastName", "Company.name"],
+    ["firstName", "lastName", "country"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -243,6 +243,14 @@ function BusinessAccountRequests() {
             </Text>
           ) : (
             <Skeleton h={10} w={100} />
+          )}
+
+          {!loading ? (
+            <Badge color="var(--prune-primary-700)" variant="light">
+              {meta?.total}
+            </Badge>
+          ) : (
+            <Skeleton h={10} w={40} />
           )}
         </Group>
 

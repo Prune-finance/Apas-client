@@ -261,9 +261,6 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
-  in: number;
-  out: number;
-  totalTrx: number;
 }
 
 export interface SingleBizMeta {

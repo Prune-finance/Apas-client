@@ -163,7 +163,7 @@ const PayoutRowComponent = ({
   };
 
   const { setData, open } = Transaction();
-  return data?.map((element) => (
+  return data?.reverse().map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {

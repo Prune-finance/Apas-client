@@ -5,7 +5,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 // Mantine Imports
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import { Box, Divider, Drawer, Group, Modal, Paper } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
 import { Text } from "@mantine/core";
@@ -39,11 +39,8 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import DebitRequestModal from "./new/modal";
 import { DebitRequestDrawer } from "./drawer";
-import { filteredSearch } from "@/lib/search";
 
 function DebitRequests() {
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
   const searchParams = useSearchParams();
 
   const { status, date, endDate, accountName } = Object.fromEntries(
@@ -80,11 +77,7 @@ function DebitRequests() {
     validate: zodResolver(FilterSchema),
   });
 
-  const rows = filteredSearch(
-    requests,
-    ["accountName", "accountNumber", "Company.name", "status"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = requests.map((element, index) => (
     <TableTr
       style={{ cursor: "pointer" }}
       key={index}
@@ -128,7 +121,7 @@ function DebitRequests() {
         </div>
 
         <Group justify="space-between" mt={30}>
-          <SearchInput search={search} setSearch={setSearch} />
+          <SearchInput />
 
           <Group gap={12}>
             <SecondaryBtn

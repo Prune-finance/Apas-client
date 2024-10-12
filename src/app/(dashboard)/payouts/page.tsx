@@ -172,7 +172,6 @@ function PayoutTrx() {
         defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
         tabs={tabs}
         mt={28}
-        keepMounted={false}
       >
         <TabsPanel value={tabs[0].value}>
           <PayoutAccount loading={loading} meta={meta} />

@@ -64,7 +64,7 @@ export const TransactionReceipt = ({
           </BackgroundImage>
 
           {details.map(({ title, value }, index) => (
-            <Fragment key={index}>
+            <Fragment key={title}>
               <Text
                 fz={10}
                 mt={44}
@@ -78,7 +78,7 @@ export const TransactionReceipt = ({
 
               <Flex direction="column" gap={16}>
                 {Object.entries(value).map(([key, value]) => (
-                  <Flex justify="space-between">
+                  <Flex justify="space-between" key={key}>
                     <Text fz={10} c="var(--prune-text-gray-600)">
                       {`${key}:`}
                     </Text>

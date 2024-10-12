@@ -199,7 +199,14 @@ function Users() {
         onClick={() => handleRowClick(element)}
         style={{ cursor: "pointer" }}
       >
-        <TableTd className={styles.table__td}>{element.email}</TableTd>
+        <TableTd className={styles.table__td} w="15%">
+          <Text
+            fz={12}
+            style={{ overflowWrap: "break-word", wordWrap: "break-word" }}
+          >
+            {element.email}
+          </Text>
+        </TableTd>
         <TableTd className={`${styles.table__td}`}>
           {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
         </TableTd>

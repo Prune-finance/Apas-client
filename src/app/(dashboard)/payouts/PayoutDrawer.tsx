@@ -370,40 +370,43 @@ export const PayoutTransactionDrawer = ({
           <Divider mt={30} mb={20} />
         </ScrollArea>
 
-        {!isAdmin && (
-          <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
-            {data &&
+        {/* {data &&
               (isAfter24Hours(data?.createdAt) ||
                 data.status === "PENDING") && (
-                <>
-                  <SecondaryBtn
-                    text="Query"
-                    icon={IconReportSearch}
-                    action={() => {
-                      setInquiryType("query");
-                      open();
-                    }}
-                  />
+                <></> */}
 
-                  <SecondaryBtn
-                    text="Run Trace"
-                    icon={IconReportSearch}
-                    action={() => {
-                      setInquiryType("trace");
-                      open();
-                    }}
-                  />
+        {!isAdmin && (
+          <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
+            {data && data.status === "CONFIRMED" && (
+              <>
+                <SecondaryBtn
+                  text="Query"
+                  icon={IconReportSearch}
+                  action={() => {
+                    setInquiryType("query");
+                    open();
+                  }}
+                />
 
-                  <SecondaryBtn
-                    text="Recall"
-                    icon={IconReload}
-                    action={() => {
-                      setInquiryType("recall");
-                      open();
-                    }}
-                  />
-                </>
-              )}
+                <SecondaryBtn
+                  text="Run Trace"
+                  icon={IconReportSearch}
+                  action={() => {
+                    setInquiryType("trace");
+                    open();
+                  }}
+                />
+
+                <SecondaryBtn
+                  text="Recall"
+                  icon={IconReload}
+                  action={() => {
+                    setInquiryType("recall");
+                    open();
+                  }}
+                />
+              </>
+            )}
 
             {data?.status === "PENDING" ? (
               <PrimaryBtn
@@ -412,17 +415,22 @@ export const PayoutTransactionDrawer = ({
                 color="#D92D20"
                 c="#fff"
                 fw={600}
+                fullWidth
                 action={openCancel}
               />
             ) : (
               <PrimaryBtn
                 icon={IconCircleArrowDown}
                 text={`Download ${
-                  !isAfter24Hours(data?.createdAt ?? new Date())
-                    ? "Receipt"
-                    : ""
+                  data?.status === "CANCELLED" ? "Receipt" : ""
                 }`}
-                fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
+                // text={`Download ${
+                //   !isAfter24Hours(data?.createdAt ?? new Date())
+                //     ? "Receipt"
+                //     : ""
+                // }`}
+                fullWidth={data?.status === "CANCELLED"}
+                // fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
                 fw={600}
                 action={() => handlePdfDownload(pdfRef)}
               />

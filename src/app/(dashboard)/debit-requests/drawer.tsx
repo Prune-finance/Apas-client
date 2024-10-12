@@ -43,7 +43,6 @@ export const DebitRequestDrawer = ({
   };
 
   const destDetails = {
-    Name: `${selectedRequest?.destinationFirstName} ${selectedRequest?.destinationLastName}`,
     "Account Name":
       selectedRequest?.destinationFirstName &&
       selectedRequest?.destinationLastName

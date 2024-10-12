@@ -536,7 +536,9 @@ function Accounts() {
               {!statusLoading && !approvedRequest && (
                 <Box pos="absolute" top={-10} right={0}>
                   <PrimaryBtn
-                    text={pendingRequest ? "Request Sent ✓" : "Request Access"}
+                    text={
+                      pendingRequest ? "Request Sent ✓" : "Request live keys"
+                    }
                     fw={600}
                     action={requestAccessOpen}
                     disabled={pendingRequest || statusLoading}

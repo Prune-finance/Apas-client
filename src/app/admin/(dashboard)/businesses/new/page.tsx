@@ -235,6 +235,32 @@ export default function NewBusiness() {
     );
   };
 
+  // const updateShareholders = (
+  //   directors: DirectorEtShareholder[],
+  //   shareholders: DirectorEtShareholder[]
+  // ) => {
+  //   directors.forEach((director) => {
+  //     const exists = shareholders.some(
+  //       (shareholder) => shareholder.id === director.id
+  //     );
+
+  //     if (exists) {
+  //       const index = shareholders.findIndex(
+  //         (shareholder) => shareholder.id === director.id
+  //       );
+
+  //       if (form.values?.shareholders) {
+  //         form.values.shareholders[index] = {
+  //           ...form.values.shareholders[index],
+  //           ...director,
+  //         };
+  //       }
+  //     } else {
+  //       form.insertListItem("shareholders", director);
+  //     }
+  //   });
+  // };
+
   const handleCloseSuccessModal = () => {
     router.push("/admin/businesses");
     closeSuccess();

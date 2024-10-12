@@ -443,6 +443,9 @@ function Accounts() {
           defaultValue={
             tabs.find((_tab) => _tab.value === tab)?.value ?? tabs[0].value
           }
+          onChange={(value) => {
+            window.history.pushState({}, "", "?tab=" + value);
+          }}
         >
           <TabsPanel value={tabs[0].value}>
             <SimpleGrid cols={3} mt={32}>

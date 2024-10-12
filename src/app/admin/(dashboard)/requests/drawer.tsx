@@ -31,7 +31,6 @@ export default function DebitDrawer({
   selectedRequest,
   revalidate,
 }: Props) {
-  console.log(selectedRequest);
   const [openedDeny, { close: closeDeny, open: openDeny }] =
     useDisclosure(false);
   const [openedApprove, { close: closeApprove, open: openApprove }] =

@@ -114,19 +114,19 @@ function Businesses() {
     },
     {
       title: "Money In",
-      value: trxMeta?.in || 0,
+      value: meta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value: trxMeta?.out || 0,
+      value: meta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: meta?.totalTrx || 0,
     },
   ];
 

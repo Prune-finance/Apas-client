@@ -15,12 +15,7 @@ import { Flex, Box, Divider } from "@mantine/core";
 import { Text, Drawer } from "@mantine/core";
 import { TableTr } from "@mantine/core";
 
-import {
-  IconX,
-  IconCheck,
-  IconSearch,
-  IconListTree,
-} from "@tabler/icons-react";
+import { IconX, IconCheck, IconListTree } from "@tabler/icons-react";
 
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
@@ -31,7 +26,7 @@ import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
 
 import Filter from "@/ui/components/Filter";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -39,13 +34,9 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import {
-  businessFilterSchema,
-  BusinessFilterType,
-  businessFilterValues,
-} from "../../../businesses/schema";
 import { closeButtonProps } from "../../../businesses/[id]/(tabs)/utils";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import Link from "next/link";
 
 function AccountPayout() {
   const searchParams = useSearchParams();
@@ -83,7 +74,15 @@ function AccountPayout() {
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const BusinessDetails = {
-    "Business Name": selectedRequest?.Company.name,
+    "Business Name": (
+      <Link
+        href={`/admin/businesses/${selectedRequest?.Company?.id}`}
+        target="_blank"
+        style={{ textDecoration: "underline" }}
+      >
+        {selectedRequest?.Company?.name}
+      </Link>
+    ),
     "Request Date": dayjs(selectedRequest?.createdAt).format("DD MMM, YYYY"),
     Status: <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };

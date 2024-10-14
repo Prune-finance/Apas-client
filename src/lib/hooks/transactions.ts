@@ -627,6 +627,7 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
       ...(customParams.recipientName && {
         recipientName: customParams.recipientName,
       }),
+
       ...(customParams.senderName && { senderName: customParams.senderName }),
     };
   }, [customParams]);

@@ -73,6 +73,20 @@ export function DonutChartComponent({
   );
 }
 
+interface LineData {
+  month: string;
+  Inflow: number;
+  Outflow: number;
+}
+
+interface GroupedData {
+  [key: string]: {
+    month: string;
+    Inflow: number;
+    Outflow: number;
+  };
+}
+
 interface IBarChartProps extends BarChartProps {
   data: any;
   h?: number;
@@ -88,13 +102,35 @@ export function BarChartComponent({
   withLegend,
   ...props
 }: IBarChartProps) {
+  const groupedData = data.reduce(
+    (
+      acc: GroupedData,
+      {
+        month,
+        Inflow,
+        Outflow,
+      }: { month: string; Inflow: number; Outflow: number }
+    ) => {
+      if (!acc[month]) {
+        acc[month] = { month, Inflow: 0, Outflow: 0 };
+      }
+      acc[month].Inflow += Inflow;
+      acc[month].Outflow += Outflow;
+      return acc;
+    },
+    {}
+  );
+
+  const result: LineData[] = Object.values(groupedData);
+
   return (
     <BarChart
       h={props.h ? props.h : 300}
-      data={data}
+      data={result}
       // dataKey="name"
       // dataKey="month"
       series={series}
+      // barProps={{ barSize: 20, radius: 3 }}
       // curveType="natural"
       gridAxis="x"
       withLegend={withLegend}

@@ -320,7 +320,10 @@ export default function NewBusiness() {
                 text="Add Director"
                 icon={IconPlus}
                 action={() =>
-                  form.insertListItem("directors", directorEtShareholderSchema)
+                  form.insertListItem("directors", {
+                    ...directorEtShareholderSchema,
+                    id: crypto.randomUUID(),
+                  })
                 }
                 fw={600}
                 h={28}
@@ -408,10 +411,10 @@ export default function NewBusiness() {
                 text="Add Shareholder"
                 icon={IconPlus}
                 action={() =>
-                  form.insertListItem(
-                    "shareholders",
-                    directorEtShareholderSchema
-                  )
+                  form.insertListItem("shareholders", {
+                    ...directorEtShareholderSchema,
+                    id: crypto.randomUUID(),
+                  })
                 }
                 fw={600}
                 h={28}

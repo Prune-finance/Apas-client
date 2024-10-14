@@ -38,7 +38,10 @@ export function TableComponent({ loading, rows, head, noBg, ...props }: Props) {
             ))}
           </TableTr>
         </TableThead>
-        <TableTbody className={styles.table__td}>
+        <TableTbody
+          className={styles.table__td}
+          style={{ wordBreak: "break-word" }}
+        >
           {loading ? DynamicSkeleton2(head.length) : rows}
         </TableTbody>
       </Table>

@@ -8,6 +8,7 @@ import {
   useUserTransactions,
 } from "@/lib/hooks/transactions";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import PaginationComponent from "@/ui/components/Pagination";
 import {
   DefaultAccountHead,
   SingleDefaultAccountBody,
@@ -22,6 +23,9 @@ export default function SingleUserPayoutAccount() {
   const params = useParams<{ id: string }>();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const searchParams = useSearchParams();
 
@@ -44,17 +48,30 @@ export default function SingleUserPayoutAccount() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
-      // page: active,
-      // limit: parseInt(limit ?? "10", 10),
+      page: active,
+      limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+  }, [
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
 
   const { loading, account } = useUserDefaultPayoutAccount();
 
   const { business, loading: loadingBiz } = useUserBusiness();
 
-  const { transactions, loading: trxLoading } =
-    useUserPayoutTransactions(param);
+  const {
+    transactions,
+    loading: trxLoading,
+    meta,
+  } = useUserPayoutTransactions(param);
   // const { transactions, loading: trxLoading } = useUserTransactions(params.id);
 
   return (
@@ -89,7 +106,16 @@ export default function SingleUserPayoutAccount() {
         setChartFrequency={setChartFrequency}
         business={business}
         payout
-      />
+        trxMeta={meta}
+      >
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        />
+      </SingleDefaultAccountBody>
     </main>
   );
 }

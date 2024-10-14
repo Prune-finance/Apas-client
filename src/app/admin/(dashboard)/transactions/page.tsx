@@ -256,8 +256,6 @@ function TransactionForAccount() {
                 <BusinessTransactionTableRows
                   data={defaultTransactions}
                   search={debouncedSearch}
-                  active={active}
-                  limit={limit}
                   searchProps={searchProps}
                 />
               }
@@ -347,8 +345,6 @@ function TransactionForAccount() {
                 <IssuedTransactionTableRows
                   data={transactions}
                   search={debouncedSearch}
-                  active={active}
-                  limit={limit}
                   searchProps={searchProps}
                 />
               }
@@ -416,8 +412,6 @@ function TransactionForAccount() {
                 <PayoutTransactionTableRows
                   data={payoutTransactions}
                   search={debouncedSearch}
-                  active={active}
-                  limit={limit}
                   searchProps={searchProps}
                 />
               }

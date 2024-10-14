@@ -105,8 +105,6 @@ export const CancelledPayoutTransactions = () => {
               "recipientBankAddress",
             ]}
             search={debouncedSearch}
-            active={active}
-            limit={limit}
           />
         }
         loading={loading}

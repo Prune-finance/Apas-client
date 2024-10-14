@@ -82,7 +82,7 @@ function DebitRequests() {
 
   const rows = filteredSearch(
     requests,
-    ["accountName", "accountNumber", "Company.name", "status"],
+    ["Account.accountName", "status"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr

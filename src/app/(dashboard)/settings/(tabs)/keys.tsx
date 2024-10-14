@@ -37,6 +37,7 @@ export default function Keys() {
   const [webHook, setWebHook] = useState<WebHook[]>([]);
   const params = useParams<{ id: string }>();
   const { handleError, handleSuccess, handleInfo } = useNotification();
+  const [loadingKey, setLoadingKey] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [processingWebHook, setProcessingWebHook] = useState(false);
   const [processingKeyRequest, setProcessingKeyRequest] = useState(false);
@@ -70,6 +71,7 @@ export default function Keys() {
   });
 
   const fetchBusinessSecrets = async () => {
+    setLoadingKey(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets`,
@@ -79,6 +81,8 @@ export default function Keys() {
       setKeys(data.data);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoadingKey(false);
     }
   };
 
@@ -233,7 +237,11 @@ export default function Keys() {
             </Group>
 
             <Stack gap={10}>
-              <KeyComponent keyString={test?.key} keyType="Secret Test Key" />
+              {loadingKey ? (
+                <Skeleton h={30} w={"100%"} mt={30} />
+              ) : (
+                <KeyComponent keyString={test?.key} keyType="Secret Test Key" />
+              )}
 
               {Boolean(meta?.hasLiveKey) && (
                 <KeyComponent keyString={live?.key} keyType="Secret Live Key" />

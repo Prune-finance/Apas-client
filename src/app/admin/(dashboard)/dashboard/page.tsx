@@ -306,11 +306,11 @@ export default function Home() {
                         rows={
                           <IssuedTransactionTableRows
                             data={transactions.slice(0, 4)}
-                            active={1}
-                            limit={null}
                             searchProps={[
                               "senderIban",
+                              "senderName",
                               "recipientIban",
+                              "recipientName",
                               "reference",
                             ]}
                             search=""

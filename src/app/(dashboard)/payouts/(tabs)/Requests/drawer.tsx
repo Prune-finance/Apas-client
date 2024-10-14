@@ -15,12 +15,11 @@ import {
   Skeleton,
   ScrollArea,
 } from "@mantine/core";
-import { IconCircleArrowDown } from "@tabler/icons-react";
+import { IconCheck, IconCircleArrowDown } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
-import styles from "./styles.module.scss";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
@@ -28,7 +27,7 @@ import {
   ReceiptDetails,
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
@@ -38,20 +37,20 @@ interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
   close: () => void;
   opened: boolean;
+  children?: ReactNode;
 }
 
-export const TransactionDrawer = ({
+export const PayoutTransactionRequestDrawer = ({
   selectedRequest,
   close,
   opened,
+  children,
 }: TransactionDrawerProps) => {
   const pdfRef = useRef<HTMLDivElement>(null);
 
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.id ?? ""
   );
-
-  const { clearData } = Transaction();
 
   const {
     transaction: defaultTransaction,
@@ -74,19 +73,15 @@ export const TransactionDrawer = ({
     IBAN: selectedRequest?.recipientIban,
     BIC: selectedRequest?.recipientBic,
     "Bank Name": selectedRequest?.recipientBankAddress,
-    "Bank Address": selectedRequest?.recipientBankAddress,
+    // "Bank Address": selectedRequest?.recipientBankAddress,
     Country: selectedRequest?.recipientBankCountry,
     "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
   const senderDetails = {
-    "Account Name": loadingSenderAcct ? (
-      <Skeleton h={10} w={100} />
-    ) : (
-      selectedRequest?.senderName
-    ),
+    "Account Name": selectedRequest?.senderName,
     IBAN: selectedRequest?.senderIban,
-    BIC: selectedRequest?.senderBic,
+    // BIC: selectedRequest?.senderBic,
     Bank:
       selectedRequest?.type === "DEBIT"
         ? "Prune Payments LTD"
@@ -100,7 +95,7 @@ export const TransactionDrawer = ({
   };
 
   const otherDetails = {
-    "Prune Reference": selectedRequest?.centrolinkRef ?? "N/A",
+    // "Prune Reference": selectedRequest?.centrolinkRef ?? "N/A",
     "C-L Reference": selectedRequest?.id,
     "Date & Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
@@ -134,7 +129,6 @@ export const TransactionDrawer = ({
     ),
     Reference: selectedRequest?.reference ?? "N/A",
     "C-L Reference": selectedRequest?.id ?? "",
-    "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
   const details: ReceiptDetails[] = [
     {
@@ -165,12 +159,12 @@ export const TransactionDrawer = ({
       <Divider mb={20} />
       <Flex direction="column" pl={28} pb={20} h="calc(100vh - 90px)">
         <ScrollArea
-          // h="calc(100vh - 145px)"
+          //   h="calc(100vh - 145px)"
           h="100%"
-          flex={1}
           scrollbars="y"
           scrollbarSize={1}
           pr={28}
+          flex={1}
         >
           <Flex align="center" justify="space-between">
             <Flex direction="column">
@@ -185,11 +179,11 @@ export const TransactionDrawer = ({
               </Text>
             </Flex>
 
-            <AmountGroup
+            {/* <AmountGroup
               type={selectedRequest?.type as "DEBIT" | "CREDIT"}
               colored
               fz={12}
-            />
+            /> */}
           </Flex>
 
           <Divider mt={30} mb={20} />
@@ -273,26 +267,8 @@ export const TransactionDrawer = ({
           <Divider mt={30} mb={20} />
         </ScrollArea>
 
-        <Box mr={28}>
-          <PrimaryBtn
-            icon={IconCircleArrowDown}
-            text="Download Receipt"
-            fullWidth
-            fw={600}
-            action={() => handlePdfDownload(pdfRef)}
-            mt={20}
-          />
-        </Box>
+        {children && children}
       </Flex>
-
-      <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
-        <TransactionReceipt
-          amount={selectedRequest?.amount ?? 0}
-          amountType="Amount Sent"
-          details={details}
-          receiptRef={pdfRef}
-        />
-      </Box>
     </Drawer>
   );
 };

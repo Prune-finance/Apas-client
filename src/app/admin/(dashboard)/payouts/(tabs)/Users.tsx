@@ -19,7 +19,7 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
 import { Suspense, use, useMemo, useState } from "react";
@@ -28,6 +28,7 @@ const UsersComponent = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
+  const { push } = useRouter();
 
   const searchParams = useSearchParams();
   const { status, endDate, date, business } = Object.fromEntries(
@@ -75,9 +76,7 @@ const UsersComponent = () => {
     <TableTr
       key={index}
       //    onClick={() => handleRowClick(element.id)}
-      onClick={() =>
-        window.open(`/admin/payouts/${element.Company.id}/account`)
-      }
+      onClick={() => push(`/admin/payouts/${element.Company.id}/account`)}
       style={{ cursor: "pointer" }}
     >
       <TableTd>

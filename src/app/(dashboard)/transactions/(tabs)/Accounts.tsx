@@ -203,8 +203,6 @@ export const AccountsTab = () => {
           <BusinessTransactionTableRows
             data={transactions}
             search={debouncedSearch}
-            active={active}
-            limit={limit}
             searchProps={searchProps}
             business
           />

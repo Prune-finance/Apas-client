@@ -17,7 +17,6 @@ import { TableTr } from "@mantine/core";
 
 import { IconX, IconCheck, IconListTree } from "@tabler/icons-react";
 
-import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
 import { PayoutAccount, usePayoutRequests } from "@/lib/hooks/requests";
@@ -35,8 +34,15 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "../../../businesses/[id]/(tabs)/utils";
-import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import {
+  FilterSchema,
+  FilterType,
+  FilterValues,
+  validateRequest,
+} from "@/lib/schema";
 import Link from "next/link";
+import ModalComponent from "@/ui/components/Modal";
+import RejectModalComponent from "@/ui/components/Modal/RejectModalComponent";
 
 function AccountPayout() {
   const searchParams = useSearchParams();
@@ -90,19 +96,36 @@ function AccountPayout() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
+  const requestForm = useForm({
+    initialValues: {
+      reason: "",
+      supportingDocumentName: "",
+      supportingDocumentUrl: "",
+    },
+    validate: zodResolver(validateRequest),
+  });
+
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout/${selectedRequest.id}/reject`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();
       close();
       closeDrawer();
+      requestForm.reset();
       handleSuccess("Action Completed", `Payout Request Rejected`);
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -132,7 +155,7 @@ function AccountPayout() {
     }
   };
 
-  const rows = filteredSearch(requests, ["companyName"], debouncedSearch).map(
+  const rows = filteredSearch(requests, ["Company.name"], debouncedSearch).map(
     (element, index) => (
       <TableTr
         key={index}
@@ -254,7 +277,7 @@ function AccountPayout() {
         </Stack>
       </Drawer>
 
-      <ModalComponent
+      <RejectModalComponent
         color="#FEF3F2"
         icon={<IconX color="#D92D20" />}
         opened={opened}
@@ -264,6 +287,7 @@ function AccountPayout() {
         title="Reject This Payout Account Request?"
         text="This means you are rejecting the payout account request of this business."
         customApproveMessage="Yes, Reject It"
+        form={requestForm}
       />
 
       <ModalComponent

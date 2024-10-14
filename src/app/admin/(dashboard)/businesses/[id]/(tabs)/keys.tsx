@@ -22,6 +22,7 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useClipboard } from "@mantine/hooks";
 import Cookies from "js-cookie";
+import { set } from "zod";
 
 export default function Keys({
   business,
@@ -31,8 +32,8 @@ export default function Keys({
   loading: boolean;
 }) {
   const [keys, setKeys] = useState<Key[]>([]);
+  const [processing, setProcessing] = useState(false);
   const params = useParams<{ id: string }>();
-  const clipboard = useClipboard({ timeout: 500 });
   const { handleError } = useNotification();
 
   const { live, test } = useMemo(() => {
@@ -42,10 +43,8 @@ export default function Keys({
     return { live, test };
   }, [keys]);
 
-  const [viewLive, setViewLive] = useState(false);
-  const [viewTest, setViewTest] = useState(false);
-
   const fetchBusinessSecrets = async () => {
+    setProcessing(true);
     try {
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${params.id}/secrets`,
@@ -55,6 +54,8 @@ export default function Keys({
       setKeys(data.data);
     } catch (error) {
       handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
     }
   };
 
@@ -78,7 +79,11 @@ export default function Keys({
             test.
           </Badge> */}
 
-          <KeyComponent keyString={test?.key} keyType="Test Key" />
+          {loading || processing ? (
+            <Skeleton w={"100%"} mt={30} h={30} />
+          ) : (
+            <KeyComponent keyString={test?.key} keyType="Test Key" />
+          )}
 
           {live && live.key && (
             <KeyComponent keyString={live?.key} keyType="Live Key" />

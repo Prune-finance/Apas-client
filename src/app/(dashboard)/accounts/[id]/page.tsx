@@ -76,7 +76,7 @@ export default function Account() {
   const {
     loading: trxLoading,
     transactions,
-    meta,
+    meta: txrMeta,
   } = useUserTransactions(params.id, customParams);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
@@ -272,14 +272,14 @@ export default function Account() {
         loading={loading}
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
-        trxMeta={meta}
+        trxMeta={txrMeta}
       >
         <PaginationComponent
           active={active}
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+          total={Math.ceil((txrMeta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
         <Text>Pagination here</Text>
       </SingleAccountBody>

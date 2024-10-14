@@ -329,9 +329,16 @@ export function useUserAccounts(customParams: IParams = {}) {
   };
 }
 
+interface MetaAccount {
+  hasPendingActivate: boolean;
+  hasPendingDeactivate: boolean;
+  hasPendingFreeze: boolean;
+}
+
 export function useSingleUserAccount(id: string) {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
+  const [meta, setMeta] = useState<MetaAccount | null>(null);
 
   async function fetchAccount() {
     setLoading(true);
@@ -342,6 +349,7 @@ export function useSingleUserAccount(id: string) {
       );
 
       setAccount(data.data);
+      setMeta(data.meta);
     } catch (error) {
       console.log(error);
     } finally {
@@ -361,7 +369,7 @@ export function useSingleUserAccount(id: string) {
     };
   }, []);
 
-  return { loading, account, revalidate };
+  return { loading, account, meta, revalidate };
 }
 
 export function useSingleAccountByIBAN(iban: string) {

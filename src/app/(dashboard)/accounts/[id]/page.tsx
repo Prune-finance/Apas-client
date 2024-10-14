@@ -31,7 +31,12 @@ import { validateRequest } from "@/lib/schema";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
-import { IconBrandLinktree, IconCheck, IconX } from "@tabler/icons-react";
+import {
+  IconBrandLinktree,
+  IconCheck,
+  IconClock12,
+  IconX,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 
 export default function Account() {
@@ -63,12 +68,15 @@ export default function Account() {
     };
   }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
 
-  const { account, loading, revalidate } = useSingleUserAccount(params.id);
+  const { account, loading, revalidate, meta } = useSingleUserAccount(
+    params.id
+  );
   const { handleSuccess, handleError } = useNotification();
   const { loading: trxLoading, transactions } = useUserTransactions(
     params.id,
     customParams
   );
+
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
 
@@ -222,13 +230,29 @@ export default function Account() {
                 account?.status === "ACTIVE" ? deactivateOpen : activateOpen
               }
               color={account?.status === "ACTIVE" ? "#D92D20" : "#027A48"}
-              c="#fff"
+              c={
+                meta?.hasPendingActivate || meta?.hasPendingDeactivate
+                  ? "#888"
+                  : "#fff"
+              }
               loading={loading}
+              disabled={meta?.hasPendingActivate || meta?.hasPendingDeactivate}
+              icon={
+                meta?.hasPendingActivate || meta?.hasPendingDeactivate
+                  ? IconClock12
+                  : undefined
+              }
             />
           )}
 
           {account?.status === "ACTIVE" && (
-            <SecondaryBtn text="Freeze Account" fw={600} action={freezeOpen} />
+            <SecondaryBtn
+              text="Freeze Account"
+              fw={600}
+              action={freezeOpen}
+              disabled={meta?.hasPendingFreeze}
+              icon={meta?.hasPendingFreeze ? IconClock12 : undefined}
+            />
           )}
 
           {account?.status === "FROZEN" && (

@@ -21,6 +21,7 @@ import {
   Meta,
   PayoutTransactionRequest,
   usePayoutTransactionRequests,
+  useUserPayoutTransactionRequests,
 } from "@/lib/hooks/requests";
 import { PayoutTransactionRequestDrawer } from "./drawer";
 import Transaction from "@/lib/store/transaction";
@@ -81,7 +82,7 @@ export const PendingPayoutRequests = () => {
   };
 
   const { requests, loading, meta, revalidate } =
-    usePayoutTransactionRequests(queryParams);
+    useUserPayoutTransactionRequests(queryParams);
 
   const { data, opened, close } = Transaction();
 

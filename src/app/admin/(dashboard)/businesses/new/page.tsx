@@ -42,7 +42,6 @@ import Documents from "./Documents";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import { useDisclosure } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
 import SuccessModalImage from "@/assets/success-modal-image.png";
 import SuccessModal from "@/ui/components/SuccessModal";
 
@@ -96,6 +95,10 @@ export default function NewBusiness() {
     });
   };
 
+  const removeIdFromObjects = (array?: DirectorEtShareholder[]) => {
+    return array?.map(({ id, ...rest }) => rest);
+  };
+
   const handleCreate = async () => {
     setProcessing(true);
     try {
@@ -129,8 +132,12 @@ export default function NewBusiness() {
         {
           ...rest,
           pricingPlanId: pricingPlan,
-          ...(initialDirEmpty ? { directors: [] } : { directors }),
-          ...(initialShrEmpty ? { shareholders: [] } : { shareholders }),
+          ...(initialDirEmpty
+            ? { directors: [] }
+            : { directors: removeIdFromObjects(directors) }),
+          ...(initialShrEmpty
+            ? { shareholders: [] }
+            : { shareholders: removeIdFromObjects(shareholders) }),
         },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
@@ -171,32 +178,31 @@ export default function NewBusiness() {
   // };
 
   const makeDirectorAShareholder = (director: DirectorEtShareholder) => {
-    // Remove empty shareholders
     form.values.shareholders &&
       form.values.shareholders.forEach((item, index) => {
-        const data = Object.values(item).every(isEmpty);
+        const data = Object.entries(item)
+          .filter(([key]) => key !== "id")
+          .every(([, value]) => isEmpty(value));
 
         if (data) form.removeListItem("shareholders", index);
       });
 
-    // Check if the director already exists as a shareholder
     const exists =
       form.values.shareholders &&
-      form.values.shareholders.some((shareholder) => {
-        return Object.keys(director).every((key) => {
-          return (
-            director[key as keyof DirectorEtShareholder] ===
-            shareholder[key as keyof DirectorEtShareholder]
-          );
-        });
-      });
+      form.values.shareholders.find(
+        (shareholder) => shareholder.id === director.id
+      );
 
-    notifications.clean();
-
-    // If the director exists, return the handleInfo function to display a toast
+    // If the director exists, return the replace the director with the new one
     if (exists) {
-      handleInfo("Director already exists as a shareholder", "");
-      return;
+      const index =
+        form.values.shareholders &&
+        form.values.shareholders.findIndex(
+          (shareholder) => shareholder.id === director.id
+        );
+
+      if (index !== -1 && index !== undefined && form.values.shareholders)
+        return form.setFieldValue(`shareholders.${index}`, director);
     }
 
     // If the director doesn't exist, add them as a shareholder
@@ -314,7 +320,10 @@ export default function NewBusiness() {
                 text="Add Director"
                 icon={IconPlus}
                 action={() =>
-                  form.insertListItem("directors", directorEtShareholderSchema)
+                  form.insertListItem("directors", {
+                    ...directorEtShareholderSchema,
+                    id: crypto.randomUUID(),
+                  })
                 }
                 fw={600}
                 h={28}
@@ -402,10 +411,10 @@ export default function NewBusiness() {
                 text="Add Shareholder"
                 icon={IconPlus}
                 action={() =>
-                  form.insertListItem(
-                    "shareholders",
-                    directorEtShareholderSchema
-                  )
+                  form.insertListItem("shareholders", {
+                    ...directorEtShareholderSchema,
+                    id: crypto.randomUUID(),
+                  })
                 }
                 fw={600}
                 h={28}

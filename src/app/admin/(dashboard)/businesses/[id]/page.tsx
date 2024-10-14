@@ -259,8 +259,6 @@ export default function SingleBusiness() {
     ).padStart(2, "0")}`;
   };
 
-  console.log(services);
-
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -290,7 +288,7 @@ export default function SingleBusiness() {
             Business
           </Text>
         </Group> */}
-        <BackBtn text="Business" />
+        <BackBtn />
         <div className={styles.container__header}>
           <Group gap={8}>
             {business?.kycTrusted && (
@@ -409,9 +407,13 @@ export default function SingleBusiness() {
 
         <div className={styles.container__body}>
           <Tabs
-            value={activeTab}
-            onChange={setActiveTab}
-            defaultValue={tab}
+            onChange={(e) => {
+              setActiveTab(e);
+              window.history.pushState({}, "", `?tab=${e}`);
+            }}
+            defaultValue={
+              tabs.find((_tab) => _tab.value === tab)?.value || "business"
+            }
             variant="pills"
             classNames={{
               root: styles.tabs,

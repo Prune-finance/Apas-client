@@ -26,9 +26,12 @@ import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import Cookies from "js-cookie";
 import dayjs from "dayjs";
+import PaginationComponent from "@/ui/components/Pagination";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const searchParams = useSearchParams();
 
@@ -51,10 +54,20 @@ export default function Account() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
-      // page: active,
-      // limit: parseInt(limit ?? "10", 10),
+      page: active,
+      limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+  }, [
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFreeze, { open: openFreeze, close: closeFreeze }] =
     useDisclosure(false);
@@ -169,7 +182,16 @@ export default function Account() {
           setChartFrequency={setChartFrequency}
           business={business}
           admin
-        />
+          trxMeta={meta}
+        >
+          <PaginationComponent
+            active={active}
+            setActive={setActive}
+            setLimit={setLimit}
+            limit={limit}
+            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+          />
+        </SingleAccountBody>
 
         <ModalComponent
           processing={processing}

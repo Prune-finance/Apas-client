@@ -545,7 +545,9 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
       ...(customParams.recipientName && {
         recipientName: customParams.recipientName,
       }),
-      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.senderName && {
+        senderName: customParams.senderName,
+      }),
     };
   }, [customParams]);
 

@@ -18,6 +18,7 @@ import { IconCheck, IconCopy } from "@tabler/icons-react";
 import { formatNumber } from "@/lib/utils";
 import Link from "next/link";
 import { SeeAll } from ".";
+import { MouseEvent } from "react";
 
 interface Props extends CardProps {
   currency: string;
@@ -47,17 +48,23 @@ export const AccountCard = ({
   children,
   ...props
 }: Props) => {
+  const handlePropagation = (e: MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
+    // return false;
+  };
+
   return link ? (
     <Card
       padding={19}
       radius={8}
-      component={Link}
-      href={link}
+      // component={Link}
+      // href={link}
       classNames={{
         root: styles.account__card,
         section: styles.account__card__section,
       }}
-      style={{ cursor: "pointer" }}
+      // style={{ cursor: "pointer" }}
       {...props}
     >
       <CardSection px={19} py={13} c="#fff">
@@ -102,7 +109,7 @@ export const AccountCard = ({
           )}
         </Group>
 
-        <Box onClick={(e) => e.stopPropagation()}>
+        <Box onClick={handlePropagation}>
           <CopyButton
             value={`IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`}
           >

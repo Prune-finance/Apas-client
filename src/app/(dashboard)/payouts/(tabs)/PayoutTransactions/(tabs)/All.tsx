@@ -125,8 +125,6 @@ export const AllPayoutTransactions = () => {
               "centrolinkRef",
             ]}
             search={debouncedSearch}
-            active={active}
-            limit={limit}
           />
         }
         loading={loading}

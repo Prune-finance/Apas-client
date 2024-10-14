@@ -38,9 +38,12 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
+import PaginationComponent from "@/ui/components/Pagination";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const searchParams = useSearchParams();
 
@@ -54,29 +57,27 @@ export default function Account() {
     recipientIban,
   } = Object.fromEntries(searchParams.entries());
 
-  const customParams = useMemo(() => {
-    return {
-      ...(status && { status: status.toUpperCase() }),
-      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-      ...(type && { type: type }),
-      ...(senderName && { senderName: senderName }),
-      ...(recipientName && { recipientName: recipientName }),
-      ...(recipientIban && { recipientIban: recipientIban }),
-      // page: active,
-      // limit: parseInt(limit ?? "10", 10),
-    };
-  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+  const customParams = {
+    ...(status && { status: status.toUpperCase() }),
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(type && { type: type }),
+    ...(senderName && { senderName: senderName }),
+    ...(recipientName && { recipientName: recipientName }),
+    ...(recipientIban && { recipientIban: recipientIban }),
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
 
   const { account, loading, revalidate, meta } = useSingleUserAccount(
     params.id
   );
   const { handleSuccess, handleError } = useNotification();
-  const { loading: trxLoading, transactions } = useUserTransactions(
-    params.id,
-    customParams
-  );
-
+  const {
+    loading: trxLoading,
+    transactions,
+    meta,
+  } = useUserTransactions(params.id, customParams);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
 
@@ -271,7 +272,17 @@ export default function Account() {
         loading={loading}
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
-      />
+        trxMeta={meta}
+      >
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        />
+        <Text>Pagination here</Text>
+      </SingleAccountBody>
 
       <Modal
         size="xl"

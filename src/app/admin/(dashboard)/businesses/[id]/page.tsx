@@ -288,7 +288,7 @@ export default function SingleBusiness() {
             Business
           </Text>
         </Group> */}
-        <BackBtn text="Business" />
+        <BackBtn />
         <div className={styles.container__header}>
           <Group gap={8}>
             {business?.kycTrusted && (

@@ -114,10 +114,15 @@ export const AllPayoutTransactions = () => {
           <PayoutTransactionTableRows
             data={transactions}
             searchProps={[
+              "senderName",
               "senderIban",
               "recipientIban",
               "recipientBic",
               "recipientBankAddress",
+              "recipientName",
+              "type",
+              "status",
+              "centrolinkRef",
             ]}
             search={debouncedSearch}
             active={active}

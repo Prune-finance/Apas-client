@@ -86,13 +86,6 @@ export default function NewBusiness() {
     const { hasErrors, errors } = form.validate();
     if (hasErrors) return;
 
-    if (active === 2 && form.values.shareholders?.length === 0) {
-      form.insertListItem("shareholders", {
-        ...directorEtShareholderSchema,
-        id: crypto.randomUUID(),
-      });
-    }
-
     setActive((current) => {
       // if (form.validate().hasErrors) return current;
       const { hasErrors } = form.validate();

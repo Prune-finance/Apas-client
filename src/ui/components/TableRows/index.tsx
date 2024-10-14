@@ -16,24 +16,18 @@ import { BusinessData } from "@/lib/hooks/businesses";
 export const BusinessTransactionTableRows = ({
   data,
   search,
-  active,
-  limit,
+
   searchProps,
   business,
 }: {
   data: TransactionType[];
   search: string;
-  active: number;
-  limit: string | null;
+
   searchProps: string[];
   business?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return frontendPagination(
-    filteredSearch(data, searchProps, search),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
+  return filteredSearch(data, searchProps, search).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -85,23 +79,16 @@ export const IssuedTransactionTableRows = ({
   data,
   noLink,
   search,
-  active,
-  limit,
   searchProps,
 }: {
   data: TransactionType[];
   search: string;
-  active: number;
-  limit: string | null;
+
   searchProps: string[];
   noLink?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return frontendPagination(
-    filteredSearch(data, searchProps, search),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
+  return filteredSearch(data, searchProps, search).map((element) => (
     <TableTr
       key={element?.id}
       onClick={() => {
@@ -165,23 +152,17 @@ export const PayoutTransactionTableRows = ({
   data,
 
   search,
-  active,
-  limit,
+
   searchProps,
 }: {
   data: TransactionType[];
 
   search: string;
-  active: number;
-  limit: string | null;
+
   searchProps: string[];
 }) => {
   const { open, setData } = Transaction();
-  return frontendPagination(
-    filteredSearch(data, searchProps, search),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
+  return filteredSearch(data, searchProps, search).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {

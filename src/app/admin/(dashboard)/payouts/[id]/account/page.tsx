@@ -14,6 +14,7 @@ import {
 } from "@/lib/hooks/transactions";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import PaginationComponent from "@/ui/components/Pagination";
 import {
   DefaultAccountHead,
   SingleAccountBody,
@@ -29,6 +30,9 @@ export default function BusinessPayoutAccount() {
   const params = useParams<{ id: string }>();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const searchParams = useSearchParams();
 
@@ -51,10 +55,20 @@ export default function BusinessPayoutAccount() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
-      // page: active,
-      // limit: parseInt(limit ?? "10", 10),
+      page: active,
+      limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+  }, [
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
 
   const { loading: loadingBiz, business } = useSingleBusiness(params.id);
 
@@ -104,7 +118,16 @@ export default function BusinessPayoutAccount() {
           business={business}
           admin
           payout
-        />
+          trxMeta={meta}
+        >
+          <PaginationComponent
+            active={active}
+            setActive={setActive}
+            setLimit={setLimit}
+            limit={limit}
+            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+          />
+        </SingleDefaultAccountBody>
       </Paper>
     </main>
   );

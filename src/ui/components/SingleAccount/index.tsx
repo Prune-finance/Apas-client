@@ -577,6 +577,12 @@ const RowComponent = ({
   ));
 };
 
+interface Meta {
+  out: number;
+  total: number;
+  in: number;
+  totalAmount: number;
+}
 interface SingleAccountProps {
   account: Account | null;
   transactions: TransactionType[];
@@ -587,6 +593,8 @@ interface SingleAccountProps {
   admin?: boolean;
   payout?: boolean;
   isDefault?: boolean;
+  trxMeta: Meta | null;
+  children: React.ReactNode;
 }
 
 export const SingleAccountBody = ({
@@ -599,10 +607,12 @@ export const SingleAccountBody = ({
   admin,
   payout,
   isDefault,
+  trxMeta,
+  children,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
-    "No. of Transaction": transactions.length,
+    "No. of Transaction": trxMeta?.total ?? 0,
     Currency: "EUR",
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
@@ -657,6 +667,8 @@ export const SingleAccountBody = ({
             transactions={transactions}
             loading={loadingTrx}
             payout={payout}
+            meta={trxMeta}
+            children={children}
           />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
@@ -688,10 +700,12 @@ export const SingleDefaultAccountBody = ({
   admin,
   payout,
   isDefault,
+  trxMeta,
+  children,
 }: SingleDefaultAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
-    "No. of Transaction": transactions.length,
+    "No. of Transaction": trxMeta?.total ?? 0,
     Currency: "EUR",
     ...(business && !payout && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
@@ -748,6 +762,8 @@ export const SingleDefaultAccountBody = ({
             transactions={transactions}
             loading={loadingTrx}
             payout={payout}
+            meta={trxMeta}
+            children={children}
           />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>

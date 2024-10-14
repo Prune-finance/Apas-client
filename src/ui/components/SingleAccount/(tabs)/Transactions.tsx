@@ -27,7 +27,7 @@ import {
   IssuedTransactionTableRows,
   PayoutTransactionTableRows,
 } from "../../TableRows";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "../../Pagination";
@@ -37,17 +37,38 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "../../Filter";
 import { useForm, zodResolver } from "@mantine/form";
 
+interface Meta {
+  out: number;
+  total: number;
+  in: number;
+  totalAmount: number;
+}
 interface Props {
   transactions: TransactionType[];
   loading: boolean;
   payout?: boolean;
+  meta: Meta | null;
+  // active: number;
+  // setActive: Dispatch<SetStateAction<number>>;
+  // limit: string | null;
+  // setLimit: Dispatch<SetStateAction<string | null>>;
+  children: React.ReactNode;
 }
 
-export const Transactions = ({ transactions, loading, payout }: Props) => {
+export const Transactions = ({
+  transactions,
+  loading,
+  payout,
+  meta,
+  children,
+}: // limit,
+// setLimit,
+// active,
+// setActive,
+Props) => {
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
   const { data, opened, close } = Transaction();
-  const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("10");
+
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const [openedFilter, { toggle }] = useDisclosure(false);
@@ -60,25 +81,27 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
   const overviewDetails = [
     {
       title: "Total Transactions",
-      value: transactions?.length,
+      value: meta?.total,
       // currency: "EUR",
       // formatted: true,
     },
     {
       title: "Money In",
-      value:
-        transactions
-          .filter((trx) => trx.type === "CREDIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      // value:
+      //   transactions
+      //     .filter((trx) => trx.type === "CREDIT")
+      //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.in,
       currency: "EUR",
       formatted: true,
     },
     {
       title: "Money Out",
-      value:
-        transactions
-          .filter((trx) => trx.type === "DEBIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      // value:
+      //   transactions
+      //     .filter((trx) => trx.type === "DEBIT")
+      //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.out,
       currency: "EUR",
       formatted: true,
     },
@@ -138,16 +161,12 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
           payout ? (
             <PayoutTransactionTableRows
               data={transactions}
-              active={active}
-              limit={limit}
               searchProps={searchProps}
               search={debouncedSearch}
             />
           ) : (
             <IssuedTransactionTableRows
               data={transactions}
-              active={active}
-              limit={limit}
               searchProps={searchProps}
               search={debouncedSearch}
             />
@@ -163,17 +182,8 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         title="There are no transactions for this account"
         text="When a transaction is recorded, it will appear here"
       />
-
-      <PaginationComponent
-        active={active}
-        setActive={setActive}
-        setLimit={setLimit}
-        limit={limit}
-        total={Math.ceil(
-          filteredSearch(transactions, searchProps, search).length /
-            parseInt(limit ?? "10", 10)
-        )}
-      />
+      {/* Add Pagination as children */}
+      {children}
 
       {!payout && (
         <TransactionDrawer
@@ -194,4 +204,6 @@ const searchProps = [
   "recipientBankAddress",
   "senderName",
   "recipientName",
+  "centrolinkRef",
+  "reference",
 ];

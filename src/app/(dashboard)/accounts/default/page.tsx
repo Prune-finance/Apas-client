@@ -26,9 +26,12 @@ import { Suspense, useMemo, useState } from "react";
 import { useUserBusiness } from "@/lib/hooks/businesses";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function Account() {
   const searchParams = useSearchParams();
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const {
     status,
@@ -49,14 +52,27 @@ function Account() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
-      // page: active,
-      // limit: parseInt(limit ?? "10", 10),
+      page: active,
+      limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+  }, [
+    status,
+    date,
+    type,
+    senderName,
+    endDate,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
 
   const { account, loading } = useUserDefaultAccount();
-  const { transactions, loading: loadingTrx } =
-    useUserDefaultTransactions(param);
+  const {
+    transactions,
+    loading: loadingTrx,
+    meta: trxMeta,
+  } = useUserDefaultTransactions(param);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
@@ -76,63 +92,6 @@ function Account() {
         ]}
       />
 
-      {/* <Flex
-        justify="space-between"
-        align="center"
-        className={styles.main__header}
-      >
-        <Group gap={12} align="center">
-          {!loading ? (
-            <Avatar
-              size="lg"
-              color="var(--prune-primary-700)"
-              // variant="light"
-            >
-              {account?.accountName
-                .split(" ")
-                .map((item) => item.charAt(0))
-                .join("")}
-            </Avatar>
-          ) : (
-            <Skeleton circle h={50} w={50} />
-          )}
-
-          <Stack gap={2}>
-            {!loading ? (
-              <Text fz={24} className={styles.main__header__text} m={0} p={0}>
-                {account?.accountName}
-              </Text>
-            ) : (
-              <Skeleton h={10} w={100} />
-            )}
-
-            {!loading ? (
-              <Text
-                fz={10}
-                fw={400}
-                className={styles.main__header__text}
-                m={0}
-                p={0}
-              >
-                {account?.accountNumber ?? ""}
-              </Text>
-            ) : (
-              <Skeleton h={10} w={50} />
-            )}
-          </Stack>
-
-          {!loading ? (
-            <BadgeComponent status={account?.status ?? ""} active />
-          ) : (
-            <Skeleton w={60} h={10} />
-          )}
-        </Group>
-
-        <Flex gap={10}>
-          <PrimaryBtn text="Send Money" fw={600} />
-        </Flex>
-      </Flex> */}
-
       <Space mt={32} />
       <DefaultAccountHead
         account={account}
@@ -148,7 +107,16 @@ function Account() {
         loading={loading}
         loadingTrx={loadingTrx}
         setChartFrequency={setChartFrequency}
-      />
+        trxMeta={trxMeta}
+      >
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil(trxMeta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+        />
+      </SingleDefaultAccountBody>
     </main>
   );
 }

@@ -58,6 +58,17 @@ export const directorEtShareholderSchema = {
   proofOfAddressFileUrl: "",
 };
 
+export const ShareholderValues = {
+  id: crypto.randomUUID(),
+  name: "",
+  email: "",
+  identityType: null,
+  proofOfAddress: null,
+  identityFileUrl: "",
+  identityFileUrlBack: "",
+  proofOfAddressFileUrl: "",
+};
+
 export const newAdmin = {
   email: "",
   firstName: "",
@@ -185,7 +196,7 @@ export const newBusiness = {
   shareholderParticular: "",
   directorParticular: "",
   directors: [directorEtShareholderSchema],
-  shareholders: [directorEtShareholderSchema],
+  shareholders: [ShareholderValues],
   contactCountryCode: "+234",
 };
 

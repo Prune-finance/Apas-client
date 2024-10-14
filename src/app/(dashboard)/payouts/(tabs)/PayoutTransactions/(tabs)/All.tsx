@@ -120,8 +120,6 @@ export const AllPayoutTransactions = () => {
               "recipientBankAddress",
             ]}
             search={debouncedSearch}
-            active={active}
-            limit={limit}
           />
         }
         loading={loading}

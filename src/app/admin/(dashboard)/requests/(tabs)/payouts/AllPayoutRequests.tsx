@@ -10,11 +10,6 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
 import { Dispatch, Fragment, SetStateAction, useState } from "react";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../../businesses/schema";
 import Filter from "@/ui/components/Filter";
 import {
   Meta,

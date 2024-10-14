@@ -10,16 +10,12 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
 import { Dispatch, Fragment, SetStateAction, useState } from "react";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../../businesses/schema";
 import Filter from "@/ui/components/Filter";
 import {
   Meta,
   PayoutTransactionRequest,
   usePayoutTransactionRequests,
+  useUserPayoutTransactionRequests,
 } from "@/lib/hooks/requests";
 import Transaction from "@/lib/store/transaction";
 
@@ -81,7 +77,8 @@ export const AllPayoutRequests = () => {
   //     page: active,
   //     not: "PENDING",
   //   }
-  const { requests, loading, meta } = usePayoutTransactionRequests(queryParams);
+  const { requests, loading, meta } =
+    useUserPayoutTransactionRequests(queryParams);
 
   const { data, opened, close } = Transaction();
 

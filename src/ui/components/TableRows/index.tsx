@@ -16,13 +16,11 @@ import { BusinessData } from "@/lib/hooks/businesses";
 export const BusinessTransactionTableRows = ({
   data,
   search,
-
   searchProps,
   business,
 }: {
   data: TransactionType[];
   search: string;
-
   searchProps: string[];
   business?: boolean;
 }) => {
@@ -83,7 +81,6 @@ export const IssuedTransactionTableRows = ({
 }: {
   data: TransactionType[];
   search: string;
-
   searchProps: string[];
   noLink?: boolean;
 }) => {
@@ -150,15 +147,11 @@ export const IssuedTransactionTableRows = ({
 
 export const PayoutTransactionTableRows = ({
   data,
-
   search,
-
   searchProps,
 }: {
   data: TransactionType[];
-
   search: string;
-
   searchProps: string[];
 }) => {
   const { open, setData } = Transaction();

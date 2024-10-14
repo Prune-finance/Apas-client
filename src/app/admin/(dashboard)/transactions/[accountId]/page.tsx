@@ -225,8 +225,6 @@ export default function AccountTransactions() {
           <IssuedTransactionTableRows
             data={transactions}
             search={debouncedSearch}
-            active={active}
-            limit={limit}
             searchProps={searchProps}
             noLink
           />

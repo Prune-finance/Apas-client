@@ -545,6 +545,7 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
       ...(customParams.recipientName && {
         recipientName: customParams.recipientName,
       }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
     };
   }, [customParams]);
 
@@ -557,6 +558,7 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
     type,
     recipientIban,
     recipientName,
+    senderName,
   } = obj;
 
   async function fetchTrx() {
@@ -588,7 +590,17 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, page, date, endDate, status, type, recipientIban, recipientName]);
+  }, [
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+  ]);
 
   return { loading, transactions, meta, revalidate };
 }
@@ -613,6 +625,7 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
       ...(customParams.recipientName && {
         recipientName: customParams.recipientName,
       }),
+
       ...(customParams.senderName && { senderName: customParams.senderName }),
     };
   }, [customParams]);

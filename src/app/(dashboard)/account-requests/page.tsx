@@ -109,7 +109,7 @@ function AccountRequests() {
 
   const rows = filteredSearch(
     requests,
-    ["firstName", "lastName", "country"],
+    ["firstName", "lastName", "country", "accountName"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr

@@ -31,7 +31,12 @@ import { validateRequest } from "@/lib/schema";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
-import { IconBrandLinktree, IconCheck, IconX } from "@tabler/icons-react";
+import {
+  IconBrandLinktree,
+  IconCheck,
+  IconClock12,
+  IconX,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
 
@@ -64,12 +69,14 @@ export default function Account() {
     limit: parseInt(limit ?? "10", 10),
   };
 
-  const { account, loading, revalidate } = useSingleUserAccount(params.id);
+  const { account, loading, revalidate, meta } = useSingleUserAccount(
+    params.id
+  );
   const { handleSuccess, handleError } = useNotification();
   const {
     loading: trxLoading,
     transactions,
-    meta,
+    meta: txrMeta,
   } = useUserTransactions(params.id, customParams);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
@@ -224,13 +231,29 @@ export default function Account() {
                 account?.status === "ACTIVE" ? deactivateOpen : activateOpen
               }
               color={account?.status === "ACTIVE" ? "#D92D20" : "#027A48"}
-              c="#fff"
+              c={
+                meta?.hasPendingActivate || meta?.hasPendingDeactivate
+                  ? "#888"
+                  : "#fff"
+              }
               loading={loading}
+              disabled={meta?.hasPendingActivate || meta?.hasPendingDeactivate}
+              icon={
+                meta?.hasPendingActivate || meta?.hasPendingDeactivate
+                  ? IconClock12
+                  : undefined
+              }
             />
           )}
 
           {account?.status === "ACTIVE" && (
-            <SecondaryBtn text="Freeze Account" fw={600} action={freezeOpen} />
+            <SecondaryBtn
+              text="Freeze Account"
+              fw={600}
+              action={freezeOpen}
+              disabled={meta?.hasPendingFreeze}
+              icon={meta?.hasPendingFreeze ? IconClock12 : undefined}
+            />
           )}
 
           {account?.status === "FROZEN" && (
@@ -249,14 +272,14 @@ export default function Account() {
         loading={loading}
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
-        trxMeta={meta}
+        trxMeta={txrMeta}
       >
         <PaginationComponent
           active={active}
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+          total={Math.ceil((txrMeta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
         <Text>Pagination here</Text>
       </SingleAccountBody>

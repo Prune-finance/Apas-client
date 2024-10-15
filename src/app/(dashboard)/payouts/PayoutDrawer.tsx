@@ -18,6 +18,7 @@ import {
 } from "@mantine/core";
 import {
   IconCircleArrowDown,
+  IconClockHour4,
   IconInfoCircleFilled,
   IconReload,
   IconReportSearch,
@@ -35,7 +36,7 @@ import {
   ReceiptDetails,
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { handlePdfDownload, parseError } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
@@ -200,6 +201,22 @@ export const PayoutTransactionDrawer = ({
       setProcessing(false);
     }
   };
+
+  const { hasQuery, hasTrace, hasRecall } = useMemo(() => {
+    const hasQuery = Boolean(
+      data?.Inquiries?.find((inq) => inq.type === "QUERY")
+    );
+    const hasTrace = Boolean(
+      data?.Inquiries?.find((inq) => inq.type === "TRACE")
+    );
+    const hasRecall = Boolean(
+      data?.Inquiries?.find((inq) => inq.type === "RECALL")
+    );
+
+    return { hasQuery, hasTrace, hasRecall };
+  }, [data?.Inquiries]);
+
+  console.log(data);
 
   return (
     <Drawer
@@ -381,29 +398,32 @@ export const PayoutTransactionDrawer = ({
               <>
                 <SecondaryBtn
                   text="Query"
-                  icon={IconReportSearch}
+                  icon={hasQuery ? IconClockHour4 : IconReportSearch}
                   action={() => {
                     setInquiryType("query");
                     open();
                   }}
+                  disabled={hasQuery}
                 />
 
                 <SecondaryBtn
                   text="Run Trace"
-                  icon={IconReportSearch}
+                  icon={hasTrace ? IconClockHour4 : IconReportSearch}
                   action={() => {
                     setInquiryType("trace");
                     open();
                   }}
+                  disabled={hasTrace}
                 />
 
                 <SecondaryBtn
                   text="Recall"
-                  icon={IconReload}
+                  icon={hasRecall ? IconClockHour4 : IconReload}
                   action={() => {
                     setInquiryType("recall");
                     open();
                   }}
+                  disabled={hasRecall}
                 />
               </>
             )}
@@ -457,6 +477,7 @@ export const PayoutTransactionDrawer = ({
         close={closeModal}
         type={inquiryType}
         trxId={data?.id ?? ""}
+        revalidate={revalidate}
       />
 
       <ModalComponent

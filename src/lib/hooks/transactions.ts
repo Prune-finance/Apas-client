@@ -815,6 +815,11 @@ export interface Meta {
   totalAmount: number;
 }
 
+export interface Inquiry {
+  id: string;
+  type: "QUERY" | "RECALL" | "TRACE";
+}
+
 export interface TransactionType {
   id: string;
   senderIban: string;
@@ -837,4 +842,5 @@ export interface TransactionType {
   type: "DEBIT" | "CREDIT";
   company: BusinessData;
   narration?: string;
+  Inquiries?: Inquiry[];
 }

@@ -57,3 +57,38 @@ export const filteredSearch = <T>(
 //     });
 //   });
 // };
+
+const matchesSearchTerms = <T>(
+  item: T,
+  properties: string[],
+  searchTerms: string[]
+): boolean => {
+  const concatenatedValues = properties
+    .map((key) => {
+      const itemValue = getNestedValue(item, key) as unknown as string;
+      return itemValue != null ? String(itemValue).toLowerCase() : "";
+    })
+    .join(" ");
+
+  console.log({
+    concatenatedValues,
+    searchTerms: searchTerms.every((term) => concatenatedValues.includes(term)),
+  });
+
+  return searchTerms.every((term) => concatenatedValues.includes(term));
+};
+
+export const multiKeySearch = <T>(
+  arr: T[],
+  properties: string[],
+  searchValue: string
+): T[] => {
+  if (properties.length === 0) return arr;
+  if (arr.length === 0) return arr;
+
+  const searchTerms = searchValue.toLowerCase().split(" ");
+
+  return arr.filter((item) =>
+    matchesSearchTerms(item, properties, searchTerms)
+  );
+};

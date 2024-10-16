@@ -199,20 +199,12 @@ function Users() {
         onClick={() => handleRowClick(element)}
         style={{ cursor: "pointer" }}
       >
-        <TableTd
-          className={styles.table__td}
-          tt="lowercase"
-          style={{ wordBreak: "break-word" }}
-          w="20%"
-        >
+        <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
           {element.email}
         </TableTd>
-        <TableTd className={`${styles.table__td}`}>
-          {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-        </TableTd>
-        <TableTd className={`${styles.table__td}`}>
-          {dayjs(element.updatedAt).fromNow()}
-          {/* {dayjs(element.updatedAt).format("ddd DD MMM YYYY")} */}
+        <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
+        <TableTd>
+          {element.lastLogIn ? dayjs(element.lastLogIn).fromNow() : "Nil"}
         </TableTd>
 
         <TableTd>
@@ -224,10 +216,7 @@ function Users() {
           />
         </TableTd>
 
-        <TableTd
-          className={`${styles.table__td}`}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <TableTd onClick={(e) => e.stopPropagation()}>
           <Menu shadow="md" width={150}>
             <MenuTarget>
               <UnstyledButton>

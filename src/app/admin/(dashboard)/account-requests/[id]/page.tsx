@@ -97,62 +97,6 @@ function BusinessAccountRequests() {
     validate: zodResolver(FilterSchema),
   });
 
-  const MenuComponent = ({ id }: { id: string }) => {
-    const { handleError, handleSuccess } = useNotification();
-
-    const handleApproval = async () => {
-      const { success, message } = await approveRequest(id);
-
-      if (success) {
-        revalidate();
-        return handleSuccess("Successful! Request Approved", message);
-      }
-      return handleError("Error! Request Approval Failed", message);
-    };
-
-    const handleRejection = async () => {
-      const { success, message } = await rejectRequest(id);
-
-      if (success) {
-        revalidate();
-        return handleSuccess("Successful! Request Denied", message);
-      }
-      return handleError("Error! Request Denials Failed", message);
-    };
-
-    return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton onClick={(e) => e.stopPropagation()}>
-            <IconDotsVertical size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          <MenuItem
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconUserCheck style={{ width: rem(14), height: rem(14) }} />
-            }
-            onClick={handleApproval}
-          >
-            Approve
-          </MenuItem>
-
-          <MenuItem
-            fz={10}
-            c="#667085"
-            leftSection={<IconX style={{ width: rem(14), height: rem(14) }} />}
-            onClick={handleRejection}
-          >
-            Deny
-          </MenuItem>
-        </MenuDropdown>
-      </Menu>
-    );
-  };
-
   const handleRowClick = (id: string, status: string, accountId: string) => {
     if (status === "APPROVED") return push(`/admin/accounts/${accountId}`);
 
@@ -161,7 +105,7 @@ function BusinessAccountRequests() {
 
   const rows = filteredSearch(
     requests,
-    ["firstName", "lastName", "Company.name"],
+    ["firstName", "lastName", "country", "accountName"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
@@ -243,6 +187,14 @@ function BusinessAccountRequests() {
             </Text>
           ) : (
             <Skeleton h={10} w={100} />
+          )}
+
+          {!loading ? (
+            <Badge color="var(--prune-primary-700)" variant="light">
+              {meta?.total}
+            </Badge>
+          ) : (
+            <Skeleton h={10} w={40} />
           )}
         </Group>
 

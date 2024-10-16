@@ -15,6 +15,7 @@ import {
   Meta,
   PayoutTransactionRequest,
   usePayoutTransactionRequests,
+  useUserPayoutTransactionRequests,
 } from "@/lib/hooks/requests";
 import Transaction from "@/lib/store/transaction";
 
@@ -76,7 +77,8 @@ export const AllPayoutRequests = () => {
   //     page: active,
   //     not: "PENDING",
   //   }
-  const { requests, loading, meta } = usePayoutTransactionRequests(queryParams);
+  const { requests, loading, meta } =
+    useUserPayoutTransactionRequests(queryParams);
 
   const { data, opened, close } = Transaction();
 

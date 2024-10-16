@@ -1,6 +1,7 @@
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
+import Transaction from "@/lib/store/transaction";
 import { camelCaseToTitleCase } from "@/lib/utils";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import DropzoneComponent from "@/ui/components/Dropzone";
@@ -18,6 +19,7 @@ interface Props {
   type?: "recall" | "query" | "trace";
   pruneRef: string;
   trxId: string;
+  revalidate?: () => void;
 }
 
 export const InquiryModal = ({
@@ -26,9 +28,11 @@ export const InquiryModal = ({
   type,
   pruneRef,
   trxId,
+  revalidate,
 }: Props) => {
   const { handleError, handleSuccess, handleInfo } = useNotification();
   const { push } = useRouter();
+  const { close: closeTrxDrawer } = Transaction();
   const [processing, setProcessing] = useState(false);
   type FormValues = z.infer<typeof schema>;
 
@@ -63,9 +67,13 @@ export const InquiryModal = ({
         type === "query" ? "created" : "initiated"
       } a ${type}. Check under inquiries tab to  track the ${type} status.`;
 
-      push(`/payouts?tab=Inquiries`);
+      // push(`/payouts?tab=Inquiries`);
+      window.history.pushState({}, "", `/payouts?tab=Inquiries`);
+
+      revalidate && revalidate();
       handleSuccess(title, msg);
       close();
+      closeTrxDrawer();
       form.reset();
     } catch (error) {
       handleError("An error occurred", parseError(error));

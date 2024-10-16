@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { BusinessData } from "./businesses";
 import { IParams } from "../schema";
-import { custom } from "zod";
 
 export function useTransactions(id: string = "", customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
@@ -171,24 +170,41 @@ export function useBusinessTransactions(
   const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function fetchTrx() {
-    const queryParams = {
+  const obj = useMemo(() => {
+    return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.not && { not: customParams.not }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
-      ...(customParams.senderName && { senderName: customParams.senderName }),
-      ...(customParams.recipientName && {
-        recipientName: customParams.recipientName,
-      }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
     };
+  }, [customParams]);
 
-    const params = new URLSearchParams(queryParams as Record<string, string>);
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  } = obj;
+
+  async function fetchTrx() {
+    const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
       const path = id ? `` : "transactions";
@@ -215,15 +231,16 @@ export function useBusinessTransactions(
       // Any cleanup code can go here
     };
   }, [
-    customParams.date,
-    customParams.limit,
-    customParams.status,
-    customParams.endDate,
-    customParams.type,
-    customParams.senderName,
-    customParams.recipientName,
-    customParams.recipientIban,
-    customParams.page,
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
   ]);
 
   return { loading, transactions, meta, revalidate };
@@ -231,15 +248,57 @@ export function useBusinessTransactions(
 
 export function useDefaultAccountTransactions(customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
-  const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
+  const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.not && { not: customParams.not }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+    };
+  }, [customParams]);
+
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  } = obj;
 
   async function fetchTrx() {
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
     };
 
     // {{account-srv}}/v1/admin/accounts/payout/trx
@@ -270,10 +329,16 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
   }, [
-    customParams.date,
-    customParams.limit,
-    customParams.status,
-    customParams.page,
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
   ]);
 
   return { loading, transactions, meta, revalidate };
@@ -281,7 +346,7 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
 
 export function usePayoutTransactions(customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
-  const [meta, setMeta] = useState<BusinessTrxMeta | null>(null);
+  const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -480,6 +545,9 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
       ...(customParams.recipientName && {
         recipientName: customParams.recipientName,
       }),
+      ...(customParams.senderName && {
+        senderName: customParams.senderName,
+      }),
     };
   }, [customParams]);
 
@@ -492,6 +560,7 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
     type,
     recipientIban,
     recipientName,
+    senderName,
   } = obj;
 
   async function fetchTrx() {
@@ -523,7 +592,17 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, page, date, endDate, status, type, recipientIban, recipientName]);
+  }, [
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+  ]);
 
   return { loading, transactions, meta, revalidate };
 }
@@ -548,6 +627,7 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
       ...(customParams.recipientName && {
         recipientName: customParams.recipientName,
       }),
+
       ...(customParams.senderName && { senderName: customParams.senderName }),
     };
   }, [customParams]);
@@ -735,6 +815,11 @@ export interface Meta {
   totalAmount: number;
 }
 
+export interface Inquiry {
+  id: string;
+  type: "QUERY" | "RECALL" | "TRACE";
+}
+
 export interface TransactionType {
   id: string;
   senderIban: string;
@@ -757,4 +842,5 @@ export interface TransactionType {
   type: "DEBIT" | "CREDIT";
   company: BusinessData;
   narration?: string;
+  Inquiries?: Inquiry[];
 }

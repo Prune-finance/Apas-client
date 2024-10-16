@@ -43,7 +43,11 @@ export const DebitRequestDrawer = ({
   };
 
   const destDetails = {
-    Name: `${selectedRequest?.destinationFirstName} ${selectedRequest?.destinationLastName}`,
+    "Account Name":
+      selectedRequest?.destinationFirstName &&
+      selectedRequest?.destinationLastName
+        ? `${selectedRequest?.destinationFirstName} ${selectedRequest?.destinationLastName}`
+        : "N/A",
     IBAN: selectedRequest?.destinationIBAN,
     BIC: selectedRequest?.destinationBIC,
     Country: selectedRequest?.destinationCountry,

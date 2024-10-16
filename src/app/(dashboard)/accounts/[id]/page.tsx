@@ -31,11 +31,19 @@ import { validateRequest } from "@/lib/schema";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
-import { IconBrandLinktree, IconCheck, IconX } from "@tabler/icons-react";
+import {
+  IconBrandLinktree,
+  IconCheck,
+  IconClock12,
+  IconX,
+} from "@tabler/icons-react";
 import dayjs from "dayjs";
+import PaginationComponent from "@/ui/components/Pagination";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
 
   const searchParams = useSearchParams();
 
@@ -49,26 +57,27 @@ export default function Account() {
     recipientIban,
   } = Object.fromEntries(searchParams.entries());
 
-  const customParams = useMemo(() => {
-    return {
-      ...(status && { status: status.toUpperCase() }),
-      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-      ...(type && { type: type }),
-      ...(senderName && { senderName: senderName }),
-      ...(recipientName && { recipientName: recipientName }),
-      ...(recipientIban && { recipientIban: recipientIban }),
-      // page: active,
-      // limit: parseInt(limit ?? "10", 10),
-    };
-  }, [status, date, type, senderName, endDate, recipientName, recipientIban]);
+  const customParams = {
+    ...(status && { status: status.toUpperCase() }),
+    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    ...(type && { type: type }),
+    ...(senderName && { senderName: senderName }),
+    ...(recipientName && { recipientName: recipientName }),
+    ...(recipientIban && { recipientIban: recipientIban }),
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
 
-  const { account, loading, revalidate } = useSingleUserAccount(params.id);
-  const { handleSuccess, handleError } = useNotification();
-  const { loading: trxLoading, transactions } = useUserTransactions(
-    params.id,
-    customParams
+  const { account, loading, revalidate, meta } = useSingleUserAccount(
+    params.id
   );
+  const { handleSuccess, handleError } = useNotification();
+  const {
+    loading: trxLoading,
+    transactions,
+    meta: txrMeta,
+  } = useUserTransactions(params.id, customParams);
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
 
@@ -222,13 +231,29 @@ export default function Account() {
                 account?.status === "ACTIVE" ? deactivateOpen : activateOpen
               }
               color={account?.status === "ACTIVE" ? "#D92D20" : "#027A48"}
-              c="#fff"
+              c={
+                meta?.hasPendingActivate || meta?.hasPendingDeactivate
+                  ? "#888"
+                  : "#fff"
+              }
               loading={loading}
+              disabled={meta?.hasPendingActivate || meta?.hasPendingDeactivate}
+              icon={
+                meta?.hasPendingActivate || meta?.hasPendingDeactivate
+                  ? IconClock12
+                  : undefined
+              }
             />
           )}
 
           {account?.status === "ACTIVE" && (
-            <SecondaryBtn text="Freeze Account" fw={600} action={freezeOpen} />
+            <SecondaryBtn
+              text="Freeze Account"
+              fw={600}
+              action={freezeOpen}
+              disabled={meta?.hasPendingFreeze}
+              icon={meta?.hasPendingFreeze ? IconClock12 : undefined}
+            />
           )}
 
           {account?.status === "FROZEN" && (
@@ -247,7 +272,17 @@ export default function Account() {
         loading={loading}
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
-      />
+        trxMeta={txrMeta}
+      >
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={Math.ceil((txrMeta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        />
+        <Text>Pagination here</Text>
+      </SingleAccountBody>
 
       <Modal
         size="xl"

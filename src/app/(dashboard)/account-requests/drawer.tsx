@@ -17,12 +17,14 @@ import {
   FileButton,
   Modal,
   Button,
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconX,
   IconPdf,
   IconFileTypePdf,
   IconInfoCircle,
+  IconCircleFilled,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
@@ -35,7 +37,7 @@ import { getNestedDocValue } from "@/lib/helpers/document-status";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import FileDisplay from "@/ui/components/DocumentViewer";
 import { useDisclosure } from "@mantine/hooks";
 import { PrimaryBtn } from "@/ui/components/Buttons";
@@ -109,6 +111,70 @@ export const AccountRequestsDrawer = ({
       setProcessing(false);
     }
   };
+
+  const groupedTitle = (title: string, reUpload: boolean) => {
+    return (
+      <Group gap={5}>
+        <Text fz={12}>{title}</Text>
+
+        {reUpload && (
+          <ActionIcon color="#D92D20" variant="transparent" size={12}>
+            <IconCircleFilled />
+          </ActionIcon>
+        )}
+      </Group>
+    );
+  };
+
+  const getNestedValue = (obj: any, keys: string[]) => {
+    for (const key in obj) {
+      if (typeof obj[key] === "object") {
+        if (getNestedValue(obj[key], keys)) {
+          return true;
+        }
+      } else if (keys.includes(key) && obj[key] === false) {
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const { certOfInc, mermat, directors, shareholders } = useMemo(() => {
+    const certOfInc = selectedRequest?.documentApprovals?.certOfInc;
+    const mermat = selectedRequest?.documentApprovals?.mermat;
+    const directors = getNestedValue(
+      selectedRequest?.documentApprovals.directors,
+      ["idFile", "poaFile"]
+    );
+    const shareholders = getNestedValue(
+      selectedRequest?.documentApprovals.shareholders,
+      ["idFile", "poaFile"]
+    );
+
+    return { certOfInc, mermat, directors, shareholders };
+  }, [selectedRequest?.documentApprovals]);
+
+  const _directors = getNestedValue(
+    selectedRequest?.documentApprovals.directors,
+    ["idFile", "poaFile"]
+  );
+  const _shareholders = getNestedValue(
+    selectedRequest?.documentApprovals.shareholders,
+    ["idFile", "poaFile"]
+  );
+
+  const tabs = [
+    {
+      value: "Documents",
+      title: groupedTitle("Documents", certOfInc === false || mermat === false),
+    },
+    // { value: "Contact Person" },
+    { value: "Directors", title: groupedTitle("Directors", directors) },
+    {
+      value: "Shareholders",
+      title: groupedTitle("Shareholders", shareholders),
+    },
+  ];
 
   return (
     <Drawer
@@ -266,7 +332,7 @@ export const AccountRequestsDrawer = ({
                     <TextInputWithFile
                       label="Certificate of Incorporation"
                       placeholder="Certificate of Incorporation"
-                      url={selectedRequest.documentData.certOfInc}
+                      url={selectedRequest?.documentData?.certOfInc}
                       path="certOfInc"
                       request={selectedRequest}
                       revalidate={revalidate}
@@ -282,7 +348,7 @@ export const AccountRequestsDrawer = ({
                     <TextInputWithFile
                       label="Mermat"
                       placeholder="Mermat"
-                      url={selectedRequest.documentData.mermat}
+                      url={selectedRequest?.documentData?.mermat}
                       path={`mermat`}
                       request={selectedRequest}
                       revalidate={revalidate}
@@ -519,13 +585,6 @@ export const AccountRequestsDrawer = ({
   );
 };
 
-const tabs = [
-  { value: "Documents" },
-  // { value: "Contact Person" },
-  { value: "Directors" },
-  { value: "Shareholders" },
-];
-
 interface UploadedFiles {
   path: string;
   url: string;
@@ -647,7 +706,8 @@ export const TextInputWithFile = ({
                 )}
               </FileButton>
             </Flex>
-          ) : getNestedDocValue(request.documentApprovals, path) === false ? (
+          ) : request.documentApprovals &&
+            getNestedDocValue(request?.documentApprovals, path) === false ? (
             <FileButton
               disabled={processing}
               onChange={(file) => handleUpload(file)}

@@ -15,11 +15,11 @@ import PruneIcon from "@/assets/icon.png";
 import ReceiptIcon from "@/assets/receipt-bg.svg";
 import { formatNumber } from "@/lib/utils";
 
-import { Fragment, RefObject } from "react";
+import { Fragment, ReactNode, RefObject } from "react";
 
 export interface ReceiptDetails {
   title: string;
-  value: Record<string, string>;
+  value: Record<string, string | ReactNode>;
 }
 
 interface Props {
@@ -64,7 +64,7 @@ export const TransactionReceipt = ({
           </BackgroundImage>
 
           {details.map(({ title, value }, index) => (
-            <Fragment key={index}>
+            <Fragment key={title}>
               <Text
                 fz={10}
                 mt={44}
@@ -78,7 +78,7 @@ export const TransactionReceipt = ({
 
               <Flex direction="column" gap={16}>
                 {Object.entries(value).map(([key, value]) => (
-                  <Flex justify="space-between">
+                  <Flex justify="space-between" key={key}>
                     <Text fz={10} c="var(--prune-text-gray-600)">
                       {`${key}:`}
                     </Text>

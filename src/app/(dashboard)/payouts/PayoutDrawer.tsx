@@ -18,6 +18,7 @@ import {
 } from "@mantine/core";
 import {
   IconCircleArrowDown,
+  IconClockHour4,
   IconInfoCircleFilled,
   IconReload,
   IconReportSearch,
@@ -35,7 +36,7 @@ import {
   ReceiptDetails,
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { handlePdfDownload, parseError } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
@@ -151,6 +152,7 @@ export const PayoutTransactionDrawer = ({
     "Payment Date": dayjs(data?.createdAt).format("hh:mm A Do MMM YYYY"),
     Reference: data?.reference ?? "N/A",
     "C-L Reference": data?.id ?? "",
+    "Status:": <BadgeComponent status={data?.status ?? ""} />,
   };
   const details: ReceiptDetails[] = [
     {
@@ -199,6 +201,22 @@ export const PayoutTransactionDrawer = ({
       setProcessing(false);
     }
   };
+
+  const { hasQuery, hasTrace, hasRecall } = useMemo(() => {
+    const hasQuery = Boolean(
+      data?.Inquiries?.find((inq) => inq.type === "QUERY")
+    );
+    const hasTrace = Boolean(
+      data?.Inquiries?.find((inq) => inq.type === "TRACE")
+    );
+    const hasRecall = Boolean(
+      data?.Inquiries?.find((inq) => inq.type === "RECALL")
+    );
+
+    return { hasQuery, hasTrace, hasRecall };
+  }, [data?.Inquiries]);
+
+  console.log(data);
 
   return (
     <Drawer
@@ -369,40 +387,46 @@ export const PayoutTransactionDrawer = ({
           <Divider mt={30} mb={20} />
         </ScrollArea>
 
-        {!isAdmin && (
-          <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
-            {data &&
+        {/* {data &&
               (isAfter24Hours(data?.createdAt) ||
                 data.status === "PENDING") && (
-                <>
-                  <SecondaryBtn
-                    text="Query"
-                    icon={IconReportSearch}
-                    action={() => {
-                      setInquiryType("query");
-                      open();
-                    }}
-                  />
+                <></> */}
 
-                  <SecondaryBtn
-                    text="Run Trace"
-                    icon={IconReportSearch}
-                    action={() => {
-                      setInquiryType("trace");
-                      open();
-                    }}
-                  />
+        {!isAdmin && (
+          <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
+            {data && data.status === "CONFIRMED" && (
+              <>
+                <SecondaryBtn
+                  text="Query"
+                  icon={hasQuery ? IconClockHour4 : IconReportSearch}
+                  action={() => {
+                    setInquiryType("query");
+                    open();
+                  }}
+                  disabled={hasQuery}
+                />
 
-                  <SecondaryBtn
-                    text="Recall"
-                    icon={IconReload}
-                    action={() => {
-                      setInquiryType("recall");
-                      open();
-                    }}
-                  />
-                </>
-              )}
+                <SecondaryBtn
+                  text="Run Trace"
+                  icon={hasTrace ? IconClockHour4 : IconReportSearch}
+                  action={() => {
+                    setInquiryType("trace");
+                    open();
+                  }}
+                  disabled={hasTrace}
+                />
+
+                <SecondaryBtn
+                  text="Recall"
+                  icon={hasRecall ? IconClockHour4 : IconReload}
+                  action={() => {
+                    setInquiryType("recall");
+                    open();
+                  }}
+                  disabled={hasRecall}
+                />
+              </>
+            )}
 
             {data?.status === "PENDING" ? (
               <PrimaryBtn
@@ -411,17 +435,22 @@ export const PayoutTransactionDrawer = ({
                 color="#D92D20"
                 c="#fff"
                 fw={600}
+                fullWidth
                 action={openCancel}
               />
             ) : (
               <PrimaryBtn
                 icon={IconCircleArrowDown}
                 text={`Download ${
-                  !isAfter24Hours(data?.createdAt ?? new Date())
-                    ? "Receipt"
-                    : ""
+                  data?.status === "CANCELLED" ? "Receipt" : ""
                 }`}
-                fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
+                // text={`Download ${
+                //   !isAfter24Hours(data?.createdAt ?? new Date())
+                //     ? "Receipt"
+                //     : ""
+                // }`}
+                fullWidth={data?.status === "CANCELLED"}
+                // fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
                 fw={600}
                 action={() => handlePdfDownload(pdfRef)}
               />
@@ -448,6 +477,7 @@ export const PayoutTransactionDrawer = ({
         close={closeModal}
         type={inquiryType}
         trxId={data?.id ?? ""}
+        revalidate={revalidate}
       />
 
       <ModalComponent

@@ -175,8 +175,6 @@ export const PayoutsTab = () => {
           <PayoutTransactionTableRows
             data={transactions}
             search={debouncedSearch}
-            active={active}
-            limit={limit}
             searchProps={searchProps}
           />
         }

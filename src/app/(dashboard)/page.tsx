@@ -1,42 +1,36 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
-import Cookies from "js-cookie";
 
-import { Text, TableTd, Paper, Box, Modal, Group } from "@mantine/core";
+import { Text, TableTd, Paper, Modal, Group } from "@mantine/core";
 import { TableTbody, TableTh, TableThead } from "@mantine/core";
 import { Tooltip, rem, Button, Table } from "@mantine/core";
 import { Stack, CopyButton, ActionIcon } from "@mantine/core";
 import { Grid, GridCol, NativeSelect, TableTr } from "@mantine/core";
-import { Flex, TableScrollContainer } from "@mantine/core";
-import { DonutChart, LineChart, AreaChart } from "@mantine/charts";
+import { Flex } from "@mantine/core";
+import { DonutChart } from "@mantine/charts";
 
 import { IconCheck, IconCircleChevronRight } from "@tabler/icons-react";
 import { IconArrowUpRight, IconCopy } from "@tabler/icons-react";
-import { IconPointFilled, IconSquareFilled } from "@tabler/icons-react";
 
 import { formatNumber } from "@/lib/utils";
-import { DynamicSkeleton2, UserDashboardData } from "@/lib/static";
+import { DynamicSkeleton2 } from "@/lib/static";
 import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
 
 import { CardFive, CardOne, CardOneBtn } from "@/ui/components/Cards";
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/user/home.module.scss";
 import { useUserDebitRequests } from "@/lib/hooks/requests";
 import { useUserBalances } from "@/lib/hooks/balance";
 import {
   useUserDefaultTransactions,
+  useUserPayoutTransactions,
   useUserTransactions,
 } from "@/lib/hooks/transactions";
 import User from "@/lib/store/user";
 import dayjs from "dayjs";
-import axios from "axios";
-import { Key } from "./settings/(tabs)/keys";
 import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "./debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
-import { TableComponent } from "@/ui/components/Table";
-import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { checkToken } from "@/lib/actions/checkToken";
 import { BarChartComponent } from "@/ui/components/Charts";
@@ -52,7 +46,7 @@ export default function Home() {
   const { account, loading: loadingDftAcct } = useUserDefaultAccount();
 
   const { loading: loadingPayout, transactions: payoutTrx } =
-    useUserDefaultTransactions();
+    useUserPayoutTransactions();
 
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -74,14 +68,15 @@ export default function Home() {
         {element.Account.accountName}
       </TableTd>
       <TableTd className={styles.table__td}>
-        <Flex align="center">
+        {/* <Flex align="center">
           <IconArrowUpRight
             color="#D92D20"
             size={16}
             className={styles.table__td__icon}
           />
           {formatNumber(element.amount, true, "EUR")}
-        </Flex>
+        </Flex> */}
+        <AmountGroup amount={element.amount} type={"DEBIT"} />
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("DD MMM, YYYY")}
@@ -94,9 +89,9 @@ export default function Home() {
 
   const payoutRows = payoutTrx.slice(0, 2).map((element) => (
     <TableTr key={element.id}>
-      <TableTd className={styles.table__td}>{element.recipientIban}</TableTd>
+      <TableTd className={styles.table__td}>{element.recipientName}</TableTd>
       <TableTd className={styles.table__td}>
-        <AmountGroup amount={element.amount} type={"DEBIT"} />
+        <AmountGroup amount={element.amount} type={element.type} />
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("DD MMM, YYYY")}
@@ -409,7 +404,9 @@ export default function Home() {
                 <Table verticalSpacing={15} fz={12}>
                   <TableThead style={{ borderBottom: "1px solid #f5f5f5" }}>
                     {debitTableHeader.map((header) => (
-                      <TableTh className={styles.table__th}>{header}</TableTh>
+                      <TableTh key={header} className={styles.table__th}>
+                        {header}
+                      </TableTh>
                     ))}
                   </TableThead>
                   <TableTbody>
@@ -426,7 +423,7 @@ export default function Home() {
                   text="When a debit request is made, they will appear here"
                 /> */}
 
-                {rows.length === 0 && (
+                {!debitLoading && rows.length === 0 && (
                   <Flex
                     style={{ flexGrow: 1 }}
                     direction="column"
@@ -477,7 +474,7 @@ export default function Home() {
 
                   <Button
                     component="a"
-                    href="/payouts"
+                    href="/payouts?tab=Transactions"
                     variant="transparent"
                     color="var(--prune-primary-800)"
                     fz={11}
@@ -511,7 +508,7 @@ export default function Home() {
                   </TableTbody>
                 </Table>
 
-                {payoutTrx.length === 0 && (
+                {!loadingPayout && payoutTrx.length === 0 && (
                   <Flex
                     style={{ flexGrow: 1 }}
                     direction="column"

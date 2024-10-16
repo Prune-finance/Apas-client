@@ -3,7 +3,7 @@ import styles from "./styles.module.scss";
 import { ReactNode } from "react";
 
 interface Tab {
-  title?: string;
+  title?: string | ReactNode;
   value: string;
   icon?: JSX.Element;
 }

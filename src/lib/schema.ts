@@ -48,6 +48,18 @@ export const validateRegister = z
 export type RegisterType = z.infer<typeof validateRegister>;
 
 export const directorEtShareholderSchema = {
+  id: crypto.randomUUID(),
+  name: "",
+  email: "",
+  identityType: null,
+  proofOfAddress: null,
+  identityFileUrl: "",
+  identityFileUrlBack: "",
+  proofOfAddressFileUrl: "",
+};
+
+export const ShareholderValues = {
+  id: crypto.randomUUID(),
   name: "",
   email: "",
   identityType: null,
@@ -184,7 +196,7 @@ export const newBusiness = {
   shareholderParticular: "",
   directorParticular: "",
   directors: [directorEtShareholderSchema],
-  shareholders: [directorEtShareholderSchema],
+  shareholders: [ShareholderValues],
   contactCountryCode: "+234",
 };
 
@@ -281,6 +293,7 @@ export const documentSchema = z.object({
 export const directorsSchema = z.object({
   directors: z
     .object({
+      id: z.string().uuid(),
       name: z.string().min(1, "Director's name is required"),
       email: z.string().refine(
         (val) => {
@@ -293,17 +306,33 @@ export const directorsSchema = z.object({
       proofOfAddress: z.string().nullable(),
       identityFileUrl: z.string(),
       identityFileUrlBack: z.string(),
-
       proofOfAddressFileUrl: z.string(),
     })
     .array()
-    .optional(),
+    .optional()
+    .superRefine((directors, ctx) => {
+      const emails = directors?.map((dir) => dir.email);
+      const emailSet = new Set();
+      emails?.forEach((email, index) => {
+        if (emailSet.has(email)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Duplicate email found: ${email}`,
+            path: [index, "email"],
+            // path: ["directors", index, "email"],
+          });
+        } else {
+          emailSet.add(email);
+        }
+      });
+    }),
 });
 
 export const shareholdersSchema = z.object({
   shareholders: z
     .array(
       z.object({
+        id: z.string().uuid(),
         name: z.string(),
         email: z.string().refine(
           (val) => {
@@ -319,7 +348,22 @@ export const shareholdersSchema = z.object({
         proofOfAddressFileUrl: z.string(),
       })
     )
-    .optional(),
+    .optional()
+    .superRefine((shareholders, ctx) => {
+      const emails = shareholders?.map((shareholder) => shareholder.email);
+      const emailSet = new Set();
+      emails?.forEach((email, index) => {
+        if (emailSet.has(email)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Duplicate email found: ${email}`,
+            path: [index, "email"],
+          });
+        } else {
+          emailSet.add(email);
+        }
+      });
+    }),
 });
 
 export const validateNewBusiness = z.object({
@@ -364,6 +408,7 @@ export const validateNewBusiness = z.object({
   directors: z
     .array(
       z.object({
+        id: z.string().uuid(),
         name: z.string().min(1, "Director's name is required"),
         email: z.string().refine(
           (val) => {
@@ -382,6 +427,7 @@ export const validateNewBusiness = z.object({
     .optional(),
   shareholders: z
     .object({
+      id: z.string().uuid(),
       name: z.string(),
       email: z.string().refine(
         (val) => {

@@ -7,7 +7,7 @@ import { IconCheck, IconInfoCircle } from "@tabler/icons-react";
 
 import { useSearchParams } from "next/navigation";
 
-import { Suspense, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -22,11 +22,14 @@ import { useDisclosure } from "@mantine/hooks";
 import { LiveDateModal } from "../settings/LiveDateModal";
 import { AlertStore } from "@/lib/store/alert";
 import { PayoutTransactions } from "./(tabs)/PayoutTransactions";
+import PayoutRequests from "./(tabs)/Requests";
+import { set } from "zod";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
 
   const { tab } = Object.fromEntries(searchParams.entries());
+  const [tabValue, setTabValue] = useState<string | null>(tab);
 
   const [processing, setProcessing] = useState(false);
   const [liveDate, setLiveDate] = useState<Date | null>(null);
@@ -38,6 +41,10 @@ function PayoutTrx() {
 
   const { business, meta, revalidate, loading } = useUserBusiness();
   const { close: closeAlert, opened: openedAlert } = AlertStore();
+
+  useEffect(() => {
+    setTabValue(tab);
+  }, [tab]);
 
   const requestPayoutAccount = async () => {
     setProcessing(true);
@@ -169,7 +176,12 @@ function PayoutTrx() {
       </Group>
 
       <TabsComponent
-        defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
+        // defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
+        value={tabValue}
+        onChange={(value) => {
+          setTabValue(value);
+          window.history.pushState({}, "", `?tab=${value}`);
+        }}
         tabs={tabs}
         mt={28}
         keepMounted={false}
@@ -186,6 +198,10 @@ function PayoutTrx() {
 
         <TabsPanel value={tabs[2].value}>
           <InquiriesTab />
+        </TabsPanel>
+
+        <TabsPanel value={tabs[3].value}>
+          <PayoutRequests />
         </TabsPanel>
       </TabsComponent>
 
@@ -213,4 +229,5 @@ const tabs = [
   { value: "Account" },
   { value: "Transactions" },
   { value: "Inquiries" },
+  { value: "Requests" },
 ];

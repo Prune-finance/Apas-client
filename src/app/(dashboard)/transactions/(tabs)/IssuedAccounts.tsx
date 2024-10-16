@@ -147,8 +147,6 @@ export const IssuedAccountsTab = () => {
           <IssuedTransactionTableRows
             data={transactions}
             search={debouncedSearch}
-            active={active}
-            limit={limit}
             searchProps={searchProps}
           />
         }

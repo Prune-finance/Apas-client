@@ -10,34 +10,20 @@ import { useState } from "react";
 
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
-import {
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  Stack,
-  TableTd,
-} from "@mantine/core";
+import { Group, Stack, TableTd } from "@mantine/core";
 import { Flex, Box, Divider } from "@mantine/core";
-import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
+import { Text, Drawer } from "@mantine/core";
 import { TableTr } from "@mantine/core";
 
-import { IconDots, IconEye, IconListTree } from "@tabler/icons-react";
-import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
+import { IconListTree } from "@tabler/icons-react";
+import { IconX, IconCheck } from "@tabler/icons-react";
 
-import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
 import { IUserRequest, useAllRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../../businesses/schema";
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
@@ -48,7 +34,15 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "../../../businesses/[id]/(tabs)/utils";
-import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import {
+  FilterSchema,
+  FilterType,
+  FilterValues,
+  validateRequest,
+} from "@/lib/schema";
+import Link from "next/link";
+import RejectModalComponent from "@/ui/components/Modal/RejectModalComponent";
+import ModalComponent from "@/ui/components/Modal";
 
 function AccountIssuance() {
   const searchParams = useSearchParams();
@@ -90,13 +84,31 @@ function AccountIssuance() {
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const BusinessDetails = {
-    "Business Name": selectedRequest?.Company.name,
+    // "Business Name": selectedRequest?.Company.name,
+    "Business Name": (
+      <Link
+        href={`/admin/businesses/${selectedRequest?.Company?.id}`}
+        target="_blank"
+        style={{ textDecoration: "underline" }}
+      >
+        {selectedRequest?.Company?.name}
+      </Link>
+    ),
     "Request Date": dayjs(selectedRequest?.createdAt).format("DD MMM, YYYY"),
     Status: <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const requestForm = useForm({
+    initialValues: {
+      reason: "",
+      supportingDocumentName: "",
+      supportingDocumentUrl: "",
+    },
+    validate: zodResolver(validateRequest),
+  });
 
   const requestType = useMemo(() => {
     switch (selectedRequest?.type) {
@@ -115,9 +127,16 @@ function AccountIssuance() {
     if (!selectedRequest) return;
     setProcessing(true);
     try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+
       await axios.patch(
         `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/reject`,
-        {},
+        {
+          reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -128,7 +147,7 @@ function AccountIssuance() {
         "Action Completed",
         `${(requestType ?? "").replace(/^./, (letter) =>
           letter.toUpperCase()
-        )} Request Denied`
+        )} Request rejected`
       );
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -163,7 +182,7 @@ function AccountIssuance() {
     }
   };
 
-  const rows = filteredSearch(requests, ["companyName"], debouncedSearch).map(
+  const rows = filteredSearch(requests, ["Company.name"], debouncedSearch).map(
     (element, index) => (
       <TableTr
         key={index}
@@ -287,7 +306,7 @@ function AccountIssuance() {
         </Stack>
       </Drawer>
 
-      <ModalComponent
+      <RejectModalComponent
         color="#FEF3F2"
         icon={<IconX color="#D92D20" />}
         opened={opened}
@@ -297,6 +316,7 @@ function AccountIssuance() {
         title="Reject This Account Issuance Request?"
         text="This means you are rejecting the account issuance request of this business."
         customApproveMessage="Yes, Reject It"
+        form={requestForm}
       />
 
       <ModalComponent

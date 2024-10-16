@@ -79,10 +79,16 @@ function TransactionForAccount() {
 
   const { loading, transactions, meta } = useTransactions(undefined, param);
 
-  const { transactions: payoutTransactions, loading: loadingPayout } =
-    usePayoutTransactions(param);
-  const { transactions: defaultTransactions, loading: loadingDefault } =
-    useDefaultAccountTransactions(param);
+  const {
+    transactions: payoutTransactions,
+    loading: loadingPayout,
+    meta: payoutMeta,
+  } = usePayoutTransactions(param);
+  const {
+    transactions: defaultTransactions,
+    loading: loadingDefault,
+    meta: defaultMeta,
+  } = useDefaultAccountTransactions(param);
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedIssued, { toggle: toggleIssuedFilter }] = useDisclosure(false);
@@ -120,34 +126,38 @@ function TransactionForAccount() {
   const defaultInfoDetails = [
     {
       title: "Total Balance",
-      value: defaultTransactions.reduce((acc, cur) => acc + cur.amount, 0),
+      value: defaultMeta?.totalAmount || 0,
+      // value: defaultTransactions.reduce((acc, cur) => acc + cur.amount, 0),
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
     },
     {
       title: "Money In",
-      value:
-        defaultTransactions
-          .filter((trx) => trx.type === "CREDIT")
-          .reduce((acc, cur) => acc + cur.amount, 0) || 0,
+      value: defaultMeta?.in || 0,
+      // value:
+      //   defaultTransactions
+      //     .filter((trx) => trx.type === "CREDIT")
+      //     .reduce((acc, cur) => acc + cur.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
     },
     {
       title: "Money Out",
-      value:
-        defaultTransactions
-          .filter((trx) => trx.type === "DEBIT")
-          .reduce((acc, cur) => acc + cur.amount, 0) || 0,
+      value: defaultMeta?.out || 0,
+      // value:
+      //   defaultTransactions
+      //     .filter((trx) => trx.type === "DEBIT")
+      //     .reduce((acc, cur) => acc + cur.amount, 0) || 0,
       formatted: true,
       currency: "EUR",
       locale: "en-GB",
     },
     {
       title: "Total Transactions",
-      value: defaultTransactions.length,
+      // value: defaultTransactions.length,
+      value: defaultMeta?.total || 0,
     },
   ];
 
@@ -246,8 +256,6 @@ function TransactionForAccount() {
                 <BusinessTransactionTableRows
                   data={defaultTransactions}
                   search={debouncedSearch}
-                  active={active}
-                  limit={limit}
                   searchProps={searchProps}
                 />
               }
@@ -337,8 +345,6 @@ function TransactionForAccount() {
                 <IssuedTransactionTableRows
                   data={transactions}
                   search={debouncedSearch}
-                  active={active}
-                  limit={limit}
                   searchProps={searchProps}
                 />
               }
@@ -406,8 +412,6 @@ function TransactionForAccount() {
                 <PayoutTransactionTableRows
                   data={payoutTransactions}
                   search={debouncedSearch}
-                  active={active}
-                  limit={limit}
                   searchProps={searchProps}
                 />
               }

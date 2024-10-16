@@ -15,13 +15,15 @@ export function useAdmins(customParams: IParams = {}) {
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.name && { name: customParams.name }),
+      ...(customParams.firstName && { firstName: customParams.firstName }),
+      ...(customParams.lastName && { lastName: customParams.lastName }),
       ...(customParams.email && { email: customParams.email }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
-  const { limit, date, endDate, status, name, email, page } = obj;
+  const { limit, date, endDate, status, firstName, lastName, email, page } =
+    obj;
 
   async function fetchUsers() {
     const params = new URLSearchParams(
@@ -52,7 +54,7 @@ export function useAdmins(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, date, endDate, status, name, email, page]);
+  }, [limit, date, endDate, status, firstName, lastName, email, page]);
 
   return { loading, users, revalidate, meta };
 }

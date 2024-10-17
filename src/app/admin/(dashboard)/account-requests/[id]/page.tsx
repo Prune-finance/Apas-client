@@ -62,7 +62,7 @@ function BusinessAccountRequests() {
   const params = useParams<{ id: string }>();
 
   const searchParams = useSearchParams();
-  const { status, endDate, date, accountType, country, accountName } =
+  const { status, endDate, date, accountType, country, firstName, lastName } =
     Object.fromEntries(searchParams.entries());
 
   const [active, setActive] = useState(1);
@@ -76,7 +76,8 @@ function BusinessAccountRequests() {
       accountType: accountType === "Individual" ? "USER" : "CORPORATE",
     }),
     ...(country && { country: country.toUpperCase() }),
-    ...(accountName && { accountName }),
+    ...(lastName && { lastName }),
+    ...(firstName && { firstName }),
     page: active,
     limit: parseInt(limit ?? "10", 10),
   };
@@ -115,18 +116,12 @@ function BusinessAccountRequests() {
       }
       style={{ cursor: "pointer" }}
     >
-      <TableTd
-        className={styles.table__td}
-        tt="capitalize"
-      >{`${element.firstName} ${element.lastName}`}</TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
-        {getUserType(element.accountType)}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element?.country}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
+      <TableTd tt="capitalize">{element.firstName}</TableTd>
+      <TableTd tt="capitalize">{element.lastName}</TableTd>
+      <TableTd tt="capitalize">{getUserType(element.accountType)}</TableTd>
+      <TableTd>{element?.country}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
+      <TableTd>
         <BadgeComponent status={element.status} />
       </TableTd>
 
@@ -219,8 +214,12 @@ function BusinessAccountRequests() {
           customStatusOption={["Approved", "Rejected", "Pending"]}
         >
           <TextBox
-            placeholder="Account Name"
-            {...form.getInputProps("accountName")}
+            placeholder="First Name"
+            {...form.getInputProps("firstName")}
+          />
+          <TextBox
+            placeholder="Last Name"
+            {...form.getInputProps("lastName")}
           />
 
           {/* <SelectBox
@@ -254,7 +253,8 @@ function BusinessAccountRequests() {
 }
 
 const tableHeaders = [
-  "Account Name",
+  "First Name",
+  "Last Name",
   "User Type",
   "Country",
   "Date Created",

@@ -93,7 +93,7 @@ export default function BusinessUsers() {
           {element.name}
         </Flex>
       </TableTd>
-      <TableTd>{element.contactEmail}</TableTd>
+      <TableTd tt="lowercase">{element.contactEmail}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>
         <BadgeComponent status={element.companyStatus} active />

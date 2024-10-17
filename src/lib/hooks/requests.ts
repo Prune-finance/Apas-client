@@ -16,8 +16,11 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.accountName && {
-        accountName: customParams.accountName,
+      ...(customParams.firstName && {
+        firstName: customParams.firstName,
+      }),
+      ...(customParams.lastName && {
+        lastName: customParams.lastName,
       }),
       ...(customParams.country && { country: customParams.country }),
       ...(customParams.accountType && {
@@ -32,7 +35,8 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     limit,
     date,
     endDate,
-    accountName,
+    firstName,
+    lastName,
     country,
     accountType,
     status,
@@ -73,7 +77,17 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, [date, endDate, page, limit, accountName, country, accountType, status]);
+  }, [
+    date,
+    endDate,
+    page,
+    limit,
+    lastName,
+    firstName,
+    country,
+    accountType,
+    status,
+  ]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -443,14 +457,28 @@ export function useUserRequests(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
-      ...(customParams.accountName && {
-        accountName: customParams.accountName,
+      ...(customParams.firstName && {
+        firstName: customParams.firstName,
+      }),
+      ...(customParams.lastName && {
+        lastName: customParams.lastName,
       }),
       ...(customParams.country && { country: customParams.country }),
     };
   }, [customParams]);
-  const { date, limit, accountName, country, endDate, status, type, page } =
-    obj;
+
+  const {
+    date,
+    limit,
+    lastName,
+    firstName,
+    country,
+    endDate,
+    status,
+    type,
+    page,
+  } = obj;
+
   async function fetchAccounts() {
     const params = new URLSearchParams(
       obj as Record<string, string>
@@ -481,7 +509,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [date, limit, accountName, country, endDate, status, type, page]);
+  }, [date, limit, firstName, lastName, country, endDate, status, type, page]);
 
   return { loading, requests, meta, revalidate };
 }

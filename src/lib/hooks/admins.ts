@@ -149,6 +149,40 @@ export function useBusinessUsers(customParams: IParams = {}, id: string) {
   return { loading, users, revalidate, meta };
 }
 
+export function useSingleBusinessUser(businessId: string, userId: string) {
+  const [user, setUser] = useState<AdminData>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchUsers() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${businessId}/users/${userId}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setUser(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchUsers();
+
+  useEffect(() => {
+    fetchUsers();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, user, revalidate };
+}
+
 export function useUsers(customParams: IParams = {}) {
   const [users, setUsers] = useState<AdminData[]>([]);
   const [meta, setMeta] = useState<{ total: number }>();

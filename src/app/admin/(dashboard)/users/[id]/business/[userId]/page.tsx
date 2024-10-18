@@ -17,7 +17,7 @@ import {
 
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import { useSingleAdmin } from "@/lib/hooks/admins";
+import { useSingleAdmin, useSingleBusinessUser } from "@/lib/hooks/admins";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
@@ -49,7 +49,10 @@ export default function SingleUser() {
   const [processing, setProcessing] = useState(false);
   const [reason, setReason] = useState("");
 
-  const { user, loading, revalidate } = useSingleAdmin(params.userId);
+  const { user, loading, revalidate } = useSingleBusinessUser(
+    params.id,
+    params.userId
+  );
   const { business, loading: loadingBiz } = useSingleBusiness(params.id);
 
   const form = useForm<typeof newAdmin>({

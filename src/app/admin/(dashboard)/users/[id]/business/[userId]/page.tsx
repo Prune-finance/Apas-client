@@ -23,7 +23,13 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import ModalComponent from "@/ui/components/Modal";
 import UpdateModal from "../../../modal";
-import { IconPencilMinus, IconUserCheck, IconUserX } from "@tabler/icons-react";
+import {
+  IconFileUnknown,
+  IconFilterQuestion,
+  IconPencilMinus,
+  IconUserCheck,
+  IconUserX,
+} from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { useForm, zodResolver } from "@mantine/form";
@@ -37,6 +43,8 @@ export default function SingleUser() {
   const [deactivateOpened, { open: openDeactivate, close: closeDeactivate }] =
     useDisclosure(false);
   const [updateOpened, { open: openUpdate, close: closeUpdate }] =
+    useDisclosure(false);
+  const [resetOpened, { open: openReset, close: closeReset }] =
     useDisclosure(false);
   const [processing, setProcessing] = useState(false);
   const [reason, setReason] = useState("");
@@ -94,8 +102,8 @@ export default function SingleUser() {
             <Group>
               {!loading ? (
                 <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
-                  {`${user?.firstName ?? "First Name Here"} ${
-                    user?.lastName ?? "Last Name Here"
+                  {`${user?.firstName ?? "Gabriela"} ${
+                    user?.lastName ?? "Anyiam"
                   }`}
                 </Text>
               ) : (
@@ -114,7 +122,7 @@ export default function SingleUser() {
           </Stack>
 
           <Group>
-            <SecondaryBtn text="Reset Password" fw={600} />
+            <SecondaryBtn text="Reset Password" fw={600} action={openReset} />
             <PrimaryBtn
               text={user?.status === "ACTIVE" ? "Deactivate" : "Activate"}
               fw={600}
@@ -215,6 +223,20 @@ export default function SingleUser() {
         customApproveMessage={`Yes, ${
           user?.status === "ACTIVE" ? "Deactivate" : "Activate"
         }`}
+      />
+
+      <ModalComponent
+        opened={resetOpened}
+        close={closeReset}
+        title="Are you sure you want send a reset password link"
+        text={`You will be sending a reset password link to ${
+          user?.email ?? ""
+        } to reset their password`}
+        customApproveMessage="Yes, Send"
+        icon={<IconFileUnknown color="#C6A700" />}
+        color="#F9F6E6"
+        processing={processing}
+        action={() => {}}
       />
 
       {/* Update Details Modal */}

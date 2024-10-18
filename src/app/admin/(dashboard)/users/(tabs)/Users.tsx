@@ -58,9 +58,8 @@ export default function Users() {
   const { handleError, handleSuccess } = useNotification();
   const [tab, setTab] = useState<string | null>("Users");
 
-  const { email, name, status, date, endDate } = Object.fromEntries(
-    searchParams.entries()
-  );
+  const { email, lastName, firstName, status, date, endDate } =
+    Object.fromEntries(searchParams.entries());
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -71,15 +70,14 @@ export default function Users() {
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(email && { email }),
-    ...(name && { name }),
+    ...(firstName && { firstName }),
+    ...(lastName && { lastName }),
     page: active,
     limit: parseInt(limit ?? "10", 10),
   });
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
-
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
 
   const [processing, setProcessing] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -106,9 +104,11 @@ export default function Users() {
         return;
       }
 
+      const { password, ...rest } = form.values;
+
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
-        form.values,
+        { ...rest },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -197,13 +197,16 @@ export default function Users() {
       <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
         {element.email}
       </TableTd>
-      <TableTd>{`${element.firstName} ${element.lastName}`}</TableTd>
+      <TableTd>{element.firstName}</TableTd>
+      <TableTd>{element.lastName}</TableTd>
       <TableTd>{element.role}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
-      <TableTd>{dayjs(element.lastLogIn).fromNow()}</TableTd>
+      <TableTd>
+        {element.lastLogIn ? dayjs(element.lastLogIn).fromNow() : "Nil"}
+      </TableTd>
 
       <TableTd>
-        <BadgeComponent status="ACTIVE" active />
+        <BadgeComponent status={element.status || "ACTIVE"} active />
       </TableTd>
 
       <TableTd onClick={(e) => e.stopPropagation()}>
@@ -300,7 +303,14 @@ export default function Users() {
         customStatusOption={["Active", "Inactive"]}
       >
         <TextBox placeholder="Email" {...filterForm.getInputProps("email")} />
-        <TextBox placeholder="Name" {...filterForm.getInputProps("name")} />
+        <TextBox
+          placeholder="First Name"
+          {...filterForm.getInputProps("firstName")}
+        />
+        <TextBox
+          placeholder="Last Name"
+          {...filterForm.getInputProps("lastName")}
+        />
       </Filter>
 
       <TableComponent
@@ -347,7 +357,8 @@ export default function Users() {
 
 const tableHeaders = [
   "Email",
-  "Name",
+  "First Name",
+  "Last Name",
   "Role",
   "Date Created",
   "Last Active",

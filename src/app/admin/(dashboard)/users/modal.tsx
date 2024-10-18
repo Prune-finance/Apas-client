@@ -98,7 +98,7 @@ export default function ModalComponent({
             />
           </Flex>
 
-          {!isEdit && (
+          {/* {!isEdit && (
             <Flex mt={24}>
               <PasswordInput
                 classNames={{ input: styles.input, label: styles.label }}
@@ -108,7 +108,7 @@ export default function ModalComponent({
                 {...form.getInputProps("password")}
               />
             </Flex>
-          )}
+          )} */}
 
           <Flex mt={24}>
             <Select

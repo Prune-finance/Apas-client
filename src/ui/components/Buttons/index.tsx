@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { FaCircleChevronLeft } from "react-icons/fa6";
+import styles from "./button.module.scss";
 
 interface Props extends ButtonProps {
   link?: string;
@@ -130,6 +131,7 @@ export const SecondaryBtn = ({
       component={Link}
       href={link}
       type={type}
+      className={styles.secondary__btn}
       {...props}
     >
       {text}
@@ -146,6 +148,7 @@ export const SecondaryBtn = ({
         e.stopPropagation();
         action && action();
       }}
+      className={styles.secondary__btn}
       type={type}
       {...props}
     >

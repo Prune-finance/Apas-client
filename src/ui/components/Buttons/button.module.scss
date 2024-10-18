@@ -1,0 +1,7 @@
+.secondary__btn {
+  transition: all 0.3s;
+
+  &:hover {
+    border: 1px solid var(--prune-text-gray-400);
+  }
+}

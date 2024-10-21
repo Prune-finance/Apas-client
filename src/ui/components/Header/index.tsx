@@ -6,8 +6,15 @@ import {
   Avatar,
   Switch,
   Stack,
+  Popover,
+  PopoverTarget,
+  PopoverDropdown,
+  Group,
+  Badge,
+  Paper,
+  Box,
 } from "@mantine/core";
-import { IconSearch, IconBell } from "@tabler/icons-react";
+import { IconSearch, IconBell, IconChecks } from "@tabler/icons-react";
 import localFont from "next/font/local";
 import { useEffect, useState } from "react";
 
@@ -22,9 +29,13 @@ import { checkToken, clearSession } from "@/lib/actions/checkToken";
 import axios from "axios";
 import Link from "next/link";
 import { getInitials } from "@/lib/utils";
+import { notifications } from "@/lib/static";
+import { NotificationRow } from "../NotificationRow";
+import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 
 export default function Header() {
   const { user, setUser } = User();
+  const [opened, setOpened] = useState(false);
 
   const handleSetUser = async () => {
     const { user, success } = await checkToken(true);
@@ -53,9 +64,72 @@ export default function Header() {
 
       <div className={styles.notification}>
         <Divider orientation="vertical" h={26} />
-        <Indicator inline processing color="red" size={15}>
-          <IconBell color="#475467" stroke={1.5} />
-        </Indicator>
+
+        <Popover
+          width={456}
+          position="bottom"
+          withArrow
+          shadow="md"
+          styles={{ dropdown: { padding: 0 } }}
+          opened={opened}
+          onChange={setOpened}
+        >
+          <PopoverTarget>
+            <Indicator
+              inline
+              processing
+              color="red"
+              size={15}
+              onClick={() => setOpened((o) => !o)}
+            >
+              <IconBell color="#475467" stroke={1.5} />
+            </Indicator>
+          </PopoverTarget>
+
+          <PopoverDropdown>
+            <Group gap={8} mt={20} px={28}>
+              <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
+                Notifications
+              </Text>
+
+              <Avatar
+                color="var(--prune-primary-600)"
+                radius="50%"
+                variant="filled"
+                size={25}
+              >
+                {notifications.length}
+              </Avatar>
+            </Group>
+            <Divider color="var(--prune-text-gray-100)" mt={20} />
+            {notifications.slice(0, 4).map((notification, index, arr) => (
+              <Box px={28} key={index}>
+                <NotificationRow
+                  {...notification}
+                  lastRow={arr.length - 1 === index}
+                />
+              </Box>
+            ))}
+
+            <Paper py={15} bg="#f9f9f9">
+              <Group px={28} justify="space-between" gap={24} wrap="nowrap">
+                <SecondaryBtn
+                  text="Mark all as read"
+                  icon={IconChecks}
+                  fullWidth
+                  action={() => setOpened(false)}
+                />
+
+                <PrimaryBtn
+                  text="View All Notifications"
+                  fullWidth
+                  link="/admin/notifications"
+                  action={() => setOpened(false)}
+                />
+              </Group>
+            </Paper>
+          </PopoverDropdown>
+        </Popover>
         <Divider orientation="vertical" h={26} />
       </div>
 
@@ -77,6 +151,7 @@ export default function Header() {
 
 export function UserHeader() {
   const { user, setUser } = User();
+  const [opened, setOpened] = useState(false);
 
   const handleSetUser = async () => {
     const { user, success } = await checkToken();
@@ -127,9 +202,76 @@ export function UserHeader() {
 
       <div className={styles.notification}>
         <Divider orientation="vertical" h={26} />
-        <Indicator inline processing color="red" size={15}>
+        {/* <Indicator inline processing color="red" size={15}>
           <IconBell color="#475467" stroke={1.5} />
-        </Indicator>
+        </Indicator> */}
+
+        <Popover
+          width={456}
+          position="bottom"
+          withArrow
+          shadow="md"
+          styles={{ dropdown: { padding: 0 } }}
+          opened={opened}
+          onChange={setOpened}
+        >
+          <PopoverTarget>
+            <Indicator
+              inline
+              processing
+              color="red"
+              size={15}
+              onClick={() => setOpened((o) => !o)}
+            >
+              <IconBell color="#475467" stroke={1.5} />
+            </Indicator>
+          </PopoverTarget>
+
+          <PopoverDropdown>
+            <Group gap={8} mt={20} px={28}>
+              <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
+                Notifications
+              </Text>
+
+              <Avatar
+                color="var(--prune-primary-600)"
+                radius="50%"
+                variant="filled"
+                size={25}
+              >
+                {notifications.length}
+              </Avatar>
+            </Group>
+            <Divider color="var(--prune-text-gray-100)" mt={20} />
+            {notifications.slice(0, 4).map((notification, index, arr) => (
+              <Box px={28} key={index}>
+                <NotificationRow
+                  {...notification}
+                  lastRow={arr.length - 1 === index}
+                />
+              </Box>
+            ))}
+
+            <Paper py={15} bg="#f9f9f9">
+              <Group px={28} justify="space-between" gap={24} wrap="nowrap">
+                <SecondaryBtn
+                  text="Mark all as read"
+                  icon={IconChecks}
+                  fullWidth
+                  action={() => setOpened(false)}
+                />
+
+                <PrimaryBtn
+                  text="View All Notifications"
+                  fullWidth
+                  link="/notifications"
+                  action={() => setOpened(false)}
+                />
+              </Group>
+            </Paper>
+          </PopoverDropdown>
+        </Popover>
+
         <Divider orientation="vertical" h={26} />
       </div>
 

@@ -341,3 +341,133 @@ export const PayoutRequestsTableHeaders = [
   "Date",
   "Status",
 ];
+
+interface Notification {
+  title: string;
+  text: string;
+  createdAt: Date;
+  status: "unread" | "read";
+}
+
+export const notifications: Notification[] = [
+  {
+    title: "Activation Link Expired",
+    text: "The activation link you received has expired. Please request a new activation link to proceed with your account setup.",
+    createdAt: new Date("2023-01-01"),
+    status: "unread",
+  },
+  {
+    title: "Business Account Activated",
+    text: "Your business account has been successfully activated. You can now access all the features and services available to business accounts.",
+    createdAt: new Date("2023-01-02"),
+    status: "read",
+  },
+  {
+    title: "Business Account Unfrozen",
+    text: "Your business account has been unfrozen. You can now resume your activities and transactions without any restrictions.",
+    createdAt: new Date("2023-01-03"),
+    status: "unread",
+  },
+  {
+    title: "Business Account Frozen",
+    text: "Your business account has been frozen due to suspicious activity. Please contact support to resolve this issue and unfreeze your account.",
+    createdAt: new Date("2023-01-04"),
+    status: "read",
+  },
+  {
+    title: "Business Account Deactivated",
+    text: "Your business account has been deactivated. If you believe this is a mistake, please contact support to reactivate your account.",
+    createdAt: new Date("2023-01-05"),
+    status: "unread",
+  },
+  {
+    title: "Payout Account Approved",
+    text: "Your payout account has been approved. You can now receive payouts to your designated account without any issues.",
+    createdAt: new Date("2023-01-06"),
+    status: "read",
+  },
+  {
+    title: "Payout Account Rejected",
+    text: "Your payout account has been rejected. Please review the provided information and submit a new request for approval.",
+    createdAt: new Date("2023-01-07"),
+    status: "unread",
+  },
+  {
+    title: "Payout Account Trusted",
+    text: "Your payout account has been marked as trusted. You can now enjoy faster and more secure transactions.",
+    createdAt: new Date("2023-01-08"),
+    status: "read",
+  },
+  {
+    title: "New Inquiry Ticket",
+    text: "A new inquiry ticket has been created for C80 Limited. Please review the details and respond accordingly. [Reference ID]",
+    createdAt: new Date("2023-01-09"),
+    status: "unread",
+  },
+  {
+    title: "New Reply",
+    text: "You have received a new reply from Primark Limited. Please review the response and take the necessary actions. [Reference ID]",
+    createdAt: new Date("2023-01-10"),
+    status: "read",
+  },
+  {
+    title: "Account Verification Required",
+    text: "Your account requires verification. Please submit the necessary documents to complete the verification process and avoid any interruptions.",
+    createdAt: new Date("2023-01-11"),
+    status: "unread",
+  },
+  {
+    title: "Password Change Successful",
+    text: "Your password has been successfully changed. If you did not request this change, please contact support immediately.",
+    createdAt: new Date("2023-01-12"),
+    status: "read",
+  },
+  {
+    title: "Subscription Renewal",
+    text: "Your subscription is due for renewal. Please ensure your payment information is up to date to avoid any service interruptions.",
+    createdAt: new Date("2023-01-13"),
+    status: "unread",
+  },
+  {
+    title: "Service Downtime Notice",
+    text: "We will be performing scheduled maintenance on our servers. During this time, our services may be temporarily unavailable. We apologize for any inconvenience.",
+    createdAt: new Date("2023-01-14"),
+    status: "read",
+  },
+  {
+    title: "New Feature Release",
+    text: "We are excited to announce the release of a new feature. Check out the latest addition to our platform and see how it can benefit you.",
+    createdAt: new Date("2023-01-15"),
+    status: "unread",
+  },
+  {
+    title: "Security Alert",
+    text: "We have detected unusual activity on your account. Please review your recent activity and contact support if you notice anything suspicious.",
+    createdAt: new Date("2023-01-16"),
+    status: "read",
+  },
+  {
+    title: "Welcome to Our Service",
+    text: "Thank you for joining our service. We are thrilled to have you on board and look forward to providing you with the best experience possible.",
+    createdAt: new Date("2023-01-17"),
+    status: "unread",
+  },
+  {
+    title: "Account Upgrade Available",
+    text: "An upgrade is available for your account. Upgrade now to enjoy additional features and benefits exclusive to premium members.",
+    createdAt: new Date("2023-01-18"),
+    status: "read",
+  },
+  {
+    title: "Payment Confirmation",
+    text: "Your payment has been successfully processed. Thank you for your purchase. If you have any questions, please contact support.",
+    createdAt: new Date("2023-01-19"),
+    status: "unread",
+  },
+  {
+    title: "Feedback Request",
+    text: "We value your feedback. Please take a moment to share your thoughts and help us improve our services. Your input is greatly appreciated.",
+    createdAt: new Date("2023-01-20"),
+    status: "read",
+  },
+];

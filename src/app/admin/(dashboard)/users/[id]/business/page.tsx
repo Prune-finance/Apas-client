@@ -91,7 +91,7 @@ export default function AllBusinessUsers() {
         <TableTd>{"User"}</TableTd>
         <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
         <TableTd>
-          {element.lastLogIn ? dayjs(element.lastLogIn).fromNow() : "Nil"}
+          {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
         </TableTd>
 
         <TableTd>

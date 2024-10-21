@@ -17,31 +17,47 @@ import {
 
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import { useSingleAdmin } from "@/lib/hooks/admins";
+import { useSingleBusinessUser } from "@/lib/hooks/admins";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import ModalComponent from "@/ui/components/Modal";
 import UpdateModal from "../../../modal";
-import { IconPencilMinus, IconUserCheck, IconUserX } from "@tabler/icons-react";
+import {
+  IconFileUnknown,
+  IconPencilMinus,
+  IconUserCheck,
+  IconUserX,
+} from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { notifications } from "@mantine/notifications";
 
 dayjs.extend(advancedFormat);
 
 export default function SingleUser() {
   const params = useParams<{ userId: string; id: string }>();
+  const { handleError, handleSuccess, handleInfo } = useNotification();
 
   const [deactivateOpened, { open: openDeactivate, close: closeDeactivate }] =
     useDisclosure(false);
   const [updateOpened, { open: openUpdate, close: closeUpdate }] =
     useDisclosure(false);
+  const [resetOpened, { open: openReset, close: closeReset }] =
+    useDisclosure(false);
   const [processing, setProcessing] = useState(false);
   const [reason, setReason] = useState("");
 
-  const { user, loading, revalidate } = useSingleAdmin(params.userId);
+  const { user, loading, revalidate } = useSingleBusinessUser(
+    params.id,
+    params.userId
+  );
   const { business, loading: loadingBiz } = useSingleBusiness(params.id);
 
   const form = useForm<typeof newAdmin>({
@@ -52,7 +68,7 @@ export default function SingleUser() {
   const details = [
     { label: "Business Name", placeholder: business?.name },
     { label: "Email", placeholder: user?.email },
-    { label: "Role", placeholder: user?.role },
+    { label: "Role", placeholder: user?.role ?? "User" },
     {
       label: "Date Added",
       placeholder: dayjs(user?.createdAt).format("Do MMMM, YYYY"),
@@ -66,7 +82,39 @@ export default function SingleUser() {
     { label: "Can create new accounts", value: true },
   ];
 
-  const handleUserStatus = async (status: "ACTIVE" | "INACTIVE") => {};
+  const handleUserStatus = async () => {
+    notifications.clean();
+
+    if (user?.status === "INVITE_PENDING")
+      return handleInfo("Pending User cannot be activated", "");
+
+    if (!reason)
+      return handleInfo("Provide a reason for carrying out this action", "");
+    setProcessing(true);
+    try {
+      const path = user?.status === "ACTIVE" ? "deactivate" : "activate";
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${params.id}/users/${params.userId}/${path}`,
+        { reason },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      closeDeactivate();
+      const title =
+        user?.status === "ACTIVE" ? "User Deactivation" : "User Activation";
+      const msg =
+        user?.status === "ACTIVE"
+          ? "User deactivated successfully"
+          : "User activated successfully";
+      handleSuccess(title, msg);
+      revalidate();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <main className={styles.main}>
@@ -93,28 +141,38 @@ export default function SingleUser() {
           <Stack gap={8}>
             <Group>
               {!loading ? (
-                <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
-                  {`${user?.firstName ?? "First Name Here"} ${
-                    user?.lastName ?? "Last Name Here"
-                  }`}
-                </Text>
+                <>
+                  {user?.firstName ||
+                    (user?.lastName && (
+                      <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
+                        {`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
+                      </Text>
+                    ))}
+                </>
               ) : (
                 <Skeleton h={10} w={100} />
               )}
 
-              <BadgeComponent status={user?.status ?? "ACTIVE"} active />
+              <BadgeComponent
+                status={
+                  user?.status === "INVITE_PENDING"
+                    ? "PENDING"
+                    : user?.status ?? ""
+                }
+                active
+              />
             </Group>
             <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
               {`Last Seen: ${
-                user?.lastLogIn
-                  ? dayjs(user?.lastLogIn).format("Do MMMM, YYYY")
+                user?.lastLogin
+                  ? dayjs(user?.lastLogin).format("Do MMMM, YYYY")
                   : "Nil"
               }`}
             </Text>
           </Stack>
 
           <Group>
-            <SecondaryBtn text="Reset Password" fw={600} />
+            <SecondaryBtn text="Reset Password" fw={600} action={openReset} />
             <PrimaryBtn
               text={user?.status === "ACTIVE" ? "Deactivate" : "Activate"}
               fw={600}
@@ -140,8 +198,8 @@ export default function SingleUser() {
             action={() => {
               openUpdate();
               form.setValues({
-                firstName: user?.firstName ?? "Benson",
-                lastName: user?.lastName ?? "Salasi",
+                firstName: user?.firstName ?? "",
+                lastName: user?.lastName ?? "",
                 email: user?.email,
                 role: user?.role,
               });
@@ -188,9 +246,7 @@ export default function SingleUser() {
       {/* Modal for handling status change */}
       <ModalComponent
         processing={processing}
-        action={() =>
-          handleUserStatus(user?.status === "ACTIVE" ? "INACTIVE" : "ACTIVE")
-        }
+        action={() => handleUserStatus()}
         color={user?.status === "ACTIVE" ? "#FEF3F2" : "#ECFDF3"}
         icon={
           user?.status === "ACTIVE" ? (
@@ -215,6 +271,20 @@ export default function SingleUser() {
         customApproveMessage={`Yes, ${
           user?.status === "ACTIVE" ? "Deactivate" : "Activate"
         }`}
+      />
+
+      <ModalComponent
+        opened={resetOpened}
+        close={closeReset}
+        title="Are you sure you want send a reset password link"
+        text={`You will be sending a reset password link to ${
+          user?.email ?? ""
+        } to reset their password`}
+        customApproveMessage="Yes, Send"
+        icon={<IconFileUnknown color="#C6A700" />}
+        color="#F9F6E6"
+        processing={processing}
+        action={() => {}}
       />
 
       {/* Update Details Modal */}

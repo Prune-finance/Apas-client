@@ -8,7 +8,7 @@ import { Flex, TabsPanel, Title } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { IconCalendarMonth, IconChecks } from "@tabler/icons-react";
 
-export default function AdminNotification() {
+export default function UserNotification() {
   return (
     <main>
       <Flex justify="space-between">

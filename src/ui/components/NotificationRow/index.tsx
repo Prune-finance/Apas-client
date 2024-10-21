@@ -18,7 +18,7 @@ export const NotificationRow = ({
   lastRow,
 }: Props) => {
   return (
-    <Box px={28}>
+    <>
       <Group wrap="nowrap" justify="space-between" py={15}>
         <Group gap={12} wrap="nowrap" flex={5}>
           <ActionIcon
@@ -71,6 +71,6 @@ export const NotificationRow = ({
       </Group>
 
       {!lastRow && <Divider color="var(--prune-text-gray-100)" />}
-    </Box>
+    </>
   );
 };

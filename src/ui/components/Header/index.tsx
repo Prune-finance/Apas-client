@@ -35,6 +35,7 @@ import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 
 export default function Header() {
   const { user, setUser } = User();
+  const [opened, setOpened] = useState(false);
 
   const handleSetUser = async () => {
     const { user, success } = await checkToken(true);
@@ -70,9 +71,17 @@ export default function Header() {
           withArrow
           shadow="md"
           styles={{ dropdown: { padding: 0 } }}
+          opened={opened}
+          onChange={setOpened}
         >
           <PopoverTarget>
-            <Indicator inline processing color="red" size={15}>
+            <Indicator
+              inline
+              processing
+              color="red"
+              size={15}
+              onClick={() => setOpened((o) => !o)}
+            >
               <IconBell color="#475467" stroke={1.5} />
             </Indicator>
           </PopoverTarget>
@@ -94,11 +103,12 @@ export default function Header() {
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />
             {notifications.slice(0, 4).map((notification, index, arr) => (
-              <NotificationRow
-                {...notification}
-                lastRow={arr.length - 1 === index}
-                key={index}
-              />
+              <Box px={28} key={index}>
+                <NotificationRow
+                  {...notification}
+                  lastRow={arr.length - 1 === index}
+                />
+              </Box>
             ))}
 
             <Paper py={15} bg="#f9f9f9">
@@ -107,12 +117,14 @@ export default function Header() {
                   text="Mark all as read"
                   icon={IconChecks}
                   fullWidth
+                  action={() => setOpened(false)}
                 />
 
                 <PrimaryBtn
                   text="View All Notifications"
                   fullWidth
                   link="/admin/notifications"
+                  action={() => setOpened(false)}
                 />
               </Group>
             </Paper>
@@ -139,6 +151,7 @@ export default function Header() {
 
 export function UserHeader() {
   const { user, setUser } = User();
+  const [opened, setOpened] = useState(false);
 
   const handleSetUser = async () => {
     const { user, success } = await checkToken();
@@ -199,9 +212,17 @@ export function UserHeader() {
           withArrow
           shadow="md"
           styles={{ dropdown: { padding: 0 } }}
+          opened={opened}
+          onChange={setOpened}
         >
           <PopoverTarget>
-            <Indicator inline processing color="red" size={15}>
+            <Indicator
+              inline
+              processing
+              color="red"
+              size={15}
+              onClick={() => setOpened((o) => !o)}
+            >
               <IconBell color="#475467" stroke={1.5} />
             </Indicator>
           </PopoverTarget>
@@ -223,11 +244,12 @@ export function UserHeader() {
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />
             {notifications.slice(0, 4).map((notification, index, arr) => (
-              <NotificationRow
-                {...notification}
-                lastRow={arr.length - 1 === index}
-                key={index}
-              />
+              <Box px={28} key={index}>
+                <NotificationRow
+                  {...notification}
+                  lastRow={arr.length - 1 === index}
+                />
+              </Box>
             ))}
 
             <Paper py={15} bg="#f9f9f9">
@@ -236,12 +258,14 @@ export function UserHeader() {
                   text="Mark all as read"
                   icon={IconChecks}
                   fullWidth
+                  action={() => setOpened(false)}
                 />
 
                 <PrimaryBtn
                   text="View All Notifications"
                   fullWidth
                   link="/notifications"
+                  action={() => setOpened(false)}
                 />
               </Group>
             </Paper>

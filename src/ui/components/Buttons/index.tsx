@@ -82,6 +82,7 @@ export const PrimaryBtn = ({
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       href={link}
+      onClick={action}
       {...props}
     >
       {text}
@@ -129,6 +130,7 @@ export const SecondaryBtn = ({
       fw={500}
       leftSection={Icon && <Icon size={14} />}
       component={Link}
+      onClick={action}
       href={link}
       type={type}
       className={styles.secondary__btn}

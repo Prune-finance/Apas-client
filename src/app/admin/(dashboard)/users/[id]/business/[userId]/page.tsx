@@ -17,7 +17,7 @@ import {
 
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import { useSingleAdmin, useSingleBusinessUser } from "@/lib/hooks/admins";
+import { useSingleBusinessUser } from "@/lib/hooks/admins";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
@@ -25,7 +25,6 @@ import ModalComponent from "@/ui/components/Modal";
 import UpdateModal from "../../../modal";
 import {
   IconFileUnknown,
-  IconFilterQuestion,
   IconPencilMinus,
   IconUserCheck,
   IconUserX,
@@ -34,11 +33,17 @@ import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { notifications } from "@mantine/notifications";
 
 dayjs.extend(advancedFormat);
 
 export default function SingleUser() {
   const params = useParams<{ userId: string; id: string }>();
+  const { handleError, handleSuccess, handleInfo } = useNotification();
 
   const [deactivateOpened, { open: openDeactivate, close: closeDeactivate }] =
     useDisclosure(false);
@@ -63,7 +68,7 @@ export default function SingleUser() {
   const details = [
     { label: "Business Name", placeholder: business?.name },
     { label: "Email", placeholder: user?.email },
-    { label: "Role", placeholder: user?.role },
+    { label: "Role", placeholder: user?.role ?? "User" },
     {
       label: "Date Added",
       placeholder: dayjs(user?.createdAt).format("Do MMMM, YYYY"),
@@ -77,7 +82,39 @@ export default function SingleUser() {
     { label: "Can create new accounts", value: true },
   ];
 
-  const handleUserStatus = async (status: "ACTIVE" | "INACTIVE") => {};
+  const handleUserStatus = async () => {
+    notifications.clean();
+
+    if (user?.status === "INVITE_PENDING")
+      return handleInfo("Pending User cannot be activated", "");
+
+    if (!reason)
+      return handleInfo("Provide a reason for carrying out this action", "");
+    setProcessing(true);
+    try {
+      const path = user?.status === "ACTIVE" ? "deactivate" : "activate";
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${params.id}/users/${params.userId}/${path}`,
+        { reason },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      closeDeactivate();
+      const title =
+        user?.status === "ACTIVE" ? "User Deactivation" : "User Activation";
+      const msg =
+        user?.status === "ACTIVE"
+          ? "User deactivated successfully"
+          : "User activated successfully";
+      handleSuccess(title, msg);
+      revalidate();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <main className={styles.main}>
@@ -104,21 +141,31 @@ export default function SingleUser() {
           <Stack gap={8}>
             <Group>
               {!loading ? (
-                <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
-                  {`${user?.firstName ?? "Gabriela"} ${
-                    user?.lastName ?? "Anyiam"
-                  }`}
-                </Text>
+                <>
+                  {user?.firstName ||
+                    (user?.lastName && (
+                      <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
+                        {`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
+                      </Text>
+                    ))}
+                </>
               ) : (
                 <Skeleton h={10} w={100} />
               )}
 
-              <BadgeComponent status={user?.status ?? "ACTIVE"} active />
+              <BadgeComponent
+                status={
+                  user?.status === "INVITE_PENDING"
+                    ? "PENDING"
+                    : user?.status ?? ""
+                }
+                active
+              />
             </Group>
             <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
               {`Last Seen: ${
-                user?.lastLogIn
-                  ? dayjs(user?.lastLogIn).format("Do MMMM, YYYY")
+                user?.lastLogin
+                  ? dayjs(user?.lastLogin).format("Do MMMM, YYYY")
                   : "Nil"
               }`}
             </Text>
@@ -151,8 +198,8 @@ export default function SingleUser() {
             action={() => {
               openUpdate();
               form.setValues({
-                firstName: user?.firstName ?? "Benson",
-                lastName: user?.lastName ?? "Salasi",
+                firstName: user?.firstName ?? "",
+                lastName: user?.lastName ?? "",
                 email: user?.email,
                 role: user?.role,
               });
@@ -199,9 +246,7 @@ export default function SingleUser() {
       {/* Modal for handling status change */}
       <ModalComponent
         processing={processing}
-        action={() =>
-          handleUserStatus(user?.status === "ACTIVE" ? "INACTIVE" : "ACTIVE")
-        }
+        action={() => handleUserStatus()}
         color={user?.status === "ACTIVE" ? "#FEF3F2" : "#ECFDF3"}
         icon={
           user?.status === "ACTIVE" ? (

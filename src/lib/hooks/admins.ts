@@ -245,6 +245,7 @@ export interface AdminData {
   firstName: string;
   lastName: string;
   role: string;
+  lastLogin: Date | null;
   lastLogIn: Date | null;
   status: "ACTIVE" | "INACTIVE" | "INVITE_PENDING";
 }

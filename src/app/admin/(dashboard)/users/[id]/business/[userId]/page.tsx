@@ -116,6 +116,52 @@ export default function SingleUser() {
     }
   };
 
+  const handleEdit = async () => {
+    setProcessing(true);
+
+    try {
+      const { firstName, lastName, email, role } = form.values;
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${params.id}/users/${params.userId}/update`,
+        { firstName, lastName, email },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess(
+        "Business User Update",
+        "Business User details successfully updated"
+      );
+      revalidate();
+      closeUpdate();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    setProcessing(true);
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${params.id}/users/${params.userId}/request-password-reset`,
+        { email: user?.email },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess(
+        "Reset Password",
+        `A password reset link has been sent to ${user?.email}`
+      );
+
+      closeReset();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -139,15 +185,16 @@ export default function SingleUser() {
 
         <Group justify="space-between">
           <Stack gap={8}>
-            <Group>
+            <Group
+            // style={{ border: "1px solid red" }}
+            >
               {!loading ? (
                 <>
-                  {user?.firstName ||
-                    (user?.lastName && (
-                      <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
-                        {`${user?.firstName ?? ""} ${user?.lastName ?? ""}`}
-                      </Text>
-                    ))}
+                  {(user?.firstName || user?.lastName) && (
+                    <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
+                      {`${user?.firstName || ""} ${user?.lastName || ""}`}
+                    </Text>
+                  )}
                 </>
               ) : (
                 <Skeleton h={10} w={100} />
@@ -182,9 +229,7 @@ export default function SingleUser() {
             />
           </Group>
         </Group>
-
         <Divider my={24} />
-
         <Group justify="space-between">
           <Text fz={16} fw={600} mb={20}>
             Basic Details
@@ -206,7 +251,6 @@ export default function SingleUser() {
             }}
           />
         </Group>
-
         <Grid mt={20} className={styles.grid__container}>
           {details.map((detail) => (
             <GridCol key={detail.label} span={4} className={styles.grid}>
@@ -222,7 +266,6 @@ export default function SingleUser() {
             </GridCol>
           ))}
         </Grid>
-
         {/* <Text fz={16} fw={500} mb={20} mt={40}>
           Permissions:
         </Text>
@@ -284,18 +327,19 @@ export default function SingleUser() {
         icon={<IconFileUnknown color="#C6A700" />}
         color="#F9F6E6"
         processing={processing}
-        action={() => {}}
+        action={() => handleResetPassword()}
       />
 
       {/* Update Details Modal */}
       <UpdateModal
         opened={updateOpened}
         close={closeUpdate}
-        action={() => {}}
+        action={() => handleEdit()}
         processing={processing}
         isEdit
         setIsEdit={() => {}}
         form={form}
+        removeRole
       />
     </main>
   );

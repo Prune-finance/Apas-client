@@ -8,8 +8,10 @@ import {
 
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(advancedFormat);
+dayjs.extend(relativeTime);
 
 import styles from "@/ui/styles/business.module.scss";
 import { useSingleBusiness } from "@/lib/hooks/businesses";

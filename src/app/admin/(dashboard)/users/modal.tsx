@@ -27,6 +27,7 @@ export default function ModalComponent({
   form,
   isEdit,
   setIsEdit,
+  removeRole,
 }: ModalProps) {
   return (
     <Modal
@@ -110,16 +111,18 @@ export default function ModalComponent({
             </Flex>
           )} */}
 
-          <Flex mt={24}>
-            <Select
-              placeholder="Role"
-              classNames={{ input: styles.input, label: styles.label }}
-              flex={1}
-              label="Role"
-              data={["Admin", "Superadmin"]}
-              {...form.getInputProps("role")}
-            />
-          </Flex>
+          {!removeRole && (
+            <Flex mt={24}>
+              <Select
+                placeholder="Role"
+                classNames={{ input: styles.input, label: styles.label }}
+                flex={1}
+                label="Role"
+                data={["Admin", "Superadmin"]}
+                {...form.getInputProps("role")}
+              />
+            </Flex>
+          )}
 
           <Flex mb={20} mt={40} justify="flex-end" gap={15}>
             <SecondaryBtn
@@ -156,4 +159,5 @@ interface ModalProps {
   form: UseFormReturnType<typeof newAdmin>;
   isEdit: boolean;
   setIsEdit: Dispatch<SetStateAction<boolean>>;
+  removeRole?: boolean;
 }

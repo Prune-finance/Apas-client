@@ -43,10 +43,10 @@ interface ICardOne {
 export const SeeAll = ({ name = "See All" }: { name?: string }) => {
   return (
     <div className={styles.card__link}>
-      <Text fz={12} td="underline">
+      <Text fz={14} td="underline" fw={600}>
         {name}
       </Text>
-      <IconChevronRight size={11} />
+      <IconChevronRight size={16} />
     </div>
   );
 };

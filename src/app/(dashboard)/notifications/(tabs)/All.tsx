@@ -15,7 +15,7 @@ export const AllNotification = () => {
 
   return (
     <>
-      <ScrollArea h="calc(100vh - 307px)">
+      <ScrollArea h="calc(100vh - 307px)" pr={20}>
         {notifications.map((notification, index, arr) => (
           <NotificationRow
             {...notification}
@@ -39,15 +39,13 @@ export const AllNotification = () => {
       )}
 
       {notifications.length > 0 && (
-        <Box mt={-40}>
-          <PaginationComponent
-            total={meta?.page ?? 0}
-            active={active}
-            setActive={setActive}
-            setLimit={setLimit}
-            limit={limit}
-          />
-        </Box>
+        <PaginationComponent
+          total={meta?.page ?? 0}
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+        />
       )}
     </>
   );

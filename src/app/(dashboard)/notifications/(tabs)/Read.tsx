@@ -16,7 +16,7 @@ export const ReadNotification = () => {
 
   return (
     <>
-      <ScrollArea h="calc(100vh - 307px)">
+      <ScrollArea h="calc(100vh - 307px)" pr={20}>
         {notifications.map((notification, index, arr) => (
           <NotificationRow
             {...notification}

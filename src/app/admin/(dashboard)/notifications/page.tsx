@@ -59,7 +59,7 @@ export default function AdminNotification() {
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           {notifications
-            .filter((n) => n.status === "unread")
+            .filter((n) => n.readAt === null)
             .map((notification, index, arr) => (
               <NotificationRow
                 {...notification}
@@ -70,7 +70,7 @@ export default function AdminNotification() {
         </TabsPanel>
         <TabsPanel value={tabs[2].value}>
           {notifications
-            .filter((n) => n.status === "read")
+            .filter((n) => n.readAt)
             .map((notification, index, arr) => (
               <NotificationRow
                 {...notification}

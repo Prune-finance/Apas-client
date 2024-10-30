@@ -1,15 +1,11 @@
 "use client";
 
-import { useUserNotifications } from "@/lib/hooks/notifications";
 import { SecondaryBtn } from "@/ui/components/Buttons";
-import EmptyTable from "@/ui/components/EmptyTable";
-import { NotificationRow } from "@/ui/components/NotificationRow";
-import PaginationComponent from "@/ui/components/Pagination";
 import TabsComponent from "@/ui/components/Tabs";
-import { Box, Center, Flex, TabsPanel, Title } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { Flex, TabsPanel, Title } from "@mantine/core";
+import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
 import { IconCalendarMonth, IconChecks } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { AllNotification } from "./(tabs)/All";
 import { UnreadNotification } from "./(tabs)/Unread";
 import { ReadNotification } from "./(tabs)/Read";
@@ -17,9 +13,14 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import { useDebouncedValue } from "@mantine/hooks";
 
 export default function UserNotification() {
   const [processing, setProcessing] = useState(false);
+
+  const initialDateRange: [Date | null, Date | null] = [null, null];
+  const [dateRange, setDateRange] = useState<DatesRangeValue>(initialDateRange);
+  const [debouncedDateRange] = useDebouncedValue(dateRange, 1000);
 
   const { handleSuccess, handleError } = useNotification();
 
@@ -57,7 +58,8 @@ export default function UserNotification() {
           <DatePickerInput
             placeholder="Date Range"
             valueFormat="YYYY-MM-DD"
-            // {...form.getInputProps("createdAt")}
+            value={dateRange}
+            onChange={(value) => setDateRange(value)}
             size="xs"
             maw={250}
             styles={{ input: { height: "35px" } }}
@@ -79,20 +81,31 @@ export default function UserNotification() {
 
       <TabsComponent
         tabs={tabs}
+        onChange={(value) => setDateRange(initialDateRange)}
         tt="capitalize"
+        keepMounted={false}
         mt={37}
         styles={{
           list: { marginBottom: "24px" },
         }}
       >
         <TabsPanel value={tabs[0].value}>
-          <AllNotification />
+          <AllNotification
+            date={debouncedDateRange[0]}
+            endDate={debouncedDateRange[1]}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
-          <UnreadNotification />
+          <UnreadNotification
+            date={debouncedDateRange[0]}
+            endDate={debouncedDateRange[1]}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[2].value}>
-          <ReadNotification />
+          <ReadNotification
+            date={debouncedDateRange[0]}
+            endDate={debouncedDateRange[1]}
+          />
         </TabsPanel>
       </TabsComponent>
     </main>

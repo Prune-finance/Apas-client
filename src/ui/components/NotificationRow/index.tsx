@@ -33,9 +33,10 @@ export const NotificationRow = ({
   const { handleError } = useNotification();
 
   const handleNotificationClick = async () => {
+    const isAdmin = !business ? "/admin" : "";
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications/${id}/mark-as-read`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}${isAdmin}/notifications/${id}/mark-as-read`,
         {},
         {
           headers: { Authorization: `Bearer ${Cookies.get("auth")}` },

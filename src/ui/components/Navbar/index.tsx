@@ -4,7 +4,6 @@ import Cookies from "js-cookie";
 
 import { NavLink, Stack, Text, UnstyledButton } from "@mantine/core";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { IconBook, IconLogout } from "@tabler/icons-react";
@@ -23,8 +22,6 @@ import { useDisclosure, useIdle } from "@mantine/hooks";
 import ModalComponent from "../Modal";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { clearSession } from "@/lib/actions/checkToken";
-import path from "path";
 
 export default function Navbar() {
   const pathname = usePathname();

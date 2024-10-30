@@ -1,14 +1,52 @@
 "use client";
 
-import { notifications } from "@/lib/static";
 import { SecondaryBtn } from "@/ui/components/Buttons";
-import { NotificationRow } from "@/ui/components/NotificationRow";
 import TabsComponent from "@/ui/components/Tabs";
 import { Flex, TabsPanel, Title } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
 import { IconCalendarMonth, IconChecks } from "@tabler/icons-react";
+import { useState } from "react";
+import { AllNotification } from "./(tabs)/All";
+import { UnreadNotification } from "./(tabs)/Unread";
+import { ReadNotification } from "./(tabs)/Read";
+import axios from "axios";
+import Cookies from "js-cookie";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import { useDebouncedValue } from "@mantine/hooks";
 
 export default function AdminNotification() {
+  const [processing, setProcessing] = useState(false);
+
+  const initialDateRange: [Date | null, Date | null] = [null, null];
+  const [dateRange, setDateRange] = useState<DatesRangeValue>(initialDateRange);
+  const [debouncedDateRange] = useDebouncedValue(dateRange, 1000);
+
+  const { handleSuccess, handleError } = useNotification();
+
+  const markAllNotificationAsRead = async () => {
+    setProcessing(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications/mark-all-as-read`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess(
+        "Mark All Notifications",
+        "All notifications marked as read successfully"
+      );
+    } catch (error) {
+      handleError(
+        "An error occurred while marking all notifications as read",
+        parseError(error)
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <main>
       <Flex justify="space-between">
@@ -20,7 +58,8 @@ export default function AdminNotification() {
           <DatePickerInput
             placeholder="Date Range"
             valueFormat="YYYY-MM-DD"
-            // {...form.getInputProps("createdAt")}
+            value={dateRange}
+            onChange={(value) => setDateRange(value)}
             size="xs"
             maw={250}
             styles={{ input: { height: "35px" } }}
@@ -34,50 +73,39 @@ export default function AdminNotification() {
           <SecondaryBtn
             text="Mark all as read"
             icon={IconChecks}
-            // fullWidth
-            // action={() => setOpened(false)}
+            loading={processing}
+            action={markAllNotificationAsRead}
           />
         </Flex>
       </Flex>
 
       <TabsComponent
         tabs={tabs}
+        onChange={(value) => setDateRange(initialDateRange)}
         tt="capitalize"
+        keepMounted={false}
         mt={37}
         styles={{
           list: { marginBottom: "24px" },
         }}
       >
         <TabsPanel value={tabs[0].value}>
-          {notifications.map((notification, index, arr) => (
-            <NotificationRow
-              {...notification}
-              lastRow={arr.length - 1 === index}
-              key={index}
-            />
-          ))}
+          <AllNotification
+            date={debouncedDateRange[0]}
+            endDate={debouncedDateRange[1]}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
-          {notifications
-            .filter((n) => n.readAt === null)
-            .map((notification, index, arr) => (
-              <NotificationRow
-                {...notification}
-                lastRow={arr.length - 1 === index}
-                key={index}
-              />
-            ))}
+          <UnreadNotification
+            date={debouncedDateRange[0]}
+            endDate={debouncedDateRange[1]}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[2].value}>
-          {notifications
-            .filter((n) => n.readAt)
-            .map((notification, index, arr) => (
-              <NotificationRow
-                {...notification}
-                lastRow={arr.length - 1 === index}
-                key={index}
-              />
-            ))}
+          <ReadNotification
+            date={debouncedDateRange[0]}
+            endDate={debouncedDateRange[1]}
+          />
         </TabsPanel>
       </TabsComponent>
     </main>

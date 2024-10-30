@@ -4,19 +4,19 @@ import {
   Text,
   Indicator,
   Avatar,
-  Switch,
   Stack,
   Popover,
   PopoverTarget,
   PopoverDropdown,
   Group,
-  Badge,
   Paper,
   Box,
+  Center,
+  Loader,
 } from "@mantine/core";
 import { IconSearch, IconBell, IconChecks } from "@tabler/icons-react";
 import localFont from "next/font/local";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
 const switzer = localFont({
@@ -30,18 +30,68 @@ import { checkToken, clearSession } from "@/lib/actions/checkToken";
 import axios from "axios";
 import Link from "next/link";
 import { getInitials } from "@/lib/utils";
-import { notifications as staticNotification } from "@/lib/static";
 import { NotificationRow } from "../NotificationRow";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import { useUserNotifications } from "@/lib/hooks/notifications";
+import {
+  useAdminNotifications,
+  useUserNotifications,
+} from "@/lib/hooks/notifications";
 import io from "socket.io-client";
-import { notifications } from "@mantine/notifications";
+
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import EmptyTable from "../EmptyTable";
 
 export default function Header() {
   const { user, setUser } = User();
   const [opened, setOpened] = useState(false);
+  const [processing, setProcessing] = useState(false);
+
+  const { loading, notifications, meta, revalidate } = useAdminNotifications({
+    status: "unread",
+  });
+
+  const { handleInfoForNotification, handleSuccess, handleError } =
+    useNotification();
+
+  useEffect(() => {
+    const socket = io(process.env.NEXT_PUBLIC_AUTH_BASE_URL);
+
+    socket.on(`admin-channel`, (data) => {
+      // console.log("I ran here");
+      revalidate();
+
+      handleInfoForNotification(data.title, data.description);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const markAllNotificationAsRead = async () => {
+    setProcessing(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications/mark-all-as-read`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess(
+        "Mark All Notifications",
+        "All notifications marked as read successfully"
+      );
+      revalidate();
+    } catch (error) {
+      handleError(
+        "An error occurred while marking all notifications as read",
+        parseError(error)
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   const handleSetUser = async () => {
     const { user, success } = await checkToken(true);
@@ -104,20 +154,41 @@ export default function Header() {
                 variant="filled"
                 size={25}
               >
-                {(staticNotification || []).length ?? 0}
+                {`${meta?.total}`}
               </Avatar>
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />
-            {(staticNotification || [])
-              .slice(0, 4)
-              .map((notification, index, arr) => (
-                <Box px={28} key={index}>
-                  <NotificationRow
-                    {...notification}
-                    lastRow={arr.length - 1 === index}
-                  />
-                </Box>
-              ))}
+
+            {loading ? (
+              <Center h={215}>
+                <Loader size={50} color="var(--prune-primary-600)" />
+              </Center>
+            ) : (
+              <Fragment>
+                {notifications.length > 0 ? (
+                  <Fragment>
+                    {notifications.map((notification, index, arr) => (
+                      <Box px={28} key={index}>
+                        <NotificationRow
+                          {...notification}
+                          lastRow={arr.length - 1 === index}
+                          revalidate={revalidate}
+                        />
+                      </Box>
+                    ))}
+                  </Fragment>
+                ) : (
+                  <Box mb={20} mt={-40}>
+                    <EmptyTable
+                      rows={notifications}
+                      title="No unread notification yet"
+                      text="When there is an unread notification, it will appear here"
+                      loading={loading}
+                    />
+                  </Box>
+                )}
+              </Fragment>
+            )}
 
             <Paper py={15} bg="#f9f9f9">
               <Group px={28} justify="space-between" gap={24} wrap="nowrap">
@@ -125,7 +196,11 @@ export default function Header() {
                   text="Mark all as read"
                   icon={IconChecks}
                   fullWidth
-                  action={() => setOpened(false)}
+                  action={() => {
+                    markAllNotificationAsRead();
+                    // setOpened(false)
+                  }}
+                  loading={processing}
                 />
 
                 <PrimaryBtn
@@ -162,12 +237,9 @@ export function UserHeader() {
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
 
-  const {
-    loading,
-    notifications: intialNotification,
-    meta,
-    revalidate,
-  } = useUserNotifications({ status: "unread" });
+  const { loading, notifications, meta, revalidate } = useUserNotifications({
+    status: "unread",
+  });
 
   const { handleInfoForNotification, handleSuccess, handleError } =
     useNotification();
@@ -200,6 +272,7 @@ export function UserHeader() {
         "Mark All Notifications",
         "All notifications marked as read successfully"
       );
+      revalidate();
     } catch (error) {
       handleError(
         "An error occurred while marking all notifications as read",
@@ -296,18 +369,42 @@ export function UserHeader() {
                 variant="filled"
                 size={25}
               >
-                {meta?.total}
+                {`${meta?.total}`}
               </Avatar>
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />
-            {intialNotification.slice(0, 4).map((notification, index, arr) => (
-              <Box px={28} key={index}>
-                <NotificationRow
-                  {...notification}
-                  lastRow={arr.length - 1 === index}
-                />
-              </Box>
-            ))}
+
+            {loading ? (
+              <Center h={215}>
+                <Loader size={50} color="var(--prune-primary-600)" />
+              </Center>
+            ) : (
+              <Fragment>
+                {notifications.length > 0 ? (
+                  <Fragment>
+                    {notifications.map((notification, index, arr) => (
+                      <Box px={28} key={index}>
+                        <NotificationRow
+                          {...notification}
+                          lastRow={arr.length - 1 === index}
+                          revalidate={revalidate}
+                          business
+                        />
+                      </Box>
+                    ))}
+                  </Fragment>
+                ) : (
+                  <Box mb={20} mt={-40}>
+                    <EmptyTable
+                      rows={notifications}
+                      title="No unread notification yet"
+                      text="When there is an unread notification, it will appear here"
+                      loading={loading}
+                    />
+                  </Box>
+                )}
+              </Fragment>
+            )}
 
             <Paper py={15} bg="#f9f9f9">
               <Group px={28} justify="space-between" gap={24} wrap="nowrap">

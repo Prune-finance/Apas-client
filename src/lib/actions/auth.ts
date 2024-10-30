@@ -70,3 +70,58 @@ export const handlePdfDownload = async (
     // setProcessing(false);
   }
 };
+
+export const handlePdfStatement = async (
+  pdfRef: RefObject<HTMLDivElement>,
+  pdfName?: string
+) => {
+  const input = pdfRef.current;
+  if (!input) return;
+  input.style.backgroundColor = "#ffffff";
+  // Capture the HTML element as a canvas
+  const canvas = await html2canvas(input, {
+    scale: 3,
+    backgroundColor: null,
+    useCORS: true,
+  });
+  const imgData = canvas.toDataURL("image/png");
+
+  // setProcessing(true);
+  try {
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "px", // Set the unit to points
+      format: "a4", // Set the page format to A4
+      compress: true, // Compress the PDF file
+      putOnlyUsedFonts: true, // Only include used fonts
+    });
+
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+
+    // Position the image at the center of the PDF page
+    const imgX = 0; // Keep X at 0 to start from the left
+    const imgY = 0;
+
+    pdf.setFillColor(255, 255, 255);
+    pdf.addImage(
+      imgData,
+      "PNG", // Change to PNG
+      imgX, // Adjusted X
+      imgY, // Adjusted Y
+      pdfWidth,
+      imgHeight * ratio // Adjusted height
+    );
+
+    // Save the PDF with a filename that includes the current timestamp
+    const timestamp = new Date().toISOString().replace(/[:.-]/g, "_");
+    pdf.save(pdfName || `Transaction_Receipt_${timestamp}.pdf`);
+  } finally {
+    // Clean up the canvas and image data
+    canvas.remove();
+    // setProcessing(false);
+  }
+};

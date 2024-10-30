@@ -17,6 +17,7 @@ import {
 import { IconSearch, IconBell, IconChecks } from "@tabler/icons-react";
 import localFont from "next/font/local";
 import { useEffect, useState } from "react";
+import Cookies from "js-cookie";
 
 const switzer = localFont({
   src: "../../../assets/fonts/Switzer-Regular.woff2",
@@ -29,9 +30,14 @@ import { checkToken, clearSession } from "@/lib/actions/checkToken";
 import axios from "axios";
 import Link from "next/link";
 import { getInitials } from "@/lib/utils";
-import { notifications } from "@/lib/static";
+import { notifications as staticNotification } from "@/lib/static";
 import { NotificationRow } from "../NotificationRow";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
+import { useUserNotifications } from "@/lib/hooks/notifications";
+import io from "socket.io-client";
+import { notifications } from "@mantine/notifications";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 export default function Header() {
   const { user, setUser } = User();
@@ -98,18 +104,20 @@ export default function Header() {
                 variant="filled"
                 size={25}
               >
-                {notifications.length}
+                {(staticNotification || []).length ?? 0}
               </Avatar>
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />
-            {notifications.slice(0, 4).map((notification, index, arr) => (
-              <Box px={28} key={index}>
-                <NotificationRow
-                  {...notification}
-                  lastRow={arr.length - 1 === index}
-                />
-              </Box>
-            ))}
+            {(staticNotification || [])
+              .slice(0, 4)
+              .map((notification, index, arr) => (
+                <Box px={28} key={index}>
+                  <NotificationRow
+                    {...notification}
+                    lastRow={arr.length - 1 === index}
+                  />
+                </Box>
+              ))}
 
             <Paper py={15} bg="#f9f9f9">
               <Group px={28} justify="space-between" gap={24} wrap="nowrap">
@@ -152,6 +160,55 @@ export default function Header() {
 export function UserHeader() {
   const { user, setUser } = User();
   const [opened, setOpened] = useState(false);
+  const [processing, setProcessing] = useState(false);
+
+  const {
+    loading,
+    notifications: intialNotification,
+    meta,
+    revalidate,
+  } = useUserNotifications({ status: "unread" });
+
+  const { handleInfoForNotification, handleSuccess, handleError } =
+    useNotification();
+
+  useEffect(() => {
+    const socket = io(process.env.NEXT_PUBLIC_AUTH_BASE_URL);
+
+    socket.on(`company-${user?.companyId}`, (data) => {
+      // console.log("I ran here");
+      revalidate();
+
+      handleInfoForNotification(data.title, data.description);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
+  const markAllNotificationAsRead = async () => {
+    setProcessing(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications/mark-all-as-read`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess(
+        "Mark All Notifications",
+        "All notifications marked as read successfully"
+      );
+    } catch (error) {
+      handleError(
+        "An error occurred while marking all notifications as read",
+        parseError(error)
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   const handleSetUser = async () => {
     const { user, success } = await checkToken();
@@ -239,11 +296,11 @@ export function UserHeader() {
                 variant="filled"
                 size={25}
               >
-                {notifications.length}
+                {meta?.total}
               </Avatar>
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />
-            {notifications.slice(0, 4).map((notification, index, arr) => (
+            {intialNotification.slice(0, 4).map((notification, index, arr) => (
               <Box px={28} key={index}>
                 <NotificationRow
                   {...notification}
@@ -258,7 +315,11 @@ export function UserHeader() {
                   text="Mark all as read"
                   icon={IconChecks}
                   fullWidth
-                  action={() => setOpened(false)}
+                  action={() => {
+                    markAllNotificationAsRead();
+                    // setOpened(false);
+                  }}
+                  loading={processing}
                 />
 
                 <PrimaryBtn

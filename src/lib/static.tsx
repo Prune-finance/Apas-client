@@ -26,6 +26,7 @@ import dayjs from "dayjs";
 import Link from "next/link";
 import businessStyles from "@/ui/styles/business.module.scss";
 import { TransactionType } from "./hooks/transactions";
+import { Notification } from "./hooks/notifications";
 
 export const AdminMainLinks = [
   {
@@ -342,132 +343,225 @@ export const PayoutRequestsTableHeaders = [
   "Status",
 ];
 
-interface Notification {
-  title: string;
-  text: string;
-  createdAt: Date;
-  status: "unread" | "read";
-}
-
 export const notifications: Notification[] = [
   {
+    id: "1",
     title: "Activation Link Expired",
-    text: "The activation link you received has expired. Please request a new activation link to proceed with your account setup.",
+    description:
+      "The activation link you received has expired. Please request a new activation link to proceed with your account setup.",
+    companyId: "company1",
+    userId: "user1",
     createdAt: new Date("2023-01-01"),
-    status: "unread",
+    updatedAt: new Date("2023-01-01"),
+    readAt: null,
   },
   {
+    id: "2",
     title: "Business Account Activated",
-    text: "Your business account has been successfully activated. You can now access all the features and services available to business accounts.",
+    description:
+      "Your business account has been successfully activated. You can now access all the features and services available to business accounts.",
+    companyId: "company2",
+    userId: "user2",
     createdAt: new Date("2023-01-02"),
-    status: "read",
+    updatedAt: new Date("2023-01-02"),
+    readAt: new Date(),
   },
   {
+    id: "3",
     title: "Business Account Unfrozen",
-    text: "Your business account has been unfrozen. You can now resume your activities and transactions without any restrictions.",
+    description:
+      "Your business account has been unfrozen. You can now resume your activities and transactions without any restrictions.",
+    companyId: "company3",
+    userId: "user3",
     createdAt: new Date("2023-01-03"),
-    status: "unread",
+    updatedAt: new Date("2023-01-03"),
+    readAt: null,
   },
   {
+    id: "4",
     title: "Business Account Frozen",
-    text: "Your business account has been frozen due to suspicious activity. Please contact support to resolve this issue and unfreeze your account.",
+    description:
+      "Your business account has been frozen due to suspicious activity. Please contact support to resolve this issue and unfreeze your account.",
+    companyId: "company4",
+    userId: "user4",
     createdAt: new Date("2023-01-04"),
-    status: "read",
+    updatedAt: new Date("2023-01-04"),
+    readAt: new Date(),
   },
   {
+    id: "5",
     title: "Business Account Deactivated",
-    text: "Your business account has been deactivated. If you believe this is a mistake, please contact support to reactivate your account.",
+    description:
+      "Your business account has been deactivated. If you believe this is a mistake, please contact support to reactivate your account.",
+    companyId: "company5",
+    userId: "user5",
     createdAt: new Date("2023-01-05"),
-    status: "unread",
+    updatedAt: new Date("2023-01-05"),
+    readAt: null,
   },
   {
+    id: "6",
     title: "Payout Account Approved",
-    text: "Your payout account has been approved. You can now receive payouts to your designated account without any issues.",
+    description:
+      "Your payout account has been approved. You can now receive payouts to your designated account without any issues.",
+    companyId: "company6",
+    userId: "user6",
     createdAt: new Date("2023-01-06"),
-    status: "read",
+    updatedAt: new Date("2023-01-06"),
+    readAt: new Date(),
   },
   {
+    id: "7",
     title: "Payout Account Rejected",
-    text: "Your payout account has been rejected. Please review the provided information and submit a new request for approval.",
+    description:
+      "Your payout account has been rejected. Please review the provided information and submit a new request for approval.",
+    companyId: "company7",
+    userId: "user7",
     createdAt: new Date("2023-01-07"),
-    status: "unread",
+    updatedAt: new Date("2023-01-07"),
+    readAt: null,
   },
   {
+    id: "8",
     title: "Payout Account Trusted",
-    text: "Your payout account has been marked as trusted. You can now enjoy faster and more secure transactions.",
+    description:
+      "Your payout account has been marked as trusted. You can now enjoy faster and more secure transactions.",
+    companyId: "company8",
+    userId: "user8",
     createdAt: new Date("2023-01-08"),
-    status: "read",
+    updatedAt: new Date("2023-01-08"),
+    readAt: new Date(),
   },
   {
+    id: "9",
     title: "New Inquiry Ticket",
-    text: "A new inquiry ticket has been created for C80 Limited. Please review the details and respond accordingly. [Reference ID]",
+    description:
+      "A new inquiry ticket has been created for C80 Limited. Please review the details and respond accordingly. [Reference ID]",
+    companyId: "company9",
+    userId: "user9",
     createdAt: new Date("2023-01-09"),
-    status: "unread",
+    updatedAt: new Date("2023-01-09"),
+    readAt: null,
   },
   {
+    id: "10",
     title: "New Reply",
-    text: "You have received a new reply from Primark Limited. Please review the response and take the necessary actions. [Reference ID]",
+    description:
+      "You have received a new reply from Primark Limited. Please review the response and take the necessary actions. [Reference ID]",
+    companyId: "company10",
+    userId: "user10",
     createdAt: new Date("2023-01-10"),
-    status: "read",
+    updatedAt: new Date("2023-01-10"),
+    readAt: new Date(),
   },
   {
+    id: "11",
     title: "Account Verification Required",
-    text: "Your account requires verification. Please submit the necessary documents to complete the verification process and avoid any interruptions.",
+    description:
+      "Your account requires verification. Please submit the necessary documents to complete the verification process and avoid any interruptions.",
+    companyId: "company11",
+    userId: "user11",
     createdAt: new Date("2023-01-11"),
-    status: "unread",
+    updatedAt: new Date("2023-01-11"),
+    readAt: null,
   },
   {
+    id: "12",
     title: "Password Change Successful",
-    text: "Your password has been successfully changed. If you did not request this change, please contact support immediately.",
+    description:
+      "Your password has been successfully changed. If you did not request this change, please contact support immediately.",
+    companyId: "company12",
+    userId: "user12",
     createdAt: new Date("2023-01-12"),
-    status: "read",
+    updatedAt: new Date("2023-01-12"),
+    readAt: new Date(),
   },
   {
+    id: "13",
     title: "Subscription Renewal",
-    text: "Your subscription is due for renewal. Please ensure your payment information is up to date to avoid any service interruptions.",
+    description:
+      "Your subscription is due for renewal. Please ensure your payment information is up to date to avoid any service interruptions.",
+    companyId: "company13",
+    userId: "user13",
     createdAt: new Date("2023-01-13"),
-    status: "unread",
+    updatedAt: new Date("2023-01-13"),
+    readAt: null,
   },
   {
+    id: "14",
     title: "Service Downtime Notice",
-    text: "We will be performing scheduled maintenance on our servers. During this time, our services may be temporarily unavailable. We apologize for any inconvenience.",
+    description:
+      "We will be performing scheduled maintenance on our servers. During this time, our services may be temporarily unavailable. We apologize for any inconvenience.",
+    companyId: "company14",
+    userId: "user14",
     createdAt: new Date("2023-01-14"),
-    status: "read",
+    updatedAt: new Date("2023-01-14"),
+    readAt: new Date(),
   },
   {
+    id: "15",
     title: "New Feature Release",
-    text: "We are excited to announce the release of a new feature. Check out the latest addition to our platform and see how it can benefit you.",
+    description:
+      "We are excited to announce the release of a new feature. Check out the latest addition to our platform and see how it can benefit you.",
+    companyId: "company15",
+    userId: "user15",
     createdAt: new Date("2023-01-15"),
-    status: "unread",
+    updatedAt: new Date("2023-01-15"),
+    readAt: null,
   },
   {
+    id: "16",
     title: "Security Alert",
-    text: "We have detected unusual activity on your account. Please review your recent activity and contact support if you notice anything suspicious.",
+    description:
+      "We have detected unusual activity on your account. Please review your recent activity and contact support if you notice anything suspicious.",
+    companyId: "company16",
+    userId: "user16",
     createdAt: new Date("2023-01-16"),
-    status: "read",
+    updatedAt: new Date("2023-01-16"),
+    readAt: new Date(),
   },
   {
+    id: "17",
     title: "Welcome to Our Service",
-    text: "Thank you for joining our service. We are thrilled to have you on board and look forward to providing you with the best experience possible.",
+    description:
+      "Thank you for joining our service. We are thrilled to have you on board and look forward to providing you with the best experience possible.",
+    companyId: "company17",
+    userId: "user17",
     createdAt: new Date("2023-01-17"),
-    status: "unread",
+    updatedAt: new Date("2023-01-17"),
+    readAt: null,
   },
   {
+    id: "18",
     title: "Account Upgrade Available",
-    text: "An upgrade is available for your account. Upgrade now to enjoy additional features and benefits exclusive to premium members.",
+    description:
+      "An upgrade is available for your account. Upgrade now to enjoy additional features and benefits exclusive to premium members.",
+    companyId: "company18",
+    userId: "user18",
     createdAt: new Date("2023-01-18"),
-    status: "read",
+    updatedAt: new Date("2023-01-18"),
+    readAt: new Date(),
   },
   {
+    id: "19",
     title: "Payment Confirmation",
-    text: "Your payment has been successfully processed. Thank you for your purchase. If you have any questions, please contact support.",
+    description:
+      "Your payment has been successfully processed. Thank you for your purchase. If you have any questions, please contact support.",
+    companyId: "company19",
+    userId: "user19",
     createdAt: new Date("2023-01-19"),
-    status: "unread",
+    updatedAt: new Date("2023-01-19"),
+    readAt: null,
   },
   {
+    id: "20",
     title: "Feedback Request",
-    text: "We value your feedback. Please take a moment to share your thoughts and help us improve our services. Your input is greatly appreciated.",
+    description:
+      "We value your feedback. Please take a moment to share your thoughts and help us improve our services. Your input is greatly appreciated.",
+    companyId: "company20",
+    userId: "user20",
     createdAt: new Date("2023-01-20"),
-    status: "read",
+    updatedAt: new Date("2023-01-20"),
+    readAt: new Date(),
   },
 ];

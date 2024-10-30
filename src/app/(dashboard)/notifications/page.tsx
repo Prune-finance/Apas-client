@@ -1,14 +1,51 @@
 "use client";
 
-import { notifications } from "@/lib/static";
+import { useUserNotifications } from "@/lib/hooks/notifications";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import EmptyTable from "@/ui/components/EmptyTable";
 import { NotificationRow } from "@/ui/components/NotificationRow";
+import PaginationComponent from "@/ui/components/Pagination";
 import TabsComponent from "@/ui/components/Tabs";
-import { Flex, TabsPanel, Title } from "@mantine/core";
+import { Box, Center, Flex, TabsPanel, Title } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { IconCalendarMonth, IconChecks } from "@tabler/icons-react";
+import { useMemo, useState } from "react";
+import { AllNotification } from "./(tabs)/All";
+import { UnreadNotification } from "./(tabs)/Unread";
+import { ReadNotification } from "./(tabs)/Read";
+import axios from "axios";
+import Cookies from "js-cookie";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 export default function UserNotification() {
+  const [processing, setProcessing] = useState(false);
+
+  const { handleSuccess, handleError } = useNotification();
+
+  const markAllNotificationAsRead = async () => {
+    setProcessing(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications/mark-all-as-read`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      handleSuccess(
+        "Mark All Notifications",
+        "All notifications marked as read successfully"
+      );
+    } catch (error) {
+      handleError(
+        "An error occurred while marking all notifications as read",
+        parseError(error)
+      );
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <main>
       <Flex justify="space-between">
@@ -34,8 +71,8 @@ export default function UserNotification() {
           <SecondaryBtn
             text="Mark all as read"
             icon={IconChecks}
-            // fullWidth
-            // action={() => setOpened(false)}
+            loading={processing}
+            action={markAllNotificationAsRead}
           />
         </Flex>
       </Flex>
@@ -49,35 +86,13 @@ export default function UserNotification() {
         }}
       >
         <TabsPanel value={tabs[0].value}>
-          {notifications.map((notification, index, arr) => (
-            <NotificationRow
-              {...notification}
-              lastRow={arr.length - 1 === index}
-              key={index}
-            />
-          ))}
+          <AllNotification />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
-          {notifications
-            .filter((n) => n.status === "unread")
-            .map((notification, index, arr) => (
-              <NotificationRow
-                {...notification}
-                lastRow={arr.length - 1 === index}
-                key={index}
-              />
-            ))}
+          <UnreadNotification />
         </TabsPanel>
         <TabsPanel value={tabs[2].value}>
-          {notifications
-            .filter((n) => n.status === "read")
-            .map((notification, index, arr) => (
-              <NotificationRow
-                {...notification}
-                lastRow={arr.length - 1 === index}
-                key={index}
-              />
-            ))}
+          <ReadNotification />
         </TabsPanel>
       </TabsComponent>
     </main>

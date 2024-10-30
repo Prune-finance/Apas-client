@@ -1,4 +1,4 @@
-import { useUserNotifications } from "@/lib/hooks/notifications";
+import { useAdminNotifications } from "@/lib/hooks/notifications";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { NotificationRow } from "@/ui/components/NotificationRow";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -11,13 +11,12 @@ interface Props {
   endDate: Date | null;
 }
 
-export const UnreadNotification = ({ date, endDate }: Props) => {
+export const AllNotification = ({ date, endDate }: Props) => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
-  const { loading, notifications, meta, revalidate } = useUserNotifications({
+  const { loading, notifications, meta, revalidate } = useAdminNotifications({
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    status: "unread",
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
   });
@@ -38,7 +37,6 @@ export const UnreadNotification = ({ date, endDate }: Props) => {
                     {...notification}
                     lastRow={arr.length - 1 === index}
                     key={index}
-                    business
                     revalidate={revalidate}
                   />
                 ))}
@@ -47,8 +45,8 @@ export const UnreadNotification = ({ date, endDate }: Props) => {
               <Center h="calc(100vh - 350px)">
                 <EmptyTable
                   rows={notifications}
-                  title="No unread notification yet"
-                  text="When there is an unread notification, it will appear here"
+                  title="No notification yet"
+                  text="When there is a notification, it will appear here"
                   loading={loading}
                 />
               </Center>

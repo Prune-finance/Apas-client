@@ -51,6 +51,8 @@ import { handlePdfDownload, handlePdfStatement } from "@/lib/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { DatePickerInput } from "@mantine/dates";
+import useNotification from "@/lib/hooks/notification";
+import { notifications } from "@mantine/notifications";
 
 interface Meta {
   out: number;
@@ -149,6 +151,11 @@ Props) => {
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
     useDisclosure(false);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const { handleSuccess, handleError, handleInfo } = useNotification();
 
   const [downloadData, setDownloadData] = useState<DownloadStatementData[]>([]);
   const [downloadMeta, setDownloadMeta] =
@@ -190,19 +197,38 @@ Props) => {
   ];
 
   const handleDownloadAccountStatement = async () => {
+    if (!dateRange[0] || !dateRange[1]) {
+      return handleInfo(
+        "Account Statement",
+        "Please select a valid date range"
+      );
+    }
+
+    notifications.clean();
     setLoadingStatement(true);
-    console.log("Account ID", accountID);
+
+    const date = dayjs(dateRange[0]).format("YYYY-MM-DD");
+    const endDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
+
     try {
       const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${accountID}/statement`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${accountID}/statement?date=${date}&endDate=${endDate}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
-      console.log(res);
+
+      if (res?.data.length === 0) {
+        setLoadingStatement(false);
+        return handleInfo(
+          "Account Statement",
+          "No transactions found for the selected date range"
+        );
+      }
       setDownloadData(res?.data);
       setDownloadMeta(res?.meta);
       await new Promise((resolve) => setTimeout(resolve, 5000));
       handlePdfStatement(pdfRef);
       setLoadingStatement(false);
+      // closePreview();
     } catch (error) {
       console.log(error);
       setLoadingStatement(false);
@@ -323,7 +349,10 @@ Props) => {
           <DatePickerInput
             placeholder="Select Date Range"
             valueFormat="YYYY-MM-DD"
-            {...form.getInputProps("createdAt")}
+            value={dateRange}
+            onChange={(value: [Date | null, Date | null]) =>
+              setDateRange(value)
+            }
             size="xs"
             w="100%"
             h={44}

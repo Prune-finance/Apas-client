@@ -102,6 +102,12 @@ export const handlePdfStatement = async (
     const pdfHeight = pdf.internal.pageSize.getHeight();
     const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
 
+    // Calculate the actual content height based on the image aspect ratio
+    const contentHeight = imgHeight * (pdfWidth / imgWidth);
+
+    // Set the height of the PDF page to the content's height if it’s less than A4 height
+    pdf.internal.pageSize.height = contentHeight;
+
     // Position the image at the center of the PDF page
     const imgX = 0; // Keep X at 0 to start from the left
     const imgY = 0;
@@ -113,7 +119,8 @@ export const handlePdfStatement = async (
       imgX, // Adjusted X
       imgY, // Adjusted Y
       pdfWidth,
-      imgHeight * ratio // Adjusted height
+      contentHeight
+      // imgHeight * ratio // Adjusted height
     );
 
     // Save the PDF with a filename that includes the current timestamp

@@ -24,6 +24,9 @@ import {
 } from "../SingleAccount/(tabs)/Transactions";
 import { formatNumber } from "@/lib/utils";
 import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(advancedFormat);
 
 export const AccountTableHeaders = [
   "Date",
@@ -60,6 +63,10 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
       "EUR"
     ),
   };
+
+  const [startDate, endDate] = meta?.summary?.range
+    ? meta.summary.range.split(" - ").map((date) => dayjs(date))
+    : [dayjs(), dayjs()];
 
   return (
     <Paper withBorder bg="#fff" w="100%" ref={receiptRef}>
@@ -99,11 +106,14 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
             <Text fz={28} fw={600} mb={12}>
               {meta?.accountDetails?.accountName ?? "N/A"}
             </Text>
-            <Text fz={14} c="#475467" fw={500} mb={8}>
-              {meta?.summary?.address ?? ""}
-            </Text>
+            {meta?.summary?.address && (
+              <Text fz={14} c="#475467" fw={500} mb={8}>
+                {meta?.summary?.address ?? ""}
+              </Text>
+            )}
             <Text fz={14} c="#475467" fw={400}>
-              {meta?.summary?.range ?? ""}
+              {startDate.format("Do MMMM YYYY")} -
+              {endDate.format("Do MMMM YYYY")}
             </Text>
           </Flex>
 
@@ -197,7 +207,7 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
           data={{
             head: AccountTableHeaders,
             body: data?.map((item) => [
-              dayjs(item?.createdAt).format("DD MMM, YYYY"),
+              dayjs(item?.createdAt).format("Do MMMM YYYY"),
               item?.description ?? "N/A",
               item?.type === "CREDIT"
                 ? formatNumber(item?.amount ?? 0, true, "EUR")

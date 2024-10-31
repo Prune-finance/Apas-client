@@ -5,7 +5,7 @@ import { IParams } from "../schema";
 
 export function useAdminNotifications(customParams: IParams = {}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [meta, setMeta] = useState<Meta>();
+  const [meta, setMeta] = useState<NotificationMeta>();
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -60,7 +60,7 @@ export function useAdminNotifications(customParams: IParams = {}) {
 
 export function useUserNotifications(customParams: IParams = {}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [meta, setMeta] = useState<Meta>();
+  const [meta, setMeta] = useState<NotificationMeta>();
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -113,18 +113,34 @@ export function useUserNotifications(customParams: IParams = {}) {
   return { loading, notifications, meta, revalidate };
 }
 
-export interface Meta {
-  total: number;
-  page: number;
-}
+const NotificationType = [
+  "PAYOUTS",
+  "TRANSACTIONS",
+  "DEBIT_REQUEST",
+  "ACCOUNT_REQUESTS",
+] as const;
+
+export type NotificationType = (typeof NotificationType)[number] | null;
 
 export interface Notification {
   id: string;
   title: string;
   description: string;
-  companyId: string;
-  userId: string;
+  companyId: string | null;
+  userId: string | null;
   createdAt: Date;
   updatedAt: Date;
   readAt: Date | null;
+  type: NotificationType;
+}
+
+export interface NotificationMeta {
+  total: number;
+  page: number;
+  countByGroup: CountByGroup[];
+}
+
+export interface CountByGroup {
+  type: NotificationType;
+  count: number;
 }

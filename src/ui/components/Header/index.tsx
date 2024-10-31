@@ -41,15 +41,21 @@ import io from "socket.io-client";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import EmptyTable from "../EmptyTable";
+import { NotificationStore } from "@/lib/store/notification";
 
 export default function Header() {
   const { user, setUser } = User();
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const { setMeta } = NotificationStore();
 
   const { loading, notifications, meta, revalidate } = useAdminNotifications({
     status: "unread",
   });
+
+  useEffect(() => {
+    setMeta(meta);
+  }, [notifications]);
 
   const { handleInfoForNotification, handleSuccess, handleError } =
     useNotification();
@@ -236,10 +242,15 @@ export function UserHeader() {
   const { user, setUser } = User();
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const { setMeta } = NotificationStore();
 
   const { loading, notifications, meta, revalidate } = useUserNotifications({
     status: "unread",
   });
+
+  useEffect(() => {
+    setMeta(meta);
+  }, [notifications]);
 
   const { handleInfoForNotification, handleSuccess, handleError } =
     useNotification();

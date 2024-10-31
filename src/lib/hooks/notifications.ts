@@ -117,6 +117,7 @@ const NotificationType = [
   "PAYOUTS",
   "TRANSACTIONS",
   "DEBIT_REQUEST",
+  "DEBIT_REQUETS",
   "ACCOUNT_REQUESTS",
 ] as const;
 

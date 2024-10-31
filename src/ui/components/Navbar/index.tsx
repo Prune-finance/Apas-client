@@ -37,6 +37,7 @@ import { NotificationType } from "@/lib/hooks/notifications";
 export default function Navbar() {
   const pathname = usePathname();
   const [opened, { open, close }] = useDisclosure(false);
+  const { meta } = NotificationStore();
 
   const [processing, setProcessing] = useState(false);
 
@@ -64,6 +65,57 @@ export default function Navbar() {
       handleAdminLogout(pathname);
     }
   }, [idle]);
+
+  const { accountReq, debitReq, payouts, transactions, _debitReq } =
+    useMemo(() => {
+      const accountReq = meta?.countByGroup.find(
+        (m) => m.type === "ACCOUNT_REQUESTS"
+      )?.count;
+      const debitReq = meta?.countByGroup.find(
+        (m) => m.type === "DEBIT_REQUEST"
+      )?.count;
+      const _debitReq = meta?.countByGroup.find(
+        (m) => m.type === "DEBIT_REQUETS"
+      )?.count;
+      const payouts = meta?.countByGroup.find(
+        (m) => m.type === "PAYOUTS"
+      )?.count;
+      const transactions = meta?.countByGroup.find(
+        (m) => m.type === "TRANSACTIONS"
+      )?.count;
+
+      return {
+        accountReq,
+        debitReq,
+        _debitReq,
+        payouts,
+        transactions,
+      };
+    }, [meta]);
+
+  const Type = [
+    "Transactions",
+    "Payouts",
+    "Requests",
+    "Account Requests",
+  ] as const;
+
+  type Type = (typeof Type)[number];
+
+  const countSwitch = (type: Type) => {
+    switch (type) {
+      case "Account Requests":
+        return accountReq;
+      case "Requests":
+        return (debitReq ?? 0) + (_debitReq ?? 0);
+      case "Payouts":
+        return payouts;
+      case "Transactions":
+        return transactions;
+      default:
+        return null;
+    }
+  };
 
   return (
     <nav className={styles.nav}>
@@ -100,7 +152,19 @@ export default function Navbar() {
                   key={index}
                   leftSection={item.icon}
                   component={Link}
-                  label={item.text}
+                  // label={item.text}
+                  label={
+                    <NavLinkLabel
+                      text={item.text}
+                      count={countSwitch(item.text as Type)}
+                      textArray={[
+                        "Transactions",
+                        "Payouts",
+                        "Requests",
+                        "Account Requests",
+                      ]}
+                    />
+                  }
                   href={item.link}
                   active={pathname.startsWith(item.link)}
                   fz={8}

@@ -268,6 +268,7 @@ export default function Account() {
 
       <SingleAccountBody
         account={account}
+        accountID={params?.id}
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={trxLoading}

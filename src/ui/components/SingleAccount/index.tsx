@@ -66,7 +66,7 @@ import {
 } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
@@ -595,6 +595,7 @@ interface SingleAccountProps {
   isDefault?: boolean;
   trxMeta: Meta | null;
   children: React.ReactNode;
+  accountID?: string;
 }
 
 export const SingleAccountBody = ({
@@ -609,6 +610,7 @@ export const SingleAccountBody = ({
   isDefault,
   trxMeta,
   children,
+  accountID,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -669,6 +671,7 @@ export const SingleAccountBody = ({
             payout={payout}
             meta={trxMeta}
             children={children}
+            accountID={accountID}
           />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
@@ -759,6 +762,7 @@ export const SingleDefaultAccountBody = ({
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
+            accountID={account?.id}
             transactions={transactions}
             loading={loadingTrx}
             payout={payout}

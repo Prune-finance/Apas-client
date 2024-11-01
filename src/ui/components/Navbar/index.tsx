@@ -66,32 +66,30 @@ export default function Navbar() {
     }
   }, [idle]);
 
-  const { accountReq, debitReq, payouts, transactions, _debitReq } =
-    useMemo(() => {
-      const accountReq = meta?.countByGroup.find(
-        (m) => m.type === "ACCOUNT_REQUESTS"
-      )?.count;
-      const debitReq = meta?.countByGroup.find(
-        (m) => m.type === "DEBIT_REQUEST"
-      )?.count;
-      const _debitReq = meta?.countByGroup.find(
-        (m) => m.type === "DEBIT_REQUETS"
-      )?.count;
-      const payouts = meta?.countByGroup.find(
-        (m) => m.type === "PAYOUTS"
-      )?.count;
-      const transactions = meta?.countByGroup.find(
-        (m) => m.type === "TRANSACTIONS"
-      )?.count;
+  const { accountReq, requests, payouts, transactions } = useMemo(() => {
+    const accountReq = meta?.countByGroup.find(
+      (m) => m.type === "ACCOUNT_REQUESTS"
+    )?.count;
 
-      return {
-        accountReq,
-        debitReq,
-        _debitReq,
-        payouts,
-        transactions,
-      };
-    }, [meta]);
+    const requests = meta?.countByGroup
+      .filter(
+        (grp) => grp.type === "DEBIT_REQUEST" || grp.type === "DEBIT_REQUETS"
+      )
+      .reduce((sum, item) => sum + (item.count ?? 0), 0);
+
+    const payouts = meta?.countByGroup.find((m) => m.type === "PAYOUTS")?.count;
+
+    const transactions = meta?.countByGroup.find(
+      (m) => m.type === "TRANSACTIONS"
+    )?.count;
+
+    return {
+      accountReq,
+      requests,
+      payouts,
+      transactions,
+    };
+  }, [meta]);
 
   const Type = [
     "Transactions",
@@ -107,7 +105,7 @@ export default function Navbar() {
       case "Account Requests":
         return accountReq;
       case "Requests":
-        return (debitReq ?? 0) + (_debitReq ?? 0);
+        return requests;
       case "Payouts":
         return payouts;
       case "Transactions":

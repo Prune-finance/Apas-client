@@ -95,14 +95,14 @@ export default function Navbar() {
     "Transactions",
     "Payouts",
     "Requests",
-    "Account Requests",
+    "Account Creation",
   ] as const;
 
   type Type = (typeof Type)[number];
 
   const countSwitch = (type: Type) => {
     switch (type) {
-      case "Account Requests":
+      case "Account Creation":
         return accountReq;
       case "Requests":
         return requests;
@@ -159,7 +159,7 @@ export default function Navbar() {
                         "Transactions",
                         "Payouts",
                         "Requests",
-                        "Account Requests",
+                        "Account Creation",
                       ]}
                     />
                   }

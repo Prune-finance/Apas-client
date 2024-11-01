@@ -31,7 +31,7 @@ const inSummary = {
   "Money In": "€0.00",
 };
 
-export const AccountTableHeaders = [
+const AccountTableHeaders = [
   "Date",
   "Description",
   "Money In",

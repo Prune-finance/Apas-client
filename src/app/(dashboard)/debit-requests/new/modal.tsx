@@ -320,6 +320,7 @@ export default function DebitRequestModal({
                 flex={1}
                 label="Country"
                 data={countries}
+                searchable
                 {...form.getInputProps("destinationCountry")}
               />
 

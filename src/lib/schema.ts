@@ -174,7 +174,7 @@ export const contactPerson = {
 
 export const newBusiness = {
   name: "",
-  domain: "",
+  domain: "https://",
   country: null,
   legalEntity: null,
   pricingPlan: null,

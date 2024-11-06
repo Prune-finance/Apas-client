@@ -135,7 +135,7 @@ export default function SingleLiveKey() {
       <Breadcrumbs
         items={[
           { title: "Requests", href: "/admin/requests?tab=live-keys" },
-          { title: "Live Keys", href: `/admin/requests/${id}live-key` },
+          { title: "Live Keys", href: `/admin/requests/${id}/live-key` },
         ]}
       />
 

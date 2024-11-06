@@ -1,5 +1,7 @@
 import { create } from "zustand";
+import { NotificationMeta } from "../hooks/notifications";
 
+type Meta = NotificationMeta | undefined;
 interface NotificationState {
   position:
     | "top-left"
@@ -13,12 +15,13 @@ interface NotificationState {
     position?: NotificationState["position"];
     limit?: number;
   }) => void;
+  meta: Meta;
+  setMeta: (meta: Meta) => void;
 }
 
 export const NotificationStore = create<NotificationState>((set, get) => ({
   limit: 1,
   position: "top-center",
-  //   setProps: ({ position, limit }) => set({ position, limit }),
   setProps: ({ position, limit }) => {
     const currentState = get();
     set({
@@ -26,4 +29,6 @@ export const NotificationStore = create<NotificationState>((set, get) => ({
       limit: limit ?? currentState.limit,
     });
   },
+  meta: undefined,
+  setMeta: (meta) => set({ meta }),
 }));

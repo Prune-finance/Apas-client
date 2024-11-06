@@ -41,15 +41,22 @@ import io from "socket.io-client";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import EmptyTable from "../EmptyTable";
+import { NotificationStore } from "@/lib/store/notification";
 
 export default function Header() {
   const { user, setUser } = User();
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const { setMeta } = NotificationStore();
 
   const { loading, notifications, meta, revalidate } = useAdminNotifications({
     status: "unread",
+    limit: 4,
   });
+
+  useEffect(() => {
+    setMeta(meta);
+  }, [notifications]);
 
   const { handleInfoForNotification, handleSuccess, handleError } =
     useNotification();
@@ -59,7 +66,7 @@ export default function Header() {
 
     socket.on(`admin-channel`, (data) => {
       // console.log("I ran here");
-      revalidate();
+      revalidate(4);
 
       handleInfoForNotification(data.title, data.description);
     });
@@ -236,10 +243,16 @@ export function UserHeader() {
   const { user, setUser } = User();
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
+  const { setMeta } = NotificationStore();
 
   const { loading, notifications, meta, revalidate } = useUserNotifications({
     status: "unread",
+    limit: 4,
   });
+
+  useEffect(() => {
+    setMeta(meta);
+  }, [notifications]);
 
   const { handleInfoForNotification, handleSuccess, handleError } =
     useNotification();
@@ -249,7 +262,7 @@ export function UserHeader() {
 
     socket.on(`company-${user?.companyId}`, (data) => {
       // console.log("I ran here");
-      revalidate();
+      revalidate(4);
 
       handleInfoForNotification(data.title, data.description);
     });

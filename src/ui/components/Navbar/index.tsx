@@ -2,7 +2,16 @@
 
 import Cookies from "js-cookie";
 
-import { NavLink, Stack, Text, UnstyledButton } from "@mantine/core";
+import {
+  Avatar,
+  Badge,
+  Flex,
+  Group,
+  NavLink,
+  Stack,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -21,11 +30,14 @@ import styles from "./styles.module.scss";
 import { useDisclosure, useIdle } from "@mantine/hooks";
 import ModalComponent from "../Modal";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { NotificationStore } from "@/lib/store/notification";
+import { NotificationType } from "@/lib/hooks/notifications";
 
 export default function Navbar() {
   const pathname = usePathname();
   const [opened, { open, close }] = useDisclosure(false);
+  const { meta } = NotificationStore();
 
   const [processing, setProcessing] = useState(false);
 
@@ -53,6 +65,55 @@ export default function Navbar() {
       handleAdminLogout(pathname);
     }
   }, [idle]);
+
+  const { accountReq, requests, payouts, transactions } = useMemo(() => {
+    const accountReq = meta?.countByGroup.find(
+      (m) => m.type === "ACCOUNT_REQUESTS"
+    )?.count;
+
+    const requests = meta?.countByGroup
+      .filter(
+        (grp) => grp.type === "DEBIT_REQUEST" || grp.type === "DEBIT_REQUETS"
+      )
+      .reduce((sum, item) => sum + (item.count ?? 0), 0);
+
+    const payouts = meta?.countByGroup.find((m) => m.type === "PAYOUTS")?.count;
+
+    const transactions = meta?.countByGroup.find(
+      (m) => m.type === "TRANSACTIONS"
+    )?.count;
+
+    return {
+      accountReq,
+      requests,
+      payouts,
+      transactions,
+    };
+  }, [meta]);
+
+  const Type = [
+    "Transactions",
+    "Payouts",
+    "Requests",
+    "Account Creation",
+  ] as const;
+
+  type Type = (typeof Type)[number];
+
+  const countSwitch = (type: Type) => {
+    switch (type) {
+      case "Account Creation":
+        return accountReq;
+      case "Requests":
+        return requests;
+      case "Payouts":
+        return payouts;
+      case "Transactions":
+        return transactions;
+      default:
+        return null;
+    }
+  };
 
   return (
     <nav className={styles.nav}>
@@ -89,7 +150,19 @@ export default function Navbar() {
                   key={index}
                   leftSection={item.icon}
                   component={Link}
-                  label={item.text}
+                  // label={item.text}
+                  label={
+                    <NavLinkLabel
+                      text={item.text}
+                      count={countSwitch(item.text as Type)}
+                      textArray={[
+                        "Transactions",
+                        "Payouts",
+                        "Requests",
+                        "Account Creation",
+                      ]}
+                    />
+                  }
                   href={item.link}
                   active={pathname.startsWith(item.link)}
                   fz={8}
@@ -155,6 +228,7 @@ export default function Navbar() {
 export function UserNavbar() {
   const pathname = usePathname();
   const [opened, { open, close }] = useDisclosure(false);
+  const { meta } = NotificationStore();
 
   const [processing, setProcessing] = useState(false);
 
@@ -192,6 +266,50 @@ export function UserNavbar() {
     );
   };
 
+  const { accountReq, debitReq, payouts, transactions } = useMemo(() => {
+    const accountReq = meta?.countByGroup.find(
+      (m) => m.type === "ACCOUNT_REQUESTS"
+    )?.count;
+    const debitReq = meta?.countByGroup.find(
+      (m) => m.type === "DEBIT_REQUEST"
+    )?.count;
+    const payouts = meta?.countByGroup.find((m) => m.type === "PAYOUTS")?.count;
+    const transactions = meta?.countByGroup.find(
+      (m) => m.type === "TRANSACTIONS"
+    )?.count;
+
+    return {
+      accountReq,
+      debitReq,
+      payouts,
+      transactions,
+    };
+  }, [meta]);
+
+  const Type = [
+    "Transactions",
+    "Payouts",
+    "Debit Requests",
+    "Account Requests",
+  ] as const;
+
+  type Type = (typeof Type)[number];
+
+  const countSwitch = (type: Type) => {
+    switch (type) {
+      case "Account Requests":
+        return accountReq;
+      case "Debit Requests":
+        return debitReq;
+      case "Payouts":
+        return payouts;
+      case "Transactions":
+        return transactions;
+      default:
+        return null;
+    }
+  };
+
   return (
     <nav className={`${styles.user__nav}`}>
       <div className={styles.logo__container}>
@@ -211,7 +329,18 @@ export function UserNavbar() {
                   key={index}
                   leftSection={item.icon}
                   component={Link}
-                  label={item.text}
+                  label={
+                    <NavLinkLabel
+                      text={item.text}
+                      count={countSwitch(item.text as Type)}
+                      textArray={[
+                        "Transactions",
+                        "Payouts",
+                        "Debit Requests",
+                        "Account Requests",
+                      ]}
+                    />
+                  }
                   href={item.link}
                   active={isActive(item.link)}
                   fz={8}
@@ -294,3 +423,29 @@ export function UserNavbar() {
     </nav>
   );
 }
+
+const NavLinkLabel = ({
+  text,
+  count,
+  textArray,
+}: {
+  text: string;
+  count: number | null | undefined;
+  textArray: string[];
+}) => {
+  return count && textArray.includes(text) ? (
+    <Flex fz={12} wrap="nowrap" justify="space-between">
+      <Text fz={12}>{text}</Text>
+      <Badge
+        h={17}
+        fz={10}
+        variant="filled"
+        radius={16}
+        color="#B42318"
+        c="#fff"
+      >{`${count}`}</Badge>
+    </Flex>
+  ) : (
+    text
+  );
+};

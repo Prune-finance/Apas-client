@@ -5,7 +5,7 @@ import { IParams } from "../schema";
 
 export function useAdminNotifications(customParams: IParams = {}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [meta, setMeta] = useState<Meta>();
+  const [meta, setMeta] = useState<NotificationMeta>();
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -22,7 +22,7 @@ export function useAdminNotifications(customParams: IParams = {}) {
 
   const { limit, date, endDate, status, business, type, page } = obj;
 
-  async function fetchNotifications() {
+  async function fetchNotifications(limit?: number) {
     setLoading(true);
     try {
       const params = new URLSearchParams(
@@ -30,7 +30,9 @@ export function useAdminNotifications(customParams: IParams = {}) {
       ).toString();
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications?${params}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications?${params}${
+          !params && limit ? `limit=${limit}` : ""
+        }`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -43,8 +45,8 @@ export function useAdminNotifications(customParams: IParams = {}) {
     }
   }
 
-  function revalidate() {
-    fetchNotifications();
+  function revalidate(limit?: number) {
+    fetchNotifications(limit);
   }
 
   useEffect(() => {
@@ -60,7 +62,7 @@ export function useAdminNotifications(customParams: IParams = {}) {
 
 export function useUserNotifications(customParams: IParams = {}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [meta, setMeta] = useState<Meta>();
+  const [meta, setMeta] = useState<NotificationMeta>();
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -77,7 +79,7 @@ export function useUserNotifications(customParams: IParams = {}) {
 
   const { limit, date, endDate, status, business, type, page } = obj;
 
-  async function fetchNotifications() {
+  async function fetchNotifications(limit?: number) {
     setLoading(true);
     try {
       const params = new URLSearchParams(
@@ -85,7 +87,9 @@ export function useUserNotifications(customParams: IParams = {}) {
       ).toString();
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications?${params}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications?${params}${
+          !params && limit ? `limit=${limit}` : ""
+        }`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -98,8 +102,8 @@ export function useUserNotifications(customParams: IParams = {}) {
     }
   }
 
-  function revalidate() {
-    fetchNotifications();
+  function revalidate(limit?: number) {
+    fetchNotifications(limit);
   }
 
   useEffect(() => {
@@ -113,18 +117,42 @@ export function useUserNotifications(customParams: IParams = {}) {
   return { loading, notifications, meta, revalidate };
 }
 
-export interface Meta {
-  total: number;
-  page: number;
-}
+const NotificationType = [
+  "PAYOUTS",
+  "TRANSACTIONS",
+  "DEBIT_REQUEST",
+  "DEBIT_REQUETS",
+  "ACCOUNT_REQUESTS",
+  "USER_ACTIVATION",
+  "USER_DEACTIVATION",
+  "PAYOUT_REQUEST",
+  "PAYOUT_PROCESSING",
+  "PAYOUT_TRANSACTION",
+  "BUSINESS_TRANSACTION",
+] as const;
+
+export type NotificationType = (typeof NotificationType)[number] | null;
 
 export interface Notification {
   id: string;
   title: string;
   description: string;
-  companyId: string;
-  userId: string;
+  companyId: string | null;
+  userId: string | null;
   createdAt: Date;
   updatedAt: Date;
   readAt: Date | null;
+  type: NotificationType;
+  referenceId: string;
+}
+
+export interface NotificationMeta {
+  total: number;
+  page: number;
+  countByGroup: CountByGroup[];
+}
+
+export interface CountByGroup {
+  type: NotificationType;
+  count: number;
 }

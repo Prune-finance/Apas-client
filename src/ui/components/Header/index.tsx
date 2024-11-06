@@ -66,7 +66,7 @@ export default function Header() {
 
     socket.on(`admin-channel`, (data) => {
       // console.log("I ran here");
-      revalidate();
+      revalidate(4);
 
       handleInfoForNotification(data.title, data.description);
     });
@@ -262,7 +262,7 @@ export function UserHeader() {
 
     socket.on(`company-${user?.companyId}`, (data) => {
       // console.log("I ran here");
-      revalidate();
+      revalidate(4);
 
       handleInfoForNotification(data.title, data.description);
     });

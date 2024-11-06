@@ -22,7 +22,7 @@ export function useAdminNotifications(customParams: IParams = {}) {
 
   const { limit, date, endDate, status, business, type, page } = obj;
 
-  async function fetchNotifications() {
+  async function fetchNotifications(limit?: number) {
     setLoading(true);
     try {
       const params = new URLSearchParams(
@@ -30,7 +30,9 @@ export function useAdminNotifications(customParams: IParams = {}) {
       ).toString();
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications?${params}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications?${params}${
+          !params && limit ? `limit=${limit}` : ""
+        }`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -43,8 +45,8 @@ export function useAdminNotifications(customParams: IParams = {}) {
     }
   }
 
-  function revalidate() {
-    fetchNotifications();
+  function revalidate(limit?: number) {
+    fetchNotifications(limit);
   }
 
   useEffect(() => {
@@ -77,7 +79,7 @@ export function useUserNotifications(customParams: IParams = {}) {
 
   const { limit, date, endDate, status, business, type, page } = obj;
 
-  async function fetchNotifications() {
+  async function fetchNotifications(limit?: number) {
     setLoading(true);
     try {
       const params = new URLSearchParams(
@@ -85,7 +87,9 @@ export function useUserNotifications(customParams: IParams = {}) {
       ).toString();
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications?${params}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications?${params}${
+          !params && limit ? `limit=${limit}` : ""
+        }`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -98,8 +102,8 @@ export function useUserNotifications(customParams: IParams = {}) {
     }
   }
 
-  function revalidate() {
-    fetchNotifications();
+  function revalidate(limit?: number) {
+    fetchNotifications(limit);
   }
 
   useEffect(() => {

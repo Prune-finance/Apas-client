@@ -140,8 +140,8 @@ export default function Header() {
           <PopoverTarget>
             <Indicator
               inline
-              processing
-              color="red"
+              processing={!!meta?.total}
+              color={!!meta?.total ? "red" : "transparent"}
               size={15}
               onClick={() => setOpened((o) => !o)}
             >
@@ -160,8 +160,11 @@ export default function Header() {
                 radius="50%"
                 variant="filled"
                 size={25}
+                styles={{
+                  placeholder: { color: "var(--prune-text-gray-800)" },
+                }}
               >
-                {`${meta?.total}`}
+                {`${meta?.total ?? 0}`}
               </Avatar>
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />
@@ -361,8 +364,8 @@ export function UserHeader() {
           <PopoverTarget>
             <Indicator
               inline
-              processing
-              color="red"
+              processing={!!meta?.total}
+              color={!!meta?.total ? "red" : "transparent"}
               size={15}
               onClick={() => setOpened((o) => !o)}
             >
@@ -381,8 +384,11 @@ export function UserHeader() {
                 radius="50%"
                 variant="filled"
                 size={25}
+                styles={{
+                  placeholder: { color: "var(--prune-text-gray-800)" },
+                }}
               >
-                {`${meta?.total}`}
+                {`${meta?.total ?? 0}`}
               </Avatar>
             </Group>
             <Divider color="var(--prune-text-gray-100)" mt={20} />

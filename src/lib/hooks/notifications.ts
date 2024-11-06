@@ -119,6 +119,12 @@ const NotificationType = [
   "DEBIT_REQUEST",
   "DEBIT_REQUETS",
   "ACCOUNT_REQUESTS",
+  "USER_ACTIVATION",
+  "USER_DEACTIVATION",
+  "PAYOUT_REQUEST",
+  "PAYOUT_PROCESSING",
+  "PAYOUT_TRANSACTION",
+  "BUSINESS_TRANSACTION",
 ] as const;
 
 export type NotificationType = (typeof NotificationType)[number] | null;
@@ -133,6 +139,7 @@ export interface Notification {
   updatedAt: Date;
   readAt: Date | null;
   type: NotificationType;
+  referenceId: string;
 }
 
 export interface NotificationMeta {

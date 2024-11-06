@@ -51,6 +51,7 @@ export default function Header() {
 
   const { loading, notifications, meta, revalidate } = useAdminNotifications({
     status: "unread",
+    limit: 4,
   });
 
   useEffect(() => {
@@ -246,6 +247,7 @@ export function UserHeader() {
 
   const { loading, notifications, meta, revalidate } = useUserNotifications({
     status: "unread",
+    limit: 4,
   });
 
   useEffect(() => {

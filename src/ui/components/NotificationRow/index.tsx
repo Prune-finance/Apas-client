@@ -1,6 +1,14 @@
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
-import { ActionIcon, Box, Divider, Group, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Box,
+  Divider,
+  Flex,
+  Group,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { IconBell, IconCircleFilled } from "@tabler/icons-react";
 import axios from "axios";
 import dayjs from "dayjs";
@@ -8,12 +16,15 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import Cookies from "js-cookie";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface Props {
   title: string;
   id: string;
   description: string;
   createdAt: Date;
+  referenceId: string;
   readAt: Date | null;
   lastRow?: boolean;
   business?: boolean;
@@ -25,12 +36,14 @@ export const NotificationRow = ({
   id,
   description,
   createdAt,
+  referenceId,
   readAt,
   lastRow,
   business,
   revalidate,
 }: Props) => {
   const { handleError } = useNotification();
+  const pathname = usePathname();
 
   const handleNotificationClick = async () => {
     const isAdmin = !business ? "/admin" : "";
@@ -49,13 +62,29 @@ export const NotificationRow = ({
     }
   };
 
+  const isValidRelativeUrl = (url: string) => {
+    try {
+      const parsedUrl = new URL(url, window.location.origin);
+      return parsedUrl.origin === window.location.origin;
+    } catch (e) {
+      return false;
+    }
+  };
+
   return (
     <>
-      <Group
+      <Flex
         wrap="nowrap"
         justify="space-between"
         py={15}
         onClick={() => handleNotificationClick()}
+        {...(referenceId &&
+          referenceId.startsWith("/") && {
+            component: Link,
+          })}
+        href={
+          referenceId && referenceId.startsWith("/") ? referenceId : pathname
+        }
       >
         <Group gap={12} wrap="nowrap" flex={5}>
           <ActionIcon
@@ -107,7 +136,7 @@ export const NotificationRow = ({
             {dayjs(createdAt).format("Do MMMM,  YYYY")}
           </Text>
         </Stack>
-      </Group>
+      </Flex>
 
       {!lastRow && <Divider color="var(--prune-text-gray-100)" />}
     </>

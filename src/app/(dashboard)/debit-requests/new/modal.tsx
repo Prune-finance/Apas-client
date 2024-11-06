@@ -109,8 +109,6 @@ export default function DebitRequestModal({
       if (form.values.accountType === "Corporate") {
         firstName = companyName.split(" ")[0];
         lastName = companyName.split(" ")[1] || "";
-
-        console.log(firstName, lastName);
       }
 
       const { accountType, ...rest } = form.values;

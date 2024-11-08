@@ -100,6 +100,7 @@ export default function SingleUserPayoutAccount() {
 
       <SingleDefaultAccountBody
         account={account}
+        location="payout"
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={trxLoading}

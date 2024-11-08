@@ -4,7 +4,12 @@ import Cookies from "js-cookie";
 import axios from "axios";
 import { Fragment, use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
+import {
+  IconArrowLeft,
+  IconCheck,
+  IconExclamationMark,
+  IconPlus,
+} from "@tabler/icons-react";
 
 import {
   Flex,
@@ -16,6 +21,10 @@ import {
   Textarea,
   Stack,
   Group,
+  Alert,
+  ActionIcon,
+  Badge,
+  Loader,
 } from "@mantine/core";
 import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -31,11 +40,16 @@ import {
 } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import { AccountData, useUserAccounts } from "@/lib/hooks/accounts";
+import {
+  AccountData,
+  useUserAccounts,
+  validateAccount,
+} from "@/lib/hooks/accounts";
 import { formatNumber } from "@/lib/utils";
 import { SelectDropdownSearch } from "@/ui/components/SelectDropdownSearch";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { countries } from "@/lib/static";
+import { useDebouncedValue } from "@mantine/hooks";
 
 export default function DebitRequestModal({
   close,
@@ -70,6 +84,9 @@ export default function DebitRequestModal({
   const { handleSuccess, handleError } = useNotification();
   // const [accountType, setAccountType] = useState<string>("");
   const [companyName, setCompanyName] = useState<string>("");
+  const [validated, setValidated] = useState<boolean | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [disabled, setDisabled] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -80,6 +97,40 @@ export default function DebitRequestModal({
     },
     validate: zodResolver(validateDebitRequest),
   });
+
+  const [{ bic, iban }] = useDebouncedValue(
+    { iban: form.values.destinationIBAN, bic: form.values.destinationBIC },
+    500
+  );
+
+  const handleIbanValidation = async () => {
+    setLoading(true);
+    setValidated(null);
+    setDisabled(false);
+    try {
+      const data = await validateAccount({ iban, bic });
+
+      if (data) {
+        form.setValues({
+          destinationBank: data.bankName,
+          destinationCountry: data.country,
+        });
+
+        setValidated(true);
+        setDisabled(true);
+      } else {
+        setValidated(false);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (iban && bic) {
+      handleIbanValidation();
+    }
+  }, [bic, iban]);
 
   // useEffect(() => {
   //   form.setFieldValue(
@@ -154,6 +205,54 @@ export default function DebitRequestModal({
         <Flex gap={10} align="center">
           <Text className={styles.form__container__hdrText}>Debit Request</Text>
         </Flex>
+
+        {validated === false && (
+          <Alert
+            title="Account  Validation Failed"
+            radius="sm"
+            color="#D92D20"
+            variant="light"
+            mt={32}
+            styles={{
+              title: { fontSize: "14px", fontWeight: 600 },
+            }}
+            icon={
+              <ThemeIcon radius="xl" color="#D92D20" size={20}>
+                <IconExclamationMark />
+              </ThemeIcon>
+            }
+          >
+            <Stack>
+              <Text fz={14} inline lh="20px">
+                Unfortunately, we couldn't validate your account information.
+                Please review the details to ensure it is accurate, or proceed
+                without validation.{" "}
+                <Text span inherit c="var(--prune-text-gray-700)" fw={600}>
+                  Know that proceeding without validation may lead to delays or
+                  errors in processing.
+                </Text>
+              </Text>
+
+              <Group justify="end" gap={12}>
+                <PrimaryBtn
+                  text="Cancel"
+                  color="#D92D20"
+                  c="#D92D20"
+                  variant="transparent"
+                  fw={600}
+                  action={() => setValidated(null)}
+                />
+                <PrimaryBtn
+                  color="#D92D20"
+                  c="#fff"
+                  text="Proceed Anyway"
+                  fw={600}
+                  action={() => setValidated(true)}
+                />
+              </Group>
+            </Stack>
+          </Alert>
+        )}
 
         <Box mt={32}>
           {/* <Select
@@ -313,51 +412,96 @@ export default function DebitRequestModal({
               />
             </Flex>
 
-            <Flex gap={20} mt={24}>
-              <Select
-                placeholder="Select Country"
-                classNames={{ input: styles.input, label: styles.label }}
-                flex={1}
-                label="Country"
-                data={countries}
-                searchable
-                {...form.getInputProps("destinationCountry")}
-              />
+            {(loading || validated) && (
+              <Group
+                justify="space-between"
+                bg="#ECFDF3"
+                w="100%"
+                px={20}
+                py={8}
+                my={32}
+              >
+                <Badge
+                  fz={14}
+                  px={0}
+                  c="#12B76A"
+                  variant="transparent"
+                  fw={600}
+                  color="#12B76A"
+                  tt="capitalize"
+                  rightSection={
+                    validated ? (
+                      <ActionIcon
+                        variant="light"
+                        radius="xl"
+                        color="#12B76A"
+                        size={23}
+                      >
+                        <IconCheck />
+                      </ActionIcon>
+                    ) : null
+                  }
+                >
+                  {validated
+                    ? "Information Validated "
+                    : "Verifying Account Details"}
+                </Badge>
 
-              <TextInput
-                placeholder="Enter Bank Name"
-                classNames={{ input: styles.input, label: styles.label }}
-                flex={1}
-                label="Bank"
-                // data={["Standard Chartered", "IBSN"]}
-                {...form.getInputProps("destinationBank")}
-              />
-            </Flex>
+                {loading && <Loader type="oval" size={24} color="#12B76A" />}
+              </Group>
+            )}
 
-            <Flex gap={20} mt={24}>
-              <TextInput
-                classNames={{ input: styles.input, label: styles.label }}
-                flex={1}
-                withAsterisk
-                label="Reference"
-                placeholder="Enter reference"
-                readOnly
-                {...form.getInputProps("reference")}
-              />
-            </Flex>
+            {validated && (
+              <>
+                <Flex gap={20} mt={24}>
+                  <Select
+                    placeholder="Select Country"
+                    classNames={{ input: styles.input, label: styles.label }}
+                    flex={1}
+                    label="Country"
+                    data={countries}
+                    disabled={disabled}
+                    searchable
+                    {...form.getInputProps("destinationCountry")}
+                  />
 
-            <Flex gap={20} mt={24}>
-              <Textarea
-                flex={1}
-                autosize
-                minRows={3}
-                classNames={{ input: styles.textarea, label: styles.label }}
-                withAsterisk
-                label="Narration"
-                placeholder="Enter narration"
-                {...form.getInputProps("reason")}
-              />
-            </Flex>
+                  <TextInput
+                    placeholder="Enter Bank Name"
+                    classNames={{ input: styles.input, label: styles.label }}
+                    flex={1}
+                    label="Bank"
+                    disabled={disabled}
+                    // data={["Standard Chartered", "IBSN"]}
+                    {...form.getInputProps("destinationBank")}
+                  />
+                </Flex>
+
+                <Flex gap={20} mt={24}>
+                  <TextInput
+                    classNames={{ input: styles.input, label: styles.label }}
+                    flex={1}
+                    withAsterisk
+                    label="Reference"
+                    placeholder="Enter reference"
+                    readOnly
+                    {...form.getInputProps("reference")}
+                  />
+                </Flex>
+
+                <Flex gap={20} mt={24}>
+                  <Textarea
+                    flex={1}
+                    autosize
+                    minRows={3}
+                    classNames={{ input: styles.textarea, label: styles.label }}
+                    withAsterisk
+                    label="Narration"
+                    placeholder="Enter narration"
+                    {...form.getInputProps("reason")}
+                  />
+                </Flex>
+              </>
+            )}
           </Box>
         </Box>
 

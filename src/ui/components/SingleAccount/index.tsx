@@ -68,7 +68,7 @@ import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import axios from "axios";
 import { useForm, zodResolver } from "@mantine/form";
 import { validateRequest } from "@/lib/schema";
@@ -924,6 +924,8 @@ export const DefaultAccountHead = ({
   const [moneySent, setMoneySent] = useState(0);
   const [receiverName, setReceiverName] = useState("");
 
+  const matches = useMediaQuery("(max-width: 768px)");
+
   const [requestForm, setRequestForm] = useState<RequestForm>({
     firstName: "",
     lastName: "",
@@ -1186,7 +1188,7 @@ export const DefaultAccountHead = ({
       <Modal
         opened={opened}
         onClose={closeMoney}
-        size={"35%"}
+        size={matches ? "90%" : 630}
         withCloseButton={false}
       >
         <SendMoneyModal

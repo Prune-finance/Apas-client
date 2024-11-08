@@ -691,6 +691,7 @@ export const SingleAccountBody = ({
 interface SingleDefaultAccountProps
   extends Omit<SingleAccountProps, "account"> {
   account: DefaultAccount | null;
+  location?: string;
 }
 
 export const SingleDefaultAccountBody = ({
@@ -705,6 +706,7 @@ export const SingleDefaultAccountBody = ({
   isDefault,
   trxMeta,
   children,
+  location,
 }: SingleDefaultAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -768,6 +770,7 @@ export const SingleDefaultAccountBody = ({
             payout={payout}
             meta={trxMeta}
             children={children}
+            location={location ?? "default"}
           />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>

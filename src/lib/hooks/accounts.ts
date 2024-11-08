@@ -329,6 +329,79 @@ export function useUserAccounts(customParams: IParams = {}) {
   };
 }
 
+export function useValidateAccount({
+  iban,
+  bic,
+}: {
+  iban: string;
+  bic: string;
+}) {
+  const [validateDetails, setValidatedDetails] = useState<ValidatedIban | null>(
+    null
+  );
+  const [loading, setLoading] = useState(false);
+
+  async function validateAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/validate/dashboard`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+      setValidatedDetails(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    validateAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [iban, bic]);
+
+  return {
+    loading,
+    validateDetails,
+  };
+}
+
+export async function validateAccount({
+  iban,
+  bic,
+}: {
+  iban: string;
+  bic: string;
+}): Promise<ValidatedIban | null> {
+  try {
+    const { data } = await axios.post(
+      `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/validate/dashboard`,
+      { iban, bic },
+      { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+    );
+    return data.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export interface ValidatedIban {
+  swiftCodes: string;
+  bankName: string;
+  bankBranch: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  countryCode: string;
+  zipCode: string;
+  supportPaymentMethod: string;
+}
+
 interface MetaAccount {
   hasPendingActivate: boolean;
   hasPendingDeactivate: boolean;

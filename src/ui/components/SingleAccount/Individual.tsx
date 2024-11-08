@@ -214,7 +214,7 @@ function Individual({
             />
           </Flex>
 
-          {iban && bic && validated !== null && (
+          {(processing || validated) && (
             <Group
               justify="space-between"
               bg="#ECFDF3"

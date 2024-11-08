@@ -71,6 +71,7 @@ interface Props {
   // setLimit: Dispatch<SetStateAction<string | null>>;
   children: React.ReactNode;
   accountID?: string;
+  location?: string;
 }
 
 export interface BalanceDetail {
@@ -136,6 +137,7 @@ export const Transactions = ({
   meta,
   children,
   accountID,
+  location,
 }: // limit,
 // setLimit,
 // active,
@@ -197,6 +199,7 @@ Props) => {
   ];
 
   const handleDownloadAccountStatement = async () => {
+    console.log(location);
     if (!dateRange[0] || !dateRange[1]) {
       return handleInfo(
         "Account Statement",
@@ -211,10 +214,16 @@ Props) => {
     const endDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
 
     try {
-      const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${accountID}/statement?date=${date}&endDate=${endDate}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data: res } =
+        location === "payout"
+          ? await axios.get(
+              `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/payouts/${accountID}/transactions/statement?date=${date}&endDate=${endDate}`,
+              { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+            )
+          : await axios.get(
+              `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${accountID}/statement?date=${date}&endDate=${endDate}`,
+              { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+            );
 
       if (res?.data.length === 0) {
         setLoadingStatement(false);
@@ -228,7 +237,7 @@ Props) => {
       await new Promise((resolve) => setTimeout(resolve, 5000));
       handlePdfStatement(pdfRef);
       setLoadingStatement(false);
-      // closePreview();
+      closePreview();
     } catch (error) {
       console.log(error);
       setLoadingStatement(false);

@@ -9,8 +9,11 @@ import { NotificationStore } from "../store/notification";
 
 const useNotification = () => {
   const { setProps } = NotificationStore();
+
   const handleError = (title: string, msg: string) => {
     setProps({ position: "top-center", limit: 1 });
+    notifications.clean();
+
     notifications.show({
       title: title,
       message: msg,
@@ -38,6 +41,8 @@ const useNotification = () => {
 
   const handleSuccess = (title: string, msg: string) => {
     setProps({ position: "top-center", limit: 1 });
+    notifications.clean();
+
     showNotification({
       title: title,
       message: msg,
@@ -67,6 +72,8 @@ const useNotification = () => {
 
   const handleInfo = (title: string, msg: string) => {
     setProps({ position: "top-center", limit: 1 });
+    notifications.clean();
+
     notifications.show({
       title: title,
       message: msg,

@@ -1,49 +1,29 @@
-import Image from "next/image";
-import {
-  Text,
-  Flex,
-  Button,
-  TextInput,
-  TableScrollContainer,
-  Table,
-  TableTh,
-  TableThead,
-  TableTr,
-  Pagination,
-  TableTbody,
-  Checkbox,
-  TableTd,
-  Group,
-  Select,
-} from "@mantine/core";
+import { Button, TextInput, TableTr, TableTd, Group } from "@mantine/core";
 import styles from "@/ui/styles/settings.module.scss";
 import {
   IconCalendar,
   IconCircleArrowDown,
-  IconListTree,
-  IconPointFilled,
   IconSearch,
 } from "@tabler/icons-react";
-import EmptyImage from "@/assets/empty.png";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import ModalComponent from "@/ui/components/Modal";
-import { formatNumber } from "@/lib/utils";
-import { AllBusinessSkeleton, DynamicSkeleton2 } from "@/lib/static";
-import { useBusiness } from "@/lib/hooks/businesses";
 import { switzer } from "@/app/layout";
 import { Fragment, Suspense, useState } from "react";
-import { useLogs } from "@/lib/hooks/logs";
+import { LogData, useLogs } from "@/lib/hooks/logs";
 import dayjs from "dayjs";
-import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import { logFilterSchema, LogFilterType, logFilterValues } from "../schema";
 import { useSearchParams } from "next/navigation";
 import { filteredSearch } from "@/lib/search";
-import { table } from "console";
 import { TableComponent } from "@/ui/components/Table";
 import { DateInput } from "@mantine/dates";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
+import Cookies from "js-cookie";
+import axios from "axios";
+import * as XLSX from "xlsx";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 
 function Logs() {
   const searchParams = useSearchParams();
@@ -56,6 +36,9 @@ function Logs() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [processingCSV, setProcessingCSV] = useState(false);
+
+  const { handleError } = useNotification();
 
   const { loading, logs, meta } = useLogs({
     ...(isNaN(Number(limit))
@@ -95,6 +78,63 @@ function Logs() {
     validate: zodResolver(logFilterSchema),
   });
 
+  const fetchLogs = async (limit: number) => {
+    try {
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/logs/all?limit=${limit}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+      return data.data;
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const handleExportCsv = async () => {
+    setProcessingCSV(true);
+    // fetch data
+    try {
+      const response = await fetchLogs(meta?.total ?? 0);
+
+      const data = response.map((log: LogData) => ({
+        User: `${log.admin.firstName} ${log.admin.lastName}`,
+        Email: log.admin.email,
+        "Date & Time": dayjs(log.createdAt).format("ddd DD MMM YYYY"),
+        Activity: log.activity,
+        "IP Address": log.ip,
+      }));
+
+      //convert data to worksheet
+      const worksheet = XLSX.utils.json_to_sheet(data);
+
+      //convert worksheet to CSV
+      const csv = XLSX.utils.sheet_to_csv(worksheet);
+
+      //download CSV
+      const downloadCSV = async (csvData: string) => {
+        const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute(
+          "download",
+          `audit-logs-${Math.floor(Date.now() / 1000)
+            .toString(36)
+            .substring(2, 15)}.csv`
+        );
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      };
+
+      await downloadCSV(csv);
+    } catch (err) {
+      handleError("An error occurred", parseError(err));
+    } finally {
+      setProcessingCSV(false);
+    }
+  };
+
   return (
     <Fragment>
       <Group
@@ -123,7 +163,7 @@ function Logs() {
             styles={{ input: { border: "1px solid #F5F5F5" } }}
           />
 
-          <Button
+          {/* <Button
             fz={12}
             fw={500}
             // w={99}
@@ -132,9 +172,17 @@ function Logs() {
             color="var(--prune-text-gray-200)"
             c="var(--prune-text-gray-800)"
             leftSection={<IconCircleArrowDown size={14} />}
+            loading={processingCSV}
           >
             Download Log
-          </Button>
+          </Button> */}
+          <SecondaryBtn
+            action={handleExportCsv}
+            loading={processingCSV}
+            icon={IconCircleArrowDown}
+            fw={600}
+            text="Download Log"
+          />
         </Group>
       </Group>
 

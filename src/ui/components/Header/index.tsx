@@ -13,6 +13,7 @@ import {
   Box,
   Center,
   Loader,
+  Switch,
 } from "@mantine/core";
 import { IconSearch, IconBell, IconChecks } from "@tabler/icons-react";
 import localFont from "next/font/local";
@@ -334,17 +335,25 @@ export function UserHeader() {
           c={stage === "live" ? "green" : "dimmed"}
         >
           {stage} Mode
-        </Text>
-        <Switch
-          color="green"
-          labelPosition="left"
-          defaultChecked={stage === "live"}
-          size="xs"
-          onChange={(event) =>
-            setStage(event.currentTarget.checked ? "live" : "test")
-          }
-        />
-      </div> */}
+        </Text> */}
+      <Switch
+        color="green"
+        c={stage === "live" ? "green" : "dimmed"}
+        fz={14}
+        fw={500}
+        labelPosition="left"
+        defaultChecked={stage === "live"}
+        size="xs"
+        tt="capitalize"
+        label={`${stage} Mode`}
+        styles={{ label: { fontSize: 14 } }}
+        onChange={(event) => {
+          const newStage = event.currentTarget.checked ? "live" : "test";
+          setStage(newStage);
+          localStorage.setItem("stage", newStage);
+        }}
+      />
+      {/* </div> */}
 
       <div className={styles.notification}>
         <Divider orientation="vertical" h={26} />

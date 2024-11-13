@@ -159,6 +159,7 @@ export default function Account() {
       />
 
       <SingleAccountBody
+        accountID={params?.id}
         account={account}
         transactions={transactions as TransactionType[]}
         loading={loading}

@@ -200,6 +200,7 @@ Props) => {
 
   const handleDownloadAccountStatement = async () => {
     console.log(location);
+
     if (!dateRange[0] || !dateRange[1]) {
       return handleInfo(
         "Account Statement",
@@ -210,37 +211,45 @@ Props) => {
     notifications.clean();
     setLoadingStatement(true);
 
-    const date = dayjs(dateRange[0]).format("YYYY-MM-DD");
-    const endDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
+    const [startDate, endDate] = dateRange.map((date) =>
+      dayjs(date).format("YYYY-MM-DD")
+    );
+    const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
+    const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
+
+    // Define the possible URLs based on location
+    const urlMap: { [key: string]: string } = {
+      payout: `${baseUrl}/payouts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "admin-account": `${baseUrl}/admin/accounts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+    };
+
+    // Use the default URL if location is undefined or not in urlMap
+    const url =
+      urlMap[location ?? "default"] ||
+      `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`;
 
     try {
-      const { data: res } =
-        location === "payout"
-          ? await axios.get(
-              `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/payouts/${accountID}/transactions/statement?date=${date}&endDate=${endDate}`,
-              { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-            )
-          : await axios.get(
-              `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${accountID}/statement?date=${date}&endDate=${endDate}`,
-              { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-            );
+      const { data: res } = await axios.get(url, { headers });
 
-      if (res?.data.length === 0) {
-        setLoadingStatement(false);
+      if (!res?.data?.length) {
         return handleInfo(
           "Account Statement",
           "No transactions found for the selected date range"
         );
       }
-      setDownloadData(res?.data);
-      setDownloadMeta(res?.meta);
+
+      setDownloadData(res.data);
+      setDownloadMeta(res.meta);
+
+      // Simulate delay for processing
       await new Promise((resolve) => setTimeout(resolve, 5000));
+
       handlePdfStatement(pdfRef);
-      setLoadingStatement(false);
       closePreview();
     } catch (error) {
-      console.log(error);
-      setLoadingStatement(false);
+      console.error("Error fetching account statement:", error);
     } finally {
       setLoadingStatement(false);
     }

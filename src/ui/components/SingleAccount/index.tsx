@@ -596,6 +596,7 @@ interface SingleAccountProps {
   trxMeta: Meta | null;
   children: React.ReactNode;
   accountID?: string;
+  location?: string;
 }
 
 export const SingleAccountBody = ({
@@ -611,6 +612,7 @@ export const SingleAccountBody = ({
   trxMeta,
   children,
   accountID,
+  location,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -667,6 +669,7 @@ export const SingleAccountBody = ({
         <TabsPanel value={tabs[1].value}>
           <Transactions
             transactions={transactions}
+            location={location ?? "admin-account"}
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}

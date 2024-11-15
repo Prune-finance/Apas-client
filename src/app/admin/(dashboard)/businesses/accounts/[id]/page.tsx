@@ -175,7 +175,9 @@ export default function Account() {
       /> */}
 
         <SingleAccountBody
+          accountID={params?.id}
           account={account}
+          location="admin-account"
           transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}

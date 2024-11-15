@@ -110,6 +110,8 @@ export default function BusinessDefaultAccount() {
 
         <SingleDefaultAccountBody
           account={account}
+          accountID={params?.id}
+          location="admin-default"
           transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}

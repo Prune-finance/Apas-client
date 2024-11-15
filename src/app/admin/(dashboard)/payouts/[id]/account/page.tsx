@@ -110,7 +110,9 @@ export default function BusinessPayoutAccount() {
         />
 
         <SingleDefaultAccountBody
+          accountID={params?.id}
           account={account}
+          location="admin-payout"
           transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}

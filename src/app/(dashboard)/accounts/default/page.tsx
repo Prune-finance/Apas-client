@@ -103,6 +103,7 @@ function Account() {
 
       <SingleDefaultAccountBody
         account={account}
+        location="own-account"
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

@@ -103,15 +103,15 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
       <Flex w="100%" mt={40} align="flex-start" justify="space-between" px={40}>
         <Flex align="flex-start" direction="column" w="100%">
           <Flex align="flex-start" direction="column">
-            <Text fz={28} fw={600} mb={12}>
+            <Text fz={28} fw={600} mb={4}>
               {meta?.accountDetails?.accountName ?? "N/A"}
             </Text>
             {meta?.summary?.address && (
-              <Text fz={14} c="#475467" fw={500} mb={8}>
+              <Text fz={12} c="#475467" fw={500} mb={8}>
                 {meta?.summary?.address ?? ""}
               </Text>
             )}
-            <Text fz={14} c="#475467" fw={400}>
+            <Text fz={12} c="#475467" fw={400}>
               {startDate.format("Do MMMM YYYY")} -
               {endDate.format("Do MMMM YYYY")}
             </Text>
@@ -149,10 +149,10 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
             >
               {Object.entries(accountDetails).map(([key, value]) => (
                 <Flex align="center" justify="space-between" w="100%" key={key}>
-                  <Text fz={14} c="#475467" fw={500}>
+                  <Text fz={12} c="#475467" fw={500}>
                     {key}
                   </Text>
-                  <Text fz={14} c="#475467" fw={400}>
+                  <Text fz={12} c="#475467" fw={400}>
                     {value}
                   </Text>
                 </Flex>
@@ -162,7 +162,7 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
         </Flex>
 
         <Flex align="flex-end" direction="column" w="100%" justify="flex-end">
-          <Flex align="flex-start" justify="flex-start" gap={4} mb={24} w={318}>
+          <Flex align="flex-start" justify="flex-start" gap={4} mb={14} w={318}>
             <Text fz={16} fw={600} c="#1D2939" ta="left">
               In Summary
             </Text>
@@ -177,10 +177,10 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
             >
               {Object.entries(inSummary).map(([key, value]) => (
                 <Flex align="center" justify="space-between" w="100%" key={key}>
-                  <Text fz={14} c="#475467" fw={500}>
+                  <Text fz={12} c="#475467" fw={500}>
                     {key}
                   </Text>
-                  <Text fz={14} c="#475467" fw={400}>
+                  <Text fz={12} c="#475467" fw={400}>
                     {value}
                   </Text>
                 </Flex>
@@ -195,6 +195,7 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
         <Table
           layout="fixed"
           mt={38}
+          fz={12}
           styles={{
             thead: {
               backgroundColor: "#000",
@@ -215,7 +216,9 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
               item?.type === "DEBIT"
                 ? formatNumber(item?.amount ?? 0, true, "EUR")
                 : formatNumber(0, true, "EUR"),
-              item?.balance,
+              item?.balance
+                ? formatNumber(item?.balance, true, "EUR")
+                : formatNumber(0, true, "EUR"),
             ]),
           }}
           w="100%"

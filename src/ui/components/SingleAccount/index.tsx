@@ -620,9 +620,7 @@ export const SingleAccountBody = ({
     Currency: "EUR",
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
-      account?.updatedAt
-    ).format("Do MMMM, YYYY"),
+    "Last Activity": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
@@ -717,9 +715,7 @@ export const SingleDefaultAccountBody = ({
     Currency: "EUR",
     ...(business && !payout && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
-      business?.lastLogin
-    ).format("Do MMMM, YYYY"),
+    "Last Activity": dayjs(business?.lastLogin).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
@@ -1136,7 +1132,7 @@ export const DefaultAccountHead = ({
         </Group>
 
         <Flex gap={10}>
-          {!payout && (
+          {!payout && !admin && (
             <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}

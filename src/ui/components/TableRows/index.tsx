@@ -78,11 +78,13 @@ export const IssuedTransactionTableRows = ({
   noLink,
   search,
   searchProps,
+  isUser,
 }: {
   data: TransactionType[];
   search: string;
   searchProps: string[];
   noLink?: boolean;
+  isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return filteredSearch(data, searchProps, search).map((element) => (
@@ -101,7 +103,9 @@ export const IssuedTransactionTableRows = ({
         }}
         style={{ pointerEvents: noLink ? "none" : "auto" }}
       >
-        <Link href={`/admin/transactions/${element.senderIban}`}>
+        <Link
+          href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
+        >
           {element?.senderName || "N/A"}
         </Link>
       </TableTd>

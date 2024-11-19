@@ -50,7 +50,7 @@ export const PayoutsTab = () => {
     limit: parseInt(limit ?? "10", 10),
   };
 
-  const { transactions, revalidate, loading } =
+  const { transactions, revalidate, loading, meta } =
     useUserPayoutTransactions(queryParams);
 
   const [opened, { toggle }] = useDisclosure(false);
@@ -66,58 +66,27 @@ export const PayoutsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: 0,
+      value: meta?.totalAmount || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money In",
-      value: 0,
+      value: meta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value: 0,
+      value: meta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: [].length,
+      value: meta?.total || 0,
     },
   ];
-
-  // const infoDetails = [
-  //   {
-  //     title: "Total Balance",
-  //     value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
-  //     formatted: true,
-  //     currency: "EUR",
-  //   },
-  //   {
-  //     title: "Money In",
-  //     value:
-  //       transactions
-  //         .filter((trx) => trx.type === "CREDIT")
-  //         .reduce((prv, curr) => prv + curr.amount, 0) || 0,
-  //     formatted: true,
-  //     currency: "EUR",
-  //   },
-  //   {
-  //     title: "Money Out",
-  //     value:
-  //       transactions
-  //         .filter((trx) => trx.type === "DEBIT")
-  //         .reduce((prv, curr) => prv + curr.amount, 0) || 0,
-  //     formatted: true,
-  //     currency: "EUR",
-  //   },
-  //   {
-  //     title: "Total Transactions",
-  //     value: transactions.length,
-  //   },
-  // ];
 
   const searchProps = ["senderIban", "recipientIban", "amount"];
 
@@ -190,7 +159,7 @@ export const PayoutsTab = () => {
         text="When a transaction is made, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil([].length / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

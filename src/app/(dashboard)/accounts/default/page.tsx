@@ -115,7 +115,7 @@ function Account() {
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={Math.ceil(trxMeta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+          total={Math.ceil((trxMeta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
       </SingleDefaultAccountBody>
     </main>

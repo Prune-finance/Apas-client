@@ -1136,7 +1136,7 @@ export const DefaultAccountHead = ({
         </Group>
 
         <Flex gap={10}>
-          {!payout && (
+          {!payout && !admin && (
             <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}

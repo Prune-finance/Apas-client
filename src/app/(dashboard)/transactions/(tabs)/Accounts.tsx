@@ -66,7 +66,8 @@ export const AccountsTab = () => {
     limit: parseInt(limit ?? "10", 10),
   };
 
-  const { transactions, loading } = useUserDefaultTransactions(queryParams);
+  const { transactions, loading, meta } =
+    useUserDefaultTransactions(queryParams);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -76,82 +77,29 @@ export const AccountsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.totalAmount || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money In",
-      value:
-        transactions
-          .filter((trx) => trx.type === "CREDIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.in || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Money Out",
-      value:
-        transactions
-          .filter((trx) => trx.type === "DEBIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.out || 0,
       formatted: true,
       currency: "EUR",
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: meta?.total || 0,
     },
   ];
 
   const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
-
-  const rows = frontendPagination(
-    filteredSearch(transactions, searchProps, debouncedSearch),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
-    <TableTr
-      key={element?.id}
-      onClick={() => {
-        setSelectedRequest(element);
-        openDrawer();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd className={styles.table__td}>
-        <Stack>
-          <Text fz={12} fw={400}>
-            {element?.recipientName}
-          </Text>
-          <Text fz={10} fw={400}>
-            {element.recipientIban}
-          </Text>
-        </Stack>
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <AmountGroup type={element?.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd>{formatNumber(element?.amount, true, "EUR")}</TableTd>
-      <TableTd w="20%" className={styles.table__td}>
-        {element?.centrolinkRef}
-      </TableTd>
-
-      <TableTd className={styles.table__td}>
-        <Stack gap={0}>
-          <Text fz={12} fw={400}>
-            {dayjs(element?.createdAt).format("Do MMMM, YYYY")}
-          </Text>
-          <Text fz={10} fw={400}>
-            {dayjs(element?.createdAt).format("hh:mm a")}
-          </Text>
-        </Stack>
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element?.status} />
-      </TableTd>
-    </TableTr>
-  ));
 
   return (
     <>
@@ -218,7 +166,7 @@ export const AccountsTab = () => {
         text="When a transaction is recorded, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

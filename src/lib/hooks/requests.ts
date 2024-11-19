@@ -664,6 +664,8 @@ export function useCompanyDebitRequests(
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.status && { status: customParams.status }),
     };
   }, [customParams]);
@@ -696,7 +698,7 @@ export function useCompanyDebitRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status]);
+  }, [obj.date, obj.limit, obj.status, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }

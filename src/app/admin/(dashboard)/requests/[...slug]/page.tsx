@@ -71,7 +71,10 @@ function CompanyRequestType() {
   const [limit, setLimit] = useState<string | null>("10");
   const [active, setActive] = useState(1);
 
-  const { loading, requests, revalidate, meta } = useCompanyDebitRequests(id);
+  const { loading, requests, revalidate, meta } = useCompanyDebitRequests(id, {
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  });
   const { business, loading: loadingBusiness } = useSingleBusiness(id);
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null

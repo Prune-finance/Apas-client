@@ -106,6 +106,7 @@ export default function BusinessDefaultAccount() {
           open={open}
           business={business}
           loadingBiz={loadingBiz}
+          admin
         />
 
         <SingleDefaultAccountBody
@@ -134,7 +135,7 @@ export default function BusinessDefaultAccount() {
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+            total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
           />
         </SingleDefaultAccountBody>
       </Paper>

@@ -274,6 +274,7 @@ export default function Account() {
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
         trxMeta={txrMeta}
+        location="issued-account"
       >
         <PaginationComponent
           active={active}

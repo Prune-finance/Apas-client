@@ -224,6 +224,7 @@ Props) => {
       "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`,
     };
 
     // Use the default URL if location is undefined or not in urlMap
@@ -249,8 +250,19 @@ Props) => {
 
       handlePdfStatement(pdfRef);
       closePreview();
+      handleSuccess(
+        "Account Statement",
+        "Account statement downloaded successful"
+      );
+      setDateRange([null, null]);
     } catch (error) {
       console.error("Error fetching account statement:", error);
+      handleError(
+        "Account Statement",
+        error instanceof Error
+          ? error.message
+          : "error downloading account statement"
+      );
     } finally {
       setLoadingStatement(false);
     }
@@ -382,6 +394,7 @@ Props) => {
             rightSection={<IconCalendarMonth size={20} />}
             numberOfColumns={2}
             clearable
+            disabled={loadingStatement}
           />
 
           <PrimaryBtn
@@ -397,7 +410,7 @@ Props) => {
         </Flex>
       </Modal>
 
-      <Box pos="absolute" left={-9999} bottom={700} w="75vw" m={0} p={0}>
+      <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
         <DownloadStatement
           receiptRef={pdfRef}
           data={downloadData}

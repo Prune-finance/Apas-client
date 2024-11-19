@@ -125,7 +125,7 @@ export const handlePdfStatement = async (
 
     // Save the PDF with a filename that includes the current timestamp
     const timestamp = new Date().toISOString().replace(/[:.-]/g, "_");
-    pdf.save(pdfName || `Transaction_Receipt_${timestamp}.pdf`);
+    pdf.save(pdfName || `Account_Statement_${timestamp}.pdf`);
   } finally {
     // Clean up the canvas and image data
     canvas.remove();

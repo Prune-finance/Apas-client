@@ -19,7 +19,7 @@ import {
 } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber, getInitials } from "@/lib/utils";
 import dayjs from "dayjs";
 
 import EmptyImage from "@/assets/empty.png";
@@ -40,10 +40,16 @@ interface ICardOne {
   btnLink?: string;
 }
 
-export const SeeAll = ({ name = "See All" }: { name?: string }) => {
+export const SeeAll = ({
+  name = "See All",
+  fontSize = 12,
+}: {
+  name?: string;
+  fontSize?: number;
+}) => {
   return (
     <div className={styles.card__link}>
-      <Text fz={14} td="underline" fw={600}>
+      <Text fz={fontSize} td="underline" fw={600}>
         {name}
       </Text>
       <IconChevronRight size={16} />
@@ -214,10 +220,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
                       placeholder: { color: "var(--prune-text-gray-700)" },
                     }}
                   >
-                    {item.title
-                      .split(" ")
-                      .map((item) => item.charAt(0))
-                      .join("")}
+                    {getInitials(item.title)}
                   </Avatar>
                   <Text fz={12} fw={600} className={styles.header__text}>
                     {item.title}

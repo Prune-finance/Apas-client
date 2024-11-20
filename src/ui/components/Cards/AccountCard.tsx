@@ -155,7 +155,7 @@ export const AccountCard = ({
       >
         {link && (
           <Link href={link}>
-            <SeeAll name="See More" />
+            <SeeAll name="See More" fontSize={14} />
           </Link>
         )}
       </Group>

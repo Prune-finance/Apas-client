@@ -283,7 +283,6 @@ export default function Account() {
           limit={limit}
           total={Math.ceil((txrMeta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
-        <Text>Pagination here</Text>
       </SingleAccountBody>
 
       <Modal

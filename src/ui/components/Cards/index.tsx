@@ -40,10 +40,16 @@ interface ICardOne {
   btnLink?: string;
 }
 
-export const SeeAll = ({ name = "See All" }: { name?: string }) => {
+export const SeeAll = ({
+  name = "See All",
+  fontSize = 12,
+}: {
+  name?: string;
+  fontSize?: number;
+}) => {
   return (
     <div className={styles.card__link}>
-      <Text fz={14} td="underline" fw={600}>
+      <Text fz={fontSize} td="underline" fw={600}>
         {name}
       </Text>
       <IconChevronRight size={16} />

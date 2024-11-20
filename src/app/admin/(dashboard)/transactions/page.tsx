@@ -61,6 +61,7 @@ function TransactionForAccount() {
     endDate,
     recipientName,
     recipientIban,
+    tab,
   } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
@@ -183,6 +184,10 @@ function TransactionForAccount() {
 
         <TabsComponent
           tabs={tabs}
+          defaultValue={
+            tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
+              ?.value ?? tabs[0].value
+          }
           mt={28}
           styles={{ list: { marginBottom: 28 } }}
           keepMounted={false}
@@ -451,9 +456,9 @@ function TransactionForAccount() {
 }
 
 const tabs = [
-  { value: "Businesses Accounts" },
-  { value: "Issued Accounts" },
-  { value: "Payout Accounts" },
+  { value: "business-accounts", title: "Business Accounts" },
+  { value: "issued-accounts", title: "Issued Accounts" },
+  { value: "payout-accounts", title: "Payout Accounts" },
 ];
 
 const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];

@@ -51,8 +51,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
-import { IssuedAccountTableHeaders } from "@/lib/static";
-import { useTransactions } from "@/lib/hooks/transactions";
+import { DynamicSkeleton2, IssuedAccountTableHeaders } from "@/lib/static";
+import {
+  usePayoutTransactions,
+  useTransactions,
+} from "@/lib/hooks/transactions";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
@@ -75,6 +78,9 @@ export default function Home() {
   } = useRequests({ status: "PENDING" });
 
   const { loading: loadingTrx, transactions } = useTransactions();
+
+  const { loading: loadingPayoutTrx, transactions: payoutTrx } =
+    usePayoutTransactions({ limit: 4 });
 
   const data = stats;
 
@@ -154,6 +160,28 @@ export default function Home() {
       </TableTd>
       <TableTd className={styles.table__td}>
         <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+
+  const payoutRows = payoutTrx.map((element) => (
+    <TableTr key={element.id}>
+      <TableTd className={styles.table__td}>{element.senderName}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientName || element.recipientIban}
+      </TableTd>
+
+      <TableTd className={styles.table__td}>
+        <AmountGroup
+          type={element.type}
+          amount={element.amount}
+          fz={12}
+          fw={400}
+        />
+      </TableTd>
+
+      <TableTd className={styles.table__td}>
+        <BadgeComponent status={element.status} fz={10} />
       </TableTd>
     </TableTr>
   ));
@@ -337,62 +365,79 @@ export default function Home() {
                           className={styles.payout__table}
                           style={{ border: "1px solid #f2f4f7" }}
                         >
-                          <Text
-                            className={styles.table__text}
-                            lts={0.5}
-                            fz={10}
-                            fw={600}
-                          >
-                            Payout History
-                          </Text>
-
-                          {/* <TableScrollContainer minWidth={500}>
-                    <Table className={styles.table} verticalSpacing="lg">
-                      <TableThead>
-                        <TableTr>
-                          <TableTh className={styles.table__th}>
-                            Account Name
-                          </TableTh>
-                          <TableTh className={styles.table__th}>
-                            Business name
-                          </TableTh>
-                          <TableTh className={styles.table__th}>Amount</TableTh>
-                          <TableTh className={styles.table__th}>Status</TableTh>
-                        </TableTr>
-                      </TableThead>
-                      <TableTbody>{rows}</TableTbody>
-                    </Table>
-                  </TableScrollContainer>
-
-                  <Button
-                    leftSection={<IconCircleChevronRight size={18} />}
-                    variant="transparent"
-                    color="#97AD05"
-                    fz={11}
-                  >
-                    See All Transactions
-                  </Button> */}
-
-                          <Flex
-                            style={{ flexGrow: 1 }}
-                            direction="column"
-                            align="center"
-                            justify="center"
-                            mt={24}
-                          >
-                            <Image
-                              src={EmptyImage}
-                              alt="no content"
-                              width={120}
-                              height={96}
-                            />
-                            <Text mt={14} fz={10} c="#1D2939">
-                              No payout history.
+                          <Flex justify="space-between" align="center">
+                            <Text
+                              className={styles.table__text}
+                              lts={0.5}
+                              fz={10}
+                              fw={600}
+                            >
+                              Payout History
                             </Text>
-                            {/* <Text fz={10} c="#667085">
+
+                            <Link
+                              href={"/admin/transactions?tab=payout-accounts"}
+                            >
+                              <SeeAll />
+                            </Link>
+                          </Flex>
+
+                          {(loadingPayoutTrx || payoutTrx.length > 0) && (
+                            <TableScrollContainer minWidth={500}>
+                              <Table
+                                verticalSpacing="lg"
+                                layout="fixed"
+                                styles={{
+                                  th: { fontWeight: 600, fontSize: 10 },
+                                  td: { fontSize: 10 },
+                                }}
+                              >
+                                <TableThead>
+                                  <TableTr>
+                                    {payoutHeaders.map((header, index) => (
+                                      <TableTh
+                                        key={index}
+                                        className={styles.table__th}
+                                      >
+                                        {header}
+                                      </TableTh>
+                                    ))}
+                                  </TableTr>
+                                </TableThead>
+                                <TableTbody
+                                  className={styles.table__td}
+                                  style={{ wordBreak: "break-word" }}
+                                >
+                                  {loadingPayoutTrx
+                                    ? DynamicSkeleton2(payoutHeaders.length)
+                                    : payoutRows}
+                                </TableTbody>
+                              </Table>
+                            </TableScrollContainer>
+                          )}
+
+                          {!loadingPayoutTrx && payoutTrx.length === 0 && (
+                            <Flex
+                              style={{ flexGrow: 1 }}
+                              direction="column"
+                              align="center"
+                              justify="center"
+                              mt={24}
+                            >
+                              <Image
+                                src={EmptyImage}
+                                alt="no content"
+                                width={120}
+                                height={96}
+                              />
+                              <Text mt={14} fz={10} c="#1D2939">
+                                No payout history.
+                              </Text>
+                            </Flex>
+                          )}
+                          {/* <Text fz={10} c="#667085">
               When an account is created, it will appear here
             </Text> */}
-                          </Flex>
                         </div>
                       </GridCol>
 
@@ -530,3 +575,5 @@ export default function Home() {
     </main>
   );
 }
+
+const payoutHeaders = ["Senders name", "Beneficiary", "Amount", "Status"];

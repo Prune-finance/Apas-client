@@ -562,7 +562,7 @@ export function usePayoutTransactions(customParams: IParams = {}) {
       setLoading(true);
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout/trx?${params}`,
+        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/transactions?${params}`,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 

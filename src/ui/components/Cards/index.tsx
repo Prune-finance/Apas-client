@@ -19,7 +19,7 @@ import {
 } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
+import { approvedBadgeColor, formatNumber, getInitials } from "@/lib/utils";
 import dayjs from "dayjs";
 
 import EmptyImage from "@/assets/empty.png";
@@ -220,10 +220,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
                       placeholder: { color: "var(--prune-text-gray-700)" },
                     }}
                   >
-                    {item.title
-                      .split(" ")
-                      .map((item) => item.charAt(0))
-                      .join("")}
+                    {getInitials(item.title)}
                   </Avatar>
                   <Text fz={12} fw={600} className={styles.header__text}>
                     {item.title}

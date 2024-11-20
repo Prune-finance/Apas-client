@@ -246,6 +246,176 @@ export function useBusinessTransactions(
   return { loading, transactions, meta, revalidate };
 }
 
+export function useBusinessAccountTransactions(
+  id: string = "",
+  customParams: IParams = {}
+) {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.not && { not: customParams.not }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+    };
+  }, [customParams]);
+
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  } = obj;
+
+  async function fetchTrx() {
+    const params = new URLSearchParams(obj as Record<string, string>);
+    try {
+      setLoading(true);
+      const path = id ? `` : "transactions";
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/business/company-account/${id}/transactions?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+    id,
+  ]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
+export function usePayoutAccountTransactions(
+  id: string = "",
+  customParams: IParams = {}
+) {
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.not && { not: customParams.not }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.recipientIban && {
+        recipientIban: customParams.recipientIban,
+      }),
+      ...(customParams.recipientName && {
+        recipientName: customParams.recipientName,
+      }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+    };
+  }, [customParams]);
+
+  const {
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+  } = obj;
+
+  async function fetchTrx() {
+    const params = new URLSearchParams(obj as Record<string, string>);
+    try {
+      setLoading(true);
+      const path = id ? `` : "transactions";
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/business/payout-account/${id}/transactions?${params}`,
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    limit,
+    page,
+    date,
+    endDate,
+    status,
+    type,
+    recipientIban,
+    recipientName,
+    senderName,
+    not,
+    id,
+  ]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
 export function useDefaultAccountTransactions(customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);

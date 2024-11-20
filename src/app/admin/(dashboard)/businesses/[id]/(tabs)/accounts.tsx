@@ -206,7 +206,7 @@ export default function Accounts({
             iban={defaultAccount?.accountNumber ?? ""}
             loading={loadingDefault}
             badgeText="Main Account"
-            link={`/admin/businesses/${params.id}/default`}
+            link={`/admin/businesses/${params.id}/default?accountId=${defaultAccount?.id}`}
             business
           />
 
@@ -218,7 +218,7 @@ export default function Accounts({
               iban={payoutAccount?.accountNumber ?? ""}
               loading={loadingPayout}
               badgeText="Payout Account"
-              link={`/admin/businesses/${params.id}/payout`}
+              link={`/admin/businesses/${params.id}/payout?accountId=${payoutAccount.id}`}
               business
               // disable
             >

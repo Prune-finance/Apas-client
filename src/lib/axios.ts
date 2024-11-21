@@ -1,9 +1,15 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const createAxiosInstance = (baseURL: string) => {
+const BASEURL = {
+  auth: process.env.NEXT_PUBLIC_SERVER_URL,
+  accounts: process.env.NEXT_PUBLIC_ACCOUNTS_URL,
+  payouts: process.env.NEXT_PUBLIC_PAYOUT_URL,
+};
+
+const createAxiosInstance = (baseURL: keyof typeof BASEURL) => {
   const axiosInstance = axios.create({
-    baseURL,
+    baseURL: BASEURL[baseURL],
   });
 
   axiosInstance.interceptors.request.use(

@@ -1,7 +1,10 @@
-import axios from "axios";
+// import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
 import { IParams } from "../schema";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
 
 export function useAdmins(customParams: IParams = {}) {
   const [users, setUsers] = useState<AdminData[]>([]);
@@ -26,16 +29,13 @@ export function useAdmins(customParams: IParams = {}) {
     obj;
 
   async function fetchUsers() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get("/admin/admins", {
+        params,
+      });
 
       setUsers(data.data);
       setMeta(data.meta);
@@ -67,10 +67,7 @@ export function useSingleAdmin(id: string) {
   async function fetchUsers() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/admins/${id}`);
 
       setUser(data.data);
     } catch (error) {
@@ -116,16 +113,13 @@ export function useBusinessUsers(customParams: IParams = {}, id: string) {
     obj;
 
   async function fetchUsers() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${id}/users?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/businesses/${id}/users`, {
+        params,
+      });
 
       setUsers(data.data);
       setMeta(data.meta);
@@ -158,8 +152,7 @@ export function useSingleBusinessUser(businessId: string, userId: string) {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${businessId}/users/${userId}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/businesses/${businessId}/users/${userId}`
       );
 
       setUser(data.data);
@@ -203,16 +196,11 @@ export function useUsers(customParams: IParams = {}) {
   const { limit, page, date, endDate, status, email } = obj;
 
   async function fetchUsers() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/auth/users`, { params });
 
       setUsers(data.data);
       setMeta(data.meta);

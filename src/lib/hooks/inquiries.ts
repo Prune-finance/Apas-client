@@ -1,7 +1,10 @@
-import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import Cookies from "js-cookie";
 import { IParams } from "../schema";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("payouts");
 
 export function useInquiries(customParams: IParams = {}) {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -29,10 +32,7 @@ export function useInquiries(customParams: IParams = {}) {
         obj as Record<string, string>
       ).toString();
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/inquiries?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/inquiries?${params}`);
 
       setMeta(data.meta);
       setInquiries(data.data);
@@ -83,10 +83,7 @@ export function useUserInquiries(customParams: IParams = {}) {
         obj as Record<string, string>
       ).toString();
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/inquiries?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/payout/inquiries?${params}`);
 
       setMeta(data.meta);
       setInquiries(data.data);
@@ -119,10 +116,7 @@ export function useSingleInquiry(id: string) {
   async function fetchInquiries() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/inquiries/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/inquiries/${id}`);
 
       setInquiry(data.data);
     } catch (error) {
@@ -154,10 +148,7 @@ export function useUserSingleInquiry(id: string) {
   async function fetchInquiries() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/inquiries/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/payout/inquiries/${id}`);
 
       setInquiry(data.data);
     } catch (error) {

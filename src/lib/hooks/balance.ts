@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import Cookies from "js-cookie";
 import createAxiosInstance from "@/lib/axios";
 
 const axios = createAxiosInstance("accounts");

@@ -1,17 +1,13 @@
-import axios from "axios";
 import { parseError } from "./auth";
-import Cookies from "js-cookie";
+import createAxiosInstance from "@/lib/axios";
 
+const axios = createAxiosInstance("accounts");
 
 export const approveRequest = async (id: string) => {
   //   if (processing) return;
   //   setProcessing(true);
   try {
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/approve/${id}`,
-      {},
-      { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-    );
+    await axios.post(`/admin/request/approve/${id}`, {});
 
     return { success: true, message: "Request Approved" };
 
@@ -27,11 +23,7 @@ export const rejectRequest = async (id: string) => {
   //   if (processing) return;
   //   setProcessing(true);
   try {
-    await axios.post(
-      `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${id}`,
-      {},
-      { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-    );
+    await axios.post(`/admin/request/reject/${id}`, {});
     return { success: true, message: "Request Rejected" };
     // close();
     // handleSuccess("Request Rejected", "You have rejected this account request");

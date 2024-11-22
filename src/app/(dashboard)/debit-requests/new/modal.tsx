@@ -1,7 +1,4 @@
 "use client";
-import Cookies from "js-cookie";
-
-import axios from "axios";
 import { Fragment, use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
@@ -50,6 +47,9 @@ import { SelectDropdownSearch } from "@/ui/components/SelectDropdownSearch";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { countries } from "@/lib/static";
 import { useDebouncedValue } from "@mantine/hooks";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("payouts");
 
 export default function DebitRequestModal({
   close,
@@ -173,17 +173,13 @@ export default function DebitRequestModal({
       // });
       // return;
 
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/request`,
-        {
-          ...rest,
-          ...(form.values.accountType === "Corporate" && {
-            destinationFirstName: firstName,
-            destinationLastName: lastName,
-          }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/payout/debit/request`, {
+        ...rest,
+        ...(form.values.accountType === "Corporate" && {
+          destinationFirstName: firstName,
+          destinationLastName: lastName,
+        }),
+      });
 
       handleSuccess(
         "Action Completed",

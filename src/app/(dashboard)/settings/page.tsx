@@ -1,6 +1,4 @@
 "use client";
-import Cookies from "js-cookie";
-
 import {
   Box,
   Button,
@@ -41,12 +39,15 @@ import {
   validateNewUser,
   validatePasswordChange,
 } from "@/lib/schema";
-import axios from "axios";
 import { Suspense, useMemo, useState } from "react";
 import Keys from "./(tabs)/keys";
 import useNotification from "@/lib/hooks/notification";
 import Pricing from "./(tabs)/pricing";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
 
 function Users() {
   const router = useRouter();
@@ -91,11 +92,7 @@ function Users() {
         return;
       }
 
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
-        { email: form.values.email },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/auth/users/add`, { email: form.values.email });
 
       revalidate();
       close();
@@ -123,11 +120,7 @@ function Users() {
         );
       }
 
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/change-password`,
-        passwordForm.values,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/auth/change-password`, passwordForm.values);
 
       handleSuccess("Action Successful", "Your password has been updated");
     } catch (error) {

@@ -1,8 +1,9 @@
 import { IParams, otherDocumentSchema } from "./../schema";
 import { DebitRequest } from "./requests";
-import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import Cookies from "js-cookie";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
 
 export function useBusiness(
   customParams: IParams = {},
@@ -50,10 +51,7 @@ export function useBusiness(
     try {
       setLoading(true);
       const { data } = await axios.get(
-        `${
-          process.env.NEXT_PUBLIC_SERVER_URL
-        }/admin/businesses?${params.toString()}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/businesses?${params.toString()}`
       );
 
       setMeta(data.meta);
@@ -72,10 +70,7 @@ export function useBusiness(
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business-stats?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/business-stats?${params}`);
       setStats(data.data);
       setStatsMeta(data.meta);
     } catch (error) {
@@ -115,10 +110,7 @@ export function useSingleBusiness(id: string) {
   async function fetchBusiness() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/businesses/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/businesses/${id}`);
 
       setBusiness(data.data);
       setMeta(data.meta);
@@ -153,10 +145,7 @@ export function useBusinessServices(id: string) {
   async function fetchServices() {
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/services/business/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/services/business/${id}`);
 
       setMeta(data.meta);
       setServices(data.data);
@@ -199,12 +188,7 @@ export function useUserBusiness(customParams: IParams = {}) {
 
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `${
-          process.env.NEXT_PUBLIC_SERVER_URL
-        }/auth/company?${params.toString()}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/auth/company?${params.toString()}`);
 
       setMeta(data.meta);
       setBusiness(data.data);

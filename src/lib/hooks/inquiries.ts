@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import Cookies from "js-cookie";
 import { IParams } from "../schema";
 
 import createAxiosInstance from "@/lib/axios";

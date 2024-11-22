@@ -1,12 +1,8 @@
 import {
   TransactionType,
-  TrxData,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { filteredSearch } from "@/lib/search";
-import { frontendPagination, formatNumber } from "@/lib/utils";
-import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -14,43 +10,28 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import {
-  Flex,
-  Group,
-  Stack,
-  TableTd,
-  TableTr,
-  TabsPanel,
-  Text,
-} from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
-import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
+import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { useState } from "react";
-import styles from "../styles.module.scss";
-import { TransactionDrawer } from "../drawer";
 import { OwnAccountTableHeaders } from "@/lib/static";
-import { AmountGroup } from "@/ui/components/AmountGroup";
 import { useSearchParams } from "next/navigation";
 import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
-import Transaction from "@/lib/store/transaction";
 
 export const AccountsTab = () => {
   const searchParams = useSearchParams();
 
   const [opened, { toggle }] = useDisclosure(false);
-  const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
-    useDisclosure(false);
+
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
-  const [selectedRequest, setSelectedRequest] =
-    useState<TransactionType | null>(null);
 
   const { status, date, endDate, type, recipientName, recipientIban } =
     Object.fromEntries(searchParams.entries());

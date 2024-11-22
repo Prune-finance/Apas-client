@@ -631,6 +631,55 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
   return { loading, requests, revalidate, meta };
 }
 
+export function useCompanyWithAccountRequests(customParams: IParams = {}) {
+  const [businesses, setBusinesses] = useState<BusinessData[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.business && { business: customParams.business }),
+    };
+  }, [customParams]);
+
+  async function fetchBusinessWithDebitReq() {
+    const params = new URLSearchParams(obj as Record<string, string>);
+    setLoading(true);
+    try {
+      const { data } = await authAxiosInstance.get(
+        `/admin/businesses/account-requests`,
+        {
+          params,
+        }
+      );
+
+      setBusinesses(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchBusinessWithDebitReq();
+
+  useEffect(() => {
+    fetchBusinessWithDebitReq();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page, obj.business]);
+
+  return { loading, businesses, revalidate, meta };
+}
+
 export function useCompanyWithDebitRequests(customParams: IParams = {}) {
   const [businesses, setBusinesses] = useState<BusinessData[]>([]);
   const [meta, setMeta] = useState<Meta>();

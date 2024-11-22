@@ -333,6 +333,7 @@ export interface BusinessData {
   lastLogin: Date;
   contactSignup: Date | null;
   contactCountryCode: string;
+  accountRequestCount?: number;
 }
 
 export interface Account {

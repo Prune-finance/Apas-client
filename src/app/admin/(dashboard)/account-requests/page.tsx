@@ -29,7 +29,10 @@ import {
 import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
-import { useRequests } from "@/lib/hooks/requests";
+import {
+  useCompanyWithAccountRequests,
+  useRequests,
+} from "@/lib/hooks/requests";
 
 // UI Imports
 import ModalComponent from "@/ui/components/Modal";
@@ -50,6 +53,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -60,18 +64,20 @@ function AccountRequests() {
   );
 
   const [active, setActive] = useState(1);
-  const [limit, setLimit] = useState<string | null>("100");
+  const [limit, setLimit] = useState<string | null>("10");
 
   const queryParams = {
     page: active,
-    limit: parseInt(limit ?? "100", 10),
+    limit: parseInt(limit ?? "10", 10),
     ...(createdAt && { date: dayjs(createdAt).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toUpperCase() }),
   };
 
-  const { loading, meta, businesses } = useBusiness(queryParams, true);
+  const { loading, meta, businesses } =
+    useCompanyWithAccountRequests(queryParams);
+  // const { loading, meta, businesses } = useBusiness(queryParams, true);
 
   const { requests, revalidate } = useRequests({
     ...(isNaN(Number(limit))
@@ -152,7 +158,7 @@ function AccountRequests() {
   };
 
   const rows = filteredSearch(
-    businesses.filter((biz) => Boolean(biz._count.AccountRequests)),
+    businesses,
     ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
@@ -163,37 +169,14 @@ function AccountRequests() {
     >
       <TableTd className={styles.table__td}>{`${element.name}`}</TableTd>
       <TableTd className={styles.table__td} tt="capitalize">
-        {element._count.AccountRequests}
+        {element.accountRequestCount}
       </TableTd>
-      {/* <TableTd className={styles.table__td} tt="capitalize">
-        {(element.legalEntity ?? "").toLowerCase()}
-      </TableTd> */}
-      {/* <TableTd className={styles.table__td}>{element.Company.country}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
-        {/* {dayjs(element.createdAt).format("ddd DD MMM YYYY")} */}
-
         {element?.contactEmail}
       </TableTd>
-      {/* <TableTd className={styles.table__td}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor(element.companyStatus)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          {element.companyStatus.toLowerCase()}
-        </Badge>
-      </TableTd> */}
-
-      {/* <TableTd
-        className={`${styles.table__td}`}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <MenuComponent id={element.id} />
-      </TableTd> */}
+      <TableTd className={`${styles.table__td}`}>
+        <BadgeComponent status={element.companyStatus} active />
+      </TableTd>
     </TableTr>
   ));
 
@@ -258,11 +241,7 @@ function AccountRequests() {
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          // total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
-          total={Math.ceil(
-            (businesses.filter((biz) => Boolean(biz._count.AccountRequests))
-              .length ?? 1) / parseInt(limit ?? "10", 10)
-          )}
+          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
         />
       </div>
     </main>
@@ -274,7 +253,7 @@ const tableHeaders = [
   "Number of Requests",
   // "Type",
   "Contact Email",
-  // "Status",
+  "Status",
   // "Action",
 ];
 

@@ -18,7 +18,6 @@ dayjs.extend(advancedFormat);
 import { useRouter } from "next/navigation";
 import { BadgeComponent } from "../../Badge";
 import Transaction from "@/lib/store/transaction";
-import { AccountTransactionDrawer } from "./drawer";
 import { PayoutDrawer } from "@/app/(dashboard)/payouts/drawer";
 import { IssuedAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "../../AmountGroup";

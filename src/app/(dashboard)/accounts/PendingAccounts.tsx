@@ -1,7 +1,5 @@
-import form from "@/app/auth/login/form";
 import { RequestData, useUserRequests } from "@/lib/hooks/requests";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { filteredSearch } from "@/lib/search";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -11,7 +9,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { Group, Select, TableTd, TableTr } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -21,7 +19,6 @@ import { AccountRequestsDrawer } from "../account-requests/drawer";
 import { getUserType } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 import { IconListTree } from "@tabler/icons-react";
-import { date } from "zod";
 
 export const PendingAccounts = () => {
   const searchParams = useSearchParams();
@@ -34,8 +31,6 @@ export const PendingAccounts = () => {
   const [search, setSearch] = useState("");
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
-
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const queryParams = {
     ...(accountName && { accountName }),

@@ -29,15 +29,29 @@ import PruneTintLogo from "@/assets/logo-tint.png";
 import styles from "./styles.module.scss";
 import { useDisclosure, useIdle } from "@mantine/hooks";
 import ModalComponent from "../Modal";
-import axios from "axios";
+// import axios from "axios";
 import { useEffect, useMemo, useState } from "react";
 import { NotificationStore } from "@/lib/store/notification";
-import { NotificationType } from "@/lib/hooks/notifications";
+import {
+  NotificationType,
+  useAdminNotifications,
+  useUserNotifications,
+} from "@/lib/hooks/notifications";
+import createAxiosInstance from "@/lib/axios";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+
+const axios = createAxiosInstance("auth");
 
 export default function Navbar() {
   const pathname = usePathname();
   const [opened, { open, close }] = useDisclosure(false);
-  const { meta } = NotificationStore();
+  const { meta, setMeta } = NotificationStore();
+  const { handleError } = useNotification();
+
+  const { meta: adminMeta, revalidate } = useAdminNotifications({
+    status: "unread",
+  });
 
   const [processing, setProcessing] = useState(false);
 
@@ -115,6 +129,35 @@ export default function Navbar() {
     }
   };
 
+  const matchType = (type: Type): NotificationType => {
+    switch (type) {
+      case "Transactions":
+        return "TRANSACTIONS";
+      case "Payouts":
+        return "PAYOUTS";
+      case "Requests":
+        return "DEBIT_REQUEST";
+      case "Account Creation":
+        return "ACCOUNT_REQUESTS";
+      default:
+        return null;
+    }
+  };
+
+  const markAllNotificationByType = async (type: NotificationType) => {
+    try {
+      await axios.patch(`/admin/notifications/${type}/mark-all-as-read`);
+      await revalidate();
+
+      setMeta(adminMeta);
+    } catch (error) {
+      handleError(
+        "An error occurred while marking all notifications as read",
+        parseError(error)
+      );
+    }
+  };
+
   return (
     <nav className={styles.nav}>
       <div className={styles.logo__container}>
@@ -131,26 +174,16 @@ export default function Navbar() {
           <Stack gap={12} mt={32}>
             {AdminMainLinks.map((item, index) => {
               return (
-                // <Link key={index} href={item.link}>
-                //   <div
-                //     className={`${styles.link} ${
-                //       pathname.startsWith(item.link) ? styles.link__active : ""
-                //     }`}
-                //   >
-                //     <div>
-                //       <Text fz={12} className={styles.link__text}>
-                //         {item.text}
-                //       </Text>
-                //     </div>
-                //     {item.icon}
-                //   </div>
-                // </Link>
-
                 <NavLink
                   key={index}
                   leftSection={item.icon}
                   component={Link}
-                  // label={item.text}
+                  onClick={() =>
+                    countSwitch(item.text as Type) &&
+                    matchType(item.text as Type)
+                      ? markAllNotificationByType(matchType(item.text as Type))
+                      : {}
+                  }
                   label={
                     <NavLinkLabel
                       text={item.text}
@@ -228,7 +261,12 @@ export default function Navbar() {
 export function UserNavbar() {
   const pathname = usePathname();
   const [opened, { open, close }] = useDisclosure(false);
-  const { meta } = NotificationStore();
+  const { meta, setMeta } = NotificationStore();
+
+  const { revalidate, meta: userMeta } = useUserNotifications({
+    status: "unread",
+  });
+  const { handleError } = useNotification();
 
   const [processing, setProcessing] = useState(false);
 
@@ -310,6 +348,35 @@ export function UserNavbar() {
     }
   };
 
+  const matchType = (type: Type): NotificationType => {
+    switch (type) {
+      case "Transactions":
+        return "TRANSACTIONS";
+      case "Payouts":
+        return "PAYOUTS";
+      case "Debit Requests":
+        return "DEBIT_REQUEST";
+      case "Account Requests":
+        return "ACCOUNT_REQUESTS";
+      default:
+        return null;
+    }
+  };
+
+  const markAllNotificationByType = async (type: NotificationType) => {
+    try {
+      await axios.patch(`/notifications/${type}/mark-all-as-read`);
+      await revalidate();
+
+      setMeta(userMeta);
+    } catch (error) {
+      handleError(
+        "An error occurred while marking all notifications as read",
+        parseError(error)
+      );
+    }
+  };
+
   return (
     <nav className={`${styles.user__nav}`}>
       <div className={styles.logo__container}>
@@ -329,6 +396,12 @@ export function UserNavbar() {
                   key={index}
                   leftSection={item.icon}
                   component={Link}
+                  onClick={() =>
+                    countSwitch(item.text as Type) &&
+                    matchType(item.text as Type)
+                      ? markAllNotificationByType(matchType(item.text as Type))
+                      : {}
+                  }
                   label={
                     <NavLinkLabel
                       text={item.text}

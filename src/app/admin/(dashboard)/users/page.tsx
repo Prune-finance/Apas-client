@@ -30,6 +30,7 @@ function UsersManagement() {
             tabs={tabs}
             tt="capitalize"
             mt={32}
+            keepMounted={false}
           >
             <TabsPanel value={tabs[0].value}>
               <Users />

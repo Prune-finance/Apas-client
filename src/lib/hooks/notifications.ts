@@ -45,7 +45,7 @@ export function useAdminNotifications(customParams: IParams = {}) {
     }
   }
 
-  function revalidate(limit?: number) {
+  async function revalidate(limit?: number) {
     fetchNotifications(limit);
   }
 
@@ -102,7 +102,7 @@ export function useUserNotifications(customParams: IParams = {}) {
     }
   }
 
-  function revalidate(limit?: number) {
+  async function revalidate(limit?: number) {
     fetchNotifications(limit);
   }
 

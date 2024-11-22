@@ -410,7 +410,7 @@ Props) => {
         </Flex>
       </Modal>
 
-      <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
+      <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
         <DownloadStatement
           receiptRef={pdfRef}
           data={downloadData}

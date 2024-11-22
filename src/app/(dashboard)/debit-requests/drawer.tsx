@@ -9,12 +9,13 @@ import ModalComponent from "@/ui/components/Modal";
 import { Drawer, Flex, Box, Divider, Text, Stack, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconX } from "@tabler/icons-react";
-import axios from "axios";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { Dispatch, SetStateAction, useState } from "react";
-import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("payouts");
 
 dayjs.extend(advancedFormat);
 type Props = {
@@ -65,11 +66,10 @@ export const DebitRequestDrawer = ({
 
     try {
       const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/request/${selectedRequest?.id}/cancel`,
+        `/payout/debit/request/${selectedRequest?.id}/cancel`,
         {
           reason: reason,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        }
       );
 
       handleSuccess("Cancel Request Successful", "");

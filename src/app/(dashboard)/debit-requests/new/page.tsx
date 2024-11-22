@@ -1,7 +1,4 @@
 "use client";
-import Cookies from "js-cookie";
-
-import axios from "axios";
 import { Fragment, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
@@ -30,6 +27,10 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useUserAccounts } from "@/lib/hooks/accounts";
 import { formatNumber } from "@/lib/utils";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("payouts");
 
 export default function DebitRequest() {
   const router = useRouter();
@@ -76,11 +77,7 @@ export default function DebitRequest() {
       const { hasErrors } = form.validate();
       if (hasErrors) return;
 
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/request`,
-        form.values,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/payout/debit/request`, form.values);
 
       handleSuccess("Action Completed", "Debit request created");
       router.push("/debit-requests");

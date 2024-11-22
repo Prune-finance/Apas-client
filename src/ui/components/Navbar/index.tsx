@@ -174,29 +174,16 @@ export default function Navbar() {
           <Stack gap={12} mt={32}>
             {AdminMainLinks.map((item, index) => {
               return (
-                // <Link key={index} href={item.link}>
-                //   <div
-                //     className={`${styles.link} ${
-                //       pathname.startsWith(item.link) ? styles.link__active : ""
-                //     }`}
-                //   >
-                //     <div>
-                //       <Text fz={12} className={styles.link__text}>
-                //         {item.text}
-                //       </Text>
-                //     </div>
-                //     {item.icon}
-                //   </div>
-                // </Link>
-
                 <NavLink
                   key={index}
                   leftSection={item.icon}
                   component={Link}
                   onClick={() =>
-                    markAllNotificationByType(matchType(item.text as Type))
+                    countSwitch(item.text as Type) &&
+                    matchType(item.text as Type)
+                      ? markAllNotificationByType(matchType(item.text as Type))
+                      : {}
                   }
-                  // label={item.text}
                   label={
                     <NavLinkLabel
                       text={item.text}
@@ -410,7 +397,10 @@ export function UserNavbar() {
                   leftSection={item.icon}
                   component={Link}
                   onClick={() =>
-                    markAllNotificationByType(matchType(item.text as Type))
+                    countSwitch(item.text as Type) &&
+                    matchType(item.text as Type)
+                      ? markAllNotificationByType(matchType(item.text as Type))
+                      : {}
                   }
                   label={
                     <NavLinkLabel

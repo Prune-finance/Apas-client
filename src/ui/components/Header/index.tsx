@@ -338,17 +338,17 @@ export function UserHeader() {
         </Text> */}
       <Switch
         color="green"
-        c={stage === "live" ? "green" : "dimmed"}
+        c={stage === "LIVE" ? "green" : "dimmed"}
         fz={14}
         fw={500}
         labelPosition="left"
-        defaultChecked={stage === "live"}
+        defaultChecked={stage === "LIVE"}
         size="xs"
         tt="capitalize"
-        label={`${stage} Mode`}
+        label={`${stage.toLowerCase()} Mode`}
         styles={{ label: { fontSize: 14 } }}
         onChange={(event) => {
-          const newStage = event.currentTarget.checked ? "live" : "test";
+          const newStage = event.currentTarget.checked ? "LIVE" : "TEST";
           setStage(newStage);
           localStorage.setItem("stage", newStage);
         }}

@@ -34,14 +34,18 @@ import { notifications } from "@mantine/notifications";
 import useNotification from "@/lib/hooks/notification";
 import { camelCaseToTitleCase, getUserType } from "@/lib/utils";
 import { getNestedDocValue } from "@/lib/helpers/document-status";
-import axios from "axios";
-import Cookies from "js-cookie";
+
 import { parseError } from "@/lib/actions/auth";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import FileDisplay from "@/ui/components/DocumentViewer";
 import { useDisclosure } from "@mantine/hooks";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { useListState, UseListStateHandlers } from "@mantine/hooks";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
+const axiosAccount = createAxiosInstance("accounts");
 
 dayjs.extend(advancedFormat);
 
@@ -93,10 +97,9 @@ export const AccountRequestsDrawer = ({
   const reUpload = async () => {
     setProcessing(true);
     try {
-      const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/${selectedRequest?.id}/document/upload`,
-        { paths: values },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      const { data: res } = await axiosAccount.post(
+        `/accounts/dashboard/requests/${selectedRequest?.id}/document/upload`,
+        { paths: values }
       );
       handleSuccess(
         "Upload Successful",
@@ -628,11 +631,7 @@ export const TextInputWithFile = ({
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.post(`/auth/upload`, formData);
 
       // Check if the path already exists
       const index = uploadedFiles.findIndex((file) => file.path === path);

@@ -1,7 +1,6 @@
 "use client";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import Cookies from "js-cookie";
 
 dayjs.extend(advancedFormat);
 
@@ -30,7 +29,6 @@ import styles from "./styles.module.scss";
 
 // Asset Imports
 import { Suspense, useState } from "react";
-import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
@@ -45,6 +43,9 @@ import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { getUserType } from "@/lib/utils";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("accounts");
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -93,11 +94,7 @@ function AccountRequests() {
   const cancelRequest = async (id: string) => {
     setProcessing(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/requests/${id}/cancel`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/accounts/requests/${id}/cancel`, {});
 
       revalidate();
       handleSuccess("Action Completed", "Account frozen");

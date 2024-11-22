@@ -1,7 +1,9 @@
-import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import Cookies from "js-cookie";
 import { IParams } from "../schema";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
 
 export function useAdminNotifications(customParams: IParams = {}) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -30,10 +32,9 @@ export function useAdminNotifications(customParams: IParams = {}) {
       ).toString();
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications?${params}${
+        `/admin/notifications?${params}${
           !params && limit ? `limit=${limit}` : ""
-        }`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        }`
       );
 
       setMeta(data.meta);
@@ -87,10 +88,7 @@ export function useUserNotifications(customParams: IParams = {}) {
       ).toString();
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/notifications?${params}${
-          !params && limit ? `limit=${limit}` : ""
-        }`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/notifications?${params}${!params && limit ? `limit=${limit}` : ""}`
       );
 
       setMeta(data.meta);

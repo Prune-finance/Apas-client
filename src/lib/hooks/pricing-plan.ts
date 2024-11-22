@@ -1,23 +1,15 @@
-import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import Cookies from "js-cookie";
+import createAxiosInstance from "@/lib/axios";
+import { IParams } from "../schema";
 
-interface IParams {
-  period?: string;
-  limit?: number;
-  date?: string | null;
-  status?: string;
-  sort?: string;
-  page?: number;
-  type?: string;
-}
+const axios = createAxiosInstance("auth");
+
 export function usePricingPlan(customParams: IParams = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
     };
@@ -33,7 +25,6 @@ export function usePricingPlan(customParams: IParams = {}) {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.sort && { sort: customParams.sort }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
     };
@@ -42,12 +33,10 @@ export function usePricingPlan(customParams: IParams = {}) {
 
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `${
-          process.env.NEXT_PUBLIC_SERVER_URL
-        }/admin/pricing-plans?${params.toString()}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+
+      const { data } = await axios.get(`/admin/pricing-plans`, {
+        params,
+      });
 
       setMeta(data.meta);
       setPricingPlan(data.data);
@@ -64,7 +53,7 @@ export function usePricingPlan(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.sort, obj.status, obj.page, obj.type]);
+  }, [obj.date, obj.limit, obj.status, obj.page, obj.type]);
 
   return { loading, pricingPlan, meta };
 }
@@ -78,10 +67,8 @@ export function useSinglePricingPlan(id: string) {
   async function fetchPlan() {
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plans/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+
+      const { data } = await axios.get(`/admin/pricing-plans/${id}`);
 
       setPricingPlan(data.data);
     } catch (error) {

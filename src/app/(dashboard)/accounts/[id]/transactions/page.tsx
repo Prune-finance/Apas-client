@@ -4,15 +4,14 @@ import dayjs from "dayjs";
 import Image from "next/image";
 import { Box, Divider, Drawer, Paper, ThemeIcon } from "@mantine/core";
 import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
-import { UnstyledButton, rem, Text, Pagination } from "@mantine/core";
+import { Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Checkbox, Flex, TableTh, TableThead } from "@mantine/core";
+import { Flex, TableTh, TableThead } from "@mantine/core";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 import {
   IconArrowUpRight,
-  IconArrowLeft,
   IconSearch,
   IconListTree,
   IconPointFilled,
@@ -25,12 +24,7 @@ import { formatNumber } from "@/lib/utils";
 import EmptyImage from "@/assets/empty.png";
 
 import { useParams, useRouter } from "next/navigation";
-import {
-  TransactionType,
-  TrxData,
-  useTransactions,
-  useUserTransactions,
-} from "@/lib/hooks/transactions";
+import { TransactionType, useUserTransactions } from "@/lib/hooks/transactions";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { BadgeComponent } from "@/ui/components/Badge";
@@ -62,7 +56,6 @@ export default function AccountTrx() {
         {element.recipientBankAddress}
       </TableTd>
       <TableTd className={styles.table__td}>{element.reference}</TableTd>
-      {/* <TableTd className={styles.table__td}>{dayjs().format()}</TableTd> */}
       <TableTd className={`${styles.table__td}`}>
         <Flex align="center" gap={5}>
           <IconArrowUpRight

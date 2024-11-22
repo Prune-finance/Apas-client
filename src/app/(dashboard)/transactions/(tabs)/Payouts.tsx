@@ -8,7 +8,7 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { Group, TabsPanel } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";

@@ -8,21 +8,10 @@ import { useState } from "react";
 import Image from "next/image";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
-import {
-  Badge,
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  Select,
-  TableTd,
-} from "@mantine/core";
-import { Flex, Box, Divider, Button, TextInput } from "@mantine/core";
-import { UnstyledButton, rem, Text, Drawer } from "@mantine/core";
-import { TableTr, Pagination } from "@mantine/core";
-
-import { IconDots, IconEye } from "@tabler/icons-react";
+import { Group, TableTd } from "@mantine/core";
+import { Flex, Box, Divider, Button } from "@mantine/core";
+import { Text, Drawer } from "@mantine/core";
+import { TableTr } from "@mantine/core";
 import { IconX, IconCheck, IconSearch } from "@tabler/icons-react";
 import { IconListTree } from "@tabler/icons-react";
 
@@ -31,8 +20,12 @@ import styles from "@/ui/styles/accounts.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 
-import { approvedBadgeColor, formatNumber } from "@/lib/utils";
-import { DebitRequest, useDebitRequests } from "@/lib/hooks/requests";
+import { formatNumber } from "@/lib/utils";
+import {
+  DebitRequest,
+  useCompanyWithDebitRequests,
+  useDebitRequests,
+} from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
@@ -50,7 +43,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 
 function Debit() {
   const searchParams = useSearchParams();
-  const [limit, setLimit] = useState<string | null>("100");
+  const [limit, setLimit] = useState<string | null>("10");
   const [active, setActive] = useState(1);
 
   const { status, endDate, date, business } = Object.fromEntries(
@@ -63,13 +56,15 @@ function Debit() {
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(business && { business }),
-    limit: parseInt(limit ?? "100", 10),
+    limit: parseInt(limit ?? "10", 10),
     page: active,
   };
 
   const { requests, revalidate } = useDebitRequests(queryParams);
 
-  const { businesses, loading } = useBusiness(queryParams, undefined, true);
+  // const { businesses, loading } = useBusiness(queryParams, undefined, true);
+  const { businesses, loading, meta } =
+    useCompanyWithDebitRequests(queryParams);
   const { push } = useRouter();
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
@@ -107,25 +102,6 @@ function Debit() {
     }
   };
 
-  const filteredBusinesses = useMemo(() => {
-    const hasAccounts = businesses.filter(
-      (business) => business.Accounts.length > 0
-    );
-
-    const bizWithDebCount = hasAccounts.map((business) => {
-      const updatedBusiness: Record<string, any> = { ...business };
-
-      const debitCount = business.Accounts.reduce((acc, account) => {
-        return acc + account.DebitRequests.length;
-      }, 0);
-
-      updatedBusiness["debitCount"] = debitCount;
-      return updatedBusiness;
-    });
-
-    return bizWithDebCount.filter((biz) => biz.debitCount > 0);
-  }, [businesses]);
-
   const handleAcceptRequest = async () => {
     if (!selectedRequest) return;
     setProcessing(true);
@@ -152,7 +128,7 @@ function Debit() {
   };
 
   const rows = filteredSearch(
-    filteredBusinesses,
+    businesses,
     ["name", "contactEmail"],
     debouncedSearch
   ).map((element, index) => (
@@ -162,7 +138,12 @@ function Debit() {
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element.name}</TableTd>
-      <TableTd className={styles.table__td}>{element.debitCount}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.Accounts.reduce(
+          (acc, curr) => acc + curr.debitRequestCount,
+          0
+        )}
+      </TableTd>
       <TableTd
         className={styles.table__td}
         tt="lowercase"
@@ -247,7 +228,7 @@ function Debit() {
         limit={limit}
         setActive={setActive}
         setLimit={setLimit}
-        total={1}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
       />
 
       <Drawer

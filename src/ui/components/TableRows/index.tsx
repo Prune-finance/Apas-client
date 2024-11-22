@@ -9,7 +9,6 @@ import dayjs from "dayjs";
 import { BadgeComponent } from "../Badge";
 import { useRouter } from "next/navigation";
 import { Inquiry } from "@/lib/hooks/inquiries";
-import { boolean } from "zod";
 import { PayoutTransactionRequest } from "@/lib/hooks/requests";
 import { BusinessData } from "@/lib/hooks/businesses";
 

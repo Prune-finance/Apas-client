@@ -2,9 +2,6 @@
 
 import {
   TransactionType,
-  TrxData,
-  useUserDefaultTransactions,
-  useUserTransactions,
   useUserTransactionsByIBAN,
 } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
@@ -20,7 +17,6 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import {
   Avatar,
-  Flex,
   Group,
   Skeleton,
   Stack,
@@ -30,7 +26,7 @@ import {
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
-import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
+import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -39,14 +35,10 @@ import { useState } from "react";
 import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
 import { useParams } from "next/navigation";
-import {
-  useSingleUserAccount,
-  useSingleUserAccountByIBAN,
-} from "@/lib/hooks/accounts";
+import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "@/ui/components/AmountGroup";
-import { useUserBusiness } from "@/lib/hooks/businesses";
 
 export default function AccountTransactions() {
   const { accountId } = useParams<{ accountId: string }>();

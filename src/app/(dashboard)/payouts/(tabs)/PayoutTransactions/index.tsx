@@ -12,8 +12,6 @@ import { Fragment, Suspense } from "react";
 import { AllPayoutTransactions } from "./(tabs)/All";
 import { CancelledPayoutTransactions } from "./(tabs)/Cancelled";
 
-import { PayoutTransactionDrawer } from "../../PayoutDrawer";
-
 const PayoutTrx = () => {
   return (
     <Fragment>

@@ -1,8 +1,7 @@
 "use client";
 import dayjs from "dayjs";
-import Cookies from "js-cookie";
 
-import React, { Suspense, useEffect, useMemo, useState } from "react";
+import React, { Suspense, useMemo, useState } from "react";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -10,28 +9,19 @@ import {
   Alert,
   Box,
   Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
   Modal,
   Paper,
-  Select,
   SimpleGrid,
   TabsPanel,
 } from "@mantine/core";
-import { UnstyledButton, rem, Text } from "@mantine/core";
+import { Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
 import styles from "./styles.module.scss";
 import {
-  IconDots,
   IconBrandLinktree,
   IconX,
-  IconSearch,
   IconCheck,
-  IconArrowDownLeft,
-  IconTrash,
   IconUsers,
   IconExclamationCircle,
   IconListTree,
@@ -42,7 +32,6 @@ import ModalComponent from "./modal";
 import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
 import { formatNumber, getUserType } from "@/lib/utils";
 
-import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useForm, zodResolver } from "@mantine/form";
 import {
@@ -66,11 +55,12 @@ import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import { parseError } from "@/lib/actions/auth";
 import { PendingAccounts } from "./PendingAccounts";
 import RequestModalComponent from "@/ui/components/Modal";
-import { AlertStore } from "@/lib/store/alert";
+import createAxiosInstance from "@/lib/axios";
 
 function Accounts() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const axios = createAxiosInstance("accounts");
 
   const { status, date, endDate, accountName, accountNumber, type, tab } =
     Object.fromEntries(searchParams.entries());
@@ -158,15 +148,11 @@ function Accounts() {
         requestForm.values;
       const { hasErrors } = requestForm.validate();
       if (hasErrors) return;
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/freeze`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/accounts/${id}/freeze`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       revalidate();
       handleSuccess("Action Completed", "Freeze request submitted");
@@ -187,15 +173,11 @@ function Accounts() {
       const { hasErrors } = requestForm.validate();
       if (hasErrors) return;
 
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/deactivate`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/accounts/${id}/deactivate`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       requestForm.reset();
       revalidate();
@@ -219,15 +201,11 @@ function Accounts() {
       const { hasErrors } = requestForm.validate();
       if (hasErrors) return;
 
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/activate`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/accounts/${id}/activate`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       requestForm.reset();
       revalidate();
@@ -248,15 +226,11 @@ function Accounts() {
       const { hasErrors } = requestForm.validate();
       if (hasErrors) return;
 
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/unfreeze`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/accounts/${id}/unfreeze`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       requestForm.reset();
       revalidate();
@@ -336,10 +310,7 @@ function Accounts() {
   const handleRequestAccess = async () => {
     setProcessing(true);
     try {
-      await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/account-issuance`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.get(`/accounts/account-issuance`);
       handleSuccess(
         "Request Sent",
         "You will receive as notification once your request has been approved"

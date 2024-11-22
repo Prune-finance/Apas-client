@@ -7,21 +7,11 @@ import {
   TransactionType,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
-import { BadgeComponent } from "@/ui/components/Badge";
-import { PrimaryBtn } from "@/ui/components/Buttons";
 import {
   DefaultAccountHead,
   SingleDefaultAccountBody,
 } from "@/ui/components/SingleAccount";
-import {
-  Flex,
-  Group,
-  Avatar,
-  Skeleton,
-  Stack,
-  Text,
-  Space,
-} from "@mantine/core";
+import { Space } from "@mantine/core";
 import { Suspense, useMemo, useState } from "react";
 import { useUserBusiness } from "@/lib/hooks/businesses";
 import { useSearchParams } from "next/navigation";

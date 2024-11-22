@@ -58,7 +58,7 @@ export default function Navbar() {
   const handleAdminLogout = async (redirect?: string) => {
     setProcessing(true);
     try {
-      await axios.get(`/api/auth/admin/logout`);
+      await fetch("/api/auth/admin/logout", { method: "GET" });
 
       // await clearSession();
 
@@ -273,8 +273,9 @@ export function UserNavbar() {
   const handleUserLogout = async (redirect?: string) => {
     setProcessing(true);
     try {
-      await axios.get(`/api/auth/logout`, {
-        withCredentials: true,
+      await fetch("/api/auth/logout", {
+        method: "GET",
+        credentials: "include",
       });
 
       // await clearSession();

@@ -9,17 +9,11 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import {
-  IconX,
-  IconArrowUpRight,
-  IconPointFilled,
-  IconCircleArrowDown,
-} from "@tabler/icons-react";
+import { IconArrowUpRight, IconCircleArrowDown } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
-import styles from "./styles.module.scss";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import Transaction from "@/lib/store/transaction";

@@ -1,8 +1,10 @@
-import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
-import Cookies from "js-cookie";
+import createAxiosInstance from "@/lib/axios";
 import { BusinessData } from "./businesses";
 import { IParams } from "../schema";
+
+const axios = createAxiosInstance("accounts");
+const payoutAxiosInstance = createAxiosInstance("payouts");
 
 export function useTransactions(id: string = "", customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
@@ -30,10 +32,10 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     try {
       setLoading(true);
       const path = id ? `${id}/transactions` : "transactions";
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${path}?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+
+      const { data } = await axios.get(`/admin/accounts/${path}`, {
+        params,
+      });
 
       setTransactions(data.data);
       setMeta(data.meta);
@@ -87,10 +89,10 @@ export function useSingleTransactions(
     try {
       setLoading(true);
       const path = id ? `${id}/transactions` : "transactions";
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/transactions/${id}/data?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+
+      const { data } = await axios.get(`/admin/transactions/${id}/data`, {
+        params,
+      });
 
       setTransaction(data.data);
       setMeta(data.meta);
@@ -134,9 +136,12 @@ export function useSingleCompanyTransactions(
     const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
       setLoading(true);
+
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/businesses/transactions/${trxId}/data?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/accounts/businesses/transactions/${trxId}/data`,
+        {
+          params,
+        }
       );
 
       setTransaction(data.data);
@@ -208,9 +213,12 @@ export function useBusinessTransactions(
     try {
       setLoading(true);
       const path = id ? `` : "transactions";
+
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/business/${id}/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/accounts/business/${id}/transactions`,
+        {
+          params,
+        }
       );
 
       setTransactions(data.data);
@@ -292,9 +300,10 @@ export function useBusinessAccountTransactions(
     try {
       setLoading(true);
       const path = id ? `` : "transactions";
+
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/business/company-account/${id}/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/accounts/business/company-account/${id}/transactions`,
+        { params }
       );
 
       setTransactions(data.data);
@@ -377,9 +386,10 @@ export function usePayoutAccountTransactions(
     try {
       setLoading(true);
       const path = id ? `` : "transactions";
+
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/business/payout-account/${id}/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/accounts/business/payout-account/${id}/transactions`,
+        { params }
       );
 
       setTransactions(data.data);
@@ -477,8 +487,8 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
       setLoading(true);
 
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/businesses/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/accounts/businesses/transactions`,
+        { params }
       );
 
       setTransactions(data.data);
@@ -554,17 +564,14 @@ export function usePayoutTransactions(customParams: IParams = {}) {
 
   async function fetchTrx() {
     // {{account-srv}}/v1/admin/accounts/payout/trx
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     try {
       setLoading(true);
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await payoutAxiosInstance.get(`/admin/transactions`, {
+        params,
+      });
 
       setTransactions(data.data);
       setMeta(data.meta);
@@ -652,16 +659,14 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
 
   async function fetchTrx() {
     setLoading(true);
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     try {
       const path = id ? `${id}/transactions` : "transactions";
-      const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${path}?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+
+      const { data: res } = await axios.get(`/accounts/${path}`, {
+        params,
+      });
 
       setTransactions(res.data);
       setMeta(res.meta);
@@ -735,15 +740,12 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
 
   async function fetchTrx() {
     setLoading(true);
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/company/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/accounts/company/transactions`, {
+        params,
+      });
 
       setTransactions(data.data);
       setMeta(data.meta);
@@ -816,17 +818,14 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
   } = obj;
   async function fetchTrx() {
     setLoading(true);
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     // {{payout-srv}}/v1/payout/transactions
 
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await payoutAxiosInstance.get(`/payout/transactions`, {
+        params,
+      });
 
       setTransactions(data.data);
       setMeta(data.meta);
@@ -876,14 +875,12 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
 
   async function fetchTrx() {
     setLoading(true);
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/number/${iban}/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/accounts/number/${iban}/transactions`,
+        { params }
       );
 
       setTransactions(data.data);
@@ -926,14 +923,12 @@ export function useUserTransactionsByIBAN(
 
   async function fetchTrx() {
     setLoading(true);
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/number/${iban}/transactions?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/accounts/number/${iban}/transactions`,
+        { params }
       );
 
       setTransactions(data.data);

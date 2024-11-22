@@ -58,7 +58,17 @@ export const AllPayoutTransactions = () => {
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, date, endDate, type, senderName, recipientName, recipientIban]);
+  }, [
+    status,
+    date,
+    endDate,
+    type,
+    senderName,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
   // const { transactions, loading, meta, revalidate } = usePayoutTransactions();
 
   const { transactions, revalidate, loading, meta } =

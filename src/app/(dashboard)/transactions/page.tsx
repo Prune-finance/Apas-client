@@ -5,7 +5,7 @@ import { Text } from "@mantine/core";
 
 import styles from "./styles.module.scss";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import TabsComponent from "@/ui/components/Tabs";
 import { AccountsTab } from "./(tabs)/Accounts";
 import { IssuedAccountsTab } from "./(tabs)/IssuedAccounts";

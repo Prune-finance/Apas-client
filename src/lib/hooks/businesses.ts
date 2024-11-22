@@ -320,7 +320,7 @@ export interface BusinessData {
   pricingPlanId: null | string;
   pricingPlan: PricingPlan | null;
   otherDocuments: Record<string, string>;
-  Accounts: { DebitRequests: { id: string }[] }[];
+  Accounts: Account[];
   Requests: { type: string; id: string }[];
   contactFirstName: string;
   contactIdType: string;
@@ -333,6 +333,12 @@ export interface BusinessData {
   lastLogin: Date;
   contactSignup: Date | null;
   contactCountryCode: string;
+  accountRequestCount?: number;
+}
+
+export interface Account {
+  id: string;
+  debitRequestCount: number;
 }
 
 export interface Document {

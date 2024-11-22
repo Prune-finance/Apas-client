@@ -1,6 +1,8 @@
-import axios from "axios";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("accounts");
 
 export function useUserBalances(id: string = "") {
   const [balance, setBalance] = useState<number>(0);
@@ -9,10 +11,7 @@ export function useUserBalances(id: string = "") {
   async function fetchBalance() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/balances`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/accounts/balances`);
 
       setBalance(data.data);
     } catch (error) {

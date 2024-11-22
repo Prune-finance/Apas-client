@@ -49,13 +49,13 @@ dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { useUserSingleInquiry } from "@/lib/hooks/inquiries";
-import axios from "axios";
-import Cookies from "js-cookie";
+
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
 import { FileUploadModal } from "@/ui/components/TicketChat/FileUploadModal";
+import createAxiosInstance from "@/lib/axios";
 
 export default function InquiryPage() {
   const { id } = useParams<{ id: string }>();
@@ -69,6 +69,8 @@ export default function InquiryPage() {
   const { inquiry, loading, revalidate } = useUserSingleInquiry(id);
   const { handleError, handleSuccess } = useNotification();
   const resetFileInputRef = useRef<() => void>(null);
+  const axios = createAxiosInstance("payouts");
+  const authAxios = createAxiosInstance("auth");
 
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLDivElement,
@@ -100,16 +102,12 @@ export default function InquiryPage() {
       const { text, file, extension } = form.values;
       const type = getMsgType(text, file);
 
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/inquiries/${id}/message`,
-        {
-          type,
-          ...(file && { file }),
-          ...(extension && { extension }),
-          ...(text && { text }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.put(`/payout/inquiries/${id}/message`, {
+        type,
+        ...(file && { file }),
+        ...(extension && { extension }),
+        ...(text && { text }),
+      });
 
       form.reset();
       setFile(null);
@@ -125,11 +123,7 @@ export default function InquiryPage() {
   const handleInquiryStatus = async (type: "close" | "open") => {
     setProcessing(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/inquiries/${id}/${type}`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/payout/inquiries/${id}/${type}`, {});
 
       const title = `${camelCaseToTitleCase(
         inquiry?.type.toLowerCase() ?? ""
@@ -154,11 +148,7 @@ export default function InquiryPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data: res } = await authAxios.post(`/auth/upload`, formData);
 
       form.setFieldValue("file", res.data.url);
       form.setFieldValue("extension", file.type);

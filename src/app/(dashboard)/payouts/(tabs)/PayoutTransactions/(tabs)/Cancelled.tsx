@@ -50,8 +50,16 @@ export const CancelledPayoutTransactions = () => {
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
-  }, [date, endDate, type, senderName, recipientName, recipientIban]);
-  // const { transactions, loading, meta, revalidate } = usePayoutTransactions();
+  }, [
+    date,
+    endDate,
+    type,
+    senderName,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
 
   const { transactions, revalidate, loading, meta } =
     useUserPayoutTransactions(param);

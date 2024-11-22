@@ -7,31 +7,21 @@ import { formatNumber } from "@/lib/utils";
 import {
   Drawer,
   Flex,
-  Box,
   Divider,
   Text,
   Stack,
   Group,
-  Skeleton,
   ScrollArea,
 } from "@mantine/core";
-import { IconCheck, IconCircleArrowDown } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { BadgeComponent } from "@/ui/components/Badge";
-import { PrimaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
-import {
-  ReceiptDetails,
-  TransactionReceipt,
-} from "@/ui/components/TransactionReceipt";
+import { ReceiptDetails } from "@/ui/components/TransactionReceipt";
 import { ReactNode, useRef } from "react";
-import { handlePdfDownload } from "@/lib/actions/auth";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
-import { AmountGroup } from "@/ui/components/AmountGroup";
-import Transaction from "@/lib/store/transaction";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;

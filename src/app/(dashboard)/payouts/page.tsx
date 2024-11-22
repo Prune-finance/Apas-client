@@ -11,8 +11,7 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import axios from "axios";
-import Cookies from "js-cookie";
+
 import { useUserBusiness } from "@/lib/hooks/businesses";
 import TabsComponent from "@/ui/components/Tabs";
 import { PayoutAccount } from "./(tabs)/Account";
@@ -23,7 +22,7 @@ import { LiveDateModal } from "../settings/LiveDateModal";
 import { AlertStore } from "@/lib/store/alert";
 import { PayoutTransactions } from "./(tabs)/PayoutTransactions";
 import PayoutRequests from "./(tabs)/Requests";
-import { set } from "zod";
+import createAxiosInstance from "@/lib/axios";
 
 function PayoutTrx() {
   const searchParams = useSearchParams();
@@ -41,6 +40,8 @@ function PayoutTrx() {
 
   const { business, meta, revalidate, loading } = useUserBusiness();
   const { close: closeAlert, opened: openedAlert } = AlertStore();
+  const axios = createAxiosInstance("accounts");
+  const authAxios = createAxiosInstance("auth");
 
   useEffect(() => {
     setTabValue(tab);
@@ -50,10 +51,7 @@ function PayoutTrx() {
     setProcessing(true);
 
     try {
-      await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/payout/request`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.get(`/accounts/payout/request`);
       revalidate();
       handleSuccess(
         "Request Sent",
@@ -73,11 +71,9 @@ function PayoutTrx() {
 
     setProcessingLKReq(true);
     try {
-      const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets/live/request`,
-        { date: liveDate },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data: res } = await authAxios.post(`/key/secrets/live/request`, {
+        date: liveDate,
+      });
 
       close();
       handleSuccess(

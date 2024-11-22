@@ -14,7 +14,6 @@ import Filter from "@/ui/components/Filter";
 import {
   Meta,
   PayoutTransactionRequest,
-  usePayoutTransactionRequests,
   useUserPayoutTransactionRequests,
 } from "@/lib/hooks/requests";
 import Transaction from "@/lib/store/transaction";
@@ -72,11 +71,7 @@ export const AllPayoutRequests = () => {
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
-  // {
-  //     limit: parseInt(limit ?? "10", 10),
-  //     page: active,
-  //     not: "PENDING",
-  //   }
+
   const { requests, loading, meta } =
     useUserPayoutTransactionRequests(queryParams);
 

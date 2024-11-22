@@ -13,14 +13,12 @@ import { Dispatch, Fragment, SetStateAction, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
-import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
-import Cookies from "js-cookie";
+import createAxiosInstance from "@/lib/axios";
 
 import {
   Meta,
   PayoutTransactionRequest,
-  usePayoutTransactionRequests,
   useUserPayoutTransactionRequests,
 } from "@/lib/hooks/requests";
 import { PayoutTransactionRequestDrawer } from "./drawer";
@@ -59,6 +57,7 @@ export const PendingPayoutRequests = () => {
     useDisclosure(false);
 
   const searchParams = useSearchParams();
+  const axios = createAxiosInstance("payouts");
 
   const {
     endDate,
@@ -104,13 +103,9 @@ export const PendingPayoutRequests = () => {
 
     setProcessing(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/transaction/requests/${data.id}/${type}`,
-        {
-          ...(type === "reject" && { reason }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/transaction/requests/${data.id}/${type}`, {
+        ...(type === "reject" && { reason }),
+      });
 
       revalidate();
       close();

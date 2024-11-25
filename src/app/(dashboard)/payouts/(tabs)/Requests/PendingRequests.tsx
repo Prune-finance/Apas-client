@@ -194,23 +194,7 @@ export const PendingPayoutRequests = () => {
         selectedRequest={data}
         opened={opened}
         close={close}
-      >
-        <Group justify="end" pr={28} mt={20}>
-          <SecondaryBtn
-            icon={IconX}
-            text="Reject"
-            fw={600}
-            action={openReject}
-          />
-
-          <PrimaryBtn
-            icon={IconCheck}
-            text="Approve"
-            fw={600}
-            action={openApprove}
-          />
-        </Group>
-      </PayoutTransactionRequestDrawer>
+      />
 
       <ModalComponent
         color="#FEF3F2"

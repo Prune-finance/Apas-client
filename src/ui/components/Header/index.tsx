@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Divider,
   TextInput,
@@ -43,6 +45,7 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import EmptyTable from "../EmptyTable";
 import { NotificationStore } from "@/lib/store/notification";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
   const { user, setUser } = User();
@@ -248,6 +251,13 @@ export function UserHeader() {
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
   const { setMeta } = NotificationStore();
+  const { refresh } = useRouter();
+
+  const _stage =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("stage")
+      : "TEST";
+  const [stage, setStage] = useState(_stage ?? "TEST");
 
   const { loading, notifications, meta, revalidate } = useUserNotifications({
     status: "unread",
@@ -313,8 +323,6 @@ export function UserHeader() {
     }
   }, [user]);
 
-  const [stage, setStage] = useState("live");
-
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   return (
     <header className={styles.header}>
@@ -327,15 +335,6 @@ export function UserHeader() {
         />
       </div>
 
-      {/* <div className={styles.stage__trigger}>
-        <Text
-          fz={14}
-          fw={500}
-          tt="capitalize"
-          c={stage === "live" ? "green" : "dimmed"}
-        >
-          {stage} Mode
-        </Text> */}
       <Switch
         color="green"
         c={stage === "LIVE" ? "green" : "dimmed"}
@@ -345,15 +344,16 @@ export function UserHeader() {
         defaultChecked={stage === "LIVE"}
         size="xs"
         tt="capitalize"
-        label={`${stage.toLowerCase()} Mode`}
+        label={`${(stage ?? "test").toLowerCase()} Mode`}
         styles={{ label: { fontSize: 14 } }}
         onChange={(event) => {
           const newStage = event.currentTarget.checked ? "LIVE" : "TEST";
           setStage(newStage);
           localStorage.setItem("stage", newStage);
+          // window.location.reload();
+          refresh();
         }}
       />
-      {/* </div> */}
 
       <div className={styles.notification}>
         <Divider orientation="vertical" h={26} />

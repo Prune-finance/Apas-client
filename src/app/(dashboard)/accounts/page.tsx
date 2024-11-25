@@ -112,6 +112,10 @@ function Accounts() {
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const stage =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("stage")
+      : "TEST";
 
   const [openedAlert, { open: openAlert, close: closeAlert }] =
     useDisclosure(true);
@@ -366,20 +370,23 @@ function Accounts() {
           </TabsPanel>
 
           <TabsPanel value={tabs[1].value}>
-            {!statusLoading && !approvedRequest && openedAlert && (
-              <Alert
-                variant="light"
-                color="#D1B933"
-                mb={28}
-                mt={30}
-                radius={8}
-                style={{ border: "1px solid #D1B933" }}
-                withCloseButton
-                onClose={closeAlert}
-                icon={<IconInfoCircle />}
-                title="Please know that you are in test mode. To go live, request for Live keys by clicking the “request live keys” button below."
-              ></Alert>
-            )}
+            {stage !== "LIVE" &&
+              !statusLoading &&
+              !approvedRequest &&
+              openedAlert && (
+                <Alert
+                  variant="light"
+                  color="#D1B933"
+                  mb={28}
+                  mt={30}
+                  radius={8}
+                  style={{ border: "1px solid #D1B933" }}
+                  withCloseButton
+                  onClose={closeAlert}
+                  icon={<IconInfoCircle />}
+                  title="Please know that you are in test mode. To go live, request for Live keys by clicking the “request live keys” button below."
+                ></Alert>
+              )}
             <TabsComponent
               tabs={issuedAccountTabs}
               mt={30}

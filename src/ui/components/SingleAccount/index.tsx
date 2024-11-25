@@ -92,6 +92,7 @@ import PreviewState from "./previewState";
 import SuccessModal from "../SuccessModal";
 // import SuccessModalImage from "@/assets/success-modal-image.png";
 import PendingModalImage from "@/assets/pending-image.png";
+import createAxiosInstance from "@/lib/axios";
 
 type Param = { id: string };
 interface Props {
@@ -922,6 +923,7 @@ export const DefaultAccountHead = ({
   const [sectionState, setSectionState] = useState("");
   const [moneySent, setMoneySent] = useState(0);
   const [receiverName, setReceiverName] = useState("");
+  const axios = createAxiosInstance("payouts");
 
   const matches = useMediaQuery("(max-width: 768px)");
 
@@ -968,24 +970,18 @@ export const DefaultAccountHead = ({
         narration,
       } = requestForm;
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/send-money`,
-        {
-          amount,
-          destinationIBAN,
-          destinationBIC,
-          destinationBank,
-          bankAddress,
-          destinationCountry,
-          reference: crypto.randomUUID(),
-          beneficiaryFullName: `${firstName} ${lastName}`,
-          invoice,
-          narration,
-        },
-        {
-          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
-        }
-      );
+      const { data } = await axios.post(`/payout/send-money`, {
+        amount,
+        destinationIBAN,
+        destinationBIC,
+        destinationBank,
+        bankAddress,
+        destinationCountry,
+        reference: crypto.randomUUID(),
+        beneficiaryFullName: `${firstName} ${lastName}`,
+        invoice,
+        narration,
+      });
       setMoneySent(Number(amount));
       setReceiverName(`${firstName} ${lastName}`);
       closePreview();
@@ -1013,24 +1009,18 @@ export const DefaultAccountHead = ({
         narration,
         reference,
       } = companyRequestForm;
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/send-money`,
-        {
-          amount,
-          destinationIBAN,
-          destinationBIC,
-          destinationBank,
-          bankAddress,
-          destinationCountry,
-          reference: crypto.randomUUID(),
-          beneficiaryFullName: companyName,
-          invoice,
-          narration,
-        },
-        {
-          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
-        }
-      );
+      const { data } = await axios.post(`/payout/send-money`, {
+        amount,
+        destinationIBAN,
+        destinationBIC,
+        destinationBank,
+        bankAddress,
+        destinationCountry,
+        reference: crypto.randomUUID(),
+        beneficiaryFullName: companyName,
+        invoice,
+        narration,
+      });
       setMoneySent(Number(amount));
       setReceiverName(companyName);
       closePreview();

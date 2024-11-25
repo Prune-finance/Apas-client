@@ -45,7 +45,7 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import EmptyTable from "../EmptyTable";
 import { NotificationStore } from "@/lib/store/notification";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function Header() {
   const { user, setUser } = User();
@@ -251,7 +251,8 @@ export function UserHeader() {
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
   const { setMeta } = NotificationStore();
-  const { refresh } = useRouter();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const _stage =
     typeof window !== "undefined"
@@ -350,8 +351,10 @@ export function UserHeader() {
           const newStage = event.currentTarget.checked ? "LIVE" : "TEST";
           setStage(newStage);
           localStorage.setItem("stage", newStage);
-          // window.location.reload();
-          refresh();
+          window.location.reload();
+          // router.refresh();
+          // router.push(pathname);
+          // window.history.replaceState(null, "", pathname);
         }}
       />
 

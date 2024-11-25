@@ -1,3 +1,5 @@
+"use client";
+
 import {
   TransactionType,
   useSingleCompanyTransactions,
@@ -66,7 +68,8 @@ export const PayoutTransactionDrawer = ({
   const [openedCancel, { open: openCancel, close: closeCancel }] =
     useDisclosure(false);
   const axios = createAxiosInstance("payouts");
-  const stage = localStorage.getItem("stage");
+  const stage =
+    typeof window !== "undefined" ? window.localStorage.getItem("stage") : "";
 
   const [inquiryType, setInquiryType] = useState<
     "recall" | "query" | "trace"

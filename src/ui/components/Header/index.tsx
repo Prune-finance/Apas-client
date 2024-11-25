@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Divider,
   TextInput,
@@ -251,7 +253,10 @@ export function UserHeader() {
   const { setMeta } = NotificationStore();
   const { refresh } = useRouter();
 
-  const _stage = localStorage.getItem("stage");
+  const _stage =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("stage")
+      : "TEST";
   const [stage, setStage] = useState(_stage ?? "TEST");
 
   const { loading, notifications, meta, revalidate } = useUserNotifications({

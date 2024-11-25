@@ -8,6 +8,7 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   Alert,
   Box,
+  Flex,
   Group,
   Modal,
   Paper,
@@ -56,6 +57,7 @@ import { parseError } from "@/lib/actions/auth";
 import { PendingAccounts } from "./PendingAccounts";
 import RequestModalComponent from "@/ui/components/Modal";
 import createAxiosInstance from "@/lib/axios";
+import { SendMoney } from "@/ui/components/SingleAccount/(tabs)/SendMoney";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -100,6 +102,8 @@ function Accounts() {
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
   const [debitOpened, { open: debitOpen, close: debitClose }] =
+    useDisclosure(false);
+  const [sendMoneyOpened, { open: sendMoneyOpen, close: sendMoneyClose }] =
     useDisclosure(false);
   const [
     requestAccessOpened,
@@ -333,16 +337,22 @@ function Accounts() {
       {/* <Breadcrumbs items={[{ title: "Accounts", href: "/accounts" }]} /> */}
 
       <Paper className={styles.table__container}>
-        <div
-        // className={styles.container__header}
-        >
-          <Text fz={18} fw={600}>
-            Accounts
-          </Text>
-          <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
-            Here’s an overview of your accounts
-          </Text>
-        </div>
+        <Flex justify="space-between" align="center">
+          <div>
+            <Text fz={18} fw={600}>
+              Accounts
+            </Text>
+            <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
+              Here’s an overview of your accounts
+            </Text>
+          </div>
+
+          <PrimaryBtn
+            text={tab === tabs[1].value ? "Debit Request" : "Send Money"}
+            fw={600}
+            action={tab === tabs[1].value ? debitOpen : sendMoneyOpen}
+          />
+        </Flex>
 
         <TabsComponent
           tabs={tabs}
@@ -472,6 +482,12 @@ function Accounts() {
             </TabsComponent>
           </TabsPanel>
         </TabsComponent>
+
+        <SendMoney
+          opened={sendMoneyOpened}
+          closeMoney={sendMoneyClose}
+          account={account}
+        />
 
         <Modal
           size="xl"

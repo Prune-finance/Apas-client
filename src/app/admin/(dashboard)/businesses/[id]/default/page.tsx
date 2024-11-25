@@ -7,6 +7,7 @@ import {
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
   TransactionType,
+  useBusinessAccountTransactions,
   useBusinessTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
@@ -41,6 +42,7 @@ export default function BusinessDefaultAccount() {
     endDate,
     recipientName,
     recipientIban,
+    accountId,
   } = Object.fromEntries(searchParams.entries());
 
   const customParams = useMemo(() => {
@@ -79,7 +81,7 @@ export default function BusinessDefaultAccount() {
     loading: loadingTrx,
     transactions,
     meta,
-  } = useBusinessTransactions(params.id, customParams);
+  } = useBusinessAccountTransactions(accountId ?? account?.id, customParams);
 
   return (
     <main>
@@ -106,10 +108,13 @@ export default function BusinessDefaultAccount() {
           open={open}
           business={business}
           loadingBiz={loadingBiz}
+          admin
         />
 
         <SingleDefaultAccountBody
           account={account}
+          accountID={params?.id}
+          location="admin-default"
           transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}
@@ -117,22 +122,14 @@ export default function BusinessDefaultAccount() {
           business={business}
           admin
           isDefault
-          // trxMeta={{ in: 0, out: 0, totalAmount: 3000, total: 17 }}
-          trxMeta={
-            meta as unknown as {
-              in: number;
-              out: number;
-              totalAmount: number;
-              total: number;
-            }
-          }
+          trxMeta={meta}
         >
           <PaginationComponent
             active={active}
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+            total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
           />
         </SingleDefaultAccountBody>
       </Paper>

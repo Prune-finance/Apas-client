@@ -1,10 +1,20 @@
-import { Drawer, Group, TableTd, TableTr } from "@mantine/core";
+import {
+  Box,
+  Drawer,
+  Flex,
+  Group,
+  Modal,
+  TableTd,
+  TableTr,
+  Text,
+} from "@mantine/core";
 import {
   IconListTree,
   IconArrowUpRight,
   IconCircleArrowDown,
+  IconCalendarMonth,
 } from "@tabler/icons-react";
-import { SecondaryBtn } from "../../Buttons";
+import { PrimaryBtn, SecondaryBtn } from "../../Buttons";
 import InfoCards from "../../Cards/InfoCards";
 import EmptyTable from "../../EmptyTable";
 import { SearchInput, SelectBox, TextBox } from "../../Inputs";
@@ -27,7 +37,7 @@ import {
   IssuedTransactionTableRows,
   PayoutTransactionTableRows,
 } from "../../TableRows";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "../../Pagination";
@@ -36,6 +46,13 @@ import form from "@/app/auth/login/form";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "../../Filter";
 import { useForm, zodResolver } from "@mantine/form";
+import DownloadStatement from "@/ui/components/DownloadStatement";
+import { handlePdfDownload, handlePdfStatement } from "@/lib/actions/auth";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { DatePickerInput } from "@mantine/dates";
+import useNotification from "@/lib/hooks/notification";
+import { notifications } from "@mantine/notifications";
 
 interface Meta {
   out: number;
@@ -53,6 +70,64 @@ interface Props {
   // limit: string | null;
   // setLimit: Dispatch<SetStateAction<string | null>>;
   children: React.ReactNode;
+  accountID?: string;
+  location?: string;
+}
+
+export interface BalanceDetail {
+  id: string;
+  type: "DEBIT" | "CREDIT";
+  amount: number;
+  balance: number;
+  accountId: string;
+  companyAccountId: string | null;
+  payoutAccountId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AccountDetails {
+  id: string;
+  iban: string;
+  country: string;
+  accountName: string;
+  createdAt: string;
+}
+
+export interface DownloadStatementData {
+  accountId: string;
+  amount: number;
+  balance: number;
+  description: string;
+  companyAccountId: string | null;
+  createdAt: string; // ISO date string
+  deletedAt: string | null; // ISO date string or null
+  id: string;
+  narration: string | null;
+  payoutAccountId: string | null;
+  reference: string;
+  senderBic: string;
+  senderIban: string;
+  senderName: string;
+  status: "PENDING" | "COMPLETED" | "FAILED"; // assuming possible values based on context
+  type: "DEBIT" | "CREDIT"; // assuming possible transaction types
+  updatedAt: string; // ISO date string
+}
+
+export interface downloadStatementMeta {
+  summary: {
+    openingBalance: BalanceDetail;
+    closingBalance: BalanceDetail;
+    range: string;
+    moneyIn: number;
+    moneyOut: number;
+    address: string;
+  };
+  accountDetails: AccountDetails;
+  out: number;
+  in: number;
+  totalAmount: number;
+  total: number;
 }
 
 export const Transactions = ({
@@ -61,17 +136,33 @@ export const Transactions = ({
   payout,
   meta,
   children,
+  accountID,
+  location,
 }: // limit,
 // setLimit,
 // active,
 // setActive,
 Props) => {
+  const pdfRef = useRef<HTMLDivElement>(null);
+
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
   const { data, opened, close } = Transaction();
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const [openedFilter, { toggle }] = useDisclosure(false);
+  const [openedPreview, { open: openPreview, close: closePreview }] =
+    useDisclosure(false);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
+  const { handleSuccess, handleError, handleInfo } = useNotification();
+
+  const [downloadData, setDownloadData] = useState<DownloadStatementData[]>([]);
+  const [downloadMeta, setDownloadMeta] =
+    useState<downloadStatementMeta | null>(null);
+  const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -106,6 +197,77 @@ Props) => {
       formatted: true,
     },
   ];
+
+  const handleDownloadAccountStatement = async () => {
+    console.log(location);
+
+    if (!dateRange[0] || !dateRange[1]) {
+      return handleInfo(
+        "Account Statement",
+        "Please select a valid date range"
+      );
+    }
+
+    notifications.clean();
+    setLoadingStatement(true);
+
+    const [startDate, endDate] = dateRange.map((date) =>
+      dayjs(date).format("YYYY-MM-DD")
+    );
+    const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
+    const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
+
+    // Define the possible URLs based on location
+    const urlMap: { [key: string]: string } = {
+      payout: `${baseUrl}/payouts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "admin-account": `${baseUrl}/admin/accounts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`,
+    };
+
+    // Use the default URL if location is undefined or not in urlMap
+    const url =
+      urlMap[location ?? "default"] ||
+      `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`;
+
+    try {
+      const { data: res } = await axios.get(url, { headers });
+
+      if (!res?.data?.length) {
+        return handleInfo(
+          "Account Statement",
+          "No transactions found for the selected date range"
+        );
+      }
+
+      setDownloadData(res.data);
+      setDownloadMeta(res.meta);
+
+      // Simulate delay for processing
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      handlePdfStatement(pdfRef);
+      closePreview();
+      handleSuccess(
+        "Account Statement",
+        "Account statement downloaded successful"
+      );
+      setDateRange([null, null]);
+    } catch (error) {
+      console.error("Error fetching account statement:", error);
+      handleError(
+        "Account Statement",
+        error instanceof Error
+          ? error.message
+          : "error downloading account statement"
+      );
+    } finally {
+      setLoadingStatement(false);
+    }
+  };
+
   return (
     <>
       <InfoCards title="Overview" details={overviewDetails} />
@@ -124,8 +286,10 @@ Props) => {
           <SecondaryBtn
             text="Download Statement"
             icon={IconCircleArrowDown}
-            style={{ cursor: "not-allowed" }}
+            // style={{ cursor: "not-allowed" }}
             fw={600}
+            // action={() => handlePdfStatement(pdfRef)}
+            action={openPreview}
           />
         </Group>
       </Group>
@@ -194,6 +358,65 @@ Props) => {
       )}
 
       {payout && <PayoutTransactionDrawer />}
+
+      <Modal
+        opened={openedPreview}
+        onClose={closePreview}
+        size={"35%"}
+        centered
+        withCloseButton={true}
+      >
+        <Flex
+          w="100%"
+          align="center"
+          justify="center"
+          direction="column"
+          px={30}
+        >
+          <Text fz={18} fw={500} c="#000">
+            Download Statement
+          </Text>
+
+          <DatePickerInput
+            placeholder="Select Date Range"
+            valueFormat="YYYY-MM-DD"
+            value={dateRange}
+            onChange={(value: [Date | null, Date | null]) =>
+              setDateRange(value)
+            }
+            size="xs"
+            w="100%"
+            h={44}
+            styles={{ input: { height: "48px" } }}
+            mt={12}
+            type="range"
+            allowSingleDateInRange
+            rightSection={<IconCalendarMonth size={20} />}
+            numberOfColumns={2}
+            clearable
+            disabled={loadingStatement}
+          />
+
+          <PrimaryBtn
+            action={handleDownloadAccountStatement}
+            loading={loadingStatement}
+            text="Submit"
+            mt={22}
+            ml="auto"
+            mb={38}
+            w="100%"
+            h={44}
+          />
+        </Flex>
+      </Modal>
+
+      <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
+        <DownloadStatement
+          receiptRef={pdfRef}
+          data={downloadData}
+          meta={downloadMeta}
+        />
+      </Box>
     </>
   );
 };

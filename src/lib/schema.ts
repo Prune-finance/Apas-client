@@ -174,7 +174,7 @@ export const contactPerson = {
 
 export const newBusiness = {
   name: "",
-  domain: "",
+  domain: "https://",
   country: null,
   legalEntity: null,
   pricingPlan: null,
@@ -587,6 +587,8 @@ export const FilterValues = {
   beneficiaryName: "",
   destinationIban: "",
   destinationBank: "",
+  firstName: "",
+  lastName: "",
 };
 
 export const FilterSchema = z.object({
@@ -610,6 +612,8 @@ export const FilterSchema = z.object({
   beneficiaryName: z.string().nullable(),
   destinationIban: z.string().nullable(),
   destinationBank: z.string().nullable(),
+  firstName: z.string().nullable(),
+  lastName: z.string().nullable(),
 });
 
 export type FilterType = z.infer<typeof FilterSchema>;
@@ -641,6 +645,8 @@ export interface IParams {
   beneficiaryName?: string;
   destinationIban?: string;
   destinationBank?: string;
+  firstName?: string;
+  lastName?: string;
 }
 
 export const removeDirectorValues = {

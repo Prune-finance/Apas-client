@@ -1,7 +1,10 @@
-import axios from "axios";
+// import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
 import { IParams } from "../schema";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
 
 export function useAdmins(customParams: IParams = {}) {
   const [users, setUsers] = useState<AdminData[]>([]);
@@ -15,25 +18,24 @@ export function useAdmins(customParams: IParams = {}) {
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.name && { name: customParams.name }),
+      ...(customParams.firstName && { firstName: customParams.firstName }),
+      ...(customParams.lastName && { lastName: customParams.lastName }),
       ...(customParams.email && { email: customParams.email }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
-  const { limit, date, endDate, status, name, email, page } = obj;
+  const { limit, date, endDate, status, firstName, lastName, email, page } =
+    obj;
 
   async function fetchUsers() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get("/admin/admins", {
+        params,
+      });
 
       setUsers(data.data);
       setMeta(data.meta);
@@ -52,7 +54,7 @@ export function useAdmins(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, date, endDate, status, name, email, page]);
+  }, [limit, date, endDate, status, firstName, lastName, email, page]);
 
   return { loading, users, revalidate, meta };
 }
@@ -65,9 +67,92 @@ export function useSingleAdmin(id: string) {
   async function fetchUsers() {
     setLoading(true);
     try {
+      const { data } = await axios.get(`/admin/admins/${id}`);
+
+      setUser(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchUsers();
+
+  useEffect(() => {
+    fetchUsers();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, user, revalidate };
+}
+
+export function useBusinessUsers(customParams: IParams = {}, id: string) {
+  const [users, setUsers] = useState<AdminData[]>([]);
+  const [meta, setMeta] = useState<{ total: number }>();
+
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.firstName && { firstName: customParams.firstName }),
+      ...(customParams.lastName && { lastName: customParams.lastName }),
+      ...(customParams.email && { email: customParams.email }),
+      ...(customParams.page && { page: customParams.page }),
+    };
+  }, [customParams]);
+
+  const { limit, date, endDate, status, firstName, lastName, email, page } =
+    obj;
+
+  async function fetchUsers() {
+    const params = new URLSearchParams(obj as Record<string, string>);
+
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/admin/businesses/${id}/users`, {
+        params,
+      });
+
+      setUsers(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchUsers();
+
+  useEffect(() => {
+    fetchUsers();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [limit, date, endDate, status, firstName, lastName, email, page]);
+
+  return { loading, users, revalidate, meta };
+}
+
+export function useSingleBusinessUser(businessId: string, userId: string) {
+  const [user, setUser] = useState<AdminData>();
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchUsers() {
+    setLoading(true);
+    try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/admins/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/businesses/${businessId}/users/${userId}`
       );
 
       setUser(data.data);
@@ -111,16 +196,11 @@ export function useUsers(customParams: IParams = {}) {
   const { limit, page, date, endDate, status, email } = obj;
 
   async function fetchUsers() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/auth/users`, { params });
 
       setUsers(data.data);
       setMeta(data.meta);
@@ -153,6 +233,7 @@ export interface AdminData {
   firstName: string;
   lastName: string;
   role: string;
+  lastLogin: Date | null;
   lastLogIn: Date | null;
   status: "ACTIVE" | "INACTIVE" | "INVITE_PENDING";
 }

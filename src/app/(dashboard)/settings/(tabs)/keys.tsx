@@ -1,6 +1,4 @@
 "use client";
-import Cookies from "js-cookie";
-
 import {
   Alert,
   Badge,
@@ -18,7 +16,6 @@ import {
 } from "@mantine/core";
 import { IconAB2, IconCheck, IconInfoCircle } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { useParams } from "next/navigation";
 
 import styles from "../styles.module.scss";
@@ -31,6 +28,10 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { matches, useForm, UseFormReturnType } from "@mantine/form";
 import { LiveDateModal } from "../LiveDateModal";
 import { notifications } from "@mantine/notifications";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
+const axiosAccounts = createAxiosInstance("accounts");
 
 export default function Keys() {
   const [keys, setKeys] = useState<Key[]>([]);
@@ -73,10 +74,7 @@ export default function Keys() {
   const fetchBusinessSecrets = async () => {
     setLoadingKey(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/key/secrets`);
 
       setKeys(data.data);
     } catch (error) {
@@ -88,10 +86,7 @@ export default function Keys() {
 
   const fetchWebHooks = async () => {
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/webhooks/dashboard`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axiosAccounts.get(`/accounts/webhooks/dashboard`);
 
       setWebHook(data.data);
       const eventURL = data.data.find(
@@ -111,11 +106,10 @@ export default function Keys() {
     if (webHookForm.validate().hasErrors) return;
     setProcessingWebHook(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/webhooks/dashboard`,
-        { eventURL, callbackURL },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axiosAccounts.patch(`/accounts/webhooks/dashboard`, {
+        eventURL,
+        callbackURL,
+      });
       handleSuccess("Webhooks Updated", "Webhooks updated successfully");
       await fetchWebHooks();
     } catch (error) {
@@ -129,10 +123,7 @@ export default function Keys() {
   const resetSecrets = async () => {
     setProcessing(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets/regenerate`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/key/secrets/regenerate`);
 
       setKeys(data.data);
       handleSuccess(
@@ -162,11 +153,9 @@ export default function Keys() {
 
     setProcessingKeyRequest(true);
     try {
-      const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/key/secrets/live/request`,
-        { date: liveDate },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data: res } = await axios.post(`/key/secrets/live/request`, {
+        date: liveDate,
+      });
 
       closeModal();
       handleSuccess(

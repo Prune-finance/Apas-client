@@ -31,7 +31,8 @@ interface User {
   lastName: string;
   email: string;
   createdAt: Date;
-  company?: { name: string };
+  company?: { name: string; id: string };
+  companyId: string;
 }
 
 export default User;

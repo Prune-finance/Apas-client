@@ -1,3 +1,5 @@
+"use client";
+
 import {
   TransactionType,
   useSingleCompanyTransactions,
@@ -45,9 +47,8 @@ import { InquiryModal } from "./InquiryModal";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 import useNotification from "@/lib/hooks/notification";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
+import createAxiosInstance from "@/lib/axios";
 
 interface TransactionDrawerProps {
   revalidate?: () => void;
@@ -66,6 +67,9 @@ export const PayoutTransactionDrawer = ({
   const [openedModal, { open, close: closeModal }] = useDisclosure(false);
   const [openedCancel, { open: openCancel, close: closeCancel }] =
     useDisclosure(false);
+  const axios = createAxiosInstance("payouts");
+  const stage =
+    typeof window !== "undefined" ? window.localStorage.getItem("stage") : "";
 
   const [inquiryType, setInquiryType] = useState<
     "recall" | "query" | "trace"
@@ -181,9 +185,8 @@ export const PayoutTransactionDrawer = ({
     setProcessing(true);
     try {
       const { data: res } = await axios.patch(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions/${data?.id}/cancel`,
-        { reason: cancelReason },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/payout/transactions/${data?.id}/cancel`,
+        { reason: cancelReason }
       );
 
       revalidate && revalidate();
@@ -215,8 +218,6 @@ export const PayoutTransactionDrawer = ({
 
     return { hasQuery, hasTrace, hasRecall };
   }, [data?.Inquiries]);
-
-  console.log(data);
 
   return (
     <Drawer
@@ -392,7 +393,7 @@ export const PayoutTransactionDrawer = ({
                 data.status === "PENDING") && (
                 <></> */}
 
-        {!isAdmin && (
+        {!isAdmin && stage === "LIVE" && (
           <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
             {data && data.status === "CONFIRMED" && (
               <>
@@ -444,11 +445,6 @@ export const PayoutTransactionDrawer = ({
                 text={`Download ${
                   data?.status === "CANCELLED" ? "Receipt" : ""
                 }`}
-                // text={`Download ${
-                //   !isAfter24Hours(data?.createdAt ?? new Date())
-                //     ? "Receipt"
-                //     : ""
-                // }`}
                 fullWidth={data?.status === "CANCELLED"}
                 // fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
                 fw={600}

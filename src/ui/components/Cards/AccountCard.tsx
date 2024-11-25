@@ -146,10 +146,16 @@ export const AccountCard = ({
           <Skeleton h={10} w={100} />
         )}
       </Group> */}
-      <Group gap={2} align="center" mt={13} c="var(--prune-text-gray-900)">
+      <Group
+        gap={2}
+        align="center"
+        justify="end"
+        mt={13}
+        c="var(--prune-text-gray-900)"
+      >
         {link && (
           <Link href={link}>
-            <SeeAll name="See More" />
+            <SeeAll name="See More" fontSize={14} />
           </Link>
         )}
       </Group>

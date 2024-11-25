@@ -9,6 +9,7 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
   TransactionType,
   useBusinessTransactions,
+  usePayoutAccountTransactions,
   usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
@@ -43,6 +44,7 @@ export default function BusinessPayoutAccount() {
     endDate,
     recipientName,
     recipientIban,
+    accountId,
   } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
@@ -81,7 +83,8 @@ export default function BusinessPayoutAccount() {
     loading: loadingTrx,
     transactions,
     meta,
-  } = usePayoutTransactions(param);
+  } = usePayoutAccountTransactions(accountId ?? account?.id, param);
+
   return (
     <main>
       <Breadcrumbs
@@ -107,10 +110,13 @@ export default function BusinessPayoutAccount() {
           open={open}
           business={business}
           loadingBiz={loadingBiz}
+          admin
         />
 
         <SingleDefaultAccountBody
           account={account}
+          accountID={params?.id}
+          location="admin-payout"
           transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}
@@ -125,7 +131,7 @@ export default function BusinessPayoutAccount() {
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+            total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
           />
         </SingleDefaultAccountBody>
       </Paper>

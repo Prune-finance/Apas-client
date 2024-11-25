@@ -1,6 +1,4 @@
 "use client";
-import Cookies from "js-cookie";
-
 import {
   Group,
   Menu,
@@ -44,7 +42,6 @@ import {
   newAdmin,
   validateNewAdmin,
 } from "@/lib/schema";
-import axios from "axios";
 import { Suspense, useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -60,6 +57,10 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { BadgeComponent } from "@/ui/components/Badge";
 import ModalComponent from "@/ui/components/Modal";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
 
 function Users() {
   const searchParams = useSearchParams();
@@ -124,11 +125,7 @@ function Users() {
         return;
       }
       const method = isEdit ? "patch" : "post";
-      await axios[method](
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/add`,
-        { email: form.values.email },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios[method](`/auth/users/add`, { email: form.values.email });
 
       revalidate();
       close();
@@ -156,11 +153,7 @@ function Users() {
     try {
       const path = status === "ACTIVE" ? "deactivate" : "activate";
 
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/users/${id}/${path}`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/auth/users/${id}/${path}`, {});
 
       revalidate();
       handleSuccess(
@@ -199,20 +192,12 @@ function Users() {
         onClick={() => handleRowClick(element)}
         style={{ cursor: "pointer" }}
       >
-        <TableTd
-          className={styles.table__td}
-          tt="lowercase"
-          style={{ wordBreak: "break-word" }}
-          w="20%"
-        >
+        <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
           {element.email}
         </TableTd>
-        <TableTd className={`${styles.table__td}`}>
-          {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-        </TableTd>
-        <TableTd className={`${styles.table__td}`}>
-          {dayjs(element.updatedAt).fromNow()}
-          {/* {dayjs(element.updatedAt).format("ddd DD MMM YYYY")} */}
+        <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
+        <TableTd>
+          {element.lastLogIn ? dayjs(element.lastLogIn).fromNow() : "Nil"}
         </TableTd>
 
         <TableTd>
@@ -224,10 +209,7 @@ function Users() {
           />
         </TableTd>
 
-        <TableTd
-          className={`${styles.table__td}`}
-          onClick={(e) => e.stopPropagation()}
-        >
+        <TableTd onClick={(e) => e.stopPropagation()}>
           <Menu shadow="md" width={150}>
             <MenuTarget>
               <UnstyledButton>

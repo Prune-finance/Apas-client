@@ -14,7 +14,7 @@ import {
   Text,
 } from "@mantine/core";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { useSingleUserAccount } from "@/lib/hooks/accounts";
 import { TransactionType, useUserTransactions } from "@/lib/hooks/transactions";
@@ -28,8 +28,6 @@ import ModalComponent from "../modal";
 import useNotification from "@/lib/hooks/notification";
 import { useForm, zodResolver } from "@mantine/form";
 import { validateRequest } from "@/lib/schema";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import {
   IconBrandLinktree,
@@ -39,11 +37,13 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
+import createAxiosInstance from "@/lib/axios";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const axios = createAxiosInstance("accounts");
 
   const searchParams = useSearchParams();
 
@@ -109,15 +109,11 @@ export default function Account() {
         requestForm.values;
       const { hasErrors } = requestForm.validate();
       if (hasErrors) return;
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${params.id}/${type}`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/accounts/${params.id}/${type}`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       const message =
         type === "freeze"
@@ -268,11 +264,13 @@ export default function Account() {
 
       <SingleAccountBody
         account={account}
+        accountID={params?.id}
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
         trxMeta={txrMeta}
+        location="issued-account"
       >
         <PaginationComponent
           active={active}
@@ -281,7 +279,6 @@ export default function Account() {
           limit={limit}
           total={Math.ceil((txrMeta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
-        <Text>Pagination here</Text>
       </SingleAccountBody>
 
       <Modal

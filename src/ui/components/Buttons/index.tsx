@@ -12,6 +12,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { FaCircleChevronLeft } from "react-icons/fa6";
+import styles from "./button.module.scss";
 
 interface Props extends ButtonProps {
   link?: string;
@@ -81,6 +82,7 @@ export const PrimaryBtn = ({
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       href={link}
+      onClick={action}
       {...props}
     >
       {text}
@@ -128,8 +130,10 @@ export const SecondaryBtn = ({
       fw={500}
       leftSection={Icon && <Icon size={14} />}
       component={Link}
+      onClick={action}
       href={link}
       type={type}
+      className={styles.secondary__btn}
       {...props}
     >
       {text}
@@ -146,6 +150,7 @@ export const SecondaryBtn = ({
         e.stopPropagation();
         action && action();
       }}
+      className={styles.secondary__btn}
       type={type}
       {...props}
     >

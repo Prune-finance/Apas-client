@@ -1,9 +1,11 @@
 import { Meta } from "./transactions";
-import axios from "axios";
-import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
 import { IParams } from "../schema";
 import { custom } from "zod";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("accounts");
 
 export function useAccounts(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
@@ -44,11 +46,7 @@ export function useAccounts(customParams: IParams = {}) {
       obj as Record<string, string>
     ).toString();
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts?${params}`,
-        // { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/accounts?${params}`);
 
       setMeta(data.meta);
       setAccounts(data.data);
@@ -79,10 +77,7 @@ export function useSingleAccount(id: string) {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/accounts/${id}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -114,10 +109,7 @@ export function useBusinessDefaultAccount(id: string) {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${id}/default-account`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/company/${id}/default-account`);
 
       setAccount(data.data);
     } catch (error) {
@@ -149,10 +141,7 @@ export function useBusinessPayoutAccount(id: string) {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${id}/payout-account`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/company/${id}/payout-account`);
 
       setAccount(data.data);
     } catch (error) {
@@ -202,10 +191,7 @@ export function usePayoutAccount(customParams: IParams = {}) {
         obj as Record<string, string>
       ).toString();
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/payout?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/accounts/payout?${params}`);
 
       setAccounts(data.data);
       setMeta(data.meta);
@@ -275,10 +261,7 @@ export function useUserAccounts(customParams: IParams = {}) {
 
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/accounts/dashboard?${params}`);
 
       setMeta(data.meta);
       setAccounts(data.data);
@@ -294,8 +277,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     // &status=PENDING
     try {
       const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests/all?type=ACCOUNT_ISSUANCE`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/accounts/dashboard/requests/all?type=ACCOUNT_ISSUANCE`
       );
 
       setIssuanceRequests(res?.data);
@@ -329,6 +311,75 @@ export function useUserAccounts(customParams: IParams = {}) {
   };
 }
 
+export function useValidateAccount({
+  iban,
+  bic,
+}: {
+  iban: string;
+  bic: string;
+}) {
+  const [validateDetails, setValidatedDetails] = useState<ValidatedIban | null>(
+    null
+  );
+  const [loading, setLoading] = useState(false);
+
+  async function validateAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/accounts/validate/dashboard`);
+      setValidatedDetails(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    validateAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [iban, bic]);
+
+  return {
+    loading,
+    validateDetails,
+  };
+}
+
+export async function validateAccount({
+  iban,
+  bic,
+}: {
+  iban: string;
+  bic: string;
+}): Promise<ValidatedIban | null> {
+  try {
+    const { data } = await axios.post(`/accounts/validate/dashboard`, {
+      iban,
+      bic,
+    });
+    return data.data;
+  } catch (error) {
+    return null;
+  }
+}
+
+export interface ValidatedIban {
+  swiftCodes: string;
+  bankName: string;
+  bankBranch: string;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  countryCode: string;
+  zipCode: string;
+  supportPaymentMethod: string;
+}
+
 interface MetaAccount {
   hasPendingActivate: boolean;
   hasPendingDeactivate: boolean;
@@ -343,10 +394,7 @@ export function useSingleUserAccount(id: string) {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/${id}/dashboard`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/accounts/${id}/dashboard`);
 
       setAccount(data.data);
       setMeta(data.meta);
@@ -380,10 +428,7 @@ export function useSingleAccountByIBAN(iban: string) {
     setLoading(true);
 
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/number/${iban}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/accounts/number/${iban}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -415,10 +460,7 @@ export function useSingleUserAccountByIBAN(iban: string) {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/number/${iban}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/accounts/number/${iban}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -450,10 +492,7 @@ export function useUserDefaultAccount() {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/default`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/accounts/default`);
 
       setAccount(data.data);
     } catch (error) {
@@ -485,10 +524,7 @@ export function useUserDefaultPayoutAccount() {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/payout`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/accounts/payout`);
 
       setAccount(data.data);
     } catch (error) {

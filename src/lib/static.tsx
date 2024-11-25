@@ -26,6 +26,7 @@ import dayjs from "dayjs";
 import Link from "next/link";
 import businessStyles from "@/ui/styles/business.module.scss";
 import { TransactionType } from "./hooks/transactions";
+import { Notification } from "./hooks/notifications";
 
 export const AdminMainLinks = [
   {

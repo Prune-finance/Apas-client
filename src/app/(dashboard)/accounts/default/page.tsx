@@ -7,21 +7,11 @@ import {
   TransactionType,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
-import { BadgeComponent } from "@/ui/components/Badge";
-import { PrimaryBtn } from "@/ui/components/Buttons";
 import {
   DefaultAccountHead,
   SingleDefaultAccountBody,
 } from "@/ui/components/SingleAccount";
-import {
-  Flex,
-  Group,
-  Avatar,
-  Skeleton,
-  Stack,
-  Text,
-  Space,
-} from "@mantine/core";
+import { Space } from "@mantine/core";
 import { Suspense, useMemo, useState } from "react";
 import { useUserBusiness } from "@/lib/hooks/businesses";
 import { useSearchParams } from "next/navigation";
@@ -103,6 +93,7 @@ function Account() {
 
       <SingleDefaultAccountBody
         account={account}
+        location="own-account"
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}
@@ -114,7 +105,7 @@ function Account() {
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={Math.ceil(trxMeta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+          total={Math.ceil((trxMeta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         />
       </SingleDefaultAccountBody>
     </main>

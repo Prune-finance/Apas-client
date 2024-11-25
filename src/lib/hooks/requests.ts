@@ -1,10 +1,12 @@
-import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
+import createAxiosInstance from "@/lib/axios";
 
-import Cookies from "js-cookie";
 import { IParams } from "../schema";
+import { BusinessData } from "./businesses";
 
-// query: string = "";
+const acctAxiosInstance = createAxiosInstance("accounts");
+const authAxiosInstance = createAxiosInstance("auth");
+const payoutAxiosInstance = createAxiosInstance("payouts");
 
 export function useRequests(customParams: IParams = {}, id: string = "") {
   const [requests, setRequests] = useState<RequestData[]>([]);
@@ -16,8 +18,11 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.accountName && {
-        accountName: customParams.accountName,
+      ...(customParams.firstName && {
+        firstName: customParams.firstName,
+      }),
+      ...(customParams.lastName && {
+        lastName: customParams.lastName,
       }),
       ...(customParams.country && { country: customParams.country }),
       ...(customParams.accountType && {
@@ -32,7 +37,8 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     limit,
     date,
     endDate,
-    accountName,
+    firstName,
+    lastName,
     country,
     accountType,
     status,
@@ -45,14 +51,11 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     try {
       const path = id ? `business/${id}/requests` : "requests";
       // const status = query ? `?status=${query}` : "";
-      const params = new URLSearchParams(
-        obj as Record<string, string>
-      ).toString();
+      const params = new URLSearchParams(obj as Record<string, string>);
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/${path}?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await acctAxiosInstance.get(`/admin/${path}`, {
+        params,
+      });
 
       setMeta(data.meta);
       setRequests(data.data);
@@ -73,7 +76,17 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     return () => {
       // Any cleanup code can go here
     };
-  }, [date, endDate, page, limit, accountName, country, accountType, status]);
+  }, [
+    date,
+    endDate,
+    page,
+    limit,
+    lastName,
+    firstName,
+    country,
+    accountType,
+    status,
+  ]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -122,14 +135,11 @@ export function useAllRequests(customParams: IParams = {}) {
     setLoading(true);
     try {
       // const status = query ? `?status=${query}` : "";
-      const params = new URLSearchParams(
-        obj as Record<string, string>
-      ).toString();
+      const params = new URLSearchParams(obj as Record<string, string>);
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/all?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await acctAxiosInstance.get(`/admin/requests/all`, {
+        params,
+      });
 
       setMeta(data.meta);
       setRequests(data.data);
@@ -189,14 +199,13 @@ export function useAllCompanyRequests(
     //  `${id}/requests`;: fetch all requests for a specific business
     setLoading(true);
     try {
-      // const status = query ? `?status=${query}` : "";
-      const params = new URLSearchParams(
-        obj as Record<string, string>
-      ).toString();
+      const params = new URLSearchParams(obj as Record<string, string>);
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${businessId}/requests/all?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      const { data } = await acctAxiosInstance.get(
+        `/admin/business/${businessId}/requests/all`,
+        {
+          params,
+        }
       );
 
       setMeta(data.meta);
@@ -265,13 +274,13 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
   async function fetchAccounts() {
     setLoading(true);
     try {
-      const params = new URLSearchParams(
-        obj as Record<string, string>
-      ).toString();
+      const params = new URLSearchParams(obj as Record<string, string>);
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/transaction/requests?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      const { data } = await payoutAxiosInstance.get(
+        `/admin/transaction/requests`,
+        {
+          params,
+        }
       );
 
       setMeta(data.meta);
@@ -351,13 +360,13 @@ export function useUserPayoutTransactionRequests(customParams: IParams = {}) {
   async function fetchAccounts() {
     setLoading(true);
     try {
-      const params = new URLSearchParams(
-        obj as Record<string, string>
-      ).toString();
+      const params = new URLSearchParams(obj as Record<string, string>);
 
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transaction/requests?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      const { data } = await payoutAxiosInstance.get(
+        `/payout/transaction/requests`,
+        {
+          params,
+        }
       );
 
       setMeta(data.meta);
@@ -402,10 +411,7 @@ export function useSingleRequest(id: string) {
   async function fetchRequest() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await acctAxiosInstance.get(`/admin/requests/${id}`);
 
       setRequest(data.data);
     } catch (error) {
@@ -443,25 +449,38 @@ export function useUserRequests(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
-      ...(customParams.accountName && {
-        accountName: customParams.accountName,
+      ...(customParams.firstName && {
+        firstName: customParams.firstName,
+      }),
+      ...(customParams.lastName && {
+        lastName: customParams.lastName,
       }),
       ...(customParams.country && { country: customParams.country }),
     };
   }, [customParams]);
-  const { date, limit, accountName, country, endDate, status, type, page } =
-    obj;
+
+  const {
+    date,
+    limit,
+    lastName,
+    firstName,
+    country,
+    endDate,
+    status,
+    type,
+    page,
+  } = obj;
+
   async function fetchAccounts() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
     try {
-      // const status = query ? `?status=${query}` : "";
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/dashboard/requests?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      const { data } = await acctAxiosInstance.get(
+        `/accounts/dashboard/requests`,
+        {
+          params,
+        }
       );
 
       setMeta(data.meta);
@@ -481,7 +500,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [date, limit, accountName, country, endDate, status, type, page]);
+  }, [date, limit, firstName, lastName, country, endDate, status, type, page]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -493,10 +512,7 @@ export function useSingleUserRequest(id: string) {
   async function fetchRequest() {
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/requests/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await acctAxiosInstance.get(`/requests/${id}`);
 
       setRequest(data.data);
     } catch (error) {
@@ -537,15 +553,12 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
   }, [customParams]);
 
   async function fetchAccounts() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await payoutAxiosInstance.get(`/admin/debit/requests`, {
+        params,
+      });
 
       setRequests(data.data);
     } catch (error) {
@@ -585,15 +598,12 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
   }, [customParams]);
 
   async function fetchAccounts() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/requests/payout?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await acctAxiosInstance.get(`/admin/requests/payout`, {
+        params,
+      });
 
       setRequests(data.data);
       setMeta(data.meta);
@@ -624,6 +634,104 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
   return { loading, requests, revalidate, meta };
 }
 
+export function useCompanyWithAccountRequests(customParams: IParams = {}) {
+  const [businesses, setBusinesses] = useState<BusinessData[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.business && { business: customParams.business }),
+    };
+  }, [customParams]);
+
+  async function fetchBusinessWithDebitReq() {
+    const params = new URLSearchParams(obj as Record<string, string>);
+    setLoading(true);
+    try {
+      const { data } = await authAxiosInstance.get(
+        `/admin/businesses/account-requests`,
+        {
+          params,
+        }
+      );
+
+      setBusinesses(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchBusinessWithDebitReq();
+
+  useEffect(() => {
+    fetchBusinessWithDebitReq();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page, obj.business]);
+
+  return { loading, businesses, revalidate, meta };
+}
+
+export function useCompanyWithDebitRequests(customParams: IParams = {}) {
+  const [businesses, setBusinesses] = useState<BusinessData[]>([]);
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.business && { business: customParams.business }),
+    };
+  }, [customParams]);
+
+  async function fetchBusinessWithDebitReq() {
+    const params = new URLSearchParams(obj as Record<string, string>);
+    setLoading(true);
+    try {
+      const { data } = await authAxiosInstance.get(
+        `/admin/businesses/debit-requests`,
+        {
+          params,
+        }
+      );
+
+      setBusinesses(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => await fetchBusinessWithDebitReq();
+
+  useEffect(() => {
+    fetchBusinessWithDebitReq();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page, obj.business]);
+
+  return { loading, businesses, revalidate, meta };
+}
+
 export function useCompanyDebitRequests(
   id: string,
   customParams: IDebitRequest = {}
@@ -636,19 +744,26 @@ export function useCompanyDebitRequests(
     return {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.status && { status: customParams.status }),
     };
   }, [customParams]);
 
   async function fetchAccounts() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/${id}/requests?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      // const { data } = await axios.get(
+      //   `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/${id}/requests?${params}`,
+      //   { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      // );
+
+      const { data } = await payoutAxiosInstance.get(
+        `/admin/debit/${id}/requests`,
+        {
+          params,
+        }
       );
 
       setRequests(data.data);
@@ -668,7 +783,7 @@ export function useCompanyDebitRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status]);
+  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page]);
 
   return { loading, requests, revalidate, meta };
 }
@@ -693,13 +808,13 @@ export function useLiveKeyRequests(customParams: IParams = {}) {
   async function fetchAccounts() {
     setLoading(true);
     try {
-      const params = new URLSearchParams(
-        obj as Record<string, string>
-      ).toString();
+      const params = new URLSearchParams(obj as Record<string, string>);
 
-      const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      const { data: res } = await authAxiosInstance.get(
+        `/admin/keys/requests`,
+        {
+          params,
+        }
       );
 
       setRequests(res.data);
@@ -732,9 +847,8 @@ export function useSingleLiveKeyRequests(id: string) {
   async function fetchAccounts() {
     setLoading(true);
     try {
-      const { data: res } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/keys/requests/${id}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      const { data: res } = await authAxiosInstance.get(
+        `/admin/keys/requests/${id}`
       );
 
       setRequests(res.data);
@@ -779,17 +893,18 @@ export function useCompanyRequests(
   }, [customParams]);
 
   async function fetchAccounts() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
 
     try {
       const path = all ? "/all" : "";
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${id}/requests${path}?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+
+      const { data } = await acctAxiosInstance.get(
+        `/admin/business/${id}/requests${path}`,
+        {
+          params,
+        }
       );
 
       setRequests(data.data);
@@ -862,17 +977,14 @@ export function useUserDebitRequests(customParams: IParams = {}) {
   const { limit, date, endDate, status, page, accountName } = obj;
 
   async function fetchRequests() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
+    const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
 
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/debit/requests?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await payoutAxiosInstance.get(`/payout/debit/requests`, {
+        params,
+      });
 
       setRequests(data.data);
       setMeta(data.meta);
@@ -1019,6 +1131,12 @@ export interface RequestMeta {
   inactiveAccounts: number;
   total: number;
   companyName: string;
+}
+
+export interface Meta {
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface PayoutAccount {

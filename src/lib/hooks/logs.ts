@@ -1,7 +1,9 @@
-import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import { AdminData } from "./admins";
-import Cookies from "js-cookie";
+
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("auth");
 
 interface IParams {
   limit?: number;
@@ -35,10 +37,7 @@ export function useLogs(customParams: ILogs = {}) {
 
     setLoading(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/logs/all?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/logs/all?${params}`);
       setLogs(data.data);
       setMeta(data.meta);
     } catch (error) {

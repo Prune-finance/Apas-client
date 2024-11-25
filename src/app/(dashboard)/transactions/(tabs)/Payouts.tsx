@@ -8,7 +8,7 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { Group, TabsPanel } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
@@ -66,7 +66,7 @@ export const PayoutsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: (meta?.in || 0) - (meta?.out || 0),
+      value: meta?.totalAmount || 0,
       formatted: true,
       currency: "EUR",
     },
@@ -84,40 +84,9 @@ export const PayoutsTab = () => {
     },
     {
       title: "Total Transactions",
-      value: transactions?.length,
+      value: meta?.total || 0,
     },
   ];
-
-  // const infoDetails = [
-  //   {
-  //     title: "Total Balance",
-  //     value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
-  //     formatted: true,
-  //     currency: "EUR",
-  //   },
-  //   {
-  //     title: "Money In",
-  //     value:
-  //       transactions
-  //         .filter((trx) => trx.type === "CREDIT")
-  //         .reduce((prv, curr) => prv + curr.amount, 0) || 0,
-  //     formatted: true,
-  //     currency: "EUR",
-  //   },
-  //   {
-  //     title: "Money Out",
-  //     value:
-  //       transactions
-  //         .filter((trx) => trx.type === "DEBIT")
-  //         .reduce((prv, curr) => prv + curr.amount, 0) || 0,
-  //     formatted: true,
-  //     currency: "EUR",
-  //   },
-  //   {
-  //     title: "Total Transactions",
-  //     value: transactions.length,
-  //   },
-  // ];
 
   const searchProps = ["senderIban", "recipientIban", "amount"];
 
@@ -190,7 +159,7 @@ export const PayoutsTab = () => {
         text="When a transaction is made, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil([].length / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

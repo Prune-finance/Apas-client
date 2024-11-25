@@ -26,7 +26,6 @@ import { useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
-import { date } from "zod";
 
 interface Props {
   transactions: TransactionType[];
@@ -71,7 +70,17 @@ export const AllPayoutTransactions = () => {
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, date, endDate, type, senderName, recipientName, recipientIban]);
+  }, [
+    status,
+    date,
+    endDate,
+    type,
+    senderName,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
   const { transactions, loading, meta, revalidate } =
     usePayoutTransactions(param);
 

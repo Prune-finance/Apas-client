@@ -12,6 +12,7 @@ import "@mantine/charts/styles.css";
 import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "@/ui/styles/globals.scss";
+import { NotificationProvider } from "@/ui/components/NotificationProvider";
 
 export const switzer = localFont({
   src: "../assets/fonts/Switzer-Regular.woff2",
@@ -34,7 +35,11 @@ export default function RootLayout({
       </head>
       <body className={switzer.className}>
         <MantineProvider>
-          <Notifications position="top-center" limit={1} />
+          <NotificationProvider />
+          {/* <Notifications
+            position={"top-center"}
+            //  limit={1}
+          /> */}
           {children}
         </MantineProvider>
       </body>

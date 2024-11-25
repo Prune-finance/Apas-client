@@ -1,12 +1,8 @@
 import {
   TransactionType,
-  TrxData,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { filteredSearch } from "@/lib/search";
-import { frontendPagination, formatNumber } from "@/lib/utils";
-import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -14,43 +10,28 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import {
-  Flex,
-  Group,
-  Stack,
-  TableTd,
-  TableTr,
-  TabsPanel,
-  Text,
-} from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
-import { IconArrowUpRight, IconListTree } from "@tabler/icons-react";
+import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 import { useState } from "react";
-import styles from "../styles.module.scss";
-import { TransactionDrawer } from "../drawer";
 import { OwnAccountTableHeaders } from "@/lib/static";
-import { AmountGroup } from "@/ui/components/AmountGroup";
 import { useSearchParams } from "next/navigation";
 import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
-import Transaction from "@/lib/store/transaction";
 
 export const AccountsTab = () => {
   const searchParams = useSearchParams();
 
   const [opened, { toggle }] = useDisclosure(false);
-  const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
-    useDisclosure(false);
+
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
-  const [selectedRequest, setSelectedRequest] =
-    useState<TransactionType | null>(null);
 
   const { status, date, endDate, type, recipientName, recipientIban } =
     Object.fromEntries(searchParams.entries());
@@ -77,7 +58,7 @@ export const AccountsTab = () => {
   const infoDetails = [
     {
       title: "Total Balance",
-      value: (meta?.in || 0) - (meta?.out || 0),
+      value: meta?.totalAmount || 0,
       formatted: true,
       currency: "EUR",
     },
@@ -95,58 +76,11 @@ export const AccountsTab = () => {
     },
     {
       title: "Total Transactions",
-      value: transactions?.length,
+      value: meta?.total || 0,
     },
   ];
 
   const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
-
-  const rows = frontendPagination(
-    filteredSearch(transactions, searchProps, debouncedSearch),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
-    <TableTr
-      key={element?.id}
-      onClick={() => {
-        setSelectedRequest(element);
-        openDrawer();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd className={styles.table__td}>
-        <Stack>
-          <Text fz={12} fw={400}>
-            {element?.recipientName}
-          </Text>
-          <Text fz={10} fw={400}>
-            {element.recipientIban}
-          </Text>
-        </Stack>
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <AmountGroup type={element?.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd>{formatNumber(element?.amount, true, "EUR")}</TableTd>
-      <TableTd w="20%" className={styles.table__td}>
-        {element?.centrolinkRef}
-      </TableTd>
-
-      <TableTd className={styles.table__td}>
-        <Stack gap={0}>
-          <Text fz={12} fw={400}>
-            {dayjs(element?.createdAt).format("Do MMMM, YYYY")}
-          </Text>
-          <Text fz={10} fw={400}>
-            {dayjs(element?.createdAt).format("hh:mm a")}
-          </Text>
-        </Stack>
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element?.status} />
-      </TableTd>
-    </TableTr>
-  ));
 
   return (
     <>
@@ -213,7 +147,7 @@ export const AccountsTab = () => {
         text="When a transaction is recorded, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

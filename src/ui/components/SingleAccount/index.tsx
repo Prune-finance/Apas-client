@@ -66,9 +66,9 @@ import {
 } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import axios from "axios";
 import { useForm, zodResolver } from "@mantine/form";
 import { validateRequest } from "@/lib/schema";
@@ -92,6 +92,7 @@ import PreviewState from "./previewState";
 import SuccessModal from "../SuccessModal";
 // import SuccessModalImage from "@/assets/success-modal-image.png";
 import PendingModalImage from "@/assets/pending-image.png";
+import createAxiosInstance from "@/lib/axios";
 
 type Param = { id: string };
 interface Props {
@@ -595,6 +596,8 @@ interface SingleAccountProps {
   isDefault?: boolean;
   trxMeta: Meta | null;
   children: React.ReactNode;
+  accountID?: string;
+  location?: string;
 }
 
 export const SingleAccountBody = ({
@@ -609,6 +612,8 @@ export const SingleAccountBody = ({
   isDefault,
   trxMeta,
   children,
+  accountID,
+  location,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -616,9 +621,7 @@ export const SingleAccountBody = ({
     Currency: "EUR",
     ...(business && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
-      account?.updatedAt
-    ).format("Do MMMM, YYYY"),
+    "Last Activity": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
@@ -665,10 +668,12 @@ export const SingleAccountBody = ({
         <TabsPanel value={tabs[1].value}>
           <Transactions
             transactions={transactions}
+            location={location ?? "admin-account"}
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}
             children={children}
+            accountID={accountID}
           />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
@@ -688,6 +693,7 @@ export const SingleAccountBody = ({
 interface SingleDefaultAccountProps
   extends Omit<SingleAccountProps, "account"> {
   account: DefaultAccount | null;
+  location?: string;
 }
 
 export const SingleDefaultAccountBody = ({
@@ -702,6 +708,7 @@ export const SingleDefaultAccountBody = ({
   isDefault,
   trxMeta,
   children,
+  location,
 }: SingleDefaultAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -709,9 +716,7 @@ export const SingleDefaultAccountBody = ({
     Currency: "EUR",
     ...(business && !payout && { "Created By": business?.name }),
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    [payout || admin ? "Last Activity" : "Last Seen"]: dayjs(
-      business?.lastLogin
-    ).format("Do MMMM, YYYY"),
+    "Last Activity": dayjs(business?.lastLogin).format("Do MMMM, YYYY"),
     "Account Type": payout ? (
       <Text fw={600} fz={14} c="var(--prune-primary-800)">
         Payout Account
@@ -759,11 +764,13 @@ export const SingleDefaultAccountBody = ({
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
+            accountID={account?.id}
             transactions={transactions}
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}
             children={children}
+            location={location ?? "default"}
           />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
@@ -916,6 +923,9 @@ export const DefaultAccountHead = ({
   const [sectionState, setSectionState] = useState("");
   const [moneySent, setMoneySent] = useState(0);
   const [receiverName, setReceiverName] = useState("");
+  const axios = createAxiosInstance("payouts");
+
+  const matches = useMediaQuery("(max-width: 768px)");
 
   const [requestForm, setRequestForm] = useState<RequestForm>({
     firstName: "",
@@ -960,24 +970,18 @@ export const DefaultAccountHead = ({
         narration,
       } = requestForm;
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/send-money`,
-        {
-          amount,
-          destinationIBAN,
-          destinationBIC,
-          destinationBank,
-          bankAddress,
-          destinationCountry,
-          reference: crypto.randomUUID(),
-          beneficiaryFullName: `${firstName} ${lastName}`,
-          invoice,
-          narration,
-        },
-        {
-          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
-        }
-      );
+      const { data } = await axios.post(`/payout/send-money`, {
+        amount,
+        destinationIBAN,
+        destinationBIC,
+        destinationBank,
+        bankAddress,
+        destinationCountry,
+        reference: crypto.randomUUID(),
+        beneficiaryFullName: `${firstName} ${lastName}`,
+        invoice,
+        narration,
+      });
       setMoneySent(Number(amount));
       setReceiverName(`${firstName} ${lastName}`);
       closePreview();
@@ -1005,24 +1009,18 @@ export const DefaultAccountHead = ({
         narration,
         reference,
       } = companyRequestForm;
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/send-money`,
-        {
-          amount,
-          destinationIBAN,
-          destinationBIC,
-          destinationBank,
-          bankAddress,
-          destinationCountry,
-          reference: crypto.randomUUID(),
-          beneficiaryFullName: companyName,
-          invoice,
-          narration,
-        },
-        {
-          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
-        }
-      );
+      const { data } = await axios.post(`/payout/send-money`, {
+        amount,
+        destinationIBAN,
+        destinationBIC,
+        destinationBank,
+        bankAddress,
+        destinationCountry,
+        reference: crypto.randomUUID(),
+        beneficiaryFullName: companyName,
+        invoice,
+        narration,
+      });
       setMoneySent(Number(amount));
       setReceiverName(companyName);
       closePreview();
@@ -1124,7 +1122,7 @@ export const DefaultAccountHead = ({
         </Group>
 
         <Flex gap={10}>
-          {!payout && (
+          {!payout && !admin && (
             <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
@@ -1179,7 +1177,7 @@ export const DefaultAccountHead = ({
       <Modal
         opened={opened}
         onClose={closeMoney}
-        size={"35%"}
+        size={matches ? "90%" : 630}
         withCloseButton={false}
       >
         <SendMoneyModal

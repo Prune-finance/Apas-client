@@ -5,16 +5,19 @@ import { Text } from "@mantine/core";
 
 import styles from "./styles.module.scss";
 
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import TabsComponent from "@/ui/components/Tabs";
 import { AccountsTab } from "./(tabs)/Accounts";
 import { IssuedAccountsTab } from "./(tabs)/IssuedAccounts";
 import { PayoutsTab } from "./(tabs)/Payouts";
 import Transaction from "@/lib/store/transaction";
 import { TransactionDrawer } from "./drawer";
+import { useSearchParams } from "next/navigation";
 
 function AccountTrx() {
   const { opened, close, data } = Transaction();
+  const searchParam = useSearchParams();
+  const tab = searchParam.get("tab");
 
   return (
     <main>
@@ -30,14 +33,22 @@ function AccountTrx() {
           </Stack>
         </div>
 
-        <TabsComponent tabs={tabs} mt={32} keepMounted={false}>
-          <TabsPanel value="Own Account">
+        <TabsComponent
+          tabs={tabs}
+          defaultValue={
+            tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
+              ?.value ?? tabs[0].value
+          }
+          mt={32}
+          keepMounted={false}
+        >
+          <TabsPanel value="own-account">
             <AccountsTab />
           </TabsPanel>
-          <TabsPanel value="Issued Accounts">
+          <TabsPanel value="issued-accounts">
             <IssuedAccountsTab />
           </TabsPanel>
-          <TabsPanel value="Payouts">
+          <TabsPanel value="payouts">
             <PayoutsTab />
           </TabsPanel>
         </TabsComponent>
@@ -57,7 +68,7 @@ export default function AccountTrxSuspense() {
 }
 
 const tabs = [
-  { value: "Own Account" },
-  { value: "Issued Accounts" },
-  { value: "Payouts" },
+  { title: "Own Account", value: "own-account" },
+  { title: "Issued Accounts", value: "issued-accounts" },
+  { title: "Payouts", value: "payouts" },
 ];

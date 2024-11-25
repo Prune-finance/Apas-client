@@ -34,7 +34,7 @@ function TabsContainer() {
       mt={24}
       tt="capitalize"
       fz={12}
-      // keepMounted={false}
+      keepMounted={false}
     >
       <TabsPanel value={tabs[0].value}>
         <Debit />

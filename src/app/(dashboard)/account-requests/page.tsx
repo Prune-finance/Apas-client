@@ -1,7 +1,6 @@
 "use client";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import Cookies from "js-cookie";
 
 dayjs.extend(advancedFormat);
 
@@ -30,7 +29,6 @@ import styles from "./styles.module.scss";
 
 // Asset Imports
 import { Suspense, useState } from "react";
-import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
@@ -45,6 +43,9 @@ import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { getUserType } from "@/lib/utils";
+import createAxiosInstance from "@/lib/axios";
+
+const axios = createAxiosInstance("accounts");
 
 function AccountRequests() {
   const searchParams = useSearchParams();
@@ -52,13 +53,14 @@ function AccountRequests() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { status, date, endDate, accountName, country, type } =
+  const { status, date, endDate, firstName, lastName, country, type } =
     Object.fromEntries(searchParams.entries());
 
   const queryParams = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(accountName && { accountName }),
+    ...(firstName && { firstName }),
+    ...(lastName && { lastName }),
     ...(country && { country }),
     ...(status && { status: status.toUpperCase() }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
@@ -92,11 +94,7 @@ function AccountRequests() {
   const cancelRequest = async (id: string) => {
     setProcessing(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/accounts/requests/${id}/cancel`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/accounts/requests/${id}/cancel`, {});
 
       revalidate();
       handleSuccess("Action Completed", "Account frozen");
@@ -120,20 +118,12 @@ function AccountRequests() {
         openDrawer();
       }}
     >
-      <TableTd
-        className={styles.table__td}
-        tt="capitalize"
-      >{`${element.firstName} ${element.lastName}`}</TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
-        {element?.country}
-      </TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
-        {getUserType(element.accountType)}
-      </TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
+      <TableTd tt="capitalize">{element.firstName}</TableTd>
+      <TableTd tt="capitalize">{element.lastName}</TableTd>
+      <TableTd tt="capitalize">{element?.country}</TableTd>
+      <TableTd tt="capitalize">{getUserType(element.accountType)}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
+      <TableTd>
         <BadgeComponent status={element.status} />
       </TableTd>
 
@@ -145,13 +135,6 @@ function AccountRequests() {
 
   return (
     <main className={styles.main}>
-      {/* <Breadcrumbs
-        items={[
-          // { title: "Dashboard", href: "/dashboard" },
-          { title: "Account Requests", href: "/accounts" },
-        ]}
-      /> */}
-
       <Paper className={styles.table__container}>
         <div className={styles.container__header}>
           <Text fz={18} fw={600}>
@@ -178,8 +161,13 @@ function AccountRequests() {
           customStatusOption={["Approved", "Pending", "Rejected"]}
         >
           <TextBox
-            placeholder="Account Name"
-            {...form.getInputProps("accountName")}
+            placeholder="First Name"
+            {...form.getInputProps("firstName")}
+          />
+
+          <TextBox
+            placeholder="Last Name"
+            {...form.getInputProps("lastName")}
           />
 
           <TextBox placeholder="Country" {...form.getInputProps("country")} />
@@ -242,7 +230,8 @@ function AccountRequests() {
 }
 
 const tableHeaders = [
-  "Account Name",
+  "First Name",
+  "Last Name",
   "Country(short)",
   "Type",
   "Date Created",

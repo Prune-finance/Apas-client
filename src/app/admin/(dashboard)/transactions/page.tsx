@@ -61,6 +61,7 @@ function TransactionForAccount() {
     endDate,
     recipientName,
     recipientIban,
+    tab,
   } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
@@ -75,7 +76,16 @@ function TransactionForAccount() {
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
-  }, [status, createdAt, type, senderName, recipientName, recipientIban]);
+  }, [
+    status,
+    createdAt,
+    type,
+    senderName,
+    recipientName,
+    recipientIban,
+    active,
+    limit,
+  ]);
 
   const { loading, transactions, meta } = useTransactions(undefined, param);
 
@@ -84,6 +94,7 @@ function TransactionForAccount() {
     loading: loadingPayout,
     meta: payoutMeta,
   } = usePayoutTransactions(param);
+
   const {
     transactions: defaultTransactions,
     loading: loadingDefault,
@@ -183,6 +194,11 @@ function TransactionForAccount() {
 
         <TabsComponent
           tabs={tabs}
+          defaultValue={
+            tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
+              ?.value ?? tabs[0].value
+          }
+          onChange={() => setActive(1)}
           mt={28}
           styles={{ list: { marginBottom: 28 } }}
           keepMounted={false}
@@ -273,8 +289,7 @@ function TransactionForAccount() {
               setLimit={setLimit}
               limit={limit}
               total={Math.ceil(
-                filteredSearch(defaultTransactions, searchProps, search)
-                  .length / parseInt(limit ?? "10", 10)
+                (defaultMeta?.total ?? 0) / parseInt(limit ?? "10", 10)
               )}
             />
           </TabsPanel>
@@ -364,8 +379,7 @@ function TransactionForAccount() {
               setLimit={setLimit}
               limit={limit}
               total={Math.ceil(
-                filteredSearch(transactions, searchProps, search).length /
-                  parseInt(limit ?? "10", 10)
+                (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
               )}
             />
           </TabsPanel>
@@ -431,8 +445,7 @@ function TransactionForAccount() {
               setLimit={setLimit}
               limit={limit}
               total={Math.ceil(
-                filteredSearch(payoutTransactions, searchProps, search).length /
-                  parseInt(limit ?? "10", 10)
+                (payoutMeta?.total ?? 0) / parseInt(limit ?? "10", 10)
               )}
             />
           </TabsPanel>
@@ -451,9 +464,9 @@ function TransactionForAccount() {
 }
 
 const tabs = [
-  { value: "Businesses Accounts" },
-  { value: "Issued Accounts" },
-  { value: "Payout Accounts" },
+  { value: "business-accounts", title: "Business Accounts" },
+  { value: "issued-accounts", title: "Issued Accounts" },
+  { value: "payout-accounts", title: "Payout Accounts" },
 ];
 
 const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];

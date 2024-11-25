@@ -8,8 +8,11 @@ import { Suspense } from "react";
 import Users from "./(tabs)/Users";
 import EmptyTable from "@/ui/components/EmptyTable";
 import BusinessUsers from "./(tabs)/BusinessUsers";
+import { useSearchParams } from "next/navigation";
 
 function UsersManagement() {
+  const searchParam = useSearchParams();
+  const tab = searchParam.get("tab");
   return (
     <main className={styles.main}>
       {/* <Breadcrumbs items={[{ title: "Users", href: "/admin/users" }]} /> */}
@@ -20,13 +23,21 @@ function UsersManagement() {
           </Text>
         </div>
         <>
-          <TabsComponent tabs={tabs} tt="capitalize" mt={32}>
+          <TabsComponent
+            defaultValue={
+              tabs.find((t) => t.value === tab)?.value ?? tabs[0].value
+            }
+            tabs={tabs}
+            tt="capitalize"
+            mt={32}
+            keepMounted={false}
+          >
             <TabsPanel value={tabs[0].value}>
               <Users />
             </TabsPanel>
 
             <TabsPanel value={tabs[1].value}>
-             <BusinessUsers />
+              <BusinessUsers />
             </TabsPanel>
           </TabsComponent>
         </>

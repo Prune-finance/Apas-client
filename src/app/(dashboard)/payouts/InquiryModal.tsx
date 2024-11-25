@@ -7,11 +7,11 @@ import { PrimaryBtn } from "@/ui/components/Buttons";
 import DropzoneComponent from "@/ui/components/Dropzone";
 import { Group, Modal, Paper, Stack, Text, Textarea } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import axios from "axios";
-import Cookies from "js-cookie";
+
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { z } from "zod";
+import createAxiosInstance from "@/lib/axios";
 
 interface Props {
   opened: boolean;
@@ -35,6 +35,7 @@ export const InquiryModal = ({
   const { close: closeTrxDrawer } = Transaction();
   const [processing, setProcessing] = useState(false);
   type FormValues = z.infer<typeof schema>;
+  const axios = createAxiosInstance("payouts");
 
   const form = useForm<FormValues>({
     initialValues,
@@ -46,17 +47,13 @@ export const InquiryModal = ({
     setProcessing(true);
     try {
       const { reason, file, extension } = form.values;
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/payout/transactions/${trxId}/${type}`,
-        {
-          reason,
-          ...(file && {
-            supportingDocument: file,
-            extension,
-          }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/payout/transactions/${trxId}/${type}`, {
+        reason,
+        ...(file && {
+          supportingDocument: file,
+          extension,
+        }),
+      });
 
       const title =
         type === "query"

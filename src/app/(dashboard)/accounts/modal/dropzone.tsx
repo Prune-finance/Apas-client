@@ -1,5 +1,5 @@
-import { Flex, Group, Loader, rem, Stack, Text } from "@mantine/core";
-import Cookies from "js-cookie";
+import { Flex, Group, Loader, rem, Text } from "@mantine/core";
+
 import {
   Dropzone,
   DropzoneProps,
@@ -10,14 +10,12 @@ import { UseFormReturnType } from "@mantine/form";
 import {
   IconUpload,
   IconX,
-  IconPhoto,
   IconCloudUpload,
   IconCloudCheck,
 } from "@tabler/icons-react";
-import axios from "axios";
-import { useEffect, useState } from "react";
 
-import { newBusiness } from "@/lib/schema";
+import { useEffect, useState } from "react";
+import createAxiosInstance from "@/lib/axios";
 
 const reqValues = {
   reason: "",
@@ -31,6 +29,7 @@ interface DropzoneCustomProps extends Partial<DropzoneProps> {
 }
 
 export default function DropzoneComponent(props: DropzoneCustomProps) {
+  const axios = createAxiosInstance("auth");
   const [file, setFile] = useState<FileWithPath | null>(null);
 
   const [uploaded, setUploaded] = useState(false);
@@ -47,11 +46,7 @@ export default function DropzoneComponent(props: DropzoneCustomProps) {
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.post(`/admin/upload`, formData);
 
       if (form) {
         if (!formKey) return;

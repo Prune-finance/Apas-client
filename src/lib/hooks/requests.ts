@@ -476,9 +476,12 @@ export function useUserRequests(customParams: IParams = {}) {
 
     setLoading(true);
     try {
-      const { data } = await acctAxiosInstance.get(`/admin/requests/all`, {
-        params,
-      });
+      const { data } = await acctAxiosInstance.get(
+        `/accounts/dashboard/requests`,
+        {
+          params,
+        }
+      );
 
       setMeta(data.meta);
       setRequests(data.data);

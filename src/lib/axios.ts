@@ -15,7 +15,7 @@ const createAxiosInstance = (baseURL: keyof typeof BASEURL) => {
   axiosInstance.interceptors.request.use(
     (config) => {
       const token = Cookies.get("auth");
-      const stage = localStorage.getItem("stage") || "test";
+      const stage = localStorage.getItem("stage") || "TEST";
 
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

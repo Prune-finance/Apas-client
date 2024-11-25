@@ -66,6 +66,7 @@ export const PayoutTransactionDrawer = ({
   const [openedCancel, { open: openCancel, close: closeCancel }] =
     useDisclosure(false);
   const axios = createAxiosInstance("payouts");
+  const stage = localStorage.getItem("stage");
 
   const [inquiryType, setInquiryType] = useState<
     "recall" | "query" | "trace"
@@ -389,7 +390,7 @@ export const PayoutTransactionDrawer = ({
                 data.status === "PENDING") && (
                 <></> */}
 
-        {!isAdmin && (
+        {!isAdmin && stage === "LIVE" && (
           <Flex wrap="nowrap" gap={10} justify="space-between" mt={20} mr={28}>
             {data && data.status === "CONFIRMED" && (
               <>
@@ -441,11 +442,6 @@ export const PayoutTransactionDrawer = ({
                 text={`Download ${
                   data?.status === "CANCELLED" ? "Receipt" : ""
                 }`}
-                // text={`Download ${
-                //   !isAfter24Hours(data?.createdAt ?? new Date())
-                //     ? "Receipt"
-                //     : ""
-                // }`}
                 fullWidth={data?.status === "CANCELLED"}
                 // fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
                 fw={600}

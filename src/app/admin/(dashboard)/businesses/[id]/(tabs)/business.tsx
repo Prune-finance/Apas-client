@@ -570,7 +570,7 @@ const Services = ({
                   : null;
               }}
               disabled={serviceId === service.serviceIdentifier}
-              indeterminate={serviceId === service.serviceIdentifier}
+              // indeterminate={serviceId === service.serviceIdentifier}
               color="var(--prune-primary-700)"
               classNames={{
                 root: styles.input,

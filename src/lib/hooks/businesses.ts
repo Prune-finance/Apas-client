@@ -169,6 +169,36 @@ export function useBusinessServices(id: string) {
   return { loading, services, meta, revalidate };
 }
 
+export function useUserBusinessServices() {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchServices() {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`/auth/company/services`);
+
+      setServices(data.data);
+    } catch (error) {
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => fetchServices();
+
+  useEffect(() => {
+    fetchServices();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, services, revalidate };
+}
+
 export function useUserBusiness(customParams: IParams = {}) {
   const [business, setBusiness] = useState<BusinessData | null>(null);
   const [meta, setMeta] = useState<UserBusinessMeta>();

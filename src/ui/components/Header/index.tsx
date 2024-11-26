@@ -16,6 +16,8 @@ import {
   Center,
   Loader,
   Switch,
+  Tooltip,
+  Button,
 } from "@mantine/core";
 import { IconSearch, IconBell, IconChecks } from "@tabler/icons-react";
 import localFont from "next/font/local";
@@ -46,6 +48,7 @@ import { parseError } from "@/lib/actions/auth";
 import EmptyTable from "../EmptyTable";
 import { NotificationStore } from "@/lib/store/notification";
 import { usePathname, useRouter } from "next/navigation";
+import { useUserBusinessServices } from "@/lib/hooks/businesses";
 
 export default function Header() {
   const { user, setUser } = User();
@@ -251,8 +254,6 @@ export function UserHeader() {
   const [opened, setOpened] = useState(false);
   const [processing, setProcessing] = useState(false);
   const { setMeta } = NotificationStore();
-  const router = useRouter();
-  const pathname = usePathname();
 
   const _stage =
     typeof window !== "undefined"
@@ -264,12 +265,16 @@ export function UserHeader() {
     status: "unread",
     limit: 4,
   });
+  const { services } = useUserBusinessServices();
+  const liveModeService = services.find(
+    (s) => s.serviceIdentifier === "LIVE_MODE_SERVICE"
+  )?.active;
 
   useEffect(() => {
     setMeta(meta);
   }, [notifications]);
 
-  const { handleInfoForNotification, handleSuccess, handleError } =
+  const { handleInfoForNotification, handleSuccess, handleError, handleInfo } =
     useNotification();
 
   useEffect(() => {
@@ -342,13 +347,24 @@ export function UserHeader() {
         fz={14}
         fw={500}
         labelPosition="left"
-        defaultChecked={stage === "LIVE"}
+        checked={stage === "LIVE"}
+        // defaultChecked={stage === "LIVE"}
         size="xs"
         tt="capitalize"
         label={`${(stage ?? "test").toLowerCase()} Mode`}
         styles={{ label: { fontSize: 14 } }}
         onChange={(event) => {
+          if (!liveModeService && event.currentTarget.checked) {
+            handleInfo(
+              "Contact Admin",
+              "You cannot toggle to LIVE mode because your Live Mode Service is not enabled. Please contact admin to enable it."
+            );
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
           const newStage = event.currentTarget.checked ? "LIVE" : "TEST";
+
           setStage(newStage);
           localStorage.setItem("stage", newStage);
           window.location.reload();

@@ -537,7 +537,8 @@ export const sendMoneyIndividualValidate = z.object({
   destinationIBAN: z.string().min(3, "Destination account is required"),
   destinationBIC: z.string().min(3, "BIC is required"),
   destinationBank: z.string().min(2, "Bank is required"),
-  bankAddress: z.string().min(2, "Bank Address is required"),
+  bankAddress: z.string().optional(),
+  // bankAddress: z.string().min(2, "Bank Address is required"),
   destinationCountry: z.string().min(2, "Country is required"),
   amount: z
     .number({ invalid_type_error: "Amount is required" })
@@ -552,7 +553,8 @@ export const sendMoneyCompanyValidate = z.object({
   destinationIBAN: z.string().min(3, "Destination account is required"),
   destinationBIC: z.string().min(3, "BIC is required"),
   destinationBank: z.string().min(2, "Bank is required"),
-  bankAddress: z.string().min(2, "Bank Address is required"),
+  bankAddress: z.string().optional(),
+  // bankAddress: z.string().min(2, "Bank Address is required"),
   amount: z
     .number({ invalid_type_error: "Amount is required" })
     .positive("A positive amount is required"),

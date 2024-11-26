@@ -1,29 +1,16 @@
 "use client";
-import Cookies from "js-cookie";
 
-import axios from "axios";
-import {
-  Dispatch,
-  Fragment,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { useRouter } from "next/navigation";
-import { IconArrowLeft, IconCheck, IconPlus } from "@tabler/icons-react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { IconCheck } from "@tabler/icons-react";
 
 import styles from "./sendMoney.module.scss";
 
 import {
   Flex,
-  Paper,
-  ThemeIcon,
   Text,
   Box,
   NumberInput,
   Textarea,
-  Stack,
   Group,
   TabsPanel,
   ActionIcon,
@@ -31,17 +18,14 @@ import {
   Loader,
   ScrollArea,
 } from "@mantine/core";
-import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
+import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import { formatNumber } from "@/lib/utils";
 import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
 import DropzoneComponent from "../Dropzone";
-import TabsComponent from "../Tabs";
 import { sendMoneyCompanyValidate } from "@/lib/schema";
 import { countries } from "@/lib/static";
 import { useDebouncedValue } from "@mantine/hooks";
-import { set } from "zod";
 
 interface CompanyProps {
   account: DefaultAccount | null;

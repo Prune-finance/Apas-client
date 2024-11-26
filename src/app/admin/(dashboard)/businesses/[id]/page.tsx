@@ -1,9 +1,7 @@
 "use client";
 import Cookies from "js-cookie";
 
-import Image from "next/image";
 import {
-  Badge,
   Button,
   Group,
   Skeleton,
@@ -13,19 +11,15 @@ import {
   TabsPanel,
   TabsTab,
   Text,
-  ThemeIcon,
-  UnstyledButton,
 } from "@mantine/core";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 import {
-  IconArrowLeft,
   IconBuildingSkyscraper,
   IconCurrencyEuro,
   IconDownload,
   IconFiles,
   IconKey,
-  IconPointFilled,
   IconUsers,
   IconUsersGroup,
   IconCheck,
@@ -36,7 +30,6 @@ import {
   IconCreditCardPay,
 } from "@tabler/icons-react";
 
-import ActiveBadge from "@/assets/active-badge.svg";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/singlebusiness.module.scss";
 
@@ -51,7 +44,6 @@ import { useBusinessServices, useSingleBusiness } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
 import { useEffect, useMemo, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
-import { activeBadgeColor } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useDisclosure, useInterval } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";

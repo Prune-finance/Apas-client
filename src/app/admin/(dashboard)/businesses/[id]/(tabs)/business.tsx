@@ -19,6 +19,7 @@ import styles from "@/ui/styles/singlebusiness.module.scss";
 import {
   BusinessData,
   Service,
+  ServiceIdentifier,
   useBusinessServices,
 } from "@/lib/hooks/businesses";
 import { useState } from "react";
@@ -30,9 +31,9 @@ import { usePricingPlan } from "@/lib/hooks/pricing-plan";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BasicInfoType } from "@/lib/schema";
 import { ContactDocumentTextInput } from "./utils";
-import { useParams } from "next/navigation";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import createAxiosInstance from "@/lib/axios";
 
 dayjs.extend(advancedFormat);
 
@@ -40,9 +41,11 @@ export default function Business({
   business,
   revalidate,
   services,
+  revalidateServices,
 }: {
   business: BusinessData;
   revalidate: () => void;
+  revalidateServices: () => Promise<void>;
   services: Service[];
 }) {
   const { handleSuccess, handleError } = useNotification();
@@ -104,7 +107,11 @@ export default function Business({
         business={business}
       />
 
-      <Services services={services} />
+      <Services
+        services={services}
+        businessId={business.id}
+        revalidate={revalidateServices}
+      />
 
       <BusinessBio
         form={form as unknown as UseFormReturnType<BasicInfoType>}
@@ -506,9 +513,38 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
   );
 };
 
-const Services = ({ services }: { services: Service[] }) => {
-  const handleServiceChange = (id: string) => {
-    console.log(id);
+const Services = ({
+  services,
+  businessId,
+  revalidate,
+}: {
+  services: Service[];
+  businessId: string;
+  revalidate: () => Promise<void>;
+}) => {
+  const { handleError, handleSuccess } = useNotification();
+  const axios = createAxiosInstance("auth");
+  const [serviceId, setServiceId] = useState<ServiceIdentifier | null>(null);
+  const handleServiceChange = async (service: Service) => {
+    try {
+      await axios.post(
+        `/admin/service/${service.id}/company/${businessId}/toggle`,
+        {}
+      );
+
+      await revalidate();
+
+      handleSuccess(
+        `${service.title} Toggled`,
+        `This service has been successfully ${
+          service.active ? "disabled" : "enabled"
+        }`
+      );
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setServiceId(null);
+    }
   };
 
   return (
@@ -527,7 +563,14 @@ const Services = ({ services }: { services: Service[] }) => {
                   ? true
                   : service.active
               }
-              // onChange={() => handleServiceChange(service.id)}
+              onChange={() => {
+                setServiceId(service.serviceIdentifier);
+                service.serviceIdentifier === "LIVE_MODE_SERVICE"
+                  ? handleServiceChange(service)
+                  : null;
+              }}
+              disabled={serviceId === service.serviceIdentifier}
+              indeterminate={serviceId === service.serviceIdentifier}
               color="var(--prune-primary-700)"
               classNames={{
                 root: styles.input,

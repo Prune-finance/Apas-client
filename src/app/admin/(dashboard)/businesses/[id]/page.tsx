@@ -440,6 +440,7 @@ export default function SingleBusiness() {
                   business={business}
                   revalidate={revalidate}
                   services={services}
+                  revalidateServices={revalidateServices}
                 />
               )}
             </TabsPanel>

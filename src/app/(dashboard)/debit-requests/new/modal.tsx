@@ -100,7 +100,7 @@ export default function DebitRequestModal({
 
   const [{ bic, iban }] = useDebouncedValue(
     { iban: form.values.destinationIBAN, bic: form.values.destinationBIC },
-    500
+    2000
   );
 
   const handleIbanValidation = async () => {

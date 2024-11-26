@@ -8,6 +8,7 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   Alert,
   Box,
+  Flex,
   Group,
   Modal,
   Paper,
@@ -56,6 +57,7 @@ import { parseError } from "@/lib/actions/auth";
 import { PendingAccounts } from "./PendingAccounts";
 import RequestModalComponent from "@/ui/components/Modal";
 import createAxiosInstance from "@/lib/axios";
+import { SendMoney } from "@/ui/components/SingleAccount/(tabs)/SendMoney";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -101,6 +103,8 @@ function Accounts() {
     useDisclosure(false);
   const [debitOpened, { open: debitOpen, close: debitClose }] =
     useDisclosure(false);
+  const [sendMoneyOpened, { open: sendMoneyOpen, close: sendMoneyClose }] =
+    useDisclosure(false);
   const [
     requestAccessOpened,
     { open: requestAccessOpen, close: requestAccessClose },
@@ -112,6 +116,10 @@ function Accounts() {
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const stage =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("stage")
+      : "TEST";
 
   const [openedAlert, { open: openAlert, close: closeAlert }] =
     useDisclosure(true);
@@ -329,16 +337,22 @@ function Accounts() {
       {/* <Breadcrumbs items={[{ title: "Accounts", href: "/accounts" }]} /> */}
 
       <Paper className={styles.table__container}>
-        <div
-        // className={styles.container__header}
-        >
-          <Text fz={18} fw={600}>
-            Accounts
-          </Text>
-          <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
-            Here’s an overview of your accounts
-          </Text>
-        </div>
+        <Flex justify="space-between" align="center">
+          <div>
+            <Text fz={18} fw={600}>
+              Accounts
+            </Text>
+            <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
+              Here’s an overview of your accounts
+            </Text>
+          </div>
+
+          <PrimaryBtn
+            text={tab === tabs[1].value ? "Debit Request" : "Send Money"}
+            fw={600}
+            action={tab === tabs[1].value ? debitOpen : sendMoneyOpen}
+          />
+        </Flex>
 
         <TabsComponent
           tabs={tabs}
@@ -366,20 +380,23 @@ function Accounts() {
           </TabsPanel>
 
           <TabsPanel value={tabs[1].value}>
-            {!statusLoading && !approvedRequest && openedAlert && (
-              <Alert
-                variant="light"
-                color="#D1B933"
-                mb={28}
-                mt={30}
-                radius={8}
-                style={{ border: "1px solid #D1B933" }}
-                withCloseButton
-                onClose={closeAlert}
-                icon={<IconInfoCircle />}
-                title="Please know that you are in test mode. To go live, request for Live keys by clicking the “request live keys” button below."
-              ></Alert>
-            )}
+            {stage !== "LIVE" &&
+              !statusLoading &&
+              !approvedRequest &&
+              openedAlert && (
+                <Alert
+                  variant="light"
+                  color="#D1B933"
+                  mb={28}
+                  mt={30}
+                  radius={8}
+                  style={{ border: "1px solid #D1B933" }}
+                  withCloseButton
+                  onClose={closeAlert}
+                  icon={<IconInfoCircle />}
+                  title="Please know that you are in test mode. To go live, request for Live keys by clicking the “request live keys” button below."
+                ></Alert>
+              )}
             <TabsComponent
               tabs={issuedAccountTabs}
               mt={30}
@@ -465,6 +482,12 @@ function Accounts() {
             </TabsComponent>
           </TabsPanel>
         </TabsComponent>
+
+        <SendMoney
+          opened={sendMoneyOpened}
+          closeMoney={sendMoneyClose}
+          account={account}
+        />
 
         <Modal
           size="xl"

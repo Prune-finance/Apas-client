@@ -93,6 +93,7 @@ import SuccessModal from "../SuccessModal";
 // import SuccessModalImage from "@/assets/success-modal-image.png";
 import PendingModalImage from "@/assets/pending-image.png";
 import createAxiosInstance from "@/lib/axios";
+import { SendMoney } from "./(tabs)/SendMoney";
 
 type Param = { id: string };
 interface Props {
@@ -886,20 +887,6 @@ interface DefaultAccountHeadProps
   revalidate?: () => void;
 }
 
-export interface RequestForm {
-  amount: string;
-  destinationIBAN: string;
-  destinationBIC: string;
-  destinationBank: string;
-  bankAddress: string;
-  destinationCountry: string;
-  reference: string; // generated using crypto.randomUUID()
-  firstName: string;
-  lastName: string;
-  invoice: string;
-  narration: string;
-}
-
 export const DefaultAccountHead = ({
   loading,
   account,
@@ -911,147 +898,20 @@ export const DefaultAccountHead = ({
   revalidate,
 }: DefaultAccountHeadProps) => {
   const [opened, { open: openMoney, close: closeMoney }] = useDisclosure(false);
-  const [openedPreview, { open: openPreview, close: closePreview }] =
-    useDisclosure(false);
-  const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
-    useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
     useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
-  const [processing, setProcessing] = useState(false);
   const [processingTrust, setProcessingTrust] = useState(false);
-  const [sectionState, setSectionState] = useState("");
-  const [moneySent, setMoneySent] = useState(0);
-  const [receiverName, setReceiverName] = useState("");
+
   const axios = createAxiosInstance("payouts");
-
-  const matches = useMediaQuery("(max-width: 768px)");
-
-  const [requestForm, setRequestForm] = useState<RequestForm>({
-    firstName: "",
-    lastName: "",
-    amount: "",
-    destinationIBAN: "",
-    destinationBIC: "",
-    destinationBank: "",
-    bankAddress: "",
-    destinationCountry: "",
-    reference: crypto.randomUUID(),
-    invoice: "",
-    narration: "",
-  });
-
-  const [companyRequestForm, setCompanyRequestForm] = useState({
-    amount: "",
-    companyName: "",
-    destinationIBAN: "",
-    destinationBIC: "",
-    destinationBank: "",
-    bankAddress: "",
-    destinationCountry: "",
-    invoice: "",
-    reference: crypto.randomUUID(),
-    narration: "",
-  });
-
-  const sendMoneyRequest = async () => {
-    setProcessing(true);
-    try {
-      const {
-        firstName,
-        lastName,
-        destinationIBAN,
-        destinationBIC,
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        amount,
-        invoice,
-        narration,
-      } = requestForm;
-
-      const { data } = await axios.post(`/payout/send-money`, {
-        amount,
-        destinationIBAN,
-        destinationBIC,
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        reference: crypto.randomUUID(),
-        beneficiaryFullName: `${firstName} ${lastName}`,
-        invoice,
-        narration,
-      });
-      setMoneySent(Number(amount));
-      setReceiverName(`${firstName} ${lastName}`);
-      closePreview();
-      openSuccess();
-      // handleSuccess("Action Completed", "You have successfully sent money");
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const sendMoneyCompanyRequest = async () => {
-    setProcessing(true);
-    try {
-      const {
-        companyName,
-        destinationIBAN,
-        destinationBIC,
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        amount,
-        invoice,
-        narration,
-        reference,
-      } = companyRequestForm;
-      const { data } = await axios.post(`/payout/send-money`, {
-        amount,
-        destinationIBAN,
-        destinationBIC,
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        reference: crypto.randomUUID(),
-        beneficiaryFullName: companyName,
-        invoice,
-        narration,
-      });
-      setMoneySent(Number(amount));
-      setReceiverName(companyName);
-      closePreview();
-      openSuccess();
-      // handleSuccess("Action Completed", "You have successfully sent money");
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-      close();
-    }
-  };
-
-  const handleCloseSuccessModal = () => {
-    // router.push("/admin/businesses");
-    closeSuccess();
-  };
 
   const handleAccountTrust = async () => {
     if (!account) return;
     setProcessingTrust(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/payout/account/${account?.id}/trust`,
-        {
-          isTrusted: account?.isTrusted ? false : true,
-        },
-        {
-          headers: { Authorization: `Bearer ${Cookies.get("auth")}` },
-        }
-      );
+      await axios.patch(`/admin/payout/account/${account?.id}/trust`, {
+        isTrusted: account?.isTrusted ? false : true,
+      });
       revalidate && revalidate();
       handleSuccess(
         "Action Completed",
@@ -1174,78 +1034,7 @@ export const DefaultAccountHead = ({
         color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
-      <Modal
-        opened={opened}
-        onClose={closeMoney}
-        size={matches ? "90%" : 630}
-        withCloseButton={false}
-      >
-        <SendMoneyModal
-          account={account}
-          close={closeMoney}
-          openPreview={openPreview}
-          setRequestForm={setRequestForm}
-          setCompanyRequestForm={setCompanyRequestForm}
-          setSectionState={setSectionState}
-        />
-      </Modal>
-
-      <Modal
-        opened={openedPreview}
-        onClose={closePreview}
-        size={"35%"}
-        centered
-        withCloseButton={false}
-      >
-        <PreviewState
-          requestForm={requestForm}
-          account={account}
-          closePreview={closePreview}
-          sendMoneyRequest={sendMoneyRequest}
-          processing={processing}
-          sectionState={sectionState}
-        />
-      </Modal>
-
-      <Modal
-        opened={openedPreview}
-        onClose={closePreview}
-        size={"35%"}
-        centered
-        withCloseButton={false}
-      >
-        <PreviewState
-          requestForm={requestForm}
-          companyRequestForm={companyRequestForm}
-          account={account}
-          closePreview={closePreview}
-          sendMoneyRequest={
-            sectionState === "Company"
-              ? sendMoneyCompanyRequest
-              : sendMoneyRequest
-          }
-          processing={processing}
-          sectionState={sectionState}
-        />
-      </Modal>
-
-      <SuccessModal
-        openedSuccess={openedSuccess}
-        handleCloseSuccessModal={handleCloseSuccessModal}
-        image={PendingModalImage.src}
-        style={{ height: 120, width: 120, marginBottom: 10 }}
-        desc={
-          <Text fz={12}>
-            Your transfer of{" "}
-            <Text inherit span fw={600} c="#97AD05">
-              {formatNumber(moneySent, true, "EUR")}
-            </Text>{" "}
-            to {receiverName} is in progress. It should be completed within the
-            next 10 minutes. Please wait for confirm.
-          </Text>
-        }
-        title="Transaction Processing"
-      />
+      <SendMoney opened={opened} closeMoney={closeMoney} account={account} />
     </>
   );
 };

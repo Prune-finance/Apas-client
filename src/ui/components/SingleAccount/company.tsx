@@ -41,6 +41,7 @@ import TabsComponent from "../Tabs";
 import { sendMoneyCompanyValidate } from "@/lib/schema";
 import { countries } from "@/lib/static";
 import { useDebouncedValue } from "@mantine/hooks";
+import { set } from "zod";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -75,7 +76,9 @@ function Company({
   setValidated,
 }: CompanyProps) {
   const [processing, setProcessing] = useState(false);
-  const [disabled, setDisabled] = useState(false);
+  const [disableBank, setDisableBank] = useState(false);
+  const [disableAddress, setDisableAddress] = useState(false);
+  const [disableCountry, setDisableCountry] = useState(false);
 
   const form2 = useForm({
     initialValues: {
@@ -110,19 +113,23 @@ function Company({
   const handleIbanValidation = async () => {
     setProcessing(true);
     setValidated(null);
-    setDisabled(false);
+    setDisableAddress(false);
+    setDisableBank(false);
+    setDisableCountry(false);
     try {
       const data = await validateAccount({ iban, bic });
 
       if (data) {
         form2.setValues({
-          bankAddress: data.address,
+          bankAddress: data.address || data.city,
           destinationBank: data.bankName,
           destinationCountry: data.country,
         });
 
         setValidated(true);
-        setDisabled(true);
+        if (data.address || data.city) setDisableAddress(true);
+        if (data.bankName) setDisableBank(true);
+        if (data.country) setDisableCountry(true);
       } else {
         setValidated(false);
       }
@@ -247,7 +254,7 @@ function Company({
                       Bank
                     </Text>
                   }
-                  disabled={disabled}
+                  disabled={disableBank}
                   {...form2.getInputProps("destinationBank")}
                   errorProps={{
                     fz: 12,
@@ -265,7 +272,7 @@ function Company({
                       Bank Address
                     </Text>
                   }
-                  disabled={disabled}
+                  disabled={disableAddress}
                   placeholder="Bank Address"
                   {...form2.getInputProps("bankAddress")}
                   errorProps={{
@@ -282,7 +289,7 @@ function Company({
                   flex={1}
                   label="Country"
                   data={countries}
-                  disabled={disabled}
+                  disabled={disableCountry}
                   {...form2.getInputProps("destinationCountry")}
                 />
               </Flex>

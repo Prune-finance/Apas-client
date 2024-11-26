@@ -1,52 +1,31 @@
 "use client";
-import Cookies from "js-cookie";
 
-import axios from "axios";
-import {
-  Dispatch,
-  Fragment,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import { useRouter } from "next/navigation";
-import { IconArrowLeft, IconCheck, IconPlus } from "@tabler/icons-react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { IconCheck } from "@tabler/icons-react";
 
 import styles from "./sendMoney.module.scss";
 
 import {
   Flex,
-  Paper,
-  ThemeIcon,
   Text,
   Box,
   NumberInput,
   Textarea,
-  Stack,
   Group,
   TabsPanel,
-  Modal,
-  Alert,
   Badge,
   Loader,
   ActionIcon,
   ScrollArea,
 } from "@mantine/core";
-import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
-import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
+import { TextInput, Select } from "@mantine/core";
+import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import { formatNumber } from "@/lib/utils";
 import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
-import TabsComponent from "../Tabs";
-import useNotification from "@/lib/hooks/notification";
 import { countries } from "@/lib/static";
 import DropzoneComponent from "../Dropzone";
-import { parseError } from "@/lib/actions/auth";
-import { useDebouncedValue, useDisclosure, useTimeout } from "@mantine/hooks";
-import { set } from "zod";
+import { useDebouncedValue } from "@mantine/hooks";
 import { sendMoneyIndividualValidate } from "@/lib/schema";
-import { FaZ } from "react-icons/fa6";
 
 interface IndividualProps {
   account: DefaultAccount | null;
@@ -81,7 +60,9 @@ function Individual({
   setValidated,
 }: IndividualProps) {
   const [processing, setProcessing] = useState(false);
-  const [disabled, setDisabled] = useState(false);
+  const [disableBank, setDisableBank] = useState(false);
+  const [disableAddress, setDisableAddress] = useState(false);
+  const [disableCountry, setDisableCountry] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -98,19 +79,23 @@ function Individual({
   const handleIbanValidation = async () => {
     setProcessing(true);
     setValidated(null);
-    setDisabled(false);
+    setDisableAddress(false);
+    setDisableBank(false);
+    setDisableCountry(false);
     try {
       const data = await validateAccount({ iban, bic });
 
       if (data) {
         form.setValues({
-          bankAddress: data.address,
+          bankAddress: data.address || data.city,
           destinationBank: data.bankName,
           destinationCountry: data.country,
         });
 
         setValidated(true);
-        setDisabled(true);
+        if (data.address || data.city) setDisableAddress(true);
+        if (data.bankName) setDisableBank(true);
+        if (data.country) setDisableCountry(true);
       } else {
         setValidated(false);
       }
@@ -269,7 +254,7 @@ function Individual({
                         Bank
                       </Text>
                     }
-                    disabled={disabled}
+                    disabled={disableBank}
                     {...form.getInputProps("destinationBank")}
                     errorProps={{
                       fz: 12,
@@ -287,7 +272,7 @@ function Individual({
                       </Text>
                     }
                     placeholder="Bank Address"
-                    disabled={disabled}
+                    disabled={disableAddress}
                     {...form.getInputProps("bankAddress")}
                     errorProps={{
                       fz: 12,
@@ -341,7 +326,7 @@ function Individual({
                     flex={1}
                     label="Country"
                     data={countries}
-                    disabled={disabled}
+                    disabled={disableCountry}
                     {...form.getInputProps("destinationCountry")}
                   />
                 </Flex>

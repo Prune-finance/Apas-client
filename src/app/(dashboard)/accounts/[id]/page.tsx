@@ -271,6 +271,7 @@ export default function Account() {
         setChartFrequency={setChartFrequency}
         trxMeta={txrMeta}
         location="issued-account"
+        isUser
       >
         <PaginationComponent
           active={active}

@@ -54,6 +54,7 @@ function SendMoneyModal({
   setSectionState,
 }: SendMoneyModalProps) {
   const [validated, setValidated] = useState<boolean | null>(null);
+  const [showBadge, setShowBadge] = useState(false);
 
   return (
     <main className={styles.main}>
@@ -121,7 +122,10 @@ function SendMoneyModal({
                   c="#fff"
                   text="Proceed Anyway"
                   fw={600}
-                  action={() => setValidated(true)}
+                  action={() => {
+                    setValidated(true);
+                    setShowBadge(false);
+                  }}
                 />
               </Group>
             </Stack>
@@ -141,7 +145,10 @@ function SendMoneyModal({
 
         <TabsComponent
           tabs={tabs}
-          onChange={() => setValidated(null)}
+          onChange={() => {
+            setValidated(null);
+            setShowBadge(false);
+          }}
           mt={32}
           keepMounted={false}
         >
@@ -153,6 +160,8 @@ function SendMoneyModal({
             setSectionState={setSectionState}
             validated={validated}
             setValidated={setValidated}
+            showBadge={showBadge}
+            setShowBadge={setShowBadge}
           />
           <Company
             account={account}
@@ -162,6 +171,8 @@ function SendMoneyModal({
             setSectionState={setSectionState}
             validated={validated}
             setValidated={setValidated}
+            showBadge={showBadge}
+            setShowBadge={setShowBadge}
           />
         </TabsComponent>
       </Paper>

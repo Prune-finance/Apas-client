@@ -35,6 +35,8 @@ interface IndividualProps {
   setSectionState: any;
   validated: boolean | null;
   setValidated: Dispatch<SetStateAction<boolean | null>>;
+  showBadge: boolean;
+  setShowBadge: Dispatch<SetStateAction<boolean>>;
 }
 
 export const sendMoneyIndividualRequest = {
@@ -58,6 +60,8 @@ function Individual({
   setSectionState,
   validated,
   setValidated,
+  setShowBadge,
+  showBadge,
 }: IndividualProps) {
   const [processing, setProcessing] = useState(false);
   const [disableBank, setDisableBank] = useState(false);
@@ -82,6 +86,7 @@ function Individual({
     setDisableAddress(false);
     setDisableBank(false);
     setDisableCountry(false);
+    setShowBadge(true);
     try {
       const data = await validateAccount({ iban, bic });
 
@@ -201,7 +206,7 @@ function Individual({
               />
             </Flex>
 
-            {(processing || validated) && (
+            {(processing || validated) && showBadge && (
               <Group
                 justify="space-between"
                 bg="#ECFDF3"

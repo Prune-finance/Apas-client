@@ -31,12 +31,13 @@ import { useDisclosure } from "@mantine/hooks";
 import DebitRequestModal from "./debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
-import { PrimaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { checkToken } from "@/lib/actions/checkToken";
 import { BarChartComponent } from "@/ui/components/Charts";
 import Image from "next/image";
 import EmptyImage from "@/assets/empty.png";
 import { AmountGroup } from "@/ui/components/AmountGroup";
+import { SendMoney } from "@/ui/components/SingleAccount/(tabs)/SendMoney";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -49,6 +50,8 @@ export default function Home() {
     useUserPayoutTransactions();
 
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedSendMoney, { open: openSendMoney, close: closeSendMoney }] =
+    useDisclosure(false);
 
   const { user } = User();
 
@@ -186,7 +189,10 @@ export default function Home() {
         >
           Account Statement
         </Button> */}
-        <PrimaryBtn text="Debit Request" fw={600} action={open} />
+        <Group>
+          <SecondaryBtn text="Debit Request" fw={600} action={open} />
+          <PrimaryBtn text="Send Money" fw={600} action={openSendMoney} />
+        </Group>
       </Flex>
 
       <Grid mt={32} h="100%">
@@ -545,6 +551,12 @@ export default function Home() {
       >
         <DebitRequestModal close={close} />
       </Modal>
+
+      <SendMoney
+        opened={openedSendMoney}
+        closeMoney={closeSendMoney}
+        account={account}
+      />
     </main>
   );
 }

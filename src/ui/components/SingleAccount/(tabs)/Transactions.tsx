@@ -65,13 +65,10 @@ interface Props {
   loading: boolean;
   payout?: boolean;
   meta: Meta | null;
-  // active: number;
-  // setActive: Dispatch<SetStateAction<number>>;
-  // limit: string | null;
-  // setLimit: Dispatch<SetStateAction<string | null>>;
   children: React.ReactNode;
   accountID?: string;
   location?: string;
+  isUser?: boolean;
 }
 
 export interface BalanceDetail {
@@ -138,11 +135,8 @@ export const Transactions = ({
   children,
   accountID,
   location,
-}: // limit,
-// setLimit,
-// active,
-// setActive,
-Props) => {
+  isUser,
+}: Props) => {
   const pdfRef = useRef<HTMLDivElement>(null);
 
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
@@ -333,6 +327,7 @@ Props) => {
               data={transactions}
               searchProps={searchProps}
               search={debouncedSearch}
+              isUser
             />
           )
         }

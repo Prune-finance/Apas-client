@@ -156,7 +156,7 @@ export function useBusinessServices(id: string) {
     }
   }
 
-  const revalidate = () => fetchServices();
+  const revalidate = async () => fetchServices();
 
   useEffect(() => {
     fetchServices();
@@ -167,6 +167,36 @@ export function useBusinessServices(id: string) {
   }, [id]);
 
   return { loading, services, meta, revalidate };
+}
+
+export function useUserBusinessServices() {
+  const [services, setServices] = useState<Service[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchServices() {
+    try {
+      setLoading(true);
+      const { data } = await axios.get(`/auth/company/services`);
+
+      setServices(data.data);
+    } catch (error) {
+      setServices([]);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => fetchServices();
+
+  useEffect(() => {
+    fetchServices();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, services, revalidate };
 }
 
 export function useUserBusiness(customParams: IParams = {}) {
@@ -368,6 +398,15 @@ export interface Service {
   deletedAt: null;
   title: string;
   serviceCode: string;
-  serviceIdentifier: string;
+  serviceIdentifier: ServiceIdentifier;
   active: boolean;
 }
+
+const SERVICE_IDENTIFIER = [
+  "ACCOUNT_SERVICE",
+  "ISSUED_ACCOUNT_SERVICE",
+  "PAYOUT_SERVICE",
+  "LIVE_MODE_SERVICE",
+] as const;
+
+export type ServiceIdentifier = (typeof SERVICE_IDENTIFIER)[number];

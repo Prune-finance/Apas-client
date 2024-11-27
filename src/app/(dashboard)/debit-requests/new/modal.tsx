@@ -87,6 +87,7 @@ export default function DebitRequestModal({
   const [validated, setValidated] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(false);
+  const [showBadge, setShowBadge] = useState(false);
 
   const form = useForm({
     initialValues: {
@@ -107,6 +108,7 @@ export default function DebitRequestModal({
     setLoading(true);
     setValidated(null);
     setDisabled(false);
+    setShowBadge(true);
     try {
       const data = await validateAccount({ iban, bic });
 
@@ -243,14 +245,17 @@ export default function DebitRequestModal({
                   c="#fff"
                   text="Proceed Anyway"
                   fw={600}
-                  action={() => setValidated(true)}
+                  action={() => {
+                    setValidated(true);
+                    setShowBadge(false);
+                  }}
                 />
               </Group>
             </Stack>
           </Alert>
         )}
 
-        <Box mt={32}>
+        <Box mt={22}>
           {/* <Select
               placeholder="Select Account"
               classNames={{ input: styles.input, label: styles.label }}
@@ -336,7 +341,7 @@ export default function DebitRequestModal({
             </Group> */}
           </Stack>
 
-          <Box mt={40}>
+          <Box mt={30}>
             <Text fz={16} c="#97AD05">
               Destination Account:
             </Text>
@@ -408,7 +413,7 @@ export default function DebitRequestModal({
               />
             </Flex>
 
-            {(loading || validated) && (
+            {(loading || validated) && showBadge && (
               <Group
                 justify="space-between"
                 bg="#ECFDF3"

@@ -599,6 +599,7 @@ interface SingleAccountProps {
   children: React.ReactNode;
   accountID?: string;
   location?: string;
+  isUser?: boolean;
 }
 
 export const SingleAccountBody = ({
@@ -615,6 +616,7 @@ export const SingleAccountBody = ({
   children,
   accountID,
   location,
+  isUser,
 }: SingleAccountProps) => {
   const info = {
     "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
@@ -675,6 +677,7 @@ export const SingleAccountBody = ({
             meta={trxMeta}
             children={children}
             accountID={accountID}
+            isUser={isUser}
           />
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>

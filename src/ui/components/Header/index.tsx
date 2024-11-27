@@ -56,6 +56,12 @@ export default function Header() {
   const [processing, setProcessing] = useState(false);
   const { setMeta } = NotificationStore();
 
+  const _stage =
+    typeof window !== "undefined"
+      ? window.localStorage.getItem("stage")
+      : "TEST";
+  const [stage, setStage] = useState(_stage ?? "TEST");
+
   const { loading, notifications, meta, revalidate } = useAdminNotifications({
     status: "unread",
     limit: 4,
@@ -131,6 +137,27 @@ export default function Header() {
           classNames={{ wrapper: styles.search__input, input: styles.input }}
         />
       </div>
+
+      <Switch
+        color="green"
+        c={stage === "LIVE" ? "green" : "dimmed"}
+        fz={14}
+        fw={500}
+        labelPosition="left"
+        checked={stage === "LIVE"}
+        // defaultChecked={stage === "LIVE"}
+        size="xs"
+        tt="capitalize"
+        label={`${(stage ?? "test").toLowerCase()} Mode`}
+        styles={{ label: { fontSize: 14 } }}
+        onChange={(event) => {
+          const newStage = event.currentTarget.checked ? "LIVE" : "TEST";
+
+          setStage(newStage);
+          localStorage.setItem("stage", newStage);
+          window.location.reload();
+        }}
+      />
 
       <div className={styles.notification}>
         <Divider orientation="vertical" h={26} />

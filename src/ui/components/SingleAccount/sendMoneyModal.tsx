@@ -1,16 +1,7 @@
 "use client";
-import Cookies from "js-cookie";
 
-import axios from "axios";
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  IconArrowLeft,
-  IconExclamationMark,
-  IconPlus,
-  IconX,
-} from "@tabler/icons-react";
-
+import { useState } from "react";
+import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
 
 import {
@@ -19,22 +10,16 @@ import {
   ThemeIcon,
   Text,
   Box,
-  NumberInput,
-  Textarea,
   Stack,
   Group,
   Alert,
 } from "@mantine/core";
-import { TextInput, Select, Button, UnstyledButton } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import { PrimaryBtn, SecondaryBtn } from "../Buttons";
+import { PrimaryBtn } from "../Buttons";
 import { formatNumber } from "@/lib/utils";
-import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
-import DropzoneComponent from "../Modal/dropzone";
+import { DefaultAccount } from "@/lib/hooks/accounts";
 import TabsComponent from "../Tabs";
 import Individual from "./Individual";
 import Company from "./company";
-import { set } from "zod";
 
 interface SendMoneyModalProps {
   account: DefaultAccount | null;

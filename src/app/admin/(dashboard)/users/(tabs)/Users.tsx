@@ -201,7 +201,7 @@ export default function Users() {
       </TableTd>
       <TableTd>{element.firstName}</TableTd>
       <TableTd>{element.lastName}</TableTd>
-      <TableTd>{element.role}</TableTd>
+      <TableTd tt="capitalize">{element.role.toLowerCase()}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd>
         {element.lastLogIn ? dayjs(element.lastLogIn).fromNow() : "Nil"}

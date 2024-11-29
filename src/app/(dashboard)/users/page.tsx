@@ -195,6 +195,7 @@ function Users() {
         <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
           {element.email}
         </TableTd>
+        <TableTd tt="capitalize">{element.role.toLowerCase()}</TableTd>
         <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
         <TableTd>
           {element.lastLogIn ? dayjs(element.lastLogIn).fromNow() : "Nil"}
@@ -414,7 +415,7 @@ export default function UsersSuspense() {
 const tableHeaders = [
   "Email",
   // "Name",
-  // "Role",
+  "Role",
   "Date Created",
   "Last Active",
   "Status",

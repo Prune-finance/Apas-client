@@ -58,6 +58,7 @@ import { PendingAccounts } from "./PendingAccounts";
 import RequestModalComponent from "@/ui/components/Modal";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "@/ui/components/SingleAccount/(tabs)/SendMoney";
+import User from "@/lib/store/user";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -116,6 +117,7 @@ function Accounts() {
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const { user } = User();
   const stage =
     typeof window !== "undefined"
       ? window.localStorage.getItem("stage")
@@ -351,6 +353,12 @@ function Accounts() {
             text={tab === tabs[1].value ? "Debit Request" : "Send Money"}
             fw={600}
             action={tab === tabs[1].value ? debitOpen : sendMoneyOpen}
+            display={
+              tab === tabs[1].value ||
+              (tab !== tabs[1].value && user?.role === "INITIATOR")
+                ? "block"
+                : "none"
+            }
           />
         </Flex>
 

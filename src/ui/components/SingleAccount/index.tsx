@@ -94,6 +94,7 @@ import SuccessModal from "../SuccessModal";
 import PendingModalImage from "@/assets/pending-image.png";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
+import User from "@/lib/store/user";
 
 type Param = { id: string };
 interface Props {
@@ -906,6 +907,8 @@ export const DefaultAccountHead = ({
   const { handleError, handleSuccess } = useNotification();
   const [processingTrust, setProcessingTrust] = useState(false);
 
+  const { user } = User();
+
   const axios = createAxiosInstance("payouts");
 
   const handleAccountTrust = async () => {
@@ -986,7 +989,12 @@ export const DefaultAccountHead = ({
 
         <Flex gap={10}>
           {!payout && !admin && (
-            <PrimaryBtn text="Send Money" fw={600} action={openMoney} />
+            <PrimaryBtn
+              text="Send Money"
+              fw={600}
+              action={openMoney}
+              display={user?.role === "INITIATOR" ? "block" : "none"}
+            />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
           {payout && admin && (

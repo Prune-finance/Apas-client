@@ -195,7 +195,9 @@ export default function Home() {
         </Button> */}
         <Group>
           <SecondaryBtn text="Debit Request" fw={600} action={open} />
-          <PrimaryBtn text="Send Money" fw={600} action={openSendMoney} />
+          {user?.role === "INITIATOR" && (
+            <PrimaryBtn text="Send Money" fw={600} action={openSendMoney} />
+          )}
         </Group>
       </Flex>
 

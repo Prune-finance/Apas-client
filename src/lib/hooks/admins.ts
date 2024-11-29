@@ -232,8 +232,10 @@ export interface AdminData {
   deletedAt: null;
   firstName: string;
   lastName: string;
-  role: string;
   lastLogin: Date | null;
   lastLogIn: Date | null;
   status: "ACTIVE" | "INACTIVE" | "INVITE_PENDING";
+  role: "USER" | "INITIATOR";
+  company?: { name: string; id: string };
+  companyId?: string;
 }

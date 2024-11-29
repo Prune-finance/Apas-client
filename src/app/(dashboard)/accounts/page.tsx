@@ -92,7 +92,11 @@ function Accounts() {
     revalidateIssuance,
   } = useUserAccounts(queryParams);
 
-  const { account, loading: loadingDftAcct } = useUserDefaultAccount();
+  const {
+    account,
+    loading: loadingDftAcct,
+    revalidate: revalidateDftAcct,
+  } = useUserDefaultAccount();
 
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -383,6 +387,8 @@ function Accounts() {
                 loading={loadingDftAcct}
                 link={`/accounts/default`}
                 business={false}
+                refresh
+                revalidate={revalidateDftAcct}
               />
             </SimpleGrid>
           </TabsPanel>

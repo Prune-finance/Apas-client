@@ -6,6 +6,7 @@ import {
   CardSection,
   CopyButton,
   Group,
+  Loader,
   Skeleton,
   Switch,
   Text,
@@ -14,11 +15,14 @@ import {
 import styles from "./styles.module.scss";
 import { GiEuropeanFlag, GiUsaFlag, GiNigeria } from "react-icons/gi";
 import { SecondaryBtn } from "../Buttons";
-import { IconCheck, IconCopy } from "@tabler/icons-react";
+import { IconCheck, IconCopy, IconReload } from "@tabler/icons-react";
 import { formatNumber } from "@/lib/utils";
 import Link from "next/link";
 import { SeeAll } from ".";
-import { MouseEvent } from "react";
+import { MouseEvent, useState } from "react";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import createAxiosInstance from "@/lib/axios";
 
 interface Props extends CardProps {
   currency: string;
@@ -32,6 +36,8 @@ interface Props extends CardProps {
   business?: boolean;
   disable?: boolean;
   children?: React.ReactNode;
+  refresh?: boolean;
+  revalidate?: () => Promise<void>;
 }
 
 export const AccountCard = ({
@@ -46,12 +52,30 @@ export const AccountCard = ({
   business,
   disable,
   children,
+  refresh,
+  revalidate,
   ...props
 }: Props) => {
+  const [processing, setProcessing] = useState(false);
+  const { handleError, handleSuccess } = useNotification();
+  const axios = createAxiosInstance("accounts");
+
   const handlePropagation = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     e.preventDefault();
     // return false;
+  };
+
+  const handleReload = async () => {
+    setProcessing(true);
+    try {
+      await axios.get(`/accounts/${iban}/balance/dashboard`);
+      revalidate && (await revalidate());
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
   };
 
   return link ? (
@@ -84,9 +108,35 @@ export const AccountCard = ({
               )}
             </Group>
 
-            <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
-              {badgeText ? badgeText : "Account"}
-            </Badge>
+            <Group gap={8}>
+              {refresh && (
+                <ThemeIcon
+                  radius="xl"
+                  color="#3F441B"
+                  size="md"
+                  p={4}
+                  onClick={() => handleReload()}
+                  style={{
+                    cursor: processing ? "not-allowed" : "pointer",
+                    pointerEvents: processing ? "none" : "auto",
+                  }}
+                >
+                  {processing ? (
+                    <Loader
+                      type="oval"
+                      size="xs"
+                      color="var(--prune-primary-600)"
+                    />
+                  ) : (
+                    <IconReload color="var(--prune-primary-600)" />
+                  )}
+                </ThemeIcon>
+              )}
+
+              <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
+                {badgeText ? badgeText : "Account"}
+              </Badge>
+            </Group>
           </Group>
 
           {disable && (
@@ -186,9 +236,35 @@ export const AccountCard = ({
             )}
           </Group>
 
-          <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
-            {badgeText ? badgeText : "Account"}
-          </Badge>
+          <Group gap={8}>
+            {refresh && (
+              <ThemeIcon
+                radius="xl"
+                color="#3F441B"
+                size="md"
+                p={4}
+                onClick={() => handleReload()}
+                style={{
+                  cursor: processing ? "not-allowed" : "pointer",
+                  pointerEvents: processing ? "none" : "auto",
+                }}
+              >
+                {processing ? (
+                  <Loader
+                    type="oval"
+                    size="xs"
+                    color="var(--prune-primary-600)"
+                  />
+                ) : (
+                  <IconReload color="var(--prune-primary-600)" />
+                )}
+              </ThemeIcon>
+            )}
+
+            <Badge tt="capitalize" color="#fff" c="#000" fz={10} fw={500}>
+              {badgeText ? badgeText : "Account"}
+            </Badge>
+          </Group>
         </Group>
       </CardSection>
 

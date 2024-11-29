@@ -15,7 +15,11 @@ interface Props {
 }
 
 export const PayoutAccount = ({ meta, loading }: Props) => {
-  const { loading: loadingAcct, account } = useUserDefaultPayoutAccount();
+  const {
+    loading: loadingAcct,
+    account,
+    revalidate,
+  } = useUserDefaultPayoutAccount();
 
   return (
     <main>
@@ -30,6 +34,8 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             bic={"ARPYGB21XXX"}
             loading={loadingAcct}
             link={`/payouts/${account?.id}/account`}
+            refresh
+            revalidate={revalidate}
           />
         </SimpleGrid>
       )}

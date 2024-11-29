@@ -44,7 +44,11 @@ export default function Home() {
   const { loading: debitLoading, requests } = useUserDebitRequests();
   const { loading: balanceLoading, balance } = useUserBalances();
   const { transactions } = useUserTransactions();
-  const { account, loading: loadingDftAcct } = useUserDefaultAccount();
+  const {
+    account,
+    loading: loadingDftAcct,
+    revalidate,
+  } = useUserDefaultAccount();
 
   const { loading: loadingPayout, transactions: payoutTrx } =
     useUserPayoutTransactions();
@@ -291,6 +295,8 @@ export default function Home() {
                 iban={account?.accountNumber ?? "No Default Account"}
                 bic={"ARPYGB21XXX"}
                 loading={loadingDftAcct}
+                refresh
+                revalidate={revalidate}
               />
             </GridCol>
 

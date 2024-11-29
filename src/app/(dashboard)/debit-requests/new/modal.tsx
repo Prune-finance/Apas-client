@@ -255,7 +255,7 @@ export default function DebitRequestModal({
           </Alert>
         )}
 
-        <Box mt={32}>
+        <Box mt={22}>
           {/* <Select
               placeholder="Select Account"
               classNames={{ input: styles.input, label: styles.label }}
@@ -341,7 +341,7 @@ export default function DebitRequestModal({
             </Group> */}
           </Stack>
 
-          <Box mt={40}>
+          <Box mt={30}>
             <Text fz={16} c="#97AD05">
               Destination Account:
             </Text>

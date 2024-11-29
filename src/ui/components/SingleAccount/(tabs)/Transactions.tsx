@@ -262,6 +262,12 @@ export const Transactions = ({
     }
   };
 
+  const closeAccountStatement = () => {
+    closePreview();
+    setDateRange([null, null]);
+    notifications.clean();
+  };
+
   return (
     <>
       <InfoCards title="Overview" details={overviewDetails} />
@@ -356,7 +362,7 @@ export const Transactions = ({
 
       <Modal
         opened={openedPreview}
-        onClose={closePreview}
+        onClose={closeAccountStatement}
         size={"35%"}
         centered
         withCloseButton={true}

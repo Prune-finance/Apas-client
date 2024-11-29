@@ -96,19 +96,20 @@ export const UserMainLinks = [
     icon: <IconUsers size={16} />,
   },
   {
-    text: "Payouts",
-    link: "/payouts",
-    icon: <IconArrowUpRight size={16} />,
-  },
-  {
     text: "Debit Requests",
     link: "/debit-requests",
     icon: <IconCreditCardPay size={16} />,
   },
+
   {
     text: "Account Requests",
     link: "/account-requests",
     icon: <IconUserPlus size={16} />,
+  },
+  {
+    text: "Payouts",
+    link: "/payouts",
+    icon: <IconArrowUpRight size={16} />,
   },
   {
     text: "Transactions",

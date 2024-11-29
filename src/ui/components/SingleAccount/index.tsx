@@ -635,6 +635,13 @@ export const SingleAccountBody = ({
     ),
   };
 
+  const _info = {
+    "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    "Last Activity": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
+    "No. of Transaction": trxMeta?.total ?? 0,
+    Currency: "EUR",
+  };
+
   const tabs = [
     { value: "Account Details" },
     { value: "Transactions" },
@@ -644,6 +651,28 @@ export const SingleAccountBody = ({
 
   return (
     <Box mt={32}>
+      <SimpleGrid cols={{ base: 1, md: 2 }}>
+        <Paper></Paper>
+
+        <SimpleGrid cols={2}>
+          {Object.entries(_info).map(([key, value]) => (
+            <Paper key={key} withBorder>
+              <Stack gap={2}>
+                <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+                  {key}
+                </Text>
+                {!loading || !loadingTrx ? (
+                  <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+                    {value}
+                  </Text>
+                ) : (
+                  <Skeleton w={100} h={10} />
+                )}
+              </Stack>
+            </Paper>
+          ))}
+        </SimpleGrid>
+      </SimpleGrid>
       <Grid>
         <GridCol span={!admin ? 8 : 9}>
           <SimpleGrid cols={!admin ? 3 : 4} verticalSpacing={28}>

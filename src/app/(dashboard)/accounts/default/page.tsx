@@ -57,7 +57,11 @@ function Account() {
     limit,
   ]);
 
-  const { account, loading } = useUserDefaultAccount();
+  const {
+    account,
+    loading,
+    revalidate: revalidateAcct,
+  } = useUserDefaultAccount();
   const {
     transactions,
     loading: loadingTrx,
@@ -99,6 +103,7 @@ function Account() {
         loadingTrx={loadingTrx}
         setChartFrequency={setChartFrequency}
         trxMeta={trxMeta}
+        revalidate={revalidateAcct}
       >
         <PaginationComponent
           active={active}

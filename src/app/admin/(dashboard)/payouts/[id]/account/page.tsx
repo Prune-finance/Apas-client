@@ -121,6 +121,7 @@ export default function BusinessPayoutAccount() {
           admin
           payout
           trxMeta={meta}
+          revalidate={revalidate}
         >
           <PaginationComponent
             active={active}

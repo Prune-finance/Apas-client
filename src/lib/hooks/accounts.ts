@@ -57,7 +57,7 @@ export function useAccounts(customParams: IParams = {}) {
     }
   }
 
-  const revalidate = () => fetchAccounts();
+  const revalidate = async () => fetchAccounts();
 
   useEffect(() => {
     fetchAccounts();
@@ -87,7 +87,7 @@ export function useSingleAccount(id: string) {
     }
   }
 
-  function revalidate() {
+  async function revalidate() {
     fetchAccount();
   }
 
@@ -119,7 +119,7 @@ export function useBusinessDefaultAccount(id: string) {
     }
   }
 
-  function revalidate() {
+  async function revalidate() {
     fetchAccount();
   }
 
@@ -151,7 +151,7 @@ export function useBusinessPayoutAccount(id: string) {
     }
   }
 
-  function revalidate() {
+  async function revalidate() {
     fetchAccount();
   }
 
@@ -202,7 +202,7 @@ export function usePayoutAccount(customParams: IParams = {}) {
     }
   }
 
-  function revalidate() {
+  async function revalidate() {
     fetchAccount();
   }
 
@@ -288,7 +288,7 @@ export function useUserAccounts(customParams: IParams = {}) {
     }
   };
 
-  const revalidate = () => fetchAccounts();
+  const revalidate = async () => fetchAccounts();
   const revalidateIssuance = () => handleCheckRequestAccess();
 
   useEffect(() => {
@@ -405,7 +405,7 @@ export function useSingleUserAccount(id: string) {
     }
   }
 
-  function revalidate() {
+  async function revalidate() {
     fetchAccount();
   }
 
@@ -438,7 +438,7 @@ export function useSingleAccountByIBAN(iban: string) {
     }
   }
 
-  function revalidate() {
+  async function revalidate() {
     fetchAccount();
   }
 
@@ -470,7 +470,7 @@ export function useSingleUserAccountByIBAN(iban: string) {
     }
   }
 
-  function revalidate() {
+  async function revalidate() {
     fetchAccount();
   }
 
@@ -534,7 +534,7 @@ export function useUserDefaultPayoutAccount() {
     }
   }
 
-  const revalidate = () => fetchDefaultAccount();
+  const revalidate = async () => fetchDefaultAccount();
 
   useEffect(() => {
     fetchDefaultAccount();

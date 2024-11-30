@@ -185,6 +185,7 @@ export default function Account() {
           business={business}
           admin
           trxMeta={meta}
+          revalidate={revalidateAcct}
         >
           <PaginationComponent
             active={active}

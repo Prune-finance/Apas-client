@@ -209,7 +209,7 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
             head: AccountTableHeaders,
             body: data?.map((item) => [
               dayjs(item?.createdAt).format("Do MMMM YYYY"),
-              item?.description ?? "N/A",
+              item?.description ?? item?.ref ?? "-",
               item?.type === "CREDIT"
                 ? formatNumber(item?.amount ?? 0, true, "EUR")
                 : formatNumber(0, true, "EUR"),

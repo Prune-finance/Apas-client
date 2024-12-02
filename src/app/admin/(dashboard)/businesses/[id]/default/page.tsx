@@ -75,7 +75,11 @@ export default function BusinessDefaultAccount() {
     revalidate,
   } = useSingleBusiness(params.id);
 
-  const { account, loading } = useBusinessDefaultAccount(params.id);
+  const {
+    account,
+    loading,
+    revalidate: revalidateAcct,
+  } = useBusinessDefaultAccount(params.id);
 
   const {
     loading: loadingTrx,
@@ -123,6 +127,7 @@ export default function BusinessDefaultAccount() {
           admin
           isDefault
           trxMeta={meta}
+          revalidate={revalidateAcct}
         >
           <PaginationComponent
             active={active}

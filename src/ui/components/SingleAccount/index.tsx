@@ -34,10 +34,12 @@ import {
   IconBrandLinktree,
   IconCheck,
   IconCircleArrowDown,
+  IconCircleFilled,
   IconCopy,
   IconExclamationCircle,
   IconInfoCircle,
   IconListTree,
+  IconReload,
   IconRosetteDiscountCheckFilled,
   IconShieldCheck,
 } from "@tabler/icons-react";
@@ -601,6 +603,7 @@ interface SingleAccountProps {
   accountID?: string;
   location?: string;
   isUser?: boolean;
+  revalidate: () => Promise<void>;
 }
 
 export const SingleAccountBody = ({
@@ -618,23 +621,8 @@ export const SingleAccountBody = ({
   accountID,
   location,
   isUser,
+  revalidate,
 }: SingleAccountProps) => {
-  const info = {
-    "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
-    "No. of Transaction": trxMeta?.total ?? 0,
-    Currency: "EUR",
-    ...(business && { "Created By": business?.name }),
-    "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    "Last Activity": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
-    "Account Type": payout ? (
-      <Text fw={600} fz={14} c="var(--prune-primary-800)">
-        Payout Account
-      </Text>
-    ) : (
-      getUserType(account?.type as "USER" | "CORPORATE")
-    ),
-  };
-
   const tabs = [
     { value: "Account Details" },
     { value: "Transactions" },
@@ -644,26 +632,15 @@ export const SingleAccountBody = ({
 
   return (
     <Box mt={32}>
-      <Grid>
-        <GridCol span={!admin ? 8 : 9}>
-          <SimpleGrid cols={!admin ? 3 : 4} verticalSpacing={28}>
-            {Object.entries(info).map(([key, value]) => (
-              <Stack gap={2} key={key}>
-                <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
-                  {key}
-                </Text>
-                {!loading || !loadingTrx ? (
-                  <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
-                    {value}
-                  </Text>
-                ) : (
-                  <Skeleton w={100} h={10} />
-                )}
-              </Stack>
-            ))}
-          </SimpleGrid>
-        </GridCol>
-      </Grid>
+      <AccountInfo
+        account={account}
+        loading={loading}
+        loadingTrx={loadingTrx}
+        payout={payout}
+        trxMeta={trxMeta}
+        isUser={isUser}
+        revalidate={revalidate}
+      />
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
@@ -714,25 +691,8 @@ export const SingleDefaultAccountBody = ({
   trxMeta,
   children,
   location,
+  revalidate,
 }: SingleDefaultAccountProps) => {
-  const info = {
-    "Account Balance": formatNumber(account?.accountBalance ?? 0, true, "EUR"),
-    "No. of Transaction": trxMeta?.total ?? 0,
-    Currency: "EUR",
-    ...(business && !payout && { "Created By": business?.name }),
-    "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    "Last Activity": dayjs(business?.lastLogin).format("Do MMMM, YYYY"),
-    "Account Type": payout ? (
-      <Text fw={600} fz={14} c="var(--prune-primary-800)">
-        Payout Account
-      </Text>
-    ) : isDefault ? (
-      "Main Account"
-    ) : (
-      getUserType(account?.type ?? "USER")
-    ),
-  };
-
   const tabs = [
     { value: "Account Details" },
     { value: "Transactions" },
@@ -742,26 +702,15 @@ export const SingleDefaultAccountBody = ({
 
   return (
     <Box mt={32}>
-      <Grid>
-        <GridCol span={!admin ? 8 : 9}>
-          <SimpleGrid cols={!admin ? 3 : 4} verticalSpacing={28}>
-            {Object.entries(info).map(([key, value]) => (
-              <Stack gap={2} key={key}>
-                <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
-                  {key}
-                </Text>
-                {!loading || !loadingTrx ? (
-                  <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
-                    {value}
-                  </Text>
-                ) : (
-                  <Skeleton w={100} h={10} />
-                )}
-              </Stack>
-            ))}
-          </SimpleGrid>
-        </GridCol>
-      </Grid>
+      <AccountInfo
+        account={account}
+        loading={loading}
+        loadingTrx={loadingTrx}
+        payout={payout}
+        trxMeta={trxMeta}
+        isUser={!admin}
+        revalidate={revalidate}
+      />
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
@@ -1047,5 +996,143 @@ export const DefaultAccountHead = ({
 
       <SendMoney opened={opened} closeMoney={closeMoney} account={account} />
     </>
+  );
+};
+
+interface AccountInfoProps {
+  loading: boolean;
+  loadingTrx: boolean;
+  account: Account | DefaultAccount | null;
+  payout?: boolean;
+  trxMeta: Meta | null;
+  isUser?: boolean;
+  revalidate?: () => Promise<void>;
+}
+
+export const AccountInfo = ({
+  loading,
+  loadingTrx,
+  account,
+  payout,
+  trxMeta,
+  isUser,
+  revalidate,
+}: AccountInfoProps) => {
+  const [processing, setProcessing] = useState(false);
+  const { handleError } = useNotification();
+  const axios = createAxiosInstance("accounts");
+  const _info = {
+    "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
+    "Last Activity": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
+    "No. of Transaction": trxMeta?.total ?? 0,
+    Currency: "EUR",
+  };
+
+  const handleReload = async () => {
+    setProcessing(true);
+    try {
+      await axios.get(`/accounts/${account?.accountNumber}/balance/dashboard`);
+      revalidate && (await revalidate());
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+  return (
+    <SimpleGrid cols={{ base: 1, md: 2 }}>
+      <Paper withBorder p={16} radius={4}>
+        <Flex justify="space-between">
+          <Stack gap={8}>
+            <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+              Account Balance
+            </Text>
+
+            {!loading || !loadingTrx ? (
+              <Text fz={24} fw={600} c="var(--prune-text-gray-800)" mt={8}>
+                {formatNumber(account?.accountBalance ?? 0, true, "EUR")}
+              </Text>
+            ) : (
+              <Skeleton w={100} h={30} />
+            )}
+
+            {isUser && (
+              <PrimaryBtn
+                text="Refresh Balance"
+                color="var(--prune-primary-600)"
+                c="var(--prune-primary-900)"
+                loading={processing}
+                action={handleReload}
+                leftSection={
+                  <ThemeIcon
+                    variant="transparent"
+                    color="var(--prune-primary-700)"
+                    size={20}
+                  >
+                    <IconReload />
+                  </ThemeIcon>
+                }
+                td="underline"
+              />
+            )}
+          </Stack>
+
+          <Stack gap={2}>
+            <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+              Account Type
+            </Text>
+            {!loading || !loadingTrx ? (
+              <Badge
+                variant="light"
+                color="var(--prune-primary-600)"
+                c="var(--prune-text-gray-800)"
+                // p="6px 8px"
+                py={12}
+                px={8}
+                leftSection={
+                  <ThemeIcon
+                    variant="transparent"
+                    color="var(--prune-primary-700)"
+                    size={16}
+                  >
+                    <IconCircleFilled />
+                  </ThemeIcon>
+                }
+                fw={500}
+                fz={14}
+                tt="capitalize"
+              >
+                {payout
+                  ? "Payout Account"
+                  : getUserType(
+                      account?.type as "USER" | "CORPORATE"
+                    ).toLowerCase()}
+              </Badge>
+            ) : (
+              <Skeleton w={100} h={10} />
+            )}
+          </Stack>
+        </Flex>
+      </Paper>
+
+      <SimpleGrid cols={{ base: 1, md: 2 }}>
+        {Object.entries(_info).map(([key, value]) => (
+          <Paper key={key} withBorder p={12} radius={4}>
+            <Stack gap={2}>
+              <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+                {key}
+              </Text>
+              {!loading || !loadingTrx ? (
+                <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+                  {value}
+                </Text>
+              ) : (
+                <Skeleton w={100} h={10} />
+              )}
+            </Stack>
+          </Paper>
+        ))}
+      </SimpleGrid>
+    </SimpleGrid>
   );
 };

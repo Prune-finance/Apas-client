@@ -96,6 +96,7 @@ export interface DownloadStatementData {
   amount: number;
   balance: number;
   description: string;
+  ref: string;
   companyAccountId: string | null;
   createdAt: string; // ISO date string
   deletedAt: string | null; // ISO date string or null
@@ -392,7 +393,7 @@ export const Transactions = ({
             mt={12}
             type="range"
             allowSingleDateInRange
-            rightSection={<IconCalendarMonth size={20} />}
+            leftSection={<IconCalendarMonth size={20} />}
             numberOfColumns={2}
             clearable
             disabled={loadingStatement}

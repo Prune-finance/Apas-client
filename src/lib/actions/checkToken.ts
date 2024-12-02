@@ -2,12 +2,11 @@
 
 import axios from "axios";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import User from "../store/user";
+import { AdminData } from "../hooks/admins";
 
 export async function checkToken(
   isAdmin: boolean = false
-): Promise<{ user: User | null; success: boolean }> {
+): Promise<{ user: AdminData | null; success: boolean }> {
   const token = cookies().get("auth")?.value;
   let success = false;
   try {

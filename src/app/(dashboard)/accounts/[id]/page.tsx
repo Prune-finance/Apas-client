@@ -272,6 +272,7 @@ export default function Account() {
         trxMeta={txrMeta}
         location="issued-account"
         isUser
+        revalidate={revalidate}
       >
         <PaginationComponent
           active={active}

@@ -63,7 +63,7 @@ export default function SingleUserPayoutAccount() {
     limit,
   ]);
 
-  const { loading, account } = useUserDefaultPayoutAccount();
+  const { loading, account, revalidate } = useUserDefaultPayoutAccount();
 
   const { business, loading: loadingBiz } = useUserBusiness();
 
@@ -108,6 +108,7 @@ export default function SingleUserPayoutAccount() {
         business={business}
         payout
         trxMeta={meta}
+        revalidate={revalidate}
       >
         <PaginationComponent
           active={active}

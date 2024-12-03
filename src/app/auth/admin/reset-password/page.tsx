@@ -43,14 +43,14 @@ function UserForgotPassword() {
     const { otp, password } = form.values;
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/reset-password`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/reset-password`,
         { token: Number(otp), password }
       );
       handleSuccess(
         "Successful! Password Reset",
         "Your password has been changed successfully"
       );
-      push("/auth/login");
+      push("/auth/admin/login");
     } catch (error) {
       handleError("Password Reset Failed", parseError(error));
     } finally {

@@ -31,14 +31,14 @@ export default function UserForgotPassword() {
     setProcessing(true);
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/auth/forgot-password`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/forgot-password`,
         { ...form.values }
       );
       handleSuccess(
         "Email Sent",
         `A password reset link has been sent to your email. `
       );
-      push("/auth/reset-password");
+      push("/auth/admin/reset-password");
     } catch (error) {
       handleError("Sending Reset Link Failed", parseError(error));
     } finally {

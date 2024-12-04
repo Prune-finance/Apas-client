@@ -1,6 +1,5 @@
 "use client";
 import dayjs from "dayjs";
-import Cookies from "js-cookie";
 
 import React, { Dispatch, SetStateAction, Suspense, useState } from "react";
 
@@ -37,7 +36,6 @@ import {
   getUserType,
 } from "@/lib/utils";
 
-import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import Filter from "@/ui/components/Filter";
@@ -58,9 +56,11 @@ import {
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import * as XLSX from "xlsx";
+import createAxiosInstance from "@/lib/axios";
 
 function Accounts() {
   const searchParams = useSearchParams();
+  const axios = createAxiosInstance("accounts");
 
   const { status, date, endDate, accountName, accountNumber, type } =
     Object.fromEntries(searchParams.entries());
@@ -101,15 +101,11 @@ function Accounts() {
     try {
       const { reason, supportingDocumentName, supportingDocumentUrl } =
         requestForm.values;
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/freeze`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/accounts/${id}/freeze`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       revalidate();
       handleSuccess("Action Completed", "Account frozen");
@@ -127,15 +123,11 @@ function Accounts() {
       const { reason, supportingDocumentName, supportingDocumentUrl } =
         requestForm.values;
 
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/deactivate`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/accounts/${id}/deactivate`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
       revalidate();
       handleSuccess("Action Completed", "Account Deactivated");
       close();
@@ -152,15 +144,11 @@ function Accounts() {
       const { reason, supportingDocumentName, supportingDocumentUrl } =
         requestForm.values;
 
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/activate`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/accounts/${id}/activate`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
       revalidate();
       handleSuccess("Action Completed", "Account Activated");
       activateClose();
@@ -177,15 +165,11 @@ function Accounts() {
       const { reason, supportingDocumentName, supportingDocumentUrl } =
         requestForm.values;
 
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/unfreeze`,
-        {
-          reason,
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-          ...(supportingDocumentName && { supportingDocumentName }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/accounts/${id}/unfreeze`, {
+        reason,
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        ...(supportingDocumentName && { supportingDocumentName }),
+      });
 
       revalidate();
       handleSuccess("Action Completed", "Account unfrozen");
@@ -213,10 +197,7 @@ function Accounts() {
 
   const fetchAccounts = async (limit: number) => {
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts?limit=${limit}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/accounts?limit=${limit}`);
 
       return data.data;
     } catch (error) {

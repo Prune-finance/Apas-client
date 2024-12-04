@@ -9,13 +9,13 @@ import { useState } from "react";
 import { AllNotification } from "./(tabs)/All";
 import { UnreadNotification } from "./(tabs)/Unread";
 import { ReadNotification } from "./(tabs)/Read";
-import axios from "axios";
-import Cookies from "js-cookie";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useDebouncedValue } from "@mantine/hooks";
+import createAxiosInstance from "@/lib/axios";
 
 export default function AdminNotification() {
+  const axios = createAxiosInstance("auth");
   const [processing, setProcessing] = useState(false);
 
   const initialDateRange: [Date | null, Date | null] = [null, null];
@@ -27,11 +27,7 @@ export default function AdminNotification() {
   const markAllNotificationAsRead = async () => {
     setProcessing(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/notifications/mark-all-as-read`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/notifications/mark-all-as-read`, {});
 
       handleSuccess(
         "Mark All Notifications",

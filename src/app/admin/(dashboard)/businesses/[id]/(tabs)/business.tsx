@@ -1,5 +1,4 @@
 "use client";
-import Cookies from "js-cookie";
 
 import {
   Checkbox,
@@ -22,7 +21,6 @@ import {
 } from "@/lib/hooks/businesses";
 import { useState } from "react";
 import { useForm, UseFormReturnType } from "@mantine/form";
-import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { usePricingPlan } from "@/lib/hooks/pricing-plan";
@@ -46,6 +44,7 @@ export default function Business({
   revalidateServices: () => Promise<void>;
   services: Service[];
 }) {
+  const axios = createAxiosInstance("accounts");
   const { handleSuccess, handleError } = useNotification();
 
   const initialValues = {
@@ -75,14 +74,10 @@ export default function Business({
 
   const handleBusinessUpdate = async () => {
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          // ...business,
-          ...form.values,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        // ...business,
+        ...form.values,
+      });
 
       handleSuccess("Business Updated", "");
       revalidate();

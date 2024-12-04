@@ -22,11 +22,11 @@ import { parseError } from "@/lib/actions/auth";
 import { validateRequest } from "@/lib/schema";
 import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
 import { IconBrandLinktree } from "@tabler/icons-react";
-import axios from "axios";
+
 import useNotification from "@/lib/hooks/notification";
-import Cookies from "js-cookie";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
+import createAxiosInstance from "@/lib/axios";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -34,6 +34,7 @@ export default function Account() {
   const [limit, setLimit] = useState<string | null>("10");
 
   const searchParams = useSearchParams();
+  const axios = createAxiosInstance("accounts");
 
   const {
     status,
@@ -111,15 +112,11 @@ export default function Account() {
         requestForm.values;
 
       const path = freeze ? "freeze" : "unfreeze";
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${id}/${path}`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/accounts/${id}/${path}`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       const message = freeze ? "Account frozen" : "Account unfrozen";
       handleSuccess("Action Completed", message);

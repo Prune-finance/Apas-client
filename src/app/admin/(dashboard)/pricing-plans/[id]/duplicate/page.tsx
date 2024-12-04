@@ -1,12 +1,10 @@
 "use client";
-import Cookies from "js-cookie";
 
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { MultiSelectCreatable } from "@/ui/components/SelectCreatable";
 import {
   Paper,
-  Button,
   Title,
   Box,
   Group,
@@ -19,23 +17,21 @@ import {
 } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  newPricingPlan,
-  pricingPlanSchema,
-  PricingPlanType,
-} from "@/lib/schema";
+import { pricingPlanSchema, PricingPlanType } from "@/lib/schema";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 import { IconX } from "@tabler/icons-react";
 import useNotification from "@/lib/hooks/notification";
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import { parseError } from "@/lib/actions/auth";
 import { useSinglePricingPlan } from "@/lib/hooks/pricing-plan";
 import classes from "@/app/admin/(dashboard)/pricing-plans/styles.module.scss";
+import createAxiosInstance from "@/lib/axios";
 
 export default function EditPlan() {
   const params = useParams<{ id: string }>();
+  const axios = createAxiosInstance("auth");
   const [opened, { open, close }] = useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
   const { push } = useRouter();
@@ -73,11 +69,10 @@ export default function EditPlan() {
     setProcessing(true);
     const { description, ...rest } = form.values;
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/pricing-plan`,
-        { ...rest, features: selectedValues },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/pricing-plan`, {
+        ...rest,
+        features: selectedValues,
+      });
 
       push("/admin/pricing-plans");
       handleSuccess(

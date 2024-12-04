@@ -1,5 +1,4 @@
 "use client";
-import Cookies from "js-cookie";
 
 import {
   Button,
@@ -13,7 +12,7 @@ import {
   Text,
 } from "@mantine/core";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import axios from "axios";
+
 import {
   IconBuildingSkyscraper,
   IconCurrencyEuro,
@@ -54,6 +53,7 @@ import duration from "dayjs/plugin/duration";
 
 dayjs.extend(duration);
 import { notifications } from "@mantine/notifications";
+import createAxiosInstance from "@/lib/axios";
 
 dayjs.extend(duration);
 
@@ -61,7 +61,7 @@ export default function SingleBusiness() {
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const { loading, business, revalidate, meta } = useSingleBusiness(params.id);
-
+  const axios = createAxiosInstance("auth");
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab")?.toLowerCase() || "business";
 
@@ -87,11 +87,9 @@ export default function SingleBusiness() {
     try {
       const currentState = business?.kycTrusted;
 
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/kyc/${params.id}`,
-        { trustKyc: !currentState },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/company/kyc/${params.id}`, {
+        trustKyc: !currentState,
+      });
 
       revalidate();
       handleSuccess(
@@ -109,11 +107,10 @@ export default function SingleBusiness() {
   const sendActivationLink = async () => {
     setProcessingLink(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/registration-link`,
-        { email: business?.contactEmail, companyId: business?.id },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/registration-link`, {
+        email: business?.contactEmail,
+        companyId: business?.id,
+      });
 
       handleSuccess("Action Completed", `Activation Link sent`);
       revalidate();
@@ -129,9 +126,8 @@ export default function SingleBusiness() {
 
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/business/${params.id}/account-issuance/enable`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/business/${params.id}/account-issuance/enable`,
+        {}
       );
 
       handleSuccess(
@@ -150,11 +146,7 @@ export default function SingleBusiness() {
   const toggleBusinessActivation = async () => {
     setProcessingActive(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${params.id}/toggle-status`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/company/${params.id}/toggle-status`, {});
 
       handleSuccess("Action Completed", `Company status updated`);
       revalidate();

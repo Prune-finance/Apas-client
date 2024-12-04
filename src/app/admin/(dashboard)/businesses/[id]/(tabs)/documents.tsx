@@ -3,7 +3,6 @@
 import {
   ActionIcon,
   Box,
-  Button,
   FileButton,
   Flex,
   Grid,
@@ -12,23 +11,18 @@ import {
   Modal,
   Text,
   TextInput,
-  ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
 import {
   IconFileTypePdf,
-  IconJpg,
-  IconPdf,
   IconPencilMinus,
   IconPlus,
   IconX,
 } from "@tabler/icons-react";
-import Cookies from "js-cookie";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, OtherDocuments } from "@/lib/hooks/businesses";
 import { useState } from "react";
-import axios from "axios";
 import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -40,8 +34,8 @@ import {
   OtherDocumentType,
   otherDocumentValues,
 } from "@/lib/schema";
-import { title } from "process";
 import FileDisplay from "@/ui/components/DocumentViewer";
+import createAxiosInstance from "@/lib/axios";
 
 export default function Documents({
   business,
@@ -55,6 +49,7 @@ export default function Documents({
   const [editingDoc, setEditingDoc] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const axios = createAxiosInstance("auth");
 
   const initialValues = {
     cacCertificate: business.cacCertificate,
@@ -81,18 +76,14 @@ export default function Documents({
 
     setProcessing(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          contactEmail,
-          name,
-          domain,
-          contactNumber,
-          ...form.values,
-          ...(documents && { documents }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        contactEmail,
+        name,
+        domain,
+        contactNumber,
+        ...form.values,
+        ...(documents && { documents }),
+      });
 
       handleSuccess("Business Updated", "");
       revalidate();
@@ -320,6 +311,7 @@ const DocumentTextInput = ({
   const [processing, setProcessing] = useState(false);
   const { handleError, handleInfo } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
+  const axios = createAxiosInstance("auth");
 
   const handleUpload = async (file: File | null, formKey: string) => {
     setProcessing(true);
@@ -329,11 +321,7 @@ const DocumentTextInput = ({
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.post(`/admin/upload`, formData);
 
       if (formKey) {
         form.setFieldValue(formKey, data.data.url);
@@ -440,6 +428,7 @@ const OtherDocumentTextInput = ({
   const [processing, setProcessing] = useState(false);
   const { handleError, handleInfo } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
+  const axios = createAxiosInstance("auth");
 
   const handleUpload = async (file: File | null) => {
     setProcessing(true);
@@ -449,11 +438,7 @@ const OtherDocumentTextInput = ({
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data: res } = await axios.post(`/admin/upload`, formData);
 
       form.setFieldValue(`documents.${index}.documentURL`, res.data.url);
     } catch (error) {

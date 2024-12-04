@@ -46,7 +46,7 @@ import {
   IconSend,
   IconX,
 } from "@tabler/icons-react";
-import axios from "axios";
+
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -54,11 +54,13 @@ dayjs.extend(advancedFormat);
 import { useParams } from "next/navigation";
 import { useRef, useState } from "react";
 import { z } from "zod";
-import Cookies from "js-cookie";
+
 import { useForm, zodResolver } from "@mantine/form";
+import createAxiosInstance from "@/lib/axios";
 
 export default function InquiryPage() {
   const { id } = useParams<{ id: string }>();
+  const axios = createAxiosInstance("payouts");
   const [opened, { toggle }] = useDisclosure(true);
   const [closeOpened, { open, close }] = useDisclosure(false);
   const [processing, setProcessing] = useState(false);
@@ -93,16 +95,12 @@ export default function InquiryPage() {
       const { text, file, extension } = form.values;
       const type = getMsgType(text, file);
 
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/inquiries/${id}/message`,
-        {
-          type,
-          ...(file && { file }),
-          ...(extension && { extension }),
-          ...(text && { text }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.put(`/admin/inquiries/${id}/message`, {
+        type,
+        ...(file && { file }),
+        ...(extension && { extension }),
+        ...(text && { text }),
+      });
 
       form.reset();
       setFile(null);
@@ -118,11 +116,7 @@ export default function InquiryPage() {
   const handleInquiryStatus = async (type: "close" | "open") => {
     setProcessing(true);
     try {
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/inquiries/${id}/${type}`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/inquiries/${id}/${type}`, {});
 
       const title = `${camelCaseToTitleCase(
         inquiry?.type.toLowerCase() ?? ""
@@ -147,11 +141,7 @@ export default function InquiryPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data: res } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data: res } = await axios.post(`/admin/upload`, formData);
 
       form.setFieldValue("file", res.data.url);
       form.setFieldValue("extension", file.type);

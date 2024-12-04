@@ -2,12 +2,12 @@ import useNotification from "@/lib/hooks/notification";
 import { DebitRequest, useCompanyDebitRequests } from "@/lib/hooks/requests";
 import { filteredSearch } from "@/lib/search";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import axios from "axios";
+
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { formatNumber } from "@/lib/utils";
-import Cookies from "js-cookie";
+
 import { BadgeComponent } from "@/ui/components/Badge";
 import { TableTr, TableTd, Box, Group } from "@mantine/core";
 import dayjs from "dayjs";
@@ -21,10 +21,11 @@ import DebitDrawer from "@/app/admin/(dashboard)/requests/drawer";
 import PaginationComponent from "@/ui/components/Pagination";
 import { debitTableHeaders } from "@/lib/static";
 import { SearchInput } from "@/ui/components/Inputs";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import createAxiosInstance from "@/lib/axios";
 
 export const Debit = () => {
   const { id } = useParams<{ id: string }>();
+  const axios = createAxiosInstance("payouts");
 
   const { loading, requests, revalidate, meta } = useCompanyDebitRequests(id);
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
@@ -51,9 +52,8 @@ export const Debit = () => {
     setProcessing(true);
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/reject`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/debit/requests/${selectedRequest.id}/reject`,
+        {}
       );
 
       await revalidate();
@@ -72,9 +72,8 @@ export const Debit = () => {
     setProcessing(true);
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/approve`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/debit/requests/${selectedRequest.id}/approve`,
+        {}
       );
 
       await revalidate();

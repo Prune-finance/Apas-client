@@ -1,48 +1,29 @@
 "use client";
-import Cookies from "js-cookie";
 
-import {
-  Avatar,
-  Button,
-  Group,
-  Skeleton,
-  Stack,
-  Tabs,
-  TabsList,
-  TabsPanel,
-  TabsTab,
-  Text,
-} from "@mantine/core";
+import { Avatar, Group, Skeleton, Stack, TabsPanel, Text } from "@mantine/core";
 import { useParams, useRouter } from "next/navigation";
 import {
-  IconArrowLeft,
-  IconBuildingSkyscraper,
   IconCheck,
   IconFileDescription,
-  IconPointFilled,
   IconRosetteDiscountCheckFilled,
   IconUser,
-  IconUsers,
-  IconUsersGroup,
   IconX,
 } from "@tabler/icons-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/singlebusiness.module.scss";
 
-import Business from "./(tabs)/business";
 import Directors from "./(tabs)/directors";
 import Account from "./(tabs)/accounts";
 import ModalComponent from "@/ui/components/Modal";
 import { useDisclosure } from "@mantine/hooks";
 import { useSingleRequest } from "@/lib/hooks/requests";
 import Shareholders from "./(tabs)/shareholder";
-import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { getInitials } from "@/lib/utils";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import Link from "next/link";
@@ -53,6 +34,7 @@ import {
   areSomeDocumentsNotApproved,
 } from "@/lib/helpers/document-status";
 import { notifications } from "@mantine/notifications";
+import createAxiosInstance from "@/lib/axios";
 
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
@@ -62,6 +44,7 @@ export default function SingleRequest() {
   );
   const { handleSuccess, handleError, handleInfo } = useNotification();
   const router = useRouter();
+  const axios = createAxiosInstance("accounts");
 
   const [opened, { open, close }] = useDisclosure(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
@@ -112,11 +95,7 @@ export default function SingleRequest() {
 
     setProcessing(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/approve/${params.requestId}`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/request/approve/${params.requestId}`, {});
 
       closeApprove();
       handleSuccess(
@@ -136,11 +115,9 @@ export default function SingleRequest() {
     if (!reason) return handleInfo("Please provide a reason", "");
     setProcessing(true);
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${params.requestId}`,
-        { ...(reason && { reason }) },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/request/reject/${params.requestId}`, {
+        ...(reason && { reason }),
+      });
 
       close();
       handleSuccess(

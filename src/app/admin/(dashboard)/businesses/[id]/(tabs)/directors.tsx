@@ -1,58 +1,37 @@
 "use client";
 
 import {
-  ActionIcon,
   Box,
-  Button,
-  Drawer,
-  FileButton,
   Flex,
   Grid,
   GridCol,
   Group,
   Modal,
-  Paper,
   Select,
   Stack,
   Text,
-  Textarea,
   TextInput,
-  ThemeIcon,
-  UnstyledButton,
 } from "@mantine/core";
-import {
-  IconFileInfo,
-  IconPencilMinus,
-  IconPlus,
-  IconTrash,
-  IconX,
-} from "@tabler/icons-react";
-import { Fragment, useState } from "react";
-import Cookies from "js-cookie";
+import { IconPencilMinus, IconPlus, IconTrash } from "@tabler/icons-react";
+import { useState } from "react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
 
 import { useDisclosure } from "@mantine/hooks";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
-import {
-  directorEtShareholderSchema,
-  removeDirectorSchema,
-  removeDirectorValues,
-  validateDirectors,
-} from "@/lib/schema";
+import { directorEtShareholderSchema, validateDirectors } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
-import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import classes from "@/ui/styles/containedInput.module.scss";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { set } from "zod";
 import DropzoneComponent from "@/ui/components/Dropzone";
 import {
   closeButtonProps,
   DocumentTextInput,
   RemoveDirectorModal,
 } from "./utils";
+import createAxiosInstance from "@/lib/axios";
 
 export default function Directors({
   business,
@@ -61,6 +40,7 @@ export default function Directors({
   business: BusinessData;
   revalidate: () => void;
 }) {
+  const axios = createAxiosInstance("auth");
   const { handleSuccess, handleError } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -87,17 +67,13 @@ export default function Directors({
     const { contactEmail, name, contactNumber, domain } = business;
     try {
       const directors = removeItemAtIndex(index);
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          contactEmail,
-          name,
-          domain,
-          contactNumber,
-          directors,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        contactEmail,
+        name,
+        domain,
+        contactNumber,
+        directors,
+      });
 
       handleSuccess(
         "Business Updated",
@@ -121,17 +97,13 @@ export default function Directors({
       if (error) {
         throw new Error(error.issues[0].message);
       }
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          contactEmail,
-          name,
-          domain,
-          contactNumber,
-          directors: [...business.directors, { ...form.values }],
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        contactEmail,
+        name,
+        domain,
+        contactNumber,
+        directors: [...business.directors, { ...form.values }],
+      });
 
       handleSuccess("Business Updated", "");
       revalidate();
@@ -149,17 +121,13 @@ export default function Directors({
     const { contactEmail, name, contactNumber, domain } = business;
     try {
       const directors = replaceItemAtIndex(index, directorValue);
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          contactEmail,
-          name,
-          domain,
-          contactNumber,
-          directors,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        contactEmail,
+        name,
+        domain,
+        contactNumber,
+        directors,
+      });
 
       handleSuccess("Business Updated", "");
       revalidate();

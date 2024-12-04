@@ -1,8 +1,5 @@
-import Cookies from "js-cookie";
-
 import { Badge, TableTd, TableTr, TabsPanel, SimpleGrid } from "@mantine/core";
 import localFont from "next/font/local";
-import axios from "axios";
 import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect } from "react";
 import {
@@ -27,14 +24,12 @@ import { useParams, useRouter, useSearchParams } from "next/navigation";
 import styles from "@/ui/styles/business.module.scss";
 import { TableComponent } from "@/ui/components/Table";
 
-import {
-  useBusinessTransactions,
-  useTransactions,
-} from "@/lib/hooks/transactions";
+import { useBusinessTransactions } from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
 import TabsComponent from "@/ui/components/Tabs";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import EmptyTable from "@/ui/components/EmptyTable";
+import createAxiosInstance from "@/lib/axios";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -49,6 +44,7 @@ export default function Accounts({
   // const [defaultAccount, setDefaultAccount] = useState<AccountData | null>(
   //   null
   // );
+  const axios = createAxiosInstance("accounts");
   const [meta, setMeta] = useState<{ total: number } | null>(null);
   const { handleError } = useNotification();
 
@@ -96,8 +92,7 @@ export default function Accounts({
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/company/${business?.id}/accounts?${params}`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/company/${business?.id}/accounts?${params}`
       );
 
       setAccounts(data.data);

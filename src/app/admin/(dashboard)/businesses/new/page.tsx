@@ -1,9 +1,8 @@
 "use client";
-import axios from "axios";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconMail, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
-import Cookies from "js-cookie";
 
 import {
   Flex,
@@ -15,8 +14,6 @@ import {
   Stepper,
   Divider,
   Checkbox,
-  Modal,
-  Image,
 } from "@mantine/core";
 import { TextInput, Select, Button } from "@mantine/core";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
@@ -29,7 +26,6 @@ import {
   directorEtShareholderSchema,
   NewBusinessType,
   newBusiness,
-  validateNewBusiness,
   basicInfoSchema,
   documentSchema,
   directorsSchema,
@@ -44,6 +40,7 @@ import ModalComponent from "@/ui/components/Modal";
 import { useDisclosure } from "@mantine/hooks";
 import SuccessModalImage from "@/assets/success-modal-image.png";
 import SuccessModal from "@/ui/components/SuccessModal";
+import createAxiosInstance from "@/lib/axios";
 
 interface DirectorEtShareholder
   extends Omit<
@@ -56,6 +53,7 @@ interface DirectorEtShareholder
 
 export default function NewBusiness() {
   const router = useRouter();
+  const axios = createAxiosInstance("auth");
   const [processing, setProcessing] = useState(false);
 
   const [opened, { open, close }] = useDisclosure(false);
@@ -63,7 +61,7 @@ export default function NewBusiness() {
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
     useDisclosure(false);
 
-  const { handleSuccess, handleError, handleInfo } = useNotification();
+  const { handleError } = useNotification();
 
   const [active, setActive] = useState(0);
 
@@ -127,20 +125,16 @@ export default function NewBusiness() {
 
       // For pricing plan, the key will be "pricingPlanId"
 
-      const data = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company`,
-        {
-          ...rest,
-          pricingPlanId: pricingPlan,
-          ...(initialDirEmpty
-            ? { directors: [] }
-            : { directors: removeIdFromObjects(directors) }),
-          ...(initialShrEmpty
-            ? { shareholders: [] }
-            : { shareholders: removeIdFromObjects(shareholders) }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const data = await axios.post(`/admin/company`, {
+        ...rest,
+        pricingPlanId: pricingPlan,
+        ...(initialDirEmpty
+          ? { directors: [] }
+          : { directors: removeIdFromObjects(directors) }),
+        ...(initialShrEmpty
+          ? { shareholders: [] }
+          : { shareholders: removeIdFromObjects(shareholders) }),
+      });
 
       // handleSuccess(
       //   "Business Created",

@@ -1,8 +1,6 @@
 "use client";
 
 import {
-  Badge,
-  Button,
   Flex,
   Group,
   Skeleton,
@@ -11,9 +9,7 @@ import {
   Tooltip,
   UnstyledButton,
 } from "@mantine/core";
-import { IconAB2, IconInfoCircle } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
-import axios from "axios";
 import { useParams } from "next/navigation";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
@@ -21,8 +17,7 @@ import { BusinessData } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useClipboard } from "@mantine/hooks";
-import Cookies from "js-cookie";
-import { set } from "zod";
+import createAxiosInstance from "@/lib/axios";
 
 export default function Keys({
   business,
@@ -35,6 +30,7 @@ export default function Keys({
   const [processing, setProcessing] = useState(false);
   const params = useParams<{ id: string }>();
   const { handleError } = useNotification();
+  const axios = createAxiosInstance("auth");
 
   const { live, test } = useMemo(() => {
     const live = keys.find((key) => key.staging === "LIVE");
@@ -46,10 +42,7 @@ export default function Keys({
   const fetchBusinessSecrets = async () => {
     setProcessing(true);
     try {
-      const { data } = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${params.id}/secrets`,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.get(`/admin/company/${params.id}/secrets`);
 
       setKeys(data.data);
     } catch (error) {

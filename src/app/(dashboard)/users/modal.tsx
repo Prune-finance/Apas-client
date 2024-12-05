@@ -26,6 +26,7 @@ export default function ModalComponent({
   form,
   isEdit,
   setIsEdit,
+  text,
 }: ModalProps) {
   return (
     <Modal
@@ -57,7 +58,9 @@ export default function ModalComponent({
             {isEdit ? "Edit User" : "Invite a New User"}
           </Text>
           <Text fz={14} className="grey-400">
-            {isEdit
+            {text
+              ? text
+              : isEdit
               ? "Update User Details"
               : "Invite a user to collaborate with you."}
           </Text>
@@ -154,4 +157,5 @@ interface ModalProps {
   form: UseFormReturnType<typeof newAdmin>;
   isEdit: boolean;
   setIsEdit: Dispatch<SetStateAction<boolean>>;
+  text?: string;
 }

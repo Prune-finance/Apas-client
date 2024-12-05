@@ -3,6 +3,7 @@
 import { Group, Skeleton, TableTd, TableTr, Text } from "@mantine/core";
 import {
   IconListTree,
+  IconPlus,
   IconRosetteDiscountCheckFilled,
 } from "@tabler/icons-react";
 
@@ -26,20 +27,34 @@ import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 
 import PaginationComponent from "@/ui/components/Pagination";
-import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import {
+  FilterSchema,
+  FilterType,
+  FilterValues,
+  newAdmin,
+  validateNewAdmin,
+} from "@/lib/schema";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useBusinessUsers } from "@/lib/hooks/admins";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import EmptyTable from "@/ui/components/EmptyTable";
 
+import useNotification from "@/lib/hooks/notification";
+import createAxiosInstance from "@/lib/axios";
+import { parseError } from "@/lib/actions/auth";
+import ModalComponent from "@/app/(dashboard)/users/modal";
+
 export default function AllBusinessUsers() {
   const searchParams = useSearchParams();
   const { id } = useParams<{ id: string }>();
+  const axios = createAxiosInstance("auth");
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [processing, setProcessing] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
 
   const { status, date, endDate, name, email } = Object.fromEntries(
     searchParams.entries()
@@ -60,20 +75,58 @@ export default function AllBusinessUsers() {
     page: active,
   };
 
-  const { loading, users, meta } = useBusinessUsers(queryParams, id);
+  const { loading, users, meta, revalidate } = useBusinessUsers(
+    queryParams,
+    id
+  );
 
   const { business, loading: loadingBiz } = useSingleBusiness(id);
 
   const [opened, { toggle }] = useDisclosure(false);
+  const [openedModal, { open, close }] = useDisclosure(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { push } = useRouter();
+  const { handleError, handleSuccess } = useNotification();
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
+
+  const new_form = useForm({
+    initialValues: newAdmin,
+    validate: zodResolver(validateNewAdmin),
+  });
+
+  const addBusinessUser = async () => {
+    setProcessing(true);
+
+    try {
+      const { hasErrors, errors } = form.validate();
+      if (hasErrors) {
+        return;
+      }
+
+      const { email } = new_form.values;
+
+      await axios.post(`/admin/company/${id}/users/add`, { email });
+
+      revalidate();
+      close();
+      handleSuccess(
+        `Successful! User Added`,
+        `User added to ${business?.name} successfully`
+      );
+      // router.push("/admin/users");
+      new_form.reset();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   const handleRowClick = (userId: string) => {
     push(`/admin/users/${id}/business/${userId}`);
@@ -147,12 +200,21 @@ export default function AllBusinessUsers() {
       <Group justify="space-between" mt={32} className={switzer.className}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn
-          text="Filter"
-          icon={IconListTree}
-          action={toggle}
-          fw={600}
-        />
+        <Group>
+          <SecondaryBtn
+            text="Filter"
+            icon={IconListTree}
+            action={toggle}
+            fw={600}
+          />
+
+          <PrimaryBtn
+            text="Add New User"
+            fw={600}
+            icon={IconPlus}
+            action={open}
+          />
+        </Group>
       </Group>
 
       <Filter<FilterType>
@@ -186,6 +248,17 @@ export default function AllBusinessUsers() {
         setLimit={setLimit}
         limit={limit}
         total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+      />
+
+      <ModalComponent
+        action={addBusinessUser}
+        processing={processing}
+        opened={openedModal}
+        close={close}
+        form={new_form}
+        isEdit={isEdit}
+        setIsEdit={setIsEdit}
+        text={`Invite user to collaborate with ${business?.name}`}
       />
     </main>
   );

@@ -158,7 +158,7 @@ export const validateNewAdmin = z.object({
   email: z.string().email("Please provide a valid email"),
   firstName: z.string().optional(),
   lastName: z.string().optional(),
-  password: z.string({ required_error: "Password is required" }),
+  password: z.string({ required_error: "Password is required" }).optional(),
   role: z.string().optional(),
 });
 

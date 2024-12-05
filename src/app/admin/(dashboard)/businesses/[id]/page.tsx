@@ -3,6 +3,9 @@
 import {
   Button,
   Group,
+  Popover,
+  PopoverDropdown,
+  PopoverTarget,
   Skeleton,
   Switch,
   Tabs,
@@ -385,6 +388,16 @@ export default function SingleBusiness() {
                   )}
                 </>
               )}
+
+              {/* <Popover width={200} position="bottom" withArrow shadow="md">
+                <Popover.Target>
+                  <PrimaryBtn text="Activate with Alt Email" fw={600} />
+                </Popover.Target>
+
+                <Popover.Dropdown>
+                  <Text>Activate with Alt Email</Text>
+                </Popover.Dropdown>
+              </Popover> */}
             </div>
           )}
         </div>

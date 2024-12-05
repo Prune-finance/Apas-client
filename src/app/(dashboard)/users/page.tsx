@@ -185,7 +185,7 @@ function Users() {
     return activateOpen();
   };
 
-  const rows = filteredSearch(users, ["email"], debouncedSearch).map(
+  const rows = filteredSearch(users, ["email", "role"], debouncedSearch).map(
     (element, index) => (
       <TableTr
         key={index}
@@ -198,7 +198,7 @@ function Users() {
         <TableTd tt="capitalize">{element.role.toLowerCase()}</TableTd>
         <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
         <TableTd>
-          {element.lastLogIn ? dayjs(element.lastLogIn).fromNow() : "Nil"}
+          {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
         </TableTd>
 
         <TableTd>

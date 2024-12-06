@@ -6,7 +6,11 @@ import {
   Grid,
   GridCol,
   Group,
+  Popover,
+  PopoverDropdown,
+  PopoverTarget,
   Select,
+  Stack,
   Text,
   Textarea,
   TextInput,
@@ -18,6 +22,7 @@ import {
   BusinessData,
   Service,
   ServiceIdentifier,
+  SingleBizMeta,
 } from "@/lib/hooks/businesses";
 import { useState } from "react";
 import { useForm, UseFormReturnType } from "@mantine/form";
@@ -30,6 +35,7 @@ import { ContactDocumentTextInput } from "./utils";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import createAxiosInstance from "@/lib/axios";
+import { useDisclosure } from "@mantine/hooks";
 
 dayjs.extend(advancedFormat);
 
@@ -38,11 +44,13 @@ export default function Business({
   revalidate,
   services,
   revalidateServices,
+  meta,
 }: {
   business: BusinessData;
   revalidate: () => void;
   revalidateServices: () => Promise<void>;
   services: Service[];
+  meta: SingleBizMeta | null;
 }) {
   const axios = createAxiosInstance("accounts");
   const { handleSuccess, handleError } = useNotification();
@@ -98,6 +106,7 @@ export default function Business({
         form={form as unknown as UseFormReturnType<BasicInfoType>}
         handleBusinessUpdate={handleBusinessUpdate}
         business={business}
+        meta={meta}
       />
 
       <Services
@@ -131,6 +140,7 @@ interface IProps {
   business: BusinessData;
   form: UseFormReturnType<BasicInfoType>;
   handleBusinessUpdate: () => Promise<void>;
+  meta?: SingleBizMeta | null;
 }
 
 const BasicInformation = ({ business, form, handleBusinessUpdate }: IProps) => {
@@ -278,9 +288,20 @@ const BasicInformation = ({ business, form, handleBusinessUpdate }: IProps) => {
   );
 };
 
-const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
+const ContactInfo = ({
+  form,
+  business,
+  handleBusinessUpdate,
+  meta,
+}: IProps) => {
   const [editingBottom, setEditingBottom] = useState(false);
+  const [email, setEmail] = useState("");
   const [processing, setProcessing] = useState(false);
+  const [opened, { toggle }] = useDisclosure(false);
+
+  const { handleError, handleSuccess } = useNotification();
+
+  const axios = createAxiosInstance("auth");
 
   const handleSubmit = async () => {
     setProcessing(true);
@@ -291,6 +312,28 @@ const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
       setProcessing(false);
     }
   };
+
+  const addBusinessUser = async () => {
+    if (!email) return;
+    setProcessing(true);
+
+    try {
+      await axios.post(`/admin/company/${business.id}/users/add`, { email });
+
+      toggle();
+      handleSuccess(
+        `Successful! User Added`,
+        `User added to ${business?.name} successfully`
+      );
+      setEmail("");
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+  console.log(meta);
+
   return (
     <div className={styles.bottom__container}>
       <Flex justify="space-between" align="center">
@@ -317,11 +360,55 @@ const ContactInfo = ({ form, business, handleBusinessUpdate }: IProps) => {
             />
           </Group>
         ) : (
-          <SecondaryBtn
-            text="Edit"
-            icon={IconPencilMinus}
-            action={() => setEditingBottom(true)}
-          />
+          <Group pos="relative">
+            {Boolean(meta?.activationLinkCount) && !Boolean(meta?.users) && (
+              <Popover
+                position="bottom"
+                // offset={23}
+                withinPortal={false}
+                trapFocus
+                width={300}
+                withArrow
+                shadow="md"
+                opened={opened}
+                offset={{ mainAxis: 10, crossAxis: 0 }}
+              >
+                <PopoverTarget>
+                  <PrimaryBtn
+                    text="Send Activation Link to alternate email"
+                    // action={() => setEditingBottom(true)}
+                    variant="light"
+                    td="underline"
+                    c="var(--prune-primary-800)"
+                    type="button"
+                    action={toggle}
+                  />
+                </PopoverTarget>
+
+                <PopoverDropdown top={40}>
+                  <Stack>
+                    <TextInput
+                      label="Email"
+                      placeholder="Enter Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.currentTarget.value)}
+                    />
+                    <PrimaryBtn
+                      text="Submit"
+                      action={addBusinessUser}
+                      loading={processing}
+                    />
+                  </Stack>
+                </PopoverDropdown>
+              </Popover>
+            )}
+
+            <SecondaryBtn
+              text="Edit"
+              icon={IconPencilMinus}
+              action={() => setEditingBottom(true)}
+            />
+          </Group>
         )}
       </Flex>
 

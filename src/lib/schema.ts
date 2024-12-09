@@ -417,8 +417,12 @@ export const validateNewBusiness = z.object({
           },
           { message: "Invalid director's email" }
         ),
-        identityType: z.string().nullable(),
-        proofOfAddress: z.string().nullable(),
+        identityType: z
+          .string({ invalid_type_error: "Identity Type is required" })
+          .nullable(),
+        proofOfAddress: z
+          .string({ invalid_type_error: "Proof of Address is required" })
+          .nullable(),
         identityFileUrl: z.string(),
         identityFileUrlBack: z.string(),
         proofOfAddressFileUrl: z.string(),
@@ -436,8 +440,12 @@ export const validateNewBusiness = z.object({
         },
         { message: "Invalid shareholder's email" }
       ),
-      identityType: z.string().nullable(),
-      proofOfAddress: z.string().nullable(),
+      identityType: z
+        .string({ invalid_type_error: "Identity Type is required" })
+        .nullable(),
+      proofOfAddress: z
+        .string({ invalid_type_error: "Proof of Address is required" })
+        .nullable(),
       identityFileUrl: z.string(),
       identityFileUrlBack: z.string(),
       proofOfAddressFileUrl: z.string(),
@@ -457,8 +465,10 @@ export const validateDirectors = z.object({
     },
     { message: "Invalid director's email" }
   ),
-  identityType: z.string(),
-  proofOfAddress: z.string(),
+  identityType: z.string({
+    invalid_type_error: "Identity Type is required",
+  }),
+  proofOfAddress: z.string().nullable(),
   identityFileUrl: z.string(),
   identityFileUrlBack: z.string(),
   proofOfAddressFileUrl: z.string(),
@@ -473,8 +483,8 @@ export const validateShareholder = z.object({
     },
     { message: "Invalid shareholder's email" }
   ),
-  identityType: z.string(),
-  proofOfAddress: z.string(),
+  identityType: z.string({ invalid_type_error: "Identity Type is required" }),
+  proofOfAddress: z.string().nullable(),
   identityFileUrl: z.string(),
   identityFileUrlBack: z.string(),
   proofOfAddressFileUrl: z.string(),

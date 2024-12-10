@@ -3,8 +3,6 @@
 import {
   Box,
   Button,
-  Drawer,
-  FileButton,
   Flex,
   Grid,
   GridCol,
@@ -13,33 +11,22 @@ import {
   Select,
   Stack,
   Text,
-  Textarea,
   TextInput,
-  ThemeIcon,
-  UnstyledButton,
 } from "@mantine/core";
 import {
-  IconFileInfo,
   IconPencilMinus,
   IconPlus,
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { Fragment, useState } from "react";
-import Cookies from "js-cookie";
+import { useState } from "react";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessData, Director } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import {
-  directorEtShareholderSchema,
-  removeDirectorSchema,
-  removeDirectorValues,
-  validateShareholder,
-} from "@/lib/schema";
+import { directorEtShareholderSchema, validateShareholder } from "@/lib/schema";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import classes from "@/ui/styles/containedInput.module.scss";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
@@ -49,6 +36,7 @@ import {
   RemoveDirectorModal,
 } from "./utils";
 import DropzoneComponent from "@/ui/components/Dropzone";
+import createAxiosInstance from "@/lib/axios";
 
 export default function Shareholders({
   business,
@@ -59,6 +47,7 @@ export default function Shareholders({
 }) {
   const { handleSuccess, handleError } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
+  const axios = createAxiosInstance("auth");
 
   const [processing, setProcessing] = useState(false);
 
@@ -83,17 +72,13 @@ export default function Shareholders({
     const { contactEmail, name, domain, contactNumber } = business;
     try {
       const shareholders = removeItemAtIndex(index);
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          contactEmail,
-          name,
-          domain,
-          contactNumber,
-          shareholders,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        contactEmail,
+        name,
+        domain,
+        contactNumber,
+        shareholders,
+      });
 
       handleSuccess("Business Updated", "");
       revalidate();
@@ -114,17 +99,13 @@ export default function Shareholders({
       if (error) {
         throw new Error(error.issues[0].message);
       }
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          contactEmail,
-          name,
-          domain,
-          contactNumber,
-          shareholders: [...business.shareholders, { ...form.values }],
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        contactEmail,
+        name,
+        domain,
+        contactNumber,
+        shareholders: [...business.shareholders, { ...form.values }],
+      });
 
       handleSuccess("Business Updated", "");
       revalidate();
@@ -142,17 +123,13 @@ export default function Shareholders({
     const { contactEmail, name, domain, contactNumber } = business;
     try {
       const shareholders = replaceItemAtIndex(index, directorValue);
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/company/${business.id}`,
-        {
-          contactEmail,
-          name,
-          domain,
-          contactNumber,
-          shareholders,
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/company/${business.id}`, {
+        contactEmail,
+        name,
+        domain,
+        contactNumber,
+        shareholders,
+      });
 
       handleSuccess("Business Updated", "");
       revalidate();
@@ -383,6 +360,7 @@ const DirectorsForm = ({
   const [editing, setEditing] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const axios = createAxiosInstance("auth");
 
   const initialValues = {
     name: director.name,
@@ -407,11 +385,7 @@ const DirectorsForm = ({
       const formData = new FormData();
       formData.append("file", file);
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      const { data } = await axios.post(`/admin/upload`, formData);
 
       if (formKey) {
         form.setFieldValue(formKey, data.data.url);

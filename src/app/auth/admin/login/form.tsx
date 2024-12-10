@@ -114,6 +114,7 @@ function LoginForm() {
         p={0}
         c="var(--prune-primary-800)"
         td="underline"
+        link="/auth/admin/forgot-password"
       />
     </Box>
   );

@@ -1,16 +1,5 @@
-import {
-  Text,
-  Modal,
-  Flex,
-  Button,
-  Stack,
-  TextInput,
-  Select,
-  Box,
-  PasswordInput,
-  ActionIcon,
-} from "@mantine/core";
-import { IconMail, IconTrash, IconX } from "@tabler/icons-react";
+import { Text, Modal, Flex, TextInput, Select, Box } from "@mantine/core";
+import { IconMail } from "@tabler/icons-react";
 
 import styles from "./modal.module.scss";
 import { UseFormReturnType } from "@mantine/form";
@@ -28,6 +17,7 @@ export default function ModalComponent({
   isEdit,
   setIsEdit,
   removeRole,
+  text,
 }: ModalProps) {
   return (
     <Modal
@@ -61,7 +51,9 @@ export default function ModalComponent({
             {isEdit ? "Update User Details" : "Invite a New User"}
           </Text>
           <Text fz={14} className="grey-400">
-            {isEdit
+            {text
+              ? text
+              : isEdit
               ? "Update user details here and save."
               : "Invite a user to collaborate with you."}
           </Text>
@@ -160,4 +152,5 @@ interface ModalProps {
   isEdit: boolean;
   setIsEdit: Dispatch<SetStateAction<boolean>>;
   removeRole?: boolean;
+  text?: string;
 }

@@ -76,8 +76,6 @@ export default function Users() {
     limit: parseInt(limit ?? "10", 10),
   });
 
-  console.log(users);
-
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
 

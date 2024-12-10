@@ -24,7 +24,7 @@ import {
   IconListTree,
   IconX,
 } from "@tabler/icons-react";
-import axios from "axios";
+
 import dayjs from "dayjs";
 import { useParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -34,7 +34,7 @@ import {
   businessFilterSchema,
 } from "../../../../schema";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import Cookies from "js-cookie";
+
 import useNotification from "@/lib/hooks/notification";
 import RequestDrawer from "@/app/admin/(dashboard)/requests/RequestDrawer";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -44,9 +44,11 @@ import Filter from "@/ui/components/Filter";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
 import ModalComponent from "@/ui/components/Modal";
+import createAxiosInstance from "@/lib/axios";
 
 export const OtherRequests = () => {
   const { id } = useParams<{ id: string }>();
+  const axios = createAxiosInstance("accounts");
   const [type, setType] = useState<string | null>("");
   const [limit, setLimit] = useState<string | null>("10");
   const [active, setActive] = useState(1);
@@ -76,9 +78,8 @@ export const OtherRequests = () => {
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/reject`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/reject`,
+        {}
       );
 
       revalidate();
@@ -102,9 +103,8 @@ export const OtherRequests = () => {
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/approve`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/business/${selectedRequest.companyId}/requests/all/${selectedRequest.id}/approve`,
+        {}
       );
 
       revalidate();

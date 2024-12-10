@@ -10,22 +10,20 @@ import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import {
   IssuedAccountHead,
-  SingleAccount,
   SingleAccountBody,
 } from "@/ui/components/SingleAccount";
 import { useDisclosure } from "@mantine/hooks";
 import { Space } from "@mantine/core";
 import { validateRequest } from "@/lib/schema";
 import { useForm, zodResolver } from "@mantine/form";
-import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
-import Cookies from "js-cookie";
 import useNotification from "@/lib/hooks/notification";
 import ModalComponent from "../modal";
 import { IconBrandLinktree } from "@tabler/icons-react";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
+import createAxiosInstance from "@/lib/axios";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -74,6 +72,7 @@ export default function Account() {
     meta,
   } = useTransactions(params.id, customParams);
   const { handleSuccess, handleError } = useNotification();
+  const axios = createAxiosInstance("accounts");
 
   const { loading, account, revalidate } = useSingleAccount(params.id);
 
@@ -102,15 +101,11 @@ export default function Account() {
 
       const { reason, supportingDocumentName, supportingDocumentUrl } =
         requestForm.values;
-      await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/accounts/${params.id}/${type}`,
-        {
-          reason,
-          ...(supportingDocumentName && { supportingDocumentName }),
-          ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.patch(`/admin/accounts/${params.id}/${type}`, {
+        reason,
+        ...(supportingDocumentName && { supportingDocumentName }),
+        ...(supportingDocumentUrl && { supportingDocumentUrl }),
+      });
 
       revalidate();
       handleSuccess("Action Completed", "Account frozen");

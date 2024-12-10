@@ -12,14 +12,12 @@ import styles from "./(tabs)/styles.module.scss";
 import { IconCheck, IconFileInfo, IconX } from "@tabler/icons-react";
 import useNotification from "@/lib/hooks/notification";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { notifications } from "@mantine/notifications";
 import { parseError } from "@/lib/actions/auth";
-import axios from "axios";
-import Cookies from "js-cookie";
-import { areSomeDocumentsNotApproved } from "@/lib/helpers/document-status";
+
 import { RequestData } from "@/lib/hooks/requests";
 import FileDisplay from "@/ui/components/DocumentViewer";
 import { useDisclosure } from "@mantine/hooks";
+import createAxiosInstance from "@/lib/axios";
 
 interface Props {
   url: string;
@@ -40,19 +38,16 @@ export const FileTextInput = ({
   revalidate,
   status,
 }: Props) => {
+  const axios = createAxiosInstance("accounts");
   const { handleInfo, handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
   const [processingRejection, setProcessingRejection] = useState(false);
 
   const handleRejection = async () => {
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${request?.id}`,
-        {
-          reason: "Re-upload the document(s) for this request to be approved.",
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/request/reject/${request?.id}`, {
+        reason: "Re-upload the document(s) for this request to be approved.",
+      });
     } catch (error) {
       return handleError("Request Approval Failed", parseError(error));
     }
@@ -67,11 +62,9 @@ export const FileTextInput = ({
       setProcessingRejection(true);
     }
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/${request?.id}/document/${type}`,
-        { path },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/request/${request?.id}/document/${type}`, {
+        path,
+      });
 
       if (type === "reject" && request?.status === "PENDING") {
         await handleRejection();
@@ -190,19 +183,16 @@ export const FileRows = ({
   revalidate,
   status,
 }: Props) => {
-  const { handleInfo, handleError, handleSuccess } = useNotification();
+  const axios = createAxiosInstance("accounts");
+  const { handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
   const [processingRejection, setProcessingRejection] = useState(false);
 
   const handleRejection = async () => {
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/reject/${request?.id}`,
-        {
-          reason: "Re-upload the document(s) for this request to be approved.",
-        },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/request/reject/${request?.id}`, {
+        reason: "Re-upload the document(s) for this request to be approved.",
+      });
     } catch (error) {
       return handleError("Request Approval Failed", parseError(error));
     }
@@ -217,11 +207,9 @@ export const FileRows = ({
       setProcessingRejection(true);
     }
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/admin/request/${request?.id}/document/${type}`,
-        { path },
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      await axios.post(`/admin/request/${request?.id}/document/${type}`, {
+        path,
+      });
 
       if (type === "reject" && request?.status === "PENDING") {
         await handleRejection();

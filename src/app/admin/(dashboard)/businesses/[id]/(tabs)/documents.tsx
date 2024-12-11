@@ -58,7 +58,7 @@ export default function Documents({
     shareholderParticular: business.shareholderParticular,
     amlCompliance: business.amlCompliance,
     operationalLicense: business.operationalLicense,
-
+    companyPOAUrl: business.companyPOAUrl,
     // otherDocuments: business.otherDocuments,
   };
 
@@ -148,7 +148,7 @@ export default function Documents({
           <GridCol span={4} className={styles.grid}>
             <DocumentTextInput
               title="CAC"
-              label="CAC Document"
+              label="Certificate of Incorporation Document"
               form={form}
               formKey="cacCertificate"
               editing={editing}
@@ -169,8 +169,19 @@ export default function Documents({
 
           <GridCol span={4} className={styles.grid}>
             <DocumentTextInput
+              title="Company POA"
+              label="Corporate Proof of Address (Electricity or Water Bill)"
+              form={form}
+              formKey="companyPOAUrl"
+              editing={editing}
+              business={business}
+            />
+          </GridCol>
+
+          <GridCol span={4} className={styles.grid}>
+            <DocumentTextInput
               title="Shareholders"
-              label="POS(Particulars of Shareholders)"
+              label="Shareholders POA"
               form={form}
               formKey="shareholderParticular"
               editing={editing}
@@ -181,7 +192,7 @@ export default function Documents({
           <GridCol span={4} className={styles.grid}>
             <DocumentTextInput
               title="Directors"
-              label="POS(Particulars of Directors)"
+              label="Directors POA"
               form={form}
               formKey="directorParticular"
               editing={editing}
@@ -192,7 +203,7 @@ export default function Documents({
           <GridCol span={4} className={styles.grid}>
             <DocumentTextInput
               title="License"
-              label="Operational License( Optional )"
+              label="Operational License (Optional)"
               form={form}
               formKey="operationalLicense"
               editing={editing}
@@ -287,6 +298,7 @@ interface FormValues {
   shareholderParticular: string | null;
   amlCompliance: string | null;
   operationalLicense: string | null;
+  companyPOAUrl: string | null;
 }
 
 type DocumentTextInputProps = {

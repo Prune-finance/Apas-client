@@ -1048,6 +1048,7 @@ export interface DebitRequest {
   status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
   companyAccountId: null;
   Account: Account;
+  staging: "TEST" | "LIVE";
 }
 
 export interface Account {

@@ -14,9 +14,8 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
 import { parseError } from "@/lib/actions/auth";
-import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
-import Cookies from "js-cookie";
+import createAxiosInstance from "@/lib/axios";
 
 type Props = {
   opened: boolean;
@@ -39,6 +38,7 @@ export default function DebitDrawer({
   const [processing, setProcessing] = useState(false);
 
   const { handleError, handleSuccess } = useNotification();
+  const axios = createAxiosInstance("payouts");
 
   const businessDetails = {
     "Business Name": selectedRequest?.Account.Company.name,
@@ -72,9 +72,8 @@ export default function DebitDrawer({
     setProcessing(true);
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/reject`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/debit/requests/${selectedRequest.id}/reject`,
+        {}
       );
 
       revalidate && revalidate();
@@ -93,9 +92,8 @@ export default function DebitDrawer({
     setProcessing(true);
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/approve`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/debit/requests/${selectedRequest.id}/approve`,
+        {}
       );
 
       revalidate && revalidate();

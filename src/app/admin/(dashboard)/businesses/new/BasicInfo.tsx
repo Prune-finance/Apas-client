@@ -5,6 +5,7 @@ import {
   NumberInput,
   rem,
   Select,
+  SimpleGrid,
   Text,
   Textarea,
   TextInput,
@@ -80,7 +81,7 @@ export default function BasicInfo({ form }: Props) {
         Basic Information
       </Text>
 
-      <Flex gap={20}>
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing={20}>
         <TextInput
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
@@ -97,6 +98,7 @@ export default function BasicInfo({ form }: Props) {
           {...form.getInputProps("tradingName")}
           withAsterisk
         />
+
         <Select
           placeholder="Select Country"
           classNames={{ input: styles.input, label: styles.label }}
@@ -113,9 +115,7 @@ export default function BasicInfo({ form }: Props) {
           ]}
           {...form.getInputProps("country")}
         />
-      </Flex>
 
-      <Flex gap={20} mt={24}>
         <Select
           placeholder="Select Business Type"
           classNames={{ input: styles.input, label: styles.label }}
@@ -136,9 +136,7 @@ export default function BasicInfo({ form }: Props) {
           {...form.getInputProps("domain")}
           rightSection={<IconWorldWww size={14} />}
         />
-      </Flex>
 
-      <Flex gap={20} mt={24}>
         <TextInput
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
@@ -162,8 +160,7 @@ export default function BasicInfo({ form }: Props) {
           // data={["Free", "Basic", "Premium"]}
           {...form.getInputProps("pricingPlan")}
         />
-      </Flex>
-
+      </SimpleGrid>
       <Textarea
         mt={24}
         label="Business Bio"

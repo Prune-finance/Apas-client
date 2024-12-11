@@ -52,7 +52,7 @@ export default function Business({
   services: Service[];
   meta: SingleBizMeta | null;
 }) {
-  const axios = createAxiosInstance("accounts");
+  const axios = createAxiosInstance("auth");
   const { handleSuccess, handleError } = useNotification();
 
   const initialValues = {

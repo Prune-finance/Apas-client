@@ -191,10 +191,11 @@ export const newBusiness = {
   cacCertificate: "",
   address: "",
   mermat: "",
+  companyPOAUrl: "",
   amlCompliance: null,
   operationalLicense: null,
-  shareholderParticular: "",
-  directorParticular: "",
+  shareholderParticular: null,
+  directorParticular: null,
   directors: [directorEtShareholderSchema],
   shareholders: [ShareholderValues],
   contactCountryCode: "+234",
@@ -270,14 +271,19 @@ export const basicInfoSchema = z
 export type BasicInfoType = z.infer<typeof basicInfoSchema>;
 
 export const documentSchema = z.object({
-  cacCertificate: z.string().url("Cac certificate is required"),
+  cacCertificate: z.string().url("Certificate of Incorporation is required"),
   mermat: z.string().url("Memart document is required"),
+  companyPOAUrl: z.string().url("Corporate Proof of Address is required"),
   directorParticular: z
     .string()
-    .url("Particular of Director document is required"),
+    .url("Particular of Director document is required")
+    .nullable()
+    .optional(),
   shareholderParticular: z
     .string()
-    .url("Particular of Shareholder document is required"),
+    .url("Particular of Shareholder document is required")
+    .nullable()
+    .optional(),
   operationalLicense: z
     .string()
     .url("Operational License document is required")
@@ -386,14 +392,19 @@ export const validateNewBusiness = z.object({
   contactIdUrlBack: z.string(),
   contactPOAUrl: z.string(),
   contactCountryCode: z.string(),
-  cacCertificate: z.string().url("Cac certificate is required"),
+  cacCertificate: z.string().url("Certificate of Incorporation is required"),
   mermat: z.string().url("Memart document is required"),
+  companyPOAUrl: z.string().url("Corporate Proof of Address is required"),
   directorParticular: z
     .string()
-    .url("Particular of Director document is required"),
+    .url("Particular of Director document is required")
+    .nullable()
+    .optional(),
   shareholderParticular: z
     .string()
-    .url("Particular of Shareholder document is required"),
+    .url("Particular of Shareholder document is required")
+    .nullable()
+    .optional(),
   operationalLicense: z
     .string()
     .url("Operational License document is required")

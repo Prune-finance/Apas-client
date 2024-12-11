@@ -95,7 +95,14 @@ export default function BasicInfo({ form }: Props) {
           flex={1}
           label="Country"
           withAsterisk
-          data={["Nigeria", "Ghana", "Kenya"]}
+          data={[
+            "Nigeria",
+            "Ghana",
+            "Kenya",
+            "Côte d’Ivoire",
+            "United Kingdom",
+            "Canada",
+          ]}
           {...form.getInputProps("country")}
         />
       </Flex>

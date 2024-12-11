@@ -314,6 +314,7 @@ export interface BusinessData {
   deletedAt: null;
   domain: string;
   name: string;
+  tradingName: string;
   staging: string;
   kycTrusted: boolean;
   address: string;

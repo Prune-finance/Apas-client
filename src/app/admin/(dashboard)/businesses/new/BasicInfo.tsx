@@ -89,6 +89,14 @@ export default function BasicInfo({ form }: Props) {
           {...form.getInputProps("name")}
           withAsterisk
         />
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          label="Trade Name"
+          placeholder="Enter Business Trade Name"
+          {...form.getInputProps("tradingName")}
+          withAsterisk
+        />
         <Select
           placeholder="Select Country"
           classNames={{ input: styles.input, label: styles.label }}

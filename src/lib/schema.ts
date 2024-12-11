@@ -219,6 +219,7 @@ export const basicInfoSchema = z
       .string()
       .trim()
       .min(3, "Business name must be a minimum of 3 characters"),
+    tradingName: z.string().trim().optional(),
     country: z.string().nullable(),
     legalEntity: z.string().nullable(),
     contactNumber: z.string().min(1, "Contact number is required"),
@@ -377,6 +378,7 @@ export const validateNewBusiness = z.object({
     .string()
     .trim()
     .min(3, "Business name must be a minimum of 3 characters"),
+  tradingName: z.string().trim().optional(),
   country: z.string().min(1, "Country is required").nullable(),
   legalEntity: z.string().min(1, "Legal Entity is required").nullable(),
   contactNumber: z.string().min(1, "Contact number is required"),

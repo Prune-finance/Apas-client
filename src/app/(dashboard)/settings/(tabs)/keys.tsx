@@ -1,9 +1,6 @@
 "use client";
 import {
-  Alert,
-  Badge,
   Box,
-  Button,
   Flex,
   Group,
   Paper,
@@ -14,7 +11,7 @@ import {
   Tooltip,
   UnstyledButton,
 } from "@mantine/core";
-import { IconAB2, IconCheck, IconInfoCircle } from "@tabler/icons-react";
+import { IconAB2, IconInfoCircle } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -30,9 +27,6 @@ import { LiveDateModal } from "../LiveDateModal";
 import { notifications } from "@mantine/notifications";
 import createAxiosInstance from "@/lib/axios";
 
-const axios = createAxiosInstance("auth");
-const axiosAccounts = createAxiosInstance("accounts");
-
 export default function Keys() {
   const [keys, setKeys] = useState<Key[]>([]);
   const [webHook, setWebHook] = useState<WebHook[]>([]);
@@ -46,6 +40,9 @@ export default function Keys() {
   const [openedModal, { open: openModal, close: closeModal }] =
     useDisclosure(false);
   const [editWebHook, setEditWebHook] = useState(false);
+
+  const axios = createAxiosInstance("auth");
+  const axiosAccounts = createAxiosInstance("accounts");
 
   const [liveDate, setLiveDate] = useState<Date | null>(null);
 

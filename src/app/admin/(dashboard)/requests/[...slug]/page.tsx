@@ -1,10 +1,8 @@
 "use client";
 
 import { Suspense } from "react";
-import Cookies from "js-cookie";
 
 import dayjs from "dayjs";
-import axios from "axios";
 import { useState } from "react";
 
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -57,11 +55,13 @@ import { SearchInput } from "@/ui/components/Inputs";
 import DebitDrawer from "../drawer";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import { debitTableHeaders } from "@/lib/static";
+import createAxiosInstance from "@/lib/axios";
 
 function CompanyRequestType() {
   const searchParams = useSearchParams();
   const params = useParams<{ slug?: string[] }>();
   const [id, tab] = params.slug ?? [];
+  const axios = createAxiosInstance("payouts");
 
   const { status, createdAt, sort } = Object.fromEntries(
     searchParams.entries()
@@ -96,9 +96,8 @@ function CompanyRequestType() {
     setProcessing(true);
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/reject`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/debit/requests/${selectedRequest.id}/reject`,
+        {}
       );
 
       await revalidate();
@@ -115,11 +114,11 @@ function CompanyRequestType() {
   const handleAcceptRequest = async () => {
     if (!selectedRequest) return;
     setProcessing(true);
+
     try {
       await axios.post(
-        `${process.env.NEXT_PUBLIC_PAYOUT_URL}/admin/debit/requests/${selectedRequest.id}/approve`,
-        {},
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        `/admin/debit/requests/${selectedRequest.id}/approve`,
+        {}
       );
 
       await revalidate();

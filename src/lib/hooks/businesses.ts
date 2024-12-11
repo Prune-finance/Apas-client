@@ -320,6 +320,7 @@ export interface BusinessData {
   country: string;
   legalEntity: string;
   cacCertificate: string;
+  companyPOAUrl: string | null;
   mermat: string;
   businessBio: null | string;
   directorParticular: null | string;

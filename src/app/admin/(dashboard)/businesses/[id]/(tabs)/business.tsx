@@ -72,6 +72,7 @@ export default function Business({
     contactIdUrlBack: business.contactIdUrlBack,
     contactPOAType: business.contactPOAType,
     contactPOAUrl: business.contactPOAUrl,
+    tradingName: business.tradingName,
     // documents: business.documents,
   };
 
@@ -208,6 +209,19 @@ const BasicInformation = ({ business, form, handleBusinessUpdate }: IProps) => {
             label="Legal Business Name"
             placeholder={business?.name}
             {...form.getInputProps("name")}
+          />
+        </GridCol>
+
+        <GridCol span={4} className={styles.grid}>
+          <TextInput
+            readOnly={!editingTop}
+            classNames={{
+              input: styles.input,
+              label: styles.label,
+            }}
+            label="Trading Name"
+            placeholder={business?.tradingName}
+            {...form.getInputProps("tradingName")}
           />
         </GridCol>
 

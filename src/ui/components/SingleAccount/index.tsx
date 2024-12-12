@@ -640,6 +640,7 @@ export const SingleAccountBody = ({
         trxMeta={trxMeta}
         isUser={isUser}
         revalidate={revalidate}
+        main={location === "own-account" || location === "admin-default"}
       />
 
       <TabsComponent tabs={tabs} mt={40}>
@@ -710,6 +711,7 @@ export const SingleDefaultAccountBody = ({
         trxMeta={trxMeta}
         isUser={!admin}
         revalidate={revalidate}
+        main={location === "own-account" || location === "admin-default"}
       />
 
       <TabsComponent tabs={tabs} mt={40}>
@@ -1004,6 +1006,7 @@ interface AccountInfoProps {
   loadingTrx: boolean;
   account: Account | DefaultAccount | null;
   payout?: boolean;
+  main?: boolean;
   trxMeta: Meta | null;
   isUser?: boolean;
   revalidate?: () => Promise<void>;
@@ -1014,6 +1017,7 @@ export const AccountInfo = ({
   loadingTrx,
   account,
   payout,
+  main,
   trxMeta,
   isUser,
   revalidate,
@@ -1028,6 +1032,12 @@ export const AccountInfo = ({
     Currency: "EUR",
   };
 
+  const accountType = payout
+    ? "Payout Account"
+    : main
+    ? "Main Account"
+    : "Issued Account";
+
   const handleReload = async () => {
     setProcessing(true);
     try {
@@ -1041,7 +1051,12 @@ export const AccountInfo = ({
   };
   return (
     <SimpleGrid cols={{ base: 1, md: 2 }}>
-      <Paper withBorder p={16} radius={4}>
+      <Paper
+        withBorder
+        p={16}
+        radius={4}
+        styles={{ root: { border: "1px solid #eef0f2" } }}
+      >
         <Flex justify="space-between">
           <Stack gap={8}>
             <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
@@ -1063,13 +1078,17 @@ export const AccountInfo = ({
                 c="var(--prune-primary-900)"
                 loading={processing}
                 action={handleReload}
+                variant="light"
+                fz={12}
+                fw={600}
+                radius="xl"
                 leftSection={
                   <ThemeIcon
                     variant="transparent"
                     color="var(--prune-primary-700)"
                     size={20}
                   >
-                    <IconReload />
+                    <IconReload stroke={2} />
                   </ThemeIcon>
                 }
                 td="underline"
@@ -1098,15 +1117,16 @@ export const AccountInfo = ({
                     <IconCircleFilled />
                   </ThemeIcon>
                 }
-                fw={500}
-                fz={14}
+                fw={600}
+                fz={12}
                 tt="capitalize"
               >
-                {payout
+                {/* {payout
                   ? "Payout Account"
                   : getUserType(
                       account?.type as "USER" | "CORPORATE"
-                    ).toLowerCase()}
+                    ).toLowerCase()} */}
+                {accountType}
               </Badge>
             ) : (
               <Skeleton w={100} h={10} />
@@ -1117,13 +1137,19 @@ export const AccountInfo = ({
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>
         {Object.entries(_info).map(([key, value]) => (
-          <Paper key={key} withBorder p={12} radius={4}>
+          <Paper
+            key={key}
+            withBorder
+            p={12}
+            radius={4}
+            styles={{ root: { border: "1px solid #eef0f2" } }}
+          >
             <Stack gap={2}>
               <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
                 {key}
               </Text>
               {!loading || !loadingTrx ? (
-                <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+                <Text fz={14} fw={600} c="var(--prune-text-gray-800)">
                   {value}
                 </Text>
               ) : (

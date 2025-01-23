@@ -59,12 +59,15 @@ import {
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
+import Transaction from "@/lib/store/transaction";
+import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 
 export default function Home() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const { loading, meta, stats, statsMeta } = useBusiness({
     period: chartFrequency === "Monthly" ? "year" : "week",
   });
+  const { data: selectedTrxData, close, opened: openedDrawer } = Transaction();
   const {
     loading: accountsLoading,
     meta: accountsMeta,
@@ -324,7 +327,7 @@ export default function Home() {
                           Transactions
                         </Text>
 
-                        <Link href="/admin/transactions">
+                        <Link href="/admin/transactions?tab=issued-accounts">
                           <SeeAll />
                         </Link>
                       </Group>
@@ -572,6 +575,14 @@ export default function Home() {
           </GridCol>
         </Grid>
       </div>
+
+      {selectedTrxData && (
+        <TransactionDrawer
+          opened={openedDrawer}
+          close={close}
+          selectedRequest={selectedTrxData}
+        />
+      )}
     </main>
   );
 }

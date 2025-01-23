@@ -96,7 +96,7 @@ export default function BasicInfo({ form }: Props) {
           label="Trade Name"
           placeholder="Enter Business Trade Name"
           {...form.getInputProps("tradingName")}
-          withAsterisk
+          // withAsterisk
         />
 
         <Select

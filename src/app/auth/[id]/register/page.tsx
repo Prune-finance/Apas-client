@@ -40,9 +40,9 @@ export default async function Register({ params }: Props) {
               Prune makes your API generation easy, fast and reliable
             </Title>
             <Text fz={14} className={`${styles.text__sub} ${pjs.className}`}>
-              The API's robust features and seamless integration capabilities
+              {`The API's robust features and seamless integration capabilities
               have transformed the way we handle transactions, manage user
-              accounts, and process payments..
+              accounts, and process payments..`}
             </Text>
           </div>
           {/* <div className={styles.notifications}>

@@ -69,6 +69,8 @@ export default function Header() {
 
   useEffect(() => {
     setMeta(meta);
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notifications]);
 
   const { handleInfoForNotification, handleSuccess, handleError } =
@@ -87,6 +89,8 @@ export default function Header() {
     return () => {
       socket.disconnect();
     };
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const markAllNotificationAsRead = async () => {
@@ -124,6 +128,7 @@ export default function Header() {
     if (!user) {
       handleSetUser();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -299,6 +304,7 @@ export function UserHeader() {
 
   useEffect(() => {
     setMeta(meta);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [notifications]);
 
   const { handleInfoForNotification, handleSuccess, handleError, handleInfo } =
@@ -317,6 +323,7 @@ export function UserHeader() {
     return () => {
       socket.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const markAllNotificationAsRead = async () => {
@@ -354,6 +361,7 @@ export function UserHeader() {
     if (!user) {
       handleSetUser();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;

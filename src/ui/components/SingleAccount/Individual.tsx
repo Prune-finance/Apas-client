@@ -113,6 +113,8 @@ function Individual({
     if (iban && bic) {
       handleIbanValidation();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bic, iban]);
 
   const handlePreviewState = () => {

@@ -75,6 +75,8 @@ function TransactionForAccount() {
   }, [
     status,
     createdAt,
+    date,
+    endDate,
     type,
     senderName,
     recipientName,

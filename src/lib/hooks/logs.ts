@@ -55,6 +55,7 @@ export function useLogs(customParams: ILogs = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj.limit, obj.date, obj.sort, obj.page]);
 
   return { loading, logs, revalidate, meta };

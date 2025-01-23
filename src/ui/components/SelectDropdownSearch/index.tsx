@@ -88,7 +88,7 @@ export function SelectDropdownSearch({
 
   useEffect(() => {
     setLocalAccounts((prev) => (accounts.length > 0 ? accounts : accountsData));
-  }, [accounts]);
+  }, [accounts, accountsData]);
 
   const combobox = useCombobox({
     onDropdownClose: () => {

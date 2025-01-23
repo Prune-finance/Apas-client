@@ -132,6 +132,8 @@ function Company({
       console.log({ bic, iban });
       handleIbanValidation();
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bic, iban]);
 
   console.log({ bic, iban });

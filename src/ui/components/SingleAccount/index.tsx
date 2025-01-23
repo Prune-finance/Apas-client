@@ -594,7 +594,7 @@ interface SingleAccountProps {
   loading: boolean;
   loadingTrx: boolean;
   setChartFrequency: Dispatch<SetStateAction<string>>;
-  business?: BusinessData | null;
+  business: BusinessData | null;
   admin?: boolean;
   payout?: boolean;
   isDefault?: boolean;
@@ -641,6 +641,7 @@ export const SingleAccountBody = ({
         isUser={isUser}
         revalidate={revalidate}
         main={location === "own-account" || location === "admin-default"}
+        business={business}
       />
 
       <TabsComponent tabs={tabs} mt={40}>
@@ -654,10 +655,12 @@ export const SingleAccountBody = ({
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}
-            children={children}
+            // children={children}
             accountID={accountID}
             isUser={isUser}
-          />
+          >
+            {children}
+          </Transactions>
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
           <Analytics
@@ -712,6 +715,7 @@ export const SingleDefaultAccountBody = ({
         isUser={!admin}
         revalidate={revalidate}
         main={location === "own-account" || location === "admin-default"}
+        business={business}
       />
 
       <TabsComponent tabs={tabs} mt={40}>
@@ -725,9 +729,11 @@ export const SingleDefaultAccountBody = ({
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}
-            children={children}
+            // children={children}
             location={location ?? "default"}
-          />
+          >
+            {children}
+          </Transactions>
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
           <Analytics
@@ -1010,6 +1016,7 @@ interface AccountInfoProps {
   trxMeta: Meta | null;
   isUser?: boolean;
   revalidate?: () => Promise<void>;
+  business: BusinessData | null;
 }
 
 export const AccountInfo = ({
@@ -1021,13 +1028,16 @@ export const AccountInfo = ({
   trxMeta,
   isUser,
   revalidate,
+  business,
 }: AccountInfoProps) => {
   const [processing, setProcessing] = useState(false);
   const { handleError } = useNotification();
   const axios = createAxiosInstance("accounts");
   const _info = {
     "Date Created": dayjs(account?.createdAt).format("Do MMMM, YYYY"),
-    "Last Activity": dayjs(account?.updatedAt).format("Do MMMM, YYYY"),
+    "Last Activity": dayjs(business?.lastLogIn ?? business?.lastLogin).format(
+      "Do MMMM, YYYY"
+    ),
     "No. of Transaction": trxMeta?.total ?? 0,
     Currency: "EUR",
   };

@@ -66,7 +66,8 @@ export default function EditPlan() {
         features: pricingPlan.features,
         cycle: pricingPlan.cycle,
       });
-  }, [pricingPlan]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pricingPlan, loading]);
 
   useEffect(() => {
     if (pricingPlan?.features) {
@@ -207,6 +208,7 @@ export default function EditPlan() {
             {selectedValues?.length > 0 &&
               selectedValues.map((item) => (
                 <Flex
+                  key={item}
                   align="center"
                   gap={18}
                   p={10}

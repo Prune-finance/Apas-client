@@ -104,6 +104,7 @@ function Account() {
         setChartFrequency={setChartFrequency}
         trxMeta={trxMeta}
         revalidate={revalidateAcct}
+        business={business}
       >
         <PaginationComponent
           active={active}

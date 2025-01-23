@@ -87,6 +87,7 @@ export function useBusiness(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     obj.date,
     obj.endDate,
@@ -131,6 +132,7 @@ export function useSingleBusiness(id: string) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return { loading, business, revalidate, meta };
@@ -164,6 +166,7 @@ export function useBusinessServices(id: string) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return { loading, services, meta, revalidate };
@@ -237,6 +240,7 @@ export function useUserBusiness(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { loading, business, meta, revalidate };
@@ -347,6 +351,7 @@ export interface BusinessData {
   contactPOAUrl: string;
   documents: Document[];
   lastLogin: Date;
+  lastLogIn?: Date;
   contactSignup: Date | null;
   contactCountryCode: string;
   accountRequestCount?: number;

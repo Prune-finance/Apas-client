@@ -112,7 +112,7 @@ export default function Home() {
         link: `/admin/account-requests/${request.id}`,
       };
     });
-  }, [requests]);
+  }, [requests, loading]);
 
   const cardTwoItems = useMemo(() => {
     if (debitLoading) return [];
@@ -141,7 +141,7 @@ export default function Home() {
         status: request.status,
       };
     });
-  }, [debitRequests]);
+  }, [debitRequests, debitLoading]);
 
   const rows = transactions.slice(0, 4).map((element) => (
     <TableTr key={element.id}>

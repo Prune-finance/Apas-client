@@ -114,6 +114,7 @@ export default function DropzoneComponent<T>(
 
   useEffect(() => {
     handleUpload();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
   return (

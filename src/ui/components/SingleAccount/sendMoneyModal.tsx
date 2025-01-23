@@ -84,9 +84,9 @@ function SendMoneyModal({
           >
             <Stack>
               <Text fz={14} inline lh="20px">
-                Unfortunately, we couldn't validate your account information.
+                {`Unfortunately, we couldn't validate your account information.
                 Please review the details to ensure it is accurate, or proceed
-                without validation.{" "}
+                without validation. `}
                 <Text span inherit c="var(--prune-text-gray-700)" fw={600}>
                   Know that proceeding without validation may lead to delays or
                   errors in processing.

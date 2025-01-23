@@ -38,6 +38,7 @@ import {
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
 import createAxiosInstance from "@/lib/axios";
+import { useUserBusiness } from "@/lib/hooks/businesses";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -78,6 +79,7 @@ export default function Account() {
     transactions,
     meta: txrMeta,
   } = useUserTransactions(params.id, customParams);
+  const { business } = useUserBusiness();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
 
@@ -273,6 +275,7 @@ export default function Account() {
         location="issued-account"
         isUser
         revalidate={revalidate}
+        business={business}
       >
         <PaginationComponent
           active={active}

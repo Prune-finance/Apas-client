@@ -190,7 +190,7 @@ export default function SingleBusiness() {
           trustText: "Are you sure you want to mark this business as trusted? ",
         };
     }
-  }, [business?.companyStatus]);
+  }, [business?.kycTrusted]);
 
   const [remainingTime, setRemainingTime] = useState(0);
   const [isExpired, setIsExpired] = useState(false);

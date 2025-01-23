@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Meta } from "./transactions";
 import { useState, useEffect, useMemo } from "react";
 import { IParams } from "../schema";

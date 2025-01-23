@@ -54,6 +54,7 @@ export default function Keys({
 
   useEffect(() => {
     fetchBusinessSecrets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

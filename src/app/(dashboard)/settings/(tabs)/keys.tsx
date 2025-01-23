@@ -137,10 +137,12 @@ export default function Keys() {
 
   useEffect(() => {
     fetchBusinessSecrets();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
     fetchWebHooks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [live?.key]);
 
   const requestLiveKey = async () => {

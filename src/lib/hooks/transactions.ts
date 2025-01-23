@@ -54,6 +54,7 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     customParams.date,
     customParams.limit,
@@ -112,6 +113,7 @@ export function useSingleTransactions(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   return { loading, transaction, meta, revalidate };
@@ -162,6 +164,7 @@ export function useSingleCompanyTransactions(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trxId]);
 
   return { loading, transaction, meta, revalidate };
@@ -238,6 +241,7 @@ export function useBusinessTransactions(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     page,
@@ -323,6 +327,7 @@ export function useBusinessAccountTransactions(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     page,
@@ -409,6 +414,7 @@ export function usePayoutAccountTransactions(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     page,
@@ -508,6 +514,7 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     page,
@@ -590,6 +597,7 @@ export function usePayoutTransactions(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     page,
@@ -685,6 +693,7 @@ export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     id,
     limit,
@@ -764,6 +773,7 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     page,
@@ -844,6 +854,7 @@ export function useUserPayoutTransactions(customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     page,
@@ -900,6 +911,7 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { loading, transactions, meta, revalidate };
@@ -948,6 +960,7 @@ export function useUserTransactionsByIBAN(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { loading, transactions, meta, revalidate };

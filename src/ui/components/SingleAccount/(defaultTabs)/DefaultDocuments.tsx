@@ -41,7 +41,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               tt="uppercase"
               c="var(--prune-text-gray-800)"
             >
-              Director's Documents
+              {`Director's Documents`}
             </Text>
 
             {account.accountDocuments.directors.map((director, index) => (
@@ -77,7 +77,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               tt="uppercase"
               c="var(--prune-text-gray-800)"
             >
-              Shareholder's Documents
+              {`Shareholder's Documents`}
             </Text>
             {account.accountDocuments.shareholders.map((director, index) => (
               <Box mb={20} key={index}>

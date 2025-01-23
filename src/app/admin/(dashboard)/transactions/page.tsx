@@ -1,9 +1,7 @@
 "use client";
 
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { Flex, Paper, Stack, TabsPanel, Text, Title } from "@mantine/core";
 import { IconCircleArrowDown, IconListTree } from "@tabler/icons-react";
-import styles from "./styles.module.scss";
 
 import { useParams, useSearchParams } from "next/navigation";
 
@@ -17,14 +15,12 @@ import Transaction from "@/lib/store/transaction";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import {
-  TransactionType,
   useDefaultAccountTransactions,
   usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import { Suspense, useMemo, useRef, useState } from "react";
-import { filteredSearch } from "@/lib/search";
 import PaginationComponent from "@/ui/components/Pagination";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";

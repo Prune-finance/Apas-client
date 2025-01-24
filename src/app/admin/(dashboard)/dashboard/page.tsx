@@ -85,14 +85,16 @@ export default function Home() {
     loading: debitLoading,
     requests: debitRequests,
     revalidate: revalidateDebitReq,
-  } = useDebitRequests();
+  } = useDebitRequests({ limit: 4 });
   const {
     loading: requestsLoading,
     meta: requestMeta,
     requests,
   } = useRequests({ status: "PENDING" });
 
-  const { loading: loadingTrx, transactions } = useTransactions();
+  const { loading: loadingTrx, transactions } = useTransactions(undefined, {
+    limit: 4,
+  });
 
   const { loading: loadingPayoutTrx, transactions: payoutTrx } =
     usePayoutTransactions({ limit: 4 });
@@ -154,30 +156,6 @@ export default function Home() {
       };
     });
   }, [debitRequests, debitLoading]);
-
-  const rows = transactions.slice(0, 4).map((element) => (
-    <TableTr key={element.id}>
-      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
-      {/* <TableTd>{"N/A"}</TableTd> */}
-      <TableTd className={styles.table__td}>
-        {element.recipientName || element.recipientIban}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <AmountGroup type={element.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        {formatNumber(element.amount, true, "EUR")}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-
-      <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
 
   const payoutRows = payoutTrx.map((element) => (
     <TableTr
@@ -407,7 +385,7 @@ export default function Home() {
                           {(loadingPayoutTrx || payoutTrx.length > 0) && (
                             <TableScrollContainer minWidth={500}>
                               <Table
-                                verticalSpacing="lg"
+                                verticalSpacing="md"
                                 layout="fixed"
                                 styles={{
                                   th: { fontWeight: 600, fontSize: 10 },

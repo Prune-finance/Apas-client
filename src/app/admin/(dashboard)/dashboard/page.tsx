@@ -11,6 +11,7 @@ import {
   Flex,
   Box,
   Group,
+  Space,
 } from "@mantine/core";
 import {
   Table,
@@ -33,6 +34,7 @@ import {
   CardOne,
   CardThree,
   CardTwo,
+  DebitRequestCard,
   SeeAll,
 } from "@/ui/components/Cards";
 import styles from "@/ui/styles/page.module.scss";
@@ -67,20 +69,32 @@ export default function Home() {
   const { loading, meta, stats, statsMeta } = useBusiness({
     period: chartFrequency === "Monthly" ? "year" : "week",
   });
-  const { data: selectedTrxData, close, opened: openedDrawer } = Transaction();
+  const {
+    data: selectedTrxData,
+    close,
+    opened: openedDrawer,
+    open,
+    setData,
+  } = Transaction();
   const {
     loading: accountsLoading,
     meta: accountsMeta,
     accounts,
   } = useAccounts();
-  const { loading: debitLoading, requests: debitRequests } = useDebitRequests();
+  const {
+    loading: debitLoading,
+    requests: debitRequests,
+    revalidate: revalidateDebitReq,
+  } = useDebitRequests({ limit: 4 });
   const {
     loading: requestsLoading,
     meta: requestMeta,
     requests,
   } = useRequests({ status: "PENDING" });
 
-  const { loading: loadingTrx, transactions } = useTransactions();
+  const { loading: loadingTrx, transactions } = useTransactions(undefined, {
+    limit: 4,
+  });
 
   const { loading: loadingPayoutTrx, transactions: payoutTrx } =
     usePayoutTransactions({ limit: 4 });
@@ -121,54 +135,37 @@ export default function Home() {
       return {
         title: request.Account.Company.name,
         amount: request.amount,
-        // subText: `Date Created: ${dayjs(request.createdAt).format(
-        //   "DD MMM, YYYY"
-        // )}`,
-        subText: (
-          <Text fz={10} c="var(--prune-text-gray-400)">
-            Number of Request:{" "}
-            <Text
-              inherit
-              fw={600}
-              component="span"
-              c="var(--prune-text-gray-700)"
-            >
-              {100}
-            </Text>
-          </Text>
-        ),
+        subText: `Date Created: ${dayjs(request.createdAt).format(
+          "DD MMM, YYYY"
+        )}`,
+        // subText: (
+        //   <Text fz={10} c="var(--prune-text-gray-400)">
+        //     Number of Request:{" "}
+        //     <Text
+        //       inherit
+        //       fw={600}
+        //       component="span"
+        //       c="var(--prune-text-gray-700)"
+        //     >
+        //       {100}
+        //     </Text>
+        //   </Text>
+        // ),
         // subText: "Date Created: 24th May, 2024",
         status: request.status,
       };
     });
   }, [debitRequests, debitLoading]);
 
-  const rows = transactions.slice(0, 4).map((element) => (
-    <TableTr key={element.id}>
-      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
-      {/* <TableTd>{"N/A"}</TableTd> */}
-      <TableTd className={styles.table__td}>
-        {element.recipientName || element.recipientIban}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <AmountGroup type={element.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        {formatNumber(element.amount, true, "EUR")}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-
-      <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-
   const payoutRows = payoutTrx.map((element) => (
-    <TableTr key={element.id}>
+    <TableTr
+      key={element.id}
+      style={{ cursor: "pointer" }}
+      onClick={() => {
+        open();
+        setData(element);
+      }}
+    >
       <TableTd className={styles.table__td}>{element.senderName}</TableTd>
       <TableTd className={styles.table__td}>
         {element.recipientName || element.recipientIban}
@@ -388,7 +385,7 @@ export default function Home() {
                           {(loadingPayoutTrx || payoutTrx.length > 0) && (
                             <TableScrollContainer minWidth={500}>
                               <Table
-                                verticalSpacing="lg"
+                                verticalSpacing="md"
                                 layout="fixed"
                                 styles={{
                                   th: { fontWeight: 600, fontSize: 10 },
@@ -447,11 +444,23 @@ export default function Home() {
                       <GridCol
                         span={{ base: 12, xs: 12, sm: 12, md: 5, lg: 6 }}
                       >
+                        <DebitRequestCard
+                          title="Debit Requests"
+                          link="/admin/requests"
+                          stat={10}
+                          // withBorder
+                          requests={debitRequests.slice(0, 4)}
+                          // requests={[]}
+                          container
+                          loading={debitLoading}
+                          revalidate={revalidateDebitReq}
+                        />
+                        {/* <Space my={20} />
                         <CardTwo
                           title="Debit Requests"
                           link="/admin/requests"
                           items={cardTwoItems}
-                        />
+                        /> */}
                       </GridCol>
                     </Grid>
                   </GridCol>

@@ -116,51 +116,20 @@ export default function AccountTransactions() {
 
   const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
 
-  const rows = frontendPagination(
-    filteredSearch(transactions, searchProps, debouncedSearch),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
-    <TableTr
-      key={element.id}
-      onClick={() => {
-        setSelectedRequest(element);
-        openDrawer();
-      }}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd className={styles.table__td}>{element.senderIban}</TableTd>
-      <TableTd>{"N/A"}</TableTd>
-      <TableTd className={styles.table__td}>
-        {element.recipientName || element.recipientIban}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <AmountGroup type={element.type} fz={12} fw={400} />
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        {formatNumber(element.amount, true, "EUR")}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.reference}</TableTd>
-
-      <TableTd className={styles.table__td}>
-        {dayjs(element.createdAt).format("Do MMMM, YYYY - hh:mm a")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <BadgeComponent status={element.status} />
-      </TableTd>
-    </TableTr>
-  ));
-
   return (
     <main>
       <Breadcrumbs
         items={[
           { title: "Transactions", href: "/admin/transactions" },
-          {
-            title: account?.accountName || "",
-            href: `/admin/transactions/${accountId}`,
-            loading: loadingAcct,
-          },
+          ...(loadingAcct || account
+            ? [
+                {
+                  title: account?.accountName || "",
+                  href: `/admin/transactions/${accountId}`,
+                  loading: loadingAcct,
+                },
+              ]
+            : []),
         ]}
       />
       <Group gap={12} align="center" mt={32}>
@@ -170,9 +139,11 @@ export default function AccountTransactions() {
             size="lg"
             color="var(--prune-primary-700)"
             // variant="light"
-          >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
-            0
-          )}`}</Avatar>
+          >
+            {account
+              ? `${account?.firstName.charAt(0)}${account?.lastName.charAt(0)}`
+              : null}
+          </Avatar>
         ) : (
           <Skeleton circle h={50} w={50} />
         )}
@@ -234,7 +205,7 @@ export default function AccountTransactions() {
       />
 
       <EmptyTable
-        rows={rows}
+        rows={transactions}
         loading={loading}
         title="There are no transactions"
         text="When a transaction is recorded, it will appear here"

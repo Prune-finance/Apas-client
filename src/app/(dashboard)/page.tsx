@@ -181,7 +181,7 @@ export default function Home() {
             Welcome
           </Text>
           <Text fz={14} className={styles.main__header__subtext}>
-            Here's an overview of your financial activities
+            {`Here's an overview of your financial activities`}
           </Text>
         </Flex>
 
@@ -508,7 +508,9 @@ export default function Home() {
                   <TableThead style={{ borderBottom: "1px solid #f5f5f5" }}>
                     {["Beneficiary Name", "Amount", "Date", "Status"].map(
                       (header) => (
-                        <TableTh className={styles.table__th}>{header}</TableTh>
+                        <TableTh className={styles.table__th} key={header}>
+                          {header}
+                        </TableTh>
                       )
                     )}
                   </TableThead>

@@ -64,7 +64,7 @@ const UsersComponent = () => {
     ).map((element, index) => [
       `${element.Company.name}`,
       dayjs(element.createdAt).format("Do MMM, YYYY"),
-      <BadgeComponent status={element.status} active />,
+      <BadgeComponent status={element.status} active key={element.id} />,
     ]),
   };
 

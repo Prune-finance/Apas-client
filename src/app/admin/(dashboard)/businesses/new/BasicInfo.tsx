@@ -73,6 +73,7 @@ export default function BasicInfo({ form }: Props) {
       const [code] = form.values.contactCountryCode.split("-");
       form.setFieldValue("contactNumber", `${code}`);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.values.contactCountryCode]);
 
   return (
@@ -96,7 +97,7 @@ export default function BasicInfo({ form }: Props) {
           label="Trade Name"
           placeholder="Enter Business Trade Name"
           {...form.getInputProps("tradingName")}
-          withAsterisk
+          // withAsterisk
         />
 
         <Select

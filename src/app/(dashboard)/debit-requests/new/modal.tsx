@@ -42,7 +42,7 @@ import {
   useUserAccounts,
   validateAccount,
 } from "@/lib/hooks/accounts";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, removeWhitespace } from "@/lib/utils";
 import { SelectDropdownSearch } from "@/ui/components/SelectDropdownSearch";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { countries } from "@/lib/static";
@@ -109,8 +109,12 @@ export default function DebitRequestModal({
     setValidated(null);
     setDisabled(false);
     setShowBadge(true);
+
     try {
-      const data = await validateAccount({ iban, bic });
+      const data = await validateAccount({
+        iban: removeWhitespace(iban),
+        bic: removeWhitespace(bic),
+      });
 
       if (data) {
         form.setValues({
@@ -132,6 +136,7 @@ export default function DebitRequestModal({
     if (iban && bic) {
       handleIbanValidation();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bic, iban]);
 
   // useEffect(() => {
@@ -164,7 +169,8 @@ export default function DebitRequestModal({
         lastName = companyName.split(" ")[1] || "";
       }
 
-      const { accountType, ...rest } = form.values;
+      const { accountType, destinationBIC, destinationIBAN, ...rest } =
+        form.values;
 
       // console.log({
       //   ...rest,
@@ -180,6 +186,8 @@ export default function DebitRequestModal({
         ...(form.values.accountType === "Corporate" && {
           destinationFirstName: firstName,
           destinationLastName: lastName,
+          destinationBIC: removeWhitespace(destinationBIC),
+          destinationIBAN: removeWhitespace(destinationIBAN),
         }),
       });
 
@@ -188,7 +196,7 @@ export default function DebitRequestModal({
         "You have successfully sent a new debit request."
       );
       router.push("/debit-requests");
-      revalidate && revalidate();
+      // revalidate && revalidate();
       close();
     } catch (error) {
       handleError("Action Failed", parseError(error));
@@ -222,9 +230,9 @@ export default function DebitRequestModal({
           >
             <Stack>
               <Text fz={14} inline lh="20px">
-                Unfortunately, we couldn't validate your account information.
+                {`Unfortunately, we couldn't validate your account information.
                 Please review the details to ensure it is accurate, or proceed
-                without validation.{" "}
+                without validation. `}
                 <Text span inherit c="var(--prune-text-gray-700)" fw={600}>
                   Know that proceeding without validation may lead to delays or
                   errors in processing.

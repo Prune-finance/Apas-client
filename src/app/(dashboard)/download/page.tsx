@@ -109,7 +109,7 @@ function DownloadStatement() {
               gap={20}
             >
               {Object.entries(accountDetails).map(([key, value]) => (
-                <Flex align="center" justify="space-between" w="100%">
+                <Flex align="center" justify="space-between" w="100%" key={key}>
                   <Text fz={14} c="#475467" fw={500}>
                     {key}
                   </Text>
@@ -137,7 +137,7 @@ function DownloadStatement() {
               gap={20}
             >
               {Object.entries(inSummary).map(([key, value]) => (
-                <Flex align="center" justify="space-between" w="100%">
+                <Flex align="center" justify="space-between" w="100%" key={key}>
                   <Text fz={14} c="#475467" fw={500}>
                     {key}
                   </Text>

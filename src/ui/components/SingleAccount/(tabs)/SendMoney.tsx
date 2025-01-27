@@ -1,4 +1,4 @@
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, removeWhitespace } from "@/lib/utils";
 import { Modal, Text } from "@mantine/core";
 
 import { useState } from "react";
@@ -78,8 +78,8 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
 
       const { data } = await axios.post(`/payout/send-money`, {
         amount,
-        destinationIBAN,
-        destinationBIC,
+        destinationIBAN: removeWhitespace(destinationIBAN),
+        destinationBIC: removeWhitespace(destinationBIC),
         destinationBank,
         bankAddress,
         destinationCountry,
@@ -117,8 +117,8 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
       } = companyRequestForm;
       const { data } = await axios.post(`/payout/send-money`, {
         amount,
-        destinationIBAN,
-        destinationBIC,
+        destinationIBAN: removeWhitespace(destinationIBAN),
+        destinationBIC: removeWhitespace(destinationBIC),
         destinationBank,
         bankAddress,
         destinationCountry,

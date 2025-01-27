@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
 
@@ -302,6 +303,7 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     status,
@@ -388,6 +390,7 @@ export function useUserPayoutTransactionRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     limit,
     status,
@@ -431,6 +434,7 @@ export function useSingleRequest(id: string) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { loading, request, revalidate };
@@ -500,6 +504,7 @@ export function useUserRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date, limit, firstName, lastName, country, endDate, status, type, page]);
 
   return { loading, requests, meta, revalidate };
@@ -532,6 +537,7 @@ export function useSingleUserRequest(id: string) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return { loading, request, revalidate };
@@ -576,6 +582,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj.date, obj.endDate, obj.limit, obj.status]);
 
   return { loading, requests, revalidate };
@@ -622,6 +629,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     obj.date,
     obj.limit,
@@ -678,6 +686,7 @@ export function useCompanyWithAccountRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page, obj.business]);
 
   return { loading, businesses, revalidate, meta };
@@ -783,6 +792,7 @@ export function useCompanyDebitRequests(
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page]);
 
   return { loading, requests, revalidate, meta };

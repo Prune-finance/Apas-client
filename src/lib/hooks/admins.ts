@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // import axios from "axios";
 import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
@@ -54,6 +55,7 @@ export function useAdmins(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [limit, date, endDate, status, firstName, lastName, email, page]);
 
   return { loading, users, revalidate, meta };

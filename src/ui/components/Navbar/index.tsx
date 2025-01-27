@@ -78,6 +78,8 @@ export default function Navbar() {
     if (idle) {
       handleAdminLogout(pathname);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idle]);
 
   const { accountReq, requests, payouts, transactions } = useMemo(() => {
@@ -296,6 +298,8 @@ export function UserNavbar() {
     if (idle) {
       handleUserLogout(pathname);
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idle]);
 
   const isActive = (link: string): boolean => {

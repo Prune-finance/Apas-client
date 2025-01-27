@@ -127,6 +127,7 @@ export default function Accounts({
   useEffect(() => {
     fetchCompanyAccounts();
     // fetchCompanyDefaultAccount();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     business,
     customParams.limit,

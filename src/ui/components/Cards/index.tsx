@@ -4,10 +4,12 @@ import {
   Badge,
   Box,
   Button,
+  Divider,
   Flex,
   Group,
   Paper,
   Skeleton,
+  Stack,
   Text,
   Title,
 } from "@mantine/core";
@@ -24,6 +26,11 @@ import dayjs from "dayjs";
 
 import EmptyImage from "@/assets/empty.png";
 import Image from "next/image";
+import { BadgeComponent } from "../Badge";
+import { DebitRequest } from "@/lib/hooks/requests";
+import DebitDrawer from "@/app/admin/(dashboard)/requests/drawer";
+import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
 
 interface ICardOne {
   title: string;
@@ -233,7 +240,7 @@ export function CardTwo({ title, link, items }: ICardTwo) {
 
               <div className={styles.item__subs}>
                 <Text className={styles.sub__text} fz={10}>
-                  {/* {item.subText} */}
+                  {item.subText}
                 </Text>
 
                 <Badge
@@ -490,3 +497,158 @@ export function CardFive({
     </Paper>
   );
 }
+
+interface ICardSix extends Omit<ICardOne, "text"> {
+  locale?: string;
+  requests: DebitRequest[];
+  revalidate: () => Promise<void>;
+}
+
+export const DebitRequestCard = ({
+  title,
+  stat,
+  link,
+  colored,
+  formatted,
+  container,
+  withBorder,
+  loading,
+  currency = "EUR",
+  flex,
+  requests,
+  locale,
+  revalidate,
+}: ICardSix) => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
+    null
+  );
+  return (
+    <Paper
+      flex={flex}
+      withBorder={!!withBorder}
+      className={styles.card__one}
+      radius={0}
+      style={{
+        border: "1px solid #F5F5F5",
+        height: container ? "100%" : "130px",
+        gap: "16px",
+        // borderRight: borderRight ? "1px solid #F5F5F5" : "none",
+      }}
+    >
+      <Group justify="space-between">
+        <Text fz={10} tt="uppercase" fw={600} c="var(--prune-text-gray-600)">
+          {title}
+        </Text>
+
+        {link && (
+          <Link href={link}>
+            <SeeAll />
+          </Link>
+        )}
+      </Group>
+
+      {loading &&
+        !!!requests.length &&
+        Array.from({ length: 4 }).map((_, index, arr) => (
+          <Box key={index}>
+            <Flex align="center" gap={8}>
+              <Skeleton w={35} h={35} />
+
+              <Group justify="space-between" align="center" w="100%">
+                <Stack gap={4}>
+                  <Skeleton w={120} h={10} />
+
+                  <Skeleton w={100} h={10} />
+                </Stack>
+
+                <Stack gap={4} align="end">
+                  <Skeleton w={50} h={10} />
+
+                  <Skeleton w={100} h={20} circle />
+                </Stack>
+              </Group>
+            </Flex>
+            {arr.length - 1 !== index && (
+              <Divider style={{ border: "1px solid #f5f5f5" }} mt={15} />
+            )}
+          </Box>
+        ))}
+
+      {requests.map((request, index, arr) => (
+        <Box
+          key={request.id}
+          onClick={() => {
+            setSelectedRequest(request);
+            open();
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          <Flex align="center" gap={8}>
+            <Avatar
+              variant="filled"
+              color="var(--prune-primary-600)"
+              radius="sm"
+              styles={{
+                placeholder: { color: "var(--prune-text-gray-700)" },
+              }}
+            >
+              {getInitials(request.Account.Company.name)}
+            </Avatar>
+
+            <Group justify="space-between" align="center" w="100%">
+              <Stack gap={4}>
+                <Text fz={12} fw={600} className={styles.header__text}>
+                  {request.Account.Company.name}
+                </Text>
+
+                <Text fz={10} c="var(--prune-text-gray-400)">
+                  Date Created:{" "}
+                  {dayjs(request.createdAt).format("DD MMM, YYYY")}
+                </Text>
+              </Stack>
+
+              <Stack gap={4} align="end">
+                <Text fz={12} fw={600} className={styles.header__text}>
+                  {formatNumber(request.amount, true, currency)}
+                </Text>
+
+                <BadgeComponent fz={10} status={request.status} />
+              </Stack>
+            </Group>
+          </Flex>
+          {arr.length - 1 !== index && (
+            <Divider style={{ border: "1px solid #f5f5f5" }} mt={15} />
+          )}
+        </Box>
+      ))}
+
+      {!loading && !!!requests.length && (
+        <Flex
+          style={{ flexGrow: 1 }}
+          direction="column"
+          align="center"
+          justify="center"
+          mt={24}
+        >
+          <Image src={EmptyImage} alt="no content" width={120} height={96} />
+          <Text mt={14} fz={10} c="#1D2939">
+            There are no debit requests.
+          </Text>
+          {/* <Text fz={10} c="#667085">
+              When an account is created, it will appear here
+            </Text> */}
+        </Flex>
+      )}
+
+      {selectedRequest && (
+        <DebitDrawer
+          opened={opened}
+          close={close}
+          selectedRequest={selectedRequest}
+          revalidate={revalidate}
+        />
+      )}
+    </Paper>
+  );
+};

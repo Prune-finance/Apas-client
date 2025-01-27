@@ -26,6 +26,7 @@ import DropzoneComponent from "../Dropzone";
 import { sendMoneyCompanyValidate } from "@/lib/schema";
 import { countries } from "@/lib/static";
 import { useDebouncedValue } from "@mantine/hooks";
+import { removeWhitespace } from "@/lib/utils";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -106,7 +107,10 @@ function Company({
     setDisableCountry(false);
     setShowBadge(true);
     try {
-      const data = await validateAccount({ iban, bic });
+      const data = await validateAccount({
+        iban: removeWhitespace(iban),
+        bic: removeWhitespace(bic),
+      });
 
       if (data) {
         form2.setValues({
@@ -132,9 +136,9 @@ function Company({
       console.log({ bic, iban });
       handleIbanValidation();
     }
-  }, [bic, iban]);
 
-  console.log({ bic, iban });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bic, iban]);
 
   return (
     <TabsPanel value="To A Company">

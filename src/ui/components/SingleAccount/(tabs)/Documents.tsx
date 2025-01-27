@@ -42,7 +42,7 @@ export const Documents = ({ account, admin = false }: Props) => {
               tt="uppercase"
               c="var(--prune-text-gray-800)"
             >
-              Director's Documents
+              {`Director's Documents`}
             </Text>
             {Object.values(account.accountDocuments.directors).map(
               (director, index) => (
@@ -81,11 +81,11 @@ export const Documents = ({ account, admin = false }: Props) => {
               tt="uppercase"
               c="var(--prune-text-gray-800)"
             >
-              Shareholder's Documents
+              {`Shareholder's Documents`}
             </Text>
             {Object.values(account.accountDocuments.shareholders).map(
               (director, index) => (
-                <Box mb={20}>
+                <Box mb={20} key={index}>
                   <Text fz={12} fw={500} c="dimmed" mb={20}>
                     Shareholder {index + 1}
                   </Text>

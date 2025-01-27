@@ -9,6 +9,7 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
   TransactionType,
   useBusinessTransactions,
+  usePayoutAccountTransactions,
   usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
@@ -78,7 +79,7 @@ export default function BusinessPayoutAccount() {
     loading: loadingTrx,
     transactions,
     meta,
-  } = usePayoutTransactions(param);
+  } = usePayoutAccountTransactions(params.id, param);
   return (
     <main>
       <Breadcrumbs

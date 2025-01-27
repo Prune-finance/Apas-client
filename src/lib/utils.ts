@@ -160,3 +160,5 @@ export const getDocumentStatus = (
 
   return "PENDING";
 };
+
+export const removeWhitespace = (text: string) => text.replace(/\s/g, "");

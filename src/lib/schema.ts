@@ -525,8 +525,11 @@ export const validateDebitRequest = z
     amount: z
       .number({ invalid_type_error: "Amount is required" })
       .positive("A positive amount is required"),
-    destinationIBAN: z.string().min(3, "Destination account is required"),
-    destinationBIC: z.string().min(3, "BIC is required"),
+    destinationIBAN: z
+      .string()
+      .min(3, "Destination account is required")
+      .trim(),
+    destinationBIC: z.string().min(3, "BIC is required").trim(),
     destinationCountry: z.string().min(2, "Country is required"),
     destinationBank: z.string().min(2, "Bank is required"),
     reference: z.string().min(2, "Reference number is required"),

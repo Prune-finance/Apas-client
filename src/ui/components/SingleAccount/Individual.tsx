@@ -26,6 +26,7 @@ import { countries } from "@/lib/static";
 import DropzoneComponent from "../Dropzone";
 import { useDebouncedValue } from "@mantine/hooks";
 import { sendMoneyIndividualValidate } from "@/lib/schema";
+import { removeWhitespace } from "@/lib/utils";
 
 interface IndividualProps {
   account: DefaultAccount | null;
@@ -88,7 +89,10 @@ function Individual({
     setDisableCountry(false);
     setShowBadge(true);
     try {
-      const data = await validateAccount({ iban, bic });
+      const data = await validateAccount({
+        iban: removeWhitespace(iban),
+        bic: removeWhitespace(bic),
+      });
 
       if (data) {
         form.setValues({

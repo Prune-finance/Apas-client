@@ -186,6 +186,37 @@ export default function Home() {
     </TableTr>
   ));
 
+  const businessAccountEmptyArray = [] as any[];
+
+  const businessRows = businessAccountEmptyArray?.map((element) => (
+    <TableTr
+      key={element.id}
+      style={{ cursor: "pointer" }}
+      onClick={() => {
+        open();
+        setData(element);
+      }}
+    >
+      <TableTd className={styles.table__td}>{element.senderName}</TableTd>
+      <TableTd className={styles.table__td}>
+        {element.recipientName || element.recipientIban}
+      </TableTd>
+
+      <TableTd className={styles.table__td}>
+        <AmountGroup
+          type={element.type}
+          amount={element.amount}
+          fz={12}
+          fw={400}
+        />
+      </TableTd>
+
+      <TableTd className={styles.table__td}>
+        <BadgeComponent status={element.status} fz={10} />
+      </TableTd>
+    </TableTr>
+  ));
+
   const cards = [
     {
       title: "Total Business",
@@ -313,134 +344,7 @@ export default function Home() {
                       />
                     </div>
 
-                    <Box style={{ border: "1px solid #f2f4f7" }} p={15} mt={15}>
-                      <Group justify="space-between">
-                        <Text
-                          tt="uppercase"
-                          fz={10}
-                          fw={600}
-                          className={styles.text}
-                        >
-                          Transactions
-                        </Text>
-
-                        <Link href="/admin/transactions?tab=issued-accounts">
-                          <SeeAll />
-                        </Link>
-                      </Group>
-
-                      <TableComponent
-                        head={IssuedAccountTableHeaders}
-                        rows={
-                          <IssuedTransactionTableRows
-                            data={transactions.slice(0, 4)}
-                            searchProps={[
-                              "senderIban",
-                              "senderName",
-                              "recipientIban",
-                              "recipientName",
-                              "reference",
-                            ]}
-                            search=""
-                          />
-                        }
-                        loading={loadingTrx}
-                        noBg
-                      />
-
-                      <EmptyTable
-                        loading={loadingTrx}
-                        rows={transactions}
-                        title="There is no transaction"
-                        text="When a transaction is created it will appear here"
-                      />
-                    </Box>
-
                     <Grid mt={15}>
-                      <GridCol
-                        span={{ base: 12, xs: 12, sm: 12, md: 7, lg: 6 }}
-                        mih={345}
-                      >
-                        <div
-                          className={styles.payout__table}
-                          style={{ border: "1px solid #f2f4f7" }}
-                        >
-                          <Flex justify="space-between" align="center">
-                            <Text
-                              className={styles.table__text}
-                              lts={0.5}
-                              fz={10}
-                              fw={600}
-                            >
-                              Payout History
-                            </Text>
-
-                            <Link
-                              href={"/admin/transactions?tab=payout-accounts"}
-                            >
-                              <SeeAll />
-                            </Link>
-                          </Flex>
-
-                          {(loadingPayoutTrx || payoutTrx.length > 0) && (
-                            <TableScrollContainer minWidth={500}>
-                              <Table
-                                verticalSpacing="md"
-                                layout="fixed"
-                                styles={{
-                                  th: { fontWeight: 600, fontSize: 10 },
-                                  td: { fontSize: 10 },
-                                }}
-                              >
-                                <TableThead>
-                                  <TableTr>
-                                    {payoutHeaders.map((header, index) => (
-                                      <TableTh
-                                        key={index}
-                                        className={styles.table__th}
-                                      >
-                                        {header}
-                                      </TableTh>
-                                    ))}
-                                  </TableTr>
-                                </TableThead>
-                                <TableTbody
-                                  className={styles.table__td}
-                                  style={{ wordBreak: "break-word" }}
-                                >
-                                  {loadingPayoutTrx
-                                    ? DynamicSkeleton2(payoutHeaders.length)
-                                    : payoutRows}
-                                </TableTbody>
-                              </Table>
-                            </TableScrollContainer>
-                          )}
-
-                          {!loadingPayoutTrx && payoutTrx.length === 0 && (
-                            <Flex
-                              style={{ flexGrow: 1 }}
-                              direction="column"
-                              align="center"
-                              justify="center"
-                              mt={24}
-                            >
-                              <Image
-                                src={EmptyImage}
-                                alt="no content"
-                                width={120}
-                                height={96}
-                              />
-                              <Text mt={14} fz={10} c="#1D2939">
-                                No payout history.
-                              </Text>
-                            </Flex>
-                          )}
-                          {/* <Text fz={10} c="#667085">
-              When an account is created, it will appear here
-            </Text> */}
-                        </div>
-                      </GridCol>
-
                       <GridCol
                         span={{ base: 12, xs: 12, sm: 12, md: 5, lg: 6 }}
                       >
@@ -449,49 +353,28 @@ export default function Home() {
                           link="/admin/requests"
                           stat={10}
                           // withBorder
-                          requests={debitRequests.slice(0, 4)}
+                          requests={debitRequests.slice(0, 3)}
                           // requests={[]}
                           container
                           loading={debitLoading}
                           revalidate={revalidateDebitReq}
                         />
-                        {/* <Space my={20} />
-                        <CardTwo
-                          title="Debit Requests"
-                          link="/admin/requests"
-                          items={cardTwoItems}
-                        /> */}
+                      </GridCol>
+
+                      <GridCol
+                        span={{ base: 12, xs: 12, sm: 12, md: 7, lg: 6 }}
+                        mih={340}
+                      >
+                        <CardFour
+                          title="Account Creation"
+                          link="/admin/account-requests"
+                          items={cardFourItems}
+                        />
                       </GridCol>
                     </Grid>
                   </GridCol>
                 </Grid>
               </GridCol>
-
-              {/* <GridCol span={{ lg: 3, md: 6 }}> */}
-              {/* <Link href="/admin/accounts?status=Frozen"> */}
-              {/* <CardOne
-              loading={requestsLoading}
-              stat={requestMeta?.inactiveAccounts || 0}
-              title="Deactivated Accounts"
-            /> */}
-              {/* </Link> */}
-              {/* </GridCol> */}
-
-              {/* <GridCol span={{ lg: 3, md: 6 }}>
-            <CardOne
-              title="Account Balance"
-              stat={accounts.reduce((prv, curr) => {
-                return prv + curr.accountBalance;
-              }, 0)}
-              formatted
-              // colored
-              currency="EUR"
-              loading={accountsLoading}
-              text={
-                <>{`From Jul 01, 2024 to ${dayjs().format("MMM DD, YYYY")}`}</>
-              }
-            />
-          </GridCol> */}
             </Grid>
           </GridCol>
 
@@ -567,20 +450,190 @@ export default function Home() {
                       // subTitle="Total Number of Active Accounts for all Business"
                     />
                   </GridCol>
-
-                  <GridCol
-                    span={{ lg: 12, md: 5 }}
-                    className={styles.grid__card}
-                  >
-                    <CardFour
-                      title="Account Creation"
-                      link="/admin/account-requests"
-                      items={cardFourItems}
-                    />
-                  </GridCol>
                 </Grid>
               </GridCol>
             </Grid>
+          </GridCol>
+        </Grid>
+
+        {/* Business  Account transactions & PAYOUTs Transactions */}
+        <Grid mt={15}>
+          <GridCol span={{ base: 12, xs: 12, sm: 12, md: 7, lg: 6 }} mih={345}>
+            <div
+              className={styles.payout__table}
+              style={{ border: "1px solid #f2f4f7" }}
+            >
+              <Flex justify="space-between" align="center">
+                <Text className={styles.table__text} lts={0.5} fz={10} fw={600}>
+                  Business Account transactions
+                </Text>
+
+                <Link href={"/admin/transactions?tab=business-accounts"}>
+                  <SeeAll />
+                </Link>
+              </Flex>
+
+              {(loadingPayoutTrx || businessAccountEmptyArray?.length > 0) && (
+                <TableScrollContainer minWidth={500}>
+                  <Table
+                    verticalSpacing="md"
+                    layout="fixed"
+                    styles={{
+                      th: { fontWeight: 600, fontSize: 10 },
+                      td: { fontSize: 10 },
+                    }}
+                  >
+                    <TableThead>
+                      <TableTr>
+                        {businessAccHeaders?.map((header, index) => (
+                          <TableTh key={index} className={styles.table__th}>
+                            {header}
+                          </TableTh>
+                        ))}
+                      </TableTr>
+                    </TableThead>
+                    <TableTbody
+                      className={styles.table__td}
+                      style={{ wordBreak: "break-word" }}
+                    >
+                      {loadingPayoutTrx
+                        ? DynamicSkeleton2(businessAccHeaders.length)
+                        : businessRows}
+                    </TableTbody>
+                  </Table>
+                </TableScrollContainer>
+              )}
+
+              {!loadingPayoutTrx && businessAccountEmptyArray.length === 0 && (
+                <Flex
+                  style={{ flexGrow: 1 }}
+                  direction="column"
+                  align="center"
+                  justify="center"
+                  mt={24}
+                >
+                  <Image
+                    src={EmptyImage}
+                    alt="no content"
+                    width={120}
+                    height={96}
+                  />
+                  <Text mt={14} fz={10} c="#1D2939">
+                    No business account history.
+                  </Text>
+                </Flex>
+              )}
+            </div>
+          </GridCol>
+
+          <GridCol span={{ base: 12, xs: 12, sm: 12, md: 7, lg: 6 }} mih={345}>
+            <div
+              className={styles.payout__table}
+              style={{ border: "1px solid #f2f4f7" }}
+            >
+              <Flex justify="space-between" align="center">
+                <Text className={styles.table__text} lts={0.5} fz={10} fw={600}>
+                  Payouts Transactions
+                </Text>
+
+                <Link href={"/admin/transactions?tab=payout-accounts"}>
+                  <SeeAll />
+                </Link>
+              </Flex>
+
+              {(loadingPayoutTrx || payoutTrx.length > 0) && (
+                <TableScrollContainer minWidth={500}>
+                  <Table
+                    verticalSpacing="md"
+                    layout="fixed"
+                    styles={{
+                      th: { fontWeight: 600, fontSize: 10 },
+                      td: { fontSize: 10 },
+                    }}
+                  >
+                    <TableThead>
+                      <TableTr>
+                        {payoutHeaders.map((header, index) => (
+                          <TableTh key={index} className={styles.table__th}>
+                            {header}
+                          </TableTh>
+                        ))}
+                      </TableTr>
+                    </TableThead>
+                    <TableTbody
+                      className={styles.table__td}
+                      style={{ wordBreak: "break-word" }}
+                    >
+                      {loadingPayoutTrx
+                        ? DynamicSkeleton2(payoutHeaders.length)
+                        : payoutRows}
+                    </TableTbody>
+                  </Table>
+                </TableScrollContainer>
+              )}
+
+              {!loadingPayoutTrx && payoutTrx.length === 0 && (
+                <Flex
+                  style={{ flexGrow: 1 }}
+                  direction="column"
+                  align="center"
+                  justify="center"
+                  mt={24}
+                >
+                  <Image
+                    src={EmptyImage}
+                    alt="no content"
+                    width={120}
+                    height={96}
+                  />
+                  <Text mt={14} fz={10} c="#1D2939">
+                    No payout history.
+                  </Text>
+                </Flex>
+              )}
+            </div>
+          </GridCol>
+        </Grid>
+
+        <Grid>
+          <GridCol span={12}>
+            <Box style={{ border: "1px solid #f2f4f7" }} p={15} mt={15}>
+              <Group justify="space-between">
+                <Text tt="uppercase" fz={10} fw={600} className={styles.text}>
+                  Issued Account transactions
+                </Text>
+
+                <Link href="/admin/transactions?tab=issued-accounts">
+                  <SeeAll />
+                </Link>
+              </Group>
+
+              <TableComponent
+                head={IssuedAccountTableHeaders}
+                rows={
+                  <IssuedTransactionTableRows
+                    data={transactions.slice(0, 4)}
+                    searchProps={[
+                      "senderIban",
+                      "senderName",
+                      "recipientIban",
+                      "recipientName",
+                      "reference",
+                    ]}
+                    search=""
+                  />
+                }
+                loading={loadingTrx}
+                noBg
+              />
+
+              <EmptyTable
+                loading={loadingTrx}
+                rows={transactions}
+                title="There is no transaction"
+                text="When a transaction is created it will appear here"
+              />
+            </Box>
           </GridCol>
         </Grid>
       </div>
@@ -597,3 +650,9 @@ export default function Home() {
 }
 
 const payoutHeaders = ["Senders name", "Beneficiary", "Amount", "Status"];
+const businessAccHeaders = [
+  "Business name",
+  "Account name",
+  "Amount",
+  "Status",
+];

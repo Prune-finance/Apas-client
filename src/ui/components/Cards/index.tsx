@@ -367,7 +367,7 @@ export function CardFour({ title, link, items }: ICardFour) {
       </div>
 
       <div className={styles.items__container}>
-        {items?.map((item, index) => {
+        {items?.slice(0, 3)?.map((item, index) => {
           return (
             <Link href={item.link} key={index}>
               <div className={styles.item__container}>

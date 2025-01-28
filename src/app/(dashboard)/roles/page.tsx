@@ -53,7 +53,7 @@ import { useForm } from "@mantine/form";
 
 dayjs.extend(relativeTime);
 
-export const newRoles = {
+const newRoles = {
   email: "",
   firstName: "",
   lastName: "",

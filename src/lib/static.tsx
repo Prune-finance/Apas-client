@@ -119,15 +119,15 @@ export const UserMainLinks = [
 ];
 
 export const UserOtherLinks = [
-  // {
-  //   text: "Roles & Permissions",
-  //   link: "/roles",
-  //   icon: <IconSettings size={16} />,
-  // },
   {
     text: "Users",
     link: "/users",
     icon: <IconUsers size={16} />,
+  },
+  {
+    text: "Roles & Permissions",
+    link: "/roles",
+    icon: <IconSettings size={16} />,
   },
   {
     text: "Settings",

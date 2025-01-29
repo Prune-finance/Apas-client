@@ -1,7 +1,13 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, { Dispatch, SetStateAction, Suspense, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  Suspense,
+  useMemo,
+  useState,
+} from "react";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -22,14 +28,13 @@ import {
   IconX,
   IconTrash,
   IconListTree,
-  IconSearch,
   IconCheck,
   IconArrowUpRight,
   IconDotsVertical,
 } from "@tabler/icons-react";
 
 // import ModalComponent from "@/ui/components/Modal";
-import { AccountData, useAccounts } from "@/lib/hooks/accounts";
+import { AccountData, AccountMeta, useAccounts } from "@/lib/hooks/accounts";
 import {
   activeBadgeColor,
   camelCaseToTitleCase,
@@ -57,6 +62,7 @@ import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import * as XLSX from "xlsx";
 import createAxiosInstance from "@/lib/axios";
+import useAxios from "@/lib/hooks/useAxios";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -68,7 +74,7 @@ function Accounts() {
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
 
-  const { loading, accounts, revalidate, meta } = useAccounts({
+  const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
@@ -77,7 +83,33 @@ function Accounts() {
     ...(accountNumber && { accountNumber }),
     page: activePage,
     limit: parseInt(limit ?? "10", 10),
+  };
+
+  const dependencies = [
+    limit,
+    activePage,
+    status,
+    date,
+    endDate,
+    accountName,
+    accountNumber,
+    type,
+  ];
+
+  const {
+    loading,
+    data: accounts,
+    meta,
+    queryFn: revalidate,
+  } = useAxios<AccountData[], AccountMeta>({
+    endpoint: "/admin/accounts",
+    baseURL: "accounts",
+    params,
+    dependencies,
   });
+
+  // TODO: Handle the resetting of activePage state when the filter is toggled
+
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
   const [unfreezeOpened, { open: unfreezeOpen, close: unfreezeClose }] =
@@ -86,105 +118,13 @@ function Accounts() {
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
   const [filterOpened, { toggle }] = useDisclosure(false);
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const { handleError, handleSuccess } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
-  const [processing, setProcessing] = useState(false);
   const [processingCSV, setProcessingCSV] = useState(false);
 
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
-
-  const freezeAccount = async (id: string) => {
-    setProcessing(true);
-    try {
-      const { reason, supportingDocumentName, supportingDocumentUrl } =
-        requestForm.values;
-      await axios.patch(`/admin/accounts/${id}/freeze`, {
-        reason,
-        ...(supportingDocumentName && { supportingDocumentName }),
-        ...(supportingDocumentUrl && { supportingDocumentUrl }),
-      });
-
-      revalidate();
-      handleSuccess("Action Completed", "Account frozen");
-      freezeClose();
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const deactivateAccount = async (id: string) => {
-    setProcessing(true);
-    try {
-      const { reason, supportingDocumentName, supportingDocumentUrl } =
-        requestForm.values;
-
-      await axios.patch(`/admin/accounts/${id}/deactivate`, {
-        reason,
-        ...(supportingDocumentName && { supportingDocumentName }),
-        ...(supportingDocumentUrl && { supportingDocumentUrl }),
-      });
-      revalidate();
-      handleSuccess("Action Completed", "Account Deactivated");
-      close();
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const activateAccount = async (id: string) => {
-    setProcessing(true);
-    try {
-      const { reason, supportingDocumentName, supportingDocumentUrl } =
-        requestForm.values;
-
-      await axios.patch(`/admin/accounts/${id}/activate`, {
-        reason,
-        ...(supportingDocumentName && { supportingDocumentName }),
-        ...(supportingDocumentUrl && { supportingDocumentUrl }),
-      });
-      revalidate();
-      handleSuccess("Action Completed", "Account Activated");
-      activateClose();
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const unfreezeAccount = async (id: string) => {
-    setProcessing(true);
-    try {
-      const { reason, supportingDocumentName, supportingDocumentUrl } =
-        requestForm.values;
-
-      await axios.patch(`/admin/accounts/${id}/unfreeze`, {
-        reason,
-        ...(supportingDocumentUrl && { supportingDocumentUrl }),
-        ...(supportingDocumentName && { supportingDocumentName }),
-      });
-
-      revalidate();
-      handleSuccess("Action Completed", "Account unfrozen");
-      unfreezeClose();
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  const form = useForm<FilterType>({
-    initialValues: FilterValues,
-    validate: zodResolver(FilterSchema),
-  });
 
   const requestForm = useForm({
     initialValues: {
@@ -193,6 +133,72 @@ function Accounts() {
       supportingDocumentUrl: "",
     },
     validate: zodResolver(validateRequest),
+  });
+
+  const { reason, supportingDocumentName, supportingDocumentUrl } =
+    requestForm.values;
+
+  const body = {
+    reason,
+    ...(supportingDocumentName && { supportingDocumentName }),
+    ...(supportingDocumentUrl && { supportingDocumentUrl }),
+  };
+
+  const { queryFn: freezeAccount, loading: loadingFreeze } = useAxios({
+    endpoint: `/admin/accounts/${rowId}/freeze`,
+    method: "PATCH",
+    body,
+    onSuccess(data, meta) {
+      revalidate();
+      handleSuccess("Action Completed", "Account frozen");
+      freezeClose();
+
+      requestForm.reset();
+    },
+  });
+
+  const { queryFn: deactivateAccount, loading: loadingDeactivate } = useAxios({
+    endpoint: `/admin/accounts/${rowId}/deactivate`,
+    method: "PATCH",
+    body,
+    onSuccess(data, meta) {
+      revalidate();
+      handleSuccess("Action Completed", "Account Deactivated");
+      close();
+
+      requestForm.reset();
+    },
+  });
+
+  const { queryFn: activateAccount, loading: processingActivation } = useAxios({
+    endpoint: `/admin/accounts/${rowId}/activate`,
+    method: "PATCH",
+    body,
+    onSuccess(data, meta) {
+      revalidate();
+      handleSuccess("Action Completed", "Account Activated");
+      activateClose();
+
+      requestForm.reset();
+    },
+  });
+
+  const { queryFn: unfreezeAccount, loading: processingUnfreeze } = useAxios({
+    endpoint: `/admin/accounts/${rowId}/unfreeze`,
+    method: "PATCH",
+    body,
+    onSuccess(data, meta) {
+      revalidate();
+      handleSuccess("Action Completed", "Account unfrozen");
+      unfreezeClose();
+
+      requestForm.reset();
+    },
+  });
+
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
   });
 
   const fetchAccounts = async (limit: number) => {
@@ -312,7 +318,7 @@ function Accounts() {
           head={tableHeaders}
           rows={
             <RowComponent
-              accounts={accounts}
+              accounts={accounts || []}
               activateOpen={activateOpen}
               unfreezeOpen={unfreezeOpen}
               freezeOpen={freezeOpen}
@@ -325,7 +331,7 @@ function Accounts() {
         />
 
         <EmptyTable
-          rows={accounts}
+          rows={accounts || []}
           loading={loading}
           title="There are no accounts"
           text="When an account is created, it will appear here."
@@ -340,8 +346,8 @@ function Accounts() {
         />
 
         <ModalComponent
-          processing={processing}
-          action={() => freezeAccount(rowId || "")}
+          processing={loadingFreeze}
+          action={() => freezeAccount()}
           form={requestForm}
           color="#F2F4F7"
           icon={<IconBrandLinktree color="#344054" />}
@@ -352,8 +358,8 @@ function Accounts() {
         />
 
         <ModalComponent
-          processing={processing}
-          action={() => unfreezeAccount(rowId || "")}
+          processing={processingUnfreeze}
+          action={() => unfreezeAccount()}
           form={requestForm}
           color="#F2F4F7"
           icon={<IconBrandLinktree color="#344054" />}
@@ -364,8 +370,8 @@ function Accounts() {
         />
 
         <ModalComponent
-          processing={processing}
-          action={() => deactivateAccount(rowId || "")}
+          processing={loadingDeactivate}
+          action={() => deactivateAccount()}
           form={requestForm}
           color="#FEF3F2"
           icon={<IconX color="#D92D20" />}
@@ -376,8 +382,8 @@ function Accounts() {
         />
 
         <ModalComponent
-          processing={processing}
-          action={() => activateAccount(rowId || "")}
+          processing={processingActivation}
+          action={() => activateAccount()}
           form={requestForm}
           color="#ECFDF3"
           icon={<IconCheck color="#12B76A" />}
@@ -434,7 +440,7 @@ const RowComponent = ({
     push(`/admin/accounts/${id}`);
   };
   return filteredSearch(
-    accounts,
+    accounts || [],
     ["accountName", "accountNumber", "Company.name"],
     debouncedSearch
   ).map((element, index) => (

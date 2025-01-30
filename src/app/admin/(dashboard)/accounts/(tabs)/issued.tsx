@@ -63,6 +63,7 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import * as XLSX from "xlsx";
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "@/lib/hooks/useAxios";
+import AccountInfoCards from "@/ui/components/AccountInfoCards";
 
 export default function IssuedAccounts() {
   const searchParams = useSearchParams();
@@ -265,6 +266,7 @@ export default function IssuedAccounts() {
 
   return (
     <div className={styles.table__container}>
+      <AccountInfoCards />
       <Group
         justify="space-between"
         align="center"

@@ -1,10 +1,10 @@
 import { Card, Group, keys, Stack, Text } from "@mantine/core";
-import { ChartHeader, LegendBadge, ThisMonth } from "./util";
+import { AccountCustomCard, ChartHeader, LegendBadge, ThisMonth } from "./util";
 import { Dispatch, SetStateAction } from "react";
 import { formatNumber } from "@/lib/utils";
 import { BarChart } from "@mantine/charts";
 
-type ChartData = {
+export type ChartData = {
   month: string;
   inflow: number;
   outflow: number;
@@ -23,12 +23,7 @@ export default function FlowChart({
   chartData,
 }: FlowChartProps) {
   return (
-    <Card
-      withBorder
-      radius={4}
-      p="16px 16px 23px 16px"
-      style={{ border: "1px solid var(--prune-text-gray-100)" }}
-    >
+    <AccountCustomCard>
       <Stack gap={16}>
         <ChartHeader
           title="Total Business Account Balance"
@@ -67,15 +62,14 @@ export default function FlowChart({
             { name: "outflow", color: "#DE1507", label: "Outflow" },
           ]}
           tickLine="none"
-          tooltipProps={
-            {
-              // shared: false,
-            }
-          }
+          tooltipProps={{
+            formatter: (value) => [`${formatNumber(value, true, "EUR")}`],
+            payload: [{ name: "05-01", value: 12, unit: "kg" }],
+          }}
           // valueFormatter={(value) => formatNumber(value, true, "EUR")}
         />
       </Stack>
-    </Card>
+    </AccountCustomCard>
   );
 }
 

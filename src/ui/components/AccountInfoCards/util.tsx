@@ -1,13 +1,15 @@
 import {
   Badge,
   BadgeProps,
+  Card,
+  Flex,
   Group,
   Text,
   ThemeIcon,
   Tooltip,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, ReactNode, SetStateAction } from "react";
 import { SelectBox } from "../Inputs";
 
 interface ChartHeaderProps {
@@ -73,7 +75,7 @@ interface ThisMonthProps {
 
 export const ThisMonth = ({ percentage, gain }: ThisMonthProps) => {
   return (
-    <Group gap={8}>
+    <Flex align="center" gap={8}>
       <Badge
         variant="light"
         color={gain ? "#027A48" : "#D92D20"}
@@ -86,6 +88,20 @@ export const ThisMonth = ({ percentage, gain }: ThisMonthProps) => {
       <Text fz={10} fw={400} c="var(--prune-text-gray-400)">
         This Month
       </Text>
-    </Group>
+    </Flex>
+  );
+};
+
+export const AccountCustomCard = ({ children }: { children: ReactNode }) => {
+  return (
+    <Card
+      withBorder
+      radius={4}
+      h="100%"
+      p="16px 16px 16px 16px"
+      style={{ border: "1px solid var(--prune-text-gray-100)" }}
+    >
+      {children}
+    </Card>
   );
 };

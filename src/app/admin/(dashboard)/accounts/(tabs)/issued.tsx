@@ -38,6 +38,7 @@ import { AccountData, AccountMeta, useAccounts } from "@/lib/hooks/accounts";
 import {
   activeBadgeColor,
   camelCaseToTitleCase,
+  formatNumber,
   getUserType,
 } from "@/lib/utils";
 
@@ -64,6 +65,8 @@ import * as XLSX from "xlsx";
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
+import { BadgeComponent } from "@/ui/components/Badge";
+import Link from "next/link";
 
 export default function IssuedAccounts() {
   const searchParams = useSearchParams();
@@ -394,9 +397,10 @@ export default function IssuedAccounts() {
 const tableHeaders = [
   "Account Name",
   "Account Number",
-  "Type",
-  "Business",
+  "Account Balance",
   "Date Created",
+  "Account Type",
+  "Business",
   "Status",
   "Action",
 ];
@@ -435,35 +439,30 @@ const RowComponent = ({
       onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td} tt="capitalize">
-        {element.accountName}
+      <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
+        <Link href={`/admin/accounts/${element.id}`}>
+          {element.accountName}
+        </Link>
       </TableTd>
-      <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
-        {getUserType(element.type)}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor(element.status)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
-        >
-          {element.status.toLowerCase()}
-        </Badge>
-      </TableTd>
-
+      <TableTd>{element.accountNumber}</TableTd>
+      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
+      <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd
-        className={`${styles.table__td}`}
+        tt="capitalize"
+        td="underline"
+        c="var(--prune-primary-800)"
         onClick={(e) => e.stopPropagation()}
       >
+        <Link href={`/admin/businesses/${element.Company.id}`}>
+          {element.Company.name}
+        </Link>
+      </TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} active />
+      </TableTd>
+
+      <TableTd onClick={(e) => e.stopPropagation()}>
         <MenuComponent
           id={element.id}
           status={element.status}

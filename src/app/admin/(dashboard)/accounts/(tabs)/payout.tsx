@@ -38,6 +38,7 @@ import { AccountData, AccountMeta, useAccounts } from "@/lib/hooks/accounts";
 import {
   activeBadgeColor,
   camelCaseToTitleCase,
+  formatNumber,
   getUserType,
 } from "@/lib/utils";
 
@@ -64,6 +65,8 @@ import * as XLSX from "xlsx";
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
+import Link from "next/link";
+import { BadgeComponent } from "@/ui/components/Badge";
 
 export default function PayoutAccounts() {
   const searchParams = useSearchParams();
@@ -222,10 +225,9 @@ export default function PayoutAccounts() {
       const response = await fetchAccounts(meta?.total ?? 0);
 
       [
-        "Account Name",
+        "Business Account Name",
         "Account Number",
-        "Type",
-        "Business",
+        "Account Balance",
         "Date Created",
         "Status",
         "Action",
@@ -394,10 +396,9 @@ export default function PayoutAccounts() {
 }
 
 const tableHeaders = [
-  "Account Name",
+  "Business Account Name",
   "Account Number",
-  "Type",
-  "Business",
+  "Account Balance",
   "Date Created",
   "Status",
   "Action",
@@ -424,8 +425,8 @@ const RowComponent = ({
 }: RowProps) => {
   const { push } = useRouter();
 
-  const handleRowClick = (id: string) => {
-    push(`/admin/accounts/${id}`);
+  const handleRowClick = (id: string, businessId: string) => {
+    push(`/admin/accounts/${id}/payout?businessId=${businessId}`);
   };
   return filteredSearch(
     accounts || [],
@@ -434,38 +435,24 @@ const RowComponent = ({
   ).map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id)}
+      onClick={() => handleRowClick(element.id, element.Company.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd className={styles.table__td} tt="capitalize">
-        {element.accountName}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
-      <TableTd className={styles.table__td} tt="capitalize">
-        {getUserType(element.type)}
-      </TableTd>
-      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
-      <TableTd className={`${styles.table__td}`}>
-        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
-      </TableTd>
-      <TableTd className={styles.table__td}>
-        <Badge
-          tt="capitalize"
-          variant="light"
-          color={activeBadgeColor(element.status)}
-          w={82}
-          h={24}
-          fw={400}
-          fz={12}
+      <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
+        <Link
+          href={`/admin/accounts/${element.id}/payout?businessId=${element.Company.id}`}
         >
-          {element.status.toLowerCase()}
-        </Badge>
+          {element.accountName}
+        </Link>
+      </TableTd>
+      <TableTd>{element.accountNumber}</TableTd>
+      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} active />
       </TableTd>
 
-      <TableTd
-        className={`${styles.table__td}`}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <TableTd onClick={(e) => e.stopPropagation()}>
         <MenuComponent
           id={element.id}
           status={element.status}

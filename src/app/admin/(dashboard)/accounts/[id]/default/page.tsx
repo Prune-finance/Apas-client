@@ -47,6 +47,7 @@ export default function BusinessDefaultAccount() {
     recipientIban,
     accountId,
   } = Object.fromEntries(searchParams.entries());
+  const [acctId, setAcctId] = useState(accountId);
 
   const customParams = useMemo(() => {
     return {
@@ -107,6 +108,9 @@ export default function BusinessDefaultAccount() {
   } = useAxios<DefaultAccount>({
     endpoint: `/admin/company/${params.id}/default-account`,
     baseURL: "accounts",
+    onSuccess(data) {
+      setAcctId(data.id);
+    },
   });
 
   const {
@@ -114,18 +118,10 @@ export default function BusinessDefaultAccount() {
     data: transactions,
     meta,
   } = useAxios<TransactionType[], Meta>({
-    endpoint: `/admin/accounts/business/company-account/${
-      accountId ?? account?.id
-    }/transactions`,
+    endpoint: `/admin/accounts/business/company-account/${acctId}/transactions`,
     baseURL: "accounts",
-    enabled: !!!(accountId || account?.id),
-    dependencies: [
-      limit,
-      active,
-      accountId,
-      account?.id,
-      ...Object.values(customParams),
-    ],
+    enabled: !!!acctId,
+    dependencies: [limit, active, acctId, ...Object.values(customParams)],
     params: customParams,
   });
 

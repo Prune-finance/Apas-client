@@ -8,6 +8,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import { useDebouncedValue } from "@mantine/hooks";
 import { useSearchParams } from "next/navigation";
 import IssuedAccounts from "./(tabs)/issued";
+import BusinessAccounts from "./(tabs)/default";
 
 function Accounts() {
   const [active, setActive] = useState(1);
@@ -34,7 +35,7 @@ function Accounts() {
         tt="capitalize"
       >
         <TabsPanel value={tabs[0].value}>
-          <IssuedAccounts />
+          <BusinessAccounts />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <IssuedAccounts />

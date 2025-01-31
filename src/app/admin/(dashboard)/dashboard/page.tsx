@@ -63,7 +63,6 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 import Transaction from "@/lib/store/transaction";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
-import useAxios from "@/lib/hooks/useAxios";
 
 export default function Home() {
   const [chartFrequency, setChartFrequency] = useState("Monthly");

@@ -38,7 +38,6 @@ import { AccountData, AccountMeta, useAccounts } from "@/lib/hooks/accounts";
 import {
   activeBadgeColor,
   camelCaseToTitleCase,
-  formatNumber,
   getUserType,
 } from "@/lib/utils";
 
@@ -65,10 +64,8 @@ import * as XLSX from "xlsx";
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
-import Link from "next/link";
-import { BadgeComponent } from "@/ui/components/Badge";
 
-export default function BusinessAccounts() {
+export default function PayoutAccounts() {
   const searchParams = useSearchParams();
   const axios = createAxiosInstance("accounts");
 
@@ -106,7 +103,7 @@ export default function BusinessAccounts() {
     meta,
     queryFn: revalidate,
   } = useAxios<AccountData[], AccountMeta>({
-    endpoint: "/admin/accounts/default",
+    endpoint: "/admin/accounts/payout",
     baseURL: "accounts",
     params,
     dependencies,
@@ -399,10 +396,9 @@ export default function BusinessAccounts() {
 const tableHeaders = [
   "Account Name",
   "Account Number",
-  "Account Balance",
+  "Type",
+  "Business",
   "Date Created",
-  "Account Type",
-  "Total No. of Issued Acc",
   "Status",
   "Action",
 ];
@@ -428,8 +424,8 @@ const RowComponent = ({
 }: RowProps) => {
   const { push } = useRouter();
 
-  const handleRowClick = (id: string, businessId: string) => {
-    push(`/admin/accounts/${businessId}/default?accountId=${id}`);
+  const handleRowClick = (id: string) => {
+    push(`/admin/accounts/${id}`);
   };
   return filteredSearch(
     accounts || [],
@@ -438,24 +434,22 @@ const RowComponent = ({
   ).map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id, element.Company.id)}
+      onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
-        <Link
-          href={`/admin/accounts/${element.Company.id}/default?accountId=${element.id}`}
-        >
-          {element.accountName}
-        </Link>
+      <TableTd className={styles.table__td} tt="capitalize">
+        {element.accountName}
       </TableTd>
-      <TableTd>{element.accountNumber}</TableTd>
-      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
-      <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
-      <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>
-      <TableTd>{"N/A"}</TableTd>
-      <TableTd>
-        <BadgeComponent status={element.status} active />
-        {/* <Badge
+      <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
+      <TableTd className={styles.table__td} tt="capitalize">
+        {getUserType(element.type)}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.Company.name}</TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <Badge
           tt="capitalize"
           variant="light"
           color={activeBadgeColor(element.status)}
@@ -465,10 +459,13 @@ const RowComponent = ({
           fz={12}
         >
           {element.status.toLowerCase()}
-        </Badge> */}
+        </Badge>
       </TableTd>
 
-      <TableTd onClick={(e) => e.stopPropagation()}>
+      <TableTd
+        className={`${styles.table__td}`}
+        onClick={(e) => e.stopPropagation()}
+      >
         <MenuComponent
           id={element.id}
           status={element.status}

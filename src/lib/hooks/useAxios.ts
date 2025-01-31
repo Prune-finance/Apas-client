@@ -4,7 +4,7 @@ import { AxiosRequestConfig, AxiosResponse } from "axios";
 import useNotification from "./notification";
 import { parseError } from "../actions/auth";
 
-interface Props<T, M> {
+interface Props<T, M = unknown> {
   endpoint: string;
   // method?: AxiosRequestConfig["method"];
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
@@ -16,7 +16,7 @@ interface Props<T, M> {
   enabled?: boolean;
 }
 
-interface ResponseType<T, M> {
+interface ResponseType<T, M = unknown> {
   data: T;
   meta: M;
   message: string;
@@ -24,7 +24,7 @@ interface ResponseType<T, M> {
   code: number;
 }
 
-const useAxios = <T, M>({
+const useAxios = <T, M = unknown>({
   endpoint,
   baseURL = "accounts",
   method = "GET",

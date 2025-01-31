@@ -461,7 +461,7 @@ function TransactionForAccount() {
   );
 }
 
-const tabs = [
+export const tabs = [
   { value: "business-accounts", title: "Business Accounts" },
   { value: "issued-accounts", title: "Issued Accounts" },
   { value: "payout-accounts", title: "Payout Accounts" },

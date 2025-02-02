@@ -163,3 +163,10 @@ export const getDocumentStatus = (
 };
 
 export const removeWhitespace = (text: string) => text.replace(/\s/g, "");
+
+export const calculateTotalPages = (
+  limit: string | null,
+  total: number | null | undefined
+) => {
+  return Math.ceil((total ?? 0) / parseInt(limit ?? "10", 10));
+};

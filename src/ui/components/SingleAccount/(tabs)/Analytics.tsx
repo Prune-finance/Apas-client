@@ -22,6 +22,10 @@ interface Props {
 }
 
 export const Analytics = ({ setChartFrequency, transactions }: Props) => {
+  /**
+   * This useMemo hook is used to calculate the total inflow and outflow of transactions for each month. The transactions are grouped by month and the inflow and outflow of each transaction is calculated and stored in an array of objects with the month, inflow and outflow as the keys.
+   * @returns {Array} - An array of objects with the month, inflow and outflow as the keys
+   */
   const lineData = useMemo(() => {
     const arr: {
       month: string;
@@ -50,17 +54,66 @@ export const Analytics = ({ setChartFrequency, transactions }: Props) => {
     return arr;
   }, [transactions]);
 
-  const donutData = useMemo(() => {
-    let completed = 0,
-      pending = 0,
-      failed = 0;
-    transactions.map((trx) => {
-      trx.status === "PENDING"
-        ? (pending += trx.amount)
-        : trx.status === "REJECTED"
-        ? (failed += trx.amount)
-        : (completed += trx.amount);
+  /**
+   * Calculates the inflow and outflow for each month.
+   *
+   * @param {Array} transactions - The list of transactions.
+   * @returns {Array} The inflow and outflow data for each month.
+   */
+  const monthlyData = useMemo(() => {
+    const arr = transactions.reverse().map((trx) => {
+      const month = dayjs(trx.createdAt).format("MMM DD");
+      const creditBal = trx.type === "CREDIT" ? trx.amount : 0;
+      const debitBal = trx.type === "DEBIT" ? trx.amount : 0;
+
+      return { month, Inflow: creditBal, Outflow: debitBal };
     });
+
+    return arr;
+  }, [transactions]);
+
+  // const donutData = useMemo(() => {
+  //   let completed = 0,
+  //     pending = 0,
+  //     failed = 0;
+  //   transactions.map((trx) => {
+  //     trx.status === "PENDING"
+  //       ? (pending += trx.amount)
+  //       : trx.status === "REJECTED"
+  //       ? (failed += trx.amount)
+  //       : (completed += trx.amount);
+  //   });
+
+  //   return [
+  //     { name: "Completed", value: completed, color: "#039855" },
+  //     { name: "Pending", value: pending, color: "#F79009" },
+  //     { name: "Failed", value: failed, color: "#D92D20" },
+  //   ];
+  // }, [transactions]);
+
+  /**
+   * @description - This is the refactored version of the above code block
+   * The above code block is refactored to use the reduce method
+   * to calculate the total amount of transactions for each status and return an array of objects with the name, value and color of each status
+   *
+   * @param {Array} transactions - The list of transactions
+   * @returns {Array} - An array of objects with the name, value and color of each status
+   */
+
+  const donutData = useMemo(() => {
+    const { completed, pending, failed } = transactions.reduce(
+      (acc, trx) => {
+        if (trx.status === "PENDING") {
+          acc.pending += trx.amount;
+        } else if (trx.status === "REJECTED") {
+          acc.failed += trx.amount;
+        } else {
+          acc.completed += trx.amount;
+        }
+        return acc;
+      },
+      { completed: 0, pending: 0, failed: 0 }
+    );
 
     return [
       { name: "Completed", value: completed, color: "#039855" },
@@ -76,7 +129,8 @@ export const Analytics = ({ setChartFrequency, transactions }: Props) => {
       <GridCol span={8.3}>
         <TransactionStatistics
           setChartFrequency={setChartFrequency}
-          lineData={lineData}
+          lineData={monthlyData}
+          // lineData={lineData}
         />
       </GridCol>
 

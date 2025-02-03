@@ -3,6 +3,7 @@
 import { usePayoutAccount } from "@/lib/hooks/accounts";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
+import { calculateTotalPages } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -22,7 +23,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useRouter, useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
-import { Suspense, use, useMemo, useState } from "react";
+import { Suspense, useState } from "react";
 
 const UsersComponent = () => {
   const [active, setActive] = useState(1);
@@ -158,7 +159,7 @@ const UsersComponent = () => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil(1 / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
       />
     </Box>
   );

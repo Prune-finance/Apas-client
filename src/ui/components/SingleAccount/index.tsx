@@ -697,7 +697,15 @@ export const SingleDefaultAccountBody = ({
   location,
   revalidate,
 }: SingleDefaultAccountProps) => {
-  const tabs = [
+  /**
+   * @description - Tabs for the default account
+   * @type {Array<{ value: string }>} - An array of objects with the value key
+   * @default - Account Details, Transactions, Statistics, Documents
+   * @returns {Array<{ value: string }>} - An array of objects with the value key
+   * @example - [{ value: "Account Details" }, { value: "Transactions" }, { value: "Statistics" }, { value: "Documents" }]
+   */
+
+  const tabs: Array<{ value: string }> = [
     { value: "Account Details" },
     { value: "Transactions" },
     { value: "Statistics" },
@@ -1048,7 +1056,12 @@ export const AccountInfo = ({
     ? "Main Account"
     : "Issued Account";
 
-  const handleReload = async () => {
+  /**
+   * @description - Reload the account balance for business only
+   * @returns {Promise<void>} - A promise that resolves to void
+   */
+
+  const handleReload = async (): Promise<void> => {
     setProcessing(true);
     try {
       await axios.get(`/accounts/${account?.accountNumber}/balance/dashboard`);
@@ -1059,6 +1072,7 @@ export const AccountInfo = ({
       setProcessing(false);
     }
   };
+
   return (
     <SimpleGrid cols={{ base: 1, md: 2 }}>
       <Paper

@@ -7,12 +7,15 @@ import {
 } from "@/lib/hooks/accounts";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
+  Meta,
   TransactionType,
   useBusinessTransactions,
   usePayoutAccountTransactions,
   usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
+import useAxios from "@/lib/hooks/useAxios";
+import { calculateTotalPages } from "@/lib/utils";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -76,10 +79,16 @@ export default function BusinessPayoutAccount() {
   const { account, loading, revalidate } = useBusinessPayoutAccount(params.id);
 
   const {
-    loading: loadingTrx,
-    transactions,
+    data: transactions,
     meta,
-  } = usePayoutAccountTransactions(params.id, param);
+    loading: loadingTrx,
+  } = useAxios<TransactionType[], Meta>({
+    baseURL: "accounts",
+    endpoint: `/admin/accounts/business/payout-account/${account?.id}/transactions`,
+    params: param,
+    enabled: !!!account?.id,
+    dependencies: [...Object.values(param), account?.id],
+  });
   return (
     <main>
       <Breadcrumbs
@@ -129,7 +138,7 @@ export default function BusinessPayoutAccount() {
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+            total={calculateTotalPages(limit, meta?.total)}
           />
         </SingleDefaultAccountBody>
       </Paper>

@@ -733,7 +733,7 @@ export const SingleDefaultAccountBody = ({
         <TabsPanel value={tabs[1].value}>
           <Transactions
             accountID={account?.id}
-            transactions={transactions || []}
+            transactions={transactions}
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}
@@ -745,7 +745,7 @@ export const SingleDefaultAccountBody = ({
         </TabsPanel>
         <TabsPanel value={tabs[2].value} mt={28}>
           <Analytics
-            transactions={transactions || []}
+            transactions={transactions}
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
@@ -783,9 +783,13 @@ export const IssuedAccountHead = ({
     >
       <Group gap={12} align="center">
         {!loading ? (
-          <Avatar variant="filled" size="lg" color="var(--prune-primary-700)">
-            {getInitials(account?.accountName ?? "")}
-          </Avatar>
+          <Avatar
+            variant="filled"
+            size="lg"
+            color="var(--prune-primary-700)"
+          >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
+            0
+          )}`}</Avatar>
         ) : (
           <Skeleton circle h={50} w={50} />
         )}
@@ -902,7 +906,7 @@ export const DefaultAccountHead = ({
         <Group gap={12} align="center">
           {!loading ? (
             <Avatar size="lg" color="var(--prune-primary-700)" variant="filled">
-              {getInitials(account?.accountName)}
+              {getInitials(account?.accountName ?? "")}
             </Avatar>
           ) : (
             <Skeleton circle h={50} w={50} />

@@ -67,8 +67,7 @@ export function splitCamelCase(input: string): string {
   return input.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
-export const getInitials = (name?: string) => {
-  if (!name) return null;
+export const getInitials = (name: string) => {
   return name
     .split(" ")
     .slice(0, 2)

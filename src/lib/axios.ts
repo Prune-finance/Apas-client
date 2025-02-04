@@ -1,7 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const BASEURL = {
+export const BASEURL = {
   auth: process.env.NEXT_PUBLIC_SERVER_URL,
   accounts: process.env.NEXT_PUBLIC_ACCOUNTS_URL,
   payouts: process.env.NEXT_PUBLIC_PAYOUT_URL,

@@ -1,13 +1,13 @@
 "use client";
 
 import {
+  DefaultAccount,
   useBusinessDefaultAccount,
   useBusinessPayoutAccount,
   useSingleAccount,
 } from "@/lib/hooks/accounts";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
-  Meta,
   TransactionType,
   useBusinessTransactions,
   usePayoutAccountTransactions,
@@ -15,7 +15,6 @@ import {
   useTransactions,
 } from "@/lib/hooks/transactions";
 import useAxios from "@/lib/hooks/useAxios";
-import { calculateTotalPages } from "@/lib/utils";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -48,6 +47,7 @@ export default function BusinessPayoutAccount() {
     endDate,
     recipientName,
     recipientIban,
+    businessId,
   } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
@@ -74,34 +74,39 @@ export default function BusinessPayoutAccount() {
     limit,
   ]);
 
-  const { loading: loadingBiz, business } = useSingleBusiness(params.id);
+  const {
+    loading,
+    data: account,
+    queryFn: revalidate,
+  } = useAxios<DefaultAccount>({
+    endpoint: `/admin/accounts/payout/${params.id}`,
+    baseURL: "accounts",
+  });
 
-  const { account, loading, revalidate } = useBusinessPayoutAccount(params.id);
+  const { loading: loadingBiz, business } = useSingleBusiness(
+    businessId ?? account?.companyId
+  );
+
+  // const { account, loading, revalidate } = useBusinessPayoutAccount(params.id);
 
   const {
-    data: transactions,
-    meta,
     loading: loadingTrx,
-  } = useAxios<TransactionType[], Meta>({
-    baseURL: "accounts",
-    endpoint: `/admin/accounts/business/payout-account/${account?.id}/transactions`,
-    params: param,
-    enabled: !!!account?.id,
-    dependencies: [...Object.values(param), account?.id],
-  });
+    transactions,
+    meta,
+  } = usePayoutAccountTransactions(params.id, param);
   return (
     <main>
       <Breadcrumbs
         items={[
-          { title: "Payouts", href: "/admin/payouts" },
+          { title: "Accounts", href: "/admin/accounts" },
           {
             title: business?.name || "",
             href: `/admin/businesses/${params.id}`,
             loading: !business?.name || loadingBiz,
           },
           {
-            title: "Accounts",
-            href: `/admin/payouts/${params.id}/account`,
+            title: account?.accountName || "",
+            href: `/admin/accounts/${params.id}/payout`,
             loading: loading,
           },
         ]}
@@ -123,7 +128,7 @@ export default function BusinessPayoutAccount() {
           accountID={params?.id}
           account={account}
           location="admin-payout"
-          transactions={transactions || []}
+          transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}
           setChartFrequency={setChartFrequency}
@@ -138,7 +143,7 @@ export default function BusinessPayoutAccount() {
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={calculateTotalPages(limit, meta?.total)}
+            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
           />
         </SingleDefaultAccountBody>
       </Paper>

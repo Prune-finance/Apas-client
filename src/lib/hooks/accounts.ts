@@ -571,6 +571,7 @@ export interface AccountData {
   Company: {
     name: string;
     id: string;
+    issuedAccountCount?: number;
   };
   staging: "TEST" | "LIVE";
   type: "USER" | "CORPORATE";

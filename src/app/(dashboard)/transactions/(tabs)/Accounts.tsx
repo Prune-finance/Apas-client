@@ -134,6 +134,7 @@ export const AccountsTab = () => {
             search={debouncedSearch}
             searchProps={searchProps}
             business
+            isUser
           />
         }
         loading={loading}

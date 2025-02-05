@@ -17,11 +17,13 @@ export const BusinessTransactionTableRows = ({
   search,
   searchProps,
   business,
+  isUser,
 }: {
   data: TransactionType[];
   search: string;
   searchProps: string[];
   business?: boolean;
+  isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return filteredSearch(data, searchProps, search).map((element) => (
@@ -33,7 +35,25 @@ export const BusinessTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && <TableTd>{element.senderName || "N/A"}</TableTd>}
+      {!business && (
+        <TableTd
+          td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={{
+            pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+          }}
+        >
+          <Link
+            href={`${!isUser ? "/admin" : ""}/transactions/${
+              element.senderIban
+            }`}
+          >
+            {element?.senderName || "N/A"}
+          </Link>
+        </TableTd>
+      )}
 
       <TableTd>
         <Stack gap={0}>
@@ -155,10 +175,12 @@ export const PayoutTransactionTableRows = ({
   data,
   search,
   searchProps,
+  isUser,
 }: {
   data: TransactionType[];
   search: string;
   searchProps: string[];
+  isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return filteredSearch(data, searchProps, search).map((element) => (
@@ -170,7 +192,23 @@ export const PayoutTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{element.senderName || "N/A"}</TableTd>
+      {/* <TableTd>{element.senderName || "N/A"}</TableTd> */}
+
+      <TableTd
+        td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        style={{
+          pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+        }}
+      >
+        <Link
+          href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
+        >
+          {element?.senderName || "N/A"}
+        </Link>
+      </TableTd>
 
       <TableTd w="15%">{element.centrolinkRef}</TableTd>
       <TableTd>

@@ -169,3 +169,6 @@ export const calculateTotalPages = (
 ) => {
   return Math.ceil((total ?? 0) / parseInt(limit ?? "10", 10));
 };
+
+export const isDummyIBAN = (iban: string): boolean =>
+  iban === "GBXXXXXXXXXXXXXXXXXX";

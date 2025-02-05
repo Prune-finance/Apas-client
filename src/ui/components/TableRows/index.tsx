@@ -1,7 +1,7 @@
 import { TransactionType } from "@/lib/hooks/transactions";
 import { filteredSearch } from "@/lib/search";
 import Transaction from "@/lib/store/transaction";
-import { formatNumber, frontendPagination } from "@/lib/utils";
+import { formatNumber, frontendPagination, isDummyIBAN } from "@/lib/utils";
 import { Stack, TableTd, TableTr, Text } from "@mantine/core";
 import Link from "next/link";
 import { AmountGroup } from "../AmountGroup";
@@ -96,11 +96,14 @@ export const IssuedTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd
-        td={noLink ? "none" : "underline"}
+        td={noLink || isDummyIBAN(element.senderIban) ? "none" : "underline"}
         onClick={(e) => {
           e.stopPropagation();
         }}
-        style={{ pointerEvents: noLink ? "none" : "auto" }}
+        style={{
+          pointerEvents:
+            noLink || isDummyIBAN(element.senderIban) ? "none" : "auto",
+        }}
       >
         <Link
           href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
@@ -283,7 +286,7 @@ export const PayoutTrxReqTableRows = ({
               | "REJECTED"
               | "CONFIRMED"
               | "CANCELLED",
-          });
+          } as unknown as TransactionType);
         }}
         style={{ cursor: "pointer" }}
       >

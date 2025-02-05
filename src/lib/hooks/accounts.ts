@@ -169,7 +169,7 @@ export function useBusinessPayoutAccount(id: string) {
 
 export function usePayoutAccount(customParams: IParams = {}) {
   const [accounts, setAccounts] = useState<AccountData[] | null>(null);
-  const [meta, setMeta] = useState<AccountMeta | null>(null);
+  const [meta, setMeta] = useState<{ total: number } | null>(null);
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
@@ -571,6 +571,7 @@ export interface AccountData {
   Company: {
     name: string;
     id: string;
+    issuedAccountCount?: number;
   };
   staging: "TEST" | "LIVE";
   type: "USER" | "CORPORATE";

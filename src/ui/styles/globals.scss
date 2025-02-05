@@ -183,4 +183,9 @@ a {
   &:focus {
     border: 1px solid var(--prune-primary-700) !important;
   }
+
+  &::placeholder {
+    font-size: 12px !important;
+    font-family: "Switzer";
+  }
 }

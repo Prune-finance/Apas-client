@@ -155,6 +155,7 @@ export const AccountRequestsDrawer = ({
     );
 
     return { certOfInc, mermat, directors, shareholders };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedRequest?.documentApprovals]);
 
   const _directors = getNestedValue(

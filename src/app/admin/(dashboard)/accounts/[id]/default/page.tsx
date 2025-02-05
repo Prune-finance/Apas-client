@@ -1,21 +1,19 @@
 "use client";
 
 import {
+  DefaultAccount,
   useBusinessDefaultAccount,
-  useBusinessPayoutAccount,
   useSingleAccount,
 } from "@/lib/hooks/accounts";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
   Meta,
   TransactionType,
+  useBusinessAccountTransactions,
   useBusinessTransactions,
-  usePayoutAccountTransactions,
-  usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
 import useAxios from "@/lib/hooks/useAxios";
-import { calculateTotalPages } from "@/lib/utils";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -30,11 +28,10 @@ import dayjs from "dayjs";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
 
-export default function BusinessPayoutAccount() {
+export default function BusinessDefaultAccount() {
   const params = useParams<{ id: string }>();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [opened, { open, close }] = useDisclosure(false);
-
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
@@ -48,9 +45,11 @@ export default function BusinessPayoutAccount() {
     endDate,
     recipientName,
     recipientIban,
+    accountId,
   } = Object.fromEntries(searchParams.entries());
+  const [acctId, setAcctId] = useState(accountId);
 
-  const param = useMemo(() => {
+  const customParams = useMemo(() => {
     return {
       ...(status && { status: status.toUpperCase() }),
       ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
@@ -74,34 +73,57 @@ export default function BusinessPayoutAccount() {
     limit,
   ]);
 
-  const { loading: loadingBiz, business } = useSingleBusiness(params.id);
+  const {
+    loading: loadingBiz,
+    business,
+    revalidate,
+  } = useSingleBusiness(params.id);
 
-  const { account, loading, revalidate } = useBusinessPayoutAccount(params.id);
+  // const {
+  //   loading,
+  //   data: account,
+  //   queryFn: revalidateAcct,
+  // } = useAxios<DefaultAccount>({
+  //   endpoint: `/admin/company/${params.id}/default-account`,
+  //   baseURL: "accounts",
+  //   onSuccess(data) {
+  //     setAcctId(data.id);
+  //   },
+  // });
+
+  // const {
+  //   loading: loadingTrx,
+  //   data: transactions,
+  //   meta,
+  // } = useAxios<TransactionType[], Meta>({
+  //   endpoint: `/admin/accounts/business/company-account/${acctId}/transactions`,
+  //   baseURL: "accounts",
+  //   enabled: !!!acctId,
+  //   dependencies: [limit, active, acctId, ...Object.values(customParams)],
+  //   params: customParams,
+  // });
 
   const {
-    data: transactions,
-    meta,
+    account,
+    loading,
+    revalidate: revalidateAcct,
+  } = useBusinessDefaultAccount(params.id);
+
+  const {
     loading: loadingTrx,
-  } = useAxios<TransactionType[], Meta>({
-    baseURL: "accounts",
-    endpoint: `/admin/accounts/business/payout-account/${account?.id}/transactions`,
-    params: param,
-    enabled: !!!account?.id,
-    dependencies: [...Object.values(param), account?.id],
-  });
+    transactions,
+    meta,
+  } = useBusinessAccountTransactions(accountId ?? account?.id, customParams);
+
   return (
     <main>
       <Breadcrumbs
         items={[
-          { title: "Payouts", href: "/admin/payouts" },
+          { title: "Accounts", href: "/admin/accounts" },
+
           {
-            title: business?.name || "",
-            href: `/admin/businesses/${params.id}`,
-            loading: !business?.name || loadingBiz,
-          },
-          {
-            title: "Accounts",
-            href: `/admin/payouts/${params.id}/account`,
+            title: account?.accountName ?? "",
+            href: `/admin/accounts/${params.id}/default`,
             loading: loading,
           },
         ]}
@@ -114,31 +136,29 @@ export default function BusinessPayoutAccount() {
           open={open}
           business={business}
           loadingBiz={loadingBiz}
-          payout
           admin
-          revalidate={revalidate}
         />
 
         <SingleDefaultAccountBody
-          accountID={params?.id}
           account={account}
-          location="admin-payout"
-          transactions={transactions || []}
+          accountID={params?.id}
+          location="admin-default"
+          transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}
           setChartFrequency={setChartFrequency}
           business={business}
           admin
-          payout
+          isDefault
           trxMeta={meta}
-          revalidate={revalidate}
+          revalidate={revalidateAcct}
         >
           <PaginationComponent
             active={active}
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={calculateTotalPages(limit, meta?.total)}
+            total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
           />
         </SingleDefaultAccountBody>
       </Paper>

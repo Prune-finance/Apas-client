@@ -83,7 +83,14 @@ export const TransactionReceipt = ({
                       {`${key}:`}
                     </Text>
 
-                    <Text fz={10} c="var(--prune-text-gray-800)" fw={600}>
+                    <Text
+                      fz={10}
+                      c="var(--prune-text-gray-800)"
+                      fw={600}
+                      lineClamp={3}
+                      maw="60%"
+                      ta="end"
+                    >
                       {value}
                     </Text>
                   </Flex>

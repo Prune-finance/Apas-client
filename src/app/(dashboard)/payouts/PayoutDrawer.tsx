@@ -40,7 +40,7 @@ import {
 } from "@/ui/components/TransactionReceipt";
 import { useMemo, useRef, useState } from "react";
 import { handlePdfDownload, parseError } from "@/lib/actions/auth";
-import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
+import { AccountData, useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import Transaction from "@/lib/store/transaction";
 import { InquiryModal } from "./InquiryModal";
@@ -49,6 +49,7 @@ import ModalComponent from "@/ui/components/Modal";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import createAxiosInstance from "@/lib/axios";
+import { useReceipt } from "@/lib/hooks/receipt";
 
 interface TransactionDrawerProps {
   revalidate?: () => void;
@@ -91,6 +92,11 @@ export const PayoutTransactionDrawer = ({
   const { account: senderAccount, loading: loadingSenderAcct } =
     useSingleUserAccountByIBAN(data?.senderIban ?? "");
 
+  const { details } = useReceipt({
+    selectedRequest: data,
+    senderAccount: senderAccount as unknown as AccountData,
+  });
+
   const businessDetails = {
     "Business Name":
       transaction?.company?.name ?? defaultTransaction?.company?.name ?? "N/A",
@@ -132,40 +138,6 @@ export const PayoutTransactionDrawer = ({
     "Date & Time": dayjs(data?.createdAt).format("Do MMMM, YYYY - HH:mma"),
     "Status:": <BadgeComponent status={data?.status ?? ""} />,
   };
-
-  const BeneficiaryDetails = {
-    "Amount Received": formatNumber(data?.amount ?? 0, true, "EUR"),
-    // "First Name": data?.destinationFirstName ?? "N/A",
-    // "Last Name": data?.destinationLastName ?? "N/A",
-    Name: data?.recipientName || "N/A",
-    IBAN: data?.recipientIban ?? "",
-    "Bank Name": data?.recipientBankAddress ?? "",
-    Country: data?.recipientBankCountry ?? "",
-    "Bank Address": "N/A",
-  };
-
-  const SenderDetails = {
-    "Account Name": senderAccount?.accountName ?? data?.senderName ?? "N/A",
-    "Account Number": data?.senderIban ?? "",
-    "Bank Name": "Prune Payments LTD",
-    BIC: "ARPYGB21XXX",
-  };
-
-  const OtherDetails = {
-    Type: data?.type === "DEBIT" ? "Debit" : "Credit",
-    "Payment Date": dayjs(data?.createdAt).format("hh:mm A Do MMM YYYY"),
-    Reference: data?.reference ?? "N/A",
-    "C-L Reference": data?.id ?? "",
-    "Status:": <BadgeComponent status={data?.status ?? ""} />,
-  };
-  const details: ReceiptDetails[] = [
-    {
-      title: "Sender Details",
-      value: SenderDetails,
-    },
-    { title: "Beneficiary Details", value: BeneficiaryDetails },
-    { title: "Other Details", value: OtherDetails },
-  ];
 
   const isAfter24Hours = (createdAt: Date): boolean => {
     // use dayjs

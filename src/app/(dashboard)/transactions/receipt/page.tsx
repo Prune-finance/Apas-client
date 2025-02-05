@@ -14,112 +14,45 @@ import html2canvas from "html2canvas";
 import { Box } from "@mantine/core";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { handlePdfDownload } from "@/lib/actions/auth";
+import { useReceipt } from "@/lib/hooks/receipt";
+import { TransactionType } from "@/lib/hooks/transactions";
 
 export default function Receipt() {
   const receiptRef = useRef<HTMLDivElement>(null);
   const [processing, setProcessing] = useState(false);
-  const beneficiaryDetails = {
-    "Amount Received": formatNumber(123445, true, "EUR"),
-    "First Name": "John",
-    "Last Name": "Doe",
-    IBAN: "GBE89370400440532013000",
-    "Bank Name": "Prune Holdings",
-    Country: "United Kingdom",
-    "Bank Address": "Prune Holdings, 123 Main Street, London, UK",
+
+  const trx = {
+    id: "d444bac1-1cfc-44a8-bff2-c74679c8f363",
+    createdAt: new Date("2024-12-17T08:03:32.234Z"),
+    updatedAt: new Date("2024-12-17T08:03:32.234Z"),
+    deletedAt: null,
+    dpsId: 746,
+    destinationFirstName: "",
+    destinationLastName: "",
+    narration: "Salary 5 payments",
+    centrolinkRef: "ARPY746",
+    recipientBankAddress: "Prune Payments LTD",
+    recipientBankCountry: "United Kingdom",
+    recipientBic: "ARPYGB21XXX",
+    recipientIban: "GB12045505050505341",
+    recipientName: "Alize Breitenberg",
+    reference: "faf1e0ba-0c5d-44be-8097-89ce78c68ced",
+    senderBic: "",
+    senderIban: "GB1204550505050598",
+    senderName: "C80 Limited",
+    status: "PENDING",
+    type: "DEBIT",
+    amount: 100,
+    accountId: null,
+    companyAccountId: "209b8ed0-4649-4e95-a040-a756747bd722",
+    payoutAccountId: null,
+    staging: "TEST",
   };
 
-  const senderDetails = {
-    "Account Name": "John Doe",
-    "Account Number": "GBE89370400440532013000",
-    "Bank Name": "Prune Holdings",
-    BIC: "GBE8937",
-  };
-
-  const otherDetails = {
-    Type: "Debit",
-    "Payment Date": dayjs().format("hh:mm A Do MMM YYYY"),
-    Reference: "1234567890",
-    "Transaction ID": "1234567890",
-  };
-  const details: ReceiptDetails[] = [
-    {
-      title: "Sender Details",
-      value: senderDetails,
-    },
-    { title: "Beneficiary Details", value: beneficiaryDetails },
-    { title: "Other Details", value: otherDetails },
-  ];
-
-  // const handlePdfDownload = async () => {
-  //   const input = receiptRef.current;
-  //   if (!input) return;
-  //   html2canvas(input).then((canvas) => {
-  //     const imgData = canvas.toDataURL("image/png");
-  //     const pdf = new jsPDF("p", "px", "a4", true);
-  //     const pdfWidth = pdf.internal.pageSize.getWidth();
-  //     const pdfHeight = pdf.internal.pageSize.getHeight();
-  //     const imgWidth = canvas.width;
-  //     const imgHeight = canvas.height;
-  //     const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-  //     const imgX = (pdfWidth - imgWidth * ratio) / 2;
-  //     const imgY = 30;
-  //     pdf.addImage(
-  //       imgData,
-  //       "PNG",
-  //       imgX,
-  //       imgY,
-  //       imgWidth * ratio,
-  //       imgHeight * ratio
-  //     );
-  //     pdf.save(`${Math.floor(Date.now() / 1000)}.pdf`);
-  //   });
-  // };
-
-  // const handlePdfDownload = async () => {
-  //   const input = receiptRef.current;
-  //   if (!input) return;
-
-  //   html2canvas(input).then((canvas) => {
-  //     const imgData = canvas.toDataURL("image/png");
-  //     const pdf = new jsPDF("p", "px", "a4", true);
-  //     const pdfWidth = pdf.internal.pageSize.getWidth();
-  //     const pdfHeight = pdf.internal.pageSize.getHeight();
-  //     const imgWidth = canvas.width;
-  //     const imgHeight = canvas.height;
-  //     const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-  //     const imgX = (pdfWidth - imgWidth * ratio) / 2;
-  //     let imgY = 30;
-  //     let remainingHeight = imgHeight * ratio;
-
-  //     while (remainingHeight > 0) {
-  //       if (remainingHeight < pdfHeight - imgY) {
-  //         pdf.addImage(
-  //           imgData,
-  //           "PNG",
-  //           imgX,
-  //           imgY,
-  //           imgWidth * ratio,
-  //           remainingHeight
-  //         );
-  //         break;
-  //       } else {
-  //         pdf.addImage(
-  //           imgData,
-  //           "PNG",
-  //           imgX,
-  //           imgY,
-  //           imgWidth * ratio,
-  //           pdfHeight - imgY
-  //         );
-  //         pdf.addPage();
-  //         remainingHeight -= pdfHeight - imgY;
-  //         imgY = 0; // Reset Y position for new page
-  //       }
-  //     }
-
-  //     pdf.save(`${Math.floor(Date.now() / 10000)}.pdf`);
-  //   });
-  // };
+  const { details } = useReceipt({
+    selectedRequest: trx as TransactionType,
+    senderAccount: null,
+  });
 
   return (
     <Box>
@@ -132,7 +65,7 @@ export default function Receipt() {
 
       <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
         <TransactionReceipt
-          amount={123445}
+          amount={trx.amount}
           amountType="Amount Sent"
           details={details}
           receiptRef={receiptRef}

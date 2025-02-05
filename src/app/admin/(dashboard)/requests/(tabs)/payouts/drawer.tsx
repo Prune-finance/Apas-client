@@ -103,42 +103,6 @@ export const PayoutTransactionRequestDrawer = ({
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
 
-  const BeneficiaryDetails = {
-    "Amount Received": formatNumber(selectedRequest?.amount ?? 0, true, "EUR"),
-    // "First Name": selectedRequest?.destinationFirstName ?? "N/A",
-    // "Last Name": selectedRequest?.destinationLastName ?? "N/A",
-    Name: selectedRequest?.recipientName || "N/A",
-    IBAN: selectedRequest?.recipientIban ?? "",
-    "Bank Name": selectedRequest?.recipientBankAddress ?? "",
-    Country: selectedRequest?.recipientBankCountry ?? "",
-    "Bank Address": "N/A",
-  };
-
-  const SenderDetails = {
-    "Account Name":
-      senderAccount?.accountName ?? selectedRequest?.senderName ?? "N/A",
-    "Account Number": selectedRequest?.senderIban ?? "",
-    "Bank Name": "Prune Payments LTD",
-    BIC: "ARPYGB21XXX",
-  };
-
-  const OtherDetails = {
-    Type: selectedRequest?.type === "DEBIT" ? "Debit" : "Credit",
-    "Payment Date": dayjs(selectedRequest?.createdAt).format(
-      "hh:mm A Do MMM YYYY"
-    ),
-    Reference: selectedRequest?.reference ?? "N/A",
-    "C-L Reference": selectedRequest?.id ?? "",
-  };
-  const details: ReceiptDetails[] = [
-    {
-      title: "Sender Details",
-      value: SenderDetails,
-    },
-    { title: "Beneficiary Details", value: BeneficiaryDetails },
-    { title: "Other Details", value: OtherDetails },
-  ];
-
   return (
     <Drawer
       opened={opened}

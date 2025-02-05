@@ -23,3 +23,7 @@ export const BadgeComponent = ({ active, status, ...props }: IBadge) => {
     </Badge>
   );
 };
+
+export const BadgeFunc = (status: string, active: boolean = false) => {
+  return <BadgeComponent status={status} active={active} />;
+};

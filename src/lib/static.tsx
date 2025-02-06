@@ -124,11 +124,11 @@ export const UserOtherLinks = [
     link: "/users",
     icon: <IconUsers size={16} />,
   },
-  {
-    text: "Roles & Permissions",
-    link: "/roles",
-    icon: <IconSettings size={16} />,
-  },
+  // {
+  //   text: "Roles & Permissions",
+  //   link: "/roles",
+  //   icon: <IconSettings size={16} />,
+  // },
   {
     text: "Settings",
     link: "/settings",

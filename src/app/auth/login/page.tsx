@@ -10,6 +10,7 @@ import LoginForm from "./form";
 import { checkToken } from "@/lib/actions/checkToken";
 import { redirect } from "next/navigation";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import Valentine from "@/ui/components/Valentine";
 
 async function Login() {
   const { success } = await checkToken();
@@ -92,6 +93,8 @@ async function Login() {
           <Text className={styles.paper__text}>
             Enter your details below to have access to your account
           </Text>
+
+          <Valentine />
 
           <LoginForm />
         </Box>

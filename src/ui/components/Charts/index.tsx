@@ -134,6 +134,7 @@ export function BarChartComponent({
       // curveType="natural"
       gridAxis="x"
       withLegend={withLegend}
+      barProps={{ barSize: 20, radius: 3 }}
       // valueFormatter={(value) => formatNumber(value, true, "EUR")}
       {...props}
     />

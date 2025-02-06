@@ -105,6 +105,7 @@ function Account() {
         trxMeta={trxMeta}
         revalidate={revalidateAcct}
         business={business}
+        isUser
       >
         <PaginationComponent
           active={active}

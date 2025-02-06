@@ -98,7 +98,7 @@ export default function BusinessPayoutAccount() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Accounts", href: "/admin/accounts" },
+          { title: "Accounts", href: "/admin/accounts?tab=payout-accounts" },
           {
             title: business?.name || "",
             href: `/admin/businesses/${params.id}`,

@@ -123,7 +123,7 @@ export default function Account() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Accounts", href: "/admin/accounts" },
+          { title: "Accounts", href: "/admin/accounts?tab=issued-accounts" },
 
           {
             title: account?.accountName || "",

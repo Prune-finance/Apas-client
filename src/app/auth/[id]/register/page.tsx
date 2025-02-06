@@ -9,6 +9,7 @@ import { CardOne, CardThree, CardTwo } from "./cards";
 import FormComponent from "./form";
 import { checkToken } from "@/lib/actions/server";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import Valentine from "@/ui/components/Valentine";
 
 type Props = {
   params: {
@@ -101,6 +102,8 @@ export default async function Register({ params }: Props) {
               <Text className={styles.paper__text}>
                 Create your payment account now
               </Text>
+
+              <Valentine />
 
               <FormComponent email={res.email} />
 

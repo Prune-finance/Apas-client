@@ -1014,6 +1014,8 @@ export interface TransactionType {
   status: "PENDING" | "CONFIRMED" | "REJECTED" | "CANCELLED";
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date | null;
+  dpsId: number;
   destinationFirstName: string;
   destinationLastName: string;
   intermediary?: string;
@@ -1021,4 +1023,8 @@ export interface TransactionType {
   company: BusinessData;
   narration?: string;
   Inquiries?: Inquiry[];
+  accountId: string | null;
+  companyAccountId: string | null;
+  payoutAccountId: string | null;
+  staging: "TEST" | "LIVE";
 }

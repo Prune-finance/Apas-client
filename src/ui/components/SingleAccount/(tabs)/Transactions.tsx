@@ -334,7 +334,7 @@ export const Transactions = ({
               data={transactions}
               searchProps={searchProps}
               search={debouncedSearch}
-              isUser
+              isUser={isUser}
             />
           )
         }

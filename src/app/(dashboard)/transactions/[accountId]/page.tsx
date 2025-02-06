@@ -6,7 +6,7 @@ import {
 } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { filteredSearch } from "@/lib/search";
-import { frontendPagination, formatNumber } from "@/lib/utils";
+import { frontendPagination, formatNumber, getInitials } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -149,9 +149,9 @@ export default function AccountTransactions() {
             size="lg"
             color="var(--prune-primary-700)"
             // variant="light"
-          >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
-            0
-          )}`}</Avatar>
+          >
+            {getInitials(account?.accountName ?? "")}
+          </Avatar>
         ) : (
           <Skeleton circle h={50} w={50} />
         )}

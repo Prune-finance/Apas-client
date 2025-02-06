@@ -145,6 +145,7 @@ export const PayoutsTab = () => {
             data={transactions}
             search={debouncedSearch}
             searchProps={searchProps}
+            isUser
           />
         }
         // rows={rows}

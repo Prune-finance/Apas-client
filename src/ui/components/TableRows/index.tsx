@@ -20,13 +20,15 @@ export const BusinessTransactionTableRows = ({
   isUser,
 }: {
   data: TransactionType[];
-  search: string;
-  searchProps: string[];
+  search?: string;
+  searchProps?: string[];
   business?: boolean;
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data, searchProps, search).map((element) => (
+  return (
+    searchProps && search ? filteredSearch(data, searchProps, search) : data
+  ).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -100,13 +102,15 @@ export const IssuedTransactionTableRows = ({
   isUser,
 }: {
   data: TransactionType[];
-  search: string;
-  searchProps: string[];
+  search?: string;
+  searchProps?: string[];
   noLink?: boolean;
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data, searchProps, search).map((element) => (
+  return (
+    searchProps && search ? filteredSearch(data, searchProps, search) : data
+  ).map((element) => (
     <TableTr
       key={element?.id}
       onClick={() => {
@@ -178,12 +182,14 @@ export const PayoutTransactionTableRows = ({
   isUser,
 }: {
   data: TransactionType[];
-  search: string;
-  searchProps: string[];
+  search?: string;
+  searchProps?: string[];
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data, searchProps, search).map((element) => (
+  return (
+    searchProps && search ? filteredSearch(data, searchProps, search) : data
+  ).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {

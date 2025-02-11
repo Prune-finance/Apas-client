@@ -1,4 +1,4 @@
-import { Card, Group, keys, Stack, Text } from "@mantine/core";
+import { Group, Stack, Text } from "@mantine/core";
 import { AccountCustomCard, ChartHeader, LegendBadge, ThisMonth } from "./util";
 import { Dispatch, SetStateAction } from "react";
 import { formatNumber } from "@/lib/utils";
@@ -15,12 +15,14 @@ interface FlowChartProps {
   frequency: string | null;
   setFrequency: Dispatch<SetStateAction<string | null>>;
   chartData: ChartData[]; // Add chartData prop
+  accountType: "Issued" | "Payout" | "Business";
 }
 export default function FlowChart({
   balance,
   frequency,
   setFrequency,
   chartData,
+  accountType,
 }: FlowChartProps) {
   return (
     <AccountCustomCard>
@@ -29,6 +31,8 @@ export default function FlowChart({
           title="Total Business Account Balance"
           value={frequency}
           setValue={setFrequency}
+          accountType={accountType}
+          isFlowChart
         />
 
         <Group justify="space-between">

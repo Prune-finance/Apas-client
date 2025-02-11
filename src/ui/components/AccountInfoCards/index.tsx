@@ -62,6 +62,7 @@ export default function AccountInfoCards({
           balance={meta?.totalAccountBalance || 0}
           frequency={frequency}
           setFrequency={setFrequency}
+          accountType={accountType}
           chartData={[
             { month: "Jan", inflow: 1000, outflow: 500 },
             { month: "Feb", inflow: 1200, outflow: 600 },
@@ -84,6 +85,7 @@ export default function AccountInfoCards({
           frequency={frequency}
           setFrequency={setFrequency}
           total={meta?.totalNumberOfAccounts || 0}
+          accountType={accountType}
           chartData={[
             {
               name: "Active Account",

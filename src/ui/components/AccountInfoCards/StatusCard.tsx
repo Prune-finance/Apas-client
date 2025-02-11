@@ -1,9 +1,7 @@
-import React from "react";
 import { AccountCustomCard, ThisMonth } from "./util";
-import { Flex, Group, Stack, Text } from "@mantine/core";
-import { formatNumber } from "@/lib/utils";
+import { Flex, Stack, Text } from "@mantine/core";
 import { PrimaryBtn } from "../Buttons";
-import { IconArrowLeft, IconChevronRight } from "@tabler/icons-react";
+import { IconChevronRight } from "@tabler/icons-react";
 
 interface StatusCardProps {
   title: string;
@@ -37,6 +35,7 @@ export default function StatusCard({
             c="var(--prune-primary-800)"
             rightSection={<IconChevronRight size={14} />}
             action={viewAction}
+            fw={600}
           />
         </Flex>
 

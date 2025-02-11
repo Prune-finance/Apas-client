@@ -16,9 +16,23 @@ interface ChartHeaderProps {
   title: string;
   value: string | null;
   setValue: Dispatch<SetStateAction<string | null>>;
+  accountType: "Issued" | "Payout" | "Business";
+  isFlowChart?: boolean;
 }
 
-export const ChartHeader = ({ title, value, setValue }: ChartHeaderProps) => {
+export const ChartHeader = ({
+  title,
+  value,
+  setValue,
+  accountType,
+  isFlowChart,
+}: ChartHeaderProps) => {
+  const tooltip = isFlowChart
+    ? `Cumulative balance of all ${accountType.toLowerCase()} 
+accounts ${accountType === "Payout" ? "created" : "onboarded"}`
+    : `Sum total of all ${accountType.toLowerCase()} 
+accounts ${accountType === "Payout" ? "created" : "onboarded"}`;
+
   return (
     <Group justify="space-between" align="start">
       <Group gap={11}>
@@ -26,7 +40,7 @@ export const ChartHeader = ({ title, value, setValue }: ChartHeaderProps) => {
           {title}
         </Text>
 
-        <Tooltip label="Tooltip">
+        <Tooltip label={tooltip}>
           <ThemeIcon
             variant="transparent"
             size={18}

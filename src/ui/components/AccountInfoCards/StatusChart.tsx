@@ -16,6 +16,7 @@ interface StatusChartProps {
   total: number;
   chartData: ChartData[];
   title: string;
+  accountType: "Issued" | "Payout" | "Business";
 }
 
 export default function StatusChart({
@@ -24,11 +25,17 @@ export default function StatusChart({
   total,
   chartData: data,
   title,
+  accountType,
 }: StatusChartProps) {
   return (
     <AccountCustomCard>
       <Stack gap={16}>
-        <ChartHeader title={title} value={frequency} setValue={setFrequency} />
+        <ChartHeader
+          title={title}
+          value={frequency}
+          setValue={setFrequency}
+          accountType={accountType}
+        />
 
         <Group justify="space-between">
           <Text fz={24} fw={600} c="var(--prune-text-gray-700)">

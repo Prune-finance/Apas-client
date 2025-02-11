@@ -62,20 +62,23 @@ export default function AccountInfoCards({
           balance={meta?.totalAccountBalance || 0}
           frequency={frequency}
           setFrequency={setFrequency}
-          chartData={[
-            { month: "Jan", inflow: 1000, outflow: 500 },
-            { month: "Feb", inflow: 1200, outflow: 600 },
-            { month: "Mar", inflow: 150, outflow: 700 },
-            { month: "Apr", inflow: 1300, outflow: 650 },
-            { month: "May", inflow: 700, outflow: 800 },
-            { month: "Jun", inflow: 1700, outflow: 850 },
-            { month: "Jul", inflow: 600, outflow: 900 },
-            { month: "Aug", inflow: 1900, outflow: 950 },
-            { month: "Sep", inflow: 200, outflow: 1000 },
-            { month: "Oct", inflow: 2100, outflow: 1050 },
-            { month: "Nov", inflow: 220, outflow: 1100 },
-            { month: "Dec", inflow: 500, outflow: 1150 },
-          ]}
+          accountType={accountType}
+          chartData={
+            [
+              // { month: "Jan", inflow: 1000, outflow: 500 },
+              // { month: "Feb", inflow: 1200, outflow: 600 },
+              // { month: "Mar", inflow: 150, outflow: 700 },
+              // { month: "Apr", inflow: 1300, outflow: 650 },
+              // { month: "May", inflow: 700, outflow: 800 },
+              // { month: "Jun", inflow: 1700, outflow: 850 },
+              // { month: "Jul", inflow: 600, outflow: 900 },
+              // { month: "Aug", inflow: 1900, outflow: 950 },
+              // { month: "Sep", inflow: 200, outflow: 1000 },
+              // { month: "Oct", inflow: 2100, outflow: 1050 },
+              // { month: "Nov", inflow: 220, outflow: 1100 },
+              // { month: "Dec", inflow: 500, outflow: 1150 },
+            ]
+          }
         />
       </GridCol>
       <GridCol span={{ base: 12, md: 5 }}>
@@ -84,6 +87,7 @@ export default function AccountInfoCards({
           frequency={frequency}
           setFrequency={setFrequency}
           total={meta?.totalNumberOfAccounts || 0}
+          accountType={accountType}
           chartData={[
             {
               name: "Active Account",

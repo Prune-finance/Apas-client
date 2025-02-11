@@ -120,6 +120,7 @@ export const CancelledPayoutTransactions = () => {
               "centrolinkRef",
             ]}
             search={debouncedSearch}
+            isUser
           />
         }
         loading={loading}

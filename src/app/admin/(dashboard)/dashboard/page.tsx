@@ -39,7 +39,7 @@ import {
 } from "@/ui/components/Cards";
 import styles from "@/ui/styles/page.module.scss";
 
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, isDummyIBAN } from "@/lib/utils";
 import { useBusiness } from "@/lib/hooks/businesses";
 import { useDebitRequests, useRequests } from "@/lib/hooks/requests";
 import { useAccounts } from "@/lib/hooks/accounts";
@@ -55,6 +55,7 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { DynamicSkeleton2, IssuedAccountTableHeaders } from "@/lib/static";
 import {
+  useDefaultAccountTransactions,
   usePayoutTransactions,
   useTransactions,
 } from "@/lib/hooks/transactions";
@@ -98,6 +99,9 @@ export default function Home() {
 
   const { loading: loadingPayoutTrx, transactions: payoutTrx } =
     usePayoutTransactions({ limit: 4 });
+
+  const { transactions: defaultTransactions, loading: loadingDefaultTrx } =
+    useDefaultAccountTransactions({ limit: 4 });
 
   const data = stats;
 
@@ -166,7 +170,20 @@ export default function Home() {
         setData(element);
       }}
     >
-      <TableTd className={styles.table__td}>{element.senderName}</TableTd>
+      {/* <TableTd className={styles.table__td}>{element.senderName}</TableTd> */}
+      <TableTd
+        td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        style={{
+          pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+        }}
+      >
+        <Link href={`/admin/transactions/${element.senderIban}`}>
+          {element?.senderName || "N/A"}
+        </Link>
+      </TableTd>
       <TableTd className={styles.table__td}>
         {element.recipientName || element.recipientIban}
       </TableTd>
@@ -186,9 +203,7 @@ export default function Home() {
     </TableTr>
   ));
 
-  const businessAccountEmptyArray = [] as any[];
-
-  const businessRows = businessAccountEmptyArray?.map((element) => (
+  const businessRows = defaultTransactions?.map((element) => (
     <TableTr
       key={element.id}
       style={{ cursor: "pointer" }}
@@ -197,7 +212,20 @@ export default function Home() {
         setData(element);
       }}
     >
-      <TableTd className={styles.table__td}>{element.senderName}</TableTd>
+      {/* <TableTd className={styles.table__td}>{element.senderName}</TableTd> */}
+      <TableTd
+        td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        style={{
+          pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+        }}
+      >
+        <Link href={`/admin/transactions/${element.senderIban}`}>
+          {element?.senderName || "N/A"}
+        </Link>
+      </TableTd>
       <TableTd className={styles.table__td}>
         {element.recipientName || element.recipientIban}
       </TableTd>
@@ -473,7 +501,7 @@ export default function Home() {
                 </Link>
               </Flex>
 
-              {(loadingPayoutTrx || businessAccountEmptyArray?.length > 0) && (
+              {(loadingDefaultTrx || defaultTransactions?.length > 0) && (
                 <TableScrollContainer minWidth={500}>
                   <Table
                     verticalSpacing="md"
@@ -496,7 +524,7 @@ export default function Home() {
                       className={styles.table__td}
                       style={{ wordBreak: "break-word" }}
                     >
-                      {loadingPayoutTrx
+                      {loadingDefaultTrx
                         ? DynamicSkeleton2(businessAccHeaders.length)
                         : businessRows}
                     </TableTbody>
@@ -504,7 +532,7 @@ export default function Home() {
                 </TableScrollContainer>
               )}
 
-              {!loadingPayoutTrx && businessAccountEmptyArray.length === 0 && (
+              {!loadingDefaultTrx && defaultTransactions.length === 0 && (
                 <Flex
                   style={{ flexGrow: 1 }}
                   direction="column"

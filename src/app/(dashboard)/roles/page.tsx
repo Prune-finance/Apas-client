@@ -24,7 +24,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import styles from "./styles.module.scss";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   IconBriefcase,
   IconDotsVertical,
@@ -64,6 +64,9 @@ const newRoles = {
 function Roles() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
+
+  const router = useRouter();
+
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
@@ -111,7 +114,10 @@ function Roles() {
             </UnstyledButton>
           </MenuTarget>
           <MenuDropdown>
-            <MenuItem leftSection={<IconEdit size={14} />} onClick={() => {}}>
+            <MenuItem
+              leftSection={<IconEdit size={14} />}
+              onClick={() => router.push("/roles/edit")}
+            >
               <Text fz={12}>Edit Role</Text>
             </MenuItem>
             <MenuItem leftSection={<IconUserX size={14} />} onClick={open}>
@@ -202,7 +208,11 @@ function Roles() {
               <SearchInput search={search} setSearch={setSearch} />
 
               <Group gap={12}>
-                <PrimaryBtn text="New Role" action={() => {}} icon={IconPlus} />
+                <PrimaryBtn
+                  text="New Role"
+                  action={() => router.push("/roles/new")}
+                  icon={IconPlus}
+                />
               </Group>
             </Group>
 

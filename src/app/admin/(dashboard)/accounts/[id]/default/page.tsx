@@ -119,7 +119,7 @@ export default function BusinessDefaultAccount() {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Accounts", href: "/admin/accounts" },
+          { title: "Accounts", href: "/admin/accounts?tab=business-accounts" },
 
           {
             title: account?.accountName ?? "",

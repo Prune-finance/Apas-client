@@ -1,7 +1,7 @@
 import { TransactionType } from "@/lib/hooks/transactions";
 import { filteredSearch } from "@/lib/search";
 import Transaction from "@/lib/store/transaction";
-import { formatNumber, frontendPagination } from "@/lib/utils";
+import { formatNumber, frontendPagination, isDummyIBAN } from "@/lib/utils";
 import { Stack, TableTd, TableTr, Text } from "@mantine/core";
 import Link from "next/link";
 import { AmountGroup } from "../AmountGroup";
@@ -17,14 +17,18 @@ export const BusinessTransactionTableRows = ({
   search,
   searchProps,
   business,
+  isUser,
 }: {
   data: TransactionType[];
-  search: string;
-  searchProps: string[];
+  search?: string;
+  searchProps?: string[];
   business?: boolean;
+  isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data, searchProps, search).map((element) => (
+  return (
+    searchProps && search ? filteredSearch(data, searchProps, search) : data
+  ).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -33,7 +37,25 @@ export const BusinessTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && <TableTd>{element.senderName || "N/A"}</TableTd>}
+      {!business && (
+        <TableTd
+          td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={{
+            pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+          }}
+        >
+          <Link
+            href={`${!isUser ? "/admin" : ""}/transactions/${
+              element.senderIban
+            }`}
+          >
+            {element?.senderName || "N/A"}
+          </Link>
+        </TableTd>
+      )}
 
       <TableTd>
         <Stack gap={0}>
@@ -80,13 +102,15 @@ export const IssuedTransactionTableRows = ({
   isUser,
 }: {
   data: TransactionType[];
-  search: string;
-  searchProps: string[];
+  search?: string;
+  searchProps?: string[];
   noLink?: boolean;
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data, searchProps, search).map((element) => (
+  return (
+    searchProps && search ? filteredSearch(data, searchProps, search) : data
+  ).map((element) => (
     <TableTr
       key={element?.id}
       onClick={() => {
@@ -96,11 +120,14 @@ export const IssuedTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd
-        td={noLink ? "none" : "underline"}
+        td={noLink || isDummyIBAN(element.senderIban) ? "none" : "underline"}
         onClick={(e) => {
           e.stopPropagation();
         }}
-        style={{ pointerEvents: noLink ? "none" : "auto" }}
+        style={{
+          pointerEvents:
+            noLink || isDummyIBAN(element.senderIban) ? "none" : "auto",
+        }}
       >
         <Link
           href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
@@ -152,13 +179,17 @@ export const PayoutTransactionTableRows = ({
   data,
   search,
   searchProps,
+  isUser,
 }: {
   data: TransactionType[];
-  search: string;
-  searchProps: string[];
+  search?: string;
+  searchProps?: string[];
+  isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data, searchProps, search).map((element) => (
+  return (
+    searchProps && search ? filteredSearch(data, searchProps, search) : data
+  ).map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -167,7 +198,23 @@ export const PayoutTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{element.senderName || "N/A"}</TableTd>
+      {/* <TableTd>{element.senderName || "N/A"}</TableTd> */}
+
+      <TableTd
+        td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        style={{
+          pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+        }}
+      >
+        <Link
+          href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
+        >
+          {element?.senderName || "N/A"}
+        </Link>
+      </TableTd>
 
       <TableTd w="15%">{element.centrolinkRef}</TableTd>
       <TableTd>
@@ -283,7 +330,7 @@ export const PayoutTrxReqTableRows = ({
               | "REJECTED"
               | "CONFIRMED"
               | "CANCELLED",
-          });
+          } as unknown as TransactionType);
         }}
         style={{ cursor: "pointer" }}
       >

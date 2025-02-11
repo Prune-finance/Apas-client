@@ -30,9 +30,10 @@ import {
 } from "@/ui/components/TransactionReceipt";
 import { useRef } from "react";
 import { handlePdfDownload } from "@/lib/actions/auth";
-import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
+import { AccountData, useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import Transaction from "@/lib/store/transaction";
+import { useReceipt } from "@/lib/hooks/receipt";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
@@ -60,6 +61,11 @@ export const TransactionDrawer = ({
 
   const { account: senderAccount, loading: loadingSenderAcct } =
     useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
+
+  const { details } = useReceipt({
+    selectedRequest,
+    senderAccount: senderAccount as unknown as AccountData,
+  });
 
   const businessDetails = {
     "Business Name":
@@ -107,43 +113,6 @@ export const TransactionDrawer = ({
     ),
     "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
-
-  const BeneficiaryDetails = {
-    "Amount Received": formatNumber(selectedRequest?.amount ?? 0, true, "EUR"),
-    // "First Name": selectedRequest?.destinationFirstName ?? "N/A",
-    // "Last Name": selectedRequest?.destinationLastName ?? "N/A",
-    Name: selectedRequest?.recipientName || "N/A",
-    IBAN: selectedRequest?.recipientIban ?? "",
-    "Bank Name": selectedRequest?.recipientBankAddress ?? "",
-    Country: selectedRequest?.recipientBankCountry ?? "",
-    "Bank Address": "N/A",
-  };
-
-  const SenderDetails = {
-    "Account Name":
-      senderAccount?.accountName ?? selectedRequest?.senderName ?? "N/A",
-    "Account Number": selectedRequest?.senderIban ?? "",
-    "Bank Name": "Prune Payments LTD",
-    BIC: "ARPYGB21XXX",
-  };
-
-  const OtherDetails = {
-    Type: selectedRequest?.type === "DEBIT" ? "Debit" : "Credit",
-    "Payment Date": dayjs(selectedRequest?.createdAt).format(
-      "hh:mm A Do MMM YYYY"
-    ),
-    Reference: selectedRequest?.reference ?? "N/A",
-    "C-L Reference": selectedRequest?.id ?? "",
-    "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
-  };
-  const details: ReceiptDetails[] = [
-    {
-      title: "Sender Details",
-      value: SenderDetails,
-    },
-    { title: "Beneficiary Details", value: BeneficiaryDetails },
-    { title: "Other Details", value: OtherDetails },
-  ];
 
   return (
     <Drawer

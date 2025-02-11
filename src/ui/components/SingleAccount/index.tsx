@@ -696,6 +696,7 @@ export const SingleDefaultAccountBody = ({
   children,
   location,
   revalidate,
+  isUser,
 }: SingleDefaultAccountProps) => {
   /**
    * @description - Tabs for the default account
@@ -739,6 +740,7 @@ export const SingleDefaultAccountBody = ({
             meta={trxMeta}
             // children={children}
             location={location ?? "default"}
+            isUser={isUser}
           >
             {children}
           </Transactions>

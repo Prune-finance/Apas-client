@@ -224,7 +224,7 @@ export function useAccountStatistics({
   accountType,
 }: {
   frequency: string;
-  accountType: string;
+  accountType: "Accounts" | "Payout" | "Company";
 }) {
   const { loading, meta, queryFn } = useAxios<unknown, AccountStatsMeta>({
     baseURL: "accounts",

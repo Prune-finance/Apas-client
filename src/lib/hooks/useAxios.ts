@@ -47,7 +47,6 @@ const useAxios = <T, M = unknown>({
   }, [dependencies]);
 
   const fetchData = useCallback(async () => {
-    console.log({ endpoint });
     setLoading(true);
     try {
       const {

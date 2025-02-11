@@ -22,12 +22,12 @@ import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
-import { countries } from "@/lib/static";
+// import { countries } from "@/lib/static";
 import DropzoneComponent from "../Dropzone";
 import { useDebouncedValue } from "@mantine/hooks";
 import { sendMoneyIndividualValidate } from "@/lib/schema";
 import { removeWhitespace } from "@/lib/utils";
-
+import countries from "@/assets/countries.json";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -336,7 +336,7 @@ function Individual({
                     classNames={{ input: styles.input, label: styles.label }}
                     flex={1}
                     label="Country"
-                    data={countries}
+                    data={countries.map((c) => c.name)}
                     disabled={disableCountry}
                     {...form.getInputProps("destinationCountry")}
                   />

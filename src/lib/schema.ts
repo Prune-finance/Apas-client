@@ -651,6 +651,7 @@ export interface IParams {
   date?: string | null;
   endDate?: string | null;
   status?: string;
+  search?: string;
   business?: string;
   email?: string;
   name?: string;

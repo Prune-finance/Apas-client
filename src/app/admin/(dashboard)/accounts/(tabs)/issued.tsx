@@ -34,7 +34,12 @@ import {
 } from "@tabler/icons-react";
 
 // import ModalComponent from "@/ui/components/Modal";
-import { AccountData, AccountMeta, useAccounts } from "@/lib/hooks/accounts";
+import {
+  AccountData,
+  AccountMeta,
+  useAccounts,
+  useAccountStatistics,
+} from "@/lib/hooks/accounts";
 import {
   activeBadgeColor,
   camelCaseToTitleCase,
@@ -77,6 +82,7 @@ export default function IssuedAccounts() {
 
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
+  const [frequency, setFrequency] = useState<string | null>("Monthly");
 
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
@@ -112,6 +118,11 @@ export default function IssuedAccounts() {
     dependencies,
   });
 
+  const { loading: loadingStats, meta: statsMeta } = useAccountStatistics({
+    frequency: frequency?.toLowerCase() ?? "monthly",
+    accountType: "Accounts",
+  });
+
   // TODO: Handle the resetting of activePage state when the filter is toggled
 
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -121,7 +132,8 @@ export default function IssuedAccounts() {
   const [opened, { open, close }] = useDisclosure(false);
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
-  const [filterOpened, { toggle }] = useDisclosure(false);
+  const [filterOpened, { toggle, open: openFilter, close: closeFilter }] =
+    useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
@@ -269,7 +281,17 @@ export default function IssuedAccounts() {
 
   return (
     <div className={styles.table__container}>
-      <AccountInfoCards />
+      <AccountInfoCards
+        loading={loadingStats}
+        frequency={frequency}
+        setFrequency={setFrequency}
+        accountType="Issued"
+        meta={statsMeta}
+        form={form}
+        open={openFilter}
+        close={closeFilter}
+        opened={filterOpened}
+      />
       <Group
         justify="space-between"
         align="center"

@@ -5,6 +5,7 @@ import { IParams } from "../schema";
 import { custom } from "zod";
 
 import createAxiosInstance from "@/lib/axios";
+import useAxios from "./useAxios";
 
 const axios = createAxiosInstance("accounts");
 
@@ -216,6 +217,23 @@ export function usePayoutAccount(customParams: IParams = {}) {
   }, [limit, date, endDate, status, business, page]);
 
   return { loading, accounts, revalidate, meta };
+}
+
+export function useAccountStatistics({
+  frequency,
+  accountType,
+}: {
+  frequency: string;
+  accountType: "Accounts" | "Payout" | "Company";
+}) {
+  const { loading, meta, queryFn } = useAxios<unknown, AccountStatsMeta>({
+    baseURL: "accounts",
+    endpoint: "/admin/accounts/statistics",
+    params: { frequency, accountType },
+    dependencies: [frequency, accountType],
+  });
+
+  return { loading, meta, revalidate: queryFn };
 }
 
 export function useUserAccounts(customParams: IParams = {}) {
@@ -655,3 +673,12 @@ export interface Director {
 export type Account = UserAccount | CorporateAccount;
 
 export type DefaultAccount = UserAccount | DefaultCorporateAccount;
+
+export interface AccountStatsMeta {
+  activeAccountCount: number;
+  inactiveAccountCount: number;
+  totalInflow: number;
+  totalOutflow: number;
+  totalNumberOfAccounts: number;
+  totalAccountBalance: number;
+}

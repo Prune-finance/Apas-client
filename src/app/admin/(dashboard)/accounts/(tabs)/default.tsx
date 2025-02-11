@@ -34,7 +34,12 @@ import {
 } from "@tabler/icons-react";
 
 // import ModalComponent from "@/ui/components/Modal";
-import { AccountData, AccountMeta, useAccounts } from "@/lib/hooks/accounts";
+import {
+  AccountData,
+  AccountMeta,
+  useAccounts,
+  useAccountStatistics,
+} from "@/lib/hooks/accounts";
 import {
   activeBadgeColor,
   camelCaseToTitleCase,
@@ -77,6 +82,7 @@ export default function BusinessAccounts() {
 
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
+  const [frequency, setFrequency] = useState<string | null>("Monthly");
 
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
@@ -112,6 +118,11 @@ export default function BusinessAccounts() {
     dependencies,
   });
 
+  const { loading: loadingStats, meta: statsMeta } = useAccountStatistics({
+    frequency: frequency?.toLowerCase() ?? "monthly",
+    accountType: "Company",
+  });
+
   // TODO: Handle the resetting of activePage state when the filter is toggled
 
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -121,7 +132,8 @@ export default function BusinessAccounts() {
   const [opened, { open, close }] = useDisclosure(false);
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
-  const [filterOpened, { toggle }] = useDisclosure(false);
+  const [filterOpened, { toggle, open: openFilter, close: closeFilter }] =
+    useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
@@ -255,7 +267,7 @@ export default function BusinessAccounts() {
         const link = document.createElement("a");
         const url = URL.createObjectURL(blob);
         link.setAttribute("href", url);
-        link.setAttribute("download", "Issued Accounts.csv");
+        link.setAttribute("download", "Business Accounts.csv");
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -271,7 +283,18 @@ export default function BusinessAccounts() {
 
   return (
     <div className={styles.table__container}>
-      <AccountInfoCards />
+      <AccountInfoCards
+        loading={loadingStats}
+        frequency={frequency}
+        setFrequency={setFrequency}
+        accountType="Business"
+        meta={statsMeta}
+        form={form}
+        open={openFilter}
+        close={closeFilter}
+        opened={filterOpened}
+      />
+
       <Group
         justify="space-between"
         align="center"

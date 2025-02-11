@@ -15,6 +15,7 @@ interface StatusChartProps {
   setFrequency: Dispatch<SetStateAction<string | null>>;
   total: number;
   chartData: ChartData[];
+  title: string;
 }
 
 export default function StatusChart({
@@ -22,15 +23,12 @@ export default function StatusChart({
   setFrequency,
   total,
   chartData: data,
+  title,
 }: StatusChartProps) {
   return (
     <AccountCustomCard>
       <Stack gap={16}>
-        <ChartHeader
-          title="Total Business Account Balance"
-          value={frequency}
-          setValue={setFrequency}
-        />
+        <ChartHeader title={title} value={frequency} setValue={setFrequency} />
 
         <Group justify="space-between">
           <Text fz={24} fw={600} c="var(--prune-text-gray-700)">

@@ -422,7 +422,7 @@ export default function Home() {
                 loading={loadingDefaultTrx}
                 row={<OwnAccountRow transactions={defaultTrx} />}
                 headers={ownAccountTableHeader}
-                href="/transactions"
+                href="/transactions?tab=own-account"
                 transactions={defaultTrx}
               />
             </GridCol>
@@ -433,7 +433,7 @@ export default function Home() {
                 loading={loadingPayout}
                 row={<PayoutAccountRow transactions={payoutTrx} />}
                 headers={payoutAccountTableHeader}
-                href="/transactions"
+                href="/payouts?tab=Transactions"
                 transactions={payoutTrx}
               />
             </GridCol>
@@ -446,7 +446,7 @@ export default function Home() {
                   <IssuedAccountRow transactions={transactions.slice(0, 3)} />
                 }
                 headers={issuedAccountTableHeader}
-                href="/transactions"
+                href="/transactions?tab=issued-accounts"
                 transactions={transactions.slice(0, 3)}
               />
             </GridCol>

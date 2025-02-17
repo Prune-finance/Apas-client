@@ -36,7 +36,7 @@ import React, { useState } from "react";
 interface Props {
   tabValue: string;
 }
-export default function DeactivatedRoles({ tabValue }: Props) {
+export default function DeactivatedRoles() {
   const [search, setSearch] = useState("");
   const [debouncedValue] = useDebouncedValue(search, 1000);
   const [active, setActive] = useState(1);
@@ -49,7 +49,7 @@ export default function DeactivatedRoles({ tabValue }: Props) {
   });
 
   return (
-    <TabsPanel value={tabValue}>
+    <Box>
       <Group justify="space-between" mt={28}>
         <SearchInput search={search} setSearch={setSearch} />
       </Group>
@@ -77,7 +77,7 @@ export default function DeactivatedRoles({ tabValue }: Props) {
         limit={limit}
         total={calculateTotalPages(limit, roles?.length ?? 0)}
       />
-    </TabsPanel>
+    </Box>
   );
 }
 

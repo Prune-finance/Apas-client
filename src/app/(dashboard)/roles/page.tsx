@@ -114,9 +114,15 @@ function Roles() {
             list: styles.tabs__list,
             tab: styles.tab,
           }}
+          keepMounted={false}
         >
-          <ActiveRoles tabValue={tabs[0].value} />
-          <DeactivatedRoles tabValue={tabs[1].value} />
+          <TabsPanel value={tabs[0].value}>
+            <ActiveRoles />
+          </TabsPanel>
+
+          <TabsPanel value={tabs[1].value}>
+            <DeactivatedRoles />
+          </TabsPanel>
         </TabsComponent>
 
         {/* <Tabs
@@ -212,7 +218,7 @@ function Roles() {
             <Text fz={12} fw={500} c="#667085" ta="center">
               For users to regain access to this account again, go to <br />
               <span style={{ color: "#97AD05", textDecoration: "underline" }}>
-                De-Activated Roles
+                Deactivated Roles
               </span>{" "}
               to re-assign users to a new role.
             </Text>
@@ -326,47 +332,6 @@ function Roles() {
     </main>
   );
 }
-
-const roleDemoData = [
-  {
-    name: "Admin",
-    date: "12-12-2002",
-  },
-  {
-    name: "Super Admin",
-    date: "01-15-2005",
-  },
-  {
-    name: "Owner",
-    date: "03-22-2010",
-  },
-  {
-    name: "Marketer",
-    date: "07-30-2018",
-  },
-  {
-    name: "Developer",
-    date: "11-05-2021",
-  },
-];
-
-const roleDemoData2 = [
-  {
-    name: "Sales",
-    date: "12-12-2002",
-    dateDeactivated: "12-12-2002",
-  },
-  {
-    name: "Support",
-    date: "01-15-2005",
-    dateDeactivated: "12-12-2002",
-  },
-  {
-    name: "Customer Service",
-    date: "03-22-2010",
-    dateDeactivated: "12-12-2002",
-  },
-];
 
 export default function RolesSuspense() {
   return (

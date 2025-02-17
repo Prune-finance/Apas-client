@@ -18,7 +18,7 @@ import {
   Text,
   Box,
 } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   IconDotsVertical,
   IconEdit,
@@ -28,25 +28,46 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import router from "next/router";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
+import DeactivateRoleModal from "../DeactivateRoleModal";
+import useAxios from "@/lib/hooks/useAxios";
+import useNotification from "@/lib/hooks/notification";
 
 interface Props {
   tabValue: string;
 }
-export default function ActiveRoles({ tabValue }: Props) {
+export default function ActiveRoles() {
   const [search, setSearch] = useState("");
   const [debouncedValue] = useDebouncedValue(search, 1000);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [id, setId] = useState("");
+  const [opened, { open, close }] = useDisclosure(false);
+  const { handleSuccess } = useNotification();
 
-  const { loading, roles } = useUserRoles({
+  const { loading, roles, revalidate } = useUserRoles({
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedValue,
   });
 
+  const { queryFn: handleDeactivation, loading: processingDeactivation } =
+    useAxios({
+      baseURL: "auth",
+      endpoint: `/roles/${id}/deactivate`,
+      method: "PATCH",
+      onSuccess: () => {
+        revalidate();
+        close();
+        handleSuccess(
+          "Role deactivation",
+          "Role has been deactivated successfully"
+        );
+      },
+    });
+
   return (
-    <TabsPanel value={tabValue}>
+    <Box>
       <Group justify="space-between" mt={28}>
         <SearchInput search={search} setSearch={setSearch} />
 
@@ -63,7 +84,7 @@ export default function ActiveRoles({ tabValue }: Props) {
       <Box mih="60vh">
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent roles={roles} />}
+          rows={<RowComponent roles={roles} open={open} setId={setId} />}
           loading={loading}
           layout="auto"
         />
@@ -83,13 +104,28 @@ export default function ActiveRoles({ tabValue }: Props) {
         limit={limit}
         total={calculateTotalPages(limit, roles?.length ?? 0)}
       />
-    </TabsPanel>
+
+      <DeactivateRoleModal
+        opened={opened}
+        close={close}
+        handleDeactivation={handleDeactivation}
+        processing={processingDeactivation}
+      />
+    </Box>
   );
 }
 
 const tableHeaders = ["Role Name", "Date Created", "Action"];
 
-const RowComponent = ({ roles }: { roles: Role[] | null }) => {
+const RowComponent = ({
+  roles,
+  open,
+  setId,
+}: {
+  roles: Role[] | null;
+  open: () => void;
+  setId: Dispatch<SetStateAction<string>>;
+}) => {
   return roles?.map((element, index) => (
     <TableTr
       key={index}
@@ -115,9 +151,12 @@ const RowComponent = ({ roles }: { roles: Role[] | null }) => {
             </MenuItem>
             <MenuItem
               leftSection={<IconUserX size={14} />}
-              //   onClick={open}
+              onClick={() => {
+                setId(element.id);
+                open();
+              }}
             >
-              <Text fz={12}>De-activate</Text>
+              <Text fz={12}>Deactivate</Text>
             </MenuItem>
             <MenuItem
               leftSection={<IconUser size={14} />}

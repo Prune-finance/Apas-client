@@ -50,6 +50,9 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import RolesDrawer from "./drawer";
 import { useForm } from "@mantine/form";
+import TabsComponent from "@/ui/components/Tabs";
+import ActiveRoles from "./(tabs)/active";
+import DeactivatedRoles from "./(tabs)/deactivated";
 
 dayjs.extend(relativeTime);
 
@@ -79,11 +82,6 @@ function Roles() {
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
 
-  const tabs = [
-    { title: "Roles", value: "Roles", icon: IconBriefcase },
-    { title: "De-activated Roles", value: "De-activated", icon: IconUserX },
-  ];
-
   const form = useForm({
     initialValues: newRoles,
     //   validate: zodResolver(validateNewAdmin),
@@ -92,78 +90,6 @@ function Roles() {
   const handleRowClick = () => {
     openDrawer();
   };
-
-  const rows = filteredSearch(
-    roleDemoData,
-    ["name", "date"],
-    debouncedSearch
-  ).map((element, index) => (
-    <TableTr
-      key={index}
-      onClick={() => handleRowClick()}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd tt="capitalize">{element?.name}</TableTd>
-      <TableTd>{dayjs(element?.date).format("ddd DD MMM YYYY")}</TableTd>
-
-      <TableTd onClick={(e) => e.stopPropagation()}>
-        <Menu shadow="md" width={150}>
-          <MenuTarget>
-            <UnstyledButton>
-              <IconDotsVertical size={17} />
-            </UnstyledButton>
-          </MenuTarget>
-          <MenuDropdown>
-            <MenuItem
-              leftSection={<IconEdit size={14} />}
-              onClick={() => router.push("/roles/edit")}
-            >
-              <Text fz={12}>Edit Role</Text>
-            </MenuItem>
-            <MenuItem leftSection={<IconUserX size={14} />} onClick={open}>
-              <Text fz={12}>De-activate</Text>
-            </MenuItem>
-            <MenuItem leftSection={<IconUser size={14} />} onClick={openInvite}>
-              <Text fz={12}>Assign User</Text>
-            </MenuItem>
-          </MenuDropdown>
-        </Menu>
-      </TableTd>
-    </TableTr>
-  ));
-
-  const rowsDeactivate = filteredSearch(
-    roleDemoData2,
-    ["name", "date"],
-    debouncedSearch
-  ).map((element, index) => (
-    <TableTr
-      key={index}
-      onClick={() => handleRowClick()}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd tt="capitalize">{element?.name}</TableTd>
-      <TableTd>{dayjs(element?.date).format("ddd DD MMM YYYY")}</TableTd>
-      <TableTd>
-        {dayjs(element?.dateDeactivated).format("ddd DD MMM YYYY")}
-      </TableTd>
-
-      <TableTd onClick={(e) => e.stopPropagation()}>
-        <Menu shadow="md" width={150}>
-          <MenuTarget>
-            <UnstyledButton>
-              <IconDotsVertical size={17} />
-            </UnstyledButton>
-          </MenuTarget>
-          <MenuDropdown>
-            <MenuItem leftSection={<IconUserX size={14} />} onClick={() => {}}>
-              <Text fz={12}>Delete Role</Text>
-            </MenuItem>
-          </MenuDropdown>
-        </Menu>
-      </TableTd>
-    </TableTr>
-  ));
 
   return (
     <main className={styles.main}>
@@ -179,7 +105,21 @@ function Roles() {
           </Text>
         </div>
 
-        <Tabs
+        <TabsComponent
+          tabs={tabs}
+          mt={32}
+          tt="capitalize"
+          classNames={{
+            root: styles.tabs,
+            list: styles.tabs__list,
+            tab: styles.tab,
+          }}
+        >
+          <ActiveRoles tabValue={tabs[0].value} />
+          <DeactivatedRoles tabValue={tabs[1].value} />
+        </TabsComponent>
+
+        {/* <Tabs
           mt={32}
           defaultValue={
             tabs.find((t) => t.value === tab)?.value ?? tabs[0].value
@@ -193,11 +133,7 @@ function Roles() {
         >
           <TabsList mb={20}>
             {tabs.map((tab, index) => (
-              <TabsTab
-                key={index}
-                value={tab.value}
-                leftSection={<tab.icon size={14} />}
-              >
+              <TabsTab key={index} value={tab.value} leftSection={tab.icon}>
                 {tab.title}
               </TabsTab>
             ))}
@@ -236,24 +172,8 @@ function Roles() {
               layout="auto"
             />
           </TabsPanel>
-        </Tabs>
-
-        <EmptyTable
-          rows={rowsDeactivate}
-          loading={false}
-          title="There are no users"
-          text="When a user is added, they will appear here."
-        />
+        </Tabs> */}
       </div>
-
-      <PaginationComponent
-        active={active}
-        setActive={setActive}
-        setLimit={setLimit}
-        limit={limit}
-        //   total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
-        total={1}
-      />
 
       <RolesDrawer opened={openedDrawer} close={closeDrawer} user={null} />
 
@@ -407,14 +327,6 @@ function Roles() {
   );
 }
 
-const tableHeaders = ["Role Name", "Date Created", "Action"];
-const tableHeaderDeactivated = [
-  "Role Name",
-  "Date Created",
-  "Date De-activated",
-  "Action",
-];
-
 const roleDemoData = [
   {
     name: "Admin",
@@ -463,3 +375,12 @@ export default function RolesSuspense() {
     </Suspense>
   );
 }
+
+const tabs = [
+  { title: "Roles", value: "Roles", icon: <IconBriefcase size={14} /> },
+  {
+    title: "Deactivated Roles",
+    value: "Deactivated",
+    icon: <IconUserX size={14} />,
+  },
+];

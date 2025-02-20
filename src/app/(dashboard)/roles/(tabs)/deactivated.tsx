@@ -42,7 +42,7 @@ export default function DeactivatedRoles() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, roles, revalidate } = useUserRoles({
+  const { loading, roles, revalidate, meta } = useUserRoles({
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedValue,
@@ -76,7 +76,7 @@ export default function DeactivatedRoles() {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={calculateTotalPages(limit, roles?.length ?? 0)}
+        total={calculateTotalPages(limit, meta?.total ?? 0)}
       />
     </Box>
   );

@@ -2,14 +2,14 @@ import { IParams } from "../schema";
 import useAxios from "./useAxios";
 
 export function useUserRoles(customParams: IParams = {}) {
-  const { data, loading, queryFn } = useAxios<Role[]>({
+  const { data, loading, meta, queryFn } = useAxios<Role[], RoleMeta>({
     baseURL: "auth",
     endpoint: "roles",
     params: customParams,
     dependencies: [...Object.values(customParams)],
   });
 
-  return { roles: data, loading, revalidate: queryFn };
+  return { roles: data, loading, revalidate: queryFn, meta };
 }
 
 export function useDeactivatedUserRoles(customParams: IParams = {}) {
@@ -41,6 +41,12 @@ export interface Role {
   deletedAt: Date | null;
   companyId: string;
   permissions: Permission[];
+}
+
+export interface RoleMeta {
+  total: 1;
+  page: 1;
+  limit: 10;
 }
 
 export interface Permission {

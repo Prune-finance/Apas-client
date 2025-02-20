@@ -45,7 +45,7 @@ export default function ActiveRoles() {
   const [opened, { open, close }] = useDisclosure(false);
   const { handleSuccess } = useNotification();
 
-  const { loading, roles, revalidate } = useUserRoles({
+  const { loading, roles, revalidate, meta } = useUserRoles({
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedValue,
@@ -103,7 +103,7 @@ export default function ActiveRoles() {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={calculateTotalPages(limit, roles?.length ?? 0)}
+        total={calculateTotalPages(limit, meta?.total ?? 0)}
       />
 
       <DeactivateRoleModal

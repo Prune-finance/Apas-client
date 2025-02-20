@@ -1,3 +1,4 @@
+import { title } from "process";
 import { z } from "zod";
 
 export const loginValues = {
@@ -788,3 +789,17 @@ export const otherDocumentSchema = z.object({
 });
 
 export type OtherDocumentType = z.infer<typeof otherDocumentSchema>;
+
+export const newRoleSchema = z.object({
+  title: z.string().min(1, "Role title is required"),
+  permissions: z.array(
+    z.array(
+      z.object({
+        title: z.string(),
+        status: z.boolean(),
+      })
+    )
+  ),
+});
+
+export type NewRoleType = z.infer<typeof newRoleSchema>;

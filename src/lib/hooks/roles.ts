@@ -2,14 +2,14 @@ import { IParams } from "../schema";
 import useAxios from "./useAxios";
 
 export function useUserRoles(customParams: IParams = {}) {
-  const { data, loading, queryFn } = useAxios<Role[]>({
+  const { data, loading, meta, queryFn } = useAxios<Role[], RoleMeta>({
     baseURL: "auth",
     endpoint: "roles",
     params: customParams,
     dependencies: [...Object.values(customParams)],
   });
 
-  return { data, loading, revalidate: queryFn };
+  return { roles: data, loading, revalidate: queryFn, meta };
 }
 
 export function useDeactivatedUserRoles(customParams: IParams = {}) {
@@ -20,7 +20,17 @@ export function useDeactivatedUserRoles(customParams: IParams = {}) {
     dependencies: [...Object.values(customParams)],
   });
 
-  return { data, loading, revalidate: queryFn };
+  return { roles: data, loading, revalidate: queryFn };
+}
+
+export function useUserPermissionsByCategory() {
+  const { data, loading, queryFn } = useAxios<PermissionsByCategory>({
+    baseURL: "auth",
+    endpoint: "roles/permissions",
+    params: { category: true },
+  });
+
+  return { permissions: data, loading, revalidate: queryFn };
 }
 
 export interface Role {
@@ -33,6 +43,12 @@ export interface Role {
   permissions: Permission[];
 }
 
+export interface RoleMeta {
+  total: 1;
+  page: 1;
+  limit: 10;
+}
+
 export interface Permission {
   id: string;
   title: string;
@@ -42,4 +58,14 @@ export interface Permission {
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
+}
+
+export interface PermissionsByCategory {
+  "ACCOUNT MANAGEMENT": Permission[];
+  "DEBIT REQUESTS": Permission[];
+  "PAYOUT MANAGEMENT": Permission[];
+  "PAYOUT INQUIRY": Permission[];
+  "TRANSACTION TRACKING": Permission[];
+  "USER MANAGEMENT": Permission[];
+  SETTINGS: Permission[];
 }

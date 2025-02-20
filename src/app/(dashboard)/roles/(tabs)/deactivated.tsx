@@ -1,4 +1,4 @@
-import { Role, useDeactivatedUserRoles } from "@/lib/hooks/roles";
+import { Role, useUserRoles } from "@/lib/hooks/roles";
 import { calculateTotalPages } from "@/lib/utils";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -42,10 +42,11 @@ export default function DeactivatedRoles() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { loading, roles } = useDeactivatedUserRoles({
+  const { loading, roles, revalidate } = useUserRoles({
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedValue,
+    status: "deactivate",
   });
 
   return (
@@ -85,7 +86,7 @@ const tableHeaderDeactivated = [
   "Role Name",
   "Date Created",
   "Date Deleted",
-  "Action",
+  // "Action",
 ];
 
 const RowComponent = ({ roles }: { roles: Role[] | null }) => {
@@ -99,6 +100,7 @@ const RowComponent = ({ roles }: { roles: Role[] | null }) => {
       <TableTd>{dayjs(element?.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd>{dayjs(element?.deletedAt).format("ddd DD MMM YYYY")}</TableTd>
 
+      {/**
       <TableTd onClick={(e) => e.stopPropagation()}>
         <Menu shadow="md" width={150}>
           <MenuTarget>
@@ -122,6 +124,7 @@ const RowComponent = ({ roles }: { roles: Role[] | null }) => {
           </MenuDropdown>
         </Menu>
       </TableTd>
+      */}
     </TableTr>
   ));
 };

@@ -49,6 +49,7 @@ export default function ActiveRoles() {
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedValue,
+    status: "activate",
   });
 
   const { queryFn: handleDeactivation, loading: processingDeactivation } =
@@ -143,12 +144,12 @@ const RowComponent = ({
             </UnstyledButton>
           </MenuTarget>
           <MenuDropdown>
-            <MenuItem
+            {/* <MenuItem
               leftSection={<IconEdit size={14} />}
               onClick={() => router.push("/roles/edit")}
             >
               <Text fz={12}>Edit Role</Text>
-            </MenuItem>
+            </MenuItem> */}
             <MenuItem
               leftSection={<IconUserX size={14} />}
               onClick={() => {
@@ -158,12 +159,12 @@ const RowComponent = ({
             >
               <Text fz={12}>Deactivate</Text>
             </MenuItem>
-            <MenuItem
+            {/* <MenuItem
               leftSection={<IconUser size={14} />}
               // onClick={openInvite}
             >
               <Text fz={12}>Assign User</Text>
-            </MenuItem>
+            </MenuItem> */}
           </MenuDropdown>
         </Menu>
       </TableTd>

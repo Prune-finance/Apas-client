@@ -3,15 +3,14 @@ import React, { Suspense, useEffect, useState } from "react";
 import {
   Accordion,
   Box,
-  Button,
+  Checkbox,
   Flex,
   Grid,
   GridCol,
-  SimpleGrid,
   Skeleton,
   Stack,
-  Switch,
   Text,
+  Textarea,
   TextInput,
 } from "@mantine/core";
 import styles from "../styles.module.scss";
@@ -23,16 +22,24 @@ import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { useRouter } from "next/navigation";
+import { SearchInput } from "@/ui/components/Inputs";
+import { useDebouncedValue } from "@mantine/hooks";
 
 function New() {
   const [rolesState, setRolesState] = useState<string | null>("");
-  const { permissions, loading } = useUserPermissionsByCategory();
   const { handleSuccess } = useNotification();
   const { push } = useRouter();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const { permissions, loading } = useUserPermissionsByCategory({
+    ...(debouncedSearch && { search: debouncedSearch }),
+  });
 
   const form = useForm<NewRoleType>({
     initialValues: {
       title: "",
+      description: "",
       permissions: [],
     },
     validate: zodResolver(newRoleSchema),
@@ -47,10 +54,15 @@ function New() {
         items.map((p: Permission) => ({
           title: p.title,
           status: false,
+          id: p.id,
         }))
       );
 
-    form.initialize({ permissions: permissionArray, title: "" });
+    form.initialize({
+      permissions: permissionArray,
+      title: "",
+      description: "",
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [permissions]);
@@ -62,9 +74,11 @@ function New() {
     body: {
       title: form.values.title,
       permissions: form.values.permissions.flatMap((p) =>
-        p.map((i) => ({ title: i.title, status: i.status }))
+        p.filter((filterP) => filterP.status).map((i) => i.id)
       ),
+      description: form.values.description,
     },
+
     onSuccess: () => {
       handleSuccess(
         "Role creation",
@@ -97,7 +111,35 @@ function New() {
         >
           <Grid gutter={33}>
             <GridCol span={12} p={0}>
-              <SimpleGrid cols={3} spacing={33} p={0}>
+              <Stack gap={32}>
+                {_item.map((item: Permission, index: number) => (
+                  <Checkbox
+                    key={index}
+                    {...form.getInputProps(
+                      `permissions.${parentIndex}.${index}.status`,
+                      { type: "checkbox" }
+                    )}
+                    color="var(--prune-primary-700)"
+                    label={item.title}
+                    description={item.description}
+                    fz={12}
+                    size="sm"
+                    styles={{
+                      description: {
+                        fontSize: "12px",
+                        color: "#98A2B3",
+                        fontWeight: 400,
+                      },
+                      label: {
+                        fontSize: "12px",
+                        color: "#475467",
+                        fontWeight: 500,
+                      },
+                    }}
+                  />
+                ))}
+              </Stack>
+              {/* <SimpleGrid cols={3} spacing={33} p={0}>
                 {_item.map((item: Permission, index: number) => (
                   <Switch
                     key={index}
@@ -130,7 +172,7 @@ function New() {
                     size="sm"
                   />
                 ))}
-              </SimpleGrid>
+              </SimpleGrid> */}
             </GridCol>
           </Grid>
         </Accordion.Panel>
@@ -151,68 +193,87 @@ function New() {
         ]}
       />
 
-      <Box mt={20} className={styles.container__header}>
-        <Text fz={18} fw={600}>
-          Create New Role
-        </Text>
-      </Box>
-
       <Box
-        mt={20}
+        // mt={20}
         className={styles.container__body}
         component="form"
         onSubmit={form.onSubmit(handleSubmit)}
+        mt={48}
       >
-        <TextInput
-          placeholder="Role Name"
-          size="md"
-          {...form.getInputProps("title")}
-          styles={{ input: { border: "1px solid #F5F5F5" } }}
-        />
+        <Grid>
+          <GridCol span={5}>
+            <Header
+              title="Enter Role Details"
+              subtitle="Input details of the role you want to create"
+            />
+            <TextInput
+              placeholder="Enter Role Name"
+              size="md"
+              {...form.getInputProps("title")}
+              styles={{ input: { border: "1px solid #F5F5F5" } }}
+              mb={16}
+            />
 
-        <Box mt={40} mb={28}>
-          <Text fz={16} fw={600}>
-            Set Permissions
-          </Text>
-          <Text fz={12} fw={400} c="#98A2B3">
-            Select activities this new user role can perform in all pages.
-          </Text>
-        </Box>
+            <Textarea
+              placeholder="Describe Role"
+              size="md"
+              {...form.getInputProps("description")}
+              styles={{ input: { border: "1px solid #F5F5F5" } }}
+              minRows={4}
+              autosize
+              maxRows={5}
+            />
+          </GridCol>
+          <GridCol span={7}>
+            <Header
+              title="Roles Permissions"
+              subtitle="Select what the user can do from the list of permission below"
+            />
 
-        <Accordion
-          defaultValue="Account Management"
-          variant="contained"
-          styles={{
-            item: {
-              border: "none",
-              backgroundColor: "transparent",
-            },
-          }}
-          value={rolesState}
-          onChange={(value) => setRolesState(value)}
-        >
-          {loading ? (
-            <Stack>
-              {Array.from({ length: 7 }).map((_, index) => (
-                <Skeleton key={index} height={30} />
-              ))}
-            </Stack>
-          ) : (
-            items
-          )}
-        </Accordion>
+            <SearchInput
+              w="100%"
+              placeholder="Search permission"
+              mb={24}
+              search={search}
+              setSearch={setSearch}
+            />
 
-        <Flex mt={40} justify="flex-end" gap={15}>
-          <SecondaryBtn text="Cancel" fw={600} action={form.reset} />
+            <Accordion
+              defaultValue="Account Management"
+              variant="contained"
+              styles={{
+                item: {
+                  border: "none",
+                  backgroundColor: "transparent",
+                },
+              }}
+              value={rolesState}
+              onChange={(value) => setRolesState(value)}
+            >
+              {loading ? (
+                <Stack>
+                  {Array.from({ length: 7 }).map((_, index) => (
+                    <Skeleton key={index} height={30} />
+                  ))}
+                </Stack>
+              ) : (
+                items
+              )}
+            </Accordion>
 
-          <PrimaryBtn
-            text="Create Role"
-            fw={600}
-            type="submit"
-            // action={handleSubmit}
-            loading={processing}
-          />
-        </Flex>
+            <Flex mt={40} justify="flex-end" gap={15}>
+              <SecondaryBtn text="Cancel" fw={600} action={form.reset} />
+
+              <PrimaryBtn
+                text="Create Role"
+                fw={600}
+                type="submit"
+                // action={handleSubmit}
+                loading={processing}
+              />
+            </Flex>
+          </GridCol>
+        </Grid>
       </Box>
     </main>
   );
@@ -225,3 +286,21 @@ export default function RolesSuspense() {
     </Suspense>
   );
 }
+
+interface HeaderProps {
+  title: string;
+  subtitle: string;
+}
+
+const Header = ({ title, subtitle }: HeaderProps) => {
+  return (
+    <Stack gap={4} mb={24}>
+      <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
+        {title}
+      </Text>
+      <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
+        {subtitle}
+      </Text>
+    </Stack>
+  );
+};

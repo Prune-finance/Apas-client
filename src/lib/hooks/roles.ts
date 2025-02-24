@@ -23,11 +23,12 @@ export function useDeactivatedUserRoles(customParams: IParams = {}) {
   return { roles: data, loading, revalidate: queryFn };
 }
 
-export function useUserPermissionsByCategory() {
+export function useUserPermissionsByCategory({ search }: { search?: string }) {
   const { data, loading, queryFn } = useAxios<PermissionsByCategory>({
     baseURL: "auth",
     endpoint: "roles/permissions",
-    params: { category: true },
+    params: { category: true, search },
+    dependencies: [search],
   });
 
   return { permissions: data, loading, revalidate: queryFn };

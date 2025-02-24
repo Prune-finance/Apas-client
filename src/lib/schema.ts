@@ -792,11 +792,14 @@ export type OtherDocumentType = z.infer<typeof otherDocumentSchema>;
 
 export const newRoleSchema = z.object({
   title: z.string().min(1, "Role title is required"),
+  description: z.string().min(1, "Role description is required"),
+
   permissions: z.array(
     z.array(
       z.object({
         title: z.string(),
         status: z.boolean(),
+        id: z.string().uuid(),
       })
     )
   ),

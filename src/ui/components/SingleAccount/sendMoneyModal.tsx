@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
+import SendMoneyBanner from "@/assets/sendMoneyBanner.png";
 
 import {
   Flex,
@@ -13,6 +14,7 @@ import {
   Stack,
   Group,
   Alert,
+  BackgroundImage,
 } from "@mantine/core";
 import { PrimaryBtn } from "../Buttons";
 import { formatNumber } from "@/lib/utils";
@@ -117,7 +119,12 @@ function SendMoneyModal({
           </Alert>
         )}
 
-        <Box h={111} bg="#fafafa" style={{ borderRadius: "4px" }} mt={32}>
+        <BackgroundImage
+          src={SendMoneyBanner.src}
+          h={111}
+          style={{ borderRadius: "4px" }}
+          mt={32}
+        >
           <Flex align="center" justify="center" direction="column" h={"100%"}>
             <Text fz={14} fw={500} c="#667085" mb={0}>
               Account Balance
@@ -126,7 +133,7 @@ function SendMoneyModal({
               {formatNumber(account?.accountBalance ?? 0, true, "EUR")}
             </Text>
           </Flex>
-        </Box>
+        </BackgroundImage>
 
         <TabsComponent
           tabs={tabs}

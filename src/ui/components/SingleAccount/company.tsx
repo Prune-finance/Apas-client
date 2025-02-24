@@ -28,6 +28,7 @@ import { sendMoneyCompanyValidate } from "@/lib/schema";
 import { useDebouncedValue } from "@mantine/hooks";
 import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
+import TransactionProcessingTimes from "./TransactionProcessingTimes";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -144,7 +145,11 @@ function Company({
   return (
     <TabsPanel value="To A Company">
       <Box mt={20}>
-        <ScrollArea h="calc(100dvh - 500px)" scrollbarSize={3} pr={20}>
+        <ScrollArea
+          h={validated ? "calc(100dvh - 500px)" : "100%"}
+          scrollbarSize={3}
+          // pr={20}
+        >
           <Flex gap={20}>
             <TextInput
               classNames={{ input: styles.input, label: styles.label }}
@@ -361,23 +366,27 @@ function Company({
               </Flex>
             </>
           )}
+
+          <TransactionProcessingTimes />
         </ScrollArea>
 
         <Flex mt={24} justify="flex-end" gap={15}>
-          <SecondaryBtn
+          {/* <SecondaryBtn
             text="Cancel"
             w={126}
             fw={600}
             action={() => {
               close();
             }}
-          />
+          /> */}
           <PrimaryBtn
             action={handlePreviewState}
             // loading={processing}
-            text="Submit"
+            text="Continue"
+            fullWidth
             fw={600}
-            w={126}
+            h={48}
+            // w={126}
           />
         </Flex>
       </Box>

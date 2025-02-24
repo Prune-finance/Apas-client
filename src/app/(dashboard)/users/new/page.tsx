@@ -81,8 +81,8 @@ function New() {
 
     onSuccess: () => {
       handleSuccess(
-        "Role creation",
-        `${form.values.title} role successfully created`
+        "New Role Created",
+        `The ${form.values.title} role has been successfully created`
       );
 
       form.reset();

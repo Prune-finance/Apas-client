@@ -27,7 +27,7 @@ const charactersList = [
       },
       {
         submitted: "4:45 PM – 6:45 AM",
-        creditTime: "4:45 PM – 6:45 AM",
+        creditTime: "9:00 AM (Following Business Day)",
       },
     ],
   },

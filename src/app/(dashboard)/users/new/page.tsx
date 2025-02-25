@@ -201,7 +201,7 @@ function New() {
         mt={48}
       >
         <Grid>
-          <GridCol span={5}>
+          <GridCol span={{ base: 12, md: 5 }}>
             <Header
               title="Enter Role Details"
               subtitle="Input details of the role you want to create"
@@ -224,7 +224,7 @@ function New() {
               maxRows={5}
             />
           </GridCol>
-          <GridCol span={7}>
+          <GridCol span={{ base: 12, md: 7 }}>
             <Header
               title="Roles Permissions"
               subtitle="Select what the user can do from the list of permission below"

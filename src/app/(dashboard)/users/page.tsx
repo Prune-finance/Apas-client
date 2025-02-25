@@ -7,8 +7,11 @@ import { Suspense } from "react";
 import ActiveUsers from "./(tabs)/activeUsers";
 import ActiveRoles from "./(tabs)/activeRole";
 import DeactivatedRoles from "./(tabs)/deactivatedRole";
+import { useSearchParams } from "next/navigation";
 
 function Users() {
+  const searchParam = useSearchParams();
+  const tab = searchParam.get("tab") || "roles";
   return (
     <main style={{ padding: 20 }}>
       <Stack gap={8}>
@@ -23,6 +26,7 @@ function Users() {
 
       <TabsComponent
         tabs={tabs}
+        defaultValue={tab}
         tt="capitalize"
         mt={38}
         styles={{ list: { marginBottom: "30px" } }}

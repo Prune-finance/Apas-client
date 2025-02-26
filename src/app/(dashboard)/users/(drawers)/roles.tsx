@@ -1,29 +1,11 @@
-import {
-  Permission,
-  Role,
-  transformPermissionsToCategory,
-} from "@/lib/hooks/roles";
+import { Role, transformPermissionsToCategory } from "@/lib/hooks/roles";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import DrawerProvider from "@/ui/components/Drawer/DrawerProvider";
-import {
-  Accordion,
-  Checkbox,
-  Divider,
-  Drawer,
-  Grid,
-  GridCol,
-  Group,
-  Skeleton,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Divider, Group, Stack, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import relativeTime from "dayjs/plugin/relativeTime";
-import React from "react";
-import { useState } from "react";
 import { PermissionAccordion } from "./PermissionAccordion";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 dayjs.extend(advancedFormat);

@@ -24,6 +24,7 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { useRouter } from "next/navigation";
 import { SearchInput } from "@/ui/components/Inputs";
 import { useDebouncedValue } from "@mantine/hooks";
+import { HeaderAndSubtitle } from "../HeaderAndSubtitle";
 
 function New() {
   const [rolesState, setRolesState] = useState<string | null>("");
@@ -86,7 +87,7 @@ function New() {
       );
 
       form.reset();
-      push("/roles");
+      push("/users?tab=roles");
     },
   });
 
@@ -202,7 +203,7 @@ function New() {
       >
         <Grid>
           <GridCol span={{ base: 12, md: 5 }}>
-            <Header
+            <HeaderAndSubtitle
               title="Enter Role Details"
               subtitle="Input details of the role you want to create"
             />
@@ -225,7 +226,7 @@ function New() {
             />
           </GridCol>
           <GridCol span={{ base: 12, md: 7 }}>
-            <Header
+            <HeaderAndSubtitle
               title="Roles Permissions"
               subtitle="Select what the user can do from the list of permission below"
             />
@@ -286,21 +287,3 @@ export default function RolesSuspense() {
     </Suspense>
   );
 }
-
-interface HeaderProps {
-  title: string;
-  subtitle: string;
-}
-
-const Header = ({ title, subtitle }: HeaderProps) => {
-  return (
-    <Stack gap={4} mb={24}>
-      <Text fz={20} fw={600} c="var(--prune-text-gray-700)">
-        {title}
-      </Text>
-      <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
-        {subtitle}
-      </Text>
-    </Stack>
-  );
-};

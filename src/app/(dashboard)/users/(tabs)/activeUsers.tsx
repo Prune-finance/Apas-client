@@ -11,6 +11,7 @@ import {
   UnstyledButton,
   rem,
   Box,
+  Flex,
 } from "@mantine/core";
 import {
   IconCheck,
@@ -38,7 +39,10 @@ import {
   FilterSchema,
   FilterType,
   FilterValues,
+  inviteUser,
+  InviteUserType,
   newAdmin,
+  validateInviteUser,
   validateNewAdmin,
 } from "@/lib/schema";
 import { Suspense, useState } from "react";
@@ -61,6 +65,9 @@ import createAxiosInstance from "@/lib/axios";
 
 const axios = createAxiosInstance("auth");
 import React from "react";
+import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import useAxios from "@/lib/hooks/useAxios";
+import { calculateTotalPages } from "@/lib/utils";
 
 export default function ActiveUsers() {
   const searchParams = useSearchParams();
@@ -95,7 +102,7 @@ export default function ActiveUsers() {
 
   const [isEdit, setIsEdit] = useState(false);
   const [user, setUser] = useState<AdminData | null>(null);
-  const [processing, setProcessing] = useState(false);
+  // const [processing, setProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -105,9 +112,9 @@ export default function ActiveUsers() {
   const [deactivateOpened, { open: deactivateOpen, close: deactivateClose }] =
     useDisclosure(false);
 
-  const form = useForm({
-    initialValues: newAdmin,
-    validate: zodResolver(validateNewAdmin),
+  const form = useForm<InviteUserType>({
+    initialValues: inviteUser,
+    validate: zodResolver(validateInviteUser),
   });
 
   const filterForm = useForm<FilterType>({
@@ -115,28 +122,54 @@ export default function ActiveUsers() {
     validate: zodResolver(FilterSchema),
   });
 
-  const addAdmin = async () => {
-    setProcessing(true);
+  const { permissions, ...rest } = form.values;
 
-    try {
-      const { hasErrors, errors } = form.validate();
-      if (hasErrors) {
-        return;
-      }
-      const method = isEdit ? "patch" : "post";
-      await axios[method](`/auth/users/add`, { email: form.values.email });
+  const { queryFn: handleSubmit, loading: processing } = useAxios({
+    baseURL: "auth",
+    endpoint: "roles/invite",
+    method: "PATCH",
+    body: {
+      ...rest,
+      permissions: permissions.flatMap((p) =>
+        p.filter((filterP) => filterP.status).map((i) => i.id)
+      ),
+    },
 
-      revalidate();
-      close();
+    onSuccess: () => {
+      handleSuccess(
+        "New User Invite",
+        `${form.values.firstName} ${form.values.lastName} has been invited successfully`
+      );
+
       form.reset();
-      handleSuccess("Successful! User Invite", "User invite sent successfully");
-      router.push("/users");
-    } catch (error) {
-      handleError("Failed! User Invite", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
+      close();
+      router.push("/users?tab=roles");
+      revalidate();
+    },
+  });
+
+  // const addAdmin = async () => {
+  //   setProcessing(true);
+
+  //   try {
+  //     const { hasErrors, errors } = form.validate();
+  //     if (hasErrors) {
+  //       return;
+  //     }
+  //     const method = isEdit ? "patch" : "post";
+  //     await axios[method](`/auth/users/add`, { email: form.values.email });
+
+  //     revalidate();
+  //     close();
+  //     form.reset();
+  //     handleSuccess("Successful! User Invite", "User invite sent successfully");
+  //     router.push("/users");
+  //   } catch (error) {
+  //     handleError("Failed! User Invite", parseError(error));
+  //   } finally {
+  //     setProcessing(false);
+  //   }
+  // };
 
   const handleEdit = (data: typeof newAdmin) => {
     form.setValues(data);
@@ -350,11 +383,11 @@ export default function ActiveUsers() {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
       />
 
       <MainModalComponent
-        action={addAdmin}
+        action={handleSubmit}
         processing={processing}
         opened={opened}
         close={close}

@@ -78,6 +78,14 @@ export const newAdmin = {
   password: "",
 };
 
+export const inviteUser = {
+  email: "",
+  firstName: "",
+  lastName: "",
+  roleId: "",
+  permissions: [],
+};
+
 export const newUser = {
   email: "",
   firstName: "",
@@ -790,34 +798,38 @@ export const otherDocumentSchema = z.object({
 
 export type OtherDocumentType = z.infer<typeof otherDocumentSchema>;
 
+export const PermissionSchema = z.array(
+  z.array(
+    z.object({
+      title: z.string(),
+      status: z.boolean(),
+      id: z.string().uuid(),
+    })
+  )
+);
+
 export const newRoleSchema = z.object({
   title: z.string().min(1, "Role title is required"),
   description: z.string().min(1, "Role description is required"),
 
-  permissions: z.array(
-    z.array(
-      z.object({
-        title: z.string(),
-        status: z.boolean(),
-        id: z.string().uuid(),
-      })
-    )
-  ),
+  permissions: PermissionSchema,
 });
 
 export const updateRoleSchema = z.object({
   title: z.string(),
   description: z.string(),
-  permissions: z.array(
-    z.array(
-      z.object({
-        title: z.string(),
-        status: z.boolean(),
-        id: z.string().uuid(),
-      })
-    )
-  ),
+  permissions: PermissionSchema,
 });
 
 export type NewRoleType = z.infer<typeof newRoleSchema>;
 export type UpdateRoleType = z.infer<typeof updateRoleSchema>;
+
+export const validateInviteUser = z.object({
+  email: z.string().email("Please provide a valid email"),
+  firstName: z.string().min(1, "First Name is required"),
+  lastName: z.string().min(1, "Last Name is required"),
+  roleId: z.string().min(1, "Role is required"),
+  permissions: PermissionSchema,
+});
+
+export type InviteUserType = z.infer<typeof validateInviteUser>;

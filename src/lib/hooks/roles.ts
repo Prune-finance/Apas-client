@@ -17,6 +17,7 @@ export function useSingleUserRoles(id: string) {
     baseURL: "auth",
     endpoint: `roles/${id}`,
     dependencies: [id],
+    enabled: !!!id,
   });
 
   return { role: data, loading, revalidate: queryFn };

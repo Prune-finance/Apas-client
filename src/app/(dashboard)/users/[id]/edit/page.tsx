@@ -87,12 +87,12 @@ function UpdateRole() {
 
     onSuccess: () => {
       handleSuccess(
-        "New Role Created",
-        `The ${form.values.title} role has been successfully created`
+        "Role Updated",
+        `The ${form.values.title} role has been successfully updated`
       );
 
       form.reset();
-      push("/roles");
+      push("/users?tab=roles");
     },
   });
 

@@ -32,6 +32,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import DeactivateRoleModal from "../../roles/DeactivateRoleModal";
 import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";
+import RoleDrawer from "../(drawers)/roles";
 
 interface Props {
   tabValue: string;
@@ -42,7 +43,10 @@ export default function ActiveRoles() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [id, setId] = useState("");
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedRole, { open: openDrawer, close: closeDrawer }] =
+    useDisclosure(false);
   const { handleSuccess } = useNotification();
 
   const { loading, roles, revalidate, meta } = useUserRoles({
@@ -85,7 +89,15 @@ export default function ActiveRoles() {
       <Box mih="60vh">
         <TableComponent
           head={tableHeaders}
-          rows={<RowComponent roles={roles} open={open} setId={setId} />}
+          rows={
+            <RowComponent
+              roles={roles}
+              open={open}
+              setId={setId}
+              setSelectedRole={setSelectedRole}
+              openDrawer={openDrawer}
+            />
+          }
           loading={loading}
           layout="auto"
         />
@@ -112,6 +124,8 @@ export default function ActiveRoles() {
         handleDeactivation={handleDeactivation}
         processing={processingDeactivation}
       />
+
+      <RoleDrawer opened={openedRole} close={closeDrawer} role={selectedRole} />
     </Box>
   );
 }
@@ -122,15 +136,23 @@ const RowComponent = ({
   roles,
   open,
   setId,
+  openDrawer,
+  setSelectedRole,
 }: {
   roles: Role[] | null;
   open: () => void;
+  openDrawer: () => void;
+  setSelectedRole: Dispatch<SetStateAction<Role | null>>;
   setId: Dispatch<SetStateAction<string>>;
 }) => {
+  const handleRowClick = (role: Role) => {
+    setSelectedRole(role);
+    openDrawer();
+  };
   return roles?.map((element, index) => (
     <TableTr
       key={index}
-      // onClick={() => handleRowClick()}
+      onClick={() => handleRowClick(element)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize">{element?.title}</TableTd>

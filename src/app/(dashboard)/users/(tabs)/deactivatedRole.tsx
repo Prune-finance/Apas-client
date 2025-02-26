@@ -18,7 +18,7 @@ import {
   Text,
   Box,
 } from "@mantine/core";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   IconBriefcase,
   IconDotsVertical,
@@ -31,7 +31,9 @@ import {
 import dayjs from "dayjs";
 import router from "next/router";
 import { parse } from "path";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
+import RoleDrawer from "../(drawers)/roles";
+import DeactivatedRoleDrawer from "../(drawers)/deactivatedRole";
 
 interface Props {
   tabValue: string;
@@ -41,6 +43,9 @@ export default function DeactivatedRoles() {
   const [debouncedValue] = useDebouncedValue(search, 1000);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
+  const [openedRole, { open: openDrawer, close: closeDrawer }] =
+    useDisclosure(false);
 
   const { loading, roles, revalidate, meta } = useUserRoles({
     limit: parseInt(limit ?? "10", 10),
@@ -58,7 +63,13 @@ export default function DeactivatedRoles() {
       <Box mih="60vh">
         <TableComponent
           head={tableHeaderDeactivated}
-          rows={<RowComponent roles={roles} />}
+          rows={
+            <RowComponent
+              roles={roles}
+              open={openDrawer}
+              setSelectedRole={setSelectedRole}
+            />
+          }
           loading={loading}
           layout="auto"
         />
@@ -78,6 +89,12 @@ export default function DeactivatedRoles() {
         limit={limit}
         total={calculateTotalPages(limit, meta?.total ?? 0)}
       />
+
+      <DeactivatedRoleDrawer
+        opened={openedRole}
+        close={closeDrawer}
+        role={selectedRole}
+      />
     </Box>
   );
 }
@@ -89,11 +106,23 @@ const tableHeaderDeactivated = [
   // "Action",
 ];
 
-const RowComponent = ({ roles }: { roles: Role[] | null }) => {
+const RowComponent = ({
+  roles,
+  open,
+  setSelectedRole,
+}: {
+  roles: Role[] | null;
+  open: () => void;
+  setSelectedRole: Dispatch<SetStateAction<Role | null>>;
+}) => {
+  const handleRowClick = (role: Role) => {
+    setSelectedRole(role);
+    open();
+  };
   return roles?.map((element, index) => (
     <TableTr
       key={index}
-      // onClick={() => handleRowClick()}
+      onClick={() => handleRowClick(element)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize">{element?.title}</TableTd>

@@ -70,3 +70,17 @@ export interface PermissionsByCategory {
   "USER MANAGEMENT": Permission[];
   SETTINGS: Permission[];
 }
+
+// Function to transform permissions into PermissionsByCategory
+export function transformPermissionsToCategory(
+  permissions: Permission[]
+): PermissionsByCategory {
+  return permissions.reduce((acc, permission) => {
+    const category = permission.category as keyof PermissionsByCategory;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(permission);
+    return acc;
+  }, {} as PermissionsByCategory);
+}

@@ -23,6 +23,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import React from "react";
 import { useState } from "react";
 import { PermissionAccordion } from "./PermissionAccordion";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 dayjs.extend(advancedFormat);
 dayjs.extend(relativeTime);
@@ -33,6 +35,7 @@ interface Props {
   role: Role | null;
 }
 export default function RoleDrawer({ opened, close, role }: Props) {
+  const { push } = useRouter();
   const info = {
     "Role Name": role?.title,
     "Date Created": dayjs(role?.createdAt).format("Do MMMM, YYYY"),
@@ -72,10 +75,16 @@ export default function RoleDrawer({ opened, close, role }: Props) {
         This role has the following permissions:
       </Text>
 
-      <PermissionAccordion permissions={role?.permissions || []} />
+      <PermissionAccordion
+        permissions={transformPermissionsToCategory(role?.permissions || [])}
+      />
 
       <Group my={40} justify="flex-end" gap={15}>
-        <PrimaryBtn text="Edit Permission" fw={600} />
+        <PrimaryBtn
+          text="Edit Permission"
+          fw={600}
+          action={() => push(`/users/${role?.id}/edit`)}
+        />
       </Group>
     </DrawerProvider>
   );

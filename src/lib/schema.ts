@@ -805,4 +805,19 @@ export const newRoleSchema = z.object({
   ),
 });
 
+export const updateRoleSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  permissions: z.array(
+    z.array(
+      z.object({
+        title: z.string(),
+        status: z.boolean(),
+        id: z.string().uuid(),
+      })
+    )
+  ),
+});
+
 export type NewRoleType = z.infer<typeof newRoleSchema>;
+export type UpdateRoleType = z.infer<typeof updateRoleSchema>;

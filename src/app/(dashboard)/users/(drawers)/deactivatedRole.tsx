@@ -73,7 +73,10 @@ export default function DeactivatedRoleDrawer({ opened, close, role }: Props) {
         This role has the following permissions:
       </Text>
 
-      <PermissionAccordion permissions={role?.permissions || []} disabled />
+      <PermissionAccordion
+        permissions={transformPermissionsToCategory(role?.permissions || [])}
+        disabled
+      />
     </DrawerProvider>
   );
 }

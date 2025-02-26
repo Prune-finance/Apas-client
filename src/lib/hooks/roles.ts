@@ -12,6 +12,16 @@ export function useUserRoles(customParams: IParams = {}) {
   return { roles: data, loading, revalidate: queryFn, meta };
 }
 
+export function useSingleUserRoles(id: string) {
+  const { data, loading, queryFn } = useAxios<Role>({
+    baseURL: "auth",
+    endpoint: `roles/${id}`,
+    dependencies: [id],
+  });
+
+  return { role: data, loading, revalidate: queryFn };
+}
+
 export function useDeactivatedUserRoles(customParams: IParams = {}) {
   const { data, loading, queryFn } = useAxios<Role[]>({
     baseURL: "auth",
@@ -37,6 +47,7 @@ export function useUserPermissionsByCategory({ search }: { search?: string }) {
 export interface Role {
   id: string;
   title: string;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;

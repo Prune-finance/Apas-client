@@ -23,6 +23,7 @@ import {
   IconDotsVertical,
   IconEdit,
   IconPlus,
+  IconTrash,
   IconUser,
   IconUserX,
 } from "@tabler/icons-react";
@@ -33,6 +34,7 @@ import DeactivateRoleModal from "../../roles/DeactivateRoleModal";
 import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";
 import RoleDrawer from "../(drawers)/roles";
+import Link from "next/link";
 
 interface Props {
   tabValue: string;
@@ -159,21 +161,27 @@ const RowComponent = ({
       <TableTd>{dayjs(element?.createdAt).format("ddd DD MMM YYYY")}</TableTd>
 
       <TableTd onClick={(e) => e.stopPropagation()}>
-        <Menu shadow="md" width={150}>
+        <Menu
+          shadow="md"
+          width={150}
+          styles={{ dropdown: { zIndex: 9999, background: "#fff" } }}
+        >
           <MenuTarget>
             <UnstyledButton>
               <IconDotsVertical size={17} />
             </UnstyledButton>
           </MenuTarget>
           <MenuDropdown>
-            {/* <MenuItem
+            <MenuItem
               leftSection={<IconEdit size={14} />}
-              onClick={() => router.push("/roles/edit")}
+              // onClick={() => router.push("/roles/edit")}
+              component={Link}
+              href={`/users/${element.id}/edit`}
             >
               <Text fz={12}>Edit Role</Text>
-            </MenuItem> */}
+            </MenuItem>
             <MenuItem
-              leftSection={<IconUserX size={14} />}
+              leftSection={<IconTrash size={14} />}
               onClick={() => {
                 setId(element.id);
                 open();
@@ -181,12 +189,12 @@ const RowComponent = ({
             >
               <Text fz={12}>Deactivate</Text>
             </MenuItem>
-            {/* <MenuItem
+            <MenuItem
               leftSection={<IconUser size={14} />}
               // onClick={openInvite}
             >
               <Text fz={12}>Assign User</Text>
-            </MenuItem> */}
+            </MenuItem>
           </MenuDropdown>
         </Menu>
       </TableTd>

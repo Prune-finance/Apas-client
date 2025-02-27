@@ -1,12 +1,12 @@
 // Updated dateRanges with the corrected last object
 const dateRanges = [
-  { submitted: "6:45 AM – 9:30 AM", creditTime: "11:10 AM" },
-  { submitted: "9:30 AM – 12:00 PM", creditTime: "1:40 PM" },
-  { submitted: "12:00 PM – 2:30 PM", creditTime: "4:10 PM" },
-  { submitted: "2:30 PM – 4:45 PM", creditTime: "5:40 PM" },
+  { submitted: "2:45 PM – 5:30 PM", creditTime: "7:10 PM" },
+  { submitted: "5:30 PM – 8:00 PM", creditTime: "9:40 PM" },
+  { submitted: "8:00 PM – 10:30 PM", creditTime: "12:10 AM (Next Day)" },
+  { submitted: "10:30 PM – 12:45 AM", creditTime: "1:40 AM (Next Day)" },
   {
-    submitted: "4:45 PM – 6:45 AM",
-    creditTime: "9:00 AM (Following Business Day)",
+    submitted: "12:45 AM – 2:45 PM",
+    creditTime: "5:00 PM (Following Business Day)",
   },
 ];
 

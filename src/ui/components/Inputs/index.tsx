@@ -153,11 +153,15 @@ export const RegisterInput = ({ form, label, ...props }: RegisterProps) => {
   );
 };
 
-type SearchInputProps = {
+interface SearchInputProps extends TextInputProps {
   search?: string;
   setSearch?: Dispatch<SetStateAction<string>>;
-};
-export const SearchInput = ({ search, setSearch }: SearchInputProps) => {
+}
+export const SearchInput = ({
+  search,
+  setSearch,
+  ...props
+}: SearchInputProps) => {
   return (
     <TextInput
       placeholder="Search here..."
@@ -167,6 +171,7 @@ export const SearchInput = ({ search, setSearch }: SearchInputProps) => {
       styles={{ input: { border: "1px solid #F5F5F5" } }}
       value={search}
       onChange={(e) => setSearch && setSearch(e.currentTarget.value)}
+      {...props}
     />
   );
 };

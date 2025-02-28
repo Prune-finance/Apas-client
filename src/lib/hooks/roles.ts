@@ -12,6 +12,17 @@ export function useUserRoles(customParams: IParams = {}) {
   return { roles: data, loading, revalidate: queryFn, meta };
 }
 
+export function useSingleUserRoles(id: string) {
+  const { data, loading, queryFn } = useAxios<Role>({
+    baseURL: "auth",
+    endpoint: `roles/${id}`,
+    dependencies: [id],
+    enabled: !!!id,
+  });
+
+  return { role: data, loading, revalidate: queryFn };
+}
+
 export function useDeactivatedUserRoles(customParams: IParams = {}) {
   const { data, loading, queryFn } = useAxios<Role[]>({
     baseURL: "auth",
@@ -23,11 +34,12 @@ export function useDeactivatedUserRoles(customParams: IParams = {}) {
   return { roles: data, loading, revalidate: queryFn };
 }
 
-export function useUserPermissionsByCategory() {
+export function useUserPermissionsByCategory({ search }: { search?: string }) {
   const { data, loading, queryFn } = useAxios<PermissionsByCategory>({
     baseURL: "auth",
     endpoint: "roles/permissions",
-    params: { category: true },
+    params: { category: true, search },
+    dependencies: [search],
   });
 
   return { permissions: data, loading, revalidate: queryFn };
@@ -36,6 +48,7 @@ export function useUserPermissionsByCategory() {
 export interface Role {
   id: string;
   title: string;
+  description: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: Date | null;
@@ -68,4 +81,18 @@ export interface PermissionsByCategory {
   "TRANSACTION TRACKING": Permission[];
   "USER MANAGEMENT": Permission[];
   SETTINGS: Permission[];
+}
+
+// Function to transform permissions into PermissionsByCategory
+export function transformPermissionsToCategory(
+  permissions: Permission[]
+): PermissionsByCategory {
+  return permissions.reduce((acc, permission) => {
+    const category = permission.category as keyof PermissionsByCategory;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(permission);
+    return acc;
+  }, {} as PermissionsByCategory);
 }

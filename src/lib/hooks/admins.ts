@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
 import { IParams } from "../schema";
 import createAxiosInstance from "@/lib/axios";
+import { Permission, Role } from "./roles";
 
 const axios = createAxiosInstance("auth");
 
@@ -238,6 +239,8 @@ export interface AdminData {
   lastLogIn: Date | null;
   status: "ACTIVE" | "INACTIVE" | "INVITE_PENDING";
   role: "USER" | "INITIATOR";
+  roles: Role[];
+  permissions: Permission[];
   company?: { name: string; id: string };
   companyId?: string;
 }

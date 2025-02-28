@@ -26,7 +26,7 @@ import { useRouter } from "next/navigation";
 
 function New() {
   const [rolesState, setRolesState] = useState<string | null>("");
-  const { permissions, loading } = useUserPermissionsByCategory();
+  const { permissions, loading } = useUserPermissionsByCategory({});
   const { handleSuccess } = useNotification();
   const { push } = useRouter();
 
@@ -34,6 +34,7 @@ function New() {
     initialValues: {
       title: "",
       permissions: [],
+      description: "",
     },
     validate: zodResolver(newRoleSchema),
   });
@@ -50,7 +51,11 @@ function New() {
         }))
       );
 
-    form.initialize({ permissions: permissionArray, title: "" });
+    form.initialize({
+      permissions: permissionArray,
+      title: "",
+      description: "",
+    });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [permissions]);

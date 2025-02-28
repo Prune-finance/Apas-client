@@ -2,21 +2,24 @@ import {
   Text,
   Modal,
   Flex,
-  Button,
-  Stack,
   TextInput,
   Select,
   Box,
-  PasswordInput,
-  ActionIcon,
+  Alert,
+  Group,
 } from "@mantine/core";
-import { IconMail, IconTrash, IconX } from "@tabler/icons-react";
+import { IconMail } from "@tabler/icons-react";
 
 import styles from "./modal.module.scss";
 import { UseFormReturnType } from "@mantine/form";
-import { newAdmin } from "@/lib/schema";
+import { InviteUserType } from "@/lib/schema";
 import { Dispatch, SetStateAction } from "react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { HeaderAndSubtitle } from "./HeaderAndSubtitle";
+import { useUserRoles } from "@/lib/hooks/roles";
+import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import { useDisclosure } from "@mantine/hooks";
+import PermissionsModal from "./PermissionsModal";
 
 export default function ModalComponent({
   opened,
@@ -28,6 +31,10 @@ export default function ModalComponent({
   setIsEdit,
   text,
 }: ModalProps) {
+  const [openedPermission, { open: openPermission, close: closePermission }] =
+    useDisclosure(false);
+  const { roles } = useUserRoles({ limit: 1000, status: "activate" });
+
   return (
     <Modal
       closeOnClickOutside={!processing}
@@ -38,31 +45,22 @@ export default function ModalComponent({
         form.reset();
       }}
       centered
-      // withCloseButton={false}
       closeButtonProps={{
-        icon: (
-          <ActionIcon
-            variant="light"
-            color="var(--prune-text-gray-400)"
-            radius="xl"
-          >
-            <IconX color="var(--prune-text-gray-600)" size={20} />
-          </ActionIcon>
-        ),
+        ...closeButtonProps,
       }}
       size="lg"
       padding={40}
       title={
         <Flex direction="column">
           <Text fz={24} fw={600}>
-            {isEdit ? "Edit User" : "Invite a New User"}
+            {isEdit ? "Edit User Permission" : "Invite a New User"}
           </Text>
           <Text fz={14} className="grey-400">
             {text
               ? text
               : isEdit
-              ? "Update User Details"
-              : "Invite a user to collaborate with you."}
+              ? "Edit this user permission details"
+              : "Invite a member to collaborate with the team."}
           </Text>
         </Flex>
       }
@@ -73,57 +71,81 @@ export default function ModalComponent({
           component="form"
           onSubmit={form.onSubmit(() => action && action())}
         >
-          {/* <Flex gap={20}>
+          <Flex gap={20} mb={16}>
             <TextInput
-              label="First name"
+              // label="First name"
               classNames={{ input: styles.input, label: styles.label }}
               placeholder="First Name"
               flex={1}
               {...form.getInputProps("firstName")}
+              disabled={isEdit}
             />
 
             <TextInput
               classNames={{ input: styles.input, label: styles.label }}
-              label="Last name"
+              // label="Last name"
               placeholder="Last Name"
               flex={1}
               {...form.getInputProps("lastName")}
+              disabled={isEdit}
             />
-          </Flex> */}
+          </Flex>
 
-          <Flex
-          //  mt={24}
-          >
+          <Flex mb={24}>
             <TextInput
               classNames={{ input: styles.input, label: styles.label }}
-              label="Email"
+              // label="Email"
               placeholder="Email"
               flex={1}
               {...form.getInputProps("email")}
+              disabled={isEdit}
               rightSection={<IconMail color="#667085" size={14} />}
             />
           </Flex>
 
-          {/* <Flex mt={24}>
-            <PasswordInput
-              classNames={{ input: styles.input, label: styles.label }}
-              label="Password"
-              placeholder="Enter password"
-              flex={1}
-              {...form.getInputProps("password")}
-            />
-          </Flex> */}
-          {/* 
-          <Flex mt={24}>
-            <Select
-              placeholder="Role"
-              classNames={{ input: styles.input, label: styles.label }}
-              flex={1}
-              label="Role"
-              data={["Admin", "Superadmin"]}
-              {...form.getInputProps("role")}
-            />
-          </Flex> */}
+          <HeaderAndSubtitle
+            title="Assign Role"
+            subtitle="Assign and customize permissions"
+            customTitleSize={16}
+            customSubtitleSize={12}
+          />
+
+          <Select
+            placeholder="Select Role"
+            classNames={{ input: styles.input, label: styles.label }}
+            flex={1}
+            data={(roles ?? []).map((role) => ({
+              value: role.id,
+              label: role.title,
+            }))}
+            {...form.getInputProps("roles")}
+          />
+
+          <Alert
+            color="var(--prune-primary-900)"
+            fz={12}
+            mt={8}
+            styles={{
+              root: { padding: "0px 10px" },
+            }}
+            title={
+              <Group gap={5}>
+                <Text fz={12} fw={500} c="var(--prune-text-gray-700)">
+                  Permissions
+                </Text>
+
+                <PrimaryBtn
+                  text="Click to view and customize permission"
+                  variant="transparent"
+                  px={0}
+                  fz={12}
+                  td="underline"
+                  c="var(--prune-primary-900)"
+                  action={openPermission}
+                />
+              </Group>
+            }
+          />
 
           <Flex mb={20} mt={40} justify="flex-end" gap={15}>
             <SecondaryBtn
@@ -137,7 +159,7 @@ export default function ModalComponent({
             />
 
             <PrimaryBtn
-              text={isEdit ? "Save Changes" : "Send Invite"}
+              text={isEdit ? "Save Changes" : "Invite New Member"}
               loading={processing}
               type="submit"
               fw={600}
@@ -145,6 +167,13 @@ export default function ModalComponent({
           </Flex>
         </Box>
       </Flex>
+
+      <PermissionsModal
+        opened={openedPermission}
+        close={closePermission}
+        form={form}
+        roles={roles ?? []}
+      />
     </Modal>
   );
 }
@@ -154,7 +183,7 @@ interface ModalProps {
   close: () => void;
   action?: () => void;
   processing?: boolean;
-  form: UseFormReturnType<typeof newAdmin>;
+  form: UseFormReturnType<InviteUserType>;
   isEdit: boolean;
   setIsEdit: Dispatch<SetStateAction<boolean>>;
   text?: string;

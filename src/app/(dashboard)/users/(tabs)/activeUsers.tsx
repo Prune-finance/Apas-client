@@ -69,6 +69,7 @@ import React from "react";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 import useAxios from "@/lib/hooks/useAxios";
 import { calculateTotalPages } from "@/lib/utils";
+import { Permission, transformPermissionsToCategory } from "@/lib/hooks/roles";
 
 export default function ActiveUsers() {
   const searchParams = useSearchParams();
@@ -104,7 +105,6 @@ export default function ActiveUsers() {
 
   const [isEdit, setIsEdit] = useState(false);
   const [user, setUser] = useState<AdminData | null>(null);
-  // const [processing, setProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -128,10 +128,12 @@ export default function ActiveUsers() {
 
   const { queryFn: handleSubmit, loading: processing } = useAxios({
     baseURL: "auth",
-    endpoint: "roles/permissions/invite",
-    method: "POST",
+    endpoint: isEdit
+      ? `roles/users/${user?.id}/permissions/update`
+      : "roles/permissions/invite",
+    method: isEdit ? "PATCH" : "POST",
     body: {
-      ...rest,
+      ...(!isEdit && { ...rest }),
       roles: [roles],
       permissions: permissions.flatMap((p) =>
         p.filter((filterP) => filterP.status).map((i) => i.id)
@@ -140,8 +142,10 @@ export default function ActiveUsers() {
 
     onSuccess: () => {
       handleSuccess(
-        "New Member Invite",
-        `The new member ${form.values.firstName} ${form.values.lastName} has been created successfully`
+        isEdit ? "Role & Permission Update" : "New Member Invite",
+        isEdit
+          ? `Roles & Permissions updated successfully`
+          : `The new member ${form.values.firstName} ${form.values.lastName} has been created successfully`
       );
 
       form.reset();
@@ -151,8 +155,26 @@ export default function ActiveUsers() {
     },
   });
 
-  const handleEdit = (data: InviteUserType) => {
-    form.setValues(data);
+  const handleEdit = (element: AdminData) => {
+    form.setValues({
+      email: element.email,
+      firstName: element.firstName,
+      lastName: element.lastName,
+      // role: element.role,
+      roles: element.roles?.[0]?.id || "",
+      permissions: Object.entries(
+        transformPermissionsToCategory(element.permissions)
+      ).map(([_, p]) =>
+        p.map((i: Permission) => ({
+          title: i.title,
+          status: true,
+          id: i.id,
+        }))
+      ),
+    });
+
+    setUser(element);
+
     open();
     setIsEdit(true);
   };
@@ -212,7 +234,10 @@ export default function ActiveUsers() {
         <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
           {element.email}
         </TableTd>
-        <TableTd tt="capitalize">{element.role.toLowerCase()}</TableTd>
+        <TableTd tt="capitalize">
+          {element.roles?.[0]?.title.toLowerCase() ||
+            element.role.toLowerCase()}
+        </TableTd>
         <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
         <TableTd>
           {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
@@ -269,14 +294,7 @@ export default function ActiveUsers() {
                     disabled={item.disabled}
                     onClick={() => {
                       if (item.text === "Edit Roles & Permissions")
-                        return handleEdit({
-                          email: element.email,
-                          firstName: element.firstName,
-                          lastName: element.lastName,
-                          // role: element.role,
-                          roles: "",
-                          permissions: [],
-                        });
+                        return handleEdit(element);
 
                       return handleStatusChange(element, element.status);
                     }}

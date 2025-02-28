@@ -35,8 +35,6 @@ export default function ModalComponent({
     useDisclosure(false);
   const { roles } = useUserRoles({ limit: 1000, status: "activate" });
 
-  console.log(form.values.roles);
-
   return (
     <Modal
       closeOnClickOutside={!processing}
@@ -55,13 +53,13 @@ export default function ModalComponent({
       title={
         <Flex direction="column">
           <Text fz={24} fw={600}>
-            {isEdit ? "Edit User" : "Invite a New User"}
+            {isEdit ? "Edit User Permission" : "Invite a New User"}
           </Text>
           <Text fz={14} className="grey-400">
             {text
               ? text
               : isEdit
-              ? "Update User Details"
+              ? "Edit this user permission details"
               : "Invite a member to collaborate with the team."}
           </Text>
         </Flex>
@@ -80,6 +78,7 @@ export default function ModalComponent({
               placeholder="First Name"
               flex={1}
               {...form.getInputProps("firstName")}
+              disabled={isEdit}
             />
 
             <TextInput
@@ -88,6 +87,7 @@ export default function ModalComponent({
               placeholder="Last Name"
               flex={1}
               {...form.getInputProps("lastName")}
+              disabled={isEdit}
             />
           </Flex>
 
@@ -98,6 +98,7 @@ export default function ModalComponent({
               placeholder="Email"
               flex={1}
               {...form.getInputProps("email")}
+              disabled={isEdit}
               rightSection={<IconMail color="#667085" size={14} />}
             />
           </Flex>

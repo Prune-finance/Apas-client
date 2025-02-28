@@ -45,6 +45,8 @@ import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
 import ModalComponent from "@/app/(dashboard)/users/modal";
+import { calculateTotalPages } from "@/lib/utils";
+import AddUserModal from "./AddUserModal";
 
 export default function AllBusinessUsers() {
   const searchParams = useSearchParams();
@@ -95,7 +97,7 @@ export default function AllBusinessUsers() {
     validate: zodResolver(FilterSchema),
   });
 
-  const new_form = useForm({
+  const new_form = useForm<typeof newAdmin>({
     initialValues: newAdmin,
     validate: zodResolver(validateNewAdmin),
   });
@@ -247,10 +249,10 @@ export default function AllBusinessUsers() {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
       />
 
-      <ModalComponent
+      <AddUserModal
         action={addBusinessUser}
         processing={processing}
         opened={openedModal}

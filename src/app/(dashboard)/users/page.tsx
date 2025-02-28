@@ -38,6 +38,7 @@ function Users() {
             tabs={roleTabs}
             tt="capitalize"
             styles={{ list: { border: "none" } }}
+            keepMounted={false}
           >
             <TabsPanel value={roleTabs[0].value}>
               <ActiveRoles />
@@ -52,6 +53,7 @@ function Users() {
             tabs={userTabs}
             tt="capitalize"
             styles={{ list: { border: "none" } }}
+            keepMounted={false}
           >
             <TabsPanel value={userTabs[0].value}>
               <ActiveUsers />

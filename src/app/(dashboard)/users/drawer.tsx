@@ -18,6 +18,8 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { HeaderAndSubtitle } from "./HeaderAndSubtitle";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import { PermissionAccordion } from "./(drawers)/PermissionAccordion";
+import { transformPermissionsToCategory } from "@/lib/hooks/roles";
 
 dayjs.extend(advancedFormat);
 
@@ -25,8 +27,16 @@ type UserDrawerProps = {
   user: AdminData | null;
   opened: boolean;
   close: () => void;
+  isDeactivated?: boolean;
+  openEditModal?: () => void;
 };
-export default function UserDrawer({ user, opened, close }: UserDrawerProps) {
+export default function UserDrawer({
+  user,
+  opened,
+  close,
+  isDeactivated = false,
+  openEditModal,
+}: UserDrawerProps) {
   const details = [
     { label: "Email", placeholder: user?.email },
     {
@@ -58,12 +68,6 @@ export default function UserDrawer({ user, opened, close }: UserDrawerProps) {
     },
   ];
 
-  const permissions = [
-    { label: "Can view all accounts", value: true },
-    { label: "Can edit all accounts", value: true },
-    { label: "Can delete all accounts", value: true },
-    { label: "Can create new accounts", value: true },
-  ];
   return (
     <Drawer
       opened={opened}
@@ -96,7 +100,7 @@ export default function UserDrawer({ user, opened, close }: UserDrawerProps) {
             ))}
           </Stack>
 
-          <Flex justify="space-between" my={24}>
+          <Flex justify="space-between" mt={24}>
             <HeaderAndSubtitle
               title="USER PERMISSIONS MANAGEMENT"
               subtitle="This user has the following permission and can be
@@ -105,32 +109,22 @@ customized uniquely for this specific user"
               customSubtitleSize={12}
             />
 
-            <PrimaryBtn text="Edit Permission" fw={600} fz={12} w="50%" />
+            <PrimaryBtn
+              text="Edit Permission"
+              fw={600}
+              fz={12}
+              w="50%"
+              display={isDeactivated ? "none" : "block"}
+              action={openEditModal}
+            />
           </Flex>
 
-          {/* <Text fz={16} fw={500} c="var(--prune-text-gray-800)" mb={24}>
-            Permissions
-          </Text>
-
-          <Stack gap={20}>
-            {permissions.map((permission, index) => (
-              <Box key={index}>
-                <Group key={index} justify="space-between">
-                  <Text fz={14} fw={400} c="var(--prune-text-gray-400)">
-                    {permission.label}:
-                  </Text>
-
-                  <Checkbox
-                    readOnly
-                    radius="xl"
-                    checked={permission.value}
-                    color="var(--prune-primary-700)"
-                  />
-                </Group>
-                <Divider />
-              </Box>
-            ))}
-          </Stack> */}
+          <PermissionAccordion
+            permissions={transformPermissionsToCategory(
+              user?.permissions || []
+            )}
+            disabled={isDeactivated}
+          />
         </Box>
       </Box>
     </Drawer>

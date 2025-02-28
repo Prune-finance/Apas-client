@@ -374,7 +374,15 @@ export default function ActiveUsers() {
         setIsEdit={setIsEdit}
       />
 
-      <UserDrawer opened={openedDrawer} close={closeDrawer} user={user} />
+      <UserDrawer
+        opened={openedDrawer}
+        close={closeDrawer}
+        user={user}
+        openEditModal={() => {
+          closeDrawer();
+          if (user) return handleEdit(user);
+        }}
+      />
 
       <ModalComponent
         processing={processingStatus}

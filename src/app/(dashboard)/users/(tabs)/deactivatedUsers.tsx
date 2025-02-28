@@ -272,7 +272,12 @@ export default function DeactivatedUsers() {
         total={calculateTotalPages(limit, meta?.total)}
       />
 
-      <UserDrawer opened={openedDrawer} close={closeDrawer} user={user} />
+      <UserDrawer
+        opened={openedDrawer}
+        close={closeDrawer}
+        user={user}
+        isDeactivated
+      />
 
       <ModalComponent
         processing={processingStatus}

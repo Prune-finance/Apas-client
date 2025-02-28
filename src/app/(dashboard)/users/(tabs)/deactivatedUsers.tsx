@@ -4,24 +4,18 @@ import {
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Stack,
   TableTd,
   TableTr,
-  Text,
   UnstyledButton,
   rem,
   Box,
-  Flex,
 } from "@mantine/core";
 import {
   IconCheck,
   IconDotsVertical,
-  IconEdit,
   IconListTree,
   IconPlus,
-  IconSearch,
   IconUserCheck,
-  IconUserEdit,
   IconUserX,
   IconX,
 } from "@tabler/icons-react";
@@ -30,7 +24,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 dayjs.extend(relativeTime);
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { AdminData, useUsers } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -66,11 +60,9 @@ import createAxiosInstance from "@/lib/axios";
 
 const axios = createAxiosInstance("auth");
 import React from "react";
-import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
-import useAxios from "@/lib/hooks/useAxios";
 import { calculateTotalPages } from "@/lib/utils";
 
-export default function ActiveUsers() {
+export default function DeactivatedUsers() {
   const searchParams = useSearchParams();
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -78,8 +70,6 @@ export default function ActiveUsers() {
   const { status, date, endDate, email } = Object.fromEntries(
     searchParams.entries()
   );
-
-  const router = useRouter();
 
   const queryParams = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
@@ -93,7 +83,7 @@ export default function ActiveUsers() {
     ...(email && { email }),
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    status: "active",
+    status: "inactive",
   };
   const { loading, users, revalidate, meta } = useUsers(queryParams);
   const [opened, { open, close }] = useDisclosure(false);
@@ -104,7 +94,6 @@ export default function ActiveUsers() {
 
   const [isEdit, setIsEdit] = useState(false);
   const [user, setUser] = useState<AdminData | null>(null);
-  // const [processing, setProcessing] = useState(false);
   const [processingStatus, setProcessingStatus] = useState(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -114,48 +103,10 @@ export default function ActiveUsers() {
   const [deactivateOpened, { open: deactivateOpen, close: deactivateClose }] =
     useDisclosure(false);
 
-  const form = useForm<InviteUserType>({
-    initialValues: inviteUser,
-    validate: zodResolver(validateInviteUser),
-  });
-
   const filterForm = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
-
-  const { permissions, roles, ...rest } = form.values;
-
-  const { queryFn: handleSubmit, loading: processing } = useAxios({
-    baseURL: "auth",
-    endpoint: "roles/permissions/invite",
-    method: "POST",
-    body: {
-      ...rest,
-      roles: [roles],
-      permissions: permissions.flatMap((p) =>
-        p.filter((filterP) => filterP.status).map((i) => i.id)
-      ),
-    },
-
-    onSuccess: () => {
-      handleSuccess(
-        "New Member Invite",
-        `The new member ${form.values.firstName} ${form.values.lastName} has been created successfully`
-      );
-
-      form.reset();
-      close();
-      router.push("/users?tab=roles");
-      revalidate();
-    },
-  });
-
-  const handleEdit = (data: InviteUserType) => {
-    form.setValues(data);
-    open();
-    setIsEdit(true);
-  };
 
   const handleUserDeactivation = async (
     id: string,
@@ -215,7 +166,9 @@ export default function ActiveUsers() {
         <TableTd tt="capitalize">{element.role.toLowerCase()}</TableTd>
         <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
         <TableTd>
-          {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
+          {element.deletedAt
+            ? dayjs(element.deletedAt).format("ddd DD MMM YYYY")
+            : "Nil"}
         </TableTd>
 
         <TableTd>
@@ -237,12 +190,6 @@ export default function ActiveUsers() {
             <MenuDropdown>
               {(() => {
                 const menuItems = [
-                  {
-                    text: "Edit Roles & Permissions",
-                    icon: (
-                      <IconEdit style={{ width: rem(14), height: rem(14) }} />
-                    ),
-                  },
                   {
                     text:
                       element.status === "INACTIVE" ? "Activate" : "Deactivate",
@@ -268,16 +215,6 @@ export default function ActiveUsers() {
                     leftSection={item.icon}
                     disabled={item.disabled}
                     onClick={() => {
-                      if (item.text === "Edit Roles & Permissions")
-                        return handleEdit({
-                          email: element.email,
-                          firstName: element.firstName,
-                          lastName: element.lastName,
-                          // role: element.role,
-                          roles: "",
-                          permissions: [],
-                        });
-
                       return handleStatusChange(element, element.status);
                     }}
                   >
@@ -296,23 +233,12 @@ export default function ActiveUsers() {
       <Group justify="space-between" mt={28}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <Group gap={12}>
-          <SecondaryBtn
-            text="Filter"
-            icon={IconListTree}
-            action={toggle}
-            fw={600}
-          />
-
-          <PrimaryBtn
-            text="Invite New User"
-            action={() => {
-              setIsEdit(false);
-              open();
-            }}
-            icon={IconPlus}
-          />
-        </Group>
+        <SecondaryBtn
+          text="Filter"
+          icon={IconListTree}
+          action={toggle}
+          fw={600}
+        />
       </Group>
 
       <Filter<FilterType>
@@ -344,16 +270,6 @@ export default function ActiveUsers() {
         setLimit={setLimit}
         limit={limit}
         total={calculateTotalPages(limit, meta?.total)}
-      />
-
-      <MainModalComponent
-        action={handleSubmit}
-        processing={processing}
-        opened={opened}
-        close={close}
-        form={form}
-        isEdit={isEdit}
-        setIsEdit={setIsEdit}
       />
 
       <UserDrawer opened={openedDrawer} close={closeDrawer} user={user} />
@@ -390,7 +306,7 @@ const tableHeaders = [
   "Email",
   "Role",
   "Date Created",
-  "Last Active",
+  "Date Deactivated",
   "Status",
   "Action",
 ];

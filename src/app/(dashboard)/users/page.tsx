@@ -8,6 +8,7 @@ import ActiveUsers from "./(tabs)/activeUsers";
 import ActiveRoles from "./(tabs)/activeRole";
 import DeactivatedRoles from "./(tabs)/deactivatedRole";
 import { useSearchParams } from "next/navigation";
+import DeactivatedUsers from "./(tabs)/deactivatedUsers";
 
 function Users() {
   const searchParam = useSearchParams();
@@ -56,7 +57,7 @@ function Users() {
               <ActiveUsers />
             </TabsPanel>
             <TabsPanel value={userTabs[1].value}>
-              <ActiveUsers />
+              <DeactivatedUsers />
             </TabsPanel>
           </TabsComponent>
         </TabsPanel>

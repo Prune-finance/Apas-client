@@ -8,7 +8,7 @@ import {
   Alert,
   Group,
 } from "@mantine/core";
-import { IconMail, IconX } from "@tabler/icons-react";
+import { IconMail } from "@tabler/icons-react";
 
 import styles from "./modal.module.scss";
 import { UseFormReturnType } from "@mantine/form";
@@ -34,6 +34,9 @@ export default function ModalComponent({
   const [openedPermission, { open: openPermission, close: closePermission }] =
     useDisclosure(false);
   const { roles } = useUserRoles({ limit: 1000, status: "activate" });
+
+  console.log(form.values.roles);
+
   return (
     <Modal
       closeOnClickOutside={!processing}
@@ -114,7 +117,7 @@ export default function ModalComponent({
               value: role.id,
               label: role.title,
             }))}
-            {...form.getInputProps("roleId")}
+            {...form.getInputProps("roles")}
           />
 
           <Alert
@@ -168,6 +171,7 @@ export default function ModalComponent({
         opened={openedPermission}
         close={closePermission}
         form={form}
+        roles={roles ?? []}
       />
     </Modal>
   );

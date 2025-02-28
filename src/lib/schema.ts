@@ -1,4 +1,3 @@
-import { title } from "process";
 import { z } from "zod";
 
 export const loginValues = {
@@ -82,8 +81,10 @@ export const inviteUser = {
   email: "",
   firstName: "",
   lastName: "",
-  roleId: "",
+  // roleId: "",
   permissions: [],
+  roles: "",
+  // roles: [],
 };
 
 export const newUser = {
@@ -828,7 +829,8 @@ export const validateInviteUser = z.object({
   email: z.string().email("Please provide a valid email"),
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
-  roleId: z.string().min(1, "Role is required"),
+  roles: z.string().min(1, "Role is required"),
+  // roles: z.array(z.string()).min(1, "Role is required"),
   permissions: PermissionSchema,
 });
 

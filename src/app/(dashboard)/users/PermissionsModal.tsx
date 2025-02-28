@@ -1,6 +1,6 @@
 import {
   Permission,
-  useSingleUserRoles,
+  Role,
   useUserPermissionsByCategory,
 } from "@/lib/hooks/roles";
 import { InviteUserType } from "@/lib/schema";
@@ -19,10 +19,14 @@ import {
 } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
 import { useDebouncedValue } from "@mantine/hooks";
-import React from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-export default function PermissionsModal({ opened, close, form }: ModalProps) {
+export default function PermissionsModal({
+  opened,
+  close,
+  form,
+  roles,
+}: ModalProps) {
   const [rolesState, setRolesState] = useState<string | null>("");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -30,27 +34,43 @@ export default function PermissionsModal({ opened, close, form }: ModalProps) {
     ...(debouncedSearch && { search: debouncedSearch }),
   });
 
-  const { role, loading: loadingRole } = useSingleUserRoles(form.values.roleId);
+  const handlePermissionStatus = useCallback(() => {
+    if (!permissions) return;
 
-  useEffect(() => {
-    if (!permissions || !role) return;
+    const selectedRoles = Array.isArray(form.values.roles)
+      ? form.values.roles
+      : [form.values.roles];
+
+    const uniquePermissionsId = Array.from(
+      new Set(
+        roles
+          .filter((r) => selectedRoles.includes(r.id))
+          .flatMap((r) => r.permissions.map((p) => p.id))
+      )
+    );
 
     const permissionArray =
       permissions &&
       Object.entries(permissions).map(([title, items]) =>
         items.map((p: Permission) => ({
           title: p.title,
-          status: (role?.permissions ?? []).some((rp) => rp.id === p.id),
+          status: uniquePermissionsId.includes(p.id),
           id: p.id,
         }))
       );
 
-    form.setValues({
-      permissions: permissionArray,
-    });
+    form.setFieldValue("permissions", permissionArray);
+
+    // form.setValues({
+    //   permissions: permissionArray,
+    // });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [permissions, role]);
+  }, [permissions, roles, JSON.stringify(form.values.roles)]);
+
+  useEffect(() => {
+    handlePermissionStatus();
+  }, [handlePermissionStatus]);
 
   const items =
     permissions &&
@@ -155,6 +175,6 @@ export default function PermissionsModal({ opened, close, form }: ModalProps) {
 interface ModalProps {
   opened: boolean;
   close: () => void;
-
+  roles: Role[];
   form: UseFormReturnType<InviteUserType>;
 }

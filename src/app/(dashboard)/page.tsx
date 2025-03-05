@@ -468,6 +468,7 @@ export default function Home() {
         opened={openedSendMoney}
         closeMoney={closeSendMoney}
         account={account}
+        openSendMoney={openSendMoney}
       />
     </main>
   );

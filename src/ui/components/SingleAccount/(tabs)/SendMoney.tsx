@@ -11,14 +11,21 @@ import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import PendingModalImage from "@/assets/pending-image.png";
+import DebtorModal from "../DebtorModal";
 
 interface Props {
   opened: boolean;
+  openSendMoney: () => void;
   closeMoney: () => void;
   account: DefaultAccount | null;
 }
 
-export const SendMoney = ({ opened, closeMoney, account }: Props) => {
+export const SendMoney = ({
+  opened,
+  closeMoney,
+  account,
+  openSendMoney,
+}: Props) => {
   const matches = useMediaQuery("(max-width: 768px)");
   const axios = createAxiosInstance("payouts");
 
@@ -27,10 +34,14 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
   const [sectionState, setSectionState] = useState("");
   const [moneySent, setMoneySent] = useState(0);
   const [receiverName, setReceiverName] = useState("");
+  const [paymentType, setPaymentType] = useState("individual");
 
   const [openedPreview, { open: openPreview, close: closePreview }] =
     useDisclosure(false);
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
+    useDisclosure(false);
+
+  const [openedDebtor, { open: openDebtor, close: closeDebtor }] =
     useDisclosure(false);
 
   const [requestForm, setRequestForm] = useState<RequestForm>({
@@ -160,8 +171,21 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
           setRequestForm={setRequestForm}
           setCompanyRequestForm={setCompanyRequestForm}
           setSectionState={setSectionState}
+          openDebtor={openDebtor}
+          paymentType={paymentType}
+          setPaymentType={setPaymentType}
         />
       </Modal>
+
+      <DebtorModal
+        openedDebtor={openedDebtor}
+        closeDebtor={closeDebtor}
+        openPreview={openPreview}
+        openDebtor={openDebtor}
+        openSendMoney={openSendMoney}
+        paymentType={paymentType}
+        setPaymentType={setPaymentType}
+      />
 
       <Modal
         opened={openedPreview}

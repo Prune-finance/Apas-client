@@ -35,6 +35,18 @@ export default function ModalComponent({
     useDisclosure(false);
   const { roles } = useUserRoles({ limit: 1000, status: "activate" });
 
+  // Group roles by isApplicationRole and map to the desired format
+  const groupedRoles = (roles ?? []).reduce((acc, role) => {
+    const group = role.isApplicationRole
+      ? "Application Roles"
+      : "Created Roles";
+    if (!acc[group]) {
+      acc[group] = [];
+    }
+    acc[group].push({ value: role.id, label: role.title });
+    return acc;
+  }, {} as Record<string, { value: string; label: string }[]>);
+
   return (
     <Modal
       closeOnClickOutside={!processing}
@@ -114,9 +126,9 @@ export default function ModalComponent({
             placeholder="Select Role"
             classNames={{ input: styles.input, label: styles.label }}
             flex={1}
-            data={(roles ?? []).map((role) => ({
-              value: role.id,
-              label: role.title,
+            data={Object.entries(groupedRoles).map(([group, items]) => ({
+              group,
+              items,
             }))}
             {...form.getInputProps("roles")}
           />

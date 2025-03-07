@@ -54,6 +54,7 @@ export interface Role {
   deletedAt: Date | null;
   companyId: string;
   permissions: Permission[];
+  isApplicationRole: boolean;
 }
 
 export interface RoleMeta {

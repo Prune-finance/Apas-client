@@ -50,7 +50,7 @@ function DebtorModal({
         h={
           paymentType === "individual"
             ? "calc(100dvh - 300px)"
-            : "calc(100dvh - 250px)"
+            : "calc(100dvh - 220px)"
         }
         px={30}
         pb={10}

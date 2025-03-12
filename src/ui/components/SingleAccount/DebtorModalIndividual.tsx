@@ -1,8 +1,19 @@
-import { Box, Flex, Modal, TabsPanel, Text, TextInput } from "@mantine/core";
+import {
+  Box,
+  Flex,
+  Modal,
+  Select,
+  TabsPanel,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import React, { useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import styles from "./sendMoney.module.scss";
+import styles from "./debtor.module.scss";
+import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
+import { useForm } from "@mantine/form";
+import { countriesShortCode } from "@/lib/countries-short-code";
 
 interface DebtorModalIndividual {
   closeDebtor: () => void;
@@ -10,11 +21,33 @@ interface DebtorModalIndividual {
   handlePreviewState: () => void;
 }
 
+const DebtorForm = {
+  location: "individual",
+  fullName: "",
+  address: "",
+  country: "",
+  postCode: "",
+  state: "",
+  city: "",
+  idType: "",
+  idNumber: "",
+};
+
 function DebtorModalIndividual({
   closeDebtor,
   openSendMoney,
   handlePreviewState,
 }: DebtorModalIndividual) {
+  const { setDebtorRequestForm } = useDebtorStore();
+  const form = useForm<DebtorFormState>({
+    initialValues: DebtorForm,
+  });
+
+  const handleDebtor = () => {
+    handlePreviewState();
+    setDebtorRequestForm(form.values);
+  };
+
   return (
     <TabsPanel value="To Individual">
       <Flex
@@ -27,8 +60,8 @@ function DebtorModalIndividual({
         p={12}
       >
         <Text fz={12} fw={400} c="#8D7700">
-          This means that you are not making this payment on behalf of someone,
-          if you are please go back and check the option
+          This means that you are making this payment on behalf of someone, if
+          you are not, please go back and uncheck the option
         </Text>
       </Flex>
 
@@ -42,8 +75,8 @@ function DebtorModalIndividual({
               Full Name
             </Text>
           }
-          placeholder="Enter first name"
-          // {...form.getInputProps("firstName")}
+          placeholder="Enter full name"
+          {...form.getInputProps("fullName")}
           errorProps={{
             fz: 12,
           }}
@@ -61,7 +94,7 @@ function DebtorModalIndividual({
             </Text>
           }
           placeholder="Enter Address"
-          // {...form.getInputProps("firstName")}
+          {...form.getInputProps("address")}
           errorProps={{
             fz: 12,
           }}
@@ -69,7 +102,8 @@ function DebtorModalIndividual({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <TextInput
+        <Select
+          data={countriesShortCode}
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           size="lg"
@@ -79,7 +113,7 @@ function DebtorModalIndividual({
             </Text>
           }
           placeholder="Enter Country"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("country")}
           errorProps={{
             fz: 12,
           }}
@@ -95,7 +129,7 @@ function DebtorModalIndividual({
             </Text>
           }
           placeholder="Enter Post Code"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("postCode")}
           errorProps={{
             fz: 12,
           }}
@@ -113,7 +147,7 @@ function DebtorModalIndividual({
             </Text>
           }
           placeholder="Enter State"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("state")}
           errorProps={{
             fz: 12,
           }}
@@ -129,7 +163,7 @@ function DebtorModalIndividual({
             </Text>
           }
           placeholder="Enter City"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("city")}
           errorProps={{
             fz: 12,
           }}
@@ -137,7 +171,8 @@ function DebtorModalIndividual({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <TextInput
+        <Select
+          data={["ID Card", "Passport", "Residence Permit"]}
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           size="lg"
@@ -147,7 +182,7 @@ function DebtorModalIndividual({
             </Text>
           }
           placeholder="Enter ID Type"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("idType")}
           errorProps={{
             fz: 12,
           }}
@@ -163,7 +198,7 @@ function DebtorModalIndividual({
             </Text>
           }
           placeholder="Enter ID Number"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("idNumber")}
           errorProps={{
             fz: 12,
           }}
@@ -182,14 +217,11 @@ function DebtorModalIndividual({
           }}
         />
         <PrimaryBtn
-          action={handlePreviewState}
-          // loading={processing}
+          action={handleDebtor}
           text="Continue"
           fullWidth
           fw={600}
           h={48}
-
-          // w={126}
         />
       </Flex>
     </TabsPanel>

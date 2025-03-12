@@ -8,8 +8,10 @@ export interface DebtorFormState {
   postCode: string | undefined;
   state: string | undefined;
   city: string | undefined;
-  website: string | undefined;
-  businessRegNo: string | undefined;
+  website?: string | undefined;
+  businessRegNo?: string | undefined;
+  idType?: string | undefined;
+  idNumber?: string | undefined;
 }
 
 interface DebtorState {

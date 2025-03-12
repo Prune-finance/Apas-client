@@ -101,8 +101,15 @@ function PreviewState({
     postCode: debtorRequestForm?.postCode,
     state: debtorRequestForm?.state,
     city: debtorRequestForm?.city,
-    website: debtorRequestForm?.website,
-    "Business Reg No": debtorRequestForm?.businessRegNo,
+    ...(debtorRequestForm?.location === "self"
+      ? {
+          website: debtorRequestForm?.website,
+          "Business Reg No": debtorRequestForm?.businessRegNo,
+        }
+      : {
+          "ID Type": debtorRequestForm?.idType,
+          "ID Number": debtorRequestForm?.idNumber,
+        }),
   };
 
   return (

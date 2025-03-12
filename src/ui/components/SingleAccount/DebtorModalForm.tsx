@@ -48,8 +48,6 @@ function DebtorModalForm({
     initialValues: DebtorForm,
   });
 
-  console.log("business", business);
-
   useMemo(() => {
     form.setValues({
       fullName: business?.name,

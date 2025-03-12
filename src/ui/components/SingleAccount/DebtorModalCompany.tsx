@@ -1,8 +1,19 @@
-import { Box, Flex, Modal, TabsPanel, Text, TextInput } from "@mantine/core";
+import {
+  Box,
+  Flex,
+  Modal,
+  Select,
+  TabsPanel,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import React, { useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import styles from "./sendMoney.module.scss";
+import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
+import { useForm } from "@mantine/form";
+import { countriesShortCode } from "@/lib/countries-short-code";
 
 interface DebtorModalCompany {
   closeDebtor: () => void;
@@ -10,11 +21,34 @@ interface DebtorModalCompany {
   handlePreviewState: () => void;
 }
 
+const DebtorForm = {
+  location: "company",
+  fullName: "",
+  address: "",
+  country: "",
+  postCode: "",
+  state: "",
+  city: "",
+  website: "",
+  businessRegNo: "",
+};
+
 function DebtorModalCompany({
   closeDebtor,
   openSendMoney,
   handlePreviewState,
 }: DebtorModalCompany) {
+  const { setDebtorRequestForm } = useDebtorStore();
+
+  const form = useForm<DebtorFormState>({
+    initialValues: DebtorForm,
+  });
+
+  const handleDebtor = () => {
+    handlePreviewState();
+    setDebtorRequestForm(form.values);
+  };
+
   return (
     <TabsPanel value="To A Company">
       <Flex
@@ -42,8 +76,8 @@ function DebtorModalCompany({
               Full Name
             </Text>
           }
-          placeholder="Enter first name"
-          // {...form.getInputProps("firstName")}
+          placeholder="Enter full name"
+          {...form.getInputProps("fullName")}
           errorProps={{
             fz: 12,
           }}
@@ -61,7 +95,7 @@ function DebtorModalCompany({
             </Text>
           }
           placeholder="Enter Address"
-          // {...form.getInputProps("firstName")}
+          {...form.getInputProps("address")}
           errorProps={{
             fz: 12,
           }}
@@ -69,7 +103,8 @@ function DebtorModalCompany({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <TextInput
+        <Select
+          data={countriesShortCode}
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           size="lg"
@@ -79,7 +114,7 @@ function DebtorModalCompany({
             </Text>
           }
           placeholder="Enter Country"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("country")}
           errorProps={{
             fz: 12,
           }}
@@ -95,7 +130,7 @@ function DebtorModalCompany({
             </Text>
           }
           placeholder="Enter Post Code"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("postCode")}
           errorProps={{
             fz: 12,
           }}
@@ -113,7 +148,7 @@ function DebtorModalCompany({
             </Text>
           }
           placeholder="Enter State"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("state")}
           errorProps={{
             fz: 12,
           }}
@@ -129,7 +164,7 @@ function DebtorModalCompany({
             </Text>
           }
           placeholder="Enter City"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("city")}
           errorProps={{
             fz: 12,
           }}
@@ -147,7 +182,7 @@ function DebtorModalCompany({
             </Text>
           }
           placeholder="Enter Website"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("website")}
           errorProps={{
             fz: 12,
           }}
@@ -163,7 +198,7 @@ function DebtorModalCompany({
             </Text>
           }
           placeholder="Enter Business Reg No"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("businessRegNo")}
           errorProps={{
             fz: 12,
           }}
@@ -182,8 +217,7 @@ function DebtorModalCompany({
           }}
         />
         <PrimaryBtn
-          action={handlePreviewState}
-          // loading={processing}
+          action={handleDebtor}
           text="Continue"
           fullWidth
           fw={600}

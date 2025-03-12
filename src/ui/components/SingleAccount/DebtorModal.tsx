@@ -8,6 +8,7 @@ import TabsComponent from "../Tabs";
 import DebtorModalIndividual from "./DebtorModalIndividual";
 import DebtorModalCompany from "./DebtorModalCompany";
 import DebtorModalForm from "./DebtorModalForm";
+import { RequestForm } from "./(tabs)/SendMoney";
 
 interface DebtorModal {
   openedDebtor: boolean;

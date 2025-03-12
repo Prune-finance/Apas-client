@@ -12,6 +12,7 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import PendingModalImage from "@/assets/pending-image.png";
 import DebtorModal from "../DebtorModal";
+import useDebtorStore from "@/lib/store/debtor";
 
 interface Props {
   opened: boolean;
@@ -29,6 +30,7 @@ export const SendMoney = ({
   const matches = useMediaQuery("(max-width: 768px)");
   const axios = createAxiosInstance("payouts");
 
+  const { debtorRequestForm } = useDebtorStore();
   const { handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
   const [sectionState, setSectionState] = useState("");
@@ -57,6 +59,18 @@ export const SendMoney = ({
     invoice: "",
     narration: "",
   });
+
+  // const [debtorRequestForm, setDebtorRequestForm] = useState<DebtorForm>({
+  //   location: "self",
+  //   fullName: "",
+  //   address: "",
+  //   country: "",
+  //   postCode: "",
+  //   state: "",
+  //   city: "",
+  //   website: "",
+  //   businessRegNo: "",
+  // });
 
   const [companyRequestForm, setCompanyRequestForm] = useState({
     amount: "",
@@ -98,7 +112,19 @@ export const SendMoney = ({
         beneficiaryFullName: `${firstName} ${lastName}`,
         invoice,
         narration,
+        // Debtor details
+        debtorFullName: `${debtorRequestForm?.fullName}`,
+        debtorAddress: `${debtorRequestForm?.address}`,
+        debtorCountryCode: `${debtorRequestForm?.country}`,
+        debtorPostCode: `${debtorRequestForm?.postCode}`,
+        debtorState: `${debtorRequestForm?.state}`,
+        debtorCity: `${debtorRequestForm?.city}`,
+        debtorWebsite: `${debtorRequestForm?.website}`,
+        debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+        debtorType: `${debtorRequestForm?.location === "self" && "COMPANY"}`,
       });
+
+      console.log({ sendMoney: data });
       setMoneySent(Number(amount));
       setReceiverName(`${firstName} ${lastName}`);
       closePreview();

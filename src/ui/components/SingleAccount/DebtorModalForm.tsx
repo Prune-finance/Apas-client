@@ -1,21 +1,85 @@
-import { Box, Flex, Modal, TabsPanel, Text, TextInput } from "@mantine/core";
+import {
+  Box,
+  Flex,
+  LoadingOverlay,
+  Modal,
+  Select,
+  TabsPanel,
+  Text,
+  TextInput,
+} from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import styles from "./sendMoney.module.scss";
+import styles from "./debtor.module.scss";
+import User from "@/lib/store/user";
+import { useUserBusiness } from "@/lib/hooks/businesses";
+import { useForm } from "@mantine/form";
+import { countriesShortCode } from "@/lib/countries-short-code";
+import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
 
 interface DebtorModalIndividual {
   closeDebtor: () => void;
   openSendMoney: () => void;
   handlePreviewState: () => void;
 }
+
+const DebtorForm = {
+  location: "self",
+  fullName: "",
+  address: "",
+  country: "",
+  postCode: "",
+  state: "",
+  city: "",
+  website: "",
+  businessRegNo: "",
+};
+
 function DebtorModalForm({
   closeDebtor,
   openSendMoney,
   handlePreviewState,
 }: DebtorModalIndividual) {
+  const { business, loading } = useUserBusiness();
+  const { setDebtorRequestForm } = useDebtorStore();
+
+  const form = useForm<DebtorFormState>({
+    initialValues: DebtorForm,
+  });
+
+  console.log("business", business);
+
+  useMemo(() => {
+    form.setValues({
+      fullName: business?.name,
+      address: business?.address,
+      country:
+        countriesShortCode.find(
+          (country) =>
+            country.label === business?.country ||
+            country.value === business?.country
+        )?.value || business?.country,
+      website: business?.domain,
+
+      // postCode: business?.postCode,
+      // state: business?.state,
+      // city: business?.city,
+      // idType: business?.contactIdType,
+      // idNumber: business?.contactIdUrl,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [business]);
+
+  const handleDebtor = () => {
+    handlePreviewState();
+    setDebtorRequestForm(form.values);
+  };
+
   return (
-    <Box>
+    <Box pos={"relative"}>
+      <LoadingOverlay visible={loading} />
+
       <Flex
         align="center"
         justify="center"
@@ -41,8 +105,8 @@ function DebtorModalForm({
               Full Name
             </Text>
           }
-          placeholder="Enter first name"
-          // {...form.getInputProps("firstName")}
+          placeholder="Enter full name"
+          {...form.getInputProps("fullName")}
           errorProps={{
             fz: 12,
           }}
@@ -60,7 +124,7 @@ function DebtorModalForm({
             </Text>
           }
           placeholder="Enter Address"
-          // {...form.getInputProps("firstName")}
+          {...form.getInputProps("address")}
           errorProps={{
             fz: 12,
           }}
@@ -68,7 +132,8 @@ function DebtorModalForm({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <TextInput
+        <Select
+          data={countriesShortCode}
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           size="lg"
@@ -78,7 +143,7 @@ function DebtorModalForm({
             </Text>
           }
           placeholder="Enter Country"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("country")}
           errorProps={{
             fz: 12,
           }}
@@ -94,7 +159,7 @@ function DebtorModalForm({
             </Text>
           }
           placeholder="Enter Post Code"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("postCode")}
           errorProps={{
             fz: 12,
           }}
@@ -112,7 +177,7 @@ function DebtorModalForm({
             </Text>
           }
           placeholder="Enter State"
-          // {...form.getInputProps("destinationIBAN")}
+          {...form.getInputProps("state")}
           errorProps={{
             fz: 12,
           }}
@@ -128,7 +193,7 @@ function DebtorModalForm({
             </Text>
           }
           placeholder="Enter City"
-          // {...form.getInputProps("destinationBIC")}
+          {...form.getInputProps("city")}
           errorProps={{
             fz: 12,
           }}
@@ -142,11 +207,11 @@ function DebtorModalForm({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              ID Type
+              Website
             </Text>
           }
-          placeholder="Enter ID Type"
-          // {...form.getInputProps("destinationIBAN")}
+          placeholder="Enter Website"
+          {...form.getInputProps("website")}
           errorProps={{
             fz: 12,
           }}
@@ -158,11 +223,11 @@ function DebtorModalForm({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              ID Number
+              Business Reg No
             </Text>
           }
-          placeholder="Enter ID Number"
-          // {...form.getInputProps("destinationBIC")}
+          placeholder="Enter Business Reg No"
+          {...form.getInputProps("businessRegNo")}
           errorProps={{
             fz: 12,
           }}
@@ -181,7 +246,7 @@ function DebtorModalForm({
           }}
         />
         <PrimaryBtn
-          action={handlePreviewState}
+          action={handleDebtor}
           // loading={processing}
           text="Continue"
           fullWidth

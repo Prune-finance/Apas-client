@@ -12,10 +12,11 @@ import {
   Text,
 } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { PrimaryBtn } from "../Buttons";
 import FileDisplay from "../DocumentViewer";
 import { useDisclosure } from "@mantine/hooks";
+import useDebtorStore from "@/lib/store/debtor";
 
 interface PreviewStateProps {
   requestForm?: any;
@@ -36,6 +37,7 @@ function PreviewState({
   companyRequestForm,
   processing,
 }: PreviewStateProps) {
+  const { debtorRequestForm } = useDebtorStore();
   const [opened, { open, close }] = useDisclosure(false);
   const [fileUrl, setFileUrl] = useState<string>("");
   const beneficiaryDetails = {
@@ -92,6 +94,17 @@ function PreviewState({
     narration: companyRequestForm?.narration,
   };
 
+  const selfDebtorDetails = {
+    fullName: debtorRequestForm?.fullName,
+    address: debtorRequestForm?.address,
+    country: debtorRequestForm?.country,
+    postCode: debtorRequestForm?.postCode,
+    state: debtorRequestForm?.state,
+    city: debtorRequestForm?.city,
+    website: debtorRequestForm?.website,
+    "Business Reg No": debtorRequestForm?.businessRegNo,
+  };
+
   return (
     <>
       <Paper px={0} pt={0} pb={10}>
@@ -139,7 +152,31 @@ function PreviewState({
 
           {sectionState === "Individual" ? (
             <Stack gap={24}>
+              <Text fz={14} fw={600}>
+                Beneficiary Details
+              </Text>
               {Object.entries(beneficiaryDetails).map(([key, value]) => (
+                <Group justify="space-between" key={key}>
+                  <Text fz={12} c="var(--prune-text-gray-500)" tt="capitalize">
+                    {key}:
+                  </Text>
+
+                  <Text
+                    fz={12}
+                    c="var(--prune-text-gray-700)"
+                    fw={600}
+                    tt="capitalize"
+                  >
+                    {value}
+                  </Text>
+                </Group>
+              ))}
+
+              <Text fz={14} fw={600}>
+                Ultimate Debtor Details
+              </Text>
+
+              {Object.entries(selfDebtorDetails).map(([key, value]) => (
                 <Group justify="space-between" key={key}>
                   <Text fz={12} c="var(--prune-text-gray-500)" tt="capitalize">
                     {key}:

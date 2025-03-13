@@ -12,7 +12,7 @@ import DeactivatedUsers from "./(tabs)/deactivatedUsers";
 
 function Users() {
   const searchParam = useSearchParams();
-  const tab = searchParam.get("tab") || "roles";
+  const tab = searchParam.get("tab") || "users";
   return (
     <main style={{ padding: 20 }}>
       <Stack gap={8}>
@@ -32,23 +32,8 @@ function Users() {
         mt={38}
         styles={{ list: { marginBottom: "30px" } }}
         keepMounted={false}
-      >
-        {/* <TabsPanel value={tabs[0].value}>
-          <TabsComponent
-            tabs={roleTabs}
-            tt="capitalize"
-            styles={{ list: { border: "none" } }}
-            keepMounted={false}
-          >
-            <TabsPanel value={roleTabs[0].value}>
-              <ActiveRoles />
-            </TabsPanel>
-            <TabsPanel value={roleTabs[1].value}>
-              <DeactivatedRoles />
-            </TabsPanel>
-          </TabsComponent>
-        </TabsPanel> */}
-        <TabsPanel value={tabs[1].value}>
+      > 
+        <TabsPanel value={tabs[0].value}>
           <TabsComponent
             tabs={userTabs}
             tt="capitalize"
@@ -64,6 +49,21 @@ function Users() {
           </TabsComponent>
         </TabsPanel>
       </TabsComponent>
+      {/* <TabsPanel value={tabs[0].value}>
+          <TabsComponent
+            tabs={roleTabs}
+            tt="capitalize"
+            styles={{ list: { border: "none" } }}
+            keepMounted={false}
+          >
+            <TabsPanel value={roleTabs[0].value}>
+              <ActiveRoles />
+            </TabsPanel>
+            <TabsPanel value={roleTabs[1].value}>
+              <DeactivatedRoles />
+            </TabsPanel>
+          </TabsComponent>
+        </TabsPanel> */}
     </main>
   );
 }
@@ -78,11 +78,11 @@ export default function UsersSuspense() {
 
 const tabs = [
   { title: "Team Members", value: "users", icon: <IconBriefcase size={15} /> },
-  // {
-  //   title: "Roles & Permissions",
-  //   value: "roles",
-  //   icon: <IconUsers size={15} />,
-  // }
+  {
+    title: "Roles & Permissions",
+    value: "roles",
+    icon: <IconUsers size={15} />,
+  },
 ];
 
 const userTabs = [

@@ -132,17 +132,17 @@ function Individual({
   }, [bic, iban]);
 
   const handleDebtorState = () => {
-    // const { hasErrors } = form.validate();
-    // if (hasErrors) return;
-    // if (
-    //   account?.accountBalance &&
-    //   account?.accountBalance < Number(form.values.amount)
-    // )
-    //   return form.setFieldError(
-    //     "amount",
-    //     `Insufficient funds: The amount entered exceeds your balance`
-    //   );
-    close();
+    // // const { hasErrors } = form.validate();
+    // // if (hasErrors) return;
+    // // if (
+    // //   account?.accountBalance &&
+    // //   account?.accountBalance < Number(form.values.amount)
+    // // )
+    // //   return form.setFieldError(
+    // //     "amount",
+    // //     `Insufficient funds: The amount entered exceeds your balance`
+    // //   );
+    // close();
     setRequestForm(form.values);
     setSectionState("Individual");
     openDebtor();

@@ -12,8 +12,9 @@ import React, { useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import styles from "./sendMoney.module.scss";
 import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
-import { useForm } from "@mantine/form";
+import { useForm, zodResolver } from "@mantine/form";
 import { countriesShortCode } from "@/lib/countries-short-code";
+import { DebtorFormCompany } from "@/lib/schema";
 
 interface DebtorModalCompany {
   closeDebtor: () => void;
@@ -42,9 +43,12 @@ function DebtorModalCompany({
 
   const form = useForm<DebtorFormState>({
     initialValues: DebtorForm,
+    validate: zodResolver(DebtorFormCompany),
   });
 
   const handleDebtor = () => {
+    const { hasErrors } = form.validate();
+    if (hasErrors) return;
     handlePreviewState();
     setDebtorRequestForm(form.values);
   };

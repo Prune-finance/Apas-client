@@ -25,7 +25,7 @@ function Valentine({ title, description }: Valentine) {
           gap={4}
         >
           <Text fz={14} fw={600} c="#97AD05" lh="18.48px">
-            {title || "Happy Valentine"}
+            {title || "Happy Valentine's Day"}
           </Text>
           <Text c="#1D2939" fz={12} fw={400} lh="15.84px" w={319}>
             {description ||

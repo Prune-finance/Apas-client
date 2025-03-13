@@ -5,6 +5,7 @@ import { formatNumber } from "../utils";
 import { TransactionType } from "./transactions";
 import { AccountData } from "./accounts";
 import dayjs from "dayjs";
+import getCreditTime from "../helpers/getCreditTime";
 
 interface Props {
   selectedRequest: TransactionType | null;
@@ -45,6 +46,9 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
         "Payment Date": dayjs(selectedRequest?.createdAt).format(
           "hh:mm A Do MMM YYYY"
         ),
+
+        "Approximate Credit Time":
+          getCreditTime(selectedRequest?.createdAt as any) ?? "N/A",
         Reference: selectedRequest?.reference ?? "N/A",
         "C-L Reference": selectedRequest?.id ?? "",
         Status: BadgeFunc(selectedRequest?.status ?? ""),

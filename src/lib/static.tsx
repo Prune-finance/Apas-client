@@ -120,7 +120,7 @@ export const UserMainLinks = [
 
 export const UserOtherLinks = [
   {
-    text: "Users",
+    text: "User Management",
     link: "/users",
     icon: <IconUsers size={16} />,
   },

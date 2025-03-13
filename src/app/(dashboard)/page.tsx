@@ -21,6 +21,7 @@ import styles from "@/ui/styles/user/home.module.scss";
 import { useUserDebitRequests } from "@/lib/hooks/requests";
 import { useUserBalances } from "@/lib/hooks/balance";
 import {
+  TransactionType,
   useUserDefaultTransactions,
   useUserPayoutTransactions,
   useUserTransactions,
@@ -43,6 +44,8 @@ import {
   BarChartLoading,
   DonutChartLoading,
 } from "@/ui/components/ChartLoading";
+import Link from "next/link";
+import { TableComponent } from "@/ui/components/Table";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -51,6 +54,11 @@ export default function Home() {
   const { transactions, loading: loadingTrx } = useUserTransactions(undefined, {
     limit: 1000,
   });
+  const { transactions: defaultTrx, loading: loadingDefaultTrx } =
+    useUserDefaultTransactions({
+      limit: 3,
+    });
+
   const {
     account,
     loading: loadingDftAcct,
@@ -58,7 +66,7 @@ export default function Home() {
   } = useUserDefaultAccount();
 
   const { loading: loadingPayout, transactions: payoutTrx } =
-    useUserPayoutTransactions();
+    useUserPayoutTransactions({ limit: 3 });
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedSendMoney, { open: openSendMoney, close: closeSendMoney }] =
@@ -77,7 +85,7 @@ export default function Home() {
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
-  const rows = requests.slice(0, 2).map((element) => (
+  const rows = requests.slice(0, 5).map((element) => (
     <TableTr key={element.id}>
       <TableTd className={styles.table__td}>
         {element.Account.accountName}
@@ -318,11 +326,13 @@ export default function Home() {
         <GridCol span={12} mih={100}>
           <Grid>
             {/* Debit Request Table */}
-            <GridCol span={6} mih={100}>
+            <GridCol span={6} mih={300}>
               <Paper
                 py={21}
                 px={24}
                 radius={8}
+                mih={300}
+                h="100%"
                 style={{ border: "1px solid #f5f5f5" }}
                 //  mt={10} className={styles.payout__table}
               >
@@ -407,90 +417,38 @@ export default function Home() {
             </GridCol>
 
             <GridCol span={6} mih={300}>
-              <Paper
-                py={21}
-                px={24}
-                radius={8}
-                mih={250}
-                style={{ border: "1px solid #f5f5f5" }}
-                //  mt={10} className={styles.payout__table}
-              >
-                <Flex
-                  style={{ borderBottom: "1px solid #f5f5f5" }}
-                  justify="space-between"
-                  align="center"
-                  pb={14}
-                >
-                  <Text
-                    className={styles.table__text}
-                    lts={0.5}
-                    fz={16}
-                    fw={600}
-                  >
-                    Payouts
-                  </Text>
+              <TransactionPaper
+                title="own"
+                loading={loadingDefaultTrx}
+                row={<OwnAccountRow transactions={defaultTrx} />}
+                headers={ownAccountTableHeader}
+                href="/transactions?tab=own-account"
+                transactions={defaultTrx}
+              />
+            </GridCol>
 
-                  <Button
-                    component="a"
-                    href="/payouts?tab=Transactions"
-                    variant="transparent"
-                    color="var(--prune-primary-800)"
-                    fz={11}
-                    className={styles.table__cta}
-                  >
-                    See all
-                  </Button>
-                </Flex>
+            <GridCol span={6} mih={300}>
+              <TransactionPaper
+                title="payout"
+                loading={loadingPayout}
+                row={<PayoutAccountRow transactions={payoutTrx} />}
+                headers={payoutAccountTableHeader}
+                href="/payouts?tab=Transactions"
+                transactions={payoutTrx}
+              />
+            </GridCol>
 
-                {/* <TableComponent
-                  rows={payoutRows}
-                  loading={loadingPayout}
-                  head={["Beneficiary Name", "Amount", "Date", "Status"]}
-                /> */}
-
-                <Table verticalSpacing={15} fz={12}>
-                  <TableThead style={{ borderBottom: "1px solid #f5f5f5" }}>
-                    {["Beneficiary Name", "Amount", "Date", "Status"].map(
-                      (header) => (
-                        <TableTh className={styles.table__th} key={header}>
-                          {header}
-                        </TableTh>
-                      )
-                    )}
-                  </TableThead>
-                  <TableTbody>
-                    {loadingPayout
-                      ? DynamicSkeleton2(
-                          ["Beneficiary Name", "Amount", "Date", "Status"]
-                            .length
-                        )
-                      : payoutRows}
-                  </TableTbody>
-                </Table>
-
-                {!loadingPayout && payoutTrx.length === 0 && (
-                  <Flex
-                    style={{ flexGrow: 1 }}
-                    direction="column"
-                    align="center"
-                    justify="center"
-                    mt={24}
-                  >
-                    <Image
-                      src={EmptyImage}
-                      alt="no content"
-                      width={80}
-                      height={60}
-                    />
-                    <Text mt={14} fz={10} c="#1D2939">
-                      No payout history.
-                    </Text>
-                    {/* <Text fz={10} c="#667085">
-              When an account is created, it will appear here
-            </Text> */}
-                  </Flex>
-                )}
-              </Paper>
+            <GridCol span={6} mih={300}>
+              <TransactionPaper
+                title="issued"
+                loading={loading}
+                row={
+                  <IssuedAccountRow transactions={transactions.slice(0, 3)} />
+                }
+                headers={issuedAccountTableHeader}
+                href="/transactions?tab=issued-accounts"
+                transactions={transactions.slice(0, 3)}
+              />
             </GridCol>
           </Grid>
         </GridCol>
@@ -538,3 +496,280 @@ const Copy = ({ value }: { value: string }) => {
 };
 
 const debitTableHeader = ["Account Name", "Amount", "Date Created", "Status"];
+
+const ownAccountTableHeader = [
+  "Beneficiary Name",
+  "Date",
+  "Amount",
+  "Type",
+  "Status",
+];
+
+const issuedAccountTableHeader = [
+  "Sender Name",
+  "Beneficiary Name",
+  "Amount",
+  "Type",
+  "Status",
+];
+
+const payoutAccountTableHeader = [
+  "Beneficiary Name",
+  "Type",
+  "Amount",
+  "Date",
+  "Status",
+];
+
+interface TransactionPaperProps {
+  transactions: TransactionType[];
+  loading: boolean;
+  title: string;
+  href: string;
+  headers: string[];
+  row: JSX.Element[] | JSX.Element;
+}
+
+const TransactionPaper = ({
+  title,
+  transactions,
+  href,
+  loading,
+  headers,
+  row,
+}: TransactionPaperProps) => {
+  return (
+    <Paper
+      py={21}
+      px={24}
+      radius={8}
+      mih={300}
+      h="100%"
+      style={{ border: "1px solid #f5f5f5" }}
+    >
+      <Flex
+        style={{ borderBottom: "1px solid #f5f5f5" }}
+        justify="space-between"
+        align="center"
+        pb={14}
+      >
+        <Text
+          className={styles.table__text}
+          lts={0.5}
+          fz={16}
+          fw={600}
+          tt="capitalize"
+        >
+          {`${title} Account Transactions`}
+        </Text>
+
+        <Button
+          component={Link}
+          href={href}
+          variant="transparent"
+          color="var(--prune-primary-800)"
+          fz={11}
+          className={styles.table__cta}
+        >
+          See all
+        </Button>
+      </Flex>
+
+      <TableComponent head={headers} rows={row} loading={loading} />
+
+      {!loading && transactions.length === 0 && (
+        <Flex
+          style={{ flexGrow: 1 }}
+          direction="column"
+          align="center"
+          justify="center"
+          mt={24}
+        >
+          <Image src={EmptyImage} alt="no content" width={80} height={60} />
+          <Text mt={14} fz={10} c="#1D2939">
+            {`No ${title} transaction history.`}
+          </Text>
+        </Flex>
+      )}
+    </Paper>
+  );
+};
+
+const OwnAccountRow = ({
+  transactions,
+}: {
+  transactions: TransactionType[];
+}) => {
+  return transactions.map((element, index) => (
+    <TableTr key={element.id}>
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {element.recipientName}
+          </Text>
+          <Text fz={10} fw={400}>
+            {element.recipientIban}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {dayjs(element.createdAt).format("DD MMM, YYYY")}
+          </Text>
+          <Text fz={10} fw={400}>
+            {dayjs(element.createdAt).format("hh:mma")}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+};
+
+const PayoutAccountRow = ({
+  transactions,
+}: {
+  transactions: TransactionType[];
+}) => {
+  return transactions.map((element, index) => (
+    <TableTr key={element.id}>
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {element.recipientName}
+          </Text>
+          <Text fz={10} fw={400}>
+            {element.recipientIban}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {dayjs(element.createdAt).format("DD MMM, YYYY")}
+          </Text>
+          <Text fz={10} fw={400}>
+            {dayjs(element.createdAt).format("hh:mma")}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+};
+
+const IssuedAccountRow = ({
+  transactions,
+}: {
+  transactions: TransactionType[];
+}) => {
+  return transactions.map((element, index) => (
+    <TableTr key={element.id}>
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {element.senderName}
+          </Text>
+          <Text fz={10} fw={400}>
+            {element.senderIban}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>{element.recipientName}</TableTd>
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>
+        <AmountGroup type={element.type} fz={12} fw={400} />
+      </TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+};
+
+// <GridCol span={6} mih={300}>
+//   <Paper
+//     py={21}
+//     px={24}
+//     radius={8}
+//     mih={250}
+//     style={{ border: "1px solid #f5f5f5" }}
+//     //  mt={10} className={styles.payout__table}
+//   >
+//     <Flex
+//       style={{ borderBottom: "1px solid #f5f5f5" }}
+//       justify="space-between"
+//       align="center"
+//       pb={14}
+//     >
+//       <Text className={styles.table__text} lts={0.5} fz={16} fw={600}>
+//         Payouts
+//       </Text>
+
+//       <Button
+//         component="a"
+//         href="/payouts?tab=Transactions"
+//         variant="transparent"
+//         color="var(--prune-primary-800)"
+//         fz={11}
+//         className={styles.table__cta}
+//       >
+//         See all
+//       </Button>
+//     </Flex>
+
+//     {/* <TableComponent
+//                 rows={payoutRows}
+//                 loading={loadingPayout}
+//                 head={["Beneficiary Name", "Amount", "Date", "Status"]}
+//               /> */}
+
+//     <Table verticalSpacing={15} fz={12}>
+//       <TableThead style={{ borderBottom: "1px solid #f5f5f5" }}>
+//         {["Beneficiary Name", "Amount", "Date", "Status"].map((header) => (
+//           <TableTh className={styles.table__th} key={header}>
+//             {header}
+//           </TableTh>
+//         ))}
+//       </TableThead>
+//       <TableTbody>
+//         {loadingPayout
+//           ? DynamicSkeleton2(
+//               ["Beneficiary Name", "Amount", "Date", "Status"].length
+//             )
+//           : payoutRows}
+//       </TableTbody>
+//     </Table>
+
+//     {!loadingPayout && payoutTrx.length === 0 && (
+//       <Flex
+//         style={{ flexGrow: 1 }}
+//         direction="column"
+//         align="center"
+//         justify="center"
+//         mt={24}
+//       >
+//         <Image src={EmptyImage} alt="no content" width={80} height={60} />
+//         <Text mt={14} fz={10} c="#1D2939">
+//           No payout history.
+//         </Text>
+//         {/* <Text fz={10} c="#667085">
+//             When an account is created, it will appear here
+//           </Text> */}
+//       </Flex>
+//     )}
+//   </Paper>
+// </GridCol>;

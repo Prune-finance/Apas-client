@@ -119,9 +119,23 @@ export const SendMoney = ({
         debtorPostCode: `${debtorRequestForm?.postCode}`,
         debtorState: `${debtorRequestForm?.state}`,
         debtorCity: `${debtorRequestForm?.city}`,
-        debtorWebsite: `${debtorRequestForm?.website}`,
-        debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
-        debtorType: `${debtorRequestForm?.location === "self" && "COMPANY"}`,
+        debtorType: `${
+          debtorRequestForm?.location === "self" ||
+          debtorRequestForm.location === "company"
+            ? "COMPANY"
+            : "INDIVIDUAL"
+        }`,
+        ...(debtorRequestForm?.location === "individual" && {
+          debtorIdType: `${debtorRequestForm?.idType}`,
+          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+        }),
+        ...(debtorRequestForm?.location === "self" ||
+        debtorRequestForm.location === "company"
+          ? {
+              debtorWebsite: `${debtorRequestForm?.website}`,
+              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+            }
+          : {}),
       });
 
       console.log({ sendMoney: data });

@@ -32,7 +32,7 @@ function DebtorModal({
   const [showBadge, setShowBadge] = useState(false);
 
   const handlePreviewState = () => {
-    closeDebtor();
+    // closeDebtor();
     openPreview();
   };
 

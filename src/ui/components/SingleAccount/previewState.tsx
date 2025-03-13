@@ -101,7 +101,8 @@ function PreviewState({
     postCode: debtorRequestForm?.postCode,
     state: debtorRequestForm?.state,
     city: debtorRequestForm?.city,
-    ...(debtorRequestForm?.location === "self"
+    ...(debtorRequestForm?.location === "self" ||
+    debtorRequestForm.location === "company"
       ? {
           website: debtorRequestForm?.website,
           "Business Reg No": debtorRequestForm?.businessRegNo,
@@ -180,7 +181,8 @@ function PreviewState({
               ))}
 
               {debtorRequestForm?.location === "self" ||
-              debtorRequestForm?.location === "individual" ? (
+              debtorRequestForm?.location === "individual" ||
+              debtorRequestForm?.location === "company" ? (
                 <>
                   <Text fz={14} fw={600}>
                     Ultimate Debtor Details

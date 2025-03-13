@@ -108,7 +108,8 @@ export default function Users() {
 
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
-        { ...rest },
+        // { ...rest },
+        form.values,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 

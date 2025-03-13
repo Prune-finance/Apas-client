@@ -17,6 +17,7 @@ import {
   Badge,
   Loader,
   ScrollArea,
+  Checkbox,
 } from "@mantine/core";
 import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -40,6 +41,9 @@ interface CompanyProps {
   setValidated: Dispatch<SetStateAction<boolean | null>>;
   showBadge: boolean;
   setShowBadge: Dispatch<SetStateAction<boolean>>;
+  openDebtor: () => void;
+  paymentType: string;
+  setPaymentType: Dispatch<SetStateAction<string>>;
 }
 
 export const sendMoneyRequest = {
@@ -65,6 +69,9 @@ function Company({
   setValidated,
   showBadge,
   setShowBadge,
+  openDebtor,
+  paymentType,
+  setPaymentType,
 }: CompanyProps) {
   const [processing, setProcessing] = useState(false);
   const [disableBank, setDisableBank] = useState(false);
@@ -95,10 +102,11 @@ function Company({
         `Insufficient funds: The amount entered exceeds your balance`
       );
 
-    close();
+    // close();
     setCompanyRequestForm(form2.values);
     setSectionState("Company");
-    openPreview();
+    openDebtor();
+    // openPreview();
   };
 
   const handleIbanValidation = async () => {
@@ -366,6 +374,36 @@ function Company({
               </Flex>
             </>
           )}
+
+          <Flex
+            align="center"
+            justify="flex-start"
+            mt={24}
+            direction="column"
+            gap={10}
+          >
+            <Box p={12} bg="#F9FAFB" w="100%">
+              <Checkbox
+                color="#97AD05"
+                fz={12}
+                value="non-individual"
+                onChange={(e) => setPaymentType(e.currentTarget.value)}
+                checked={paymentType === "non-individual"}
+                label="Yes, I am making this payment on behalf of another party"
+              />
+            </Box>
+
+            <Box p={12} bg="#F9FAFB" w="100%">
+              <Checkbox
+                color="#97AD05"
+                fz={12}
+                value="individual"
+                onChange={(e) => setPaymentType(e.currentTarget.value)}
+                checked={paymentType === "individual"}
+                label="No, I am making this payment on my own behalf"
+              />
+            </Box>
+          </Flex>
 
           <TransactionProcessingTimes />
         </ScrollArea>

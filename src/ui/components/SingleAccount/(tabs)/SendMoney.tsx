@@ -177,6 +177,30 @@ export const SendMoney = ({
         beneficiaryFullName: companyName,
         invoice,
         narration,
+        // Debtor details
+        debtorFullName: `${debtorRequestForm?.fullName}`,
+        debtorAddress: `${debtorRequestForm?.address}`,
+        debtorCountryCode: `${debtorRequestForm?.country}`,
+        debtorPostCode: `${debtorRequestForm?.postCode}`,
+        debtorState: `${debtorRequestForm?.state}`,
+        debtorCity: `${debtorRequestForm?.city}`,
+        debtorType: `${
+          debtorRequestForm?.location === "self" ||
+          debtorRequestForm.location === "company"
+            ? "COMPANY"
+            : "INDIVIDUAL"
+        }`,
+        ...(debtorRequestForm?.location === "individual" && {
+          debtorIdType: `${debtorRequestForm?.idType}`,
+          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+        }),
+        ...(debtorRequestForm?.location === "self" ||
+        debtorRequestForm.location === "company"
+          ? {
+              debtorWebsite: `${debtorRequestForm?.website}`,
+              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+            }
+          : {}),
       });
       setMoneySent(Number(amount));
       setReceiverName(companyName);

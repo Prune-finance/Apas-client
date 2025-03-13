@@ -230,7 +230,9 @@ function PreviewState({
                 </Group>
               ))}
 
-              {debtorRequestForm.location === "company" && (
+              {debtorRequestForm?.location === "self" ||
+              debtorRequestForm?.location === "individual" ||
+              debtorRequestForm?.location === "company" ? (
                 <>
                   <Text fz={14} fw={600}>
                     Ultimate Debtor Details
@@ -257,7 +259,7 @@ function PreviewState({
                     </Group>
                   ))}
                 </>
-              )}
+              ) : null}
             </Stack>
           )}
           <Divider my={20} />

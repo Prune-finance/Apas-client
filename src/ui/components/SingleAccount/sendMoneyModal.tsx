@@ -174,6 +174,9 @@ function SendMoneyModal({
             setValidated={setValidated}
             showBadge={showBadge}
             setShowBadge={setShowBadge}
+            openDebtor={openDebtor}
+            paymentType={paymentType}
+            setPaymentType={setPaymentType}
           />
         </TabsComponent>
       </Paper>

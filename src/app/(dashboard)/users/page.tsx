@@ -77,12 +77,12 @@ export default function UsersSuspense() {
 }
 
 const tabs = [
-  {
-    title: "Roles & Permissions",
-    value: "roles",
-    icon: <IconUsers size={15} />,
-  },
   { title: "Team Members", value: "users", icon: <IconBriefcase size={15} /> },
+  // {
+  //   title: "Roles & Permissions",
+  //   value: "roles",
+  //   icon: <IconUsers size={15} />,
+  // }
 ];
 
 const userTabs = [

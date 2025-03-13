@@ -54,6 +54,7 @@ function DebtorModal({
         }
         px={30}
         pb={10}
+        style={{ overflowY: "auto" }}
       >
         <Flex gap={10} align="center" justify="space-between" w="100%">
           <Text

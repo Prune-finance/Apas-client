@@ -14,9 +14,10 @@ import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import styles from "./debtor.module.scss";
 import User from "@/lib/store/user";
 import { useUserBusiness } from "@/lib/hooks/businesses";
-import { useForm } from "@mantine/form";
+import { useForm, zodResolver } from "@mantine/form";
 import { countriesShortCode } from "@/lib/countries-short-code";
 import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
+import { DebtorFormSelf } from "@/lib/schema";
 
 interface DebtorModalIndividual {
   closeDebtor: () => void;
@@ -46,6 +47,7 @@ function DebtorModalForm({
 
   const form = useForm<DebtorFormState>({
     initialValues: DebtorForm,
+    validate: zodResolver(DebtorFormSelf),
   });
 
   useMemo(() => {
@@ -70,6 +72,8 @@ function DebtorModalForm({
   }, [business]);
 
   const handleDebtor = () => {
+    const { hasErrors } = form.validate();
+    if (hasErrors) return;
     handlePreviewState();
     setDebtorRequestForm(form.values);
   };

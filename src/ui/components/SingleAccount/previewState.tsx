@@ -179,35 +179,35 @@ function PreviewState({
                 </Group>
               ))}
 
-              {debtorRequestForm.location === "self" ||
-                (debtorRequestForm.location === "individual" && (
-                  <>
-                    <Text fz={14} fw={600}>
-                      Ultimate Debtor Details
-                    </Text>
+              {debtorRequestForm?.location === "self" ||
+              debtorRequestForm?.location === "individual" ? (
+                <>
+                  <Text fz={14} fw={600}>
+                    Ultimate Debtor Details
+                  </Text>
 
-                    {Object.entries(selfDebtorDetails).map(([key, value]) => (
-                      <Group justify="space-between" key={key}>
-                        <Text
-                          fz={12}
-                          c="var(--prune-text-gray-500)"
-                          tt="capitalize"
-                        >
-                          {key}:
-                        </Text>
+                  {Object.entries(selfDebtorDetails).map(([key, value]) => (
+                    <Group justify="space-between" key={key}>
+                      <Text
+                        fz={12}
+                        c="var(--prune-text-gray-500)"
+                        tt="capitalize"
+                      >
+                        {key}:
+                      </Text>
 
-                        <Text
-                          fz={12}
-                          c="var(--prune-text-gray-700)"
-                          fw={600}
-                          tt="capitalize"
-                        >
-                          {value}
-                        </Text>
-                      </Group>
-                    ))}
-                  </>
-                ))}
+                      <Text
+                        fz={12}
+                        c="var(--prune-text-gray-700)"
+                        fw={600}
+                        tt="capitalize"
+                      >
+                        {value}
+                      </Text>
+                    </Group>
+                  ))}
+                </>
+              ) : null}
             </Stack>
           ) : (
             <Stack gap={24}>

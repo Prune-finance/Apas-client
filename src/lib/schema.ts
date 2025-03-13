@@ -584,6 +584,17 @@ export const sendMoneyIndividualValidate = z.object({
   // accountBalance: z.number().positive("A positive amount is required"),
 });
 
+export const DebtorFormSelf = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
+  address: z.string().min(2, "Address is required"),
+  country: z.string().min(2, "Country is required"),
+  postCode: z.string().min(2, "Post Code is required"),
+  state: z.string().min(2, "State is required"),
+  city: z.string().min(2, "City is required"),
+  website: z.string().url("Website is required"),
+  businessRegNo: z.string().min(2, "Business Registration Number is required"),
+});
+
 export const sendMoneyCompanyValidate = z.object({
   companyName: z.string().min(2, "First Name is required"),
   destinationIBAN: z.string().min(3, "Destination account is required"),

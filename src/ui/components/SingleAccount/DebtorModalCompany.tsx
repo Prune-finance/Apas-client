@@ -10,7 +10,7 @@ import {
 import { IconX } from "@tabler/icons-react";
 import React, { useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import styles from "./sendMoney.module.scss";
+import styles from "./debtor.module.scss";
 import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
 import { useForm, zodResolver } from "@mantine/form";
 import { countriesShortCode } from "@/lib/countries-short-code";

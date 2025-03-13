@@ -7,27 +7,39 @@ const charactersList = [
 
     label: "Transaction Processing Times",
     description:
-      "We strive to make your money transfers as fast as possible. However, processing times may vary depending on time of submission.",
+      "We strive to make your money transfers as fast as possible. However, processing times may vary depending on time of submission (Monday - Friday).",
     table: [
       {
-        submitted: "2:45 PM – 5:30 PM",
-        creditTime: "7:10 PM",
+        submitted: "04:45 AM – 05:28 AM (on mondays)",
+        creditTime: "05:30 AM",
       },
       {
-        submitted: "5:30 PM – 8:00 PM",
-        creditTime: "1:40 PM",
+        submitted: "05:31 AM – 06:49 AM",
+        creditTime: "06:50 AM",
       },
       {
-        submitted: "8:00 PM – 10:30 PM",
-        creditTime: "12:10 AM (Next Day)",
+        submitted: "06:51 AM – 07:29 AM",
+        creditTime: "07:30 AM",
       },
       {
-        submitted: "10:30 PM – 12:45 AM",
-        creditTime: "1:40 AM (Next Day)",
+        submitted: "07:31 AM – 09:59 AM",
+        creditTime: "10:00 AM",
       },
       {
-        submitted: "12:45 AM – 2:45 PM",
-        creditTime: "5:00 PM (Following Business Day)",
+        submitted: "10:01 AM – 12:29 AM",
+        creditTime: "12:30 AM",
+      },
+      {
+        submitted: "12:31 PM – 14:29 PM",
+        creditTime: "14:30 PM",
+      },
+      {
+        submitted: "14:31 PM – 14:44 PM",
+        creditTime: "14:45 PM",
+      },
+      {
+        submitted: "14:44 PM – 23:59 PM",
+        creditTime: "04:45 AM (Next business day)",
       },
     ],
   },

@@ -33,7 +33,7 @@ function Users() {
         styles={{ list: { marginBottom: "30px" } }}
         keepMounted={false}
       >
-        <TabsPanel value={tabs[0].value}>
+        {/* <TabsPanel value={tabs[0].value}>
           <TabsComponent
             tabs={roleTabs}
             tt="capitalize"
@@ -47,7 +47,7 @@ function Users() {
               <DeactivatedRoles />
             </TabsPanel>
           </TabsComponent>
-        </TabsPanel>
+        </TabsPanel> */}
         <TabsPanel value={tabs[1].value}>
           <TabsComponent
             tabs={userTabs}

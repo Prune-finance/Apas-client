@@ -11,26 +11,39 @@ import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import PendingModalImage from "@/assets/pending-image.png";
+import DebtorModal from "../DebtorModal";
+import useDebtorStore from "@/lib/store/debtor";
 
 interface Props {
   opened: boolean;
+  openSendMoney: () => void;
   closeMoney: () => void;
   account: DefaultAccount | null;
 }
 
-export const SendMoney = ({ opened, closeMoney, account }: Props) => {
+export const SendMoney = ({
+  opened,
+  closeMoney,
+  account,
+  openSendMoney,
+}: Props) => {
   const matches = useMediaQuery("(max-width: 768px)");
   const axios = createAxiosInstance("payouts");
 
+  const { debtorRequestForm } = useDebtorStore();
   const { handleError, handleSuccess } = useNotification();
   const [processing, setProcessing] = useState(false);
   const [sectionState, setSectionState] = useState("");
   const [moneySent, setMoneySent] = useState(0);
   const [receiverName, setReceiverName] = useState("");
+  const [paymentType, setPaymentType] = useState("individual");
 
   const [openedPreview, { open: openPreview, close: closePreview }] =
     useDisclosure(false);
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
+    useDisclosure(false);
+
+  const [openedDebtor, { open: openDebtor, close: closeDebtor }] =
     useDisclosure(false);
 
   const [requestForm, setRequestForm] = useState<RequestForm>({
@@ -46,6 +59,18 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
     invoice: "",
     narration: "",
   });
+
+  // const [debtorRequestForm, setDebtorRequestForm] = useState<DebtorForm>({
+  //   location: "self",
+  //   fullName: "",
+  //   address: "",
+  //   country: "",
+  //   postCode: "",
+  //   state: "",
+  //   city: "",
+  //   website: "",
+  //   businessRegNo: "",
+  // });
 
   const [companyRequestForm, setCompanyRequestForm] = useState({
     amount: "",
@@ -87,7 +112,33 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
         beneficiaryFullName: `${firstName} ${lastName}`,
         invoice,
         narration,
+        // Debtor details
+        debtorFullName: `${debtorRequestForm?.fullName}`,
+        debtorAddress: `${debtorRequestForm?.address}`,
+        debtorCountryCode: `${debtorRequestForm?.country}`,
+        debtorPostCode: `${debtorRequestForm?.postCode}`,
+        debtorState: `${debtorRequestForm?.state}`,
+        debtorCity: `${debtorRequestForm?.city}`,
+        debtorType: `${
+          debtorRequestForm?.location === "self" ||
+          debtorRequestForm.location === "company"
+            ? "COMPANY"
+            : "INDIVIDUAL"
+        }`,
+        ...(debtorRequestForm?.location === "individual" && {
+          debtorIdType: `${debtorRequestForm?.idType}`,
+          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+        }),
+        ...(debtorRequestForm?.location === "self" ||
+        debtorRequestForm.location === "company"
+          ? {
+              debtorWebsite: `${debtorRequestForm?.website}`,
+              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+            }
+          : {}),
       });
+
+      console.log({ sendMoney: data });
       setMoneySent(Number(amount));
       setReceiverName(`${firstName} ${lastName}`);
       closePreview();
@@ -126,6 +177,30 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
         beneficiaryFullName: companyName,
         invoice,
         narration,
+        // Debtor details
+        debtorFullName: `${debtorRequestForm?.fullName}`,
+        debtorAddress: `${debtorRequestForm?.address}`,
+        debtorCountryCode: `${debtorRequestForm?.country}`,
+        debtorPostCode: `${debtorRequestForm?.postCode}`,
+        debtorState: `${debtorRequestForm?.state}`,
+        debtorCity: `${debtorRequestForm?.city}`,
+        debtorType: `${
+          debtorRequestForm?.location === "self" ||
+          debtorRequestForm.location === "company"
+            ? "COMPANY"
+            : "INDIVIDUAL"
+        }`,
+        ...(debtorRequestForm?.location === "individual" && {
+          debtorIdType: `${debtorRequestForm?.idType}`,
+          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+        }),
+        ...(debtorRequestForm?.location === "self" ||
+        debtorRequestForm.location === "company"
+          ? {
+              debtorWebsite: `${debtorRequestForm?.website}`,
+              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+            }
+          : {}),
       });
       setMoneySent(Number(amount));
       setReceiverName(companyName);
@@ -160,8 +235,21 @@ export const SendMoney = ({ opened, closeMoney, account }: Props) => {
           setRequestForm={setRequestForm}
           setCompanyRequestForm={setCompanyRequestForm}
           setSectionState={setSectionState}
+          openDebtor={openDebtor}
+          paymentType={paymentType}
+          setPaymentType={setPaymentType}
         />
       </Modal>
+
+      <DebtorModal
+        openedDebtor={openedDebtor}
+        closeDebtor={closeDebtor}
+        openPreview={openPreview}
+        openDebtor={openDebtor}
+        openSendMoney={openSendMoney}
+        paymentType={paymentType}
+        setPaymentType={setPaymentType}
+      />
 
       <Modal
         opened={openedPreview}

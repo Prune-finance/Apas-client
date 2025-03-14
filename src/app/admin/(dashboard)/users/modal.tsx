@@ -1,4 +1,12 @@
-import { Text, Modal, Flex, TextInput, Select, Box } from "@mantine/core";
+import {
+  Text,
+  Modal,
+  Flex,
+  TextInput,
+  Select,
+  Box,
+  PasswordInput,
+} from "@mantine/core";
 import { IconMail } from "@tabler/icons-react";
 
 import styles from "./modal.module.scss";
@@ -91,7 +99,7 @@ export default function ModalComponent({
             />
           </Flex>
 
-          {/* {!isEdit && (
+          {!isEdit && (
             <Flex mt={24}>
               <PasswordInput
                 classNames={{ input: styles.input, label: styles.label }}
@@ -101,7 +109,7 @@ export default function ModalComponent({
                 {...form.getInputProps("password")}
               />
             </Flex>
-          )} */}
+          )}
 
           {!removeRole && (
             <Flex mt={24}>

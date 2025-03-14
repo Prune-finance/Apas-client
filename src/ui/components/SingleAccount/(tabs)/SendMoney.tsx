@@ -300,9 +300,7 @@ export const SendMoney = ({
             Your transfer of{" "}
             <Text inherit span fw={600} c="#97AD05">
               {formatNumber(moneySent, true, "EUR")}
-            </Text>{" "}
-            to {receiverName} is in progress. It should be completed within the
-            next 10 minutes. Please wait for confirm.
+            </Text>{" "} to {receiverName} is in progress. It will be processed shortly. You will be notified on resolution of payment.
           </Text>
         }
         title="Transaction Processing"

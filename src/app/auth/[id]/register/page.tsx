@@ -103,8 +103,6 @@ export default async function Register({ params }: Props) {
                 Create your payment account now
               </Text>
 
-              <Valentine />
-
               <FormComponent email={res.email} />
 
               <Group

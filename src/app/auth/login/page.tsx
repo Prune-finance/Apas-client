@@ -93,9 +93,6 @@ async function Login() {
           <Text className={styles.paper__text}>
             Enter your details below to have access to your account
           </Text>
-
-          <Valentine />
-
           <LoginForm />
         </Box>
       </div>

@@ -501,6 +501,7 @@ function Accounts() {
           opened={sendMoneyOpened}
           closeMoney={sendMoneyClose}
           account={account}
+          openSendMoney={sendMoneyOpen}
         />
 
         <Modal

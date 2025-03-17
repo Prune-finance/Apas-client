@@ -176,7 +176,20 @@ function DebtorModalIndividual({
 
       <Flex gap={20} mt={24}>
         <Select
-          data={["ID Card", "Passport", "Residence Permit"]}
+          data={[
+            {
+              "label": "ID Card",
+              "value": "identityCard"
+            }, 
+            {
+              "label": "Passport",
+              "value": "passport"
+            },
+            {
+              "label": "Residence Permit",
+              "value": "residencePermit"
+            }
+          ]}
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}
           size="lg"

@@ -217,6 +217,8 @@ export const SendMoney = ({
 
   const handleCloseSuccessModal = () => {
     // router.push("/admin/businesses");
+    closeMoney();
+    closeDebtor();
     closeSuccess();
   };
 

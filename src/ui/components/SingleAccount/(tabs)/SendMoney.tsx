@@ -141,8 +141,6 @@ export const SendMoney = ({
       console.log({ sendMoney: data });
       setMoneySent(Number(amount));
       setReceiverName(`${firstName} ${lastName}`);
-      closeMoney();
-      closeDebtor();
       closePreview();
       openSuccess();
       // handleSuccess("Action Completed", "You have successfully sent money");
@@ -206,8 +204,6 @@ export const SendMoney = ({
       });
       setMoneySent(Number(amount));
       setReceiverName(companyName);
-      closeMoney();
-      closeDebtor();
       closePreview();
       openSuccess();
       // handleSuccess("Action Completed", "You have successfully sent money");
@@ -306,9 +302,7 @@ export const SendMoney = ({
             Your transfer of{" "}
             <Text inherit span fw={600} c="#97AD05">
               {formatNumber(moneySent, true, "EUR")}
-            </Text>{" "}
-            to {receiverName} is in progress. It will be processed shortly. You
-            will be notified on resolution of payment.
+            </Text>{" "} to {receiverName} is in progress. It will be processed shortly. You will be notified on resolution of payment.
           </Text>
         }
         title="Transaction Processing"

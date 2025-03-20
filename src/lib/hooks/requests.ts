@@ -193,6 +193,7 @@ export function useAllCompanyRequests(
       ...(customParams.type && { type: customParams.type.toUpperCase() }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -228,7 +229,15 @@ export function useAllCompanyRequests(
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status, obj.type, obj.page, obj.companyId]);
+  }, [
+    obj.date,
+    obj.limit,
+    obj.status,
+    obj.type,
+    obj.page,
+    obj.companyId,
+    obj.search,
+  ]);
 
   return { loading, requests, meta, revalidate };
 }
@@ -756,6 +765,7 @@ export function useCompanyDebitRequests(
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.status && { status: customParams.status }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -793,7 +803,7 @@ export function useCompanyDebitRequests(
       // Any cleanup code can go here
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page]);
+  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page, obj.search]);
 
   return { loading, requests, revalidate, meta };
 }

@@ -22,6 +22,7 @@ export function useBusiness(
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -44,6 +45,7 @@ export function useBusiness(
       ...(reqCount && { reqCount: "true" }),
       ...(otherReq && { otherReq: "true" }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.search && { search: customParams.search }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -98,6 +100,7 @@ export function useBusiness(
     obj.status,
     obj.page,
     obj.type,
+    obj.search,
   ]);
 
   return { loading, businesses, meta, stats, statsMeta };

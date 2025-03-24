@@ -29,6 +29,7 @@ const UsersComponent = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
   const { push } = useRouter();
 
   const searchParams = useSearchParams();
@@ -43,11 +44,10 @@ const UsersComponent = () => {
     ...(business && { business }),
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
   const { accounts, revalidate, meta, loading } = usePayoutAccount(queryParams);
-
-  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -58,22 +58,14 @@ const UsersComponent = () => {
 
   const tableData: TableData = {
     head: tableHeaders,
-    body: filteredSearch(
-      accounts ?? [],
-      ["Company.name", "legalEntity"],
-      debouncedSearch
-    ).map((element, index) => [
+    body: accounts?.map((element, index) => [
       `${element.Company.name}`,
       dayjs(element.createdAt).format("Do MMM, YYYY"),
       <BadgeComponent status={element.status} active key={element.id} />,
     ]),
   };
 
-  const rows = filteredSearch(
-    accounts ?? [],
-    ["Company.name", "legalEntity"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = (accounts ?? []).map((element, index) => (
     <TableTr
       key={index}
       //    onClick={() => handleRowClick(element.id)}

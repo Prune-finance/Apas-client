@@ -181,10 +181,11 @@ export function usePayoutAccount(customParams: IParams = {}) {
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.business && { business: customParams.business }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
-  const { limit, date, endDate, status, business, page } = obj;
+  const { limit, date, endDate, status, business, page, search } = obj;
 
   async function fetchAccount() {
     setLoading(true);
@@ -214,7 +215,7 @@ export function usePayoutAccount(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, date, endDate, status, business, page]);
+  }, [limit, date, endDate, status, business, page, search]);
 
   return { loading, accounts, revalidate, meta };
 }

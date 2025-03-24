@@ -187,9 +187,7 @@ export const PayoutTransactionTableRows = ({
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return (
-    searchProps && search ? filteredSearch(data, searchProps, search) : data
-  ).map((element) => (
+  return data.map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -255,16 +253,12 @@ export const PayoutTransactionTableRows = ({
 export const InquiryTableRows = ({
   data,
   business,
-  search,
-  searchProps,
 }: {
   data: Inquiry[];
   business?: boolean;
-  search: string;
-  searchProps: string[];
 }) => {
   const { push } = useRouter();
-  return filteredSearch(data, searchProps, search).map((element) => (
+  return data.map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {

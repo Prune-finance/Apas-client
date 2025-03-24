@@ -26,7 +26,6 @@ import { useMemo, useState } from "react";
 
 export const CancelledPayoutTransactions = () => {
   const [search, setSearch] = useState("");
-
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
@@ -49,6 +48,7 @@ export const CancelledPayoutTransactions = () => {
       ...(recipientIban && { recipientIban }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
+      search: debouncedSearch,
     };
   }, [
     date,
@@ -59,6 +59,7 @@ export const CancelledPayoutTransactions = () => {
     recipientIban,
     active,
     limit,
+    debouncedSearch,
   ]);
   const { transactions, loading, meta, revalidate } =
     usePayoutTransactions(param);
@@ -104,18 +105,7 @@ export const CancelledPayoutTransactions = () => {
       <TableComponent
         head={PayoutTableHeaders}
         // rows={rows}
-        rows={
-          <PayoutTransactionTableRows
-            data={transactions}
-            searchProps={[
-              "senderIban",
-              "recipientIban",
-              "recipientBic",
-              "recipientBankAddress",
-            ]}
-            search={debouncedSearch}
-          />
-        }
+        rows={<PayoutTransactionTableRows data={transactions} />}
         loading={loading}
       />
 

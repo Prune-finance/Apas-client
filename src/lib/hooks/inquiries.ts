@@ -20,10 +20,11 @@ export function useInquiries(customParams: IParams = {}) {
       ...(customParams.business && { business: customParams.business }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
-  const { limit, date, endDate, status, business, type, page } = obj;
+  const { limit, date, endDate, status, business, type, page, search } = obj;
 
   async function fetchInquiries() {
     setLoading(true);
@@ -53,7 +54,7 @@ export function useInquiries(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, date, endDate, status, business, type, page]);
+  }, [limit, date, endDate, status, business, type, page, search]);
 
   return { loading, inquiries, meta, revalidate };
 }

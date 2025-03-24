@@ -280,6 +280,7 @@ export function useBusinessAccountTransactions(
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.search && { search: customParams.search }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -301,6 +302,7 @@ export function useBusinessAccountTransactions(
     recipientName,
     senderName,
     not,
+    search,
   } = obj;
 
   async function fetchTrx() {
@@ -344,6 +346,7 @@ export function useBusinessAccountTransactions(
     senderName,
     not,
     id,
+    search,
   ]);
 
   return { loading, transactions, meta, revalidate };
@@ -367,6 +370,7 @@ export function usePayoutAccountTransactions(
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.search && { search: customParams.search }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -388,6 +392,7 @@ export function usePayoutAccountTransactions(
     recipientName,
     senderName,
     not,
+    search,
   } = obj;
 
   async function fetchTrx() {
@@ -431,6 +436,7 @@ export function usePayoutAccountTransactions(
     senderName,
     not,
     id,
+    search,
   ]);
 
   return { loading, transactions, meta, revalidate };

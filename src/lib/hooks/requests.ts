@@ -31,6 +31,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
       }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -44,6 +45,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     accountType,
     status,
     page,
+    search,
   } = obj;
 
   async function fetchAccounts() {
@@ -87,6 +89,7 @@ export function useRequests(customParams: IParams = {}, id: string = "") {
     country,
     accountType,
     status,
+    search,
   ]);
 
   return { loading, requests, meta, revalidate };
@@ -664,6 +667,7 @@ export function useCompanyWithAccountRequests(customParams: IParams = {}) {
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.business && { business: customParams.business }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -696,7 +700,15 @@ export function useCompanyWithAccountRequests(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page, obj.business]);
+  }, [
+    obj.date,
+    obj.endDate,
+    obj.limit,
+    obj.status,
+    obj.page,
+    obj.business,
+    obj.search,
+  ]);
 
   return { loading, businesses, revalidate, meta };
 }

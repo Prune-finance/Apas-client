@@ -285,82 +285,76 @@ export const InquiryTableRows = ({
 
 export const PayoutTrxReqTableRows = ({
   data,
-  search,
-  searchProps,
 }: {
   data: PayoutTransactionRequest[];
-  search: string;
-  searchProps: string[];
 }) => {
   const { open, setData } = Transaction();
-  return filteredSearch(data, searchProps, search).map(
-    (element: PayoutTransactionRequest) => (
-      <TableTr
-        key={element.id}
-        onClick={() => {
-          open();
-          setData({
-            recipientName: element.beneficiaryFullName,
-            recipientIban: element.destinationIBAN,
-            senderIban: element?.PayoutAccount?.accountNumber || "N/A",
-            senderName: element?.PayoutAccount?.accountName || "N/A",
-            recipientBankAddress: element.destinationBank,
-            recipientBic: element.destinationBIC,
-            destinationFirstName: "",
-            destinationLastName: "",
-            centrolinkRef: "",
-            recipientBankCountry: element.destinationCountry,
-            senderBic: "",
-            type: "DEBIT",
-            narration: element.reason,
+  return data.map((element: PayoutTransactionRequest) => (
+    <TableTr
+      key={element.id}
+      onClick={() => {
+        open();
+        setData({
+          recipientName: element.beneficiaryFullName,
+          recipientIban: element.destinationIBAN,
+          senderIban: element?.PayoutAccount?.accountNumber || "N/A",
+          senderName: element?.PayoutAccount?.accountName || "N/A",
+          recipientBankAddress: element.destinationBank,
+          recipientBic: element.destinationBIC,
+          destinationFirstName: "",
+          destinationLastName: "",
+          centrolinkRef: "",
+          recipientBankCountry: element.destinationCountry,
+          senderBic: "",
+          type: "DEBIT",
+          narration: element.reason,
 
-            company: {
-              id: "",
-              name: "",
-            } as BusinessData,
-            ...element,
-            status: element.status as unknown as
-              | "PENDING"
-              | "REJECTED"
-              | "CONFIRMED"
-              | "CANCELLED",
-          } as unknown as TransactionType);
-        }}
-        style={{ cursor: "pointer" }}
-      >
-        <TableTd>
-          <Stack gap={0}>
-            <Text fz={12} fw={400}>
-              {element.beneficiaryFullName}
-            </Text>
-            <Text fz={10} fw={400}>
-              {element.destinationIBAN}
-            </Text>
-          </Stack>
-        </TableTd>
+          company: {
+            id: "",
+            name: "",
+          } as BusinessData,
+          ...element,
+          status: element.status as unknown as
+            | "PENDING"
+            | "REJECTED"
+            | "CONFIRMED"
+            | "CANCELLED",
+        } as unknown as TransactionType);
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {element.beneficiaryFullName}
+          </Text>
+          <Text fz={10} fw={400}>
+            {element.destinationIBAN}
+          </Text>
+        </Stack>
+      </TableTd>
 
-        <TableTd>{element?.PayoutAccount?.accountNumber || "N/A"}</TableTd>
+      <TableTd>{element?.PayoutAccount?.accountNumber || "N/A"}</TableTd>
 
-        <TableTd>{element.destinationBank}</TableTd>
+      <TableTd>{element.destinationBank}</TableTd>
 
-        <TableTd w="15%">{element.reference}</TableTd>
+      <TableTd w="15%">{element.reference}</TableTd>
 
-        <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
 
-        <TableTd>
-          <Stack gap={0}>
-            <Text fz={12} fw={400}>
-              {dayjs(element.createdAt).format("Do MMMM, YYYY")}
-            </Text>
-            <Text fz={10} fw={400}>
-              {dayjs(element.createdAt).format("hh:mm a")}
-            </Text>
-          </Stack>
-        </TableTd>
-        <TableTd>
-          <BadgeComponent status={element.status} />
-        </TableTd>
-      </TableTr>
-    )
-  );
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={400}>
+            {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+          </Text>
+          <Text fz={10} fw={400}>
+            {dayjs(element.createdAt).format("hh:mm a")}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
 };

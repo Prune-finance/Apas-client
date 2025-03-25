@@ -118,6 +118,7 @@ export function useAllRequests(customParams: IParams = {}) {
         accountType: customParams.accountType,
       }),
       ...(customParams.business && { business: customParams.business }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -132,6 +133,7 @@ export function useAllRequests(customParams: IParams = {}) {
     business,
     accountType,
     page,
+    search,
   } = obj;
 
   async function fetchAccounts() {
@@ -175,6 +177,7 @@ export function useAllRequests(customParams: IParams = {}) {
     business,
     accountType,
     page,
+    search,
   ]);
 
   return { loading, requests, meta, revalidate };
@@ -268,6 +271,7 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
       }),
       ...(customParams.senderIban && { senderIban: customParams.senderIban }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -282,6 +286,7 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
     date,
     endDate,
     page,
+    search,
   } = obj;
 
   async function fetchAccounts() {
@@ -327,6 +332,7 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
     date,
     endDate,
     page,
+    search,
   ]);
 
   return { loading, requests, meta, revalidate };
@@ -567,6 +573,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.business && { business: customParams.business }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -595,7 +602,7 @@ export function useDebitRequests(customParams: IDebitRequest = {}) {
       // Any cleanup code can go here
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [obj.date, obj.endDate, obj.limit, obj.status]);
+  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.search]);
 
   return { loading, requests, revalidate };
 }
@@ -613,6 +620,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
       ...(customParams.business && { business: customParams.business }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.companyId && { companyId: customParams.companyId }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -649,6 +657,7 @@ export function usePayoutRequests(customParams: IDebitRequest = {}) {
     obj.companyId,
     obj.endDate,
     obj.business,
+    obj.search,
   ]);
 
   return { loading, requests, revalidate, meta };
@@ -726,6 +735,7 @@ export function useCompanyWithDebitRequests(customParams: IParams = {}) {
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.business && { business: customParams.business }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -757,7 +767,15 @@ export function useCompanyWithDebitRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.endDate, obj.limit, obj.status, obj.page, obj.business]);
+  }, [
+    obj.date,
+    obj.endDate,
+    obj.limit,
+    obj.status,
+    obj.page,
+    obj.business,
+    obj.search,
+  ]);
 
   return { loading, businesses, revalidate, meta };
 }
@@ -833,10 +851,11 @@ export function useLiveKeyRequests(customParams: IParams = {}) {
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.business && { business: customParams.business }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
-  const { limit, page, date, endDate, business, status } = obj;
+  const { limit, page, date, endDate, business, status, search } = obj;
   async function fetchAccounts() {
     setLoading(true);
     try {
@@ -866,7 +885,7 @@ export function useLiveKeyRequests(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, page, date, endDate, business, status]);
+  }, [limit, page, date, endDate, business, status, search]);
 
   return { loading, requests, revalidate, meta };
 }

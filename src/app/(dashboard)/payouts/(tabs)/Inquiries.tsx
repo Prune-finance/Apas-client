@@ -80,8 +80,7 @@ export const InquiriesTab = () => {
           <InquiryTableRows
             data={inquiries}
             // data={inquiriesData}
-            searchProps={["Transaction.centrolinkRef", "type", "status"]}
-            search={debouncedSearch}
+
             business
           />
         }

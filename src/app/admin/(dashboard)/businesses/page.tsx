@@ -73,6 +73,8 @@ function Businesses() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { status, date, endDate, name, contactEmail } = Object.fromEntries(
     searchParams.entries()
@@ -86,6 +88,7 @@ function Businesses() {
     ...(contactEmail && { email: contactEmail }),
     limit: parseInt(limit ?? "10", 10),
     page: active,
+    search: debouncedSearch,
   };
 
   const { loading, businesses, meta } = useBusiness(queryParams);
@@ -97,8 +100,6 @@ function Businesses() {
   } = useTransactions();
 
   const [opened, { toggle }] = useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { push } = useRouter();
 
@@ -145,11 +146,9 @@ function Businesses() {
     push(`/admin/businesses/${id}`);
   };
 
-  const rows = filteredSearch(
-    businesses,
-    ["name", "contactEmail"],
-    debouncedSearch
-  ).map((element, index) => (
+  // filteredSearch(businesses, ["name", "contactEmail"], debouncedSearch);
+
+  const rows = businesses.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => handleRowClick(element.id)}

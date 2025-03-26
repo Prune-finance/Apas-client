@@ -222,7 +222,7 @@ export default function Home() {
                       { name: "pending", color: "#F79009", label: "Pending" },
                     ]}
                     barProps={{ barSize: 20, radius: 3 }}
-                    minBarSize={0}
+                    // minBarSize={0}
                     gridAxis="xy"
                     valueFormatter={(value) =>
                       new Intl.NumberFormat("en-US").format(value)

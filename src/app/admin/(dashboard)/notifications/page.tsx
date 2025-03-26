@@ -1,8 +1,8 @@
 "use client";
 
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import TabsComponent from "@/ui/components/Tabs";
-import { Flex, TabsPanel, Title } from "@mantine/core";
+import { Flex, Tabs, TabsPanel, Title } from "@mantine/core";
 import { DatePickerInput, DatesRangeValue } from "@mantine/dates";
 import { IconCalendarMonth, IconChecks } from "@tabler/icons-react";
 import { useState } from "react";

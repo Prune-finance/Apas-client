@@ -111,6 +111,7 @@ function Reactivate() {
       accountType:
         accountType.toLowerCase() === "individual" ? "USER" : "CORPORATE",
     }),
+    search: debouncedSearch,
   };
 
   const { requests, revalidate, loading, meta } = useAllRequests({
@@ -224,11 +225,7 @@ function Reactivate() {
     );
   };
 
-  const rows = filteredSearch(
-    requests,
-    ["name", "contactEmail"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = requests.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => {

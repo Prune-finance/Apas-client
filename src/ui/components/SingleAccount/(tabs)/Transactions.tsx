@@ -53,81 +53,7 @@ import Cookies from "js-cookie";
 import { DatePickerInput } from "@mantine/dates";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
-
-interface Meta {
-  out: number;
-  total: number;
-  in: number;
-  totalAmount: number;
-}
-interface Props {
-  transactions: TransactionType[];
-  loading: boolean;
-  payout?: boolean;
-  meta: Meta | null;
-  children: React.ReactNode;
-  accountID?: string;
-  location?: string;
-  isUser?: boolean;
-}
-
-export interface BalanceDetail {
-  id: string;
-  type: "DEBIT" | "CREDIT";
-  amount: number;
-  balance: number;
-  accountId: string;
-  companyAccountId: string | null;
-  payoutAccountId: string | null;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface AccountDetails {
-  id: string;
-  iban: string;
-  country: string;
-  accountName: string;
-  createdAt: string;
-}
-
-export interface DownloadStatementData {
-  accountId: string;
-  amount: number;
-  balance: number;
-  description: string;
-  ref: string;
-  companyAccountId: string | null;
-  createdAt: string; // ISO date string
-  deletedAt: string | null; // ISO date string or null
-  id: string;
-  narration: string | null;
-  payoutAccountId: string | null;
-  reference: string;
-  senderBic: string;
-  senderIban: string;
-  senderName: string;
-  status: "PENDING" | "COMPLETED" | "FAILED"; // assuming possible values based on context
-  type: "DEBIT" | "CREDIT"; // assuming possible transaction types
-  updatedAt: string; // ISO date string
-}
-
-export interface downloadStatementMeta {
-  summary: {
-    openingBalance: BalanceDetail;
-    closingBalance: BalanceDetail;
-    range: string;
-    moneyIn: number;
-    moneyOut: number;
-    address: string;
-  };
-  accountDetails: AccountDetails;
-  out: number;
-  in: number;
-  totalAmount: number;
-  total: number;
-}
-
+import { useQueryState } from "nuqs";
 export const Transactions = ({
   transactions,
   loading,
@@ -143,8 +69,8 @@ export const Transactions = ({
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
   const { data, opened, close } = Transaction();
 
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 500);
+  // const [search, setSearch] = useState("");
+  // const [debouncedSearch] = useDebouncedValue(search, 500);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
     useDisclosure(false);
@@ -158,6 +84,13 @@ export const Transactions = ({
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
+
+  const [search, setSearch] = useQueryState("search", {
+    defaultValue: "",
+    history: "push",
+    throttleMs: 3000,
+    shallow: false,
+  });
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -274,7 +207,11 @@ export const Transactions = ({
       <InfoCards title="Overview" details={overviewDetails} />
 
       <Group mt={32} justify="space-between">
-        <SearchInput search={search} setSearch={setSearch} />
+        <SearchInput
+          // search={search} setSearch={setSearch}
+          value={search}
+          onChange={(e) => setSearch(e.currentTarget.value)}
+        />
 
         <Group gap={12}>
           <SecondaryBtn
@@ -326,14 +263,14 @@ export const Transactions = ({
           payout ? (
             <PayoutTransactionTableRows
               data={transactions}
-              searchProps={searchProps}
-              search={debouncedSearch}
+              // searchProps={searchProps}
+              // search={debouncedSearch}
             />
           ) : (
             <IssuedTransactionTableRows
               data={transactions}
-              searchProps={searchProps}
-              search={debouncedSearch}
+              // searchProps={searchProps}
+              // search={debouncedSearch}
               isUser={isUser}
             />
           )
@@ -423,12 +360,86 @@ export const Transactions = ({
   );
 };
 
-const searchProps = [
-  "senderIban",
-  "recipientIban",
-  "recipientBankAddress",
-  "senderName",
-  "recipientName",
-  "centrolinkRef",
-  "reference",
-];
+// const searchProps = [
+//   "senderIban",
+//   "recipientIban",
+//   "recipientBankAddress",
+//   "senderName",
+//   "recipientName",
+//   "centrolinkRef",
+//   "reference",
+// ];
+
+interface Meta {
+  out: number;
+  total: number;
+  in: number;
+  totalAmount: number;
+}
+interface Props {
+  transactions: TransactionType[];
+  loading: boolean;
+  payout?: boolean;
+  meta: Meta | null;
+  children: React.ReactNode;
+  accountID?: string;
+  location?: string;
+  isUser?: boolean;
+}
+
+export interface BalanceDetail {
+  id: string;
+  type: "DEBIT" | "CREDIT";
+  amount: number;
+  balance: number;
+  accountId: string;
+  companyAccountId: string | null;
+  payoutAccountId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AccountDetails {
+  id: string;
+  iban: string;
+  country: string;
+  accountName: string;
+  createdAt: string;
+}
+
+export interface DownloadStatementData {
+  accountId: string;
+  amount: number;
+  balance: number;
+  description: string;
+  ref: string;
+  companyAccountId: string | null;
+  createdAt: string; // ISO date string
+  deletedAt: string | null; // ISO date string or null
+  id: string;
+  narration: string | null;
+  payoutAccountId: string | null;
+  reference: string;
+  senderBic: string;
+  senderIban: string;
+  senderName: string;
+  status: "PENDING" | "COMPLETED" | "FAILED"; // assuming possible values based on context
+  type: "DEBIT" | "CREDIT"; // assuming possible transaction types
+  updatedAt: string; // ISO date string
+}
+
+export interface downloadStatementMeta {
+  summary: {
+    openingBalance: BalanceDetail;
+    closingBalance: BalanceDetail;
+    range: string;
+    moneyIn: number;
+    moneyOut: number;
+    address: string;
+  };
+  accountDetails: AccountDetails;
+  out: number;
+  in: number;
+  totalAmount: number;
+  total: number;
+}

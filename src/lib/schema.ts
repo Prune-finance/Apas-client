@@ -867,4 +867,13 @@ export const validateInviteUser = z.object({
   permissions: PermissionSchema,
 });
 
+export const validateEditUser = z.object({
+  email: z.string().email("Please provide a valid email"),
+  firstName: z.string(),
+  lastName: z.string(),
+  roles: z.string().min(1, "Role is required"),
+  // roles: z.array(z.string()).min(1, "Role is required"),
+  permissions: PermissionSchema,
+});
+
 export type InviteUserType = z.infer<typeof validateInviteUser>;

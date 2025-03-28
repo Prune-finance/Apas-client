@@ -165,13 +165,7 @@ export const PendingPayoutRequests = () => {
 
       <TableComponent
         head={PayoutRequestsTableHeaders}
-        rows={
-          <PayoutTrxReqTableRows
-            search={debouncedSearch}
-            data={requests}
-            searchProps={PayoutReqSearchProps}
-          />
-        }
+        rows={<PayoutTrxReqTableRows data={requests} />}
         loading={loading}
       />
 

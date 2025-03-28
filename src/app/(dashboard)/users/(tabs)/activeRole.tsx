@@ -189,12 +189,12 @@ const RowComponent = ({
             >
               <Text fz={12}>Deactivate</Text>
             </MenuItem>
-            <MenuItem
+            {/* <MenuItem
               leftSection={<IconUser size={14} />}
               // onClick={openInvite}
             >
               <Text fz={12}>Assign User</Text>
-            </MenuItem>
+            </MenuItem> */}
           </MenuDropdown>
         </Menu>
       </TableTd>

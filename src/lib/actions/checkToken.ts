@@ -2,11 +2,11 @@
 
 import axios from "axios";
 import { cookies } from "next/headers";
-import { AdminData } from "../hooks/admins";
+import { AdminData, UserData } from "../hooks/admins";
 
 export async function checkToken(
   isAdmin: boolean = false
-): Promise<{ user: AdminData | null; success: boolean }> {
+): Promise<{ user: UserData | null; success: boolean }> {
   const token = cookies().get("auth")?.value;
 
   try {

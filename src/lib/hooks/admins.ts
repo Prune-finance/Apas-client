@@ -215,3 +215,21 @@ export interface AdminData {
   company?: { name: string; id: string };
   companyId?: string;
 }
+
+export interface UserData {
+  id: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: null;
+  firstName: string;
+  lastName: string;
+  lastLogin: Date | null;
+  lastLogIn: Date | null;
+  status: "ACTIVE" | "INACTIVE" | "INVITE_PENDING";
+  role: "USER" | "INITIATOR";
+  roles: string[];
+  permissions: string[];
+  company?: { name: string; id: string };
+  companyId?: string;
+}

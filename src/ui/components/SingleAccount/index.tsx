@@ -97,6 +97,7 @@ import PendingModalImage from "@/assets/pending-image.png";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
+import { useHasPermission } from "@/lib/hooks/checkPermission";
 
 type Param = { id: string };
 interface Props {
@@ -873,6 +874,7 @@ export const DefaultAccountHead = ({
   const [processingTrust, setProcessingTrust] = useState(false);
 
   const { user } = User();
+  const canSendMoney = useHasPermission("Transaction Initiation");
 
   const axios = createAxiosInstance("payouts");
 
@@ -958,7 +960,8 @@ export const DefaultAccountHead = ({
               text="Send Money"
               fw={600}
               action={openMoney}
-              display={user?.role === "INITIATOR" ? "block" : "none"}
+              display={canSendMoney ? "block" : "none"}
+              // display={user?.role === "INITIATOR" ? "block" : "none"}
             />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}

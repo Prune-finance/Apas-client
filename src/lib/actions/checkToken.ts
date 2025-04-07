@@ -8,7 +8,7 @@ export async function checkToken(
   isAdmin: boolean = false
 ): Promise<{ user: AdminData | null; success: boolean }> {
   const token = cookies().get("auth")?.value;
-  let success = false;
+
   try {
     const { data: res } = await axios.get(
       `${process.env.NEXT_PUBLIC_SERVER_URL}/${isAdmin ? "admin" : "auth"}/me`,

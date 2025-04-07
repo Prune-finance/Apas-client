@@ -719,6 +719,8 @@ export interface IParams {
   destinationBank?: string;
   firstName?: string;
   lastName?: string;
+  reqCount?: string;
+  otherReq?: string;
 }
 
 export const removeDirectorValues = {

@@ -22,9 +22,9 @@ import {
   IconEdit,
   IconPlus,
 } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TableComponent } from "@/ui/components/Table";
-import { formatNumber } from "@/lib/utils";
+import { calculateTotalPages, formatNumber, sanitizeURL } from "@/lib/utils";
 import Plan from "@/lib/store/plan";
 import PaginationComponent from "@/ui/components/Pagination";
 import PlanDrawer from "./drawer";
@@ -47,9 +47,21 @@ export default function PricingPlans() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { pricingPlan, loading, meta } = usePricingPlan();
+  const queryParams = {
+    search: debouncedSearch,
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+  };
+
+  const { pricingPlan, loading, meta } = usePricingPlan(queryParams);
 
   const { opened, data, close } = Plan();
+
+  const dependencies = sanitizeURL({ ...queryParams, page: undefined });
+
+  useEffect(() => {
+    setActive(1);
+  }, [dependencies]);
 
   return (
     <main>
@@ -74,9 +86,7 @@ export default function PricingPlans() {
 
         <TableComponent
           head={tableHeaders}
-          rows={
-            <RowComponent plans={pricingPlan} searchValue={debouncedSearch} />
-          }
+          rows={<RowComponent plans={pricingPlan} />}
           loading={loading}
         />
 
@@ -92,7 +102,7 @@ export default function PricingPlans() {
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+          total={calculateTotalPages(limit, meta?.total)}
         />
       </Paper>
 
@@ -124,43 +134,35 @@ const tableHeaders = [
   "Action",
 ];
 
-const RowComponent = ({
-  plans,
-  searchValue,
-}: {
-  plans: PricingPlan[];
-  searchValue: string;
-}) => {
+const RowComponent = ({ plans }: { plans: PricingPlan[] }) => {
   const { open, setData } = Plan();
 
-  return filteredSearch(plans, ["name", "cost", "cycle"], searchValue).map(
-    (plan) => (
-      <TableTr
-        key={plan.id}
-        onClick={() => {
-          setData(plan);
-          open();
-        }}
-        style={{ cursor: "pointer" }}
-      >
-        <TableTd>{plan.name}</TableTd>
-        <TableTd>{plan.cycle}</TableTd>
-        <TableTd>{formatNumber(plan.cost, true, "EUR")}</TableTd>
-        <TableTd>{dayjs(plan.createdAt).format("Do MMM, YYYY")}</TableTd>
-        <TableTd>
-          <Text fz={12} lineClamp={1}>
-            {plan.description ? plan.description : "-"}
-          </Text>
-        </TableTd>
-        {/* <TableTd>
+  return plans.map((plan) => (
+    <TableTr
+      key={plan.id}
+      onClick={() => {
+        setData(plan);
+        open();
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd>{plan.name}</TableTd>
+      <TableTd>{plan.cycle}</TableTd>
+      <TableTd>{formatNumber(plan.cost, true, "EUR")}</TableTd>
+      <TableTd>{dayjs(plan.createdAt).format("Do MMM, YYYY")}</TableTd>
+      <TableTd>
+        <Text fz={12} lineClamp={1}>
+          {plan.description ? plan.description : "-"}
+        </Text>
+      </TableTd>
+      {/* <TableTd>
           {plan.features.length ? plan.features.join(", ") : "-"}
         </TableTd> */}
-        <TableTd onClick={(e) => e.stopPropagation()}>
-          <MenuComponent id={plan.id.toString()} />
-        </TableTd>
-      </TableTr>
-    )
-  );
+      <TableTd onClick={(e) => e.stopPropagation()}>
+        <MenuComponent id={plan.id.toString()} />
+      </TableTd>
+    </TableTr>
+  ));
 };
 
 const MenuComponent = ({ id }: { id: string }) => {

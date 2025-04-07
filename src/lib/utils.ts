@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { RequestData } from "./hooks/requests";
+import { IParams } from "./schema";
 
 export const formatNumber = (
   number: number,
@@ -173,7 +174,7 @@ export const calculateTotalPages = (
 export const isDummyIBAN = (iban: string): boolean =>
   iban === "GBXXXXXXXXXXXXXXXXXX";
 
-export const sanitizeURL = (obj: Record<string, string>): string => {
+export const sanitizeURL = (obj: IParams): string => {
   const sanitizedObj = Object.fromEntries(
     Object.entries(obj).filter(([_, value]) => Boolean(value))
   );

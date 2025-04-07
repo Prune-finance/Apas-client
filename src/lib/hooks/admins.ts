@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo } from "react";
 import { IParams } from "../schema";
 import createAxiosInstance from "@/lib/axios";
 import { Permission, Role } from "./roles";
+import { sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("auth");
 
@@ -23,21 +24,36 @@ export function useAdmins(customParams: IParams = {}) {
       ...(customParams.firstName && { firstName: customParams.firstName }),
       ...(customParams.lastName && { lastName: customParams.lastName }),
       ...(customParams.email && { email: customParams.email }),
+      ...(customParams.search && { search: customParams.search }),
       ...(customParams.page && { page: customParams.page }),
     };
   }, [customParams]);
 
-  const { limit, date, endDate, status, firstName, lastName, email, page } =
-    obj;
+  const params = sanitizeURL(customParams as Record<string, string>);
+  console.log(params);
+
+  const {
+    limit,
+    date,
+    endDate,
+    status,
+    firstName,
+    lastName,
+    email,
+    page,
+    search,
+  } = obj;
 
   async function fetchUsers() {
-    const params = new URLSearchParams(obj as Record<string, string>);
+    // const params = new URLSearchParams(obj as Record<string, string>);
 
     setLoading(true);
     try {
       const { data } = await axios.get("/admin/admins", {
         params,
       });
+
+      console.log(data);
 
       setUsers(data.data);
       setMeta(data.meta);
@@ -57,7 +73,7 @@ export function useAdmins(customParams: IParams = {}) {
       // Any cleanup code can go here
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [limit, date, endDate, status, firstName, lastName, email, page]);
+  }, []);
 
   return { loading, users, revalidate, meta };
 }

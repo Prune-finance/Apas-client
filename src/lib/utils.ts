@@ -172,3 +172,11 @@ export const calculateTotalPages = (
 
 export const isDummyIBAN = (iban: string): boolean =>
   iban === "GBXXXXXXXXXXXXXXXXXX";
+
+export const sanitizeURL = (obj: Record<string, string>): string => {
+  const sanitizedObj = Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => Boolean(value))
+  );
+
+  return new URLSearchParams(sanitizedObj).toString();
+};

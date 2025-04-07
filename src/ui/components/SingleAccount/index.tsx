@@ -785,13 +785,11 @@ export const IssuedAccountHead = ({
     >
       <Group gap={12} align="center">
         {!loading ? (
-          <Avatar
-            variant="filled"
-            size="lg"
-            color="var(--prune-primary-700)"
-          >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
-            0
-          )}`}</Avatar>
+          <Avatar variant="filled" size="lg" color="var(--prune-primary-700)">
+            {getInitials(
+              `${account?.firstName ?? ""} ${account?.lastName ?? ""}`
+            )}
+          </Avatar>
         ) : (
           <Skeleton circle h={50} w={50} />
         )}
@@ -1137,8 +1135,9 @@ export const AccountInfo = ({
                 color="var(--prune-primary-600)"
                 c="var(--prune-text-gray-800)"
                 // p="6px 8px"
-                py={12}
+                // py={18}
                 px={8}
+                h={30}
                 leftSection={
                   <ThemeIcon
                     variant="transparent"

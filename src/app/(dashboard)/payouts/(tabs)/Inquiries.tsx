@@ -28,11 +28,11 @@ export const InquiriesTab = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
+
   const { status, type, date, endDate } = Object.fromEntries(
     searchParams.entries()
   );
-
-  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -80,8 +80,7 @@ export const InquiriesTab = () => {
           <InquiryTableRows
             data={inquiries}
             // data={inquiriesData}
-            searchProps={["Transaction.centrolinkRef", "type", "status"]}
-            search={debouncedSearch}
+
             business
           />
         }

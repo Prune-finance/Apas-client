@@ -41,12 +41,25 @@ export default function PermissionsModal({
       ? form.values.roles
       : [form.values.roles];
 
-    const uniquePermissionsId = Array.from(
+    // Get permissions from roles
+    const rolePermissionIds = Array.from(
       new Set(
         roles
           .filter((r) => selectedRoles.includes(r.id))
           .flatMap((r) => r.permissions.map((p) => p.id))
       )
+    );
+
+    // Get directly assigned permissions from form values
+    const directPermissionIds =
+      form.values.permissions
+        ?.flat()
+        ?.filter((p) => p?.status)
+        ?.map((p) => p.id) || [];
+
+    // Combine both sets of permissions
+    const uniquePermissionsId = Array.from(
+      new Set([...rolePermissionIds, ...directPermissionIds])
     );
 
     const permissionArray =

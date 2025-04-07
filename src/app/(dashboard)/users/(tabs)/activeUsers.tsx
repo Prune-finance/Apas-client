@@ -70,6 +70,8 @@ import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)
 import useAxios from "@/lib/hooks/useAxios";
 import { calculateTotalPages } from "@/lib/utils";
 import { Permission, transformPermissionsToCategory } from "@/lib/hooks/roles";
+import { checkToken } from "@/lib/actions/checkToken";
+import User from "@/lib/store/user";
 
 export default function ActiveUsers() {
   const searchParams = useSearchParams();
@@ -109,6 +111,8 @@ export default function ActiveUsers() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
+  const { setUser: setStoreUser, user: storeUser } = User();
+
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
   const [deactivateOpened, { open: deactivateOpen, close: deactivateClose }] =
@@ -140,7 +144,7 @@ export default function ActiveUsers() {
       ),
     },
 
-    onSuccess: () => {
+    onSuccess: async () => {
       handleSuccess(
         isEdit ? "Role & Permission Update" : "New Member Invite",
         isEdit
@@ -152,6 +156,12 @@ export default function ActiveUsers() {
       close();
       router.push("/users?tab=roles");
       revalidate();
+
+      if (storeUser?.id === user?.id) {
+        const { user } = await checkToken();
+
+        setStoreUser(user);
+      }
     },
   });
 
@@ -178,6 +188,8 @@ export default function ActiveUsers() {
     open();
     setIsEdit(true);
   };
+
+  console.log(form.values);
 
   const handleUserDeactivation = async (
     id: string,

@@ -43,6 +43,7 @@ import {
   inviteUser,
   InviteUserType,
   newAdmin,
+  validateEditUser,
   validateInviteUser,
   validateNewAdmin,
 } from "@/lib/schema";
@@ -120,7 +121,7 @@ export default function ActiveUsers() {
 
   const form = useForm<InviteUserType>({
     initialValues: inviteUser,
-    validate: zodResolver(validateInviteUser),
+    validate: zodResolver(isEdit ? validateEditUser : validateInviteUser),
   });
 
   const filterForm = useForm<FilterType>({
@@ -168,8 +169,8 @@ export default function ActiveUsers() {
   const handleEdit = (element: AdminData) => {
     form.setValues({
       email: element.email,
-      firstName: element.firstName,
-      lastName: element.lastName,
+      firstName: element.firstName || "",
+      lastName: element.lastName || "",
       // role: element.role,
       roles: element.roles?.[0]?.id || "",
       permissions: Object.entries(

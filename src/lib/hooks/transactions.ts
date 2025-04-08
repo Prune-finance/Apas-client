@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
 import { BusinessData } from "./businesses";
 import { IParams } from "../schema";
+import useAxios from "./useAxios";
+import { sanitizedQueryParams, sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 const payoutAxiosInstance = createAxiosInstance("payouts");
@@ -809,85 +811,14 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
 }
 
 export function useUserPayoutTransactions(customParams: ITrx = {}) {
-  const [transactions, setTransactions] = useState<TransactionType[]>([]);
-  const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data, meta, loading, queryFn } = useAxios<TransactionType[], Meta>({
+    endpoint: "/payout/transactions",
+    baseURL: "payouts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
 
-  const obj = useMemo(() => {
-    return {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.not && { not: customParams.not }),
-      ...(customParams.page && { page: customParams.page }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.type && { type: customParams.type }),
-      ...(customParams.recipientIban && {
-        recipientIban: customParams.recipientIban,
-      }),
-      ...(customParams.recipientName && {
-        recipientName: customParams.recipientName,
-      }),
-
-      ...(customParams.senderName && { senderName: customParams.senderName }),
-    };
-  }, [customParams]);
-
-  const {
-    limit,
-    page,
-    date,
-    endDate,
-    status,
-    type,
-    recipientIban,
-    recipientName,
-    senderName,
-    not,
-  } = obj;
-  async function fetchTrx() {
-    setLoading(true);
-    const params = new URLSearchParams(obj as Record<string, string>);
-
-    // {{payout-srv}}/v1/payout/transactions
-
-    try {
-      const { data } = await payoutAxiosInstance.get(`/payout/transactions`, {
-        params,
-      });
-
-      setTransactions(data.data);
-      setMeta(data.meta);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const revalidate = () => fetchTrx();
-
-  useEffect(() => {
-    fetchTrx();
-
-    return () => {
-      // Any cleanup code can go here
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    limit,
-    page,
-    date,
-    endDate,
-    status,
-    type,
-    recipientIban,
-    recipientName,
-    senderName,
-    not,
-  ]);
-
-  return { loading, transactions, meta, revalidate };
+  return { loading, transactions: data || [], meta, revalidate: queryFn };
 }
 
 export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {

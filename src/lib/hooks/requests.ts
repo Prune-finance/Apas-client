@@ -4,6 +4,8 @@ import createAxiosInstance from "@/lib/axios";
 
 import { IParams } from "../schema";
 import { BusinessData } from "./businesses";
+import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import useAxios from "./useAxios";
 
 const acctAxiosInstance = createAxiosInstance("accounts");
 const authAxiosInstance = createAxiosInstance("auth");
@@ -459,73 +461,16 @@ export function useSingleRequest(id: string) {
 }
 
 export function useUserRequests(customParams: IParams = {}) {
-  const [requests, setRequests] = useState<RequestData[]>([]);
-  const [meta, setMeta] = useState<RequestMeta>();
-  const [loading, setLoading] = useState(true);
-
-  const obj = useMemo(() => {
-    return {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.type && { type: customParams.type }),
-      ...(customParams.page && { page: customParams.page }),
-      ...(customParams.firstName && {
-        firstName: customParams.firstName,
-      }),
-      ...(customParams.lastName && {
-        lastName: customParams.lastName,
-      }),
-      ...(customParams.country && { country: customParams.country }),
-    };
-  }, [customParams]);
-
-  const {
-    date,
-    limit,
-    lastName,
-    firstName,
-    country,
-    endDate,
-    status,
-    type,
-    page,
-  } = obj;
-
-  async function fetchAccounts() {
-    const params = new URLSearchParams(obj as Record<string, string>);
-
-    setLoading(true);
-    try {
-      const { data } = await acctAxiosInstance.get(
-        `/accounts/dashboard/requests`,
-        {
-          params,
-        }
-      );
-
-      setMeta(data.meta);
-      setRequests(data.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
+  const { data, meta, loading, queryFn } = useAxios<RequestData[], RequestMeta>(
+    {
+      endpoint: "/accounts/dashboard/requests",
+      baseURL: "accounts",
+      params: sanitizedQueryParams(customParams),
+      dependencies: [sanitizeURL(customParams)],
     }
-  }
+  );
 
-  const revalidate = () => fetchAccounts();
-
-  useEffect(() => {
-    fetchAccounts();
-
-    return () => {
-      // Any cleanup code can go here
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date, limit, firstName, lastName, country, endDate, status, type, page]);
-
-  return { loading, requests, meta, revalidate };
+  return { loading, requests: data || [], meta, revalidate: queryFn };
 }
 
 export function useSingleUserRequest(id: string) {

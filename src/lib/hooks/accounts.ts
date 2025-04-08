@@ -6,6 +6,7 @@ import { custom } from "zod";
 
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "./useAxios";
+import { sanitizedQueryParams, sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 
@@ -238,92 +239,29 @@ export function useAccountStatistics({
 }
 
 export function useUserAccounts(customParams: IParams = {}) {
-  const [accounts, setAccounts] = useState<AccountData[]>([]);
-  const [meta, setMeta] = useState<AccountMeta>();
-  const [loading, setLoading] = useState(true);
-  const [statusLoading, setStatusLoading] = useState(true);
-  const [issuanceRequests, setIssuanceRequests] = useState<
-    { id: string; status: "PENDING" | "APPROVED" | "REJECTED" }[]
-  >([]);
-
-  const obj = useMemo(() => {
-    return {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.type && { type: customParams.type }),
-      ...(customParams.page && { page: customParams.page }),
-      ...(customParams.accountName && {
-        accountName: customParams.accountName,
-      }),
-      ...(customParams.accountNumber && {
-        accountNumber: customParams.accountNumber,
-      }),
-    };
-  }, [customParams]);
+  const { data, meta, loading, queryFn } = useAxios<AccountData[], AccountMeta>(
+    {
+      endpoint: "/accounts/dashboard",
+      baseURL: "accounts",
+      params: sanitizedQueryParams(customParams),
+      dependencies: [sanitizeURL(customParams)],
+    }
+  );
 
   const {
-    limit,
-    status,
-    date,
-    endDate,
-    accountName,
-    type,
-    accountNumber,
-    page,
-  } = obj;
-
-  async function fetchAccounts() {
-    const params = new URLSearchParams(
-      obj as Record<string, string>
-    ).toString();
-
-    setLoading(true);
-    try {
-      const { data } = await axios.get(`/accounts/dashboard?${params}`);
-
-      setMeta(data.meta);
-      setAccounts(data.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  const handleCheckRequestAccess = async () => {
-    setStatusLoading(true);
-    // &status=PENDING
-    try {
-      const { data: res } = await axios.get(
-        `/accounts/dashboard/requests/all?type=ACCOUNT_ISSUANCE`
-      );
-
-      setIssuanceRequests(res?.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setStatusLoading(false);
-    }
-  };
-
-  const revalidate = async () => fetchAccounts();
-  const revalidateIssuance = () => handleCheckRequestAccess();
-
-  useEffect(() => {
-    fetchAccounts();
-    handleCheckRequestAccess();
-
-    return () => {
-      // Any cleanup code can go here
-    };
-  }, [limit, status, date, endDate, accountName, type, accountNumber, page]);
+    data: issuanceRequests,
+    loading: statusLoading,
+    queryFn: revalidateIssuance,
+  } = useAxios<{ id: string; status: "PENDING" | "APPROVED" | "REJECTED" }[]>({
+    endpoint: "/accounts/dashboard/requests/all",
+    baseURL: "accounts",
+    params: { type: "ACCOUNT_ISSUANCE" },
+  });
 
   return {
     loading,
-    accounts,
-    revalidate,
+    accounts: data,
+    revalidate: queryFn,
     revalidateIssuance,
     meta,
     statusLoading,

@@ -953,55 +953,64 @@ export interface Meta {
 }
 
 export function useUserDebitRequests(customParams: IParams = {}) {
-  const [requests, setRequests] = useState<DebitRequest[]>([]);
-  const [meta, setMeta] = useState<RequestMeta>();
-  const [loading, setLoading] = useState(true);
+  const { data, meta, loading, queryFn } = useAxios<
+    DebitRequest[],
+    RequestMeta
+  >({
+    endpoint: `/payout/debit/requests`,
+    baseURL: "payouts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  // const [requests, setRequests] = useState<DebitRequest[]>([]);
+  // const [meta, setMeta] = useState<RequestMeta>();
+  // const [loading, setLoading] = useState(true);
 
-  const obj = useMemo(() => {
-    return {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.accountName && {
-        accountName: customParams.accountName,
-      }),
-      ...(customParams.page && { page: customParams.page }),
-    };
-  }, [customParams]);
+  // const obj = useMemo(() => {
+  //   return {
+  //     ...(customParams.limit && { limit: customParams.limit }),
+  //     ...(customParams.date && { date: customParams.date }),
+  //     ...(customParams.endDate && { endDate: customParams.endDate }),
+  //     ...(customParams.status && { status: customParams.status }),
+  //     ...(customParams.accountName && {
+  //       accountName: customParams.accountName,
+  //     }),
+  //     ...(customParams.page && { page: customParams.page }),
+  //   };
+  // }, [customParams]);
 
-  const { limit, date, endDate, status, page, accountName } = obj;
+  // const { limit, date, endDate, status, page, accountName } = obj;
 
-  async function fetchRequests() {
-    const params = new URLSearchParams(obj as Record<string, string>);
+  // async function fetchRequests() {
+  //   const params = new URLSearchParams(obj as Record<string, string>);
 
-    setLoading(true);
+  //   setLoading(true);
 
-    try {
-      const { data } = await payoutAxiosInstance.get(`/payout/debit/requests`, {
-        params,
-      });
+  //   try {
+  //     const { data } = await payoutAxiosInstance.get(`/payout/debit/requests`, {
+  //       params,
+  //     });
 
-      setRequests(data.data);
-      setMeta(data.meta);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  //     setRequests(data.data);
+  //     setMeta(data.meta);
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
-  const revalidate = async () => await fetchRequests();
+  // const revalidate = async () => await fetchRequests();
 
-  useEffect(() => {
-    fetchRequests();
+  // useEffect(() => {
+  //   fetchRequests();
 
-    return () => {
-      // Any cleanup code can go here
-    };
-  }, [limit, date, endDate, status, page, accountName]);
+  //   return () => {
+  //     // Any cleanup code can go here
+  //   };
+  // }, [limit, date, endDate, status, page, accountName]);
 
-  return { loading, requests, revalidate, meta };
+  return { loading, requests: data || [], revalidate: queryFn, meta };
 }
 
 interface BaseData {

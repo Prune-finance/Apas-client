@@ -47,6 +47,7 @@ import { parseError } from "@/lib/actions/auth";
 import ModalComponent from "@/app/(dashboard)/users/modal";
 import { calculateTotalPages, sanitizeURL } from "@/lib/utils";
 import AddUserModal from "./AddUserModal";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 export default function AllBusinessUsers() {
   const searchParams = useSearchParams();
@@ -90,6 +91,7 @@ export default function AllBusinessUsers() {
 
   const { push } = useRouter();
   const { handleError, handleSuccess } = useNotification();
+  usePaginationReset({ queryParams, setActive });
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -132,12 +134,6 @@ export default function AllBusinessUsers() {
   const handleRowClick = (userId: string) => {
     push(`/admin/users/${id}/business/${userId}`);
   };
-
-  const dependencies = sanitizeURL({ ...queryParams, page: undefined });
-
-  useEffect(() => {
-    setActive(1);
-  }, [dependencies]);
 
   const rows = users.map((element, index) => (
     <TableTr

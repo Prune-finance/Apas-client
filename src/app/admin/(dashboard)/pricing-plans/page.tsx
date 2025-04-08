@@ -40,6 +40,7 @@ import { SearchInput } from "@/ui/components/Inputs";
 import { useDebouncedValue } from "@mantine/hooks";
 import { filteredSearch } from "@/lib/search";
 import Link from "next/link";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 export default function PricingPlans() {
   const [search, setSearch] = useState("");
@@ -54,14 +55,9 @@ export default function PricingPlans() {
   };
 
   const { pricingPlan, loading, meta } = usePricingPlan(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const { opened, data, close } = Plan();
-
-  const dependencies = sanitizeURL({ ...queryParams, page: undefined });
-
-  useEffect(() => {
-    setActive(1);
-  }, [dependencies]);
 
   return (
     <main>

@@ -31,6 +31,7 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 export default function BusinessUsers() {
   const searchParams = useSearchParams();
@@ -56,6 +57,7 @@ export default function BusinessUsers() {
   };
 
   const { loading, businesses, meta } = useBusiness(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -65,12 +67,6 @@ export default function BusinessUsers() {
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
-
-  const dependencies = sanitizeURL({ ...queryParams, page: undefined });
-
-  useEffect(() => {
-    setActive(1);
-  }, [dependencies]);
 
   const handleRowClick = (id: string) => {
     push(`/admin/users/${id}/business`);

@@ -177,13 +177,9 @@ export const IssuedTransactionTableRows = ({
 
 export const PayoutTransactionTableRows = ({
   data,
-  search,
-  searchProps,
   isUser,
 }: {
   data: TransactionType[];
-  search?: string;
-  searchProps?: string[];
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();

@@ -4,35 +4,24 @@ import {
   Badge,
   Button,
   Flex,
-  Group,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
-  Pagination,
-  Select,
   TableTd,
   TableTr,
   Text,
   TextInput,
-  ThemeIcon,
   UnstyledButton,
   rem,
 } from "@mantine/core";
 import {
-  IconDots,
   IconDotsVertical,
   IconDownload,
-  IconEdit,
-  IconEye,
   IconListTree,
   IconPlus,
-  IconPointFilled,
   IconRosetteDiscountCheckFilled,
   IconSearch,
-  IconTrash,
-  IconUserCancel,
-  IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -50,22 +39,18 @@ import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  businessFilterSchema,
-  BusinessFilterType,
-  businessFilterValues,
-} from "./schema";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
-import { filteredSearch } from "@/lib/search";
 
-import { activeBadgeColor, serialNumber } from "@/lib/utils";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+
+import { activeBadgeColor, sanitizeURL, serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import { useTransactions } from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { TextBox } from "@/ui/components/Inputs";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 function Businesses() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
@@ -81,17 +66,18 @@ function Businesses() {
   );
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(name && { business: name }),
-    ...(contactEmail && { email: contactEmail }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
+    status: status ? status.toUpperCase() : "",
+    business: name,
+    email: contactEmail,
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedSearch,
   };
 
   const { loading, businesses, meta } = useBusiness(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const {
     loading: loadingTrx,

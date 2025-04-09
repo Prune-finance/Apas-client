@@ -43,6 +43,7 @@ export default function BusinessDefaultAccount() {
     recipientName,
     recipientIban,
     accountId,
+    search,
   } = Object.fromEntries(searchParams.entries());
 
   const customParams = useMemo(() => {
@@ -54,6 +55,7 @@ export default function BusinessDefaultAccount() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
+      ...(search && { search: search }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -67,6 +69,7 @@ export default function BusinessDefaultAccount() {
     recipientIban,
     active,
     limit,
+    search,
   ]);
 
   const {

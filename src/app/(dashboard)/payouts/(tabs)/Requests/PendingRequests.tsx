@@ -29,6 +29,7 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import { PayoutReqSearchProps } from ".";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 interface Props {
   requests: PayoutTransactionRequest[];
@@ -69,19 +70,21 @@ export const PendingPayoutRequests = () => {
   } = Object.fromEntries(searchParams.entries());
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(beneficiaryName && { beneficiaryName }),
-    ...(destinationIban && { destinationIban }),
-    ...(destinationBank && { destinationBank }),
-    ...(senderIban && { senderIban }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    beneficiaryName,
+    destinationIban,
+    destinationBank,
+    senderIban,
     limit: parseInt(limit ?? "100", 10),
     page: active,
     status: "PENDING",
+    search: debouncedSearch,
   };
 
   const { requests, loading, meta, revalidate } =
     useUserPayoutTransactionRequests(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const { data, opened, close } = Transaction();
 

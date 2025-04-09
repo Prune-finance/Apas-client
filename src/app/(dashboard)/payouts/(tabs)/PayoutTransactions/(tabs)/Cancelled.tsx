@@ -23,6 +23,8 @@ import { useSearchParams } from "next/navigation";
 dayjs.extend(advancedFormat);
 import { useMemo, useState } from "react";
 import { PayoutTransactionDrawer } from "../../../PayoutDrawer";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { calculateTotalPages } from "@/lib/utils";
 
 export const CancelledPayoutTransactions = () => {
   const [search, setSearch] = useState("");
@@ -38,31 +40,22 @@ export const CancelledPayoutTransactions = () => {
   const { date, endDate, type, senderName, recipientName, recipientIban } =
     Object.fromEntries(searchParams.entries());
 
-  const param = useMemo(() => {
-    return {
-      status: "CANCELLED",
-      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-      ...(type && { type }),
-      ...(senderName && { senderName }),
-      ...(recipientName && { recipientName }),
-      ...(recipientIban && { recipientIban }),
-      page: active,
-      limit: parseInt(limit ?? "10", 10),
-    };
-  }, [
-    date,
-    endDate,
+  const param = {
+    status: "CANCELLED",
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
     type,
     senderName,
     recipientName,
     recipientIban,
-    active,
-    limit,
-  ]);
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
+  };
 
   const { transactions, revalidate, loading, meta } =
     useUserPayoutTransactions(param);
+  usePaginationReset({ queryParams: param, setActive });
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -105,24 +98,7 @@ export const CancelledPayoutTransactions = () => {
       <TableComponent
         head={PayoutTableHeaders}
         // rows={rows}
-        rows={
-          <PayoutTransactionTableRows
-            data={transactions}
-            searchProps={[
-              "senderName",
-              "senderIban",
-              "recipientIban",
-              "recipientBic",
-              "recipientBankAddress",
-              "recipientName",
-              "type",
-              "status",
-              "centrolinkRef",
-            ]}
-            search={debouncedSearch}
-            isUser
-          />
-        }
+        rows={<PayoutTransactionTableRows data={transactions} isUser />}
         loading={loading}
       />
 
@@ -138,9 +114,7 @@ export const CancelledPayoutTransactions = () => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil(
-          (meta?.total || transactions.length) / parseInt(limit ?? "10", 10)
-        )}
+        total={calculateTotalPages(limit, meta?.total)}
       />
 
       <PayoutTransactionDrawer revalidate={revalidate} />

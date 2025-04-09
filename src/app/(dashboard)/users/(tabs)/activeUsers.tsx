@@ -73,6 +73,7 @@ import { calculateTotalPages } from "@/lib/utils";
 import { Permission, transformPermissionsToCategory } from "@/lib/hooks/roles";
 import { checkToken } from "@/lib/actions/checkToken";
 import User from "@/lib/store/user";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 export default function ActiveUsers() {
   const searchParams = useSearchParams();
@@ -83,23 +84,23 @@ export default function ActiveUsers() {
     searchParams.entries()
   );
 
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
   const router = useRouter();
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    // ...(status && {
-    //   status:
-    //     status.toLowerCase() === "pending"
-    //       ? "INVITE_PENDING"
-    //       : status.toUpperCase(),
-    // }),
-    ...(email && { email }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    email,
     page: active,
     limit: parseInt(limit ?? "10", 10),
     status: "active",
+    search: debouncedSearch,
   };
+
   const { loading, users, revalidate, meta } = useUsers(queryParams);
+  usePaginationReset({ queryParams, setActive });
+
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -109,8 +110,6 @@ export default function ActiveUsers() {
   const [isEdit, setIsEdit] = useState(false);
   const [user, setUser] = useState<AdminData | null>(null);
   const [processingStatus, setProcessingStatus] = useState(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { setUser: setStoreUser, user: storeUser } = User();
 
@@ -190,8 +189,6 @@ export default function ActiveUsers() {
     setIsEdit(true);
   };
 
-  console.log(form.values);
-
   const handleUserDeactivation = async (
     id: string,
     status: "ACTIVE" | "INACTIVE"
@@ -232,96 +229,91 @@ export default function ActiveUsers() {
     return activateOpen();
   };
 
-  const rows = filteredSearch(users, ["email", "role"], debouncedSearch).map(
-    (element, index) => (
-      <TableTr
-        key={index}
-        onClick={() => handleRowClick(element)}
-        style={{ cursor: "pointer" }}
-      >
-        <TableTd>
-          {!element.firstName || !element.lastName
-            ? "N/A"
-            : `${element.firstName} ${element.lastName}`}
-        </TableTd>
-        <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
-          {element.email}
-        </TableTd>
-        <TableTd tt="capitalize">
-          {element.roles?.[0]?.title.toLowerCase() ||
-            element.role.toLowerCase()}
-        </TableTd>
-        <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
-        <TableTd>
-          {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
-        </TableTd>
+  const rows = users.map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd>
+        {!element.firstName || !element.lastName
+          ? "N/A"
+          : `${element.firstName} ${element.lastName}`}
+      </TableTd>
+      <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
+        {element.email}
+      </TableTd>
+      <TableTd tt="capitalize">
+        {element.roles?.[0]?.title.toLowerCase() || element.role.toLowerCase()}
+      </TableTd>
+      <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
+      <TableTd>
+        {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
+      </TableTd>
 
-        <TableTd>
-          <BadgeComponent
-            status={
-              element.status === "INVITE_PENDING" ? "PENDING" : element.status
-            }
-            active
-          />
-        </TableTd>
+      <TableTd>
+        <BadgeComponent
+          status={
+            element.status === "INVITE_PENDING" ? "PENDING" : element.status
+          }
+          active
+        />
+      </TableTd>
 
-        <TableTd onClick={(e) => e.stopPropagation()}>
-          <Menu shadow="md" width={200}>
-            <MenuTarget>
-              <UnstyledButton>
-                <IconDotsVertical size={17} />
-              </UnstyledButton>
-            </MenuTarget>
-            <MenuDropdown>
-              {(() => {
-                const menuItems = [
-                  {
-                    text: "Edit Roles & Permissions",
-                    icon: (
-                      <IconEdit style={{ width: rem(14), height: rem(14) }} />
+      <TableTd onClick={(e) => e.stopPropagation()}>
+        <Menu shadow="md" width={200}>
+          <MenuTarget>
+            <UnstyledButton>
+              <IconDotsVertical size={17} />
+            </UnstyledButton>
+          </MenuTarget>
+          <MenuDropdown>
+            {(() => {
+              const menuItems = [
+                {
+                  text: "Edit Roles & Permissions",
+                  icon: (
+                    <IconEdit style={{ width: rem(14), height: rem(14) }} />
+                  ),
+                },
+                {
+                  text:
+                    element.status === "INACTIVE" ? "Activate" : "Deactivate",
+                  disabled: element.status === "INVITE_PENDING",
+                  icon:
+                    element.status === "INACTIVE" ? (
+                      <IconUserCheck
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    ) : (
+                      <IconUserX style={{ width: rem(14), height: rem(14) }} />
                     ),
-                  },
-                  {
-                    text:
-                      element.status === "INACTIVE" ? "Activate" : "Deactivate",
-                    disabled: element.status === "INVITE_PENDING",
-                    icon:
-                      element.status === "INACTIVE" ? (
-                        <IconUserCheck
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      ) : (
-                        <IconUserX
-                          style={{ width: rem(14), height: rem(14) }}
-                        />
-                      ),
-                  },
-                ];
+                },
+              ];
 
-                return menuItems.map((item, index) => (
-                  <MenuItem
-                    key={index}
-                    fz={10}
-                    c="#667085"
-                    leftSection={item.icon}
-                    disabled={item.disabled}
-                    onClick={() => {
-                      if (item.text === "Edit Roles & Permissions")
-                        return handleEdit(element);
+              return menuItems.map((item, index) => (
+                <MenuItem
+                  key={index}
+                  fz={10}
+                  c="#667085"
+                  leftSection={item.icon}
+                  disabled={item.disabled}
+                  onClick={() => {
+                    if (item.text === "Edit Roles & Permissions")
+                      return handleEdit(element);
 
-                      return handleStatusChange(element, element.status);
-                    }}
-                  >
-                    {item.text}
-                  </MenuItem>
-                ));
-              })()}
-            </MenuDropdown>
-          </Menu>
-        </TableTd>
-      </TableTr>
-    )
-  );
+                    return handleStatusChange(element, element.status);
+                  }}
+                >
+                  {item.text}
+                </MenuItem>
+              ));
+            })()}
+          </MenuDropdown>
+        </Menu>
+      </TableTd>
+    </TableTr>
+  ));
   return (
     <Box>
       <Group justify="space-between" mt={28}>

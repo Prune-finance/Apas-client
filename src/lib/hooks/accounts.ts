@@ -260,7 +260,7 @@ export function useUserAccounts(customParams: IParams = {}) {
 
   return {
     loading,
-    accounts: data,
+    accounts: data || [],
     revalidate: queryFn,
     revalidateIssuance,
     meta,

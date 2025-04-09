@@ -14,21 +14,16 @@ import { BusinessData } from "@/lib/hooks/businesses";
 
 export const BusinessTransactionTableRows = ({
   data,
-  search,
-  searchProps,
+
   business,
   isUser,
 }: {
   data: TransactionType[];
-  search?: string;
-  searchProps?: string[];
   business?: boolean;
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return (
-    searchProps && search ? filteredSearch(data, searchProps, search) : data
-  ).map((element) => (
+  return data.map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -97,20 +92,16 @@ export const BusinessTransactionTableRows = ({
 export const IssuedTransactionTableRows = ({
   data,
   noLink,
-  search,
-  searchProps,
+
   isUser,
 }: {
   data: TransactionType[];
-  search?: string;
-  searchProps?: string[];
+
   noLink?: boolean;
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return (
-    searchProps && search ? filteredSearch(data, searchProps, search) : data
-  ).map((element) => (
+  return data.map((element) => (
     <TableTr
       key={element?.id}
       onClick={() => {

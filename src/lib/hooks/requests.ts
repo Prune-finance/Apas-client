@@ -341,90 +341,19 @@ export function usePayoutTransactionRequests(customParams: IParams = {}) {
 }
 
 export function useUserPayoutTransactionRequests(customParams: IParams = {}) {
-  const [requests, setRequests] = useState<PayoutTransactionRequest[]>([]);
-  const [meta, setMeta] = useState<Meta>();
-  const [loading, setLoading] = useState(true);
-
-  const obj = useMemo(() => {
-    return {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.not && { not: customParams.not }),
-      ...(customParams.destinationBank && {
-        bank: customParams.destinationBank,
-      }),
-      ...(customParams.destinationIban && {
-        recipientIban: customParams.destinationIban,
-      }),
-      ...(customParams.beneficiaryName && {
-        recipientName: customParams.beneficiaryName,
-      }),
-      ...(customParams.senderIban && { senderIban: customParams.senderIban }),
-      ...(customParams.page && { page: customParams.page }),
-    };
-  }, [customParams]);
-
   const {
-    limit,
-    status,
-    not,
-    recipientIban,
-    recipientName,
-    senderIban,
-    bank,
-    date,
-    endDate,
-    page,
-  } = obj;
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<PayoutTransactionRequest[], Meta>({
+    endpoint: `/payout/transaction/requests`,
+    baseURL: "payouts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
 
-  async function fetchAccounts() {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams(obj as Record<string, string>);
-
-      const { data } = await payoutAxiosInstance.get(
-        `/payout/transaction/requests`,
-        {
-          params,
-        }
-      );
-
-      setMeta(data.meta);
-      setRequests(data.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function revalidate() {
-    fetchAccounts();
-  }
-
-  useEffect(() => {
-    fetchAccounts();
-
-    return () => {
-      // Any cleanup code can go here
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    limit,
-    status,
-    not,
-    recipientIban,
-    recipientName,
-    senderIban,
-    bank,
-    date,
-    endDate,
-    page,
-  ]);
-
-  return { loading, requests, meta, revalidate };
+  return { loading, requests: data || [], meta, revalidate };
 }
 
 export function useSingleRequest(id: string) {

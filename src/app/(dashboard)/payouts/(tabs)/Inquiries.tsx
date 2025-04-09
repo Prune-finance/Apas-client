@@ -1,9 +1,11 @@
 "use client";
 
 import { useUserInquiries } from "@/lib/hooks/inquiries";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 
 import { InquiriesTableHeaders } from "@/lib/static";
+import { calculateTotalPages } from "@/lib/utils";
 
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -37,15 +39,17 @@ export const InquiriesTab = () => {
   const [opened, { toggle }] = useDisclosure(false);
 
   const queryParams = {
-    ...(type && { type: type.toUpperCase() }),
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
+    type: type?.toUpperCase(),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    status: status?.toUpperCase(),
     limit: parseInt(limit ?? "10", 10),
     page: active,
+    search: debouncedSearch,
   };
 
   const { inquiries, loading, meta } = useUserInquiries(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -99,7 +103,7 @@ export const InquiriesTab = () => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
       />
     </Box>
   );

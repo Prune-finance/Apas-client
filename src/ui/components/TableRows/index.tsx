@@ -92,7 +92,6 @@ export const BusinessTransactionTableRows = ({
 export const IssuedTransactionTableRows = ({
   data,
   noLink,
-
   isUser,
 }: {
   data: TransactionType[];

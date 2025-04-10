@@ -77,10 +77,10 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Full Name
+              Company Name
             </Text>
           }
-          placeholder="Enter full name"
+          placeholder="Enter company name"
           {...form.getInputProps("fullName")}
           errorProps={{
             fz: 12,
@@ -100,6 +100,40 @@ function DebtorModalCompany({
           }
           placeholder="Enter Address"
           {...form.getInputProps("address")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+      </Flex>
+
+      <Flex gap={20} mt={24}>
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              City
+            </Text>
+          }
+          placeholder="Enter City"
+          {...form.getInputProps("city")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              State
+            </Text>
+          }
+          placeholder="Enter State"
+          {...form.getInputProps("state")}
           errorProps={{
             fz: 12,
           }}
@@ -135,40 +169,6 @@ function DebtorModalCompany({
           }
           placeholder="Enter Post Code"
           {...form.getInputProps("postCode")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-      </Flex>
-
-      <Flex gap={20} mt={24}>
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              State
-            </Text>
-          }
-          placeholder="Enter State"
-          {...form.getInputProps("state")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              City
-            </Text>
-          }
-          placeholder="Enter City"
-          {...form.getInputProps("city")}
           errorProps={{
             fz: 12,
           }}

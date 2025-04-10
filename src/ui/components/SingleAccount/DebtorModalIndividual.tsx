@@ -106,6 +106,40 @@ function DebtorModalIndividual({
       </Flex>
 
       <Flex gap={20} mt={24}>
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              City
+            </Text>
+          }
+          placeholder="Enter City"
+          {...form.getInputProps("city")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              State
+            </Text>
+          }
+          placeholder="Enter State"
+          {...form.getInputProps("state")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+      </Flex>
+
+      <Flex gap={20} mt={24}>
         <Select
           data={countriesShortCode}
           classNames={{ input: styles.input, label: styles.label }}
@@ -141,54 +175,20 @@ function DebtorModalIndividual({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              State
-            </Text>
-          }
-          placeholder="Enter State"
-          {...form.getInputProps("state")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              City
-            </Text>
-          }
-          placeholder="Enter City"
-          {...form.getInputProps("city")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-      </Flex>
-
-      <Flex gap={20} mt={24}>
         <Select
           data={[
             {
-              "label": "ID Card",
-              "value": "identityCard"
-            }, 
-            {
-              "label": "Passport",
-              "value": "passport"
+              label: "ID Card",
+              value: "identityCard",
             },
             {
-              "label": "Residence Permit",
-              "value": "residencePermit"
-            }
+              label: "Passport",
+              value: "passport",
+            },
+            {
+              label: "Residence Permit",
+              value: "residencePermit",
+            },
           ]}
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}

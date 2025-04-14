@@ -15,6 +15,7 @@ import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
 import { useForm, zodResolver } from "@mantine/form";
 import { countriesShortCode } from "@/lib/countries-short-code";
 import { DebtorFormCompany } from "@/lib/schema";
+import countries from "@/assets/countries.json";
 
 interface DebtorModalCompany {
   closeDebtor: () => void;
@@ -142,8 +143,13 @@ function DebtorModalCompany({
 
       <Flex gap={20} mt={24}>
         <Select
-          data={countriesShortCode}
-          classNames={{ input: styles.input, label: styles.label }}
+          searchable
+          data={countries.map((c) => c?.name)}
+          classNames={{
+            input: styles.input,
+            label: styles.label,
+            option: styles.option,
+          }}
           flex={1}
           size="lg"
           label={

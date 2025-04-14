@@ -368,11 +368,11 @@ function Accounts() {
           </div>
 
           <Flex align="center" gap={16}>
-            {/* <SecondaryBtn
+            <SecondaryBtn
               text="Create Account"
               action={addAccountOpen}
               fw={600}
-            /> */}
+            />
 
             <PrimaryBtn
               text={tab === tabs[1].value ? "Debit Request" : "Send Money"}

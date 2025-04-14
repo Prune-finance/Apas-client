@@ -12,9 +12,11 @@ import { useState } from "react";
 import classes from "./services.module.css";
 import CheckboxCard from "./CheckboxCard";
 import { QuestionnaireNav } from "./QuestionnaireNav";
+import { useRouter } from "next/navigation";
 
 export default function Services() {
   const [value, setValue] = useState<string[]>([]);
+  const { push } = useRouter();
 
   return (
     <Box>
@@ -36,7 +38,9 @@ export default function Services() {
         </SimpleGrid>
       </Checkbox.Group>
 
-      <QuestionnaireNav />
+      <QuestionnaireNav
+        onNext={() => push("/questionnaire/services/operations-account")}
+      />
     </Box>
   );
 }

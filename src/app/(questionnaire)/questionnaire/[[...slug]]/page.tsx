@@ -10,6 +10,7 @@ import { useParams, useRouter } from "next/navigation";
 import Services from "./Services";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import OperationsAccount from "./OperationsAccount";
+import VirtualAccount from "./VirtualAccount";
 
 export default function Questionnaire() {
   const [turnover, setTurnover] = useState("");
@@ -23,6 +24,13 @@ export default function Questionnaire() {
     params.slug[1] === "operations-account"
   )
     return <OperationsAccount />;
+
+  if (
+    params?.slug &&
+    params?.slug[0] === "services" &&
+    params.slug[1] === "virtual-account"
+  )
+    return <VirtualAccount />;
 
   if (params?.slug && params?.slug[0] === "services") return <Services />;
 

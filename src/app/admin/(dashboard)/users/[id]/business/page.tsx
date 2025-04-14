@@ -21,7 +21,7 @@ import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 
 import { TableComponent } from "@/ui/components/Table";
@@ -45,8 +45,9 @@ import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
 import ModalComponent from "@/app/(dashboard)/users/modal";
-import { calculateTotalPages } from "@/lib/utils";
+import { calculateTotalPages, sanitizeURL } from "@/lib/utils";
 import AddUserModal from "./AddUserModal";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 export default function AllBusinessUsers() {
   const searchParams = useSearchParams();
@@ -57,24 +58,25 @@ export default function AllBusinessUsers() {
   const [limit, setLimit] = useState<string | null>("10");
   const [processing, setProcessing] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { status, date, endDate, name, email } = Object.fromEntries(
     searchParams.entries()
   );
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && {
-      status:
-        status.toUpperCase() === "PENDING"
-          ? "INVITE_PENDING"
-          : status.toUpperCase(),
-    }),
-    // ...(name && { business: name }),
-    ...(email && { email }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
+    status: status
+      ? status.toUpperCase() === "PENDING"
+        ? "INVITE_PENDING"
+        : status.toUpperCase()
+      : "",
+    email,
     limit: parseInt(limit ?? "10", 10),
     page: active,
+    search: debouncedSearch,
   };
 
   const { loading, users, meta, revalidate } = useBusinessUsers(
@@ -86,11 +88,10 @@ export default function AllBusinessUsers() {
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedModal, { open, close }] = useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { push } = useRouter();
   const { handleError, handleSuccess } = useNotification();
+  usePaginationReset({ queryParams, setActive });
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -134,34 +135,32 @@ export default function AllBusinessUsers() {
     push(`/admin/users/${id}/business/${userId}`);
   };
 
-  const rows = filteredSearch(users, ["name", "email"], debouncedSearch).map(
-    (element, index) => (
-      <TableTr
-        key={index}
-        onClick={() => handleRowClick(element.id)}
-        style={{ cursor: "pointer" }}
-      >
-        <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
-          {element.email}
-        </TableTd>
+  const rows = users.map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd tt="lowercase" style={{ wordBreak: "break-word" }} w="20%">
+        {element.email}
+      </TableTd>
 
-        <TableTd>{"User"}</TableTd>
-        <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
-        <TableTd>
-          {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
-        </TableTd>
+      <TableTd>{"User"}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
+      <TableTd>
+        {element.lastLogin ? dayjs(element.lastLogin).fromNow() : "Nil"}
+      </TableTd>
 
-        <TableTd>
-          <BadgeComponent
-            status={
-              element.status === "INVITE_PENDING" ? "PENDING" : element.status
-            }
-            active
-          />
-        </TableTd>
-      </TableTr>
-    )
-  );
+      <TableTd>
+        <BadgeComponent
+          status={
+            element.status === "INVITE_PENDING" ? "PENDING" : element.status
+          }
+          active
+        />
+      </TableTd>
+    </TableTr>
+  ));
 
   return (
     <main className={styles.main}>

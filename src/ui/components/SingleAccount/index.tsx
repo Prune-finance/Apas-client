@@ -97,6 +97,7 @@ import PendingModalImage from "@/assets/pending-image.png";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
+import { useHasPermission } from "@/lib/hooks/checkPermission";
 
 type Param = { id: string };
 interface Props {
@@ -785,13 +786,11 @@ export const IssuedAccountHead = ({
     >
       <Group gap={12} align="center">
         {!loading ? (
-          <Avatar
-            variant="filled"
-            size="lg"
-            color="var(--prune-primary-700)"
-          >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
-            0
-          )}`}</Avatar>
+          <Avatar variant="filled" size="lg" color="var(--prune-primary-700)">
+            {getInitials(
+              `${account?.firstName ?? ""} ${account?.lastName ?? ""}`
+            )}
+          </Avatar>
         ) : (
           <Skeleton circle h={50} w={50} />
         )}
@@ -875,6 +874,7 @@ export const DefaultAccountHead = ({
   const [processingTrust, setProcessingTrust] = useState(false);
 
   const { user } = User();
+  const canSendMoney = useHasPermission("Transaction Initiation");
 
   const axios = createAxiosInstance("payouts");
 
@@ -960,7 +960,8 @@ export const DefaultAccountHead = ({
               text="Send Money"
               fw={600}
               action={openMoney}
-              display={user?.role === "INITIATOR" ? "block" : "none"}
+              display={canSendMoney ? "block" : "none"}
+              // display={user?.role === "INITIATOR" ? "block" : "none"}
             />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
@@ -1137,8 +1138,9 @@ export const AccountInfo = ({
                 color="var(--prune-primary-600)"
                 c="var(--prune-text-gray-800)"
                 // p="6px 8px"
-                py={12}
+                // py={18}
                 px={8}
+                h={30}
                 leftSection={
                   <ThemeIcon
                     variant="transparent"

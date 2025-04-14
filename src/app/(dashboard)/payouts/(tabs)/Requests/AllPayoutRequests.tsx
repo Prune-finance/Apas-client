@@ -23,6 +23,8 @@ import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { PayoutReqSearchProps } from ".";
+import { calculateTotalPages } from "@/lib/utils";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 interface Props {
   requests: PayoutTransactionRequest[];
@@ -38,6 +40,8 @@ export const AllPayoutRequests = () => {
   const searchParams = useSearchParams();
   const [limit, setLimit] = useState<string | null>("100");
   const [active, setActive] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const {
     status,
@@ -50,20 +54,18 @@ export const AllPayoutRequests = () => {
   } = Object.fromEntries(searchParams.entries());
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(beneficiaryName && { beneficiaryName }),
-    ...(destinationIban && { destinationIban }),
-    ...(destinationBank && { destinationBank }),
-    ...(senderIban && { senderIban }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    status: status?.toUpperCase(),
+    beneficiaryName,
+    destinationIban,
+    destinationBank,
+    senderIban,
     limit: parseInt(limit ?? "100", 10),
     page: active,
     not: "PENDING",
+    search: debouncedSearch,
   };
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const [openedFilter, { toggle }] = useDisclosure(false);
 
@@ -74,6 +76,7 @@ export const AllPayoutRequests = () => {
 
   const { requests, loading, meta } =
     useUserPayoutTransactionRequests(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const { data, opened, close } = Transaction();
 
@@ -119,13 +122,7 @@ export const AllPayoutRequests = () => {
 
       <TableComponent
         head={PayoutRequestsTableHeaders}
-        rows={
-          <PayoutTrxReqTableRows
-            search={debouncedSearch}
-            data={requests}
-            searchProps={PayoutReqSearchProps}
-          />
-        }
+        rows={<PayoutTrxReqTableRows data={requests} />}
         loading={loading}
       />
 
@@ -137,7 +134,7 @@ export const AllPayoutRequests = () => {
       />
 
       <PaginationComponent
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
         active={active}
         setActive={setActive}
         limit={limit}

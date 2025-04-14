@@ -10,6 +10,7 @@ interface successModalProps {
   desc?: any;
   title?: string;
   style?: any;
+  size?: number | string;
 }
 
 function SuccessModal({
@@ -19,6 +20,7 @@ function SuccessModal({
   desc,
   title,
   style,
+  size = 400,
 }: successModalProps) {
   return (
     <Modal
@@ -27,7 +29,7 @@ function SuccessModal({
       centered
       bg="#fff"
       title=""
-      size={400}
+      size={size}
     >
       <Flex align="center" justify="center" direction="column" mb={40} px={30}>
         <Box style={style}>

@@ -15,6 +15,7 @@ import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
 import { useForm, zodResolver } from "@mantine/form";
 import { countriesShortCode } from "@/lib/countries-short-code";
 import { DebtorFormCompany } from "@/lib/schema";
+import countries from "@/assets/countries.json";
 
 interface DebtorModalCompany {
   closeDebtor: () => void;
@@ -77,10 +78,10 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Full Name
+              Company Name
             </Text>
           }
-          placeholder="Enter full name"
+          placeholder="Enter company name"
           {...form.getInputProps("fullName")}
           errorProps={{
             fz: 12,
@@ -107,9 +108,48 @@ function DebtorModalCompany({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <Select
-          data={countriesShortCode}
+        <TextInput
           classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              City
+            </Text>
+          }
+          placeholder="Enter City"
+          {...form.getInputProps("city")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              State
+            </Text>
+          }
+          placeholder="Enter State"
+          {...form.getInputProps("state")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+      </Flex>
+
+      <Flex gap={20} mt={24}>
+        <Select
+          searchable
+          data={countries.map((c) => c?.name)}
+          classNames={{
+            input: styles.input,
+            label: styles.label,
+            option: styles.option,
+          }}
           flex={1}
           size="lg"
           label={
@@ -135,40 +175,6 @@ function DebtorModalCompany({
           }
           placeholder="Enter Post Code"
           {...form.getInputProps("postCode")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-      </Flex>
-
-      <Flex gap={20} mt={24}>
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              State
-            </Text>
-          }
-          placeholder="Enter State"
-          {...form.getInputProps("state")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              City
-            </Text>
-          }
-          placeholder="Enter City"
-          {...form.getInputProps("city")}
           errorProps={{
             fz: 12,
           }}

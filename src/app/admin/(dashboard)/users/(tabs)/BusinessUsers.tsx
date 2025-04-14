@@ -20,10 +20,10 @@ import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { filteredSearch } from "@/lib/search";
 
-import { serialNumber } from "@/lib/utils";
+import { sanitizeURL, serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 
 import PaginationComponent from "@/ui/components/Pagination";
@@ -31,32 +31,35 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 export default function BusinessUsers() {
   const searchParams = useSearchParams();
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { status, date, endDate, name, email } = Object.fromEntries(
     searchParams.entries()
   );
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(name && { business: name }),
-    ...(email && { email }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
+    status: status ? status.toUpperCase() : "",
+    business: name,
+    email,
+    search: debouncedSearch,
     limit: parseInt(limit ?? "10", 10),
     page: active,
   };
 
   const { loading, businesses, meta } = useBusiness(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const [opened, { toggle }] = useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { push } = useRouter();
 
@@ -69,11 +72,7 @@ export default function BusinessUsers() {
     push(`/admin/users/${id}/business`);
   };
 
-  const rows = filteredSearch(
-    businesses,
-    ["name", "contactEmail"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = businesses.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => handleRowClick(element.id)}

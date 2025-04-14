@@ -6,15 +6,23 @@ import CustomRadio from "./CustomRadio";
 import { validateEditUser } from "@/lib/schema";
 import { useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Services from "./Services";
 import { QuestionnaireNav } from "./QuestionnaireNav";
+import OperationsAccount from "./OperationsAccount";
 
 export default function Questionnaire() {
   const [turnover, setTurnover] = useState("");
   const params = useParams();
+  const { push } = useRouter();
 
   // console.log(params?.slug);
+  if (
+    params?.slug &&
+    params?.slug[0] === "services" &&
+    params.slug[1] === "operations-account"
+  )
+    return <OperationsAccount />;
 
   if (params?.slug && params?.slug[0] === "services") return <Services />;
 
@@ -46,12 +54,12 @@ export default function Questionnaire() {
           ))}
         </Stack>
       </RadioGroup>
-      <QuestionnaireNav />
+      <QuestionnaireNav onNext={() => push("/questionnaire/services")} />
     </Box>
   );
 }
 
-const turnoverOptions = {
+export const turnoverOptions = {
   "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
   "less-than-50000": `${formatNumber(10000, true, "GBP")} - ${formatNumber(
     50000,

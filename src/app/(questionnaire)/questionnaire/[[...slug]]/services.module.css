@@ -19,6 +19,21 @@
   }
 }
 
+.card {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid var(--prune-text-gray-200);
+
+  transition: border-color 150ms ease, background-color 150ms ease;
+
+  &[data-checked] {
+    background: var(--prune-primary-50);
+    border: 2px solid var(--prune-primary-700);
+  }
+}
+
 .label {
   color: var(--prune-text-gray-700);
   font-size: var(--typography-font-size-md, 16px);

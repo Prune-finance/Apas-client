@@ -213,7 +213,7 @@ export const AccountCard = ({
         </Group>
       </Card>
 
-      <NewAccountCard
+      {/* <NewAccountCard
         currency={currency}
         companyName={companyName}
         link={link}
@@ -227,7 +227,7 @@ export const AccountCard = ({
         refresh={refresh}
         revalidate={revalidate}
         {...props}
-      />
+      /> */}
     </>
   ) : (
     <Card

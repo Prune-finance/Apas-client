@@ -15,6 +15,7 @@ import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
 import { useForm, zodResolver } from "@mantine/form";
 import { countriesShortCode } from "@/lib/countries-short-code";
 import { DebtorFormIndividual } from "@/lib/schema";
+import countries from "@/assets/countries.json";
 
 interface DebtorModalIndividual {
   closeDebtor: () => void;
@@ -106,9 +107,48 @@ function DebtorModalIndividual({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <Select
-          data={countriesShortCode}
+        <TextInput
           classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              City
+            </Text>
+          }
+          placeholder="Enter City"
+          {...form.getInputProps("city")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              State
+            </Text>
+          }
+          placeholder="Enter State"
+          {...form.getInputProps("state")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+      </Flex>
+
+      <Flex gap={20} mt={24}>
+        <Select
+          searchable
+          data={countries.map((c) => c?.name)}
+          classNames={{
+            input: styles.input,
+            label: styles.label,
+            option: styles.option,
+          }}
           flex={1}
           size="lg"
           label={
@@ -141,54 +181,20 @@ function DebtorModalIndividual({
       </Flex>
 
       <Flex gap={20} mt={24}>
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              State
-            </Text>
-          }
-          placeholder="Enter State"
-          {...form.getInputProps("state")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-
-        <TextInput
-          classNames={{ input: styles.input, label: styles.label }}
-          flex={1}
-          size="lg"
-          label={
-            <Text fz={14} c="#667085">
-              City
-            </Text>
-          }
-          placeholder="Enter City"
-          {...form.getInputProps("city")}
-          errorProps={{
-            fz: 12,
-          }}
-        />
-      </Flex>
-
-      <Flex gap={20} mt={24}>
         <Select
           data={[
             {
-              "label": "ID Card",
-              "value": "identityCard"
-            }, 
-            {
-              "label": "Passport",
-              "value": "passport"
+              label: "ID Card",
+              value: "identityCard",
             },
             {
-              "label": "Residence Permit",
-              "value": "residencePermit"
-            }
+              label: "Passport",
+              value: "passport",
+            },
+            {
+              label: "Residence Permit",
+              value: "residencePermit",
+            },
           ]}
           classNames={{ input: styles.input, label: styles.label }}
           flex={1}

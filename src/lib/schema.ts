@@ -719,6 +719,8 @@ export interface IParams {
   destinationBank?: string;
   firstName?: string;
   lastName?: string;
+  reqCount?: string;
+  otherReq?: string;
 }
 
 export const removeDirectorValues = {
@@ -862,6 +864,15 @@ export const validateInviteUser = z.object({
   email: z.string().email("Please provide a valid email"),
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
+  roles: z.string().min(1, "Role is required"),
+  // roles: z.array(z.string()).min(1, "Role is required"),
+  permissions: PermissionSchema,
+});
+
+export const validateEditUser = z.object({
+  email: z.string().email("Please provide a valid email"),
+  firstName: z.string(),
+  lastName: z.string(),
   roles: z.string().min(1, "Role is required"),
   // roles: z.array(z.string()).min(1, "Role is required"),
   permissions: PermissionSchema,

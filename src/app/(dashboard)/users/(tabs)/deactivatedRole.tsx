@@ -1,39 +1,18 @@
 import { Role, useUserRoles } from "@/lib/hooks/roles";
 import { calculateTotalPages } from "@/lib/utils";
-import { PrimaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { SearchInput } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import {
-  TabsPanel,
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  TableTd,
-  TableTr,
-  UnstyledButton,
-  Text,
-  Box,
-} from "@mantine/core";
+import { Group, TableTd, TableTr, Box } from "@mantine/core";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import {
-  IconBriefcase,
-  IconDotsVertical,
-  IconEdit,
-  IconPlus,
-  IconTrash,
-  IconUser,
-  IconUserX,
-} from "@tabler/icons-react";
+
 import dayjs from "dayjs";
-import router from "next/router";
-import { parse } from "path";
+
 import React, { Dispatch, SetStateAction, useState } from "react";
-import RoleDrawer from "../(drawers)/roles";
+
 import DeactivatedRoleDrawer from "../(drawers)/deactivatedRole";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 interface Props {
   tabValue: string;
@@ -47,12 +26,15 @@ export default function DeactivatedRoles() {
   const [openedRole, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
 
-  const { loading, roles, revalidate, meta } = useUserRoles({
+  const queryParams = {
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedValue,
     status: "deactivate",
-  });
+  };
+
+  const { loading, roles, revalidate, meta } = useUserRoles(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   return (
     <Box>

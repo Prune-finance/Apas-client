@@ -2,19 +2,12 @@
 import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
 import { IParams } from "../schema";
+import { sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("auth");
 
 export function usePricingPlan(customParams: IParams = {}) {
-  const obj = useMemo(() => {
-    return {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.page && { page: customParams.page }),
-      ...(customParams.type && { type: customParams.type }),
-    };
-  }, [customParams]);
+  const params = sanitizeURL(customParams);
 
   const [pricingPlan, setPricingPlan] = useState<PricingPlan[]>([]);
   const [meta, setMeta] = useState<Meta>();
@@ -22,22 +15,10 @@ export function usePricingPlan(customParams: IParams = {}) {
   const [loading, setLoading] = useState(true);
 
   async function fetchPricingPlans() {
-    const queryParams = {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.page && { page: customParams.page }),
-      ...(customParams.type && { type: customParams.type }),
-    };
-
-    const params = new URLSearchParams(queryParams as Record<string, string>);
-
     try {
       setLoading(true);
 
-      const { data } = await axios.get(`/admin/pricing-plans`, {
-        params,
-      });
+      const { data } = await axios.get(`/admin/pricing-plans?${params}`);
 
       setMeta(data.meta);
       setPricingPlan(data.data);
@@ -54,7 +35,7 @@ export function usePricingPlan(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [obj.date, obj.limit, obj.status, obj.page, obj.type]);
+  }, [params]);
 
   return { loading, pricingPlan, meta };
 }

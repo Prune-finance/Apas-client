@@ -78,6 +78,7 @@ export const PendingPayoutRequests = () => {
     limit: parseInt(limit ?? "100", 10),
     page: active,
     status: "PENDING",
+    search: debouncedSearch,
   };
 
   const { requests, loading, meta, revalidate } =
@@ -169,13 +170,7 @@ export const PendingPayoutRequests = () => {
 
       <TableComponent
         head={PayoutRequestsTableHeaders}
-        rows={
-          <PayoutTrxReqTableRows
-            search={debouncedSearch}
-            data={requests}
-            searchProps={PayoutReqSearchProps}
-          />
-        }
+        rows={<PayoutTrxReqTableRows data={requests} />}
         loading={loading}
       />
 

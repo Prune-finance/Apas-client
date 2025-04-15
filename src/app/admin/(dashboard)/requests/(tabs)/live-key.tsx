@@ -39,6 +39,8 @@ function LiveKey() {
   const searchParams = useSearchParams();
   const [limit, setLimit] = useState<string | null>("10");
   const [active, setActive] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { status, date, endDate, business } = Object.fromEntries(
     searchParams.entries()
@@ -51,6 +53,7 @@ function LiveKey() {
     ...(business && { business }),
     limit: parseInt(limit ?? "10", 10),
     page: active,
+    search: debouncedSearch,
   };
 
   const { handleError, handleSuccess } = useNotification();
@@ -71,9 +74,6 @@ function LiveKey() {
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
@@ -121,27 +121,25 @@ function LiveKey() {
     push(`/admin/requests/${id}/live-key`);
   };
 
-  const rows = filteredSearch(requests, ["Company.name"], debouncedSearch).map(
-    (element, index) => (
-      <TableTr
-        key={index}
-        onClick={() => handleRowClick(element.id)}
-        style={{ cursor: "pointer" }}
-      >
-        <TableTd>{element.Company.name}</TableTd>
-        <TableTd>{dayjs(element.date).format("Do MMM, YYYY")}</TableTd>
-        <TableTd>{dayjs(element.createdAt).format("Do MMM, YYYY")}</TableTd>
+  const rows = requests.map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => handleRowClick(element.id)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd>{element.Company.name}</TableTd>
+      <TableTd>{dayjs(element.date).format("Do MMM, YYYY")}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("Do MMM, YYYY")}</TableTd>
 
-        <TableTd>
-          <BadgeComponent status={element.status} />
-        </TableTd>
+      <TableTd>
+        <BadgeComponent status={element.status} />
+      </TableTd>
 
-        {/* <TableTd className={`${styles.table__td}`}>
+      {/* <TableTd className={`${styles.table__td}`}>
           <MenuComponent request={element} />
         </TableTd> */}
-      </TableTr>
-    )
-  );
+    </TableTr>
+  ));
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,

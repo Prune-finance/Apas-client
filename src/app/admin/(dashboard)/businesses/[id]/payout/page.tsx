@@ -45,6 +45,7 @@ export default function BusinessPayoutAccount() {
     recipientName,
     recipientIban,
     accountId,
+    search,
   } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
@@ -55,6 +56,7 @@ export default function BusinessPayoutAccount() {
       ...(type && { type: type }),
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
+      ...(search && { search: search }),
       ...(recipientIban && { recipientIban: recipientIban }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
@@ -69,6 +71,7 @@ export default function BusinessPayoutAccount() {
     recipientIban,
     active,
     limit,
+    search,
   ]);
 
   const {

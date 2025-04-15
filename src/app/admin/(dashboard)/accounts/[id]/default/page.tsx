@@ -1,25 +1,16 @@
 "use client";
 
-import {
-  DefaultAccount,
-  useBusinessDefaultAccount,
-  useSingleAccount,
-} from "@/lib/hooks/accounts";
+import { useBusinessDefaultAccount } from "@/lib/hooks/accounts";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
-  Meta,
   TransactionType,
   useBusinessAccountTransactions,
-  useBusinessTransactions,
-  useTransactions,
 } from "@/lib/hooks/transactions";
-import useAxios from "@/lib/hooks/useAxios";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import PaginationComponent from "@/ui/components/Pagination";
 import {
   DefaultAccountHead,
-  SingleAccountBody,
   SingleDefaultAccountBody,
 } from "@/ui/components/SingleAccount";
 import { Paper } from "@mantine/core";
@@ -46,6 +37,7 @@ export default function BusinessDefaultAccount() {
     recipientName,
     recipientIban,
     accountId,
+    search,
   } = Object.fromEntries(searchParams.entries());
   const [acctId, setAcctId] = useState(accountId);
 
@@ -58,6 +50,7 @@ export default function BusinessDefaultAccount() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
+      ...(search && { search: search }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -71,6 +64,7 @@ export default function BusinessDefaultAccount() {
     recipientIban,
     active,
     limit,
+    search,
   ]);
 
   const {

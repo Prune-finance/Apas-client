@@ -67,6 +67,8 @@ function BusinessAccountRequests() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const queryParams = {
     ...(date && { date: dayjs(date).format("DD-MM-YYYY") }),
@@ -78,8 +80,10 @@ function BusinessAccountRequests() {
     ...(country && { country: country.toUpperCase() }),
     ...(lastName && { lastName }),
     ...(firstName && { firstName }),
+
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
   const { loading, requests, meta, revalidate } = useRequests(
@@ -90,8 +94,6 @@ function BusinessAccountRequests() {
   const { back, push } = useRouter();
 
   const [opened, { toggle }] = useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -104,11 +106,7 @@ function BusinessAccountRequests() {
     push(`/admin/account-requests/${params.id}/${id}`);
   };
 
-  const rows = filteredSearch(
-    requests,
-    ["firstName", "lastName", "country", "accountName"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = requests.map((element, index) => (
     <TableTr
       key={index}
       onClick={() =>

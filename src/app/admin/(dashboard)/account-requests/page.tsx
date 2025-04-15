@@ -5,15 +5,7 @@ import Link from "next/link";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import {
-  Badge,
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  Select,
-} from "@mantine/core";
+import { Group, Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
 
 import { UnstyledButton, rem, Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
@@ -39,7 +31,7 @@ import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
 // Asset Imports
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import { Suspense, useState } from "react";
@@ -47,17 +39,15 @@ import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";
-import { useBusiness } from "@/lib/hooks/businesses";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput } from "@/ui/components/Inputs";
-import { SecondaryBtn } from "@/ui/components/Buttons";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { calculateTotalPages } from "@/lib/utils";
 
 function AccountRequests() {
   const searchParams = useSearchParams();
-  const pathname = usePathname();
 
   const { status, createdAt, sort, type } = Object.fromEntries(
     searchParams.entries()
@@ -65,6 +55,8 @@ function AccountRequests() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const queryParams = {
     page: active,
@@ -73,6 +65,7 @@ function AccountRequests() {
     ...(status && { status: status.toUpperCase() }),
     ...(sort && { sort: sort.toLowerCase() }),
     ...(type && { type: type.toUpperCase() }),
+    ...(debouncedSearch && { search: debouncedSearch }),
   };
 
   const { loading, meta, businesses } =
@@ -92,9 +85,6 @@ function AccountRequests() {
   const [opened, { toggle }] = useDisclosure(false);
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   const { push } = useRouter();
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const MenuComponent = ({ id }: { id: string }) => {
     const { handleError, handleSuccess } = useNotification();
@@ -157,11 +147,7 @@ function AccountRequests() {
     push(`/admin/account-requests/${id}`);
   };
 
-  const rows = filteredSearch(
-    businesses,
-    ["name", "contactEmail"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = businesses.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => handleRowClick(element.id)}
@@ -241,7 +227,7 @@ function AccountRequests() {
           setActive={setActive}
           setLimit={setLimit}
           limit={limit}
-          total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+          total={calculateTotalPages(limit, meta?.total)}
         />
       </div>
     </main>

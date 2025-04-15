@@ -45,6 +45,8 @@ function Debit() {
   const searchParams = useSearchParams();
   const [limit, setLimit] = useState<string | null>("10");
   const [active, setActive] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { status, endDate, date, business } = Object.fromEntries(
     searchParams.entries()
@@ -58,6 +60,7 @@ function Debit() {
     ...(business && { business }),
     limit: parseInt(limit ?? "10", 10),
     page: active,
+    search: debouncedSearch,
   };
 
   const { requests, revalidate } = useDebitRequests(queryParams);
@@ -77,9 +80,6 @@ function Debit() {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
@@ -127,11 +127,7 @@ function Debit() {
     push(`/admin/requests/${id}/debit`);
   };
 
-  const rows = filteredSearch(
-    businesses,
-    ["name", "contactEmail"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = businesses.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => handleRowClick(element.id)}

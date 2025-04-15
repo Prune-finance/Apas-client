@@ -133,7 +133,8 @@ function Accounts() {
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  const canSendMoney = useHasPermission("Transaction Initiation") || useHasPermission("INITIATOR");
+  const isInitiator = useHasPermission("INITIATOR")
+  const canSendMoney = useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
   const stage =

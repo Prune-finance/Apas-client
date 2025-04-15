@@ -63,6 +63,7 @@ import { useHasPermission } from "@/lib/hooks/checkPermission";
 import AddAccount from "./AddAccount";
 import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
+
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 
 function Accounts() {
@@ -134,7 +135,9 @@ function Accounts() {
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  const canSendMoney = useHasPermission("Transaction Initiation");
+  const isInitiator = useHasPermission("INITIATOR");
+  const canSendMoney =
+    useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
   const stage =
@@ -374,6 +377,11 @@ function Accounts() {
               action={addAccountOpen}
               fw={600}
             />
+            {/* <SecondaryBtn
+              text="Create Account"
+              action={addAccountOpen}
+              fw={600}
+            /> */}
 
             <PrimaryBtn
               text={tab === tabs[1].value ? "Debit Request" : "Send Money"}

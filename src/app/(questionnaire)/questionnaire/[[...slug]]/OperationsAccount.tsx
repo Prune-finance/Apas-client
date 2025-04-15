@@ -1,9 +1,9 @@
 import { Box, RadioGroup, Stack, Text } from "@mantine/core";
 import React, { useState } from "react";
 import CustomRadio from "./CustomRadio";
-import { turnoverOptions } from "./page";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useRouter } from "next/navigation";
+import { formatNumber } from "@/lib/utils";
 
 export default function OperationsAccount() {
   const [turnover, setTurnover] = useState("");
@@ -27,7 +27,7 @@ export default function OperationsAccount() {
         }}
       >
         <Stack gap={20} mt="xs" style={{ cursor: "pointer" }}>
-          {Object.entries(turnoverOptions).map(([value, label], idx) => (
+          {Object.entries(estimatedBalance).map(([value, label], idx) => (
             <CustomRadio
               key={idx}
               value={value}
@@ -43,3 +43,23 @@ export default function OperationsAccount() {
     </Box>
   );
 }
+
+export const estimatedBalance = {
+  "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
+  "between-10000-50000": `Between ${formatNumber(
+    10000,
+    true,
+    "GBP"
+  )} - ${formatNumber(50000, true, "GBP")}`,
+  "between-50000-100000": `Between ${formatNumber(
+    50000,
+    true,
+    "GBP"
+  )} - ${formatNumber(100000, true, "GBP")}`,
+  "between-100000-500000": `Between ${formatNumber(
+    100000,
+    true,
+    "GBP"
+  )} - ${formatNumber(500000, true, "GBP")}`,
+  "above-500000": `Above ${formatNumber(500000, true, "GBP")}`,
+} as const;

@@ -3,6 +3,7 @@ import { Permission } from "./roles";
 
 export function useHasPermission(permission: string): boolean {
   const { user } = User();
+
   return Boolean(
     user &&
       user?.permissions &&

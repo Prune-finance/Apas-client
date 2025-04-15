@@ -63,7 +63,10 @@ import { useHasPermission } from "@/lib/hooks/checkPermission";
 import AddAccount from "./AddAccount";
 import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
+<<<<<<< HEAD
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
+=======
+>>>>>>> 29d4f5cb3a1589b3f503f79db4dd805dfde6aa65
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -134,9 +137,14 @@ function Accounts() {
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
+<<<<<<< HEAD
   const isInitiator = useHasPermission("INITIATOR");
   const canSendMoney =
     useHasPermission("Transaction Initiation") || isInitiator;
+=======
+  const isInitiator = useHasPermission("INITIATOR")
+  const canSendMoney = useHasPermission("Transaction Initiation") || isInitiator;
+>>>>>>> 29d4f5cb3a1589b3f503f79db4dd805dfde6aa65
 
   const { user } = User();
   const stage =
@@ -371,11 +379,14 @@ function Accounts() {
           </div>
 
           <Flex align="center" gap={16}>
+<<<<<<< HEAD
             <SecondaryBtn
               text="Create Account"
               action={addAccountOpen}
               fw={600}
             />
+=======
+>>>>>>> 29d4f5cb3a1589b3f503f79db4dd805dfde6aa65
             {/* <SecondaryBtn
               text="Create Account"
               action={addAccountOpen}

@@ -6,6 +6,7 @@ import {
   CopyButton,
   Flex,
   Group,
+  Image,
   Loader,
   Skeleton,
   Stack,
@@ -22,14 +23,16 @@ import { GiEuropeanFlag, GiNigeria } from "react-icons/gi";
 import { formatNumber } from "@/lib/utils";
 import { SecondaryBtn } from "../Buttons";
 import { IconCheck, IconCopy, IconReload } from "@tabler/icons-react";
+import GBImage from "@/assets/GB.png";
+import EUImage from "@/assets/EU-icon.png";
 import { SeeAll } from ".";
 import Link from "next/link";
 
 interface Props extends CardProps {
   currency: string;
   companyName?: string;
-  iban: string;
-  bic: string;
+  iban?: string;
+  bic?: string;
   balance: number;
   link?: string;
   loading: boolean;
@@ -38,6 +41,8 @@ interface Props extends CardProps {
   disable?: boolean;
   children?: React.ReactNode;
   refresh?: boolean;
+  sortCode?: string;
+  accountNumber?: string;
   revalidate?: () => Promise<void>;
 }
 
@@ -53,7 +58,7 @@ type CurrencyConfig = {
 const currencyConfigs: Record<string, CurrencyConfig> = {
   EUR: {
     background: newAccountImageEuro.src,
-    icon: <GiEuropeanFlag />,
+    icon: <Image src={EUImage.src} alt="EUR" width={20} height={20} />,
     bankIdLabel: "BIC",
     accountIdLabel: "IBAN",
     currencySymbol: "€",
@@ -61,7 +66,7 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
   },
   GBP: {
     background: AccountImageGBP.src,
-    icon: <GiEuropeanFlag />,
+    icon: <Image src={GBImage.src} alt="GBP" width={20} height={20} />,
     bankIdLabel: "Sort Code",
     accountIdLabel: "Account Number",
     currencySymbol: "£",
@@ -82,6 +87,8 @@ function NewAccountCard({
   companyName,
   iban,
   bic,
+  sortCode,
+  accountNumber,
   balance,
   link,
   loading,
@@ -131,16 +138,7 @@ function NewAccountCard({
       <Stack align="flex-start" justify="space-between" gap={20} p={16}>
         <Flex align="center" justify="space-between" w="100%">
           <Group gap={8}>
-            <ThemeIcon
-              color={
-                currency === "EUR"
-                  ? "#0052B4"
-                  : currency === "GBP"
-                  ? "#00247D"
-                  : "#008751"
-              }
-              radius="xl"
-            >
+            <ThemeIcon color="transparent" radius="xl">
               {config.icon}
             </ThemeIcon>
 
@@ -157,9 +155,10 @@ function NewAccountCard({
             {refresh && (
               <ThemeIcon
                 radius="xl"
-                color="#3F441B"
-                size="md"
-                p={4}
+                color="transparent"
+                // color="#3F441B"
+                size="xs"
+                // p={4}
                 onClick={() => handleReload()}
                 style={{
                   cursor: processing ? "not-allowed" : "pointer",
@@ -167,18 +166,14 @@ function NewAccountCard({
                 }}
               >
                 {processing ? (
-                  <Loader
-                    type="oval"
-                    size="xs"
-                    color="var(--prune-primary-600)"
-                  />
+                  <Loader type="oval" size="xs" color="#596603" />
                 ) : (
-                  <IconReload color="var(--prune-primary-600)" />
+                  <IconReload color="#596603" />
                 )}
               </ThemeIcon>
             )}
 
-            {/* <Group
+            <Group
               gap={2}
               align="center"
               justify="end"
@@ -186,23 +181,34 @@ function NewAccountCard({
             >
               {link && (
                 <Link href={link}>
-                  <SeeAll name="See More" fontSize={14} />
+                  <Text fz={12} td="underline" fw={500} c="#596603">
+                    See More
+                  </Text>
                 </Link>
               )}
-            </Group> */}
+            </Group>
           </Group>
         </Flex>
 
-        <Flex direction="column" align="flex-start">
-          <Group align="center" gap={4} mt={27}>
+        <Flex direction="column" align="flex-start" w={"100%"}>
+          <Group
+            align="center"
+            justify="space-between"
+            gap={4}
+            mt={27}
+            w={"100%"}
+          >
             {!loading ? (
               <>
-                <Text fz={12} fw={400} c="#667085" lh="100%">
-                  {config.bankIdLabel}:
-                </Text>
-                <Text fz={14} fw={600} c="#1D2939" lh="100%">
-                  {config.bankIdLabel === "BIC" ? bic : ""}
-                </Text>
+                <Flex align="center" gap={4}>
+                  <Text fz={12} fw={400} c="#667085" lh="100%">
+                    {config.bankIdLabel}:
+                  </Text>
+
+                  <Text fz={14} fw={600} c="#1D2939" lh="100%">
+                    {config.bankIdLabel === "BIC" ? bic : sortCode}
+                  </Text>
+                </Flex>
               </>
             ) : (
               <Skeleton h={10} w={100} />
@@ -228,7 +234,7 @@ function NewAccountCard({
                   {config.accountIdLabel}:
                 </Text>
                 <Text fz={14} fw={600} c="#1D2939" lh="100%">
-                  {config.accountIdLabel === "IBAN" ? iban : ""}
+                  {config.accountIdLabel === "IBAN" ? iban : accountNumber}
                 </Text>
               </>
             ) : (
@@ -236,28 +242,31 @@ function NewAccountCard({
             )}
           </Group>
 
-          <Box onClick={handlePropagation}>
-            <CopyButton
-              value={
-                currency === "EUR"
-                  ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
-                  : currency === "GBP"
-                  ? `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
-                  : `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
-              }
-            >
-              {({ copied, copy }) => (
-                <SecondaryBtn
-                  icon={copied ? IconCheck : IconCopy}
-                  text={copied ? "Copied" : "Copy Details"}
-                  fz={14}
-                  action={copy}
-                  variant="transparent"
-                  c="#596603"
-                />
-              )}
-            </CopyButton>
-          </Box>
+          <Flex align="flex-end" justify="flex-end">
+            <Box onClick={handlePropagation}>
+              <CopyButton
+                value={
+                  currency === "EUR"
+                    ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
+                    : currency === "GBP"
+                    ? `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
+                    : `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
+                }
+              >
+                {({ copied, copy }) => (
+                  <SecondaryBtn
+                    icon={copied ? IconCheck : IconCopy}
+                    text={copied ? "Copied" : "Copy Details"}
+                    fz={12}
+                    action={copy}
+                    variant="transparent"
+                    c="#596603"
+                    style={{ border: "none" }}
+                  />
+                )}
+              </CopyButton>
+            </Box>
+          </Flex>
         </Flex>
       </Stack>
     </BackgroundImage>

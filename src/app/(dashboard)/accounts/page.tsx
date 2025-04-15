@@ -63,6 +63,7 @@ import { useHasPermission } from "@/lib/hooks/checkPermission";
 import AddAccount from "./AddAccount";
 import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
+import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -399,7 +400,7 @@ function Accounts() {
         >
           <TabsPanel value={tabs[0].value}>
             <SimpleGrid cols={3} mt={32}>
-              <AccountCard
+              {/* <AccountCard
                 balance={account?.accountBalance ?? 0}
                 currency="EUR"
                 companyName={account?.accountName ?? "No Default Account"}
@@ -407,6 +408,32 @@ function Accounts() {
                 bic={"ARPYGB21XXX"}
                 loading={loadingDftAcct}
                 link={`/accounts/default`}
+                business={false}
+                refresh
+                revalidate={revalidateDftAcct}
+              /> */}
+
+              <NewAccountCard
+                currency={"EUR"}
+                companyName={account?.accountName ?? "No Default Account"}
+                link={`/accounts/default`}
+                iban={account?.accountNumber ?? "No Default Account"}
+                bic={"ARPYGB21XXX"}
+                balance={account?.accountBalance ?? 0}
+                loading={loadingDftAcct}
+                business={false}
+                refresh
+                revalidate={revalidateDftAcct}
+              />
+
+              <NewAccountCard
+                currency={"GBP"}
+                companyName={account?.accountName ?? "No Default Account"}
+                link={`/accounts/default`}
+                sortCode="567890"
+                accountNumber="567890"
+                balance={account?.accountBalance ?? 0}
+                loading={loadingDftAcct}
                 business={false}
                 refresh
                 revalidate={revalidateDftAcct}

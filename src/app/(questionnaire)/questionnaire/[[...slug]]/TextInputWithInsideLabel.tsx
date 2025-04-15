@@ -19,6 +19,11 @@ export const NumberInputWithInsideLabel = ({
   ...props
 }: NumberInputWithInsideLabelProps) => {
   return (
-    <NumberInput {...props} placeholder="Enter number" classNames={classes} />
+    <NumberInput
+      {...props}
+      placeholder="Enter number"
+      classNames={classes}
+      thousandSeparator=","
+    />
   );
 };

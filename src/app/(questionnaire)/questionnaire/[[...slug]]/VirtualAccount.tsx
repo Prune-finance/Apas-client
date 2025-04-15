@@ -41,6 +41,8 @@ export default function VirtualAccount() {
                     leftSection={<IconCurrencyPound />}
                     placeholder="Amount"
                     w="100%"
+                    min={0}
+                    thousandSeparator=","
                   />
                 </Group>
               ))}
@@ -57,19 +59,33 @@ export default function VirtualAccount() {
 type Period = "daily" | "monthly" | "annually";
 
 interface LimitSection {
-  title: string;
+  title: string | JSX.Element;
   fields: Period[];
 }
 
 export const transactionLimits: LimitSection[] = [
   {
-    title:
-      "Please indicate the maximum value processed per transaction by a single virtual account",
+    title: (
+      <Text>
+        Please indicate the maximum value processed per transaction by a{" "}
+        <Text fw={700} inherit span>
+          single
+        </Text>{" "}
+        virtual account
+      </Text>
+    ),
     fields: ["daily", "monthly", "annually"],
   },
   {
-    title:
-      "Please indicate the maximum value processed per transaction by all virtual account",
+    title: (
+      <Text>
+        Please indicate the maximum value processed per transaction by{" "}
+        <Text fw={700} inherit span>
+          all
+        </Text>{" "}
+        virtual account
+      </Text>
+    ),
     fields: ["daily", "monthly", "annually"],
   },
   {

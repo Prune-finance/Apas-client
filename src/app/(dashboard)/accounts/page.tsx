@@ -63,7 +63,6 @@ import { useHasPermission } from "@/lib/hooks/checkPermission";
 import AddAccount from "./AddAccount";
 import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
-
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 
 function Accounts() {

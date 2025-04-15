@@ -89,11 +89,6 @@ import { BusinessData } from "@/lib/hooks/businesses";
 import { Documents } from "./(tabs)/Documents";
 import DefaultAccountDetails from "./(defaultTabs)/DefaultAccountDetails";
 import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
-import SendMoneyModal from "./sendMoneyModal";
-import PreviewState from "./previewState";
-import SuccessModal from "../SuccessModal";
-// import SuccessModalImage from "@/assets/success-modal-image.png";
-import PendingModalImage from "@/assets/pending-image.png";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
@@ -872,6 +867,9 @@ export const DefaultAccountHead = ({
     useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
   const [processingTrust, setProcessingTrust] = useState(false);
+  const isInitiator = useHasPermission("INITIATOR");
+  const canSendMoney =
+    useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
 

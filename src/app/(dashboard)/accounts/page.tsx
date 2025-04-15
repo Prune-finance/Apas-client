@@ -436,7 +436,7 @@ function Accounts() {
               <NewAccountCard
                 currency={"GBP"}
                 companyName={account?.accountName ?? "No Default Account"}
-                link={`/accounts/default`}
+                link={`/accounts/default/1`}
                 sortCode="567890"
                 accountNumber="567890"
                 balance={account?.accountBalance ?? 0}

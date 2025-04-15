@@ -9,34 +9,56 @@ import {
   Stack,
   Skeleton,
   Text,
+  Image,
 } from "@mantine/core";
 import { GiEuropeanFlag } from "react-icons/gi";
 import { PrimaryBtn } from "../../Buttons";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
+import GBImage from "@/assets/GB.png";
+import EUImage from "@/assets/EU-icon.png";
 
 interface Props {
   account: DefaultAccount | null;
   loading: boolean;
+  accountType?: string;
 }
 
-export default function DefaultAccountDetails({ account, loading }: Props) {
+export default function DefaultAccountDetails({
+  account,
+  loading,
+  accountType,
+}: Props) {
   const accountDetails = {
     "Account Name": account?.accountName,
-    "IBAN/Account Number": account?.accountNumber,
-    BIC: "ARPYGB21XXX",
+    [accountType === "GBP" ? "Sort Code" : "IBAN/Account Number"]:
+      accountType === "GBP" ? account?.accountNumber : account?.accountNumber,
+
+    [accountType === "GBP" ? "Account Number" : "BIC"]:
+      accountType === "GBP" ? "678902" : "ARPYGB21XXX",
+
     "Bank Name": "Prune Payments LTD",
+
     "Bank Address": "Office 7 35-37 Ludgate Hill, London",
+
     "Bank Country": "United Kingdom",
   };
 
   return (
     <>
       <Group gap={7}>
-        <ThemeIcon radius="xl" color="#0052B4">
-          <GiEuropeanFlag />
+        <ThemeIcon
+          radius="xl"
+          // color="#0052B4"
+          color="transparent"
+        >
+          {accountType === "GBP" ? (
+            <Image src={GBImage.src} alt="GBP" w={20} h={20} />
+          ) : (
+            <Image src={EUImage.src} alt="EUR" w={20} h={20} />
+          )}
         </ThemeIcon>
         <Text fz={16} fw={500}>
-          EUR Account Details
+          {accountType ?? "EUR"} Account Details
         </Text>
         <CopyButton
           value={`Account Name: ${

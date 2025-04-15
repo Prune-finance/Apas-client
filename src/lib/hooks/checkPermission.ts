@@ -8,5 +8,5 @@ export function useHasPermission(permission: string): boolean {
     user &&
       user?.permissions &&
       user?.permissions.includes(permission)
-  );
+  ) || Boolean(user?.role === permission);
 }

@@ -874,7 +874,7 @@ export const DefaultAccountHead = ({
   const [processingTrust, setProcessingTrust] = useState(false);
 
   const { user } = User();
-  const canSendMoney = useHasPermission("Transaction Initiation");
+  const canSendMoney = useHasPermission("Transaction Initiation") || useHasPermission("INITIATOR");
 
   const axios = createAxiosInstance("payouts");
 

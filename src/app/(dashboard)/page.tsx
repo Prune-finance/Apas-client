@@ -60,7 +60,7 @@ export default function Home() {
       limit: 3,
     });
 
-  const canSendMoney = useHasPermission("Transaction Initiation");
+  const canSendMoney = useHasPermission("Transaction Initiation") || useHasPermission("INITIATOR");
 
   const {
     account,

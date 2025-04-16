@@ -3,7 +3,8 @@ import Photo2 from "@/assets/questionnaire/questionnaire2.png";
 import Photo3 from "@/assets/questionnaire/questionnaire3.png";
 import Photo4 from "@/assets/questionnaire/questionnaire4.png";
 import Photo5 from "@/assets/questionnaire/questionnaire5.png";
-import { BackgroundImage, Box } from "@mantine/core";
+import Icon from "@/assets/icon.png";
+import { BackgroundImage, Box, Group, Image, Stack, Text } from "@mantine/core";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 
@@ -30,11 +31,28 @@ export default function Navbar() {
   }, [slug?.[0], slug?.[1], isOperationsAccount, isServices]);
 
   return (
-    <BackgroundImage
-      src={selectedTestimonial.photo}
-      w="100%"
-      h="100vh"
-    ></BackgroundImage>
+    <BackgroundImage src={selectedTestimonial.photo} w="100%" h="100vh" p={32}>
+      <Stack justify="space-between" c="#fff" h="100%">
+        <Group gap={8} wrap="nowrap">
+          <Image src={Icon.src} alt="Logo" w={33} h={33} />
+          <Text fz={20} fw={600} c="#fff">
+            Prune Payments
+          </Text>
+        </Group>
+
+        <Stack gap={4}>
+          <Text fz={24} fw={700} mb={12}>
+            {selectedTestimonial.comment}
+          </Text>
+          <Text fz={16} fw={700}>
+            {selectedTestimonial.name}
+          </Text>
+          <Text fz={14} fw={400}>
+            {selectedTestimonial.position}
+          </Text>
+        </Stack>
+      </Stack>
+    </BackgroundImage>
   );
 }
 

@@ -2,6 +2,7 @@
 
 import { useUserDefaultPayoutAccount } from "@/lib/hooks/accounts";
 import { useUserBusiness } from "@/lib/hooks/businesses";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import {
   TransactionType,
   useUserPayoutTransactions,
@@ -37,31 +38,21 @@ export default function SingleUserPayoutAccount() {
     endDate,
     recipientName,
     recipientIban,
+    search,
   } = Object.fromEntries(searchParams.entries());
 
-  const param = useMemo(() => {
-    return {
-      ...(status && { status: status.toUpperCase() }),
-      ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-      ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-      ...(type && { type: type }),
-      ...(senderName && { senderName: senderName }),
-      ...(recipientName && { recipientName: recipientName }),
-      ...(recipientIban && { recipientIban: recipientIban }),
-      page: active,
-      limit: parseInt(limit ?? "10", 10),
-    };
-  }, [
-    status,
-    date,
+  const param = {
+    status: status?.toUpperCase(),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
     type,
     senderName,
-    endDate,
     recipientName,
     recipientIban,
-    active,
-    limit,
-  ]);
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+    search,
+  };
 
   const { loading, account, revalidate } = useUserDefaultPayoutAccount();
 
@@ -72,6 +63,7 @@ export default function SingleUserPayoutAccount() {
     loading: trxLoading,
     meta,
   } = useUserPayoutTransactions(param);
+  usePaginationReset({ queryParams: param, setActive });
   // const { transactions, loading: trxLoading } = useUserTransactions(params.id);
 
   return (

@@ -44,6 +44,7 @@ import { TableComponent } from "@/ui/components/Table";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { getUserType } from "@/lib/utils";
 import createAxiosInstance from "@/lib/axios";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 const axios = createAxiosInstance("accounts");
 
@@ -52,29 +53,31 @@ function AccountRequests() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { status, date, endDate, firstName, lastName, country, type } =
     Object.fromEntries(searchParams.entries());
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(firstName && { firstName }),
-    ...(lastName && { lastName }),
-    ...(country && { country }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    firstName,
+    lastName,
+    country,
+    status: status?.toUpperCase(),
+    type: type ? (type === "Individual" ? "USER" : "CORPORATE") : undefined,
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
   const { loading, requests, revalidate, meta } = useUserRequests(queryParams);
+  usePaginationReset({ queryParams, setActive });
   const { handleSuccess } = useNotification();
   const [opened, { open, close }] = useDisclosure(false);
   const [cancelOpened, { open: cancelOpen, close: cancelClose }] =
     useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 

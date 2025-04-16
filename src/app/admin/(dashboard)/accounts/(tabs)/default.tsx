@@ -83,6 +83,8 @@ export default function BusinessAccounts() {
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
   const [frequency, setFrequency] = useState<string | null>("Monthly");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
@@ -93,6 +95,7 @@ export default function BusinessAccounts() {
     ...(accountNumber && { accountNumber }),
     page: activePage,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
   const dependencies = [
@@ -104,6 +107,7 @@ export default function BusinessAccounts() {
     accountName,
     accountNumber,
     type,
+    debouncedSearch,
   ];
 
   const {
@@ -138,9 +142,6 @@ export default function BusinessAccounts() {
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processingCSV, setProcessingCSV] = useState(false);
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const requestForm = useForm({
     initialValues: {
@@ -346,7 +347,6 @@ export default function BusinessAccounts() {
             unfreezeOpen={unfreezeOpen}
             freezeOpen={freezeOpen}
             open={open}
-            debouncedSearch={debouncedSearch}
             setRowId={setRowId}
           />
         }
@@ -432,7 +432,6 @@ const tableHeaders = [
 
 type RowProps = {
   accounts: AccountData[];
-  debouncedSearch: string;
   setRowId: Dispatch<SetStateAction<string | null>>;
   activateOpen: () => void;
   freezeOpen: () => void;
@@ -442,7 +441,7 @@ type RowProps = {
 
 const RowComponent = ({
   accounts,
-  debouncedSearch,
+
   setRowId,
   activateOpen,
   freezeOpen,
@@ -451,14 +450,16 @@ const RowComponent = ({
 }: RowProps) => {
   const { push } = useRouter();
 
+  // filteredSearch(
+  //   accounts || [],
+  //   ["accountName", "accountNumber", "Company.name"],
+  //   debouncedSearch
+  // );
+
   const handleRowClick = (id: string, businessId: string) => {
     push(`/admin/accounts/${businessId}/default?accountId=${id}`);
   };
-  return filteredSearch(
-    accounts || [],
-    ["accountName", "accountNumber", "Company.name"],
-    debouncedSearch
-  ).map((element, index) => (
+  return accounts.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => handleRowClick(element.id, element.Company.id)}

@@ -59,6 +59,9 @@ export const OtherRequests = () => {
 
   const { requests, revalidate, loading, meta } = useAllCompanyRequests(id, {
     ...(type === "All" || !type ? {} : { type }),
+    search: debouncedSearch,
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
   });
 
   const [selectedRequest, setSelectedRequest] = useState<IUserRequest | null>(
@@ -175,11 +178,9 @@ export const OtherRequests = () => {
     );
   };
 
-  const rows = filteredSearch(
-    requests,
-    ["name", "contactEmail"],
-    debouncedSearch
-  ).map((element, index) => (
+  // filteredSearch(requests, ["name", "contactEmail"], debouncedSearch);
+
+  const rows = requests.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => {

@@ -89,14 +89,10 @@ import { BusinessData } from "@/lib/hooks/businesses";
 import { Documents } from "./(tabs)/Documents";
 import DefaultAccountDetails from "./(defaultTabs)/DefaultAccountDetails";
 import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
-import SendMoneyModal from "./sendMoneyModal";
-import PreviewState from "./previewState";
-import SuccessModal from "../SuccessModal";
-// import SuccessModalImage from "@/assets/success-modal-image.png";
-import PendingModalImage from "@/assets/pending-image.png";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
+import { useHasPermission } from "@/lib/hooks/checkPermission";
 
 type Param = { id: string };
 interface Props {
@@ -680,6 +676,7 @@ interface SingleDefaultAccountProps
   extends Omit<SingleAccountProps, "account"> {
   account: DefaultAccount | null;
   location?: string;
+  accountType?: string;
 }
 
 export const SingleDefaultAccountBody = ({
@@ -697,6 +694,7 @@ export const SingleDefaultAccountBody = ({
   location,
   revalidate,
   isUser,
+  accountType,
 }: SingleDefaultAccountProps) => {
   /**
    * @description - Tabs for the default account
@@ -725,11 +723,16 @@ export const SingleDefaultAccountBody = ({
         revalidate={revalidate}
         main={location === "own-account" || location === "admin-default"}
         business={business}
+        currencyType={accountType}
       />
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
-          <DefaultAccountDetails account={account} loading={loading} />
+          <DefaultAccountDetails
+            account={account}
+            loading={loading}
+            accountType={accountType}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
@@ -785,13 +788,11 @@ export const IssuedAccountHead = ({
     >
       <Group gap={12} align="center">
         {!loading ? (
-          <Avatar
-            variant="filled"
-            size="lg"
-            color="var(--prune-primary-700)"
-          >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
-            0
-          )}`}</Avatar>
+          <Avatar variant="filled" size="lg" color="var(--prune-primary-700)">
+            {getInitials(
+              `${account?.firstName ?? ""} ${account?.lastName ?? ""}`
+            )}
+          </Avatar>
         ) : (
           <Skeleton circle h={50} w={50} />
         )}
@@ -873,6 +874,9 @@ export const DefaultAccountHead = ({
     useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
   const [processingTrust, setProcessingTrust] = useState(false);
+  const isInitiator = useHasPermission("INITIATOR");
+  const canSendMoney =
+    useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
 
@@ -960,7 +964,8 @@ export const DefaultAccountHead = ({
               text="Send Money"
               fw={600}
               action={openMoney}
-              display={user?.role === "INITIATOR" ? "block" : "none"}
+              display={canSendMoney ? "block" : "none"}
+              // display={user?.role === "INITIATOR" ? "block" : "none"}
             />
           )}
           {/* {!payout && <SecondaryBtn text="Freeze Account" fw={600} />} */}
@@ -1012,7 +1017,12 @@ export const DefaultAccountHead = ({
         color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
-      <SendMoney opened={opened} closeMoney={closeMoney} account={account} />
+      <SendMoney
+        opened={opened}
+        closeMoney={closeMoney}
+        account={account}
+        openSendMoney={openMoney}
+      />
     </>
   );
 };
@@ -1027,6 +1037,7 @@ interface AccountInfoProps {
   isUser?: boolean;
   revalidate?: () => Promise<void>;
   business: BusinessData | null;
+  currencyType?: string;
 }
 
 export const AccountInfo = ({
@@ -1039,6 +1050,7 @@ export const AccountInfo = ({
   isUser,
   revalidate,
   business,
+  currencyType,
 }: AccountInfoProps) => {
   const [processing, setProcessing] = useState(false);
   const { handleError } = useNotification();
@@ -1049,7 +1061,7 @@ export const AccountInfo = ({
       "Do MMMM, YYYY"
     ),
     "No. of Transaction": trxMeta?.total ?? 0,
-    Currency: "EUR",
+    Currency: currencyType ?? "EUR",
   };
 
   const accountType = payout
@@ -1091,7 +1103,11 @@ export const AccountInfo = ({
 
             {!loading || !loadingTrx ? (
               <Text fz={24} fw={600} c="var(--prune-text-gray-800)" mt={8}>
-                {formatNumber(account?.accountBalance ?? 0, true, "EUR")}
+                {formatNumber(
+                  account?.accountBalance ?? 0,
+                  true,
+                  currencyType ?? "EUR"
+                )}
               </Text>
             ) : (
               <Skeleton w={100} h={30} />
@@ -1132,8 +1148,9 @@ export const AccountInfo = ({
                 color="var(--prune-primary-600)"
                 c="var(--prune-text-gray-800)"
                 // p="6px 8px"
-                py={12}
+                // py={18}
                 px={8}
+                h={30}
                 leftSection={
                   <ThemeIcon
                     variant="transparent"

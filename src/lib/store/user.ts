@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import { AdminData } from "../hooks/admins";
+import { AdminData, UserData } from "../hooks/admins";
 
 const User = create<UserState>()(
   persist(
@@ -19,10 +19,10 @@ const User = create<UserState>()(
 );
 
 interface UserState {
-  user: null | AdminData;
+  user: null | UserData;
   isIdle: boolean;
   setIsIdle: (state: boolean) => void;
-  setUser: (user: AdminData | null) => void;
+  setUser: (user: UserData | null) => void;
   removeUser: () => void;
 }
 

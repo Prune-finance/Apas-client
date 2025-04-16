@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
-import SendMoneyBanner from "@/assets/sendMoneyBanner.png";
+import SendMoneyBanner from "@/assets/sendMoney-new-bg.png";
 
 import {
   Flex,
@@ -22,6 +22,7 @@ import { DefaultAccount } from "@/lib/hooks/accounts";
 import TabsComponent from "../Tabs";
 import Individual from "./Individual";
 import Company from "./company";
+import CurrencyTab from "../CurrencyTab";
 
 interface SendMoneyModalProps {
   account: DefaultAccount | null;
@@ -30,6 +31,9 @@ interface SendMoneyModalProps {
   setRequestForm: any;
   setCompanyRequestForm: any;
   setSectionState: any;
+  openDebtor: () => void;
+  paymentType: string;
+  setPaymentType: Dispatch<SetStateAction<string>>;
 }
 
 function SendMoneyModal({
@@ -39,6 +43,9 @@ function SendMoneyModal({
   setRequestForm,
   setCompanyRequestForm,
   setSectionState,
+  openDebtor,
+  paymentType,
+  setPaymentType,
 }: SendMoneyModalProps) {
   const [validated, setValidated] = useState<boolean | null>(null);
   const [showBadge, setShowBadge] = useState(false);
@@ -121,7 +128,7 @@ function SendMoneyModal({
 
         <BackgroundImage
           src={SendMoneyBanner.src}
-          h={111}
+          h={176}
           style={{ borderRadius: "4px" }}
           mt={32}
         >
@@ -129,9 +136,11 @@ function SendMoneyModal({
             <Text fz={14} fw={500} c="#667085" mb={0}>
               Account Balance
             </Text>
-            <Text fz={32} fw={600} c="#344054" mt={0}>
+            <Text fz={32} fw={600} c="#344054" mt={0} mb={16}>
               {formatNumber(account?.accountBalance ?? 0, true, "EUR")}
             </Text>
+
+            <CurrencyTab />
           </Flex>
         </BackgroundImage>
 
@@ -154,6 +163,9 @@ function SendMoneyModal({
             setValidated={setValidated}
             showBadge={showBadge}
             setShowBadge={setShowBadge}
+            openDebtor={openDebtor}
+            paymentType={paymentType}
+            setPaymentType={setPaymentType}
           />
           <Company
             account={account}
@@ -165,6 +177,9 @@ function SendMoneyModal({
             setValidated={setValidated}
             showBadge={showBadge}
             setShowBadge={setShowBadge}
+            openDebtor={openDebtor}
+            paymentType={paymentType}
+            setPaymentType={setPaymentType}
           />
         </TabsComponent>
       </Paper>

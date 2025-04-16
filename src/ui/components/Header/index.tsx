@@ -358,7 +358,7 @@ export function UserHeader() {
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!user || (user && !user.permissions)) {
       handleSetUser();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

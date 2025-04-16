@@ -48,8 +48,7 @@ function Users() {
             </TabsPanel>
           </TabsComponent>
         </TabsPanel>
-      </TabsComponent>
-      {/* <TabsPanel value={tabs[0].value}>
+        <TabsPanel value={tabs[1].value}>
           <TabsComponent
             tabs={roleTabs}
             tt="capitalize"
@@ -63,7 +62,8 @@ function Users() {
               <DeactivatedRoles />
             </TabsPanel>
           </TabsComponent>
-        </TabsPanel> */}
+        </TabsPanel>
+      </TabsComponent>
     </main>
   );
 }

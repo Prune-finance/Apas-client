@@ -40,6 +40,7 @@ export default function Account() {
     endDate,
     recipientName,
     recipientIban,
+    search,
   } = Object.fromEntries(searchParams.entries());
 
   const customParams = useMemo(() => {
@@ -51,6 +52,7 @@ export default function Account() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
+      ...(search && { search: search }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -64,6 +66,7 @@ export default function Account() {
     recipientIban,
     active,
     limit,
+    search,
   ]);
 
   const {

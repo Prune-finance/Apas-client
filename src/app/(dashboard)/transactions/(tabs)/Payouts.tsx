@@ -22,11 +22,15 @@ import { useSearchParams } from "next/navigation";
 
 import { PayoutTableHeaders } from "@/lib/static";
 import { PayoutTransactionTableRows } from "@/ui/components/TableRows";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { calculateTotalPages } from "@/lib/utils";
 
 export const PayoutsTab = () => {
   const searchParams = useSearchParams();
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const {
     status,
@@ -39,24 +43,23 @@ export const PayoutsTab = () => {
   } = Object.fromEntries(searchParams.entries());
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(recipientIban && { recipientIban }),
-    ...(recipientName && { recipientName }),
-    ...(senderName && { senderName }),
-    ...(type && { type: type.toUpperCase() }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    status: status?.toUpperCase(),
+    recipientIban,
+    recipientName,
+    senderName,
+    type: type?.toUpperCase(),
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
-  const { transactions, revalidate, loading, meta } =
+  const { transactions, loading, meta } =
     useUserPayoutTransactions(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const [opened, { toggle }] = useDisclosure(false);
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -87,8 +90,6 @@ export const PayoutsTab = () => {
       value: meta?.total || 0,
     },
   ];
-
-  const searchProps = ["senderIban", "recipientIban", "amount"];
 
   return (
     <>
@@ -140,14 +141,7 @@ export const PayoutsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={
-          <PayoutTransactionTableRows
-            data={transactions}
-            search={debouncedSearch}
-            searchProps={searchProps}
-            isUser
-          />
-        }
+        rows={<PayoutTransactionTableRows data={transactions} isUser />}
         // rows={rows}
         loading={loading}
         head={PayoutTableHeaders}
@@ -160,7 +154,7 @@ export const PayoutsTab = () => {
         text="When a transaction is made, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
         active={active}
         setActive={setActive}
         limit={limit}

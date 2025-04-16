@@ -27,6 +27,7 @@ import useNotification from "@/lib/hooks/notification";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
 import createAxiosInstance from "@/lib/axios";
+import { calculateTotalPages } from "@/lib/utils";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
@@ -44,6 +45,7 @@ export default function Account() {
     endDate,
     recipientName,
     recipientIban,
+    search,
   } = Object.fromEntries(searchParams.entries());
 
   const customParams = useMemo(() => {
@@ -55,6 +57,7 @@ export default function Account() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
+      ...(search && { search: search }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -68,6 +71,7 @@ export default function Account() {
     recipientIban,
     active,
     limit,
+    search,
   ]);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFreeze, { open: openFreeze, close: closeFreeze }] =
@@ -189,7 +193,7 @@ export default function Account() {
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+            total={calculateTotalPages(limit, meta?.total)}
           />
         </SingleAccountBody>
 

@@ -22,6 +22,8 @@ import { useState } from "react";
 import { OwnAccountTableHeaders } from "@/lib/static";
 import { useSearchParams } from "next/navigation";
 import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { calculateTotalPages } from "@/lib/utils";
 
 export const AccountsTab = () => {
   const searchParams = useSearchParams();
@@ -37,18 +39,20 @@ export const AccountsTab = () => {
     Object.fromEntries(searchParams.entries());
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(recipientIban && { recipientIban }),
-    ...(recipientName && { recipientName }),
-    ...(type && { type: type.toUpperCase() }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    status: status?.toUpperCase(),
+    recipientIban,
+    recipientName,
+    type: type?.toUpperCase(),
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
   const { transactions, loading, meta } =
     useUserDefaultTransactions(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -79,8 +83,6 @@ export const AccountsTab = () => {
       value: meta?.total || 0,
     },
   ];
-
-  const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
 
   return (
     <>
@@ -129,13 +131,7 @@ export const AccountsTab = () => {
 
       <TableComponent
         rows={
-          <BusinessTransactionTableRows
-            data={transactions}
-            search={debouncedSearch}
-            searchProps={searchProps}
-            business
-            isUser
-          />
+          <BusinessTransactionTableRows data={transactions} business isUser />
         }
         loading={loading}
         head={OwnAccountTableHeaders}
@@ -148,7 +144,8 @@ export const AccountsTab = () => {
         text="When a transaction is recorded, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        // total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
         active={active}
         setActive={setActive}
         limit={limit}

@@ -23,6 +23,8 @@ import { useSearchParams } from "next/navigation";
 
 import { IssuedAccountTableHeaders } from "@/lib/static";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { calculateTotalPages } from "@/lib/utils";
 
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
@@ -38,28 +40,29 @@ export const IssuedAccountsTab = () => {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(recipientIban && { recipientIban }),
-    ...(recipientName && { recipientName }),
-    ...(senderName && { senderName }),
-    ...(type && { type: type.toUpperCase() }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    status: status?.toUpperCase(),
+    recipientIban,
+    recipientName,
+    senderName,
+    type: type?.toUpperCase(),
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
-  const { transactions, revalidate, loading, meta } = useUserTransactions(
+  const { transactions, loading, meta } = useUserTransactions(
     undefined,
     queryParams
   );
+  usePaginationReset({ queryParams, setActive });
 
   const [opened, { toggle }] = useDisclosure(false);
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -90,8 +93,6 @@ export const IssuedAccountsTab = () => {
       value: meta?.total || 0,
     },
   ];
-
-  const searchProps = ["senderIban", "recipientIban", "amount"];
 
   return (
     <>
@@ -143,14 +144,7 @@ export const IssuedAccountsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={
-          <IssuedTransactionTableRows
-            data={transactions}
-            search={debouncedSearch}
-            searchProps={searchProps}
-            isUser
-          />
-        }
+        rows={<IssuedTransactionTableRows data={transactions} isUser />}
         loading={loading}
         head={IssuedAccountTableHeaders}
       />
@@ -162,7 +156,7 @@ export const IssuedAccountsTab = () => {
         text="When a transaction is made, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
         active={active}
         setActive={setActive}
         limit={limit}

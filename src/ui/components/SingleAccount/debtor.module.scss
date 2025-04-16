@@ -1,0 +1,30 @@
+.label {
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.textarea {
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  font-size: 14px;
+
+  &::placeholder {
+    font-size: 12px;
+  }
+}
+
+.input {
+  height: 45px;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  font-size: 14px;
+
+  &::placeholder {
+    font-size: 12px;
+  }
+}
+
+.option {
+  font-size: 14px;
+  color: var(--prune-text-gray-600);
+}

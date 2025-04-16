@@ -291,8 +291,9 @@ export default function DebitRequestModal({
               description={
                 Number(form.values.amount) >
                 Number(
-                  accounts.find((item) => item.id === form.values.account)
-                    ?.accountBalance
+                  (accounts ?? []).find(
+                    (item) => item.id === form.values.account
+                  )?.accountBalance
                 )
                   ? "Insufficient Balance"
                   : ""
@@ -305,8 +306,9 @@ export default function DebitRequestModal({
                   border:
                     Number(form.values.amount) >
                     Number(
-                      accounts.find((item) => item.id === form.values.account)
-                        ?.accountBalance
+                      (accounts ?? []).find(
+                        (item) => item.id === form.values.account
+                      )?.accountBalance
                     )
                       ? "1px solid red"
                       : "1px solid #eaecf0",
@@ -323,8 +325,9 @@ export default function DebitRequestModal({
             {form.values.account && (
               <Text fz={12} c="var(--prune-primary-800)">
                 {`Account balance: ${formatNumber(
-                  accounts.find((item) => item.id === form.values.account)
-                    ?.accountBalance ?? 0,
+                  (accounts ?? []).find(
+                    (item) => item.id === form.values.account
+                  )?.accountBalance ?? 0,
                   true,
                   "EUR"
                 )}`}

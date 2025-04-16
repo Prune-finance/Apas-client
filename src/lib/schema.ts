@@ -584,6 +584,39 @@ export const sendMoneyIndividualValidate = z.object({
   // accountBalance: z.number().positive("A positive amount is required"),
 });
 
+export const DebtorFormSelf = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
+  address: z.string().min(2, "Address is required"),
+  country: z.string().min(2, "Country is required"),
+  postCode: z.string().min(2, "Post Code is required"),
+  state: z.string().min(2, "State is required"),
+  city: z.string().min(2, "City is required"),
+  website: z.string().url("Website is required"),
+  businessRegNo: z.string().min(2, "Business Registration Number is required"),
+});
+
+export const DebtorFormCompany = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
+  address: z.string().min(2, "Address is required"),
+  country: z.string().min(2, "Country is required"),
+  postCode: z.string().min(2, "Post Code is required"),
+  state: z.string().min(2, "State is required"),
+  city: z.string().min(2, "City is required"),
+  website: z.string().url("Website is required"),
+  businessRegNo: z.string().min(2, "Business Registration Number is required"),
+});
+
+export const DebtorFormIndividual = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
+  address: z.string().min(2, "Address is required"),
+  country: z.string().min(2, "Country is required"),
+  postCode: z.string().min(2, "Post Code is required"),
+  state: z.string().min(2, "State is required"),
+  city: z.string().min(2, "City is required"),
+  idType: z.string().min(2, "ID Type is required"),
+  idNumber: z.string().min(2, "ID Number is required"),
+});
+
 export const sendMoneyCompanyValidate = z.object({
   companyName: z.string().min(2, "First Name is required"),
   destinationIBAN: z.string().min(3, "Destination account is required"),
@@ -686,6 +719,8 @@ export interface IParams {
   destinationBank?: string;
   firstName?: string;
   lastName?: string;
+  reqCount?: string;
+  otherReq?: string;
 }
 
 export const removeDirectorValues = {
@@ -829,6 +864,15 @@ export const validateInviteUser = z.object({
   email: z.string().email("Please provide a valid email"),
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
+  roles: z.string().min(1, "Role is required"),
+  // roles: z.array(z.string()).min(1, "Role is required"),
+  permissions: PermissionSchema,
+});
+
+export const validateEditUser = z.object({
+  email: z.string().email("Please provide a valid email"),
+  firstName: z.string(),
+  lastName: z.string(),
   roles: z.string().min(1, "Role is required"),
   // roles: z.array(z.string()).min(1, "Role is required"),
   permissions: PermissionSchema,

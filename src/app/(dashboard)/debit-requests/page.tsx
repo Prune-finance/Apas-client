@@ -26,7 +26,7 @@ import styles from "./styles.module.scss";
 // Asset Imports
 import EmptyImage from "@/assets/empty.png";
 import { Suspense, useState } from "react";
-import { formatNumber } from "@/lib/utils";
+import { calculateTotalPages, formatNumber } from "@/lib/utils";
 import { useForm, zodResolver } from "@mantine/form";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "@/ui/components/Filter";
@@ -40,6 +40,7 @@ import { TableComponent } from "@/ui/components/Table";
 import DebitRequestModal from "./new/modal";
 import { DebitRequestDrawer } from "./drawer";
 import { filteredSearch } from "@/lib/search";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 function DebitRequests() {
   const [search, setSearch] = useState("");
@@ -54,17 +55,19 @@ function DebitRequests() {
   const [limit, setLimit] = useState<string | null>("10");
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(accountName && { accountName: accountName }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    status: status?.toUpperCase(),
+    accountName,
     page: active,
     limit: parseInt(limit ?? "10", 10),
-    // ...(type && { type: type.toLowerCase() }),
+    search: debouncedSearch,
+    // type: type?.toLowerCase(),
   };
 
   const { loading, requests, meta, revalidate } =
     useUserDebitRequests(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
@@ -80,11 +83,7 @@ function DebitRequests() {
     validate: zodResolver(FilterSchema),
   });
 
-  const rows = filteredSearch(
-    requests,
-    ["Account.accountName", "status"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = requests.map((element, index) => (
     <TableTr
       style={{ cursor: "pointer" }}
       key={index}
@@ -163,7 +162,7 @@ function DebitRequests() {
         />
 
         <PaginationComponent
-          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+          total={calculateTotalPages(limit, meta?.total)}
           active={active}
           setActive={setActive}
           limit={limit}

@@ -114,8 +114,6 @@ export default function AccountTransactions() {
     },
   ];
 
-  const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
-
   return (
     <main>
       <Breadcrumbs
@@ -192,14 +190,7 @@ export default function AccountTransactions() {
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 
       <TableComponent
-        rows={
-          <IssuedTransactionTableRows
-            data={transactions}
-            search={debouncedSearch}
-            searchProps={searchProps}
-            noLink
-          />
-        }
+        rows={<IssuedTransactionTableRows data={transactions} noLink />}
         loading={loading}
         head={IssuedAccountTableHeaders}
       />

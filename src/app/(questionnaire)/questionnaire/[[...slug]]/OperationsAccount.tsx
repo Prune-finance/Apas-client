@@ -8,11 +8,9 @@ import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 export default function OperationsAccount() {
   const [turnover, setTurnover] = useState("");
-  const { push } = useRouter();
+  const { push, back } = useRouter();
   const form = useQuestionnaireFormContext();
-  const { estimatedBalance: est } = form.getValues().operationsAccount;
 
-  console.log(est);
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
@@ -39,6 +37,7 @@ export default function OperationsAccount() {
       </RadioGroup>
       <QuestionnaireNav
         onNext={() => push("/questionnaire/services/virtual-account")}
+        onPrevious={back}
       />
     </Box>
   );

@@ -1,14 +1,14 @@
 import { Box, Group, NumberInput, Stack, Text } from "@mantine/core";
-import React from "react";
 import { NumberInputWithInsideLabel } from "./TextInputWithInsideLabel";
 import { IconCurrencyPound } from "@tabler/icons-react";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import { useRouter } from "next/navigation";
 
 export default function VirtualAccount() {
   const form = useQuestionnaireFormContext();
+  const { back } = useRouter();
 
-  console.log(form.getValues());
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
@@ -78,7 +78,7 @@ export default function VirtualAccount() {
         ))}
       </Stack>
 
-      <QuestionnaireNav nextText="Submit" />
+      <QuestionnaireNav nextText="Submit" onPrevious={back} />
     </Box>
   );
 }

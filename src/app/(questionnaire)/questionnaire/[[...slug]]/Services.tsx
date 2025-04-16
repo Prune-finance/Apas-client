@@ -1,4 +1,4 @@
-import { Box, Checkbox, Group, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Box, SimpleGrid, Text } from "@mantine/core";
 import {
   IconCreditCard,
   IconMoneybag,
@@ -10,11 +10,9 @@ import { useState } from "react";
 import CheckboxCard from "./CheckboxCard";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useRouter } from "next/navigation";
-import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 export default function Services() {
-  const [value, setValue] = useState<string[]>([]);
-  const { push } = useRouter();
+  const { push, back } = useRouter();
 
   return (
     <Box>
@@ -22,23 +20,7 @@ export default function Services() {
         What service(s) is this Entity interested in?
       </Text>
 
-      {/* <Checkbox.Group
-        // {...form.getInputProps("services")}
-        value={form.getValues().services}
-        onChange={(selectedTitles: string[]) => {
-          console.log({ selectedTitles });
-          const selectedServices = selectedTitles.map((title) => {
-            const service = serviceCategories.find((s) => s.title === title);
-            return {
-              name: service?.title || "",
-              accounts: service?.accounts || [],
-            };
-          });
-          form.setFieldValue("services", selectedServices);
-        }}
-        key={form.key("services")}
-      > */}
-      <SimpleGrid cols={2} pt="md">
+      <SimpleGrid cols={{ base: 1, md: 2 }} pt="md">
         {serviceCategories.map((item, idx) => (
           <CheckboxCard
             key={item.title}
@@ -50,10 +32,10 @@ export default function Services() {
           />
         ))}
       </SimpleGrid>
-      {/* </Checkbox.Group> */}
 
       <QuestionnaireNav
         onNext={() => push("/questionnaire/services/operations-account")}
+        onPrevious={back}
       />
     </Box>
   );

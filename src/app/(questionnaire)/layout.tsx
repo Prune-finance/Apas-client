@@ -2,7 +2,6 @@
 
 import {
   OperationsAccountSchema,
-  QuestionnaireType,
   questionnaireValues,
   ServicesSchema,
   TurnoverSchema,
@@ -15,18 +14,21 @@ import {
 import {
   AppShell,
   Box,
-  Burger,
   Container,
-  Divider,
-  Group,
   Progress,
   Skeleton,
   Text,
 } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
+import { zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
+import Photo1 from "@/assets/questionnaire/questionnaire1.png";
+import Photo2 from "@/assets/questionnaire/questionnaire2.png";
+import Photo3 from "@/assets/questionnaire/questionnaire3.png";
+import Photo4 from "@/assets/questionnaire/questionnaire4.png";
+import Photo5 from "@/assets/questionnaire/questionnaire5.png";
+import Navbar from "./questionnaire/[[...slug]]/Navbar";
 
 export default function QuestionnaireLayout({
   children,
@@ -84,13 +86,14 @@ export default function QuestionnaireLayout({
       navbar={{ width: 300, breakpoint: "sm", collapsed: { mobile: !opened } }}
       padding="md"
     >
-      <AppShell.Navbar p="md" withBorder={false}>
-        Navbar
+      <AppShell.Navbar withBorder={false}>
+        {/* Navbar
         {Array(15)
           .fill(0)
           .map((_, index) => (
             <Skeleton key={index} h={28} mt="sm" animate={false} />
-          ))}
+          ))} */}
+        <Navbar />
       </AppShell.Navbar>
       <AppShell.Main>
         <Box pos="sticky" top={0} bg="#FCFCFD" mb={30} style={{ zIndex: 100 }}>
@@ -120,3 +123,36 @@ export default function QuestionnaireLayout({
     </AppShell>
   );
 }
+
+const navBarPhotos = [
+  {
+    photo: Photo1.src,
+    comment: "Just what I needed to settle my distributors.",
+    name: "Karen Yue",
+    position: "Director of Digital Marketing Technology",
+  },
+  {
+    photo: Photo2.src,
+    comment: "Simplified our international payments process.",
+    name: "Michael Chen",
+    position: "Finance Director",
+  },
+  {
+    photo: Photo3.src,
+    comment: "Great platform for managing client accounts.",
+    name: "Sarah Johnson",
+    position: "Operations Manager",
+  },
+  {
+    photo: Photo4.src,
+    comment: "Streamlined our remittance operations.",
+    name: "David Williams",
+    position: "Head of Payments",
+  },
+  {
+    photo: Photo5.src,
+    comment: "Perfect solution for our virtual account needs.",
+    name: "Emma Rodriguez",
+    position: "Treasury Manager",
+  },
+];

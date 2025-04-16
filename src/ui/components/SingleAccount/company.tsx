@@ -295,7 +295,10 @@ function Company({
                   classNames={{ input: styles.input, label: styles.label }}
                   flex={1}
                   label="Country"
-                  data={countries.map((c) => c.name)}
+                  data={countries.map((c) => ({
+                    label: c?.name,
+                    value: c?.code,
+                  }))}
                   disabled={disableCountry}
                   {...form2.getInputProps("destinationCountry")}
                 />

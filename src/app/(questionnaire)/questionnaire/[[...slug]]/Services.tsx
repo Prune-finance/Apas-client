@@ -1,18 +1,16 @@
 import { Box, Checkbox, Group, SimpleGrid, Stack, Text } from "@mantine/core";
 import {
-  IconBuildingBank,
   IconCreditCard,
   IconMoneybag,
   IconArrowsRightLeft,
   IconSearch,
-  IconDatabaseCog,
   IconDatabase,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import classes from "./services.module.css";
 import CheckboxCard from "./CheckboxCard";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useRouter } from "next/navigation";
+import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 export default function Services() {
   const [value, setValue] = useState<string[]>([]);
@@ -24,19 +22,35 @@ export default function Services() {
         What service(s) is this Entity interested in?
       </Text>
 
-      <Checkbox.Group value={value} onChange={setValue}>
-        <SimpleGrid cols={2} pt="md">
-          {serviceCategories.map((item) => (
-            <CheckboxCard
-              key={item.title}
-              title={item.title}
-              description={item.description}
-              accounts={item.accounts}
-              icon={item.icon}
-            />
-          ))}
-        </SimpleGrid>
-      </Checkbox.Group>
+      {/* <Checkbox.Group
+        // {...form.getInputProps("services")}
+        value={form.getValues().services}
+        onChange={(selectedTitles: string[]) => {
+          console.log({ selectedTitles });
+          const selectedServices = selectedTitles.map((title) => {
+            const service = serviceCategories.find((s) => s.title === title);
+            return {
+              name: service?.title || "",
+              accounts: service?.accounts || [],
+            };
+          });
+          form.setFieldValue("services", selectedServices);
+        }}
+        key={form.key("services")}
+      > */}
+      <SimpleGrid cols={2} pt="md">
+        {serviceCategories.map((item, idx) => (
+          <CheckboxCard
+            key={item.title}
+            title={item.title}
+            description={item.description}
+            accounts={item.accounts}
+            icon={item.icon}
+            idx={idx}
+          />
+        ))}
+      </SimpleGrid>
+      {/* </Checkbox.Group> */}
 
       <QuestionnaireNav
         onNext={() => push("/questionnaire/services/operations-account")}

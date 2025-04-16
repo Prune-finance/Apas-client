@@ -4,10 +4,15 @@ import CustomRadio from "./CustomRadio";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useRouter } from "next/navigation";
 import { formatNumber } from "@/lib/utils";
+import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 export default function OperationsAccount() {
   const [turnover, setTurnover] = useState("");
   const { push } = useRouter();
+  const form = useQuestionnaireFormContext();
+  const { estimatedBalance: est } = form.getValues().operationsAccount;
+
+  console.log(est);
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
@@ -17,8 +22,8 @@ export default function OperationsAccount() {
       <RadioGroup
         name="operations-account-balance"
         label="Please indicate the estimated balance(s) you will hold in the operating account(s)"
-        value={turnover}
-        onChange={setTurnover}
+        {...form.getInputProps("operationsAccount.estimatedBalance")}
+        key={form.key("operationsAccount.estimatedBalance")}
         labelProps={{
           fz: 16,
           fw: 500,
@@ -28,12 +33,7 @@ export default function OperationsAccount() {
       >
         <Stack gap={20} mt="xs" style={{ cursor: "pointer" }}>
           {Object.entries(estimatedBalance).map(([value, label], idx) => (
-            <CustomRadio
-              key={idx}
-              value={value}
-              label={label}
-              selected={value === turnover}
-            />
+            <CustomRadio key={idx} value={value} label={label} />
           ))}
         </Stack>
       </RadioGroup>

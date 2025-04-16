@@ -7,6 +7,7 @@ interface QuestionnaireNavProps {
   nextText?: string;
   previousText?: string;
   disabled?: boolean;
+  disabledPrev?: boolean;
 }
 
 export function QuestionnaireNav({
@@ -15,6 +16,7 @@ export function QuestionnaireNav({
   nextText = "Next",
   previousText = "Previous step",
   disabled = false,
+  disabledPrev = false,
 }: QuestionnaireNavProps) {
   return (
     <Stack gap={12} mt={32}>
@@ -30,6 +32,7 @@ export function QuestionnaireNav({
         fullWidth
         fw={600}
         action={onPrevious}
+        disabled={disabledPrev}
       />
     </Stack>
   );

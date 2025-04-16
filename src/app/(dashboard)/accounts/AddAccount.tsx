@@ -18,7 +18,7 @@ function AddAccount({ onClose, openSuccess }: AddAccountProps) {
   const data = [
     { value: "euros", label: "🇪🇺 EUR Account (Euros)" },
     { value: "pounds", label: "🇬🇧 GBP Account (Pounds)" },
-    { value: "naira", label: "🇳🇬 GBP Account (Pounds)" },
+    { value: "naira", label: "🇳🇬 NGN Account (Naira)" },
   ];
 
   return (

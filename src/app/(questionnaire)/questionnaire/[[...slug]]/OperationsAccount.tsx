@@ -53,7 +53,7 @@ export default function OperationsAccount() {
   );
 }
 
-export const estimatedBalance = {
+const estimatedBalance = {
   "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
   "between-10000-50000": `Between ${formatNumber(
     10000,

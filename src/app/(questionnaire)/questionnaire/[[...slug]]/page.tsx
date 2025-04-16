@@ -66,7 +66,7 @@ export default function Questionnaire() {
   );
 }
 
-export const turnoverOptions = {
+const turnoverOptions = {
   "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
   "less-than-50000": `${formatNumber(10000, true, "GBP")} - ${formatNumber(
     50000,

@@ -24,6 +24,7 @@ export const NumberInputWithInsideLabel = ({
       placeholder="Enter number"
       classNames={classes}
       thousandSeparator=","
+      min={0}
     />
   );
 };

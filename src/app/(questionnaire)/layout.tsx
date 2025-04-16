@@ -17,6 +17,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
 import Navbar from "./questionnaire/[[...slug]]/Navbar";
+import { z } from "zod";
 
 export default function QuestionnaireLayout({
   children,
@@ -34,11 +35,20 @@ export default function QuestionnaireLayout({
     initialValues: questionnaireValues,
     mode: "uncontrolled",
     validate: (values) => {
-      if (!slug) return zodResolver(TurnoverSchema)(values);
+      console.log({ values });
+      if (slug === undefined) return zodResolver(TurnoverSchema)(values);
       if (isOperationsAccount)
-        return zodResolver(OperationsAccountSchema)(values);
-      if (isVirtualAccount) return zodResolver(VirtualAccountSchema)(values);
-      if (isServices) return zodResolver(ServicesSchema)(values);
+        return zodResolver(
+          z.object({
+            operationsAccount: OperationsAccountSchema,
+          })
+        )(values);
+      if (isVirtualAccount)
+        return zodResolver(z.object({ virtualAccount: VirtualAccountSchema }))(
+          values
+        );
+      if (isServices)
+        return zodResolver(z.object({ services: ServicesSchema }))(values);
 
       return {};
     },

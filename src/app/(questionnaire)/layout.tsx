@@ -16,7 +16,7 @@ import { zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
-import Navbar from "./questionnaire/[[...slug]]/Navbar";
+import Navbar from "./Navbar";
 import { z } from "zod";
 
 export default function QuestionnaireLayout({

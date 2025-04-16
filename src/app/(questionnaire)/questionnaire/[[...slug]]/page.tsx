@@ -44,6 +44,7 @@ export default function Questionnaire() {
         label="What is this entity's annual turnover?"
         {...form.getInputProps("turnover")}
         key={form.key("turnover")}
+        errorProps={{ mt: 10 }}
         labelProps={{
           fz: 16,
           fw: 500,

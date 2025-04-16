@@ -10,9 +10,11 @@ import { useState } from "react";
 import CheckboxCard from "./CheckboxCard";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useRouter } from "next/navigation";
+import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 export default function Services() {
   const { push, back } = useRouter();
+  const form = useQuestionnaireFormContext();
 
   return (
     <Box>
@@ -32,6 +34,11 @@ export default function Services() {
           />
         ))}
       </SimpleGrid>
+      {form.errors.services && (
+        <Text fz={12} c="red" mt={10}>
+          {form.errors.services}
+        </Text>
+      )}
 
       <QuestionnaireNav
         onNext={() => push("/questionnaire/services/operations-account")}

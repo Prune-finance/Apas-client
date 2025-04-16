@@ -172,26 +172,20 @@ export const validateNewAdmin = z.object({
   role: z.string().optional(),
 });
 
-export const TurnoverSchema = z.string().min(1, "Turnover is required");
-export const ServicesSchema = z.array(
-  z.object({
-    name: z.string().min(1, "Service name is required"),
-    accounts: z
-      .array(z.string().min(1, "Account type is required"))
-      .min(1, "At least one account type is required"),
-  })
-);
-
-export const transactionLimitSchema = z
-  .string()
-  .min(1, "Amount is required")
-  .regex(/^\d+$/, "Amount must be a number");
-
-export const trxLimitSchema = z.object({
-  daily: transactionLimitSchema,
-  monthly: transactionLimitSchema,
-  annually: transactionLimitSchema,
+export const TurnoverSchema = z.object({
+  turnover: z.string().min(1, "Entity's annual turnover is required"),
 });
+
+export const ServicesSchema = z
+  .array(
+    z.object({
+      name: z.string().min(1, "Service name is required"),
+      accounts: z
+        .array(z.string().min(2, "Account type is required"))
+        .min(1, "At least one account type is required"),
+    })
+  )
+  .min(1, "Select at least one service");
 
 const positiveIntegerSchema = (fieldName: string) =>
   z.union([
@@ -203,11 +197,39 @@ const positiveIntegerSchema = (fieldName: string) =>
   ]);
 
 export const VirtualAccountSchema = z.object({
-  numberOfAccounts: positiveIntegerSchema("Number of accounts"),
-  projectedTotalAccounts: positiveIntegerSchema("Projected total accounts"),
-  singleAccount: trxLimitSchema,
-  allAccounts: trxLimitSchema,
-  transactionCount: trxLimitSchema,
+  numberOfAccounts: positiveIntegerSchema(
+    "Initial virtual account requirement"
+  ),
+  projectedTotalAccounts: positiveIntegerSchema(
+    "Projected virtual accounts at full capacity"
+  ),
+  singleAccount: z.object({
+    daily: positiveIntegerSchema(
+      "Daily maximum transaction value for single virtual account"
+    ),
+    monthly: positiveIntegerSchema(
+      "Monthly maximum transaction value for single virtual account"
+    ),
+    annually: positiveIntegerSchema(
+      "Annual maximum transaction value for single virtual account"
+    ),
+  }),
+  allAccounts: z.object({
+    daily: positiveIntegerSchema(
+      "Daily maximum transaction value for all virtual accounts"
+    ),
+    monthly: positiveIntegerSchema(
+      "Monthly maximum transaction value for all virtual accounts"
+    ),
+    annually: positiveIntegerSchema(
+      "Annual maximum transaction value for all virtual accounts"
+    ),
+  }),
+  transactionCount: z.object({
+    daily: positiveIntegerSchema("Daily maximum transaction count"),
+    monthly: positiveIntegerSchema("Monthly maximum transaction count"),
+    annually: positiveIntegerSchema("Annual maximum transaction count"),
+  }),
 });
 
 export const OperationsAccountSchema = z.object({

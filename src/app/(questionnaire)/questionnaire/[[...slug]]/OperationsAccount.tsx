@@ -28,6 +28,7 @@ export default function OperationsAccount() {
           c: "var(--prune-text-gray-500)",
           mb: 16,
         }}
+        errorProps={{ mt: 10 }}
       >
         <Stack gap={20} mt="xs" style={{ cursor: "pointer" }}>
           {Object.entries(estimatedBalance).map(([value, label], idx) => (

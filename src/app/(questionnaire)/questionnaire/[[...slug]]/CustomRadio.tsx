@@ -1,11 +1,9 @@
 import { Group, Radio, RadioProps, Text } from "@mantine/core";
 import classes from "./services.module.css";
 
-interface Props extends RadioProps {
-  selected?: boolean;
-}
+interface Props extends RadioProps {}
 
-export default function CustomRadio({ label, value, selected = false }: Props) {
+export default function CustomRadio({ label, value }: Props) {
   return (
     <Radio.Card
       value={String(value)}

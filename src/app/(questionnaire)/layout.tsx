@@ -1,6 +1,18 @@
 "use client";
 
 import {
+  OperationsAccountSchema,
+  QuestionnaireType,
+  questionnaireValues,
+  ServicesSchema,
+  TurnoverSchema,
+  VirtualAccountSchema,
+} from "@/lib/schema";
+import {
+  QuestionnaireFormProvider,
+  useQuestionnaireForm,
+} from "@/lib/store/questionnaire";
+import {
   AppShell,
   Box,
   Burger,
@@ -11,7 +23,10 @@ import {
   Skeleton,
   Text,
 } from "@mantine/core";
+import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
+import { useParams } from "next/navigation";
+import { useMemo } from "react";
 
 export default function QuestionnaireLayout({
   children,
@@ -19,6 +34,50 @@ export default function QuestionnaireLayout({
   children: React.ReactNode;
 }>) {
   const [opened, { toggle }] = useDisclosure();
+  const params = useParams();
+  const { slug } = params;
+  const isServices = slug && slug[0] === "services";
+  const isOperationsAccount = isServices && slug[1] === "operations-account";
+  const isVirtualAccount = isServices && slug[1] === "virtual-account";
+
+  const form = useQuestionnaireForm({
+    initialValues: questionnaireValues,
+    mode: "uncontrolled",
+    validate: (values) => {
+      if (!slug) return zodResolver(TurnoverSchema)(values);
+      if (isOperationsAccount)
+        return zodResolver(OperationsAccountSchema)(values);
+      if (isVirtualAccount) return zodResolver(VirtualAccountSchema)(values);
+      if (isServices) return zodResolver(ServicesSchema)(values);
+
+      return {};
+    },
+  });
+
+  const calculateProgress = useMemo(() => {
+    switch (true) {
+      case slug === undefined:
+        return 25;
+      case isOperationsAccount:
+        if (
+          !form
+            .getValues()
+            .services.find(
+              (service) => service.name === "Virtual Account Services"
+            )
+        ) {
+          return 100;
+        }
+        return 75;
+      case isVirtualAccount:
+        return 100;
+      case isServices:
+        return 50;
+      default:
+        return 100;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug?.[0], slug?.[1], isOperationsAccount, isServices]);
 
   return (
     <AppShell
@@ -45,11 +104,18 @@ export default function QuestionnaireLayout({
             >
               Prune Onboarding: Company Profile
             </Text>
-            <Progress value={50} color="var(--prune-primary-600)" />
+            <Progress
+              value={calculateProgress}
+              color="var(--prune-primary-600)"
+            />
           </Container>
         </Box>
 
-        <Container size={1200}>{children}</Container>
+        <Container size={1200}>
+          <QuestionnaireFormProvider form={form}>
+            {children}
+          </QuestionnaireFormProvider>
+        </Container>
       </AppShell.Main>
     </AppShell>
   );

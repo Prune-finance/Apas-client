@@ -4,20 +4,20 @@ import { formatNumber } from "@/lib/utils";
 import { Box, Group, Radio, RadioGroup, Stack, Text } from "@mantine/core";
 import CustomRadio from "./CustomRadio";
 import { validateEditUser } from "@/lib/schema";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { useParams, useRouter } from "next/navigation";
 import Services from "./Services";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import OperationsAccount from "./OperationsAccount";
 import VirtualAccount from "./VirtualAccount";
+import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 export default function Questionnaire() {
-  const [turnover, setTurnover] = useState("");
   const params = useParams();
   const { push } = useRouter();
+  const form = useQuestionnaireFormContext();
 
-  // console.log(params?.slug);
   if (
     params?.slug &&
     params?.slug[0] === "services" &&
@@ -40,10 +40,10 @@ export default function Questionnaire() {
         Tell Us More About Your Business.
       </Text>
       <RadioGroup
-        name="annual-turnover"
+        name="turnover"
         label="What is this entity's annual turnover?"
-        value={turnover}
-        onChange={setTurnover}
+        {...form.getInputProps("turnover")}
+        key={form.key("turnover")}
         labelProps={{
           fz: 16,
           fw: 500,
@@ -53,12 +53,7 @@ export default function Questionnaire() {
       >
         <Stack gap={20} mt="xs" style={{ cursor: "pointer" }}>
           {Object.entries(turnoverOptions).map(([value, label], idx) => (
-            <CustomRadio
-              key={idx}
-              value={value}
-              label={label}
-              selected={value === turnover}
-            />
+            <CustomRadio key={idx} value={value} label={label} />
           ))}
         </Stack>
       </RadioGroup>

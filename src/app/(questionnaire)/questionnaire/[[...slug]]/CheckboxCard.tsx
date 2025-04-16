@@ -46,7 +46,6 @@ export default function CheckboxCard({
         const removeIdx = services.findIndex(
           (service) => service.name === title
         );
-        // form.insertListItem(`services.${idx}.accounts`, []);
         form.removeListItem("services", removeIdx);
       }}
       key={form.key(`services.${idx}`)}

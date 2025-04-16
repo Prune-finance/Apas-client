@@ -135,6 +135,7 @@ export default function Home() {
     { title: "Inactive Account", value: meta?.inactive },
   ];
 
+  console.log(user, 'useruseruser')
   return (
     <main className={styles.main}>
       {/* <Breadcrumbs items={[{ title: "Dashboard", href: "/" }]} /> */}

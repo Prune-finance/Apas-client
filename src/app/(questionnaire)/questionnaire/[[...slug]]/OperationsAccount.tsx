@@ -10,6 +10,11 @@ export default function OperationsAccount() {
   const [turnover, setTurnover] = useState("");
   const { push, back } = useRouter();
   const form = useQuestionnaireFormContext();
+  const isVirtualAccount = Boolean(
+    form
+      .getValues()
+      .services.find((service) => service.name === "Virtual Account Services")
+  );
 
   return (
     <Box>
@@ -37,7 +42,11 @@ export default function OperationsAccount() {
         </Stack>
       </RadioGroup>
       <QuestionnaireNav
-        onNext={() => push("/questionnaire/services/virtual-account")}
+        nextText={!isVirtualAccount ? "Submit" : "Next"}
+        onNext={() => {
+          if (!isVirtualAccount) return;
+          push("/questionnaire/services/virtual-account");
+        }}
         onPrevious={back}
       />
     </Box>

@@ -35,7 +35,6 @@ export default function QuestionnaireLayout({
     initialValues: questionnaireValues,
     mode: "uncontrolled",
     validate: (values) => {
-      console.log({ values });
       if (slug === undefined) return zodResolver(TurnoverSchema)(values);
       if (isOperationsAccount)
         return zodResolver(

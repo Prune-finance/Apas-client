@@ -38,7 +38,6 @@ interface Props {
 
 export const AllPayoutTransactions = () => {
   const [search, setSearch] = useState("");
-
   const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
@@ -69,6 +68,7 @@ export const AllPayoutTransactions = () => {
       ...(recipientIban && { recipientIban }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
+      search: debouncedSearch,
     };
   }, [
     status,
@@ -80,6 +80,7 @@ export const AllPayoutTransactions = () => {
     recipientIban,
     active,
     limit,
+    debouncedSearch,
   ]);
   const { transactions, loading, meta, revalidate } =
     usePayoutTransactions(param);
@@ -131,18 +132,7 @@ export const AllPayoutTransactions = () => {
       <TableComponent
         head={PayoutTableHeaders}
         // rows={rows}
-        rows={
-          <PayoutTransactionTableRows
-            data={transactions}
-            searchProps={[
-              "senderIban",
-              "recipientIban",
-              "recipientBic",
-              "recipientBankAddress",
-            ]}
-            search={debouncedSearch}
-          />
-        }
+        rows={<PayoutTransactionTableRows data={transactions} />}
         loading={loading}
       />
 

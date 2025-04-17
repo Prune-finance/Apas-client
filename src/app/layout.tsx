@@ -13,6 +13,7 @@ import "@mantine/dropzone/styles.css";
 import "@mantine/notifications/styles.css";
 import "@/ui/styles/globals.scss";
 import { NotificationProvider } from "@/ui/components/NotificationProvider";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 export const switzer = localFont({
   src: "../assets/fonts/Switzer-Regular.woff2",
@@ -40,7 +41,7 @@ export default function RootLayout({
             position={"top-center"}
             //  limit={1}
           /> */}
-          {children}
+          <NuqsAdapter>{children}</NuqsAdapter>
         </MantineProvider>
       </body>
     </html>

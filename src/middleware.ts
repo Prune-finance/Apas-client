@@ -40,19 +40,6 @@ export async function middleware(request: NextRequest) {
   }
 }
 
-// export const config = {
-//   matcher: [
-//     /*
-//      * Match all request paths except for the ones starting with:
-//      * - api (API routes)
-//      * - _next/static (static files)
-//      * - _next/image (image optimization files)
-//      * - favicon.ico (favicon file)
-//      */
-//     "/((?!api|_next/static|_next/image|favicon.ico|auth|404).*)",
-//   ],
-// };
-
 export const config = {
   matcher: [
     /*
@@ -62,7 +49,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - pdf.worker.min.mjs (PDF worker file)
+     * - questionnaire (questionnaire pages)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|auth|404|pdf.worker.min.mjs).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth|404|pdf.worker.min.mjs|questionnaire).*)",
   ],
 };

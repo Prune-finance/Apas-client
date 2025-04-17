@@ -172,6 +172,110 @@ export const validateNewAdmin = z.object({
   role: z.string().optional(),
 });
 
+export const TurnoverSchema = z.object({
+  turnover: z.string().min(1, "Entity's annual turnover is required"),
+});
+
+export const ServicesSchema = z
+  .array(
+    z.object({
+      name: z.string().min(1, "Service name is required"),
+      accounts: z
+        .array(z.string().min(2, "Account type is required"))
+        .min(1, "At least one account type is required"),
+    })
+  )
+  .min(1, "Select at least one service");
+
+const positiveIntegerSchema = (fieldName: string) =>
+  z.union([
+    z.string().min(1, `${fieldName} is required`),
+    z
+      .number({ invalid_type_error: `${fieldName} must be a number` })
+      .positive(`${fieldName} must be a positive number`)
+      .int(`${fieldName} must be an integer`),
+  ]);
+
+export const VirtualAccountSchema = z.object({
+  numberOfAccounts: positiveIntegerSchema(
+    "Initial virtual account requirement"
+  ),
+  projectedTotalAccounts: positiveIntegerSchema(
+    "Projected virtual accounts at full capacity"
+  ),
+  singleAccount: z.object({
+    daily: positiveIntegerSchema(
+      "Daily maximum transaction value for single virtual account"
+    ),
+    monthly: positiveIntegerSchema(
+      "Monthly maximum transaction value for single virtual account"
+    ),
+    annually: positiveIntegerSchema(
+      "Annual maximum transaction value for single virtual account"
+    ),
+  }),
+  allAccounts: z.object({
+    daily: positiveIntegerSchema(
+      "Daily maximum transaction value for all virtual accounts"
+    ),
+    monthly: positiveIntegerSchema(
+      "Monthly maximum transaction value for all virtual accounts"
+    ),
+    annually: positiveIntegerSchema(
+      "Annual maximum transaction value for all virtual accounts"
+    ),
+  }),
+  transactionCount: z.object({
+    daily: positiveIntegerSchema("Daily maximum transaction count"),
+    monthly: positiveIntegerSchema("Monthly maximum transaction count"),
+    annually: positiveIntegerSchema("Annual maximum transaction count"),
+  }),
+});
+
+export const OperationsAccountSchema = z.object({
+  estimatedBalance: z.string().min(1, "Estimated balance is required"),
+});
+
+export const questionnaireSchema = z.object({
+  turnover: z.string().min(1, "Turnover is required"),
+  services: ServicesSchema,
+  virtualAccount: VirtualAccountSchema,
+  operationsAccount: OperationsAccountSchema,
+});
+
+export type VirtualAccountType = z.infer<typeof VirtualAccountSchema>;
+export type QuestionnaireType = z.infer<typeof questionnaireSchema>;
+export type OperationsAccountType = z.infer<typeof OperationsAccountSchema>;
+export type ServicesType = z.infer<typeof ServicesSchema>;
+export type TurnoverType = z.infer<typeof TurnoverSchema>;
+
+export const questionnaireValues: QuestionnaireType = {
+  turnover: "",
+  services: [],
+  virtualAccount: {
+    numberOfAccounts: "",
+    projectedTotalAccounts: "",
+    singleAccount: {
+      daily: "",
+      monthly: "",
+      annually: "",
+    },
+    allAccounts: {
+      daily: "",
+      monthly: "",
+      annually: "",
+    },
+    transactionCount: {
+      daily: "",
+      monthly: "",
+      annually: "",
+    },
+  },
+  operationsAccount: {
+    estimatedBalance: "",
+  },
+};
+
 export const contactPerson = {
   firstName: "",
   lastName: "",
@@ -584,6 +688,39 @@ export const sendMoneyIndividualValidate = z.object({
   // accountBalance: z.number().positive("A positive amount is required"),
 });
 
+export const DebtorFormSelf = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
+  address: z.string().min(2, "Address is required"),
+  country: z.string().min(2, "Country is required"),
+  postCode: z.string().min(2, "Post Code is required"),
+  state: z.string().min(2, "State is required"),
+  city: z.string().min(2, "City is required"),
+  website: z.string().url("Website is required"),
+  businessRegNo: z.string().min(2, "Business Registration Number is required"),
+});
+
+export const DebtorFormCompany = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
+  address: z.string().min(2, "Address is required"),
+  country: z.string().min(2, "Country is required"),
+  postCode: z.string().min(2, "Post Code is required"),
+  state: z.string().min(2, "State is required"),
+  city: z.string().min(2, "City is required"),
+  website: z.string().url("Website is required"),
+  businessRegNo: z.string().min(2, "Business Registration Number is required"),
+});
+
+export const DebtorFormIndividual = z.object({
+  fullName: z.string().min(2, "Full Name is required"),
+  address: z.string().min(2, "Address is required"),
+  country: z.string().min(2, "Country is required"),
+  postCode: z.string().min(2, "Post Code is required"),
+  state: z.string().min(2, "State is required"),
+  city: z.string().min(2, "City is required"),
+  idType: z.string().min(2, "ID Type is required"),
+  idNumber: z.string().min(2, "ID Number is required"),
+});
+
 export const sendMoneyCompanyValidate = z.object({
   companyName: z.string().min(2, "First Name is required"),
   destinationIBAN: z.string().min(3, "Destination account is required"),
@@ -686,6 +823,8 @@ export interface IParams {
   destinationBank?: string;
   firstName?: string;
   lastName?: string;
+  reqCount?: string;
+  otherReq?: string;
 }
 
 export const removeDirectorValues = {
@@ -829,6 +968,15 @@ export const validateInviteUser = z.object({
   email: z.string().email("Please provide a valid email"),
   firstName: z.string().min(1, "First Name is required"),
   lastName: z.string().min(1, "Last Name is required"),
+  roles: z.string().min(1, "Role is required"),
+  // roles: z.array(z.string()).min(1, "Role is required"),
+  permissions: PermissionSchema,
+});
+
+export const validateEditUser = z.object({
+  email: z.string().email("Please provide a valid email"),
+  firstName: z.string(),
+  lastName: z.string(),
   roles: z.string().min(1, "Role is required"),
   // roles: z.array(z.string()).min(1, "Role is required"),
   permissions: PermissionSchema,

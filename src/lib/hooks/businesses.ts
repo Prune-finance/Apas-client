@@ -2,6 +2,7 @@ import { IParams, otherDocumentSchema } from "./../schema";
 import { DebitRequest } from "./requests";
 import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
+import { sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("auth");
 
@@ -22,6 +23,7 @@ export function useBusiness(
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
       ...(customParams.type && { type: customParams.type }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
@@ -32,21 +34,28 @@ export function useBusiness(
 
   const [loading, setLoading] = useState(true);
 
-  async function fetchBusinesses() {
-    const queryParams = {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.email && { email: customParams.email }),
-      ...(customParams.business && { business: customParams.business }),
-      ...(customParams.page && { page: customParams.page }),
-      ...(reqCount && { reqCount: "true" }),
-      ...(otherReq && { otherReq: "true" }),
-      ...(customParams.type && { type: customParams.type }),
-    };
+  const params = sanitizeURL({
+    ...customParams,
+    reqCount: reqCount ? "true" : "",
+    otherReq: otherReq ? "true" : "",
+  });
 
-    const params = new URLSearchParams(queryParams as Record<string, string>);
+  async function fetchBusinesses() {
+    // const queryParams = {
+    //   ...(customParams.limit && { limit: customParams.limit }),
+    //   ...(customParams.date && { date: customParams.date }),
+    //   ...(customParams.endDate && { endDate: customParams.endDate }),
+    //   ...(customParams.status && { status: customParams.status }),
+    //   ...(customParams.email && { email: customParams.email }),
+    //   ...(customParams.business && { business: customParams.business }),
+    //   ...(customParams.page && { page: customParams.page }),
+    //   ...(reqCount && { reqCount: "true" }),
+    //   ...(otherReq && { otherReq: "true" }),
+    //   ...(customParams.type && { type: customParams.type }),
+    //   ...(customParams.search && { search: customParams.search }),
+    // };
+
+    // const params = new URLSearchParams(queryParams as Record<string, string>);
 
     try {
       setLoading(true);
@@ -88,17 +97,7 @@ export function useBusiness(
       // Any cleanup code can go here
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    obj.date,
-    obj.endDate,
-    obj.business,
-    obj.email,
-    obj.limit,
-    obj.period,
-    obj.status,
-    obj.page,
-    obj.type,
-  ]);
+  }, [params]);
 
   return { loading, businesses, meta, stats, statsMeta };
 }

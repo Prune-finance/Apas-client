@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
 import SendMoneyBanner from "@/assets/sendMoneyBanner.png";
@@ -30,6 +30,9 @@ interface SendMoneyModalProps {
   setRequestForm: any;
   setCompanyRequestForm: any;
   setSectionState: any;
+  openDebtor: () => void;
+  paymentType: string;
+  setPaymentType: Dispatch<SetStateAction<string>>;
 }
 
 function SendMoneyModal({
@@ -39,6 +42,9 @@ function SendMoneyModal({
   setRequestForm,
   setCompanyRequestForm,
   setSectionState,
+  openDebtor,
+  paymentType,
+  setPaymentType,
 }: SendMoneyModalProps) {
   const [validated, setValidated] = useState<boolean | null>(null);
   const [showBadge, setShowBadge] = useState(false);
@@ -154,6 +160,9 @@ function SendMoneyModal({
             setValidated={setValidated}
             showBadge={showBadge}
             setShowBadge={setShowBadge}
+            openDebtor={openDebtor}
+            paymentType={paymentType}
+            setPaymentType={setPaymentType}
           />
           <Company
             account={account}
@@ -165,6 +174,9 @@ function SendMoneyModal({
             setValidated={setValidated}
             showBadge={showBadge}
             setShowBadge={setShowBadge}
+            openDebtor={openDebtor}
+            paymentType={paymentType}
+            setPaymentType={setPaymentType}
           />
         </TabsComponent>
       </Paper>

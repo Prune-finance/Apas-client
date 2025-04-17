@@ -51,6 +51,7 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { calculateTotalPages, sanitizeURL } from "@/lib/utils";
 
 export default function Users() {
   const searchParams = useSearchParams();
@@ -63,18 +64,38 @@ export default function Users() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const router = useRouter();
-  const { loading, users, revalidate, meta } = useAdmins({
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(email && { email }),
-    ...(firstName && { firstName }),
-    ...(lastName && { lastName }),
+  const obj = {
+    lastName,
+    firstName,
+    email,
+    status: status ? status.toUpperCase() : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    search: debouncedSearch,
     page: active,
     limit: parseInt(limit ?? "10", 10),
-  });
+  };
+  const { loading, users, revalidate, meta } = useAdmins(obj);
+
+  // {
+  //   ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
+  //   ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+  //   ...(status && { status: status.toUpperCase() }),
+  //   ...(email && { email }),
+  //   ...(firstName && { firstName }),
+  //   ...(lastName && { lastName }),
+  //   ...(debouncedSearch && { search: debouncedSearch }),
+  //   page: active,
+  //   limit: parseInt(limit ?? "10", 10),
+  // }
+
+  // const params = new URLSearchParams(obj);
+
+  // console.log(sanitizeURL(obj));
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
@@ -82,8 +103,6 @@ export default function Users() {
   const [processing, setProcessing] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState("");
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const form = useForm({
     initialValues: newAdmin,
@@ -108,7 +127,8 @@ export default function Users() {
 
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
-        { ...rest },
+        // { ...rest },
+        form.values,
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
@@ -184,11 +204,7 @@ export default function Users() {
     setId(id);
   };
 
-  const rows = filteredSearch(
-    users,
-    ["email", "firstName", "lastName", "role"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = users.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => handleRowClick(element.id)}
@@ -330,7 +346,7 @@ export default function Users() {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
       />
 
       <ModalComponent

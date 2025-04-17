@@ -3,6 +3,8 @@ import { useState, useEffect, useMemo } from "react";
 import { IParams } from "../schema";
 
 import createAxiosInstance from "@/lib/axios";
+import useAxios from "./useAxios";
+import { sanitizedQueryParams, sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("payouts");
 
@@ -20,10 +22,11 @@ export function useInquiries(customParams: IParams = {}) {
       ...(customParams.business && { business: customParams.business }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.search && { search: customParams.search }),
     };
   }, [customParams]);
 
-  const { limit, date, endDate, status, business, type, page } = obj;
+  const { limit, date, endDate, status, business, type, page, search } = obj;
 
   async function fetchInquiries() {
     setLoading(true);
@@ -53,60 +56,25 @@ export function useInquiries(customParams: IParams = {}) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [limit, date, endDate, status, business, type, page]);
+  }, [limit, date, endDate, status, business, type, page, search]);
 
   return { loading, inquiries, meta, revalidate };
 }
 
 export function useUserInquiries(customParams: IParams = {}) {
-  const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [meta, setMeta] = useState<{ total: number }>();
-  const [loading, setLoading] = useState(true);
+  const {
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<Inquiry[], { total: number }>({
+    endpoint: "/payout/inquiries",
+    baseURL: "payouts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
 
-  const obj = useMemo(() => {
-    return {
-      ...(customParams.limit && { limit: customParams.limit }),
-      ...(customParams.date && { date: customParams.date }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
-      ...(customParams.status && { status: customParams.status }),
-      ...(customParams.type && { type: customParams.type }),
-      ...(customParams.page && { page: customParams.page }),
-    };
-  }, [customParams]);
-
-  const { limit, date, endDate, status, type, page } = obj;
-
-  async function fetchInquiries() {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams(
-        obj as Record<string, string>
-      ).toString();
-
-      const { data } = await axios.get(`/payout/inquiries?${params}`);
-
-      setMeta(data.meta);
-      setInquiries(data.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  function revalidate() {
-    fetchInquiries();
-  }
-
-  useEffect(() => {
-    fetchInquiries();
-
-    return () => {
-      // Any cleanup code can go here
-    };
-  }, [limit, date, endDate, status, type, page]);
-
-  return { loading, inquiries, meta, revalidate };
+  return { loading, inquiries: data || [], meta, revalidate };
 }
 
 export function useSingleInquiry(id: string) {

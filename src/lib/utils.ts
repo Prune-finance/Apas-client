@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import { RequestData } from "./hooks/requests";
+import { IParams } from "./schema";
 
 export const formatNumber = (
   number: number,
@@ -172,3 +173,14 @@ export const calculateTotalPages = (
 
 export const isDummyIBAN = (iban: string): boolean =>
   iban === "GBXXXXXXXXXXXXXXXXXX";
+
+export const sanitizedQueryParams = (obj: IParams): IParams =>
+  Object.fromEntries(
+    Object.entries(obj).filter(([_, value]) => Boolean(value))
+  );
+
+export const sanitizeURL = (obj: IParams): string => {
+  const sanitizedObj = sanitizedQueryParams(obj);
+
+  return new URLSearchParams(sanitizedObj as Record<string, string>).toString();
+};

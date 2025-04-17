@@ -639,17 +639,7 @@ export default function Home() {
               <TableComponent
                 head={IssuedAccountTableHeaders}
                 rows={
-                  <IssuedTransactionTableRows
-                    data={transactions.slice(0, 4)}
-                    searchProps={[
-                      "senderIban",
-                      "senderName",
-                      "recipientIban",
-                      "recipientName",
-                      "reference",
-                    ]}
-                    search=""
-                  />
+                  <IssuedTransactionTableRows data={transactions.slice(0, 4)} />
                 }
                 loading={loadingTrx}
                 noBg

@@ -9,7 +9,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { Group, Select, TableTd, TableTr } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -29,18 +29,20 @@ export const PendingAccounts = () => {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
   const queryParams = {
-    ...(accountName && { accountName }),
-    ...(country && { country }),
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
+    accountName,
+    country,
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
     status: "PENDING",
-    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
+    type: type ? (type === "Individual" ? "USER" : "CORPORATE") : "",
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
   const { loading, requests, revalidate, meta } = useUserRequests(queryParams);

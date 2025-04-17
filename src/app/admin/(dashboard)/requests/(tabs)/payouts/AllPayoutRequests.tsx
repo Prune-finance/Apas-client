@@ -38,6 +38,8 @@ export const AllPayoutRequests = () => {
   const searchParams = useSearchParams();
   const [limit, setLimit] = useState<string | null>("100");
   const [active, setActive] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const {
     status,
@@ -60,10 +62,8 @@ export const AllPayoutRequests = () => {
     limit: parseInt(limit ?? "100", 10),
     page: active,
     not: "PENDING",
+    search: debouncedSearch,
   };
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const [openedFilter, { toggle }] = useDisclosure(false);
 
@@ -122,13 +122,7 @@ export const AllPayoutRequests = () => {
 
       <TableComponent
         head={PayoutRequestsTableHeaders}
-        rows={
-          <PayoutTrxReqTableRows
-            search={debouncedSearch}
-            data={requests}
-            searchProps={PayoutReqSearchProps}
-          />
-        }
+        rows={<PayoutTrxReqTableRows data={requests} />}
         loading={loading}
       />
 

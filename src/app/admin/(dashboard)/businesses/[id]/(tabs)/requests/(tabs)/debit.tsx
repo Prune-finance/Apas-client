@@ -6,7 +6,7 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { parseError } from "@/lib/actions/auth";
-import { formatNumber } from "@/lib/utils";
+import { calculateTotalPages, formatNumber } from "@/lib/utils";
 
 import { BadgeComponent } from "@/ui/components/Badge";
 import { TableTr, TableTd, Box, Group } from "@mantine/core";
@@ -27,14 +27,22 @@ export const Debit = () => {
   const { id } = useParams<{ id: string }>();
   const axios = createAxiosInstance("payouts");
 
-  const { loading, requests, revalidate, meta } = useCompanyDebitRequests(id);
+  const [limit, setLimit] = useState<string | null>("10");
+  const [active, setActive] = useState(1);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const { loading, requests, revalidate, meta } = useCompanyDebitRequests(id, {
+    search: debouncedSearch,
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
+  });
+
   const [selectedRequest, setSelectedRequest] = useState<DebitRequest | null>(
     null
   );
 
   const { handleSuccess, handleError } = useNotification();
-  const [limit, setLimit] = useState<string | null>("10");
-  const [active, setActive] = useState(1);
   const [processing, setProcessing] = useState(false);
 
   const [opened, { open, close }] = useDisclosure(false);
@@ -43,9 +51,6 @@ export const Debit = () => {
   const [drawerOpened, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const handleRejectRequest = async () => {
     if (!selectedRequest) return;
@@ -87,11 +92,13 @@ export const Debit = () => {
     }
   };
 
-  const rows = filteredSearch(
-    requests,
-    ["destinationFirstName", "destinationLastName"],
-    debouncedSearch
-  ).map((element, index) => (
+  // filteredSearch(
+  //   requests,
+  //   ["destinationFirstName", "destinationLastName"],
+  //   debouncedSearch
+  // );
+
+  const rows = requests.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => {
@@ -146,7 +153,7 @@ export const Debit = () => {
         setActive={setActive}
         setLimit={setLimit}
         limit={limit}
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total)}
       />
 
       <DebitDrawer

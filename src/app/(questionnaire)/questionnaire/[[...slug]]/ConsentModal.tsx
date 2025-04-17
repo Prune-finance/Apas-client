@@ -14,6 +14,7 @@ interface ConsentModalProps {
 
 export default function ConsentModal({ opened, close }: ConsentModalProps) {
   const [firstLoad, setFirstLoad] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const schema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -140,6 +141,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
             fw={600}
             disabled={!form.isDirty()}
             type="submit"
+            loading={loading}
           />
         </Flex>
       </Box>

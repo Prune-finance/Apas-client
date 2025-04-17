@@ -53,35 +53,35 @@ const serviceCategories = [
     title: "Operations Account",
     description:
       "Prune Payments payout service gives the business access to payouts.",
-    accounts: ["Euro Account", "GBP Account", "USD Account", "NGN Account"],
+    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
     icon: IconDatabase,
   },
   {
     title: "Virtual Account Services",
     description:
       "The account service lets businesses issue user accounts to clients.",
-    accounts: ["Euro Account", "GBP Account", "USD Account", "NGN Account"],
+    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
     icon: IconCreditCard,
   },
   {
     title: "Payout Services",
     description:
       "This helps businesses manage and disburse funds to recipients.",
-    accounts: ["Euro Account", "GBP Account", "USD Account", "NGN Account"],
+    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
     icon: IconMoneybag,
   },
   {
     title: "Account Lookup Services",
     description:
       "This helps businesses quickly verify and access account details for transactions.",
-    accounts: ["Euro Account", "GBP Account", "USD Account", "NGN Account"],
+    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
     icon: IconSearch,
   },
   {
     title: "Remittance",
     description:
       "This helps businesses quickly verify and access account details for transactions.",
-    accounts: ["Euro Account", "GBP Account", "USD Account", "NGN Account"],
+    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
     icon: IconArrowsRightLeft,
   },
 ];

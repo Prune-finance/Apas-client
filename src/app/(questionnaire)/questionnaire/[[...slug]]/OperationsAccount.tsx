@@ -5,10 +5,12 @@ import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useRouter } from "next/navigation";
 import { formatNumber } from "@/lib/utils";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import { useDisclosure } from "@mantine/hooks";
+import ConsentModal from "./ConsentModal";
 
 export default function OperationsAccount() {
-  const [turnover, setTurnover] = useState("");
   const { push, back } = useRouter();
+  const [opened, { open, close }] = useDisclosure(false);
   const form = useQuestionnaireFormContext();
   const isVirtualAccount = Boolean(
     form
@@ -44,11 +46,13 @@ export default function OperationsAccount() {
       <QuestionnaireNav
         nextText={!isVirtualAccount ? "Submit" : "Next"}
         onNext={() => {
-          if (!isVirtualAccount) return;
+          if (!isVirtualAccount) return open();
           push("/questionnaire/services/virtual-account");
         }}
         onPrevious={back}
       />
+
+      <ConsentModal opened={opened} close={close} />
     </Box>
   );
 }

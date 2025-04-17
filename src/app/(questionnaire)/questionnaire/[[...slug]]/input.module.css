@@ -1,13 +1,16 @@
 .root {
   position: relative;
+  font-family: Switzer;
 }
 
 .input {
   height: 54px;
   padding-top: 18px;
+  font-family: Switzer;
 }
 
 .label {
+  font-family: Switzer;
   position: absolute;
   pointer-events: none;
   font-size: var(--mantine-font-size-xs);

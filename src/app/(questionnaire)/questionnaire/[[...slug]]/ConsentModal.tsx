@@ -6,6 +6,7 @@ import { SelectCountryDialCode } from "@/ui/components/SelectDropdownSearch";
 import styles from "./styles.module.scss";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
+import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 interface ConsentModalProps {
   opened: boolean;
@@ -15,6 +16,7 @@ interface ConsentModalProps {
 export default function ConsentModal({ opened, close }: ConsentModalProps) {
   const [firstLoad, setFirstLoad] = useState(true);
   const [loading, setLoading] = useState(false);
+  const questionnaireForm = useQuestionnaireFormContext();
 
   const schema = z.object({
     name: z.string().min(1, "Name is required"),
@@ -58,6 +60,23 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
     />
   );
 
+  const handleSubmit = async (values: z.infer<typeof schema>) => {
+    setLoading(true);
+    try {
+      setTimeout(() => {
+        setLoading(false);
+        close();
+      }, 2000);
+      console.log({ values });
+      form.reset();
+      questionnaireForm.reset();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Modal
       opened={opened}
@@ -91,7 +110,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
           gap: 24,
         }}
         component="form"
-        onSubmit={form.onSubmit((values) => console.log(values))}
+        onSubmit={form.onSubmit((values) => handleSubmit(values))}
       >
         <TextInputWithInsideLabel
           label="Name"

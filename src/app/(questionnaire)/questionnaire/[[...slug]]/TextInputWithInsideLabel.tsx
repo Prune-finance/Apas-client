@@ -3,8 +3,9 @@ import {
   NumberInputProps,
   TextInput,
   TextInputProps,
+  useMantineTheme,
 } from "@mantine/core";
-import classes from "./input.module.css";
+import classes from "./input.module.scss";
 
 interface TextInputWithInsideLabelProps extends TextInputProps {}
 export const TextInputWithInsideLabel = ({
@@ -18,9 +19,11 @@ interface NumberInputWithInsideLabelProps extends NumberInputProps {}
 export const NumberInputWithInsideLabel = ({
   ...props
 }: NumberInputWithInsideLabelProps) => {
+  const theme = useMantineTheme();
   return (
     <NumberInput
       {...props}
+      className="Switzer"
       placeholder="Enter number"
       classNames={classes}
       thousandSeparator=","

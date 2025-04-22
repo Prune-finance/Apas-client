@@ -15,6 +15,7 @@ import {
   useTransactions,
 } from "@/lib/hooks/transactions";
 import useAxios from "@/lib/hooks/useAxios";
+import { calculateTotalPages } from "@/lib/utils";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -48,6 +49,7 @@ export default function BusinessPayoutAccount() {
     recipientName,
     recipientIban,
     businessId,
+    search,
   } = Object.fromEntries(searchParams.entries());
 
   const param = useMemo(() => {
@@ -59,6 +61,7 @@ export default function BusinessPayoutAccount() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
+      ...(search && { search: search }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -72,6 +75,7 @@ export default function BusinessPayoutAccount() {
     recipientIban,
     active,
     limit,
+    search,
   ]);
 
   const {
@@ -143,7 +147,7 @@ export default function BusinessPayoutAccount() {
             setActive={setActive}
             setLimit={setLimit}
             limit={limit}
-            total={Math.ceil(meta?.total ?? 0 / parseInt(limit ?? "10", 10))}
+            total={calculateTotalPages(limit, meta?.total)}
           />
         </SingleDefaultAccountBody>
       </Paper>

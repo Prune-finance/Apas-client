@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 import styles from "./sendMoney.module.scss";
 
@@ -17,6 +17,8 @@ import {
   Loader,
   ActionIcon,
   ScrollArea,
+  Checkbox,
+  Modal,
 } from "@mantine/core";
 import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -24,11 +26,12 @@ import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
 // import { countries } from "@/lib/static";
 import DropzoneComponent from "../Dropzone";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { sendMoneyIndividualValidate } from "@/lib/schema";
 import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
+import DebtorModal from "./DebtorModal";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -39,6 +42,9 @@ interface IndividualProps {
   setValidated: Dispatch<SetStateAction<boolean | null>>;
   showBadge: boolean;
   setShowBadge: Dispatch<SetStateAction<boolean>>;
+  openDebtor: () => void;
+  paymentType: string;
+  setPaymentType: Dispatch<SetStateAction<string>>;
 }
 
 export const sendMoneyIndividualRequest = {
@@ -64,6 +70,9 @@ function Individual({
   setValidated,
   setShowBadge,
   showBadge,
+  openDebtor,
+  paymentType,
+  setPaymentType,
 }: IndividualProps) {
   const [processing, setProcessing] = useState(false);
   const [disableBank, setDisableBank] = useState(false);
@@ -122,7 +131,7 @@ function Individual({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bic, iban]);
 
-  const handlePreviewState = () => {
+  const handleDebtorState = () => {
     const { hasErrors } = form.validate();
     if (hasErrors) return;
     if (
@@ -133,11 +142,10 @@ function Individual({
         "amount",
         `Insufficient funds: The amount entered exceeds your balance`
       );
-
-    close();
+    // close();
     setRequestForm(form.values);
     setSectionState("Individual");
-    openPreview();
+    openDebtor();
   };
 
   return (
@@ -380,6 +388,36 @@ function Individual({
               </>
             )}
 
+            <Flex
+              align="center"
+              justify="flex-start"
+              mt={24}
+              direction="column"
+              gap={10}
+            >
+              <Box p={12} bg="#F9FAFB" w="100%">
+                <Checkbox
+                  color="#97AD05"
+                  fz={12}
+                  value="non-individual"
+                  onChange={(e) => setPaymentType(e.currentTarget.value)}
+                  checked={paymentType === "non-individual"}
+                  label="Yes, I am making this payment on behalf of another party"
+                />
+              </Box>
+
+              <Box p={12} bg="#F9FAFB" w="100%">
+                <Checkbox
+                  color="#97AD05"
+                  fz={12}
+                  value="individual"
+                  onChange={(e) => setPaymentType(e.currentTarget.value)}
+                  checked={paymentType === "individual"}
+                  label="No, I am making this payment on my own behalf"
+                />
+              </Box>
+            </Flex>
+
             <TransactionProcessingTimes />
           </ScrollArea>
 
@@ -393,7 +431,8 @@ function Individual({
               }}
             /> */}
             <PrimaryBtn
-              action={handlePreviewState}
+              // action={handlePreviewState}
+              action={handleDebtorState}
               // loading={processing}
               text="Continue"
               fullWidth

@@ -54,6 +54,9 @@ function AccountPayout() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [processing, setProcessing] = useState(false);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const queryParams = {
     page: active,
@@ -62,6 +65,7 @@ function AccountPayout() {
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(business && { business }),
+    search: debouncedSearch,
   };
 
   const { requests, revalidate, meta, loading } =
@@ -70,7 +74,6 @@ function AccountPayout() {
   const [selectedRequest, setSelectedRequest] = useState<PayoutAccount | null>(
     null
   );
-  const [processing, setProcessing] = useState(false);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
@@ -92,9 +95,6 @@ function AccountPayout() {
     "Request Date": dayjs(selectedRequest?.createdAt).format("DD MMM, YYYY"),
     Status: <BadgeComponent status={selectedRequest?.status ?? ""} />,
   };
-
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const requestForm = useForm({
     initialValues: {
@@ -155,26 +155,24 @@ function AccountPayout() {
     }
   };
 
-  const rows = filteredSearch(requests, ["Company.name"], debouncedSearch).map(
-    (element, index) => (
-      <TableTr
-        key={index}
-        onClick={() => {
-          setSelectedRequest(element);
-          openDrawer();
-        }}
-        style={{ cursor: "pointer" }}
-      >
-        <TableTd>{element?.Company?.name ?? "N/A"}</TableTd>
-        <TableTd tt="capitalize">{"Payout Account"}</TableTd>
-        <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
+  const rows = requests.map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => {
+        setSelectedRequest(element);
+        openDrawer();
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd>{element?.Company?.name ?? "N/A"}</TableTd>
+      <TableTd tt="capitalize">{"Payout Account"}</TableTd>
+      <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
 
-        <TableTd className={`${styles.table__td}`}>
-          <BadgeComponent status={element.status} />
-        </TableTd>
-      </TableTr>
-    )
-  );
+      <TableTd className={`${styles.table__td}`}>
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,

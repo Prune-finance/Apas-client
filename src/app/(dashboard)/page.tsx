@@ -46,6 +46,7 @@ import {
 } from "@/ui/components/ChartLoading";
 import Link from "next/link";
 import { TableComponent } from "@/ui/components/Table";
+import { useHasPermission } from "@/lib/hooks/checkPermission";
 
 export default function Home() {
   const { loading, meta } = useUserAccounts();
@@ -58,6 +59,8 @@ export default function Home() {
     useUserDefaultTransactions({
       limit: 3,
     });
+
+  const canSendMoney = useHasPermission("Transaction Initiation");
 
   const {
     account,
@@ -158,9 +161,12 @@ export default function Home() {
         </Button> */}
         <Group>
           <SecondaryBtn text="Debit Request" fw={600} action={open} />
-          {user?.role === "INITIATOR" && (
+          {canSendMoney && (
             <PrimaryBtn text="Send Money" fw={600} action={openSendMoney} />
           )}
+          {/* {user?.role === "INITIATOR" && (
+            <PrimaryBtn text="Send Money" fw={600} action={openSendMoney} />
+          )} */}
         </Group>
       </Flex>
 
@@ -222,7 +228,7 @@ export default function Home() {
                       { name: "pending", color: "#F79009", label: "Pending" },
                     ]}
                     barProps={{ barSize: 20, radius: 3 }}
-                    minBarSize={0}
+                    // minBarSize={0}
                     gridAxis="xy"
                     valueFormatter={(value) =>
                       new Intl.NumberFormat("en-US").format(value)
@@ -468,6 +474,7 @@ export default function Home() {
         opened={openedSendMoney}
         closeMoney={closeSendMoney}
         account={account}
+        openSendMoney={openSendMoney}
       />
     </main>
   );

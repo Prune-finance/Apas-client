@@ -35,6 +35,7 @@ import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";
 import RoleDrawer from "../(drawers)/roles";
 import Link from "next/link";
+import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 interface Props {
   tabValue: string;
@@ -51,12 +52,15 @@ export default function ActiveRoles() {
     useDisclosure(false);
   const { handleSuccess } = useNotification();
 
-  const { loading, roles, revalidate, meta } = useUserRoles({
+  const queryParams = {
     limit: parseInt(limit ?? "10", 10),
     page: active,
     search: debouncedValue,
     status: "activate",
-  });
+  };
+
+  const { loading, roles, revalidate, meta } = useUserRoles(queryParams);
+  usePaginationReset({ queryParams, setActive });
 
   const { queryFn: handleDeactivation, loading: processingDeactivation } =
     useAxios({
@@ -189,12 +193,12 @@ const RowComponent = ({
             >
               <Text fz={12}>Deactivate</Text>
             </MenuItem>
-            <MenuItem
+            {/* <MenuItem
               leftSection={<IconUser size={14} />}
               // onClick={openInvite}
             >
               <Text fz={12}>Assign User</Text>
-            </MenuItem>
+            </MenuItem> */}
           </MenuDropdown>
         </Menu>
       </TableTd>

@@ -70,16 +70,19 @@ function Accounts() {
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const queryParams = {
-    ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
-    ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(accountName && { accountName }),
-    ...(accountNumber && { accountNumber }),
-    ...(status && { status: status.toUpperCase() }),
-    ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
+    accountName,
+    accountNumber,
+    status: status ? status.toUpperCase() : "",
+    type: type ? (type === "Individual" ? "USER" : "CORPORATE") : "",
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
 
   const {
@@ -119,8 +122,6 @@ function Accounts() {
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 1000);
   const { user } = User();
   const stage =
     typeof window !== "undefined"
@@ -136,10 +137,10 @@ function Accounts() {
   });
 
   const { pendingRequest, approvedRequest } = useMemo(() => {
-    const hasPending = issuanceRequests.some(
+    const hasPending = (issuanceRequests ?? []).some(
       (request) => request.status === "PENDING"
     );
-    const hasApproved = issuanceRequests.some(
+    const hasApproved = (issuanceRequests ?? []).some(
       (request) => request.status === "APPROVED"
     );
 
@@ -257,11 +258,7 @@ function Accounts() {
     }
   };
 
-  const rows = filteredSearch(
-    accounts,
-    ["accountName", "accountNumber", "Company.name"],
-    debouncedSearch
-  ).map((element, index) => (
+  const rows = (accounts ?? []).map((element, index) => (
     <TableTr key={index} style={{ cursor: "pointer" }}>
       <TableTd
         onClick={() => router.push(`/accounts/${element.id}`)}
@@ -501,6 +498,7 @@ function Accounts() {
           opened={sendMoneyOpened}
           closeMoney={sendMoneyClose}
           account={account}
+          openSendMoney={sendMoneyOpen}
         />
 
         <Modal
@@ -513,7 +511,7 @@ function Accounts() {
           <DebitRequestModal
             close={debitClose}
             selectedId={rowId || ""}
-            accountsData={accounts}
+            accountsData={accounts || []}
           />
         </Modal>
 

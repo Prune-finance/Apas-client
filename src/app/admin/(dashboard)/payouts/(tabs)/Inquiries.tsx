@@ -33,6 +33,7 @@ export const InquiriesTab = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
   const searchParams = useSearchParams();
 
   const { status, date, endDate, type, business } = Object.fromEntries(
@@ -47,9 +48,8 @@ export const InquiriesTab = () => {
     ...(business && { business }),
     page: active,
     limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
   };
-
-  const [debouncedSearch] = useDebouncedValue(search, 500);
 
   const [opened, { toggle }] = useDisclosure(false);
 
@@ -93,13 +93,7 @@ export const InquiriesTab = () => {
 
       <TableComponent
         head={InquiriesTableHeaders}
-        rows={
-          <InquiryTableRows
-            data={inquiries}
-            searchProps={["Company.name", "Transaction.centrolinkRef", "type"]}
-            search={debouncedSearch}
-          />
-        }
+        rows={<InquiryTableRows data={inquiries} />}
         loading={loading}
       />
 

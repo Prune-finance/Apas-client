@@ -5,7 +5,7 @@
 
 .textarea {
   border: 1px solid #eaecf0;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 14px;
 
   &::placeholder {
@@ -14,17 +14,12 @@
 }
 
 .input {
-  height: 45px;
+  height: 56px;
   border: 1px solid #eaecf0;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 14px;
 
   &::placeholder {
     font-size: 12px;
   }
-}
-
-.option {
-  font-size: 14px;
-  color: var(--prune-text-gray-600);
 }

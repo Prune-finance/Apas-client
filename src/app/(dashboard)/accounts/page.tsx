@@ -59,6 +59,11 @@ import RequestModalComponent from "@/ui/components/Modal";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "@/ui/components/SingleAccount/(tabs)/SendMoney";
 import User from "@/lib/store/user";
+import { useHasPermission } from "@/lib/hooks/checkPermission";
+import AddAccount from "./AddAccount";
+import SuccessModal from "@/ui/components/SuccessModal";
+import PendingModalImage from "@/assets/add-account-success.png";
+import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -117,10 +122,20 @@ function Accounts() {
     requestAccessOpened,
     { open: requestAccessOpen, close: requestAccessClose },
   ] = useDisclosure(false);
+
+  const [addAccountOpened, { open: addAccountOpen, close: addAccountClose }] =
+    useDisclosure(false);
+
+  const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
+    useDisclosure(false);
+
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+
+  const isInitiator = useHasPermission("INITIATOR")
+  const canSendMoney = useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
   const stage =
@@ -258,6 +273,10 @@ function Accounts() {
     }
   };
 
+  const handleCloseSuccessModal = () => {
+    closeSuccess();
+  };
+
   const rows = (accounts ?? []).map((element, index) => (
     <TableTr key={index} style={{ cursor: "pointer" }}>
       <TableTd
@@ -350,17 +369,29 @@ function Accounts() {
             </Text>
           </div>
 
-          <PrimaryBtn
-            text={tab === tabs[1].value ? "Debit Request" : "Send Money"}
-            fw={600}
-            action={tab === tabs[1].value ? debitOpen : sendMoneyOpen}
-            display={
-              tab === tabs[1].value ||
-              (tab !== tabs[1].value && user?.role === "INITIATOR")
-                ? "block"
-                : "none"
-            }
-          />
+          <Flex align="center" gap={16}>
+            <SecondaryBtn
+              text="Create Account"
+              action={addAccountOpen}
+              fw={600}
+            />
+            {/* <SecondaryBtn
+              text="Create Account"
+              action={addAccountOpen}
+              fw={600}
+            /> */}
+
+            <PrimaryBtn
+              text={tab === tabs[1].value ? "Debit Request" : "Send Money"}
+              fw={600}
+              action={tab === tabs[1].value ? debitOpen : sendMoneyOpen}
+              display={
+                tab === tabs[1].value || (tab !== tabs[1].value && canSendMoney)
+                  ? "block"
+                  : "none"
+              }
+            />
+          </Flex>
         </Flex>
 
         <TabsComponent
@@ -375,7 +406,7 @@ function Accounts() {
         >
           <TabsPanel value={tabs[0].value}>
             <SimpleGrid cols={3} mt={32}>
-              <AccountCard
+              {/* <AccountCard
                 balance={account?.accountBalance ?? 0}
                 currency="EUR"
                 companyName={account?.accountName ?? "No Default Account"}
@@ -383,6 +414,32 @@ function Accounts() {
                 bic={"ARPYGB21XXX"}
                 loading={loadingDftAcct}
                 link={`/accounts/default`}
+                business={false}
+                refresh
+                revalidate={revalidateDftAcct}
+              /> */}
+
+              <NewAccountCard
+                currency={"EUR"}
+                companyName={account?.accountName ?? "No Default Account"}
+                link={`/accounts/default`}
+                iban={account?.accountNumber ?? "No Default Account"}
+                bic={"ARPYGB21XXX"}
+                balance={account?.accountBalance ?? 0}
+                loading={loadingDftAcct}
+                business={false}
+                refresh
+                revalidate={revalidateDftAcct}
+              />
+
+              <NewAccountCard
+                currency={"GBP"}
+                companyName={account?.accountName ?? "No Default Account"}
+                link={`/accounts/default/1`}
+                sortCode="567890"
+                accountNumber="567890"
+                balance={account?.accountBalance ?? 0}
+                loading={loadingDftAcct}
                 business={false}
                 refresh
                 revalidate={revalidateDftAcct}
@@ -493,6 +550,30 @@ function Accounts() {
             </TabsComponent>
           </TabsPanel>
         </TabsComponent>
+
+        <Modal
+          opened={addAccountOpened}
+          onClose={addAccountClose}
+          centered
+          size={460}
+          padding={30}
+        >
+          <AddAccount onClose={addAccountClose} openSuccess={openSuccess} />
+        </Modal>
+
+        <SuccessModal
+          size={460}
+          openedSuccess={openedSuccess}
+          handleCloseSuccessModal={handleCloseSuccessModal}
+          image={PendingModalImage.src}
+          style={{ height: 190, width: "100%", marginBottom: 10 }}
+          desc={
+            <Text fz={14} c="#667085">
+              You have successfully requested a naira account.
+            </Text>
+          }
+          title="Account Requested Successfully."
+        />
 
         <SendMoney
           opened={sendMoneyOpened}

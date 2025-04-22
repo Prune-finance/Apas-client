@@ -584,6 +584,17 @@ export const sendMoneyIndividualValidate = z.object({
   // accountBalance: z.number().positive("A positive amount is required"),
 });
 
+const myObject = z
+  .object({
+    website: z.string(),
+    businessRegNo: z.string(),
+  })
+  .partial()
+  .refine(
+    data => data.website || data.businessRegNo,
+    'Either city or second businessRegNo is required.',
+  );
+
 export const DebtorFormSelf = z.object({
   fullName: z.string().min(2, "Full Name is required"),
   address: z.string().min(2, "Address is required"),
@@ -591,9 +602,12 @@ export const DebtorFormSelf = z.object({
   postCode: z.string().min(2, "Post Code is required"),
   state: z.string().min(2, "State is required"),
   city: z.string().min(2, "City is required"),
-  website: z.string().url("Website is required"),
-  businessRegNo: z.string().min(2, "Business Registration Number is required"),
-});
+  website: z.string(),
+  businessRegNo: z.string(),
+}).partial().refine(
+  data => data.website || data.businessRegNo,
+  'Either Website or Business Registration Number is required.',
+);
 
 export const DebtorFormCompany = z.object({
   fullName: z.string().min(2, "Full Name is required"),
@@ -602,9 +616,12 @@ export const DebtorFormCompany = z.object({
   postCode: z.string().min(2, "Post Code is required"),
   state: z.string().min(2, "State is required"),
   city: z.string().min(2, "City is required"),
-  website: z.string().url("Website is required"),
-  businessRegNo: z.string().min(2, "Business Registration Number is required"),
-});
+  website: z.string(),
+  businessRegNo: z.string(),
+}).partial().refine(
+  data => data.website || data.businessRegNo,
+  'Either Website or Business Registration Number is required.',
+);
 
 export const DebtorFormIndividual = z.object({
   fullName: z.string().min(2, "Full Name is required"),

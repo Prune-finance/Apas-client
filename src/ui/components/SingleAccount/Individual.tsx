@@ -349,7 +349,7 @@ function Individual({
                     classNames={{ input: styles.input, label: styles.label }}
                     flex={1}
                     label="Country"
-                    data={countries.map((c) => c.name)}
+                    data={countries.map((c) => c?.name)}
                     disabled={disableCountry}
                     {...form.getInputProps("destinationCountry")}
                   />

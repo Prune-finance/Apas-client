@@ -50,6 +50,7 @@ export default function VirtualAccount() {
                     leftSection={<IconCurrencyPound />}
                     placeholder="Amount"
                     w="100%"
+                    className="Switzer"
                     min={0}
                     thousandSeparator=","
                     {...form.getInputProps(

@@ -1,16 +1,22 @@
 .root {
   position: relative;
-  font-family: Switzer;
+  /* font-family: "Switzer" !important; */
+  font-family: --var(--mantine-font-family) !important;
 }
 
 .input {
   height: 54px;
   padding-top: 18px;
-  font-family: Switzer;
+  font-family: "Switzer" !important;
+
+  /* &::placeholder {
+    font-size: 50px;
+  } */
 }
 
 .label {
-  font-family: Switzer;
+  font-family: --var(--mantine-font-family) !important;
+  font-weight: 400;
   position: absolute;
   pointer-events: none;
   font-size: var(--mantine-font-size-xs);

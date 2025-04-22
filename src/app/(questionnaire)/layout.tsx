@@ -1,5 +1,6 @@
 "use client";
 
+import "@/ui/styles/globals.scss";
 import {
   OperationsAccountSchema,
   questionnaireValues,
@@ -81,13 +82,13 @@ export default function QuestionnaireLayout({
   return (
     <AppShell
       navbar={{ width: 364, breakpoint: "sm", collapsed: { mobile: !opened } }}
-      padding="md"
+      bg="#fff"
     >
       <AppShell.Navbar withBorder={false}>
         <Navbar />
       </AppShell.Navbar>
-      <AppShell.Main>
-        <Box pos="sticky" top={0} bg="#FCFCFD" mb={30} style={{ zIndex: 100 }}>
+      <AppShell.Main pb="lg">
+        <Box pos="sticky" top={0} style={{ zIndex: 100 }} bg="#FCFCFD">
           <Container size={1200} pt={30} pb={20}>
             <Text
               ta="left"

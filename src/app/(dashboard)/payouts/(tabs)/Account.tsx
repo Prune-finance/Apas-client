@@ -8,6 +8,7 @@ import { useUserDefaultPayoutAccount } from "@/lib/hooks/accounts";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
 
 import { UserBusinessMeta, useUserBusiness } from "@/lib/hooks/businesses";
+import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 
 interface Props {
   meta?: UserBusinessMeta;
@@ -25,7 +26,33 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
     <main>
       {Boolean(meta?.hasPayoutAccount) && (
         <SimpleGrid cols={3} mt={32}>
-          <AccountCard
+          <NewAccountCard
+            currency={"EUR"}
+            companyName={account?.accountName ?? "No Default Account"}
+            link={`/accounts/default`}
+            iban={account?.accountNumber ?? "No Default Account"}
+            bic={"ARPYGB21XXX"}
+            balance={account?.accountBalance ?? 0}
+            loading={loadingAcct}
+            business={false}
+            refresh
+            revalidate={revalidate}
+          />
+
+          <NewAccountCard
+            currency={"GBP"}
+            companyName={account?.accountName ?? "No Default Account"}
+            link={`/accounts/default/1`}
+            sortCode="567890"
+            accountNumber="567890"
+            balance={account?.accountBalance ?? 0}
+            loading={loadingAcct}
+            business={false}
+            refresh
+            revalidate={revalidate}
+          />
+
+          {/* <AccountCard
             balance={account?.accountBalance ?? 0}
             currency="EUR"
             companyName={account?.accountName ?? "No Default Account"}
@@ -36,7 +63,7 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             link={`/payouts/${account?.id}/account`}
             refresh
             revalidate={revalidate}
-          />
+          /> */}
         </SimpleGrid>
       )}
 

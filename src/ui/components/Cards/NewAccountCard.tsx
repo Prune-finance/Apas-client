@@ -152,27 +152,6 @@ function NewAccountCard({
           </Group>
 
           <Group gap={8} align="center">
-            {refresh && (
-              <ThemeIcon
-                radius="xl"
-                color="transparent"
-                // color="#3F441B"
-                size="xs"
-                // p={4}
-                onClick={() => handleReload()}
-                style={{
-                  cursor: processing ? "not-allowed" : "pointer",
-                  pointerEvents: processing ? "none" : "auto",
-                }}
-              >
-                {processing ? (
-                  <Loader type="oval" size="xs" color="#596603" />
-                ) : (
-                  <IconReload color="#596603" />
-                )}
-              </ThemeIcon>
-            )}
-
             <Group
               gap={2}
               align="center"
@@ -181,9 +160,11 @@ function NewAccountCard({
             >
               {link && (
                 <Link href={link}>
-                  <Text fz={12} td="underline" fw={500} c="#596603">
-                    See More
-                  </Text>
+                  <Box bg="#596603" px={8} p={2} style={{ borderRadius: 12 }}>
+                    <Text fz={10} fw={500} c="#fff">
+                      See More
+                    </Text>
+                  </Box>
                 </Link>
               )}
             </Group>
@@ -191,82 +172,102 @@ function NewAccountCard({
         </Flex>
 
         <Flex direction="column" align="flex-start" w={"100%"}>
-          <Group
-            align="center"
-            justify="space-between"
-            gap={4}
-            mt={27}
-            w={"100%"}
-          >
-            {!loading ? (
-              <>
-                <Flex align="center" gap={4}>
-                  <Text fz={12} fw={400} c="#667085" lh="100%">
-                    {config.bankIdLabel}:
-                  </Text>
-
-                  <Text fz={14} fw={600} c="#1D2939" lh="100%">
-                    {config.bankIdLabel === "BIC" ? bic : sortCode}
-                  </Text>
-                </Flex>
-              </>
-            ) : (
-              <Skeleton h={10} w={100} />
-            )}
-          </Group>
-
           <Group align="center" gap={4}>
             {!loading ? (
-              <Text c="var(--prune-text-gray-900)" fz={26} fw={600} mt={9}>
-                {formatNumber(balance, true, config?.currencyCode)}
-              </Text>
+              <Flex align="center" justify="center" gap={11} mt={9}>
+                <Text c="var(--prune-text-gray-900)" fz={26} fw={600}>
+                  {formatNumber(balance, true, config?.currencyCode)}
+                </Text>
+
+                {refresh && (
+                  <ThemeIcon
+                    radius="xl"
+                    color="#596603"
+                    size="xs"
+                    p={2}
+                    onClick={() => handleReload()}
+                    style={{
+                      cursor: processing ? "not-allowed" : "pointer",
+                      pointerEvents: processing ? "none" : "auto",
+                    }}
+                  >
+                    {processing ? (
+                      <Loader type="oval" size="xs" color="#FFFFFF" />
+                    ) : (
+                      <IconReload color="#FFFFFF" />
+                    )}
+                  </ThemeIcon>
+                )}
+              </Flex>
             ) : (
               <Skeleton mt={9} h={30} w={100} />
             )}
           </Group>
         </Flex>
 
-        <Flex align="center" justify="space-between" w="100%" mb="auto">
-          <Group align="center" gap={4}>
-            {!loading ? (
-              <>
-                <Text fz={12} fw={400} c="#667085" lh="100%">
-                  {config.accountIdLabel}:
-                </Text>
-                <Text fz={14} fw={600} c="#1D2939" lh="100%">
-                  {config.accountIdLabel === "IBAN" ? iban : accountNumber}
-                </Text>
-              </>
-            ) : (
-              <Skeleton h={10} w={200} />
-            )}
-          </Group>
+        <Flex align="flex-end" justify="space-between" w="100%">
+          <Group w="100%" gap={10}>
+            <Group align="flex-end" justify="space-between" gap={4} w={"100%"}>
+              {!loading ? (
+                <>
+                  <Flex align="center" gap={4}>
+                    <Text fz={12} fw={400} c="#667085" lh="100%">
+                      {config.bankIdLabel}:
+                    </Text>
 
-          <Flex align="flex-end" justify="flex-end">
-            <Box onClick={handlePropagation}>
-              <CopyButton
-                value={
-                  currency === "EUR"
-                    ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
-                    : currency === "GBP"
-                    ? `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
-                    : `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
-                }
-              >
-                {({ copied, copy }) => (
-                  <SecondaryBtn
-                    icon={copied ? IconCheck : IconCopy}
-                    text={copied ? "Copied" : "Copy Details"}
-                    fz={12}
-                    action={copy}
-                    variant="transparent"
-                    c="#596603"
-                    style={{ border: "none" }}
-                  />
+                    <Text fz={14} fw={600} c="#1D2939" lh="100%">
+                      {config.bankIdLabel === "BIC" ? bic : sortCode}
+                    </Text>
+                  </Flex>
+                </>
+              ) : (
+                <Skeleton h={10} w={100} />
+              )}
+            </Group>
+
+            <Flex align="center" justify="space-between" w="100%">
+              <Group align="flex-end" gap={4}>
+                {!loading ? (
+                  <>
+                    <Text fz={12} fw={400} c="#667085" lh="100%">
+                      {config.accountIdLabel}:
+                    </Text>
+                    <Text fz={14} fw={600} c="#1D2939" lh="100%">
+                      {config.accountIdLabel === "IBAN" ? iban : accountNumber}
+                    </Text>
+                  </>
+                ) : (
+                  <Skeleton h={10} w={200} />
                 )}
-              </CopyButton>
-            </Box>
-          </Flex>
+              </Group>
+
+              <Box onClick={handlePropagation}>
+                <CopyButton
+                  value={
+                    currency === "EUR"
+                      ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
+                      : currency === "GBP"
+                      ? `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
+                      : `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
+                  }
+                >
+                  {({ copied, copy }) => (
+                    <SecondaryBtn
+                      icon={copied ? IconCheck : IconCopy}
+                      text={copied ? "Copied" : "Copy Details"}
+                      fz={12}
+                      action={copy}
+                      m={0}
+                      px={0}
+                      variant="transparent"
+                      c="#596603"
+                      style={{ border: "none" }}
+                    />
+                  )}
+                </CopyButton>
+              </Box>
+            </Flex>
+          </Group>
         </Flex>
       </Stack>
     </BackgroundImage>

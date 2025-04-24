@@ -1,0 +1,27 @@
+.root {
+  position: relative;
+  /* font-family: "Switzer" !important; */
+  font-family: --var(--mantine-font-family) !important;
+}
+
+.input {
+  height: 54px;
+  padding-top: 18px;
+  font-family: "Switzer" !important;
+  background-color: #fcfcfd;
+
+  /* &::placeholder {
+    font-size: 50px;
+  } */
+}
+
+.label {
+  font-family: --var(--mantine-font-family) !important;
+  font-weight: 400;
+  position: absolute;
+  pointer-events: none;
+  font-size: var(--mantine-font-size-xs);
+  padding-left: var(--mantine-spacing-sm);
+  padding-top: calc(var(--mantine-spacing-sm) / 2);
+  z-index: 1;
+}

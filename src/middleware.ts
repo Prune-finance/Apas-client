@@ -51,6 +51,6 @@ export const config = {
      * - pdf.worker.min.mjs (PDF worker file)
      * - questionnaire (questionnaire pages)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|auth|404|pdf.worker.min.mjs|questionnaire).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|auth|404|pdf.worker.min.mjs|pre-onboarding|onboarding).*)",
   ],
 };

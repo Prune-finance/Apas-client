@@ -47,7 +47,7 @@ export default function OperationsAccount() {
         nextText={!isVirtualAccount ? "Submit" : "Next"}
         onNext={() => {
           if (!isVirtualAccount) return open();
-          push("/questionnaire/services/virtual-account");
+          push("/pre-onboarding/services/virtual-account");
         }}
         onPrevious={back}
       />

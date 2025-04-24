@@ -2,6 +2,7 @@ import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import {
+  DateInputWithInsideLabel,
   SelectInputWithInsideLabel,
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
@@ -26,12 +27,7 @@ export const AddDirectorsInfo = ({ setActive, active }: AddDirectorsInfo) => {
 
         <Flex gap={24} w="100%">
           <TextInputWithInsideLabel label="Email" w="100%" />
-          <TextInputWithInsideLabel label="Date of Birth" w="100%" />
-        </Flex>
-
-        <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Identity Type" w="100%" />
-          <TextInputWithInsideLabel label="Proof of Address" w="100%" />
+          <DateInputWithInsideLabel label="Date of Birth" w="100%" />
         </Flex>
 
         <Flex gap={24} w="100%">

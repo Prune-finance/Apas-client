@@ -1,4 +1,5 @@
 import {
+  DateInputWithInsideLabel,
   SelectInputWithInsideLabel,
   TextareaWithInsideLabel,
   TextInputWithInsideLabel,
@@ -27,7 +28,7 @@ export const CEOInfo = ({ setActive, active }: CEOInfo) => {
 
         <Flex gap={24} w="100%">
           <TextInputWithInsideLabel label="Email" w="100%" />
-          <TextInputWithInsideLabel label="Date of Birth" w="100%" />
+          <DateInputWithInsideLabel label="Date of Birth" w="100%" />
         </Flex>
 
         <Flex gap={24} w="100%">

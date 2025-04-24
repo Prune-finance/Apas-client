@@ -59,7 +59,7 @@ export default function Questionnaire() {
         </Stack>
       </RadioGroup>
       <QuestionnaireNav
-        onNext={() => push("/questionnaire/services")}
+        onNext={() => push("/pre-onboarding/services")}
         disabledPrev
       />
     </Box>

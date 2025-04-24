@@ -6,56 +6,16 @@ import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
-interface BusinessInfo {
+interface CEOInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
 }
 
-export const BusinessInfo = ({ setActive, active }: BusinessInfo) => {
+export const CEOInfo = ({ setActive, active }: CEOInfo) => {
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
-        Business Information
-      </Text>
-
-      <Stack mt={30} gap={24}>
-        <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Business Name" w="100%" />
-          <TextInputWithInsideLabel label="Trading Name" w="100%" />
-        </Flex>
-
-        <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Business Type" w="100%" />
-          <TextInputWithInsideLabel label="Business Industry" w="100%" />
-        </Flex>
-
-        <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Country" w="100%" />
-          <TextInputWithInsideLabel label="Address" w="100%" />
-        </Flex>
-
-        <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Email" w="100%" />
-          <TextInputWithInsideLabel label="Phone" w="100%" />
-        </Flex>
-
-        <Flex gap={24} w="50%">
-          <TextInputWithInsideLabel label="Business Website" w="100%" />
-        </Flex>
-
-        <Flex gap={24} w="100%" mb={48}>
-          <TextareaWithInsideLabel
-            label="Company's Description"
-            w="100%"
-            autosize
-            maxRows={7}
-            minRows={5}
-          />
-        </Flex>
-      </Stack>
-
-      <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
-        Contact Person
+        CEO Details
       </Text>
 
       <Stack mt={30} gap={24}>
@@ -66,7 +26,7 @@ export const BusinessInfo = ({ setActive, active }: BusinessInfo) => {
 
         <Flex gap={24} w="100%">
           <TextInputWithInsideLabel label="Email" w="100%" />
-          <TextInputWithInsideLabel label="Phone Number" w="100%" />
+          <TextInputWithInsideLabel label="Date of Birth" w="100%" />
         </Flex>
 
         <Flex gap={24} w="100%">

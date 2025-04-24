@@ -26,18 +26,18 @@ export const BusinessInfo = ({ setActive, active }: BusinessInfo) => {
         </Flex>
 
         <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Business Type" w="100%" />
+          <SelectInputWithInsideLabel label="Business Type" w="100%" />
           <TextInputWithInsideLabel label="Business Industry" w="100%" />
         </Flex>
 
         <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Country" w="100%" />
+          <SelectInputWithInsideLabel label="Country" w="100%" />
           <TextInputWithInsideLabel label="Address" w="100%" />
         </Flex>
 
         <Flex gap={24} w="100%">
           <TextInputWithInsideLabel label="Email" w="100%" />
-          <TextInputWithInsideLabel label="Phone" w="100%" />
+          <TextInputWithInsideLabel label="Phone Number" w="100%" />
         </Flex>
 
         <Flex gap={24} w="50%">

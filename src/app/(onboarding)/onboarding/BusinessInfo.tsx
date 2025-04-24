@@ -1,4 +1,5 @@
 import {
+  SelectInputWithInsideLabel,
   TextareaWithInsideLabel,
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
@@ -70,8 +71,8 @@ export const BusinessInfo = ({ setActive, active }: BusinessInfo) => {
         </Flex>
 
         <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Identity Type" w="100%" />
-          <TextInputWithInsideLabel label="Proof of Address" w="100%" />
+          <SelectInputWithInsideLabel label="Identity Type" w="100%" />
+          <SelectInputWithInsideLabel label="Proof of Address" w="100%" />
         </Flex>
 
         <Flex gap={24} w="100%">

@@ -1,7 +1,10 @@
 import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { TextInputWithInsideLabel } from "@/ui/components/InputWithLabel";
+import {
+  SelectInputWithInsideLabel,
+  TextInputWithInsideLabel,
+} from "@/ui/components/InputWithLabel";
 
 interface AddDirectorsInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -32,8 +35,8 @@ export const AddDirectorsInfo = ({ setActive, active }: AddDirectorsInfo) => {
         </Flex>
 
         <Flex gap={24} w="100%">
-          <OnBoardingDocumentBox title="Upload Identity Document" />
-          <OnBoardingDocumentBox title="Upload Identity Document" />
+          <SelectInputWithInsideLabel label="Identity Type" w="100%" />
+          <SelectInputWithInsideLabel label="Proof of Address" w="100%" />
         </Flex>
       </Stack>
 

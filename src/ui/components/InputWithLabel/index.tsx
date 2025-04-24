@@ -1,6 +1,8 @@
 import {
   NumberInput,
   NumberInputProps,
+  Select,
+  SelectProps,
   Textarea,
   TextareaProps,
   TextInput,
@@ -30,6 +32,17 @@ export const NumberInputWithInsideLabel = ({
       classNames={classes}
       thousandSeparator=","
       min={0}
+    />
+  );
+};
+export const SelectInputWithInsideLabel = ({ ...props }: SelectProps) => {
+  const theme = useMantineTheme();
+  return (
+    <Select
+      {...props}
+      className="Switzer"
+      placeholder="Enter number"
+      classNames={classes}
     />
   );
 };

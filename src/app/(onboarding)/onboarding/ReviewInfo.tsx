@@ -7,6 +7,7 @@ import BasicInfoCard from "./BasicInfoCard";
 import CEOInfoCard from "./CeoInfoCard";
 import DocumentInfoCard from "./DocumentInfoCard";
 import DirectorInfoCard from "./DirectorInfoCard";
+import ShareholderInfoCard from "./ShareholderInfoCard";
 
 interface ReviewInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -32,6 +33,9 @@ export const ReviewInfo = ({ setActive, active }: ReviewInfo) => {
         </TabsPanel>
         <TabsPanel value={tabs[3]?.value}>
           <DirectorInfoCard setActive={setActive} data={ceoInfo} />
+        </TabsPanel>
+        <TabsPanel value={tabs[4]?.value}>
+          <ShareholderInfoCard setActive={setActive} data={ceoInfo} />
         </TabsPanel>
       </TabsComponent>
 

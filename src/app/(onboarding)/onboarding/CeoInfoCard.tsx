@@ -11,7 +11,7 @@ interface CEOInfoCard {
 
 function CEOInfoCard({ setActive, data }: CEOInfoCard) {
   return (
-    <Box p={16} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
+    <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">
         <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
           CEO
@@ -29,12 +29,12 @@ function CEOInfoCard({ setActive, data }: CEOInfoCard) {
       <Stack gap={10} mt={20}>
         {Object.entries(data).map(([key, value]) => (
           <Group key={key} justify="space-between" align="start">
-            <Text c="var(--prune-text-gray-700)" fz={12}>
+            <Text c="#667085" fz={12}>
               {key}:
             </Text>
             <Text
-              c="var(--prune-text-gray-500)"
-              ta="left"
+              c="#344054"
+              ta="right"
               w={244}
               fz={12}
               // miw="100%"

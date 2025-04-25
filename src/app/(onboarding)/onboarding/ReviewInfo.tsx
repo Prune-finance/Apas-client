@@ -8,6 +8,8 @@ import CEOInfoCard from "./CeoInfoCard";
 import DocumentInfoCard from "./DocumentInfoCard";
 import DirectorInfoCard from "./DirectorInfoCard";
 import ShareholderInfoCard from "./ShareholderInfoCard";
+import { FiFileText, FiUser, FiUsers } from "react-icons/fi";
+import { TbBuildings } from "react-icons/tb";
 
 interface ReviewInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -21,7 +23,7 @@ export const ReviewInfo = ({ setActive, active }: ReviewInfo) => {
         Review
       </Text>
 
-      <TabsComponent tabs={tabs} mt={24}>
+      <TabsComponent tabs={tabs} mt={24} tt="capitalize">
         <TabsPanel value={tabs[0]?.value}>
           <BasicInfoCard setActive={setActive} data={basicInfo} />
         </TabsPanel>
@@ -85,17 +87,22 @@ const ceoInfo = {
 const tabs = [
   {
     value: "Company Profile",
+    icon: <TbBuildings size={16} />,
   },
   {
     value: "CEO",
+    icon: <FiUser size={16} />,
   },
   {
     value: "Document",
+    icon: <FiFileText size={16} />,
   },
   {
     value: "Directors",
+    icon: <FiUsers size={16} />,
   },
   {
     value: "Key Shareholders",
+    icon: <FiUsers size={16} />,
   },
 ];

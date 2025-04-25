@@ -44,6 +44,11 @@ export const AddDirectorsInfo = ({ setActive, active }: AddDirectorsInfo) => {
           <SelectInputWithInsideLabel label="Identity Type" w="100%" />
           <SelectInputWithInsideLabel label="Proof of Address" w="100%" />
         </Flex>
+
+        <Flex gap={24} w="100%">
+          <OnBoardingDocumentBox title="Upload Identity Document" />
+          <OnBoardingDocumentBox title="Upload Identity Document" />
+        </Flex>
       </Stack>
 
       <Flex align="center" justify="space-between" w="100%" mt={20}>

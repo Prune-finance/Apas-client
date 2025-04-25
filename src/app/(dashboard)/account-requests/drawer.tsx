@@ -30,7 +30,6 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import TabsComponent from "@/ui/components/Tabs";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
-import { notifications } from "@mantine/notifications";
 import useNotification from "@/lib/hooks/notification";
 import { camelCaseToTitleCase, getUserType } from "@/lib/utils";
 import { getNestedDocValue } from "@/lib/helpers/document-status";

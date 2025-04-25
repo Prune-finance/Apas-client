@@ -32,9 +32,7 @@ import { useForm, zodResolver } from "@mantine/form";
 
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
-import { useBusiness } from "@/lib/hooks/businesses";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";

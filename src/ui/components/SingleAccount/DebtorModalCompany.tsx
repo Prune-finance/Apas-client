@@ -1,19 +1,8 @@
-import {
-  Box,
-  Flex,
-  Modal,
-  Select,
-  TabsPanel,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
-import React, { useState } from "react";
+import { Flex, Select, TabsPanel, Text, TextInput } from "@mantine/core";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import styles from "./debtor.module.scss";
 import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
 import { useForm, zodResolver } from "@mantine/form";
-import { countriesShortCode } from "@/lib/countries-short-code";
 import { DebtorFormCompany } from "@/lib/schema";
 import countries from "@/assets/countries.json";
 

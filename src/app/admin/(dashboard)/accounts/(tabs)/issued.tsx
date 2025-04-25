@@ -1,24 +1,11 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, {
-  Dispatch,
-  SetStateAction,
-  Suspense,
-  useMemo,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import {
-  Badge,
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-} from "@mantine/core";
+import { Group, Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
 import { UnstyledButton, rem, Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
@@ -37,15 +24,9 @@ import {
 import {
   AccountData,
   AccountMeta,
-  useAccounts,
   useAccountStatistics,
 } from "@/lib/hooks/accounts";
-import {
-  activeBadgeColor,
-  camelCaseToTitleCase,
-  formatNumber,
-  getUserType,
-} from "@/lib/utils";
+import { camelCaseToTitleCase, formatNumber, getUserType } from "@/lib/utils";
 
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
@@ -53,17 +34,12 @@ import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import ModalComponent from "../modal";
-import {
-  FilterSchema,
-  FilterType,
-  FilterValues,
-  validateRequest,
-} from "@/lib/schema";
+import { validateRequest } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import * as XLSX from "xlsx";

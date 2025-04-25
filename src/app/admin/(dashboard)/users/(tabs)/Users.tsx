@@ -16,7 +16,6 @@ import {
   IconDotsVertical,
   IconListTree,
   IconPlus,
-  IconSearch,
   IconUserEdit,
 } from "@tabler/icons-react";
 
@@ -30,20 +29,14 @@ import { useAdmins } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import ModalComponent from "../modal";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  FilterSchema,
-  FilterType,
-  FilterValues,
-  newAdmin,
-  validateNewAdmin,
-} from "@/lib/schema";
+import { newAdmin, validateNewAdmin } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import axios from "axios";
 import { Fragment, useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 
 import Filter from "@/ui/components/Filter";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -51,7 +44,7 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { calculateTotalPages, sanitizeURL } from "@/lib/utils";
+import { calculateTotalPages } from "@/lib/utils";
 
 export default function Users() {
   const searchParams = useSearchParams();

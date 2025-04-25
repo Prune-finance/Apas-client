@@ -18,12 +18,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-import {
-  directorEtShareholderSchema,
-  NewBusinessType,
-  OtherDocumentType,
-  RemoveDirectorType,
-} from "@/lib/schema";
+import { directorEtShareholderSchema, OtherDocumentType } from "@/lib/schema";
+import { NewBusinessType, RemoveDirectorType } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 
 interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {

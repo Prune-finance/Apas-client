@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
 
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 import { BusinessData } from "./businesses";
 import { sanitizedQueryParams, sanitizeURL } from "../utils";
 import useAxios from "./useAxios";

@@ -1,5 +1,5 @@
-import { IParams, otherDocumentSchema } from "./../schema";
-import { DebitRequest } from "./requests";
+import { IParams } from "@/lib/schema";
+
 import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
 import { sanitizeURL } from "../utils";

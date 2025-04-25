@@ -11,7 +11,6 @@ import { useSingleAccount } from "@/lib/hooks/accounts";
 import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
 import {
   IssuedAccountHead,
-  SingleAccount,
   SingleAccountBody,
 } from "@/ui/components/SingleAccount";
 import { useSingleBusiness } from "@/lib/hooks/businesses";

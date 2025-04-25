@@ -23,14 +23,14 @@ export const AddShareholdersInfo = ({
         <Flex align="center" justify="center" gap={20}>
           <SecondaryBtn
             text="Previous"
-            fw={500}
+            fw={600}
             action={() => setActive(active - 1)}
             disabled={active === 0}
           />
           <PrimaryBtn
             text="Next"
             w={126}
-            fw={500}
+            fw={600}
             action={() => setActive(active + 1)}
           />
         </Flex>

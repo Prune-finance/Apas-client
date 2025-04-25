@@ -1,0 +1,28 @@
+.input {
+  border: none;
+  border-radius: 4px;
+  background-color: #fcfcfd;
+  height: 44px;
+  font-family: "Switzer";
+
+  &::placeholder {
+    font-size: 14px !important;
+    color: #344054;
+    font-family: "Switzer";
+  }
+}
+.label {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--prune-text-gray-600);
+  margin-bottom: 10px;
+}
+
+.input__right__section {
+  background-color: #eaecf0;
+  padding: 4px;
+  border-radius: 12px;
+  width: 46px;
+  display: flex;
+  justify-content: center;
+}

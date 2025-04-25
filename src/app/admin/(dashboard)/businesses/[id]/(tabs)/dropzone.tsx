@@ -1,4 +1,4 @@
-import { Flex, Group, Loader, rem, Text } from "@mantine/core";
+import { Flex, Loader, rem, Text } from "@mantine/core";
 import {
   Dropzone,
   DropzoneProps,
@@ -15,11 +15,8 @@ import {
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
-import {
-  directorEtShareholderSchema,
-  OtherDocumentType,
-  RemoveDirectorType,
-} from "@/lib/schema";
+import { directorEtShareholderSchema, OtherDocumentType } from "@/lib/schema";
+import { RemoveDirectorType } from "@/lib/schema/business";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";

@@ -1,5 +1,5 @@
 import { PayoutRequestsTableHeaders } from "@/lib/static";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -28,7 +28,6 @@ import { notifications } from "@mantine/notifications";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
-import { PayoutReqSearchProps } from ".";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 interface Props {

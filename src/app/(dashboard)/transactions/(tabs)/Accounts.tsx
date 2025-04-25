@@ -1,7 +1,4 @@
-import {
-  TransactionType,
-  useUserDefaultTransactions,
-} from "@/lib/hooks/transactions";
+import { useUserDefaultTransactions } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";

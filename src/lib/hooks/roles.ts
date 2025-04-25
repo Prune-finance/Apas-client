@@ -1,4 +1,4 @@
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 import useAxios from "./useAxios";
 
 export function useUserRoles(customParams: IParams = {}) {

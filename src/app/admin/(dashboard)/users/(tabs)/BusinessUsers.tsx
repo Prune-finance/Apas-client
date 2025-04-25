@@ -20,10 +20,9 @@ import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { filteredSearch } from "@/lib/search";
+import { useState } from "react";
 
-import { sanitizeURL, serialNumber } from "@/lib/utils";
+import { serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 
 import PaginationComponent from "@/ui/components/Pagination";

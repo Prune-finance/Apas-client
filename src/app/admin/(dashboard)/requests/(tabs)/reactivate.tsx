@@ -38,24 +38,13 @@ import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
 import { formatNumber, getUserType } from "@/lib/utils";
-import {
-  DebitRequest,
-  IUserRequest,
-  useAllRequests,
-} from "@/lib/hooks/requests";
+import { IUserRequest, useAllRequests } from "@/lib/hooks/requests";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  BusinessFilterType,
-  businessFilterValues,
-  businessFilterSchema,
-} from "../../businesses/schema";
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
-import { useBusiness } from "@/lib/hooks/businesses";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";

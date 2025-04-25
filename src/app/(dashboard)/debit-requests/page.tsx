@@ -6,25 +6,21 @@ dayjs.extend(advancedFormat);
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { Box, Divider, Drawer, Group, Modal, Paper } from "@mantine/core";
-import { Button, TextInput, Table, TableScrollContainer } from "@mantine/core";
+import { Group, Modal, Paper } from "@mantine/core";
 import { Text } from "@mantine/core";
-import { TableTr, TableTd, TableTbody } from "@mantine/core";
-import { Flex, TableTh, TableThead } from "@mantine/core";
+import { TableTr, TableTd } from "@mantine/core";
 
 // Tabler Imports
-import { IconAlignCenter, IconPlus, IconX } from "@tabler/icons-react";
-import { IconListTree, IconSearch } from "@tabler/icons-react";
+import { IconAlignCenter, IconPlus } from "@tabler/icons-react";
+import { IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
 import { DebitRequest, useUserDebitRequests } from "@/lib/hooks/requests";
-import { DynamicSkeleton2 } from "@/lib/static";
 
 // UI Imports
 import styles from "./styles.module.scss";
 
 // Asset Imports
-import EmptyImage from "@/assets/empty.png";
 import { Suspense, useState } from "react";
 import { calculateTotalPages, formatNumber } from "@/lib/utils";
 import { useForm, zodResolver } from "@mantine/form";
@@ -39,7 +35,6 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import DebitRequestModal from "./new/modal";
 import { DebitRequestDrawer } from "./drawer";
-import { filteredSearch } from "@/lib/search";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 function DebitRequests() {

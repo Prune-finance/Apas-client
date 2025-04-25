@@ -1,11 +1,8 @@
 "use client";
 
 import { formatNumber } from "@/lib/utils";
-import { Box, Group, Radio, RadioGroup, Stack, Text } from "@mantine/core";
+import { Box, RadioGroup, Stack, Text } from "@mantine/core";
 import CustomRadio from "./CustomRadio";
-import { validateEditUser } from "@/lib/schema";
-import { useEffect, useState } from "react";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { useParams, useRouter } from "next/navigation";
 import Services from "./Services";
 import { QuestionnaireNav } from "./QuestionnaireNav";

@@ -21,7 +21,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useSearchParams } from "next/navigation";
 
 dayjs.extend(advancedFormat);
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { PayoutTransactionDrawer } from "../../../PayoutDrawer";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { calculateTotalPages } from "@/lib/utils";

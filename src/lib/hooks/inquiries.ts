@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useMemo } from "react";
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "./useAxios";

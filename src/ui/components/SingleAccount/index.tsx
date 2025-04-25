@@ -28,17 +28,13 @@ import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 import {
-  IconAlertTriangle,
   IconArrowLeft,
   IconArrowUpRight,
   IconBrandLinktree,
   IconCheck,
-  IconCircleArrowDown,
   IconCircleFilled,
   IconCopy,
   IconExclamationCircle,
-  IconInfoCircle,
-  IconListTree,
   IconReload,
   IconRosetteDiscountCheckFilled,
   IconShieldCheck,
@@ -49,28 +45,18 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
-import {
-  approvedBadgeColor,
-  formatNumber,
-  getInitials,
-  getUserType,
-} from "@/lib/utils";
+import { formatNumber, getInitials } from "@/lib/utils";
 import Link from "next/link";
 import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
 import EmptyTable from "../EmptyTable";
 import { TableComponent } from "../Table";
-import {
-  Account,
-  AccountData,
-  DefaultAccount,
-  useSingleAccount,
-} from "@/lib/hooks/accounts";
+import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 import { useForm, zodResolver } from "@mantine/form";
 import { validateRequest } from "@/lib/schema";
@@ -80,8 +66,7 @@ import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
 import OriginalModalComponent from "../Modal";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import TabsComponent from "../Tabs";
-import { GiEuropeanFlag } from "react-icons/gi";
-import { SearchInput } from "../Inputs";
+
 import AccountDetails from "./(tabs)/AccountDetails";
 import { Transactions } from "./(tabs)/Transactions";
 import { Analytics } from "./(tabs)/Analytics";

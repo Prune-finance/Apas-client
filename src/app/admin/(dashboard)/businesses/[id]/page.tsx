@@ -3,9 +3,6 @@
 import {
   Button,
   Group,
-  Popover,
-  PopoverDropdown,
-  PopoverTarget,
   Skeleton,
   Switch,
   Tabs,

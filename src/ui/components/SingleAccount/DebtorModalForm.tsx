@@ -2,17 +2,13 @@ import {
   Box,
   Flex,
   LoadingOverlay,
-  Modal,
   Select,
-  TabsPanel,
   Text,
   TextInput,
 } from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import styles from "./debtor.module.scss";
-import User from "@/lib/store/user";
 import { useUserBusiness } from "@/lib/hooks/businesses";
 import { useForm, zodResolver } from "@mantine/form";
 import { countriesShortCode } from "@/lib/countries-short-code";

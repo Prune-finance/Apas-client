@@ -3,7 +3,7 @@
 import Cookies from "js-cookie";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
-import { LoginType, loginValues, validateLogin } from "@/lib/schema";
+import { LoginType, loginValues, validateLogin } from "@/lib/schema/auth";
 import User from "@/lib/store/user";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { LoginInput } from "@/ui/components/Inputs";

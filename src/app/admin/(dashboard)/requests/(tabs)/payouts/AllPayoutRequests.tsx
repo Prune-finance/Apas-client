@@ -22,7 +22,6 @@ import { PayoutTransactionRequestDrawer } from "./drawer";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { PayoutReqSearchProps } from ".";
 
 interface Props {
   requests: PayoutTransactionRequest[];

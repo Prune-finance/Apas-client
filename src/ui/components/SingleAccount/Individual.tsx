@@ -1,7 +1,7 @@
 "use client";
 
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconCheck } from "@tabler/icons-react";
 
 import styles from "./sendMoney.module.scss";
 
@@ -22,7 +22,7 @@ import {
 } from "@mantine/core";
 import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
-import { PrimaryBtn, SecondaryBtn } from "../Buttons";
+import { PrimaryBtn } from "../Buttons";
 import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
 // import { countries } from "@/lib/static";
 import DropzoneComponent from "../Dropzone";
@@ -31,7 +31,6 @@ import { sendMoneyIndividualValidate } from "@/lib/schema";
 import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
-import DebtorModal from "./DebtorModal";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;

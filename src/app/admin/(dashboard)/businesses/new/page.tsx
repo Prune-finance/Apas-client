@@ -22,15 +22,15 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 
 import DropzoneComponent from "@/ui/components/Dropzone";
+import { directorEtShareholderSchema } from "@/lib/schema";
 import {
-  directorEtShareholderSchema,
   NewBusinessType,
   newBusiness,
   basicInfoSchema,
   documentSchema,
   directorsSchema,
   shareholdersSchema,
-} from "@/lib/schema";
+} from "@/lib/schema/business";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import BasicInfo from "./BasicInfo";

@@ -6,6 +6,7 @@ import {
   SelectInputWithInsideLabel,
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
+import { IconPlus } from "@tabler/icons-react";
 
 interface AddDirectorsInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -20,7 +21,12 @@ export const AddDirectorsInfo = ({ setActive, active }: AddDirectorsInfo) => {
           Add Directors
         </Text>
 
-        <PrimaryBtn text="Add Directors" w={126} fw={600} action={() => {}} />
+        <PrimaryBtn
+          text="Add Directors"
+          leftSection={<IconPlus size={18} />}
+          fw={600}
+          action={() => {}}
+        />
       </Flex>
 
       <Stack mt={30} gap={24}>

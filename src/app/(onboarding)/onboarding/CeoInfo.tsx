@@ -43,19 +43,19 @@ export const CEOInfo = ({ setActive, active }: CEOInfo) => {
       </Stack>
 
       <Flex align="center" justify="space-between" w="100%" mt={20}>
-        <SecondaryBtn text="Clear Form" fw={500} />
+        <SecondaryBtn text="Clear Form" fw={600} />
 
         <Flex align="center" justify="center" gap={20}>
           <SecondaryBtn
             text="Previous"
-            fw={500}
+            fw={600}
             action={() => setActive(active - 1)}
             disabled={active === 0}
           />
           <PrimaryBtn
             text="Next"
             w={126}
-            fw={500}
+            fw={600}
             action={() => setActive(active + 1)}
           />
         </Flex>

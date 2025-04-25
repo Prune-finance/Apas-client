@@ -15,9 +15,13 @@ interface AddDirectorsInfo {
 export const AddDirectorsInfo = ({ setActive, active }: AddDirectorsInfo) => {
   return (
     <Box>
-      <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
-        Add Directors
-      </Text>
+      <Flex align="center" justify="space-between" w="100%">
+        <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
+          Add Directors
+        </Text>
+
+        <PrimaryBtn text="Add Directors" w={126} fw={600} action={() => {}} />
+      </Flex>
 
       <Stack mt={30} gap={24}>
         <Flex gap={24} w="100%">
@@ -37,19 +41,19 @@ export const AddDirectorsInfo = ({ setActive, active }: AddDirectorsInfo) => {
       </Stack>
 
       <Flex align="center" justify="space-between" w="100%" mt={20}>
-        <SecondaryBtn text="Clear Form" fw={500} />
+        <SecondaryBtn text="Clear Form" fw={600} />
 
         <Flex align="center" justify="center" gap={20}>
           <SecondaryBtn
             text="Previous"
-            fw={500}
+            fw={600}
             action={() => setActive(active - 1)}
             disabled={active === 0}
           />
           <PrimaryBtn
             text="Next"
             w={126}
-            fw={500}
+            fw={600}
             action={() => setActive(active + 1)}
           />
         </Flex>

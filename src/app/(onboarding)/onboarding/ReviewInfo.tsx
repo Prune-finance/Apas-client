@@ -5,6 +5,8 @@ import { IconEdit } from "@tabler/icons-react";
 import TabsComponent from "@/ui/components/Tabs";
 import BasicInfoCard from "./BasicInfoCard";
 import CEOInfoCard from "./CeoInfoCard";
+import DocumentInfoCard from "./DocumentInfoCard";
+import DirectorInfoCard from "./DirectorInfoCard";
 
 interface ReviewInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -24,6 +26,12 @@ export const ReviewInfo = ({ setActive, active }: ReviewInfo) => {
         </TabsPanel>
         <TabsPanel value={tabs[1]?.value}>
           <CEOInfoCard setActive={setActive} data={ceoInfo} />
+        </TabsPanel>
+        <TabsPanel value={tabs[2]?.value}>
+          <DocumentInfoCard setActive={setActive} data={ceoInfo} />
+        </TabsPanel>
+        <TabsPanel value={tabs[3]?.value}>
+          <DirectorInfoCard setActive={setActive} data={ceoInfo} />
         </TabsPanel>
       </TabsComponent>
 

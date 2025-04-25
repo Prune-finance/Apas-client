@@ -4,17 +4,17 @@ import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
 
-interface DocumentInfoCard {
+interface ShareholderInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   data: Record<string, string>;
 }
 
-function DocumentInfoCard({ setActive, data }: DocumentInfoCard) {
+function ShareholderInfoCard({ setActive, data }: ShareholderInfoCard) {
   return (
     <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">
         <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
-          Business Document
+          Shareholder
         </Text>
 
         <PrimaryBtn
@@ -23,15 +23,44 @@ function DocumentInfoCard({ setActive, data }: DocumentInfoCard) {
           text="Edit"
           rightSection={<IconEdit size={18} color="#758604" />}
           fw={600}
-          action={() => setActive(2)}
+          action={() => setActive(4)}
         />
       </Flex>
 
-      <Box mt={24}>
-        <Flex gap={24} w="100%" mt={16}>
-          <DocumentPreview label="Identity Document" title="File.pdf....." />
-          <DocumentPreview label="Proof of Address" title="File.pdf....." />
-        </Flex>
+      <Text
+        c="var(--prune-text-gray-700)"
+        fz={12}
+        fw={600}
+        mt={24}
+        tt="uppercase"
+      >
+        SHAREHOLDER 1
+      </Text>
+
+      <Stack gap={10} mt={20}>
+        {Object.entries(data).map(([key, value]) => (
+          <Group key={key} justify="space-between" align="start">
+            <Text c="#667085" fz={12}>
+              {key}:
+            </Text>
+            <Text
+              c="#344054"
+              ta="right"
+              w={244}
+              fz={12}
+              // miw="100%"
+            >
+              {value}
+            </Text>
+          </Group>
+        ))}
+      </Stack>
+
+      <Box mt={16}>
+        <Text c="var(--prune-text-gray-700)" fz={14} fw={600}>
+          Uploaded Documents
+        </Text>
+
         <Flex gap={24} w="100%" mt={16}>
           <DocumentPreview label="Identity Document" title="File.pdf....." />
           <DocumentPreview label="Proof of Address" title="File.pdf....." />
@@ -41,4 +70,4 @@ function DocumentInfoCard({ setActive, data }: DocumentInfoCard) {
   );
 }
 
-export default DocumentInfoCard;
+export default ShareholderInfoCard;

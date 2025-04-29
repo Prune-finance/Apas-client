@@ -3,13 +3,15 @@ import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
+import { UseFormReturnType } from "@mantine/form";
+import { OnboardingType } from "@/lib/schema";
 
 interface DocumentInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
-  data: Record<string, string>;
+  form: UseFormReturnType<OnboardingType>;
 }
 
-function DocumentInfoCard({ setActive, data }: DocumentInfoCard) {
+function DocumentInfoCard({ setActive, form }: DocumentInfoCard) {
   return (
     <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">

@@ -5,7 +5,7 @@ import React from "react";
 
 interface BasicInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
-  data: Record<string, string>;
+  data: Record<string, string | null | undefined>;
 }
 
 function BasicInfoCard({ setActive, data }: BasicInfoCard) {

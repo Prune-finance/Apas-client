@@ -14,16 +14,19 @@ import { TermsOfUseInfo } from "./TermsOfUseInfo";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   CEOSchema,
-  directorsSchema,
   newOnboardingValue,
   onboardingBasicInfoSchema,
+  onboardingDirectors,
   onboardingDocumentSchema,
+  onboardingShareholders,
   OnboardingType,
-  shareholdersSchema,
 } from "@/lib/schema";
 
 export default function Onboarding() {
   const [active, setActive] = useState(0);
+  const [directors, setDirectors] = useState<OnboardingType["directors"]>();
+  const [shareholders, setShareholders] =
+    useState<OnboardingType["shareholders"]>();
 
   const form = useForm<OnboardingType>({
     mode: "uncontrolled",
@@ -32,10 +35,14 @@ export default function Onboarding() {
       if (active === 0) return zodResolver(onboardingBasicInfoSchema)(values);
       if (active === 1) return zodResolver(CEOSchema)(values);
       if (active === 2) return zodResolver(onboardingDocumentSchema)(values);
-      if (active === 3) return zodResolver(directorsSchema)(values);
-      if (active === 4) return zodResolver(shareholdersSchema)(values);
+      if (active === 3) return zodResolver(onboardingDirectors)(values);
+      if (active === 4) return zodResolver(onboardingShareholders)(values);
 
       return {};
+    },
+    onValuesChange: (values) => {
+      setDirectors(values.directors);
+      setShareholders(values.shareholders);
     },
   });
   return (
@@ -61,6 +68,7 @@ export default function Onboarding() {
                 setActive={setActive}
                 active={active}
                 form={form}
+                // directors={directors}
               />
             )}
             {active === 4 && (
@@ -68,6 +76,7 @@ export default function Onboarding() {
                 setActive={setActive}
                 active={active}
                 form={form}
+                shareholders={shareholders}
               />
             )}
             {active === 5 && (

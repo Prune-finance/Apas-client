@@ -18,10 +18,11 @@ interface BusinessInfo {
 }
 
 export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
+  const { contactIdType, contactPOAType } = form.getValues();
   const [IdCheck, setIdCheck] = useState({
-    isContactIdType: false,
-    isContactPOAType: false,
-    isPassport: true,
+    isContactIdType: Boolean(contactIdType) || false,
+    isContactPOAType: Boolean(contactPOAType) || false,
+    isPassport: contactIdType === "Passport" ? true : false,
   });
 
   form.watch("contactIdType", ({ value }) => {
@@ -29,13 +30,14 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
       setIdCheck({
         ...IdCheck,
         isContactIdType: true,
-        isPassport: true,
+        isPassport: false,
       });
 
       if (value === "Passport") {
         setIdCheck({
           ...IdCheck,
-          isPassport: false,
+          isContactIdType: true,
+          isPassport: true,
         });
       }
 
@@ -205,7 +207,7 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
                 {...form.getInputProps("contactIdUrl")}
               />
 
-              {IdCheck.isPassport && (
+              {!IdCheck.isPassport && (
                 <OnBoardingDocumentBox
                   title="Upload Identity Document (Back)"
                   formKey="contactIdUrlBack"

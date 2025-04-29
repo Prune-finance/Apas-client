@@ -15,13 +15,17 @@ interface DocumentInfo {
 }
 
 export const DocumentInfo = ({ setActive, active, form }: DocumentInfo) => {
-  console.log(form.errors);
   return (
     <Box
       component="form"
-      onSubmit={form.onSubmit(() => {
-        setActive(active + 1);
-      })}
+      onSubmit={form.onSubmit(
+        () => {
+          setActive(active + 1);
+        },
+        () => {
+          setActive(active + 1);
+        }
+      )}
     >
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
         Documents

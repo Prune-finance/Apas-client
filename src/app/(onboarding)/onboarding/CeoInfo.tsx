@@ -18,10 +18,11 @@ interface CEOInfo {
 }
 
 export const CEOInfo = ({ setActive, active, form }: CEOInfo) => {
+  const { ceoIdType, ceoPOAType } = form.getValues();
   const [IdCheck, setIdCheck] = useState({
-    isCeoIdType: false,
-    isCeoPOAType: false,
-    isPassport: true,
+    isCeoIdType: Boolean(ceoIdType) || false,
+    isCeoPOAType: Boolean(ceoPOAType) || false,
+    isPassport: ceoIdType === "Passport" ? true : false,
   });
 
   form.watch("ceoIdType", ({ value }) => {
@@ -29,13 +30,14 @@ export const CEOInfo = ({ setActive, active, form }: CEOInfo) => {
       setIdCheck({
         ...IdCheck,
         isCeoIdType: true,
-        isPassport: true,
+        isPassport: false,
       });
 
       if (value === "Passport") {
         setIdCheck({
           ...IdCheck,
-          isPassport: false,
+          isCeoIdType: true,
+          isPassport: true,
         });
       }
 
@@ -120,7 +122,7 @@ export const CEOInfo = ({ setActive, active, form }: CEOInfo) => {
                 title="Upload Identity Document"
                 {...form.getInputProps("ceoIdUrl")}
               />
-              {IdCheck.isPassport && (
+              {!IdCheck.isPassport && (
                 <OnBoardingDocumentBox
                   title="Upload Identity Document (Back)"
                   {...form.getInputProps("ceoIdUrlBack")}

@@ -1,20 +1,19 @@
 import { Box, Text } from "@mantine/core";
 import DropzoneComponent from "@/ui/components/Dropzone";
-import { NewBusinessType } from "@/lib/schema";
+import { NewBusinessType, OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
 
 interface DocumentBoxProps {
   title: string;
-  form?: UseFormReturnType<NewBusinessType>;
+  form?: UseFormReturnType<OnboardingType>;
   formKey?:
     | "mermat"
     | "cacCertificate"
     | "amlCompliance"
-    | "directorParticular"
-    | "operationalLicense"
-    | "shareholderParticular"
-    | "companyPOAUrl";
-
+    | "contactIdUrl"
+    | "contactIdUrlBack"
+    | "contactPOAUrl"
+    | "operationalLicense";
   uploadedFileUrl?: string;
   required?: boolean;
 }
@@ -41,15 +40,16 @@ export default function OnBoardingDocumentBox({
         )}
       </Text>
       <DropzoneComponent
-        form={form}
+        otherForm={form}
         formKey={formKey}
         uploadedFileUrl={uploadedFileUrl}
+        isUser
       />
-      {/* {form.errors[formKey] && (
+      {form?.errors[formKey || "cacCertificate"] && (
         <Text fz={12} c="var(--prune-warning)" mt={5}>
-          {form.errors[formKey]}
+          {form.errors[formKey || "cacCertificate"]}
         </Text>
-      )} */}
+      )}
     </Box>
   );
 }

@@ -7,15 +7,19 @@ import {
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
 import { IconPlus } from "@tabler/icons-react";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
 interface AddShareholdersInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
+  form: UseFormReturnType<OnboardingType>;
 }
 
 export const AddShareholdersInfo = ({
   setActive,
   active,
+  form,
 }: AddShareholdersInfo) => {
   return (
     <Box>

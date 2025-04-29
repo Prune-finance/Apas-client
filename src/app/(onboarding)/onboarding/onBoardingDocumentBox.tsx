@@ -6,14 +6,16 @@ import { UseFormReturnType } from "@mantine/form";
 interface DocumentBoxProps {
   title: string;
   form?: UseFormReturnType<OnboardingType>;
-  formKey?:
-    | "mermat"
-    | "cacCertificate"
-    | "amlCompliance"
-    | "contactIdUrl"
-    | "contactIdUrlBack"
-    | "contactPOAUrl"
-    | "operationalLicense";
+  // formKey?:
+  //   | "mermat"
+  //   | "cacCertificate"
+  //   | "amlCompliance"
+  //   | "contactIdUrl"
+  //   | "contactIdUrlBack"
+  //   | "contactPOAUrl"
+  //   | "operationalLicense";
+  // formKey?: keyof OnboardingType
+  formKey?: string;
   uploadedFileUrl?: string;
   required?: boolean;
 }

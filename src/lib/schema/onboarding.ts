@@ -1,27 +1,100 @@
 import { z } from "zod";
-import {
-  directorEtShareholderSchema,
-  directorsSchema,
-  documentSchema,
-  shareholdersSchema,
-  ShareholderValues,
-} from "./business";
 
 const emailSchema = z.string().email();
 
-// const handleNullableString = (fieldName: string) =>
-//   z.union([
-//     z.literal(null),
-//     z.preprocess(
-//       (val) => (val === null ? undefined : val),
-//       z
-//         .string({
-//           required_error: `${fieldName} is required`,
-//           invalid_type_error: `${fieldName} is required`,
-//         })
-//         .min(1, `${fieldName} is required`)
-//     ),
-//   ]);
+const Director = z.object({
+  id: z.string().uuid(),
+  firstName: z.string().min(1, "Director's first name is required"),
+  lastName: z.string().min(1, "Director's last name is required"),
+  dob: z
+    .union([
+      z.date({ required_error: "Director's Date of birth is required" }),
+      z.string().nullable(),
+    ])
+    .refine((val) => val, {
+      message: "Director's Date of birth is required",
+    }),
+  email: z.string().refine(
+    (val) => {
+      if (!val) return true;
+      return emailSchema.safeParse(val).success;
+    },
+    { message: "Invalid director's email" }
+  ),
+  identityType: z.string().nullable(),
+  proofOfAddress: z.string().nullable(),
+  identityFileUrl: z.string(),
+  identityFileUrlBack: z.string(),
+  proofOfAddressFileUrl: z.string(),
+});
+
+export const onboardingDirectors = z.object({
+  directors: z.array(Director).superRefine((directors, ctx) => {
+    const emails = directors?.map((dir) => dir.email);
+    const emailSet = new Set();
+    emails?.forEach((email, index) => {
+      if (emailSet.has(email) && email) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Duplicate email found: ${email}`,
+          path: [index, "email"],
+          // path: ["directors", index, "email"],
+        });
+      } else {
+        emailSet.add(email);
+      }
+    });
+  }),
+});
+
+export const onboardingShareholders = z.object({
+  shareholders: z
+    .array(
+      z.object({
+        id: z.string().uuid(),
+        firstName: z.string().min(1, "Shareholder's first name is required"),
+        lastName: z.string().min(1, "Shareholder's last name is required"),
+        dob: z
+          .union([
+            z.date({
+              required_error: "Shareholder's Date of birth is required",
+            }),
+            z.string().nullable(),
+          ])
+          .refine((val) => val, {
+            message: "Shareholder's Date of birth is required",
+          }),
+        email: z.string().refine(
+          (val) => {
+            if (!val) return true;
+            return emailSchema.safeParse(val).success;
+          },
+          { message: "Invalid shareholder's email" }
+        ),
+        identityType: z.string().nullable(),
+        proofOfAddress: z.string().nullable(),
+        identityFileUrl: z.string(),
+        identityFileUrlBack: z.string(),
+        proofOfAddressFileUrl: z.string(),
+      })
+    )
+    .optional()
+    .superRefine((shareholders, ctx) => {
+      const emails = shareholders?.map((shareholder) => shareholder.email);
+      const emailSet = new Set();
+      emails?.forEach((email, index) => {
+        if (emailSet.has(email) && email) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Duplicate email found: ${email}`,
+            path: [index, "email"],
+          });
+        } else {
+          emailSet.add(email);
+        }
+      });
+    }),
+});
 
 const handleNullableString = (fieldName: string) =>
   z
@@ -93,11 +166,39 @@ export const onboardingDocumentSchema = z.object({
 
 export const onboardingSchema = onboardingBasicInfoSchema
   .merge(onboardingDocumentSchema)
-  .merge(directorsSchema)
-  .merge(shareholdersSchema)
+  .merge(onboardingDirectors)
+  .merge(onboardingShareholders)
   .merge(CEOSchema);
 
 export type OnboardingType = z.infer<typeof onboardingSchema>;
+
+type DirectorType = z.infer<typeof Director>;
+
+export const OnboardingDirectorValues: DirectorType = {
+  id: crypto.randomUUID(),
+  firstName: "",
+  lastName: "",
+  email: "",
+  dob: null,
+  identityType: null,
+  proofOfAddress: null,
+  identityFileUrl: "",
+  identityFileUrlBack: "",
+  proofOfAddressFileUrl: "",
+};
+
+export const OnboardingShareholderValues: DirectorType = {
+  id: crypto.randomUUID(),
+  firstName: "",
+  lastName: "",
+  email: "",
+  dob: null,
+  identityType: null,
+  proofOfAddress: null,
+  identityFileUrl: "",
+  identityFileUrlBack: "",
+  proofOfAddressFileUrl: "",
+};
 
 export const newOnboardingValue: OnboardingType = {
   name: "",
@@ -125,8 +226,8 @@ export const newOnboardingValue: OnboardingType = {
   // directorParticular: null,
   amlCompliance: "",
   operationalLicense: null,
-  directors: [directorEtShareholderSchema],
-  shareholders: [ShareholderValues],
+  directors: [OnboardingDirectorValues],
+  shareholders: [OnboardingShareholderValues],
   contactCountryCode: "+234",
   ceoFirstName: "",
   ceoLastName: "",

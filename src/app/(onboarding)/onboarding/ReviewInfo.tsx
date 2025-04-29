@@ -12,6 +12,7 @@ import { FiFileText, FiUser, FiUsers } from "react-icons/fi";
 import { TbBuilding } from "react-icons/tb";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
+import dayjs from "dayjs";
 
 interface ReviewInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -20,6 +21,63 @@ interface ReviewInfo {
 }
 
 export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
+  const {
+    directors,
+    shareholders,
+    name,
+    tradingName,
+    contactNumber,
+    address,
+    amlCompliance,
+    businessBio,
+    businessIndustry,
+    businessNumber,
+    cacCertificate,
+    ceoDOB,
+    ceoEmail,
+    ceoFirstName,
+    ceoIdType,
+    ceoIdUrl,
+    ceoIdUrlBack,
+    ceoLastName,
+    ceoPOAType,
+    ceoPOAUrl,
+    contactCountryCode,
+    contactEmail,
+    contactFirstName,
+    contactIdType,
+    contactIdUrl,
+    contactIdUrlBack,
+    contactLastName,
+    contactPOAType,
+    contactPOAUrl,
+    country,
+    domain,
+    legalEntity,
+    mermat,
+    operationalLicense,
+  } = form.getValues();
+
+  const basicInfo = {
+    "Business Name": name,
+    "Trading Name": tradingName,
+    "Phone number": businessNumber,
+    Email: contactEmail,
+    "Business Type": legalEntity,
+    "Business Industry": businessIndustry,
+    "Business Website (URL)": domain,
+    Country: country,
+    "Business Address": address,
+    "Business Bio": businessBio,
+  };
+  const ceoInfo = {
+    "First name": ceoFirstName,
+    "Last Name": ceoLastName,
+    "Date of Birth": dayjs(ceoDOB).format("DD-MM-YYYY"),
+    Email: ceoEmail,
+    "Identity Type": ceoIdType,
+    "Proof of Address": ceoPOAType,
+  };
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
@@ -34,13 +92,13 @@ export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
           <CEOInfoCard setActive={setActive} data={ceoInfo} />
         </TabsPanel>
         <TabsPanel value={tabs[2]?.value}>
-          <DocumentInfoCard setActive={setActive} data={ceoInfo} />
+          <DocumentInfoCard setActive={setActive} form={form} />
         </TabsPanel>
         <TabsPanel value={tabs[3]?.value}>
-          <DirectorInfoCard setActive={setActive} data={ceoInfo} />
+          <DirectorInfoCard setActive={setActive} form={form} />
         </TabsPanel>
         <TabsPanel value={tabs[4]?.value}>
-          <ShareholderInfoCard setActive={setActive} data={ceoInfo} />
+          <ShareholderInfoCard setActive={setActive} form={form} />
         </TabsPanel>
       </TabsComponent>
 
@@ -62,29 +120,6 @@ export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
       </Flex>
     </Box>
   );
-};
-
-const basicInfo = {
-  "Business Name": "1905 Logistics",
-  "Trading Name": "1905 Logistics",
-  "Phone number": "+234123456789",
-  Email: "hello@1905logistics.com",
-  "Business Type": "Corporate",
-  "Business Industry": "Logistics",
-  "Business Website (URL)": "https://www.1905logistics.com",
-  Country: "Nigeria",
-  "Business Address":
-    "32 Adetokunbo Ademola Street, Victoria Island, Lagos Nigeria",
-  "Business Bio":
-    "Sarah Chen, CEO of Quantum Dynamics, is a tech industry veteran who transformed an AI startup into a global market leader. With MIT and Harvard credentials, she drove the company's expansion into 15 markets with double-digit growth.",
-};
-const ceoInfo = {
-  "First name": "Sofia",
-  "Last Name": "Martinez",
-  "Date of Birth": "19-08-1954",
-  Email: "sofiamartinez007@gmail.com",
-  "Identity Type": "International Passport",
-  "Proof of Address": " Utility Bill",
 };
 
 const tabs = [

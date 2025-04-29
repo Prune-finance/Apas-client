@@ -3,13 +3,25 @@ import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
+import dayjs from "dayjs";
 
 interface DirectorInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
-  data: Record<string, string>;
+  form: UseFormReturnType<OnboardingType>;
 }
 
-function DirectorInfoCard({ setActive, data }: DirectorInfoCard) {
+function DirectorInfoCard({ setActive, form }: DirectorInfoCard) {
+  const data = form.getValues().directors.map((director, index) => ({
+    "First name": director.firstName,
+    "Last Name": director.lastName,
+    "Date of Birth": dayjs(director.dob).format("DD-MM-YYYY"),
+    Email: director.email,
+    "Identity Type": director.identityType,
+    "Proof of Address": director.proofOfAddress,
+  }));
+
   return (
     <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">
@@ -27,34 +39,38 @@ function DirectorInfoCard({ setActive, data }: DirectorInfoCard) {
         />
       </Flex>
 
-      <Text
-        c="var(--prune-text-gray-700)"
-        fz={12}
-        fw={600}
-        mt={24}
-        tt="uppercase"
-      >
-        Director 1
-      </Text>
+      {data.map((director, directorIndex) => (
+        <React.Fragment key={directorIndex}>
+          <Text
+            c="var(--prune-text-gray-700)"
+            fz={12}
+            fw={600}
+            mt={24}
+            tt="uppercase"
+          >
+            Director {directorIndex + 1}
+          </Text>
 
-      <Stack gap={10} mt={20}>
-        {Object.entries(data).map(([key, value]) => (
-          <Group key={key} justify="space-between" align="start">
-            <Text c="#667085" fz={12}>
-              {key}:
-            </Text>
-            <Text
-              c="#344054"
-              ta="right"
-              w={244}
-              fz={12}
-              // miw="100%"
-            >
-              {value}
-            </Text>
-          </Group>
-        ))}
-      </Stack>
+          <Stack gap={10} mt={20}>
+            {Object.entries(director).map(([key, value]) => (
+              <Group key={key} justify="space-between" align="start">
+                <Text c="#667085" fz={12}>
+                  {key}:
+                </Text>
+                <Text
+                  c="#344054"
+                  ta="right"
+                  w={244}
+                  fz={12}
+                  tt={key === "Email" ? "lowercase" : "capitalize"}
+                >
+                  {value}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+        </React.Fragment>
+      ))}
 
       <Box mt={16}>
         <Text c="var(--prune-text-gray-700)" fz={14} fw={600}>

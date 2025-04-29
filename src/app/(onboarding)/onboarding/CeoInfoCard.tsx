@@ -6,7 +6,7 @@ import { DocumentPreview } from "./DocumentPreview";
 
 interface CEOInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
-  data: Record<string, string>;
+  data: Record<string, string | null | undefined>;
 }
 
 function CEOInfoCard({ setActive, data }: CEOInfoCard) {

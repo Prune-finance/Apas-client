@@ -1,13 +1,16 @@
 import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
 interface TermsOfUseInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
+  form: UseFormReturnType<OnboardingType>;
 }
 
-export const TermsOfUseInfo = ({ setActive, active }: TermsOfUseInfo) => {
+export const TermsOfUseInfo = ({ setActive, active, form }: TermsOfUseInfo) => {
   return (
     <Box>
       <Text fz={24} fw={600} c="#344054">

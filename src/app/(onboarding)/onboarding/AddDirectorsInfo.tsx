@@ -7,13 +7,20 @@ import {
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
 import { IconPlus } from "@tabler/icons-react";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
 interface AddDirectorsInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
+  form: UseFormReturnType<OnboardingType>;
 }
 
-export const AddDirectorsInfo = ({ setActive, active }: AddDirectorsInfo) => {
+export const AddDirectorsInfo = ({
+  setActive,
+  active,
+  form,
+}: AddDirectorsInfo) => {
   return (
     <Box>
       <Flex align="center" justify="space-between" w="100%">

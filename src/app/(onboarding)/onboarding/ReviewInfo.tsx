@@ -9,14 +9,17 @@ import DocumentInfoCard from "./DocumentInfoCard";
 import DirectorInfoCard from "./DirectorInfoCard";
 import ShareholderInfoCard from "./ShareholderInfoCard";
 import { FiFileText, FiUser, FiUsers } from "react-icons/fi";
-import { TbBuildings } from "react-icons/tb";
+import { TbBuilding } from "react-icons/tb";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
 interface ReviewInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
+  form: UseFormReturnType<OnboardingType>;
 }
 
-export const ReviewInfo = ({ setActive, active }: ReviewInfo) => {
+export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
@@ -87,7 +90,7 @@ const ceoInfo = {
 const tabs = [
   {
     value: "Company Profile",
-    icon: <TbBuildings size={16} />,
+    icon: <TbBuilding size={16} />,
   },
   {
     value: "CEO",

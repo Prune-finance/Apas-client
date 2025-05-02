@@ -3,12 +3,12 @@
   border-radius: 4px;
   background-color: #fcfcfd;
   height: 44px;
-  font-family: "Switzer";
+  font-family: var(--mantine-font-family) !important;
 
   &::placeholder {
     font-size: 14px !important;
     color: #344054;
-    font-family: "Switzer";
+    font-family: var(--mantine-font-family) !important;
   }
 }
 .label {

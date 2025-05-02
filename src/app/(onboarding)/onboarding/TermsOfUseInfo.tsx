@@ -3,6 +3,8 @@ import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import ConsentModal from "./ConfirmConsentModal";
 
 interface TermsOfUseInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -11,6 +13,7 @@ interface TermsOfUseInfo {
 }
 
 export const TermsOfUseInfo = ({ setActive, active, form }: TermsOfUseInfo) => {
+  const [opened, { open, close }] = useDisclosure(false);
   return (
     <Box>
       <Text fz={24} fw={600} c="#344054">
@@ -71,9 +74,11 @@ export const TermsOfUseInfo = ({ setActive, active, form }: TermsOfUseInfo) => {
             action={() => setActive(active - 1)}
             disabled={active === 0}
           />
-          <PrimaryBtn text="Next" w={126} fw={600} action={() => {}} />
+          <PrimaryBtn text="Next" w={126} fw={600} action={open} />
         </Flex>
       </Flex>
+
+      <ConsentModal opened={opened} close={close} />
     </Box>
   );
 };

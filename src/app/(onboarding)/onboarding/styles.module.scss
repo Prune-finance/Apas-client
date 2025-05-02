@@ -1,0 +1,15 @@
+.label {
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.input {
+  height: 35px;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  font-size: 14px;
+
+  &::placeholder {
+    font-size: 12px;
+  }
+}

@@ -1,5 +1,5 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Box, Flex, Group, Stack, Text } from "@mantine/core";
+import { Box, Divider, Flex, Group, Stack, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
@@ -67,20 +67,33 @@ function ShareholderInfoCard({ setActive, form }: ShareholderInfoCard) {
                 </Text>
               </Group>
             ))}
+            <Box mt={16}>
+              <Text c="var(--prune-text-gray-700)" fz={14} fw={600}>
+                Uploaded Documents
+              </Text>
+
+              <Flex gap={24} w="100%" mt={16}>
+                <DocumentPreview
+                  label="Identity Document"
+                  title="File.pdf....."
+                />
+                <DocumentPreview
+                  label="Proof of Address"
+                  title="File.pdf....."
+                />
+              </Flex>
+            </Box>
+
+            <Divider
+              mt={20}
+              color="var(--prune-text-gray-200)"
+              display={
+                shareholderIdx !== (data ?? []).length - 1 ? "block" : "none"
+              }
+            />
           </Stack>
         </React.Fragment>
       ))}
-
-      <Box mt={16}>
-        <Text c="var(--prune-text-gray-700)" fz={14} fw={600}>
-          Uploaded Documents
-        </Text>
-
-        <Flex gap={24} w="100%" mt={16}>
-          <DocumentPreview label="Identity Document" title="File.pdf....." />
-          <DocumentPreview label="Proof of Address" title="File.pdf....." />
-        </Flex>
-      </Box>
     </Box>
   );
 }

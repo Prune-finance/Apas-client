@@ -23,7 +23,6 @@ export const AddShareholdersInfo = ({
   form,
   shareholders,
 }: AddShareholdersInfo) => {
-  console.log(form.errors);
   return (
     <Box
       component="form"
@@ -53,7 +52,7 @@ export const AddShareholdersInfo = ({
         <Stack mt={30} gap={24} key={shareholder.id}>
           <Flex justify="space-between" align="center" w="100%">
             <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
-              Director {index + 1}
+              Shareholder {index + 1}
             </Text>
             {index !== 0 && (
               <ThemeIcon

@@ -1,15 +1,22 @@
 .root {
   position: relative;
   /* font-family: "Switzer" !important; */
-  font-family: --var(--mantine-font-family) !important;
+  font-family: var(--mantine-font-family) !important;
 }
 
 .input {
   height: 54px;
   padding-top: 18px;
-  font-family: "Switzer" !important;
+  // font-family: "Switzer" !important;
+  font-family: var(--mantine-font-family) !important;
   background-color: #fcfcfd;
   border: 1px solid #f2f4f7;
+
+  &::placeholder {
+    font-family: var(--mantine-font-family) !important;
+    // font-family: "Switzer" !important;
+    // font-size: 16px !important;
+  }
 
   /* &::placeholder {
     font-size: 50px;
@@ -17,7 +24,7 @@
 }
 
 .label {
-  font-family: --var(--mantine-font-family) !important;
+  font-family: var(--mantine-font-family) !important;
   font-weight: 400;
   position: absolute;
   pointer-events: none;

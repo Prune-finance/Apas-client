@@ -201,7 +201,7 @@ export function SelectCountryDialCode({ value, setValue }: Props) {
     <Combobox
       width={300}
       store={combobox}
-      withinPortal={false}
+      withinPortal
       onOptionSubmit={(val) => {
         setValue(val);
         combobox.closeDropdown();

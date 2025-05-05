@@ -83,9 +83,10 @@ export const PhoneNumberInput = <T,>({
 }: PhoneNumberInputProps<T>) => {
   const select = (
     <SelectCountryDialCode
-      value={form.values[countryCodeKey] as string}
+      value={form.getValues()[countryCodeKey] as string}
       setValue={(value: string) => {
         const [code] = value.split("-");
+
         form.setValues({
           [phoneNumberKey]: `+${code}`,
           [countryCodeKey]: value,
@@ -100,7 +101,6 @@ export const PhoneNumberInput = <T,>({
       flex={1}
       withAsterisk
       type="tel"
-      //   label="Contact Phone Number"
       placeholder="00000000"
       value={form.values[phoneNumberKey] as string}
       onChange={(value) => {
@@ -109,6 +109,7 @@ export const PhoneNumberInput = <T,>({
         } as Partial<T>);
       }}
       error={form.errors[phoneNumberKey]}
+      key={form.key(phoneNumberKey)}
       prefix={"+"}
       leftSection={select}
       hideControls

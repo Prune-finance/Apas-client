@@ -11,6 +11,7 @@ import { UseFormReturnType } from "@mantine/form";
 import { OnboardingType } from "@/lib/schema";
 import countries from "@/assets/countries.json";
 import { useState } from "react";
+import { businessIndustries } from "@/lib/static";
 
 interface BusinessInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -268,35 +269,3 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
     </Box>
   );
 };
-
-const businessIndustries: string[] = [
-  "Agriculture",
-  "Automotive",
-  "Banking & Financial Services",
-  "Construction",
-  "Consulting",
-  "Consumer Goods",
-  "E-commerce",
-  "Education",
-  "Energy & Utilities",
-  "Entertainment & Media",
-  "Environmental Services",
-  "Fashion & Apparel",
-  "Food & Beverage",
-  "Government",
-  "Healthcare & Medical",
-  "Hospitality",
-  "Insurance",
-  "Legal Services",
-  "Logistics & Transportation",
-  "Manufacturing",
-  "Marketing & Advertising",
-  "Nonprofit & NGOs",
-  "Pharmaceuticals & Biotechnology",
-  "Real Estate",
-  "Retail",
-  "Software & Technology",
-  "Telecommunications",
-  "Travel & Tourism",
-  "Wholesale & Distribution",
-];

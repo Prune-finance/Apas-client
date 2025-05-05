@@ -2,6 +2,7 @@
 
 import "@/ui/styles/globals.scss";
 import {
+  BizBasicInfoSchema,
   OperationsAccountSchema,
   questionnaireValues,
   ServicesSchema,
@@ -16,7 +17,7 @@ import { AppShell, Box, Container, Progress, Text } from "@mantine/core";
 import { zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import Navbar from "./Navbar";
 import { z } from "zod";
 
@@ -27,16 +28,19 @@ export default function QuestionnaireLayout({
 }>) {
   const [opened, { toggle }] = useDisclosure();
   const params = useParams();
+  const [countryCode, setCountryCode] = useState("+234");
   const { slug } = params;
   const isServices = slug && slug[0] === "services";
+  const isTurnover = slug && slug[0] === "turnover";
   const isOperationsAccount = isServices && slug[1] === "operations-account";
   const isVirtualAccount = isServices && slug[1] === "virtual-account";
 
   const form = useQuestionnaireForm({
     initialValues: questionnaireValues,
-    mode: "uncontrolled",
+    mode: "controlled",
     validate: (values) => {
-      if (slug === undefined) return zodResolver(TurnoverSchema)(values);
+      if (slug === undefined) return zodResolver(BizBasicInfoSchema)(values);
+      if (isTurnover) return zodResolver(TurnoverSchema)(values);
       if (isOperationsAccount)
         return zodResolver(
           z.object({
@@ -52,12 +56,18 @@ export default function QuestionnaireLayout({
 
       return {};
     },
+    onValuesChange: (values) => {
+      const { phoneNumber, countryCode } = values;
+      setCountryCode(countryCode);
+    },
   });
 
   const calculateProgress = useMemo(() => {
     switch (true) {
       case slug === undefined:
-        return 25;
+        return 20;
+      case isTurnover:
+        return 40;
       case isOperationsAccount:
         if (
           !form
@@ -68,11 +78,11 @@ export default function QuestionnaireLayout({
         ) {
           return 100;
         }
-        return 75;
+        return 80;
       case isVirtualAccount:
         return 100;
       case isServices:
-        return 50;
+        return 60;
       default:
         return 100;
     }

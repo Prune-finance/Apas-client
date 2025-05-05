@@ -40,7 +40,7 @@ export default function Header() {
                 span
                 inherit
                 component={Link}
-                href={"/"}
+                href={"onboarding/contact"}
                 c="var(--prune-primary-800)"
               >
                 Contact Support

@@ -1,7 +1,7 @@
 "use client";
 
 import { formatNumber } from "@/lib/utils";
-import { Box, RadioGroup, Stack, Text } from "@mantine/core";
+import { Box, Flex, RadioGroup, Stack, Text } from "@mantine/core";
 import CustomRadio from "./CustomRadio";
 import { useParams, useRouter } from "next/navigation";
 import Services from "./Services";
@@ -9,6 +9,9 @@ import { QuestionnaireNav } from "./QuestionnaireNav";
 import OperationsAccount from "./OperationsAccount";
 import VirtualAccount from "./VirtualAccount";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import Turnover from "./Turnover";
+import { TextInputWithInsideLabel } from "@/ui/components/InputWithLabel";
+import { IconBriefcase } from "@tabler/icons-react";
 
 export default function Questionnaire() {
   const params = useParams();
@@ -30,31 +33,17 @@ export default function Questionnaire() {
     return <VirtualAccount />;
 
   if (params?.slug && params?.slug[0] === "services") return <Services />;
+  if (params?.slug && params?.slug[0] === "turnover") return <Turnover />;
 
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
-        Tell Us More About Your Business.
+        Tell Us About Your Business.
       </Text>
-      <RadioGroup
-        name="turnover"
-        label="What is this entity's annual turnover?"
-        {...form.getInputProps("turnover")}
-        key={form.key("turnover")}
-        errorProps={{ mt: 10 }}
-        labelProps={{
-          fz: 16,
-          fw: 500,
-          c: "var(--prune-text-gray-500)",
-          mb: 16,
-        }}
-      >
-        <Stack gap={20} mt="xs" style={{ cursor: "pointer" }}>
-          {Object.entries(turnoverOptions).map(([value, label], idx) => (
-            <CustomRadio key={idx} value={value} label={label} />
-          ))}
-        </Stack>
-      </RadioGroup>
+      <Flex direction={{ base: "column", md: "row" }} align="center">
+        <TextInputWithInsideLabel label="Legal Business Name" />
+      </Flex>
+
       <QuestionnaireNav
         onNext={() => push("/pre-onboarding/services")}
         disabledPrev
@@ -63,7 +52,7 @@ export default function Questionnaire() {
   );
 }
 
-const turnoverOptions = {
+export const turnoverOptions = {
   "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
   "less-than-50000": `${formatNumber(10000, true, "GBP")} - ${formatNumber(
     50000,

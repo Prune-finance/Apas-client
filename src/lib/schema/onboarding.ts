@@ -130,6 +130,7 @@ export const onboardingBasicInfoSchema = z.object({
   contactIdUrlBack: z.string(),
   contactPOAUrl: z.string(),
   contactCountryCode: z.string(),
+  businessNumberCode: z.string(),
 });
 
 export type OnboardingBasicInfoType = z.infer<typeof onboardingBasicInfoSchema>;
@@ -229,6 +230,7 @@ export const newOnboardingValue: OnboardingType = {
   directors: [OnboardingDirectorValues],
   shareholders: [OnboardingShareholderValues],
   contactCountryCode: "+234",
+  businessNumberCode: "+234",
   ceoFirstName: "",
   ceoLastName: "",
   ceoEmail: "",

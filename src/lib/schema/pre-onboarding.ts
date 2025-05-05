@@ -87,6 +87,20 @@ export const BizBasicInfoSchema = z.object({
   businessDescription: z.string().min(1, "Business description is required"),
 });
 
+export const ContactPerson = z.object({
+  contactName: z.string().min(1, "Contact name is required"),
+  contactDesignation: z.string().min(1, "Contact designation is required"),
+  contactEmail: z
+    .string()
+    .email("Invalid email address")
+    .min(1, "Contact email address is required"),
+  contactPhoneNumber: z
+    .string()
+    .min(10, "Contact phone number is required")
+    .regex(/^\+?[0-9]*$/, "Contact phone number must be a valid number"),
+  contactCountryCode: z.string().min(1, "Contact country code is required"),
+});
+
 export const questionnaireSchema = z
   .object({
     services: ServicesSchema,
@@ -95,6 +109,7 @@ export const questionnaireSchema = z
   })
   .merge(BizBasicInfoSchema)
   .merge(TurnoverSchema);
+// .merge(ContactPerson);
 
 export type VirtualAccountType = z.infer<typeof VirtualAccountSchema>;
 export type QuestionnaireType = z.infer<typeof questionnaireSchema>;

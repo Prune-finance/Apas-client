@@ -1,4 +1,5 @@
 import {
+  PhoneNumberInput,
   SelectInputWithInsideLabel,
   TextareaWithInsideLabel,
   TextInputWithInsideLabel,
@@ -123,10 +124,16 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
             w="100%"
             {...form.getInputProps("contactEmail")}
           />
-          <TextInputWithInsideLabel
+          {/* <TextInputWithInsideLabel
             label="Phone Number"
             w="100%"
             {...form.getInputProps("businessNumber")}
+          /> */}
+
+          <PhoneNumberInput<OnboardingType>
+            form={form}
+            phoneNumberKey="businessNumber"
+            countryCodeKey="businessNumberCode"
           />
         </Flex>
 
@@ -174,10 +181,15 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
             w="100%"
             {...form.getInputProps("contactEmail")}
           />
-          <TextInputWithInsideLabel
+          {/* <TextInputWithInsideLabel
             label="Phone Number"
             w="100%"
             {...form.getInputProps("contactNumber")}
+          /> */}
+          <PhoneNumberInput<OnboardingType>
+            form={form}
+            phoneNumberKey="contactNumber"
+            countryCodeKey="contactCountryCode"
           />
         </Flex>
 

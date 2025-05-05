@@ -27,8 +27,8 @@ export default function OperationsAccount() {
       <RadioGroup
         name="operations-account-balance"
         label="Please indicate the estimated balance(s) you will hold in the operating account(s)"
-        {...form.getInputProps("operationsAccount.estimatedBalance")}
-        key={form.key("operationsAccount.estimatedBalance")}
+        {...form.getInputProps("operationsAccount.estimated_balance")}
+        key={form.key("operationsAccount.estimated_balance")}
         labelProps={{
           fz: 16,
           fw: 500,

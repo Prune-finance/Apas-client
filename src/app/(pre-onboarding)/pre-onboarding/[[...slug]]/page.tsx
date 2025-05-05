@@ -70,16 +70,16 @@ export default function Questionnaire() {
             label="Legal Business Name"
             w="100%"
             rightSection={<IconBriefcase />}
-            {...form.getInputProps("name")}
-            key={form.key("name")}
+            {...form.getInputProps("businessName")}
+            key={form.key("businessName")}
             withAsterisk
           />
           <TextInputWithInsideLabel
             label="Trading Name"
             w="100%"
             rightSection={<IconBriefcase />}
-            {...form.getInputProps("tradingName")}
-            key={form.key("tradingName")}
+            {...form.getInputProps("businessTradingName")}
+            key={form.key("businessTradingName")}
             withAsterisk
           />
         </Flex>
@@ -93,16 +93,16 @@ export default function Questionnaire() {
               label: country.name,
             }))}
             searchable
-            {...form.getInputProps("country")}
-            key={form.key("country")}
+            {...form.getInputProps("businessCountry")}
+            key={form.key("businessCountry")}
             withAsterisk
           />
           <TextInputWithInsideLabel
             label="Business Address"
             w="100%"
             rightSection={<IconMapPin />}
-            {...form.getInputProps("address")}
-            key={form.key("address")}
+            {...form.getInputProps("businessAddress")}
+            key={form.key("businessAddress")}
             withAsterisk
           />
         </Flex>
@@ -122,8 +122,8 @@ export default function Questionnaire() {
             label="Email"
             w="100%"
             rightSection={<IconMail />}
-            {...form.getInputProps("email")}
-            key={form.key("email")}
+            {...form.getInputProps("businessEmail")}
+            key={form.key("businessEmail")}
             withAsterisk
           />
 
@@ -131,7 +131,7 @@ export default function Questionnaire() {
             <PhoneNumberInput<QuestionnaireType>
               form={form}
               countryCodeKey="countryCode"
-              phoneNumberKey="phoneNumber"
+              phoneNumberKey="businessPhoneNumber"
             />
           </Box>
         </Flex>
@@ -141,8 +141,8 @@ export default function Questionnaire() {
           minRows={4}
           autosize
           maxRows={4}
-          {...form.getInputProps("businessBio")}
-          key={form.key("businessBio")}
+          {...form.getInputProps("businessDescription")}
+          key={form.key("businessDescription")}
           withAsterisk
         />
 
@@ -158,9 +158,9 @@ export default function Questionnaire() {
 
         <RadioGroup
           label="Is this entity regulated? Does it hold any regulatory licenses? "
-          {...form.getInputProps("isEntityRegulated")}
+          {...form.getInputProps("isRegulated")}
           color="var(--prune-primary-600)"
-          key={form.key("isEntityRegulated")}
+          key={form.key("isRegulated")}
         >
           <Stack gap={6} mt="xs">
             <Radio label="Yes" value="yes" color="var(--prune-primary-600)" />

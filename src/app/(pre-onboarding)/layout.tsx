@@ -57,7 +57,7 @@ export default function QuestionnaireLayout({
       return {};
     },
     onValuesChange: (values) => {
-      const { phoneNumber, countryCode } = values;
+      const { businessPhoneNumber, countryCode } = values;
       setCountryCode(countryCode);
     },
   });

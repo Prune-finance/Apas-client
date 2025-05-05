@@ -26,10 +26,10 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
     questionnaireForm.values;
 
   const schema = z.object({
-    contactName: z.string().min(1, "Name is required"),
-    contactDesignation: z.string().min(1, "Designation is required"),
-    contactPhoneNumber: z.string().min(1, "Contact number is required"),
-    contactEmail: z
+    contactPersonName: z.string().min(1, "Name is required"),
+    contactPersonDesignation: z.string().min(1, "Designation is required"),
+    contactPersonPhoneNumber: z.string().min(1, "Contact number is required"),
+    contactPersonEmail: z
       .string()
       .email("Invalid email address")
       .min(1, "Email is required"),
@@ -40,14 +40,16 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
 
   const form = useForm<FormValues>({
     initialValues: {
-      contactName: "",
-      contactDesignation: "",
-      contactPhoneNumber: "",
-      contactEmail: "",
+      contactPersonName: "",
+      contactPersonDesignation: "",
+      contactPersonPhoneNumber: "",
+      contactPersonEmail: "",
       contactCountryCode: "+234",
     },
     validate: zodResolver(schema),
   });
+
+  const { contactCountryCode, ...rest } = form.values;
 
   const { loading, queryFn } = useAxios({
     baseURL: "auth",
@@ -56,7 +58,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
     body: {
       ...restOfQuestionnaire,
       isRegulated: isRegulated === "yes",
-      ...form.values,
+      ...rest,
     },
     onSuccess: () => {
       close();
@@ -123,25 +125,25 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
           <TextInputWithInsideLabel
             label="Name"
             w="100%"
-            {...form.getInputProps("contactName")}
+            {...form.getInputProps("contactPersonName")}
           />
 
           <TextInputWithInsideLabel
             label="Designation"
             w="100%"
-            {...form.getInputProps("contactDesignation")}
+            {...form.getInputProps("contactPersonDesignation")}
           />
 
           <PhoneNumberInput<FormValues>
             form={form}
-            phoneNumberKey="contactPhoneNumber"
+            phoneNumberKey="contactPersonPhoneNumber"
             countryCodeKey="contactCountryCode"
           />
 
           <TextInputWithInsideLabel
             label="Email"
             w="100%"
-            {...form.getInputProps("contactEmail")}
+            {...form.getInputProps("contactPersonEmail")}
           />
 
           <Flex justify="end">

@@ -63,12 +63,34 @@ export const OperationsAccountSchema = z.object({
   estimatedBalance: z.string().min(1, "Estimated balance is required"),
 });
 
-export const questionnaireSchema = z.object({
-  turnover: z.string().min(1, "Turnover is required"),
-  services: ServicesSchema,
-  virtualAccount: VirtualAccountSchema,
-  operationsAccount: OperationsAccountSchema,
+export const BizBasicInfoSchema = z.object({
+  name: z.string().min(1, "Legal business name is required"),
+  tradingName: z.string().min(1, "Trading name is required"),
+  country: z.string().min(1, "Country is required"),
+  address: z.string().min(1, "Business address is required"),
+  businessIndustry: z.string().min(1, "Business industry is required"),
+  email: z
+    .string()
+    .email("Invalid email address")
+    .min(1, "Email address is required"),
+  phoneNumber: z
+    .string()
+    .min(1, "Phone number is required")
+    .regex(/^\+?[0-9]*$/, "Phone number must be a valid number"),
+  countryCode: z.string().min(1, "Country code is required"),
+  isEntityRegulated: z.enum(["yes", "no"]),
+  geoFootprint: z.string().min(1, "Geo footprint is required"),
+  businessBio: z.string().min(1, "Business bio is required"),
 });
+
+export const questionnaireSchema = z
+  .object({
+    turnover: z.string().min(1, "Turnover is required"),
+    services: ServicesSchema,
+    virtualAccount: VirtualAccountSchema,
+    operationsAccount: OperationsAccountSchema,
+  })
+  .merge(BizBasicInfoSchema);
 
 export type VirtualAccountType = z.infer<typeof VirtualAccountSchema>;
 export type QuestionnaireType = z.infer<typeof questionnaireSchema>;
@@ -77,6 +99,17 @@ export type ServicesType = z.infer<typeof ServicesSchema>;
 export type TurnoverType = z.infer<typeof TurnoverSchema>;
 
 export const questionnaireValues: QuestionnaireType = {
+  name: "",
+  tradingName: "",
+  country: "",
+  address: "",
+  businessIndustry: "",
+  email: "",
+  phoneNumber: "+234",
+  countryCode: "+234",
+  isEntityRegulated: "no",
+  geoFootprint: "",
+  businessBio: "",
   turnover: "",
   services: [],
   virtualAccount: {

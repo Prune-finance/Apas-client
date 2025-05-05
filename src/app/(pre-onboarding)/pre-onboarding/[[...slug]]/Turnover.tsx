@@ -1,10 +1,10 @@
 import { Box, Text, RadioGroup, Stack } from "@mantine/core";
 import React from "react";
 import CustomRadio from "./CustomRadio";
-import { turnoverOptions } from "./page";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { useRouter } from "next/navigation";
+import { formatNumber } from "@/lib/utils";
 
 export default function Turnover() {
   const form = useQuestionnaireFormContext();
@@ -40,3 +40,23 @@ export default function Turnover() {
     </Box>
   );
 }
+
+const turnoverOptions = {
+  "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
+  "less-than-50000": `${formatNumber(10000, true, "GBP")} - ${formatNumber(
+    50000,
+    true,
+    "GBP"
+  )}`,
+  "less-than-100000": `${formatNumber(50000, true, "GBP")} - ${formatNumber(
+    100000,
+    true,
+    "GBP"
+  )}`,
+  "less-than-500000": `${formatNumber(100000, true, "GBP")} - ${formatNumber(
+    500000,
+    true,
+    "GBP"
+  )}`,
+  "less-than-1000000": `More than ${formatNumber(500000, true, "GBP")}`,
+} as const;

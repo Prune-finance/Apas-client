@@ -18,14 +18,16 @@ export default function VirtualAccount() {
       <Stack gap={16}>
         <NumberInputWithInsideLabel
           label="How many virtual accounts do you need as a day one requirement?"
-          {...form.getInputProps("virtualAccount.numberOfAccounts")}
-          key={form.key("virtualAccount.numberOfAccounts")}
+          {...form.getInputProps("virtualAccount.day_one_requirement")}
+          key={form.key("virtualAccount.day_one_requirement")}
         />
 
         <NumberInputWithInsideLabel
           label="What is the projected total number of virtual accounts needed at full capacity?"
-          {...form.getInputProps("virtualAccount.projectedTotalAccounts")}
-          key={form.key("virtualAccount.projectedTotalAccounts")}
+          {...form.getInputProps(
+            "virtualAccount.total_number_of_virtual_accounts"
+          )}
+          key={form.key("virtualAccount.total_number_of_virtual_accounts")}
         />
 
         {transactionLimits.map((section, idx) => (
@@ -56,19 +58,19 @@ export default function VirtualAccount() {
                     {...form.getInputProps(
                       `virtualAccount.${
                         idx === 0
-                          ? "singleAccount"
+                          ? "max_value_per_transaction"
                           : idx === 1
-                          ? "allAccounts"
-                          : "transactionCount"
+                          ? "max_value_all_virtual_accounts"
+                          : "total_highest_transaction_count"
                       }.${field}`
                     )}
                     key={form.key(
                       `virtualAccount.${
                         idx === 0
-                          ? "singleAccount"
+                          ? "max_value_per_transaction"
                           : idx === 1
-                          ? "allAccounts"
-                          : "transactionCount"
+                          ? "max_value_all_virtual_accounts"
+                          : "total_highest_transaction_count"
                       }.${field}`
                     )}
                   />

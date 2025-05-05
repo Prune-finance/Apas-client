@@ -17,8 +17,8 @@ export default function Turnover() {
       <RadioGroup
         name="turnover"
         label="What is this entity's annual turnover?"
-        {...form.getInputProps("turnover")}
-        key={form.key("turnover")}
+        {...form.getInputProps("annualTurnover")}
+        key={form.key("annualTurnover")}
         errorProps={{ mt: 10 }}
         labelProps={{
           fz: 16,

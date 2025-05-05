@@ -1,19 +1,21 @@
 import { z } from "zod";
 
 export const TurnoverSchema = z.object({
-  turnover: z.string().min(1, "Entity's annual turnover is required"),
+  annualTurnover: z.string().min(1, "Entity's annual turnover is required"),
 });
 
+// Services
 export const ServicesSchema = z
   .array(
     z.object({
       name: z.string().min(1, "Service name is required"),
-      accounts: z
-        .array(z.string().min(2, "Account type is required"))
-        .min(1, "At least one account type is required"),
+      currencies: z
+        .array(z.string().min(1, "Currency is required"))
+        .min(1, "At least one currency is required"),
     })
   )
   .min(1, "Select at least one service");
+
 const positiveIntegerSchema = (fieldName: string) =>
   z.union([
     z.string().min(1, `${fieldName} is required`),
@@ -24,13 +26,13 @@ const positiveIntegerSchema = (fieldName: string) =>
   ]);
 
 export const VirtualAccountSchema = z.object({
-  numberOfAccounts: positiveIntegerSchema(
+  day_one_requirement: positiveIntegerSchema(
     "Initial virtual account requirement"
   ),
-  projectedTotalAccounts: positiveIntegerSchema(
+  total_number_of_virtual_accounts: positiveIntegerSchema(
     "Projected virtual accounts at full capacity"
   ),
-  singleAccount: z.object({
+  max_value_per_transaction: z.object({
     daily: positiveIntegerSchema(
       "Daily maximum transaction value for single virtual account"
     ),
@@ -41,7 +43,7 @@ export const VirtualAccountSchema = z.object({
       "Annual maximum transaction value for single virtual account"
     ),
   }),
-  allAccounts: z.object({
+  max_value_all_virtual_accounts: z.object({
     daily: positiveIntegerSchema(
       "Daily maximum transaction value for all virtual accounts"
     ),
@@ -52,45 +54,47 @@ export const VirtualAccountSchema = z.object({
       "Annual maximum transaction value for all virtual accounts"
     ),
   }),
-  transactionCount: z.object({
+  total_highest_transaction_count: z.object({
     daily: positiveIntegerSchema("Daily maximum transaction count"),
     monthly: positiveIntegerSchema("Monthly maximum transaction count"),
     annually: positiveIntegerSchema("Annual maximum transaction count"),
   }),
 });
 
+// Operations Account
 export const OperationsAccountSchema = z.object({
-  estimatedBalance: z.string().min(1, "Estimated balance is required"),
+  estimated_balance: z.string().min(1, "Estimated balance is required"),
 });
 
+// Business Basic Info
 export const BizBasicInfoSchema = z.object({
-  name: z.string().min(1, "Legal business name is required"),
-  tradingName: z.string().min(1, "Trading name is required"),
-  country: z.string().min(1, "Country is required"),
-  address: z.string().min(1, "Business address is required"),
+  businessName: z.string().min(1, "Legal business name is required"),
+  businessTradingName: z.string().min(1, "Trading name is required"),
+  businessCountry: z.string().min(1, "Country is required"),
+  businessAddress: z.string().min(1, "Business address is required"),
   businessIndustry: z.string().min(1, "Business industry is required"),
-  email: z
+  businessEmail: z
     .string()
     .email("Invalid email address")
     .min(1, "Email address is required"),
-  phoneNumber: z
+  businessPhoneNumber: z
     .string()
     .min(1, "Phone number is required")
     .regex(/^\+?[0-9]*$/, "Phone number must be a valid number"),
   countryCode: z.string().min(1, "Country code is required"),
-  isEntityRegulated: z.enum(["yes", "no"]),
+  isRegulated: z.enum(["yes", "no"]),
   geoFootprint: z.string().min(1, "Geo footprint is required"),
-  businessBio: z.string().min(1, "Business bio is required"),
+  businessDescription: z.string().min(1, "Business description is required"),
 });
 
 export const questionnaireSchema = z
   .object({
-    turnover: z.string().min(1, "Turnover is required"),
     services: ServicesSchema,
     virtualAccount: VirtualAccountSchema,
     operationsAccount: OperationsAccountSchema,
   })
-  .merge(BizBasicInfoSchema);
+  .merge(BizBasicInfoSchema)
+  .merge(TurnoverSchema);
 
 export type VirtualAccountType = z.infer<typeof VirtualAccountSchema>;
 export type QuestionnaireType = z.infer<typeof questionnaireSchema>;
@@ -99,39 +103,39 @@ export type ServicesType = z.infer<typeof ServicesSchema>;
 export type TurnoverType = z.infer<typeof TurnoverSchema>;
 
 export const questionnaireValues: QuestionnaireType = {
-  name: "",
-  tradingName: "",
-  country: "",
-  address: "",
-  businessIndustry: "",
-  email: "",
-  phoneNumber: "+234",
+  businessName: "",
+  businessTradingName: "",
+  businessEmail: "",
+  businessPhoneNumber: "+234",
+  businessCountry: "",
+  businessAddress: "",
   countryCode: "+234",
-  isEntityRegulated: "no",
+  businessIndustry: "",
+  isRegulated: "no",
   geoFootprint: "",
-  businessBio: "",
-  turnover: "",
+  businessDescription: "",
+  annualTurnover: "",
   services: [],
   virtualAccount: {
-    numberOfAccounts: "",
-    projectedTotalAccounts: "",
-    singleAccount: {
+    day_one_requirement: "",
+    total_number_of_virtual_accounts: "",
+    max_value_per_transaction: {
       daily: "",
       monthly: "",
       annually: "",
     },
-    allAccounts: {
+    max_value_all_virtual_accounts: {
       daily: "",
       monthly: "",
       annually: "",
     },
-    transactionCount: {
+    total_highest_transaction_count: {
       daily: "",
       monthly: "",
       annually: "",
     },
   },
   operationsAccount: {
-    estimatedBalance: "",
+    estimated_balance: "",
   },
 };

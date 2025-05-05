@@ -38,7 +38,7 @@ export default function CheckboxCard({
         if (e) {
           form.insertListItem(`services`, {
             name: title,
-            accounts: [accounts.at(0)],
+            currencies: [accounts.at(0)],
           });
           return;
         }
@@ -65,7 +65,7 @@ export default function CheckboxCard({
         <SimpleGrid cols={2}>
           {accounts.map((item, index) => (
             <Checkbox
-              key={form.key(`services.${idx}.accounts.${index}`)}
+              key={form.key(`services.${idx}.currencies.${index}`)}
               label={item}
               // value={item}
               onClick={(e) => e.stopPropagation()}
@@ -73,7 +73,7 @@ export default function CheckboxCard({
                 form
                   .getValues()
                   .services.find((service) => service.name === title)
-                  ?.accounts?.includes(item)
+                  ?.currencies?.includes(item)
               )}
               onChange={(e) => {
                 const { services } = form.getValues();
@@ -81,18 +81,18 @@ export default function CheckboxCard({
                   (service) => service.name === title
                 );
                 const service = services.find((s) => s.name === title);
-                const acctIndex = services[removeIdx].accounts.findIndex(
+                const acctIndex = services[removeIdx].currencies.findIndex(
                   (acct) => acct === item
                 );
 
                 if (!e.target.checked) {
-                  if (services[removeIdx].accounts.length <= 1) {
+                  if (services[removeIdx].currencies.length <= 1) {
                     form.removeListItem("services", removeIdx);
 
                     return;
                   }
                   form.removeListItem(
-                    `services.${removeIdx}.accounts`,
+                    `services.${removeIdx}.currencies`,
                     acctIndex
                   );
                   return;
@@ -101,14 +101,14 @@ export default function CheckboxCard({
                 if (!service) {
                   form.insertListItem(
                     `services`,
-                    { name: title, accounts: [item] },
+                    { name: title, currencies: [item] },
                     idx
                   );
 
                   return;
                 }
 
-                form.insertListItem(`services.${removeIdx}.accounts`, item);
+                form.insertListItem(`services.${removeIdx}.currencies`, item);
               }}
               fz={12}
               color="var(--prune-primary-600)"

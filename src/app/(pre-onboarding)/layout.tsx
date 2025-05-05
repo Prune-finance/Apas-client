@@ -28,7 +28,6 @@ export default function QuestionnaireLayout({
 }>) {
   const [opened, { toggle }] = useDisclosure();
   const params = useParams();
-  const [countryCode, setCountryCode] = useState("+234");
   const { slug } = params;
   const isServices = slug && slug[0] === "services";
   const isTurnover = slug && slug[0] === "turnover";
@@ -55,10 +54,6 @@ export default function QuestionnaireLayout({
         return zodResolver(z.object({ services: ServicesSchema }))(values);
 
       return {};
-    },
-    onValuesChange: (values) => {
-      const { businessPhoneNumber, countryCode } = values;
-      setCountryCode(countryCode);
     },
   });
 

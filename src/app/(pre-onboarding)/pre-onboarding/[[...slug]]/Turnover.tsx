@@ -8,7 +8,7 @@ import { formatNumber } from "@/lib/utils";
 
 export default function Turnover() {
   const form = useQuestionnaireFormContext();
-  const { push } = useRouter();
+  const { push, back } = useRouter();
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
@@ -35,7 +35,7 @@ export default function Turnover() {
       </RadioGroup>
       <QuestionnaireNav
         onNext={() => push("/pre-onboarding/services")}
-        disabledPrev
+        onPrevious={back}
       />
     </Box>
   );

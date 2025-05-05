@@ -9,6 +9,8 @@ import { z } from "zod";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { useDisclosure } from "@mantine/hooks";
 import ConfirmationModal from "./ConfirmationModal";
+import { PhoneNumberInput } from "@/ui/components/InputWithLabel";
+import useAxios from "@/lib/hooks/useAxios";
 
 interface ConsentModalProps {
   opened: boolean;
@@ -16,71 +18,71 @@ interface ConsentModalProps {
 }
 
 export default function ConsentModal({ opened, close }: ConsentModalProps) {
-  const [firstLoad, setFirstLoad] = useState(true);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
   const [openedConfirm, { open, close: closeConfirm }] = useDisclosure(false);
 
   const questionnaireForm = useQuestionnaireFormContext();
+  const { countryCode, isRegulated, ...restOfQuestionnaire } =
+    questionnaireForm.values;
 
   const schema = z.object({
-    name: z.string().min(1, "Name is required"),
-    designation: z.string().min(1, "Designation is required"),
-    contactNumber: z.string().min(1, "Contact number is required"),
-    email: z
+    contactName: z.string().min(1, "Name is required"),
+    contactDesignation: z.string().min(1, "Designation is required"),
+    contactPhoneNumber: z.string().min(1, "Contact number is required"),
+    contactEmail: z
       .string()
       .email("Invalid email address")
       .min(1, "Email is required"),
     contactCountryCode: z.string().min(1, "Country code is required"),
   });
 
-  const form = useForm({
+  type FormValues = z.infer<typeof schema>;
+
+  const form = useForm<FormValues>({
     initialValues: {
-      name: "",
-      designation: "",
-      contactNumber: "",
-      email: "",
+      contactName: "",
+      contactDesignation: "",
+      contactPhoneNumber: "",
+      contactEmail: "",
       contactCountryCode: "+234",
     },
     validate: zodResolver(schema),
   });
 
-  useEffect(() => {
-    if (firstLoad) {
-      setFirstLoad(false);
-      return;
-    }
-
-    if (form.values.contactCountryCode) {
-      const [code] = form.values.contactCountryCode.split("-");
-      form.setFieldValue("contactNumber", `${code}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.values.contactCountryCode]);
-
-  const select = (
-    <SelectCountryDialCode
-      value={form.values.contactCountryCode}
-      setValue={(value) => form.setFieldValue("contactCountryCode", value)}
-    />
-  );
-
-  const handleSubmit = async (values: z.infer<typeof schema>) => {
-    setLoading(true);
-    try {
+  const { loading, queryFn } = useAxios({
+    baseURL: "auth",
+    endpoint: "/onboarding/questionnaire/create",
+    method: "POST",
+    body: {
+      ...restOfQuestionnaire,
+      isRegulated: isRegulated === "yes",
+      ...form.values,
+    },
+    onSuccess: () => {
       close();
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-      console.log({ values });
       form.reset();
       questionnaireForm.reset();
       open();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+  });
+
+  // const handleSubmit = async (values: z.infer<typeof schema>) => {
+  //   setLoading(true);
+  //   try {
+  //     close();
+  //     setTimeout(() => {
+  //       setLoading(false);
+  //     }, 2000);
+  //     console.log({ values });
+  //     form.reset();
+  //     questionnaireForm.reset();
+  //     open();
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <>
@@ -116,48 +118,30 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
             gap: 24,
           }}
           component="form"
-          onSubmit={form.onSubmit((values) => handleSubmit(values))}
+          onSubmit={form.onSubmit((values) => queryFn())}
         >
           <TextInputWithInsideLabel
             label="Name"
             w="100%"
-            {...form.getInputProps("name")}
+            {...form.getInputProps("contactName")}
           />
 
           <TextInputWithInsideLabel
             label="Designation"
             w="100%"
-            {...form.getInputProps("designation")}
+            {...form.getInputProps("contactDesignation")}
           />
 
-          <NumberInput
-            classNames={{ input: styles.input, label: styles.label }}
-            flex={1}
-            withAsterisk
-            type="tel"
-            //   label="Contact Phone Number"
-            placeholder="00000000"
-            // {...form.getInputProps("contactNumber")}
-            value={form.values.contactNumber}
-            onChange={(value) =>
-              form.setFieldValue("contactNumber", String(`+${value}`))
-            }
-            error={form.errors.contactNumber}
-            prefix={"+"}
-            leftSection={select}
-            hideControls
-            leftSectionWidth={50}
-            styles={{
-              input: {
-                paddingLeft: rem(60),
-              },
-            }}
+          <PhoneNumberInput<FormValues>
+            form={form}
+            phoneNumberKey="contactPhoneNumber"
+            countryCodeKey="contactCountryCode"
           />
 
           <TextInputWithInsideLabel
             label="Email"
             w="100%"
-            {...form.getInputProps("email")}
+            {...form.getInputProps("contactEmail")}
           />
 
           <Flex justify="end">

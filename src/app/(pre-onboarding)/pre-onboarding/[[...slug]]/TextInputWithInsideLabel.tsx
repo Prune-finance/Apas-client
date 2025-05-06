@@ -1,6 +1,8 @@
 import {
   NumberInput,
   NumberInputProps,
+  Textarea,
+  TextareaProps,
   TextInput,
   TextInputProps,
   useMantineTheme,
@@ -11,7 +13,7 @@ interface TextInputWithInsideLabelProps extends TextInputProps {}
 export const TextInputWithInsideLabel = ({
   ...props
 }: TextInputWithInsideLabelProps) => {
-  return <TextInput {...props} classNames={classes} />;
+  return <TextInput {...props} classNames={classes} className="Switzer" />;
 };
 
 interface NumberInputWithInsideLabelProps extends NumberInputProps {}
@@ -30,4 +32,11 @@ export const NumberInputWithInsideLabel = ({
       min={0}
     />
   );
+};
+
+interface TextareaWithInsideLabelProps extends TextareaProps {}
+export const TextareaWithInsideLabel = ({
+  ...props
+}: TextareaWithInsideLabelProps) => {
+  return <Textarea {...props} classNames={classes} className="Switzer" />;
 };

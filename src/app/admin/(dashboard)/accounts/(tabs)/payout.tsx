@@ -52,12 +52,8 @@ import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import ModalComponent from "../modal";
-import {
-  FilterSchema,
-  FilterType,
-  FilterValues,
-  validateRequest,
-} from "@/lib/schema";
+import { validateRequest } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import * as XLSX from "xlsx";

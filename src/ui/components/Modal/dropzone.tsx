@@ -9,15 +9,12 @@ import { UseFormReturnType } from "@mantine/form";
 import {
   IconUpload,
   IconX,
-  IconPhoto,
   IconCloudUpload,
   IconCloudCheck,
 } from "@tabler/icons-react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
-
-import { newBusiness } from "@/lib/schema";
 
 const reqValues = {
   reason: "",

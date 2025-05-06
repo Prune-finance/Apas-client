@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 // import axios from "axios";
-import Cookies from "js-cookie";
 import { useState, useEffect, useMemo } from "react";
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 import createAxiosInstance from "@/lib/axios";
 import { Permission, Role } from "./roles";
 import { sanitizedQueryParams, sanitizeURL } from "../utils";

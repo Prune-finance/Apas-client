@@ -41,9 +41,9 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 
-import { activeBadgeColor, sanitizeURL, serialNumber } from "@/lib/utils";
+import { activeBadgeColor, serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import { useTransactions } from "@/lib/hooks/transactions";

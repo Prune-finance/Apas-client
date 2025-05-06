@@ -7,7 +7,6 @@ import {
   PinInput,
   Stack,
   Text,
-  TextInput,
 } from "@mantine/core";
 import Image from "next/image";
 import PruneIcon from "@/assets/icon.png";

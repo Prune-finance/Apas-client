@@ -1,39 +1,14 @@
-"use client";
-
-import { formatNumber } from "@/lib/utils";
-import { Box, Group, Radio, RadioGroup, Stack, Text } from "@mantine/core";
+import { Box, Text, RadioGroup, Stack } from "@mantine/core";
+import React from "react";
 import CustomRadio from "./CustomRadio";
-import { validateEditUser } from "@/lib/schema";
-import { useEffect, useState } from "react";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { useParams, useRouter } from "next/navigation";
-import Services from "./Services";
 import { QuestionnaireNav } from "./QuestionnaireNav";
-import OperationsAccount from "./OperationsAccount";
-import VirtualAccount from "./VirtualAccount";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import { useRouter } from "next/navigation";
+import { formatNumber } from "@/lib/utils";
 
-export default function Questionnaire() {
-  const params = useParams();
-  const { push } = useRouter();
+export default function Turnover() {
   const form = useQuestionnaireFormContext();
-
-  if (
-    params?.slug &&
-    params?.slug[0] === "services" &&
-    params.slug[1] === "operations-account"
-  )
-    return <OperationsAccount />;
-
-  if (
-    params?.slug &&
-    params?.slug[0] === "services" &&
-    params.slug[1] === "virtual-account"
-  )
-    return <VirtualAccount />;
-
-  if (params?.slug && params?.slug[0] === "services") return <Services />;
-
+  const { push, back } = useRouter();
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
@@ -42,8 +17,8 @@ export default function Questionnaire() {
       <RadioGroup
         name="turnover"
         label="What is this entity's annual turnover?"
-        {...form.getInputProps("turnover")}
-        key={form.key("turnover")}
+        {...form.getInputProps("annualTurnover")}
+        key={form.key("annualTurnover")}
         errorProps={{ mt: 10 }}
         labelProps={{
           fz: 16,
@@ -59,8 +34,8 @@ export default function Questionnaire() {
         </Stack>
       </RadioGroup>
       <QuestionnaireNav
-        onNext={() => push("/questionnaire/services")}
-        disabledPrev
+        onNext={() => push("/pre-onboarding/services")}
+        onPrevious={back}
       />
     </Box>
   );

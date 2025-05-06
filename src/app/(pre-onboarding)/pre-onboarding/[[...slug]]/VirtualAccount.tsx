@@ -4,10 +4,15 @@ import { IconCurrencyPound } from "@tabler/icons-react";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { useRouter } from "next/navigation";
+import ConsentModal from "./ConsentModal";
+import { useDisclosure } from "@mantine/hooks";
 
 export default function VirtualAccount() {
   const form = useQuestionnaireFormContext();
   const { back } = useRouter();
+  const [opened, { open, close }] = useDisclosure(false);
+
+  console.log(form.errors);
 
   return (
     <Box>
@@ -18,14 +23,16 @@ export default function VirtualAccount() {
       <Stack gap={16}>
         <NumberInputWithInsideLabel
           label="How many virtual accounts do you need as a day one requirement?"
-          {...form.getInputProps("virtualAccount.numberOfAccounts")}
-          key={form.key("virtualAccount.numberOfAccounts")}
+          {...form.getInputProps("virtualAccounts.day_one_requirement")}
+          key={form.key("virtualAccounts.day_one_requirement")}
         />
 
         <NumberInputWithInsideLabel
           label="What is the projected total number of virtual accounts needed at full capacity?"
-          {...form.getInputProps("virtualAccount.projectedTotalAccounts")}
-          key={form.key("virtualAccount.projectedTotalAccounts")}
+          {...form.getInputProps(
+            "virtualAccounts.total_number_of_virtual_accounts"
+          )}
+          key={form.key("virtualAccounts.total_number_of_virtual_accounts")}
         />
 
         {transactionLimits.map((section, idx) => (
@@ -54,21 +61,21 @@ export default function VirtualAccount() {
                     min={0}
                     thousandSeparator=","
                     {...form.getInputProps(
-                      `virtualAccount.${
+                      `virtualAccounts.${
                         idx === 0
-                          ? "singleAccount"
+                          ? "max_value_per_transaction"
                           : idx === 1
-                          ? "allAccounts"
-                          : "transactionCount"
+                          ? "max_value_all_virtual_accounts"
+                          : "total_highest_transaction_count"
                       }.${field}`
                     )}
                     key={form.key(
-                      `virtualAccount.${
+                      `virtualAccounts.${
                         idx === 0
-                          ? "singleAccount"
+                          ? "max_value_per_transaction"
                           : idx === 1
-                          ? "allAccounts"
-                          : "transactionCount"
+                          ? "max_value_all_virtual_accounts"
+                          : "total_highest_transaction_count"
                       }.${field}`
                     )}
                   />
@@ -79,7 +86,9 @@ export default function VirtualAccount() {
         ))}
       </Stack>
 
-      <QuestionnaireNav nextText="Submit" onPrevious={back} />
+      <QuestionnaireNav nextText="Submit" onPrevious={back} onNext={open} />
+
+      <ConsentModal opened={opened} close={close} />
     </Box>
   );
 }

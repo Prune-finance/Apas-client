@@ -35,15 +35,10 @@ import { formatNumber, getUserType } from "@/lib/utils";
 
 import useNotification from "@/lib/hooks/notification";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  FilterValues,
-  FilterSchema,
-  FilterType,
-  validateRequest,
-} from "@/lib/schema";
+import { validateRequest } from "@/lib/schema";
+import { FilterValues, FilterSchema, FilterType } from "@/lib/schema";
 import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
-import { filteredSearch } from "@/lib/search";
 import DebitRequestModal from "../debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -52,7 +47,6 @@ import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import TabsComponent from "@/ui/components/Tabs";
-import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import { parseError } from "@/lib/actions/auth";
 import { PendingAccounts } from "./PendingAccounts";
 import RequestModalComponent from "@/ui/components/Modal";
@@ -134,8 +128,9 @@ function Accounts() {
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  const isInitiator = useHasPermission("INITIATOR")
-  const canSendMoney = useHasPermission("Transaction Initiation") || isInitiator;
+  const isInitiator = useHasPermission("INITIATOR");
+  const canSendMoney =
+    useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
   const stage =

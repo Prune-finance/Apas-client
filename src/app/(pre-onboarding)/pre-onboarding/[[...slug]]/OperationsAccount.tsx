@@ -27,8 +27,8 @@ export default function OperationsAccount() {
       <RadioGroup
         name="operations-account-balance"
         label="Please indicate the estimated balance(s) you will hold in the operating account(s)"
-        {...form.getInputProps("operationsAccount.estimatedBalance")}
-        key={form.key("operationsAccount.estimatedBalance")}
+        {...form.getInputProps("operationsAccounts.estimated_balance")}
+        key={form.key("operationsAccounts.estimated_balance")}
         labelProps={{
           fz: 16,
           fw: 500,
@@ -47,7 +47,7 @@ export default function OperationsAccount() {
         nextText={!isVirtualAccount ? "Submit" : "Next"}
         onNext={() => {
           if (!isVirtualAccount) return open();
-          push("/questionnaire/services/virtual-account");
+          push("/pre-onboarding/services/virtual-account");
         }}
         onPrevious={back}
       />

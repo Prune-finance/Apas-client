@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
 import { BusinessData } from "./businesses";
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 import useAxios from "./useAxios";
 import { sanitizedQueryParams, sanitizeURL } from "../utils";
 
@@ -651,7 +651,10 @@ interface ITrx extends IParams {
   id?: string;
 }
 
-export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
+export function useUserTransactions(
+  id: string = "",
+  customParams: IParams = {}
+) {
   const path = id ? `${id}/transactions` : "transactions";
   const {
     data,

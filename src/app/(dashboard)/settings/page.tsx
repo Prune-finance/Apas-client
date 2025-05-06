@@ -1,7 +1,6 @@
 "use client";
 import {
   Box,
-  Button,
   Checkbox,
   Flex,
   Paper,
@@ -12,17 +11,8 @@ import {
   TabsPanel,
   TabsTab,
   Text,
-  rem,
 } from "@mantine/core";
-import {
-  IconCheck,
-  IconEye,
-  IconKey,
-  IconLock,
-  IconSearch,
-  IconTags,
-  IconTrash,
-} from "@tabler/icons-react";
+import { IconKey, IconLock, IconSearch, IconTags } from "@tabler/icons-react";
 
 import { useRouter, useSearchParams } from "next/navigation";
 

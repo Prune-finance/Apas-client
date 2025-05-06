@@ -1,14 +1,17 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Box, Flex, Modal, NumberInput, rem, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
-import { TextInputWithInsideLabel } from "./TextInputWithInsideLabel";
+
 import { SelectCountryDialCode } from "@/ui/components/SelectDropdownSearch";
 import styles from "./styles.module.scss";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { useDisclosure } from "@mantine/hooks";
-import ConfirmationModal from "./ConfirmationModal";
+import {
+  PhoneNumberInput,
+  TextInputWithInsideLabel,
+} from "@/ui/components/InputWithLabel";
 
 interface ConsentModalProps {
   opened: boolean;
@@ -20,11 +23,10 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
   const [loading, setLoading] = useState(false);
   const [openedConfirm, { open, close: closeConfirm }] = useDisclosure(false);
 
-  const questionnaireForm = useQuestionnaireFormContext();
-
   const schema = z.object({
     name: z.string().min(1, "Name is required"),
     designation: z.string().min(1, "Designation is required"),
+    signature: z.string().min(1, "Signature is required"),
     contactNumber: z.string().min(1, "Contact number is required"),
     email: z
       .string()
@@ -33,36 +35,39 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
     contactCountryCode: z.string().min(1, "Country code is required"),
   });
 
+  type FormValues = z.infer<typeof schema>;
+
   const form = useForm({
     initialValues: {
       name: "",
+      signature: "",
       designation: "",
-      contactNumber: "",
+      contactNumber: "+234",
       email: "",
       contactCountryCode: "+234",
     },
     validate: zodResolver(schema),
   });
 
-  useEffect(() => {
-    if (firstLoad) {
-      setFirstLoad(false);
-      return;
-    }
+  //   useEffect(() => {
+  //     if (firstLoad) {
+  //       setFirstLoad(false);
+  //       return;
+  //     }
 
-    if (form.values.contactCountryCode) {
-      const [code] = form.values.contactCountryCode.split("-");
-      form.setFieldValue("contactNumber", `${code}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.values.contactCountryCode]);
+  //     if (form.values.contactCountryCode) {
+  //       const [code] = form.values.contactCountryCode.split("-");
+  //       form.setFieldValue("contactNumber", `${code}`);
+  //     }
+  //     // eslint-disable-next-line react-hooks/exhaustive-deps
+  //   }, [form.values.contactCountryCode]);
 
-  const select = (
-    <SelectCountryDialCode
-      value={form.values.contactCountryCode}
-      setValue={(value) => form.setFieldValue("contactCountryCode", value)}
-    />
-  );
+  //   const select = (
+  //     <SelectCountryDialCode
+  //       value={form.values.contactCountryCode}
+  //       setValue={(value) => form.setFieldValue("contactCountryCode", value)}
+  //     />
+  //   );
 
   const handleSubmit = async (values: z.infer<typeof schema>) => {
     setLoading(true);
@@ -73,7 +78,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
       }, 2000);
       console.log({ values });
       form.reset();
-      questionnaireForm.reset();
+
       open();
     } catch (error) {
       console.error(error);
@@ -90,7 +95,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
           form.reset();
           close();
         }}
-        title="Company Profile"
+        title="Onboarding"
         styles={{
           title: {
             fontSize: "14px",
@@ -100,13 +105,14 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
         }}
         padding={24}
         centered
+        size={498}
       >
         <Text fz={24} fw={700} c="var(--prune-text-gray-700)">
-          Contact Person
+          Confirm your consent to our Term of Use
         </Text>
 
         <Text my={16} c="var(--prune-text-gray-700)" fw={500} fz={16}>
-          Who is filling this form?
+          A signed copied of your consent would be sent to your email.
         </Text>
 
         <Box
@@ -119,7 +125,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
           onSubmit={form.onSubmit((values) => handleSubmit(values))}
         >
           <TextInputWithInsideLabel
-            label="Name"
+            label="Signed by"
             w="100%"
             {...form.getInputProps("name")}
           />
@@ -130,7 +136,13 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
             {...form.getInputProps("designation")}
           />
 
-          <NumberInput
+          <TextInputWithInsideLabel
+            label="Signature"
+            w="100%"
+            {...form.getInputProps("signature")}
+          />
+
+          {/* <NumberInput
             classNames={{ input: styles.input, label: styles.label }}
             flex={1}
             withAsterisk
@@ -152,6 +164,12 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
                 paddingLeft: rem(60),
               },
             }}
+          /> */}
+
+          <PhoneNumberInput<FormValues>
+            form={form}
+            phoneNumberKey="contactNumber"
+            countryCodeKey="contactCountryCode"
           />
 
           <TextInputWithInsideLabel
@@ -171,8 +189,6 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
           </Flex>
         </Box>
       </Modal>
-
-      <ConfirmationModal opened={openedConfirm} close={closeConfirm} />
     </>
   );
 }

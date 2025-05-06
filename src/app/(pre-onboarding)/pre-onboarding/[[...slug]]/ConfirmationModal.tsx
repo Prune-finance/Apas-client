@@ -1,5 +1,6 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Flex, Modal, Stack, Text } from "@mantine/core";
+import { useRouter } from "next/navigation";
 
 import React from "react";
 interface ConfirmationModalProps {
@@ -11,10 +12,15 @@ export default function ConfirmationModal({
   opened,
   close,
 }: ConfirmationModalProps) {
+  const { push } = useRouter();
+
   return (
     <Modal
       opened={opened}
-      onClose={close}
+      onClose={() => {
+        close();
+        push("/pre-onboarding");
+      }}
       withCloseButton={false}
       padding={24}
       centered

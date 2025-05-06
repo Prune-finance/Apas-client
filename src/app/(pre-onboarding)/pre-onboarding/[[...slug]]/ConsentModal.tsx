@@ -1,15 +1,14 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Box, Flex, Modal, NumberInput, rem, Text } from "@mantine/core";
-import React, { useEffect, useState } from "react";
-import { TextInputWithInsideLabel } from "./TextInputWithInsideLabel";
-import { SelectCountryDialCode } from "@/ui/components/SelectDropdownSearch";
-import styles from "./styles.module.scss";
+import { Box, Flex, Modal, Text } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { useDisclosure } from "@mantine/hooks";
 import ConfirmationModal from "./ConfirmationModal";
-import { PhoneNumberInput } from "@/ui/components/InputWithLabel";
+import {
+  PhoneNumberInput,
+  TextInputWithInsideLabel,
+} from "@/ui/components/InputWithLabel";
 import useAxios from "@/lib/hooks/useAxios";
 
 interface ConsentModalProps {

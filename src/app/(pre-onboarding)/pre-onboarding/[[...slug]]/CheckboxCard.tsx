@@ -10,6 +10,7 @@ import classes from "./services.module.css";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { Icon, IconProps } from "@tabler/icons-react";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import useNotification from "@/lib/hooks/notification";
 
 interface ServiceCategory {
   idx: number;
@@ -25,6 +26,7 @@ export default function CheckboxCard({
   icon,
   idx,
 }: ServiceCategory) {
+  const { handleInfo } = useNotification();
   const Icon = icon;
   const form = useQuestionnaireFormContext();
   const services = form.getValues().services;
@@ -77,18 +79,33 @@ export default function CheckboxCard({
               )}
               onChange={(e) => {
                 const { services } = form.getValues();
-                const removeIdx = services.findIndex(
+                const removeIdx = services?.findIndex(
                   (service) => service.name === title
                 );
+
                 const service = services.find((s) => s.name === title);
-                const acctIndex = services[removeIdx].currencies.findIndex(
+
+                if (removeIdx === -1)
+                  return handleInfo(
+                    "Service Required",
+                    "Please select a service before choosing a currency."
+                  ); // Prevent undefined access
+
+                // Only proceed if services[removeIdx] exists and has currencies
+                const currentService = services[removeIdx];
+                if (
+                  !currentService ||
+                  !Array.isArray(currentService.currencies)
+                )
+                  return;
+
+                const acctIndex = currentService.currencies.findIndex(
                   (acct) => acct === item
                 );
 
                 if (!e.target.checked) {
-                  if (services[removeIdx].currencies.length <= 1) {
+                  if (currentService.currencies.length <= 1) {
                     form.removeListItem("services", removeIdx);
-
                     return;
                   }
                   form.removeListItem(

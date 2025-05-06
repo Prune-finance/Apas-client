@@ -43,11 +43,11 @@ export default function QuestionnaireLayout({
       if (isOperationsAccount)
         return zodResolver(
           z.object({
-            operationsAccount: OperationsAccountSchema,
+            operationsAccounts: OperationsAccountSchema,
           })
         )(values);
       if (isVirtualAccount)
-        return zodResolver(z.object({ virtualAccount: VirtualAccountSchema }))(
+        return zodResolver(z.object({ virtualAccounts: VirtualAccountSchema }))(
           values
         );
       if (isServices)

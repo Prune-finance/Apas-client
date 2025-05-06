@@ -51,7 +51,11 @@ export default function OnboardingLogin() {
   };
 
   return (
-    <Box w="100%" component="form" onSubmit={form.onSubmit(() => handleSubmit)}>
+    <Box
+      w="100%"
+      component="form"
+      onSubmit={form.onSubmit((values) => handleSubmit(values))}
+    >
       <Title order={2}>Log in</Title>
 
       <Text c="var(--prune-text-gray-600)" fz={14} fw={400}>

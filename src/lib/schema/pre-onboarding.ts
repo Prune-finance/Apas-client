@@ -104,8 +104,8 @@ export const ContactPerson = z.object({
 export const questionnaireSchema = z
   .object({
     services: ServicesSchema,
-    virtualAccount: VirtualAccountSchema,
-    operationsAccount: OperationsAccountSchema,
+    virtualAccounts: VirtualAccountSchema,
+    operationsAccounts: OperationsAccountSchema,
   })
   .merge(BizBasicInfoSchema)
   .merge(TurnoverSchema);
@@ -131,7 +131,7 @@ export const questionnaireValues: QuestionnaireType = {
   businessDescription: "",
   annualTurnover: "",
   services: [],
-  virtualAccount: {
+  virtualAccounts: {
     day_one_requirement: "",
     total_number_of_virtual_accounts: "",
     max_value_per_transaction: {
@@ -150,7 +150,7 @@ export const questionnaireValues: QuestionnaireType = {
       annually: "",
     },
   },
-  operationsAccount: {
+  operationsAccounts: {
     estimated_balance: "",
   },
 };

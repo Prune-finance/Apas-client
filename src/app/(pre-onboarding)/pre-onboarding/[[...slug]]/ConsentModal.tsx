@@ -18,7 +18,6 @@ interface ConsentModalProps {
 }
 
 export default function ConsentModal({ opened, close }: ConsentModalProps) {
-  // const [loading, setLoading] = useState(false);
   const [openedConfirm, { open, close: closeConfirm }] = useDisclosure(false);
 
   const questionnaireForm = useQuestionnaireFormContext();
@@ -67,24 +66,6 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
       open();
     },
   });
-
-  // const handleSubmit = async (values: z.infer<typeof schema>) => {
-  //   setLoading(true);
-  //   try {
-  //     close();
-  //     setTimeout(() => {
-  //       setLoading(false);
-  //     }, 2000);
-  //     console.log({ values });
-  //     form.reset();
-  //     questionnaireForm.reset();
-  //     open();
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   return (
     <>

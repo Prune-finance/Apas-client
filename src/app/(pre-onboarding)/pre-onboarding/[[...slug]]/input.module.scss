@@ -1,17 +1,16 @@
 .root {
   position: relative;
-  /* font-family: "Switzer" !important; */
   font-family: --var(--mantine-font-family) !important;
 }
 
 .input {
   height: 54px;
   padding-top: 18px;
-  font-family: "Switzer" !important;
+  font-family: var(--mantine-font-family) !important;
 
-  /* &::placeholder {
-    font-size: 50px;
-  } */
+  &::placeholder {
+    font-family: var(--mantine-font-family) !important;
+  }
 }
 
 .label {

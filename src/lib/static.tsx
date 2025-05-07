@@ -21,6 +21,7 @@ import {
   IconArrowsSort,
   IconPremiumRights,
   IconArrowUpRight,
+  IconRosetteDiscountCheck,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -48,6 +49,11 @@ export const AdminMainLinks = [
     text: "Account Creation",
     link: "/admin/account-requests",
     icon: <IconUserPlus size={16} />,
+  },
+  {
+    text: "Eligibility Center",
+    link: "/admin/eligibility-center",
+    icon: <IconRosetteDiscountCheck size={16} />,
   },
   {
     text: "Transactions",

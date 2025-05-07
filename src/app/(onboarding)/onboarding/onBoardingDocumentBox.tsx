@@ -3,9 +3,9 @@ import DropzoneComponent from "@/ui/components/Dropzone";
 import { NewBusinessType, OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
 
-interface DocumentBoxProps {
+interface DocumentBoxProps<T = OnboardingType> {
   title: string;
-  form?: UseFormReturnType<OnboardingType>;
+  form?: UseFormReturnType<T>;
   // formKey?:
   //   | "mermat"
   //   | "cacCertificate"
@@ -20,13 +20,13 @@ interface DocumentBoxProps {
   required?: boolean;
 }
 
-export default function OnBoardingDocumentBox({
+export default function OnBoardingDocumentBox<T>({
   title,
   form,
   formKey,
   uploadedFileUrl,
   required,
-}: DocumentBoxProps) {
+}: DocumentBoxProps<T>) {
   return (
     <Box flex={1}>
       {/* <Text fz={12} c="#344054" mb={10}>

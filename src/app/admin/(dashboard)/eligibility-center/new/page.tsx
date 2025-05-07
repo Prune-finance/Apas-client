@@ -260,10 +260,7 @@ function EligibilityCenterNew() {
         <Divider color="var(--prune-text-gray-200)" />
 
         <Flex justify="space-between" align="center">
-          <Flex gap={24}>
-            <SecondaryBtn text="Clear Form" action={form.reset} fw={600} />
-            <SecondaryBtn text="Save and continue later" fw={600} />
-          </Flex>
+          <SecondaryBtn text="Clear Form" action={form.reset} fw={600} />
 
           <PrimaryBtn text="Save" type="submit" fw={600} />
         </Flex>

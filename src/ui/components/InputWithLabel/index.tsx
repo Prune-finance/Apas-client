@@ -1,4 +1,7 @@
 import {
+  Checkbox,
+  CheckboxProps,
+  Flex,
   NumberInput,
   NumberInputProps,
   rem,
@@ -8,6 +11,8 @@ import {
   TextareaProps,
   TextInput,
   TextInputProps,
+  ThemeIcon,
+  Tooltip,
   useMantineTheme,
 } from "@mantine/core";
 import classes from "./input.module.scss";
@@ -16,6 +21,7 @@ import { DateInput, DateInputProps } from "@mantine/dates";
 import React, { useEffect, useState } from "react";
 import { SelectCountryDialCode } from "../SelectDropdownSearch";
 import { UseFormReturnType } from "@mantine/form";
+import { IconHelp } from "@tabler/icons-react";
 
 interface TextInputWithInsideLabelProps extends TextInputProps {}
 export const TextInputWithInsideLabel = ({
@@ -43,10 +49,11 @@ export const NumberInputWithInsideLabel = ({
 export const SelectInputWithInsideLabel = ({ ...props }: SelectProps) => {
   return (
     <Select
-      {...props}
       className="Switzer"
       placeholder="Select"
       classNames={classes}
+      styles={{ input: { paddingTop: rem(18) } }}
+      {...props}
     />
   );
 };
@@ -83,6 +90,7 @@ export const PhoneNumberInput = <T,>({
 }: PhoneNumberInputProps<T>) => {
   const select = (
     <SelectCountryDialCode
+      height={54}
       value={form.getValues()[countryCodeKey] as string}
       setValue={(value: string) => {
         const [code] = value.split("-");
@@ -97,7 +105,7 @@ export const PhoneNumberInput = <T,>({
 
   return (
     <NumberInput
-      classNames={{ input: styles.input, label: styles.label }}
+      classNames={{ ...classes, input: styles.input, label: styles.label }}
       flex={1}
       withAsterisk
       type="tel"
@@ -108,6 +116,7 @@ export const PhoneNumberInput = <T,>({
           [phoneNumberKey]: `${value}`,
         } as Partial<T>);
       }}
+      h="100%"
       error={form.errors[phoneNumberKey]}
       key={form.key(phoneNumberKey)}
       prefix={"+"}
@@ -117,8 +126,39 @@ export const PhoneNumberInput = <T,>({
       styles={{
         input: {
           paddingLeft: rem(60),
+          height: rem(54),
+          backgroundColor: "#fcfcfd",
+          borderColor: "#f2f4f7",
+          //         background-color: #fcfcfd;
+          // border: 1px solid #f2f4f7;
         },
       }}
     />
+  );
+};
+
+interface MakeInitiatorProps extends CheckboxProps {}
+export const MakeInitiator = ({ ...props }: MakeInitiatorProps) => {
+  return (
+    <Flex align="center">
+      <Checkbox
+        label="Make this contact an initiator"
+        labelPosition="right"
+        styles={{
+          label: { fontSize: "14px", fontWeight: 500 },
+        }}
+        {...props}
+      />
+
+      <Tooltip label="Initiator">
+        <ThemeIcon
+          variant="transparent"
+          color="var(--prune-text-gray-500)"
+          size={16}
+        >
+          <IconHelp />
+        </ThemeIcon>
+      </Tooltip>
+    </Flex>
   );
 };

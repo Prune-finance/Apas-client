@@ -1,24 +1,16 @@
+"use client";
+
 import React, { Suspense } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
-import {
-  Box,
-  Button,
-  Flex,
-  Grid,
-  GridCol,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { IconSearch } from "@tabler/icons-react";
+import { Box, Flex, Grid, GridCol, Text } from "@mantine/core";
 import { switzer } from "@/app/layout";
-import Link from "next/link";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { SearchInput } from "@/ui/components/Inputs";
 
 function EligibilityCenter() {
-  const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
-
   return (
     <main className={styles.main}>
       <div className={styles.table__container}>
@@ -53,30 +45,15 @@ function EligibilityCenter() {
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}
         >
-          <TextInput
-            placeholder="Search here..."
-            leftSectionPointerEvents="none"
-            leftSection={searchIcon}
-            color="var(--prune-text-gray-200)"
-            c="#000"
-            w={381}
-            styles={{ input: { border: "1px solid #F5F5F5" } }}
-          />
+          <SearchInput />
 
           <Flex gap={12}>
-            <Button
-              //   component={Link}
-              //   href="/admin/businesses/new"
-              variant="filled"
-              radius={4}
-              fz={12}
-              c="#344054"
+            <PrimaryBtn
+              text="Add New Profile"
               fw={600}
-              w={130}
-              color="var(--prune-primary-600)"
-            >
-              Add New Profile
-            </Button>
+              fz={12}
+              link="/admin/eligibility-center/new"
+            />
           </Flex>
         </div>
 
@@ -85,8 +62,8 @@ function EligibilityCenter() {
         <EmptyTable
           rows={[]}
           loading={false}
-          title="There are no requests"
-          text="When a request is created, it will appear here."
+          title="There are no profiles"
+          text="When a profile is created, it will appear here."
         />
       </div>
     </main>

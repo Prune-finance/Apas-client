@@ -5,6 +5,7 @@ import {
   IconCircleArrowUpRight,
   IconCircleKey,
   IconArrowUpRight,
+  IconRosetteDiscountCheck,
 } from "@tabler/icons-react";
 
 import { TabsPanel } from "@mantine/core";
@@ -18,6 +19,7 @@ import LiveKeySuspense from "./(tabs)/live-key";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import PayoutRequests from "./(tabs)/payouts";
+import OtherCurrency from "./(tabs)/otherCurrencies";
 
 // import PayoutRequestsSuspense from "./(tabs)/payouts";
 
@@ -45,14 +47,18 @@ function TabsContainer() {
       </TabsPanel>
 
       <TabsPanel value={tabs[2].value}>
-        <LiveKeySuspense />
+        <OtherCurrency />
       </TabsPanel>
 
       <TabsPanel value={tabs[3].value}>
-        <PayoutRequests />
+        <LiveKeySuspense />
       </TabsPanel>
 
       <TabsPanel value={tabs[4].value}>
+        <PayoutRequests />
+      </TabsPanel>
+
+      <TabsPanel value={tabs[5].value}>
         <Reactivate />
       </TabsPanel>
     </TabsComponent>
@@ -69,6 +75,12 @@ const tabs = [
     title: "Services",
     value: "services",
     icon: <IconUserPlus size={16} />,
+  },
+
+  {
+    title: "Other currencies",
+    value: "other-currencies",
+    icon: <IconRosetteDiscountCheck size={16} />,
   },
 
   {

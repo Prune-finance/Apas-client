@@ -10,6 +10,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import Tabs from "@/ui/components/Tabs";
+import CompanyProfile from "./(tabs)/CompanyProfile";
 
 export default function OnboardingProfile() {
   return (
@@ -36,7 +37,7 @@ export default function OnboardingProfile() {
       >
         {[1, 2, 3, 4, 5].map((tab, idx) => (
           <TabsPanel key={tab} value={tabs[idx].value}>
-            <Text>Onboarding profile</Text>
+            <CompanyProfile />
           </TabsPanel>
         ))}
       </Tabs>

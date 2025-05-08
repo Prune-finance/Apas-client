@@ -1,12 +1,8 @@
 import { Tabs, TabsList, TabsPanel, TabsProps, TabsTab } from "@mantine/core";
 import styles from "./styles.module.scss";
 import { ReactNode } from "react";
+import { Tab } from "@/lib/schema";
 
-interface Tab {
-  title?: string | ReactNode;
-  value: string;
-  icon?: JSX.Element;
-}
 interface Props extends TabsProps {
   tabs: Tab[];
   children: ReactNode;

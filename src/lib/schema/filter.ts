@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { z } from "zod";
 
 // .refine((data) => data.accountBalance < data.amount, {
@@ -89,4 +90,10 @@ export interface IParams {
   lastName?: string;
   reqCount?: string;
   otherReq?: string;
+}
+
+export interface Tab {
+  title?: string | ReactNode;
+  value: string;
+  icon?: JSX.Element;
 }

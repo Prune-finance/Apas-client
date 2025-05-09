@@ -1,3 +1,5 @@
+"use client";
+
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { Box, TabsPanel, Text } from "@mantine/core";
 import React from "react";

@@ -26,7 +26,7 @@ const metadata: Metadata = {
 };
 
 const theme = createTheme({
-  fontFamily: switzer.style.fontFamily,
+  fontFamily: switzer.className,
 });
 
 export default function RootLayout({

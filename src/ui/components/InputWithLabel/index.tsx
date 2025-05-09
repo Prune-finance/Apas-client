@@ -13,12 +13,12 @@ import {
   TextInputProps,
   ThemeIcon,
   Tooltip,
-  useMantineTheme,
 } from "@mantine/core";
 import classes from "./input.module.scss";
 import styles from "./styles.module.scss";
+import profile_styles from "./profile.module.scss";
 import { DateInput, DateInputProps } from "@mantine/dates";
-import React, { useEffect, useState } from "react";
+
 import { SelectCountryDialCode } from "../SelectDropdownSearch";
 import { UseFormReturnType } from "@mantine/form";
 import { IconHelp } from "@tabler/icons-react";
@@ -160,5 +160,30 @@ export const MakeInitiator = ({ ...props }: MakeInitiatorProps) => {
         </ThemeIcon>
       </Tooltip>
     </Flex>
+  );
+};
+
+interface ProfileTextInputProps extends TextInputProps {
+  editing?: boolean;
+}
+export const ProfileTextInput = ({
+  editing = false,
+  ...props
+}: ProfileTextInputProps) => {
+  return (
+    <TextInput
+      styles={{
+        input: {
+          border: editing ? "1px solid var(--prune-text-gray-200)" : "none",
+        },
+      }}
+      classNames={{
+        input: profile_styles.profile_input,
+        label: profile_styles.profile_label,
+      }}
+      w="100%"
+      readOnly={!editing}
+      {...props}
+    />
   );
 };

@@ -1,20 +1,20 @@
 .root {
   position: relative;
-  font-family: --var(--mantine-font-family) !important;
+  // font-family: --var(--mantine-font-family) !important;
 }
 
 .input {
   height: 54px;
   padding-top: 18px;
-  font-family: var(--mantine-font-family) !important;
+  // font-family: var(--mantine-font-family) !important;
 
   &::placeholder {
-    font-family: var(--mantine-font-family) !important;
+    // font-family: var(--mantine-font-family) !important;
   }
 }
 
 .label {
-  font-family: --var(--mantine-font-family) !important;
+  // font-family: --var(--font-) !important;
   font-weight: 400;
   position: absolute;
   pointer-events: none;

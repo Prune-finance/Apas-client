@@ -6,7 +6,6 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { switzer } from "@/app/layout";
 import { Fragment, Suspense, useState } from "react";
 import { LogData, useLogs } from "@/lib/hooks/logs";
 import dayjs from "dayjs";
@@ -24,6 +23,7 @@ import * as XLSX from "xlsx";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import { switzer } from "@/ui/fonts";
 
 function Logs() {
   const searchParams = useSearchParams();

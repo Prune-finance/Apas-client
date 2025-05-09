@@ -27,7 +27,7 @@ interface TextInputWithInsideLabelProps extends TextInputProps {}
 export const TextInputWithInsideLabel = ({
   ...props
 }: TextInputWithInsideLabelProps) => {
-  return <TextInput {...props} classNames={classes} className="Switzer" />;
+  return <TextInput {...props} classNames={classes} />;
 };
 
 interface NumberInputWithInsideLabelProps extends NumberInputProps {}
@@ -38,7 +38,6 @@ export const NumberInputWithInsideLabel = ({
   return (
     <NumberInput
       {...props}
-      className="Switzer"
       placeholder="Enter number"
       classNames={classes}
       thousandSeparator=","
@@ -49,7 +48,6 @@ export const NumberInputWithInsideLabel = ({
 export const SelectInputWithInsideLabel = ({ ...props }: SelectProps) => {
   return (
     <Select
-      className="Switzer"
       placeholder="Select"
       classNames={classes}
       styles={{ input: { paddingTop: rem(18) } }}
@@ -60,12 +58,7 @@ export const SelectInputWithInsideLabel = ({ ...props }: SelectProps) => {
 
 export const DateInputWithInsideLabel = ({ ...props }: DateInputProps) => {
   return (
-    <DateInput
-      {...props}
-      className="Switzer"
-      placeholder="Select Date"
-      classNames={classes}
-    />
+    <DateInput {...props} placeholder="Select Date" classNames={classes} />
   );
 };
 
@@ -73,7 +66,7 @@ interface TextareaWithInsideLabelProps extends TextareaProps {}
 export const TextareaWithInsideLabel = ({
   ...props
 }: TextareaWithInsideLabelProps) => {
-  return <Textarea {...props} classNames={classes} className="Switzer" />;
+  return <Textarea {...props} classNames={classes} />;
 };
 
 interface PhoneNumberInputProps<T> {

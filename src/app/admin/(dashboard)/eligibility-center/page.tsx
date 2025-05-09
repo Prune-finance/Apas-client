@@ -4,11 +4,11 @@ import React, { Suspense } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
 import { Box, Flex, Grid, GridCol, Text } from "@mantine/core";
-import { switzer } from "@/app/layout";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
+import { switzer } from "@/ui/fonts";
 
 function EligibilityCenter() {
   return (

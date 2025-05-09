@@ -8,6 +8,7 @@ export const switzer = localFont({
   src: [
     {
       path: "../assets/fonts/Switzer-Thin.woff2",
+      //   path: "../assets/fonts/Switzer-Thin.woff2",
       weight: "100",
       style: "normal",
     },

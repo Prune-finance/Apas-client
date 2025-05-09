@@ -1,11 +1,3 @@
-@font-face {
-  font-family: "Switzer";
-  src: url("/fonts/Switzer-Regular.woff2") format("woff2"),
-    url("/fonts/Switzer-Regular.woff") format("woff");
-  font-weight: normal;
-  font-style: normal;
-}
-
 :root {
   --max-width: 1100px;
   --border-radius: 12px;
@@ -207,32 +199,10 @@ body {
   overflow-x: hidden;
 }
 
-input {
-  font-family: "Switzer";
-
-  &::placeholder {
-    font-family: "Switzer" !important;
-    color: purple !important;
-  }
-
-  &::-webkit-input-placeholder {
-    font-family: cursive !important;
-    color: rebeccapurple !important;
-  }
-  &::-moz-placeholder {
-    font-family: "Switzer" !important;
-    color: yellow !important;
-  }
-  &:-ms-input-placeholder {
-    font-family: "Switzer" !important;
-    color: aliceblue !important;
-  }
-}
-
 body {
   color: var(--prune-text-gray-700);
   background: #f6f6f6;
-  font-family: "Switzer";
+  font-family: var(--font-switzer);
 }
 
 a {
@@ -345,12 +315,15 @@ a {
 .mantine-RichTextEditor-content,
 .m_6c018570,
 .mantine-PillsInput-wrapper {
+  font-family: var(--font-switzer);
+
   &:focus {
     border: 1px solid var(--prune-primary-700) !important;
   }
 
   &::placeholder {
     font-size: 12px !important;
-    font-family: "Switzer";
+    font-family: var(--font-switzer);
+    // font-family: "Switzer" !important;
   }
 }

@@ -1,6 +1,8 @@
-import { Box, Flex, Stack, Text } from "@mantine/core";
+import { Box, Flex, SimpleGrid, Stack, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import React from "react";
+import PaperContainer from "../PaperContainer";
+import { ProfileTextInput } from "@/ui/components/InputWithLabel";
 
 export default function CompanyProfile() {
   const summaryData = {
@@ -24,6 +26,31 @@ export default function CompanyProfile() {
           </Stack>
         ))}
       </Flex>
+
+      <PaperContainer title="Basic information" mt={20}>
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+          <ProfileTextInput
+            label="Business Name"
+            placeholder="1905 Logistics"
+            editing
+          />
+          <ProfileTextInput label="Trading Name" placeholder="1905 Logistics" />
+          <ProfileTextInput label="Industry" placeholder="Logistics" />
+          <ProfileTextInput label="Country" placeholder="1905 Logistics" />
+          <ProfileTextInput
+            label="Business Name"
+            placeholder="1905 Logistics"
+          />
+          <ProfileTextInput
+            label="Business Name"
+            placeholder="1905 Logistics"
+          />
+          <ProfileTextInput
+            label="Business Name"
+            placeholder="1905 Logistics"
+          />
+        </SimpleGrid>
+      </PaperContainer>
     </Box>
   );
 }

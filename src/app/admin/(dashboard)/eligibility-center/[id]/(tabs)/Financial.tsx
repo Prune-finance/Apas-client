@@ -6,8 +6,12 @@ import {
 } from "@/ui/components/InputWithLabel";
 import { formatNumber } from "@/lib/utils";
 import { operationsAccountEstimatedBalance } from "@/lib/static";
+import { useState } from "react";
+import { PanelWrapper } from "./utils";
 
 export default function Financial() {
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState([]);
   const boldLabel = (boldText: string, normalText: string) => (
     <Text inherit span>
       <Text inherit span fw={700}>
@@ -18,7 +22,7 @@ export default function Financial() {
   );
 
   return (
-    <Box>
+    <PanelWrapper loading={loading} rows={rows} panelName="Financial">
       <PaperContainer title="Finance">
         <Stack gap={8}>
           <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
@@ -84,6 +88,6 @@ export default function Financial() {
           </SimpleGrid>
         </Radio.Group>
       </PaperContainer>
-    </Box>
+    </PanelWrapper>
   );
 }

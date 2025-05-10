@@ -13,6 +13,7 @@ import {
 } from "@tabler/icons-react";
 import Tabs from "@/ui/components/Tabs";
 import CompanyProfile from "./(tabs)/CompanyProfile";
+import Financial from "./(tabs)/Financial";
 
 export default function OnboardingProfile() {
   return (
@@ -37,11 +38,13 @@ export default function OnboardingProfile() {
           list: { marginBottom: "24px" },
         }}
       >
-        {[1, 2, 3, 4, 5].map((tab, idx) => (
-          <TabsPanel key={tab} value={tabs[idx].value}>
-            <CompanyProfile />
-          </TabsPanel>
-        ))}
+        {[CompanyProfile, Financial, Financial, Financial, Financial].map(
+          (Component, idx) => (
+            <TabsPanel key={idx} value={tabs[idx].value}>
+              <Component />
+            </TabsPanel>
+          )
+        )}
       </Tabs>
     </Box>
   );

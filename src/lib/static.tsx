@@ -28,6 +28,7 @@ import Link from "next/link";
 import businessStyles from "@/ui/styles/business.module.scss";
 import { TransactionType } from "./hooks/transactions";
 import { Notification } from "./hooks/notifications";
+import { formatNumber } from "./utils";
 
 export const AdminMainLinks = [
   {
@@ -381,3 +382,23 @@ export const businessIndustries: string[] = [
   "Travel & Tourism",
   "Wholesale & Distribution",
 ];
+
+export const operationsAccountEstimatedBalance = {
+  "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
+  "between-10000-50000": `Between ${formatNumber(
+    10000,
+    true,
+    "GBP"
+  )} - ${formatNumber(50000, true, "GBP")}`,
+  "between-50000-100000": `Between ${formatNumber(
+    50000,
+    true,
+    "GBP"
+  )} - ${formatNumber(100000, true, "GBP")}`,
+  "between-100000-500000": `Between ${formatNumber(
+    100000,
+    true,
+    "GBP"
+  )} - ${formatNumber(500000, true, "GBP")}`,
+  "above-500000": `Above ${formatNumber(500000, true, "GBP")}`,
+} as const;

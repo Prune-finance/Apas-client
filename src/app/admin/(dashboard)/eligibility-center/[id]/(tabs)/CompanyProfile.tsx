@@ -3,29 +3,20 @@ import dayjs from "dayjs";
 import React, { useState } from "react";
 import PaperContainer from "../PaperContainer";
 import {
+  ProfileDateInput,
   ProfileTextarea,
   ProfileTextInput,
 } from "@/ui/components/InputWithLabel";
 import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { PanelWrapper } from "./utils";
+import { IconPencilMinus } from "@tabler/icons-react";
 
 export default function CompanyProfile() {
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState([1]);
 
-  const actionNode = (
-    <Group gap={10}>
-      <SecondaryBtn
-        fz={12}
-        fw={600}
-        text="Edit"
-        action={() => setEditing(!editing)}
-      />
-      <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
-    </Group>
-  );
   const summaryData = {
     "Application submitted": dayjs().format("DD-MM-YYYY"),
     "Submitted by": "Sarah Samuel",
@@ -76,36 +67,109 @@ export default function CompanyProfile() {
         />
       </PaperContainer>
 
-      <PaperContainer
-        title="Contact Person Information"
-        actionNode={actionNode}
-        mt={20}
-      >
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-          <ProfileTextInput
-            label="First Name"
-            placeholder="Tobi"
-            editing={editing}
-          />
-          <ProfileTextInput
-            label="Last Name"
-            placeholder="Khalid"
-            editing={editing}
-          />
-          <ProfileTextInput
-            label="Email"
-            placeholder="1905Logistics@gmail.com"
-            editing={editing}
-          />
-          <ProfileTextInput
-            label="Phone Number"
-            placeholder="+2348163320000"
-            editing={editing}
-          />
-          <DocumentPreview label="Identity Document" title="File.pdf....." />
-          <DocumentPreview label="Proof of Address" title="File.pdf....." />
-        </SimpleGrid>
-      </PaperContainer>
+      <ContactPerson />
+      <CeoDetails />
     </PanelWrapper>
   );
 }
+
+const ContactPerson = () => {
+  const [editing, setEditing] = useState(false);
+
+  const actionNode = (
+    <Group gap={10}>
+      <SecondaryBtn
+        fz={12}
+        fw={600}
+        text="Edit"
+        action={() => setEditing((prev) => !prev)}
+        leftSection={<IconPencilMinus size={16} />}
+      />
+      <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
+    </Group>
+  );
+
+  return (
+    <PaperContainer
+      title="Contact Person Information"
+      actionNode={actionNode}
+      mt={20}
+    >
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+        <ProfileTextInput
+          label="First Name"
+          placeholder="Tobi"
+          editing={editing}
+        />
+        <ProfileTextInput
+          label="Last Name"
+          placeholder="Khalid"
+          editing={editing}
+        />
+        <ProfileTextInput
+          label="Email"
+          placeholder="1905Logistics@gmail.com"
+          editing={editing}
+        />
+        <ProfileTextInput
+          label="Phone Number"
+          placeholder="+2348163320000"
+          editing={editing}
+        />
+        <DocumentPreview label="Identity Document" title="File.pdf....." />
+        <DocumentPreview label="Proof of Address" title="File.pdf....." />
+      </SimpleGrid>
+    </PaperContainer>
+  );
+};
+
+const CeoDetails = () => {
+  const [editing, setEditing] = useState(false);
+  const actionNode = (
+    <Group gap={10}>
+      <SecondaryBtn
+        fz={12}
+        fw={600}
+        text="Edit"
+        action={() => setEditing((prev) => !prev)}
+        leftSection={<IconPencilMinus size={16} />}
+      />
+      <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
+    </Group>
+  );
+
+  return (
+    <PaperContainer title="Ceo details" actionNode={actionNode} mt={20}>
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
+        <ProfileTextInput
+          label="First Name"
+          placeholder="Tobi"
+          editing={editing}
+        />
+        <ProfileTextInput
+          label="Last Name"
+          placeholder="Khalid"
+          editing={editing}
+        />
+        <ProfileTextInput
+          label="Email"
+          placeholder="1905Logistics@gmail.com"
+          editing={editing}
+        />
+        <ProfileTextInput
+          label="Phone Number"
+          placeholder="+2348163320000"
+          editing={editing}
+        />
+        <ProfileDateInput
+          label="Date of Birth"
+          placeholder={`${dayjs().format("DD-MM-YYYY")}`}
+          editing={editing}
+          valueFormat="DD-MM-YYYY"
+        />
+        <DocumentPreview label="Identity Document" title="File.pdf....." />
+        <DocumentPreview label="Proof of Address" title="File.pdf....." />
+      </SimpleGrid>
+    </PaperContainer>
+  );
+};

@@ -14,6 +14,7 @@ import {
 import Tabs from "@/ui/components/Tabs";
 import CompanyProfile from "./(tabs)/CompanyProfile";
 import Financial from "./(tabs)/Financial";
+import Documents from "./(tabs)/Documents";
 
 export default function OnboardingProfile() {
   return (
@@ -38,7 +39,7 @@ export default function OnboardingProfile() {
           list: { marginBottom: "24px" },
         }}
       >
-        {[CompanyProfile, Financial, Financial, Financial, Financial].map(
+        {[CompanyProfile, Financial, Documents, Financial, Financial].map(
           (Component, idx) => (
             <TabsPanel key={idx} value={tabs[idx].value}>
               <Component />

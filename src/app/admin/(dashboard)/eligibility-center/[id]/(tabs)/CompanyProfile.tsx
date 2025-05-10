@@ -8,9 +8,12 @@ import {
 } from "@/ui/components/InputWithLabel";
 import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { PanelWrapper } from "./utils";
 
 export default function CompanyProfile() {
   const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState([]);
 
   const actionNode = (
     <Group gap={10}>
@@ -28,7 +31,7 @@ export default function CompanyProfile() {
     "Submitted by": "Sarah Samuel",
   };
   return (
-    <Box>
+    <PanelWrapper loading={loading} rows={rows} panelName="Company Profile">
       <Text tt="uppercase" fz={12} fw={600} c="var(--prune-text-gray-800)">
         Summary
       </Text>
@@ -103,6 +106,6 @@ export default function CompanyProfile() {
           <DocumentPreview label="Proof of Address" title="File.pdf....." />
         </SimpleGrid>
       </PaperContainer>
-    </Box>
+    </PanelWrapper>
   );
 }

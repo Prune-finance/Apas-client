@@ -8,7 +8,7 @@ import { PanelWrapper } from "./utils";
 
 export default function Documents() {
   const [loading, setLoading] = useState(false);
-  const [rows, setRows] = useState([1, 2, 3, 4, 5]);
+  const [rows, setRows] = useState([]);
   const businessDocs = [
     { label: "CAC Certificate", title: "File.pdf", value: "" },
     { label: "Memart", title: "File.pdf", value: "" },

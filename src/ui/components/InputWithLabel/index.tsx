@@ -184,6 +184,32 @@ export const ProfileTextInput = ({
   );
 };
 
+interface ProfileDateInputProps extends DateInputProps {
+  editing?: boolean;
+}
+export const ProfileDateInput = ({
+  editing = false,
+  ...props
+}: ProfileDateInputProps) => {
+  return (
+    <DateInput
+      styles={{
+        input: {
+          border: editing ? "1px solid var(--prune-text-gray-200)" : "none",
+        },
+      }}
+      classNames={{
+        input: profile_styles.profile_input,
+        label: profile_styles.profile_label,
+      }}
+      w="100%"
+      maxDate={new Date()}
+      readOnly={!editing}
+      {...props}
+    />
+  );
+};
+
 interface ProfileTextareaProps extends TextareaProps {
   editing?: boolean;
 }

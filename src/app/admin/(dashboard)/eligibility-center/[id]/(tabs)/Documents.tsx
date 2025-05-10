@@ -3,6 +3,8 @@ import React from "react";
 import PaperContainer from "../PaperContainer";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { IconPlus } from "@tabler/icons-react";
 
 export default function Documents() {
   const businessDocs = [
@@ -32,7 +34,18 @@ export default function Documents() {
         </SimpleGrid>
       </PaperContainer>
 
-      <PaperContainer title="Business Documents" mt={24}>
+      <PaperContainer
+        title="Business Documents"
+        mt={24}
+        actionNode={
+          <PrimaryBtn
+            text="Add Document"
+            fw={600}
+            fz={12}
+            leftSection={<IconPlus size={16} />}
+          />
+        }
+      >
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
           {businessDocs.map((doc, idx) => (
             <DocumentPreview key={idx} label={doc.label} title={doc.title} />

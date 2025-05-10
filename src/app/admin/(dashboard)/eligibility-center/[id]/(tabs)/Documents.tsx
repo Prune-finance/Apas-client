@@ -1,12 +1,14 @@
-import { Box, Center, SimpleGrid } from "@mantine/core";
-import React from "react";
+import { SimpleGrid } from "@mantine/core";
+import React, { useState } from "react";
 import PaperContainer from "../PaperContainer";
-import EmptyTable from "@/ui/components/EmptyTable";
 import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { IconPlus } from "@tabler/icons-react";
+import { PanelWrapper } from "./utils";
 
 export default function Documents() {
+  const [loading, setLoading] = useState(false);
+  const [rows, setRows] = useState([1, 2, 3, 4, 5]);
   const businessDocs = [
     { label: "CAC Certificate", title: "File.pdf", value: "" },
     { label: "Memart", title: "File.pdf", value: "" },
@@ -14,20 +16,7 @@ export default function Documents() {
     { label: "Operational License (optional)", title: "File.pdf", value: "" },
   ];
   return (
-    <Box>
-      {/* For empty documents */}
-      {/* <PaperContainer title="Documents" h="calc(100vh - 300px)">
-        <Center h="calc(100% - 140px)">
-          <EmptyTable
-            rows={[]}
-            loading={false}
-            title=""
-            text="There is no data here for now"
-          />
-        </Center>
-      </PaperContainer> */}
-
-      {/* For filled out documents from onboarding flow */}
+    <PanelWrapper loading={loading} rows={rows} panelName="Document">
       <PaperContainer title="Terms of use agreement">
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
           <DocumentPreview label="" title="File.pdf....." />
@@ -52,6 +41,6 @@ export default function Documents() {
           ))}
         </SimpleGrid>
       </PaperContainer>
-    </Box>
+    </PanelWrapper>
   );
 }

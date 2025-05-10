@@ -2,11 +2,14 @@ import {
   Checkbox,
   CheckboxProps,
   Flex,
+  Group,
   NumberInput,
   NumberInputProps,
+  Radio,
   rem,
   Select,
   SelectProps,
+  Text,
   Textarea,
   TextareaProps,
   TextInput,
@@ -178,5 +181,55 @@ export const ProfileTextInput = ({
       readOnly={!editing}
       {...props}
     />
+  );
+};
+
+interface ProfileTextareaProps extends TextareaProps {
+  editing?: boolean;
+}
+export const ProfileTextarea = ({
+  editing = false,
+  ...props
+}: ProfileTextareaProps) => {
+  return (
+    <Textarea
+      styles={{
+        input: {
+          border: editing ? "1px solid var(--prune-text-gray-200)" : "none",
+        },
+      }}
+      classNames={{
+        input: profile_styles.profile_input,
+        label: profile_styles.profile_label,
+      }}
+      w="100%"
+      readOnly={!editing}
+      minRows={4}
+      maxRows={5}
+      autosize
+      {...props}
+    />
+  );
+};
+
+interface CustomRadioCardProps {
+  label: string;
+  value: string | number;
+}
+
+export const CustomRadioCard = ({ label, value }: CustomRadioCardProps) => {
+  return (
+    <Radio.Card
+      value={String(value)}
+      color="var(--prune-primary-700)"
+      classNames={{ card: profile_styles.card }}
+    >
+      <Group wrap="nowrap" align="center" justify="space-between">
+        <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+          {label}
+        </Text>
+        <Radio.Indicator color="var(--prune-primary-700)" />
+      </Group>
+    </Radio.Card>
   );
 };

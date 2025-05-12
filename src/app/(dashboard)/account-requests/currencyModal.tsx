@@ -4,6 +4,9 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { Box, Flex, Modal, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { CurrencyRequest } from "@/lib/hooks/requests";
+import AdvancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(AdvancedFormat);
 
 interface CurrencyRequestProps {
   opened: boolean;
@@ -54,7 +57,7 @@ function CurrencyModal({
           </Text>
           <Text fz={12} fw={500} c="#344054">
             {selectedRequest?.createdAt &&
-              dayjs(selectedRequest?.createdAt).format("DD/MM/YYYY")}
+              dayjs(selectedRequest?.createdAt).format("Do MMMM, YYYY")}
           </Text>
         </Flex>
         <Flex justify="space-between" align="center" gap={5}>

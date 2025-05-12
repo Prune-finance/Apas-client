@@ -24,6 +24,9 @@ import dayjs from "dayjs";
 import { useSearchParams } from "next/navigation";
 import React, { Fragment, useState } from "react";
 import CurrencyModal from "./currencyModal";
+import AdvancedFormat from "dayjs/plugin/advancedFormat";
+
+dayjs.extend(AdvancedFormat);
 
 function AdditionalCurrency() {
   const searchParams = useSearchParams();
@@ -67,8 +70,12 @@ function AdditionalCurrency() {
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element?.accountName}</TableTd>
-      <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
       <TableTd>-</TableTd>
+      <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
+      <TableTd tt="capitalize">
+        {element?.createdAt &&
+          dayjs(element?.createdAt).format("Do MMMM, YYYY")}
+      </TableTd>
 
       <TableTd>
         <BadgeComponent status={element.status} />
@@ -134,8 +141,9 @@ function AdditionalCurrency() {
 
 const tableHeaders = [
   "Business Name",
-  "Requested Currency",
   "Existing Currencies",
+  "Requested Currency",
+  "Date Requested",
   "Status",
 ];
 

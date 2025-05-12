@@ -27,7 +27,7 @@ import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import Cookies from "js-cookie";
 
-function OperationAccount() {
+function PayoutCurrencyAccount() {
   const searchParams = useSearchParams();
 
   const { status, date, endDate, business } = Object.fromEntries(
@@ -79,6 +79,7 @@ function OperationAccount() {
     >
       <TableTd>{element?.accountName}</TableTd>
       <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
+      <TableTd>-</TableTd>
       <TableTd>-</TableTd>
 
       <TableTd>
@@ -243,7 +244,8 @@ const tableHeaders = [
   "Business Name",
   "Requested Currency",
   "Existing Currencies",
+  "Date Created",
   "Status",
 ];
 
-export default OperationAccount;
+export default PayoutCurrencyAccount;

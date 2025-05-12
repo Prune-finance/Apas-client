@@ -237,7 +237,92 @@ export function useCurrencyRequests(customParams: IParams = {}) {
         }
       );
 
-      console.log(data);
+      setMeta(data.meta);
+      setCurrencyRequests(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchCurrencyRequest();
+  }
+
+  useEffect(() => {
+    fetchCurrencyRequest();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, [
+    limit,
+    date,
+    endDate,
+    status,
+    accountName,
+    accountNumber,
+    business,
+    accountType,
+    page,
+    search,
+  ]);
+
+  return { loading, currencyRequests, meta, revalidate };
+}
+
+export function useBusinessCurrencyRequests(customParams: IParams = {}) {
+  const [currencyRequests, setCurrencyRequests] = useState<CurrencyRequest[]>(
+    []
+  );
+  const [meta, setMeta] = useState<Meta>();
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.accountName && {
+        accountName: customParams.accountName,
+      }),
+      ...(customParams.accountNumber && {
+        accountNumber: customParams.accountNumber,
+      }),
+      ...(customParams.accountType && {
+        accountType: customParams.accountType,
+      }),
+      ...(customParams.business && { business: customParams.business }),
+      ...(customParams.search && { search: customParams.search }),
+    };
+  }, [customParams]);
+
+  const {
+    limit,
+    date,
+    endDate,
+    status,
+    accountName,
+    accountNumber,
+    business,
+    accountType,
+    page,
+    search,
+  } = obj;
+
+  async function fetchCurrencyRequest() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(obj as Record<string, string>);
+      const { data } = await acctAxiosInstance.get(
+        `/currency-account/get-business-currency-account-requests`,
+        {
+          params,
+        }
+      );
       setMeta(data.meta);
       setCurrencyRequests(data.data);
     } catch (error) {

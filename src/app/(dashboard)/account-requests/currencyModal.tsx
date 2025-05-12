@@ -1,32 +1,29 @@
 import React from "react";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+
 import { Box, Flex, Modal, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { CurrencyRequest } from "@/lib/hooks/requests";
 
 interface CurrencyRequestProps {
-  approveOpened: boolean;
-  currencyOpenApprove: () => void;
-  currencyRejectedApprove: () => void;
-  closeApprove: () => void;
+  opened: boolean;
+  close: () => void;
   selectedRequest: CurrencyRequest | null;
 }
 
-function SingleCurrencyModal({
-  approveOpened,
-  currencyOpenApprove,
-  currencyRejectedApprove,
-  closeApprove,
+function CurrencyModal({
+  opened,
+  close,
+
   selectedRequest,
 }: CurrencyRequestProps) {
   return (
     <Modal
-      opened={approveOpened}
-      onClose={closeApprove}
+      opened={opened}
+      onClose={close}
       title={
         <Text tt="uppercase" fz={14} fw={600} c="#1D2939" ml={32}>
-          {selectedRequest?.Currency?.symbol} Own ACCOUNT REQUEST
+          {selectedRequest?.Currency?.symbol} ACCOUNT REQUEST
         </Text>
       }
       closeButtonProps={{
@@ -36,7 +33,7 @@ function SingleCurrencyModal({
           top: 16,
           right: 32,
         },
-        onClick: closeApprove,
+        onClick: close,
       }}
       size={400}
       padding={0}
@@ -88,28 +85,8 @@ function SingleCurrencyModal({
           </Box>
         </Flex>
       </Box>
-
-      {selectedRequest?.status === "PENDING" && (
-        <Flex justify="center" gap={15} px={32} py={15} bg="#F9F9F9">
-          <SecondaryBtn
-            text="Reject"
-            action={currencyRejectedApprove}
-            fullWidth
-          />
-
-          <PrimaryBtn
-            text={"Approved"}
-            action={() => {
-              currencyOpenApprove();
-              closeApprove();
-            }}
-            loading={false}
-            fullWidth
-          />
-        </Flex>
-      )}
     </Modal>
   );
 }
 
-export default SingleCurrencyModal;
+export default CurrencyModal;

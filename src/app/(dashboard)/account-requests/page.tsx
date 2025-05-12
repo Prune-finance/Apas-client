@@ -47,6 +47,7 @@ import createAxiosInstance from "@/lib/axios";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import TabsComponent from "@/ui/components/Tabs";
 import AccountRequestIcon from "@/assets/account-req-icon.png";
+import AdditionalCurrency from "./AdditionalCurrency";
 
 const axios = createAxiosInstance("accounts");
 
@@ -161,53 +162,7 @@ function AccountRequests() {
           style={{ position: "relative" }}
         >
           <TabsPanel value={accountRequestTabs[0].value}>
-            <Group justify="space-between" mt={30}>
-              <SearchInput search={search} setSearch={setSearch} />
-
-              <SecondaryBtn
-                text="Filter"
-                action={toggle}
-                icon={IconListTree}
-                fw={600}
-              />
-            </Group>
-
-            <Filter<FilterType>
-              opened={openedFilter}
-              toggle={toggle}
-              form={form}
-              approvalStatus
-              customStatusOption={["Approved", "Pending", "Rejected"]}
-            >
-              <TextBox
-                placeholder="First Name"
-                {...form.getInputProps("firstName")}
-              />
-
-              <TextBox
-                placeholder="Last Name"
-                {...form.getInputProps("lastName")}
-              />
-
-              <TextBox
-                placeholder="Country"
-                {...form.getInputProps("country")}
-              />
-
-              <SelectBox
-                placeholder="Type"
-                {...form.getInputProps("type")}
-                data={["Corporate", "Individual"]}
-                clearable
-              />
-            </Filter>
-
-            <EmptyTable
-              rows={[]}
-              loading={loading}
-              title="There are no additional currency requests"
-              text="When a request is created, it will appear here"
-            />
+            <AdditionalCurrency />
           </TabsPanel>
 
           <TabsPanel value={accountRequestTabs[1].value}>

@@ -1,6 +1,11 @@
 import useNotification from "@/lib/hooks/notification";
 import { CurrencyRequest, useCurrencyRequests } from "@/lib/hooks/requests";
-import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import {
+  currencyRequest,
+  FilterSchema,
+  FilterType,
+  FilterValues,
+} from "@/lib/schema";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -18,6 +23,9 @@ import { useSearchParams } from "next/navigation";
 import React, { Fragment, useState } from "react";
 import SingleCurrencyModal from "./SingleCurrencyModal";
 import RejectModalComponent from "./RejectCurrencyModal";
+import axios from "axios";
+import { parseError } from "@/lib/actions/auth";
+import Cookies from "js-cookie";
 
 function OperationAccount() {
   const searchParams = useSearchParams();
@@ -33,8 +41,7 @@ function OperationAccount() {
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
-
-  const [opened, { open, close }] = useDisclosure(false);
+  const [processing, setProcessing] = useState(false);
   const [approveOpened, { open: openApprove, close: closeApprove }] =
     useDisclosure(false);
   const [
@@ -80,12 +87,6 @@ function OperationAccount() {
     </TableTr>
   ));
 
-  const data = {
-    accountName: selectedRequest?.accountName,
-    requestedDate: selectedRequest?.createdAt,
-    status: selectedRequest?.status,
-  };
-
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
@@ -97,8 +98,65 @@ function OperationAccount() {
       supportingDocumentName: "",
       supportingDocumentUrl: "",
     },
-    // validate: zodResolver(validateRequest),
+    validate: zodResolver(currencyRequest),
   });
+
+  const handleRejectCurrencyRequest = async () => {
+    if (!selectedRequest) return;
+    setProcessing(true);
+    try {
+      const { reason, supportingDocumentName, supportingDocumentUrl } =
+        requestForm.values;
+
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-account/admin-reject-business-currency-account-request/${selectedRequest?.id}`,
+        {
+          rejectComment: reason,
+          ...(supportingDocumentName && { supportingDocumentName }),
+          ...(supportingDocumentUrl && { supportingDocumentUrl }),
+        },
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      revalidate();
+      currencyRejectApprove();
+
+      handleSuccess(
+        `${selectedRequest?.Currency?.symbol} Operations account Rejected`,
+        `Request for ${selectedRequest?.Currency?.symbol} rejected`
+      );
+      setSelectedRequest(null);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleApprovedCurrencyRequest = async () => {
+    if (!selectedRequest) return;
+    setProcessing(true);
+    try {
+      await axios.patch(
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-account/admin-approve-business-currency-account-request/${selectedRequest?.id}`,
+        {},
+        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+      );
+
+      revalidate();
+      currencyCloseApprove();
+      handleSuccess(
+        `${selectedRequest?.Currency?.symbol} Operations account Approved`,
+        `Request for ${selectedRequest?.Currency?.symbol} approved`
+      );
+      setSelectedRequest(null);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   return (
     <Fragment>
       <Group justify="space-between">
@@ -158,8 +216,8 @@ function OperationAccount() {
         icon={<IconCheck color="#12B76A" />}
         opened={currencyApproveOpened}
         close={currencyCloseApprove}
-        action={() => {}}
-        processing={false}
+        action={handleApprovedCurrencyRequest}
+        processing={processing}
         title="GBP Account Request Approval"
         text="This means you are approving the request for GBP account for this business."
         customApproveMessage="Yes, Approve"
@@ -170,8 +228,8 @@ function OperationAccount() {
         icon={<IconX color="#D92D20" />}
         opened={currencyRejectedOpened}
         close={currencyRejectApprove}
-        action={() => {}}
-        processing={false}
+        action={handleRejectCurrencyRequest}
+        processing={processing}
         title="Reject This Account Issuance Request?"
         text="This means you are rejecting the account issuance request of this business."
         customApproveMessage="Yes, Reject"

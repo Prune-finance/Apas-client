@@ -120,7 +120,6 @@ function OperationAccount() {
 
       revalidate();
       currencyRejectApprove();
-
       handleSuccess(
         `${selectedRequest?.Currency?.symbol} Operations account Rejected`,
         `Request for ${selectedRequest?.Currency?.symbol} rejected`
@@ -145,6 +144,7 @@ function OperationAccount() {
 
       revalidate();
       currencyCloseApprove();
+      closeApprove();
       handleSuccess(
         `${selectedRequest?.Currency?.symbol} Operations account Approved`,
         `Request for ${selectedRequest?.Currency?.symbol} approved`

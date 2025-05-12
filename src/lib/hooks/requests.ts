@@ -237,6 +237,7 @@ export function useCurrencyRequests(customParams: IParams = {}) {
         }
       );
 
+      console.log(data);
       setMeta(data.meta);
       setCurrencyRequests(data.data);
     } catch (error) {

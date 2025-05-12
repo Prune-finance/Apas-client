@@ -160,7 +160,7 @@ function OperationAccount() {
   return (
     <Fragment>
       <Group justify="space-between">
-        <SearchInput />
+        <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
           text="Filter"

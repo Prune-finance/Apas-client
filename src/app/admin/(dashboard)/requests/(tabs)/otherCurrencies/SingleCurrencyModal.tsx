@@ -8,6 +8,7 @@ import { CurrencyRequest } from "@/lib/hooks/requests";
 interface CurrencyRequestProps {
   approveOpened: boolean;
   currencyOpenApprove: () => void;
+  currencyRejectedApprove: () => void;
   closeApprove: () => void;
   selectedRequest: CurrencyRequest | null;
 }
@@ -15,6 +16,7 @@ interface CurrencyRequestProps {
 function SingleCurrencyModal({
   approveOpened,
   currencyOpenApprove,
+  currencyRejectedApprove,
   closeApprove,
   selectedRequest,
 }: CurrencyRequestProps) {
@@ -89,7 +91,11 @@ function SingleCurrencyModal({
 
       {selectedRequest?.status === "PENDING" && (
         <Flex justify="center" gap={15} px={32} py={15} bg="#F9F9F9">
-          <SecondaryBtn text="Reject" action={() => {}} fullWidth />
+          <SecondaryBtn
+            text="Reject"
+            action={currencyRejectedApprove}
+            fullWidth
+          />
 
           <PrimaryBtn
             text={"Approved"}

@@ -12,11 +12,12 @@ import { TableComponent } from "@/ui/components/Table";
 import { Box, Flex, Group, Modal, TableTd, TableTr, Text } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconCheck, IconListTree } from "@tabler/icons-react";
+import { IconCheck, IconListTree, IconX } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { useSearchParams } from "next/navigation";
 import React, { Fragment, useState } from "react";
 import SingleCurrencyModal from "./SingleCurrencyModal";
+import RejectModalComponent from "./RejectCurrencyModal";
 
 function OperationAccount() {
   const searchParams = useSearchParams();
@@ -39,6 +40,10 @@ function OperationAccount() {
   const [
     currencyApproveOpened,
     { open: currencyOpenApprove, close: currencyCloseApprove },
+  ] = useDisclosure(false);
+  const [
+    currencyRejectedOpened,
+    { open: currencyRejectedApprove, close: currencyRejectApprove },
   ] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
 
@@ -85,6 +90,15 @@ function OperationAccount() {
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
+
+  const requestForm = useForm({
+    initialValues: {
+      reason: "",
+      supportingDocumentName: "",
+      supportingDocumentUrl: "",
+    },
+    // validate: zodResolver(validateRequest),
+  });
   return (
     <Fragment>
       <Group justify="space-between">
@@ -130,6 +144,7 @@ function OperationAccount() {
       <SingleCurrencyModal
         approveOpened={approveOpened}
         currencyOpenApprove={currencyOpenApprove}
+        currencyRejectedApprove={currencyRejectedApprove}
         closeApprove={() => {
           closeApprove();
           // setSelectedRequest(null);
@@ -148,6 +163,19 @@ function OperationAccount() {
         title="GBP Account Request Approval"
         text="This means you are approving the request for GBP account for this business."
         customApproveMessage="Yes, Approve"
+      />
+
+      <RejectModalComponent
+        color="#FEF3F2"
+        icon={<IconX color="#D92D20" />}
+        opened={currencyRejectedOpened}
+        close={currencyRejectApprove}
+        action={() => {}}
+        processing={false}
+        title="Reject This Account Issuance Request?"
+        text="This means you are rejecting the account issuance request of this business."
+        customApproveMessage="Yes, Reject"
+        form={requestForm}
       />
     </Fragment>
   );

@@ -1,20 +1,22 @@
 import useNotification from "@/lib/hooks/notification";
-import { useCurrencyRequests } from "@/lib/hooks/requests";
+import { CurrencyRequest, useCurrencyRequests } from "@/lib/hooks/requests";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
+import ModalComponent from "@/ui/components/Modal";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { Group, TableTd, TableTr } from "@mantine/core";
+import { Box, Flex, Group, Modal, TableTd, TableTr, Text } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconListTree } from "@tabler/icons-react";
+import { IconCheck, IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { useSearchParams } from "next/navigation";
 import React, { Fragment, useState } from "react";
+import SingleCurrencyModal from "./SingleCurrencyModal";
 
 function OperationAccount() {
   const searchParams = useSearchParams();
@@ -23,6 +25,8 @@ function OperationAccount() {
     searchParams.entries()
   );
   const { handleError, handleSuccess } = useNotification();
+  const [selectedRequest, setSelectedRequest] =
+    useState<CurrencyRequest | null>(null);
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -30,6 +34,12 @@ function OperationAccount() {
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const [opened, { open, close }] = useDisclosure(false);
+  const [approveOpened, { open: openApprove, close: closeApprove }] =
+    useDisclosure(false);
+  const [
+    currencyApproveOpened,
+    { open: currencyOpenApprove, close: currencyCloseApprove },
+  ] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
 
   const queryParams = {
@@ -46,13 +56,12 @@ function OperationAccount() {
     ...queryParams,
   });
 
-  console.log("currencyRequests", currencyRequests);
-
   const rows = currencyRequests.map((element, index) => (
     <TableTr
       key={index}
       onClick={() => {
-        // setSelectedRequest(element);
+        setSelectedRequest(element);
+        openApprove();
       }}
       style={{ cursor: "pointer" }}
     >
@@ -65,6 +74,12 @@ function OperationAccount() {
       </TableTd>
     </TableTr>
   ));
+
+  const data = {
+    accountName: selectedRequest?.accountName,
+    requestedDate: selectedRequest?.createdAt,
+    status: selectedRequest?.status,
+  };
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -110,6 +125,29 @@ function OperationAccount() {
         setActive={setActive}
         limit={limit}
         setLimit={setLimit}
+      />
+
+      <SingleCurrencyModal
+        approveOpened={approveOpened}
+        currencyOpenApprove={currencyOpenApprove}
+        closeApprove={() => {
+          closeApprove();
+          // setSelectedRequest(null);
+        }}
+        selectedRequest={selectedRequest}
+      />
+
+      <ModalComponent
+        size={400}
+        color="#ECFDF3"
+        icon={<IconCheck color="#12B76A" />}
+        opened={currencyApproveOpened}
+        close={currencyCloseApprove}
+        action={() => {}}
+        processing={false}
+        title="GBP Account Request Approval"
+        text="This means you are approving the request for GBP account for this business."
+        customApproveMessage="Yes, Approve"
       />
     </Fragment>
   );

@@ -13,7 +13,7 @@ interface TextInputWithInsideLabelProps extends TextInputProps {}
 export const TextInputWithInsideLabel = ({
   ...props
 }: TextInputWithInsideLabelProps) => {
-  return <TextInput {...props} classNames={classes} className="Switzer" />;
+  return <TextInput {...props} classNames={classes} />;
 };
 
 interface NumberInputWithInsideLabelProps extends NumberInputProps {}
@@ -25,7 +25,6 @@ export const NumberInputWithInsideLabel = ({
   return (
     <NumberInput
       {...props}
-      className="Switzer"
       placeholder="Enter number"
       classNames={classes}
       thousandSeparator=","
@@ -38,5 +37,5 @@ interface TextareaWithInsideLabelProps extends TextareaProps {}
 export const TextareaWithInsideLabel = ({
   ...props
 }: TextareaWithInsideLabelProps) => {
-  return <Textarea {...props} classNames={classes} className="Switzer" />;
+  return <Textarea {...props} classNames={classes} />;
 };

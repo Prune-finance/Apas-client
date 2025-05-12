@@ -14,10 +14,11 @@ import "@mantine/notifications/styles.css";
 import "@/ui/styles/globals.scss";
 import { NotificationProvider } from "@/ui/components/NotificationProvider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { switzer } from "@/ui/fonts";
 
-export const switzer = localFont({
-  src: "../assets/fonts/Switzer-Regular.woff2",
-});
+// export const switzer = localFont({
+//   src: "../assets/fonts/Switzer-Regular.woff2",
+// });
 
 const metadata: Metadata = {
   title: "Prune",
@@ -25,7 +26,10 @@ const metadata: Metadata = {
 };
 
 const theme = createTheme({
-  fontFamily: switzer.style.fontFamily,
+  fontFamily: switzer.className,
+  headings: {
+    fontFamily: switzer.style.fontFamily,
+  },
 });
 
 export default function RootLayout({

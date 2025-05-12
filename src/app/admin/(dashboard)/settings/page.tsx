@@ -1,52 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import {
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  UnstyledButton,
-  rem,
-  Text,
-  Drawer,
-  Flex,
-  Box,
-  Divider,
-  Button,
-  TextInput,
-  TableScrollContainer,
-  Table,
-  TableTh,
-  TableThead,
-  TableTr,
-  Pagination,
-  Tabs,
-  TabsList,
-  TabsTab,
-  TabsPanel,
-} from "@mantine/core";
-import Breadcrumbs from "@/ui/components/Breadcrumbs";
+import { Text, Tabs, TabsList, TabsTab, TabsPanel } from "@mantine/core";
+
 import styles from "@/ui/styles/settings.module.scss";
-import {
-  IconDots,
-  IconEye,
-  IconTrash,
-  IconX,
-  IconCheck,
-  IconSearch,
-  IconListTree,
-  IconLogs,
-  IconAccessible,
-  IconNotification,
-} from "@tabler/icons-react";
-import EmptyImage from "@/assets/empty.png";
-import { useDisclosure } from "@mantine/hooks";
-import ModalComponent from "@/ui/components/Modal";
-import { formatNumber } from "@/lib/utils";
-import { AllBusinessSkeleton } from "@/lib/static";
-import { useBusiness } from "@/lib/hooks/businesses";
-import { switzer } from "@/app/layout";
+import { IconLogs, IconNotification } from "@tabler/icons-react";
+
 import Logs from "./(tabs)/logs";
 import { useState } from "react";
 import Notifications from "./(tabs)/notifications";

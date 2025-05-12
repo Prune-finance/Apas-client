@@ -15,7 +15,6 @@ import styles from "@/ui/styles/business.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
-import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
@@ -31,6 +30,7 @@ import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { switzer } from "@/ui/fonts";
 
 export default function BusinessUsers() {
   const searchParams = useSearchParams();

@@ -1090,6 +1090,7 @@ export interface CurrencyRequest {
   reason: string | null;
   stage: "TEST" | "LIVE" | string;
   status: "APPROVED" | "PENDING" | "REJECTED" | string;
+  createdAt: Date;
 }
 
 export interface Account {

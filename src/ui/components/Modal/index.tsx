@@ -28,6 +28,7 @@ export default function ModalComponent({
   reason,
   setReason,
   addReason,
+  size,
 }: ModalProps) {
   return (
     <Modal
@@ -36,6 +37,7 @@ export default function ModalComponent({
       onClose={close}
       centered
       withCloseButton={false}
+      size={size}
     >
       <Flex className={styles.modal} direction="column">
         <Flex justify="flex-end">
@@ -47,7 +49,7 @@ export default function ModalComponent({
           </div>
         </Flex>
 
-        <Flex direction="column" className={styles.top__flex}>
+        <Flex direction="column" className={styles.top__flex} mt={0}>
           <Flex justify="center">
             <div
               className={styles.top__flex__icon}
@@ -115,4 +117,5 @@ interface ModalProps {
   reason?: string;
   setReason?: Dispatch<SetStateAction<string>>;
   addReason?: boolean;
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "full" | number;
 }

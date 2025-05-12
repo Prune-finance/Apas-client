@@ -67,7 +67,7 @@ export default function RejectModalComponent({
             {...form.getInputProps("reason")}
           />
 
-          <Select
+          {/* <Select
             mb={20}
             placeholder="Select Supporting Document (Optional)"
             flex={1}
@@ -75,13 +75,12 @@ export default function RejectModalComponent({
             classNames={{ input: styles.input }}
             size="lg"
             {...form.getInputProps("supportingDocumentName")}
-          />
+          /> */}
 
           <DropzoneComponent<typeof reqValues>
             otherForm={form}
             formKey="supportingDocumentUrl"
             uploadedFileUrl={form.values.supportingDocumentUrl}
-            isUser
           />
         </Flex>
 

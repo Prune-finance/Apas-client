@@ -19,6 +19,10 @@ export const validateRequest = z.object({
   reason: z.string().min(1, "Reason is required"),
 });
 
+export const currencyRequest = z.object({
+  reason: z.string().min(1, "Reason is required"),
+});
+
 export const validateDebitRequest = z
   .object({
     account: z.string().min(3, "Account is required"),

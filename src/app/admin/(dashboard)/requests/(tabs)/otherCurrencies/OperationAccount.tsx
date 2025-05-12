@@ -1,12 +1,14 @@
 import useNotification from "@/lib/hooks/notification";
+import { useCurrencyRequests } from "@/lib/hooks/requests";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { Group } from "@mantine/core";
+import { Group, TableTd, TableTr } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconListTree } from "@tabler/icons-react";
@@ -40,6 +42,30 @@ function OperationAccount() {
     search: debouncedSearch,
   };
 
+  const { currencyRequests, revalidate, loading, meta } = useCurrencyRequests({
+    ...queryParams,
+  });
+
+  console.log("currencyRequests", currencyRequests);
+
+  const rows = currencyRequests.map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => {
+        // setSelectedRequest(element);
+      }}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd>{element?.accountName}</TableTd>
+      <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
+      <TableTd></TableTd>
+
+      <TableTd>
+        <BadgeComponent status={element.status} />
+      </TableTd>
+    </TableTr>
+  ));
+
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
@@ -69,18 +95,17 @@ function OperationAccount() {
         />
       </Filter>
 
-      <TableComponent head={tableHeaders} rows={[]} loading={false} />
+      <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
       <EmptyTable
-        rows={[]}
-        loading={false}
+        rows={rows}
+        loading={loading}
         title="There are no requests"
         text="When an account is freezed, it will appear here"
       />
 
       <PaginationComponent
-        total={1}
-        //   total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

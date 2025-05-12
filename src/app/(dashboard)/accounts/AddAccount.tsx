@@ -26,7 +26,7 @@ const data = [
 ];
 
 const accountType = [
-  { value: "ISSUED_ACCOUNT", label: "ISSUED ACCOUNT" },
+  // { value: "ISSUED_ACCOUNT", label: "ISSUED ACCOUNT" },
   { value: "PAYOUT_ACCOUNT", label: "PAYOUT ACCOUNT" },
   { value: "COMPANY_ACCOUNT", label: "COMPANY ACCOUNT" },
 ];

@@ -8,17 +8,22 @@ import Link from "next/link";
 import { useForm, zodResolver } from "@mantine/form";
 import { RegisterType, registerValues, validateRegister } from "@/lib/schema";
 import createAxiosInstance from "@/lib/axios";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import useNotification from "@/lib/hooks/notification";
-import User from "@/lib/store/user";
 import { isAxiosError } from "axios";
+import useAxios from "@/lib/hooks/useAxios";
+import { Onboarding } from "@/lib/interface";
+import OnboardingStore from "@/lib/store/onboarding";
 
 export default function OnboardingRegister() {
   const axios = createAxiosInstance("auth");
   const { push } = useRouter();
+  const { id } = useParams<{ id: string }>();
   const { handleSuccess, handleError } = useNotification();
-  const { setUser } = User();
+  // const { setUser } = User();
+  const { setData } = OnboardingStore();
+  console.log({ id });
 
   const [loading, setLoading] = useState(false);
   const form = useForm<RegisterType>({
@@ -27,17 +32,34 @@ export default function OnboardingRegister() {
     validate: zodResolver(validateRegister),
   });
 
+  const { data, error, queryFn } = useAxios<Onboarding>({
+    baseURL: "auth",
+    endpoint: `/onboarding/questionnaire/${id}`,
+    dependencies: [id],
+    enabled: !!!id,
+    method: "GET",
+    onSuccess: (data) => {
+      console.log(data);
+      setData(data);
+      form.initialize({
+        email: data.businessEmail || "",
+        password: "",
+        confirmPassword: "",
+      });
+    },
+  });
+
   const handleSubmit = async (values: RegisterType) => {
     setLoading(true);
 
     try {
-      const { data } = await axios.post("/onboarding/login", {
-        ...values,
+      const { data } = await axios.post("/onboarding/create", {
+        password: values.password,
         businessEmail: values.email,
       });
 
       Cookies.set("auth", data.meta.token, { expires: 0.25 });
-      handleSuccess("Account Created", "Welcome to Prune");
+      handleSuccess("Profile Created", "Please complete your profile");
 
       push("/onboarding");
     } catch (error) {
@@ -71,6 +93,7 @@ export default function OnboardingRegister() {
         placeholder="Enter Email"
         key={form.key("email")}
         {...form.getInputProps("email")}
+        disabled={!!data?.businessEmail}
       />
 
       <PasswordInput
@@ -154,7 +177,7 @@ export default function OnboardingRegister() {
           fw={700}
           c="var(--prune-primary-800)"
           component={Link}
-          href={"/auth/login"}
+          href={"/auth/onboarding/login"}
         >
           Log in
         </Text>

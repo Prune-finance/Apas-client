@@ -3,6 +3,7 @@ import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
+import { camelCaseToTitleCase } from "@/lib/utils";
 
 interface CEOInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -38,6 +39,7 @@ function CEOInfoCard({ setActive, data }: CEOInfoCard) {
               w={244}
               fz={12}
               // miw="100%"
+              tt="none"
             >
               {value}
             </Text>
@@ -51,7 +53,7 @@ function CEOInfoCard({ setActive, data }: CEOInfoCard) {
         </Text>
 
         <Flex gap={24} w="100%" mt={16}>
-          <DocumentPreview label="Identity Document" title="File.pdf....." />
+          <DocumentPreview label="Identity Document" title={camelCaseToTitleCase(String(data.ceoIdType)))} />
           <DocumentPreview label="Proof of Address" title="File.pdf....." />
         </Flex>
       </Box>

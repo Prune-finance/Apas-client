@@ -4,13 +4,16 @@ import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
 import { camelCaseToTitleCase } from "@/lib/utils";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
 interface CEOInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   data: Record<string, string | null | undefined>;
+  form: UseFormReturnType<OnboardingType>;
 }
 
-function CEOInfoCard({ setActive, data }: CEOInfoCard) {
+function CEOInfoCard({ setActive, data, form }: CEOInfoCard) {
   return (
     <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">
@@ -53,8 +56,16 @@ function CEOInfoCard({ setActive, data }: CEOInfoCard) {
         </Text>
 
         <Flex gap={24} w="100%" mt={16}>
-          <DocumentPreview label="Identity Document" title={camelCaseToTitleCase(String(data.ceoIdType)))} />
-          <DocumentPreview label="Proof of Address" title="File.pdf....." />
+          <DocumentPreview
+            label="Identity Document"
+            title={form.values.ceoIdType || ""}
+            value={form.values.ceoIdUrl}
+          />
+          <DocumentPreview
+            label="Proof of Address"
+            title={form.values.ceoPOAType || ""}
+            value={form.values.ceoPOAUrl}
+          />
         </Flex>
       </Box>
     </Box>

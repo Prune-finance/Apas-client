@@ -12,6 +12,8 @@ interface DocumentInfoCard {
 }
 
 function DocumentInfoCard({ setActive, form }: DocumentInfoCard) {
+  const { mermat, cacCertificate, amlCompliance, operationalLicense } =
+    form.values;
   return (
     <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">
@@ -31,12 +33,26 @@ function DocumentInfoCard({ setActive, form }: DocumentInfoCard) {
 
       <Box mt={24}>
         <Flex gap={24} w="100%" mt={16}>
-          <DocumentPreview label="Identity Document" title="File.pdf....." />
-          <DocumentPreview label="Proof of Address" title="File.pdf....." />
+          <DocumentPreview
+            label="CAC Certificate"
+            title="CAC Certificate"
+            value={cacCertificate}
+          />
+          <DocumentPreview label="Memart" title="Memart" value={mermat} />
         </Flex>
         <Flex gap={24} w="100%" mt={16}>
-          <DocumentPreview label="Identity Document" title="File.pdf....." />
-          <DocumentPreview label="Proof of Address" title="File.pdf....." />
+          <DocumentPreview
+            label="AML Compliance Framework"
+            title="AML Compliance Framework"
+            value={amlCompliance}
+          />
+          {operationalLicense && (
+            <DocumentPreview
+              label="Operational License"
+              title="Operational License"
+              value={operationalLicense}
+            />
+          )}
         </Flex>
       </Box>
     </Box>

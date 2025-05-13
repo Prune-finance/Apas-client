@@ -7,6 +7,8 @@ import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
+import useNotification from "@/lib/hooks/notification";
+import useAxios from "@/lib/hooks/useAxios";
 
 interface DocumentInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -15,18 +17,26 @@ interface DocumentInfo {
 }
 
 export const DocumentInfo = ({ setActive, active, form }: DocumentInfo) => {
+  const { handleSuccess } = useNotification();
+
+  const { queryFn, loading } = useAxios({
+    baseURL: "auth",
+    endpoint: "/onboarding/business-documents",
+    method: "POST",
+    body: {
+      cacCertificate: form.getValues().cacCertificate,
+      mermat: form.getValues().mermat,
+      amlCompliance: form.getValues().amlCompliance,
+      operationalLicense: form.getValues().operationalLicense,
+    },
+    onSuccess: (data) => {
+      setActive(active + 1);
+      handleSuccess("Business Documents", "Business Documents saved");
+    },
+  });
+
   return (
-    <Box
-      component="form"
-      onSubmit={form.onSubmit(
-        () => {
-          setActive(active + 1);
-        },
-        () => {
-          setActive(active + 1);
-        }
-      )}
-    >
+    <Box component="form" onSubmit={form.onSubmit(() => queryFn())}>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
         Documents
       </Text>
@@ -80,7 +90,13 @@ export const DocumentInfo = ({ setActive, active, form }: DocumentInfo) => {
             action={() => setActive(active - 1)}
             disabled={active === 0}
           />
-          <PrimaryBtn text="Next" w={126} fw={600} type="submit" />
+          <PrimaryBtn
+            text="Next"
+            w={126}
+            fw={600}
+            type="submit"
+            loading={loading}
+          />
         </Flex>
       </Flex>
     </Box>

@@ -140,6 +140,7 @@ export const MakeInitiator = ({ ...props }: MakeInitiatorProps) => {
       <Checkbox
         label="Make this contact an initiator"
         labelPosition="right"
+        color="var(--prune-primary-600)"
         styles={{
           label: { fontSize: "14px", fontWeight: 500 },
         }}

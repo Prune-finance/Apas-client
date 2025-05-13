@@ -2,6 +2,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import { TabsPanel } from "@mantine/core";
 import React from "react";
 import OperationAccount from "./OperationAccount";
+import PayoutCurrencyAccount from "./PayoutCurrencyAccount";
 
 function OtherCurrency() {
   return (
@@ -11,7 +12,7 @@ function OtherCurrency() {
       </TabsPanel>
 
       <TabsPanel value="Payout Account" mt={28} tt="capitalize">
-        <h1>Hello world</h1>
+        <PayoutCurrencyAccount />
       </TabsPanel>
     </TabsComponent>
   );

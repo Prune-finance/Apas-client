@@ -18,8 +18,8 @@ export default function ConfirmationModal({
     <Modal
       opened={opened}
       onClose={() => {
-        close();
         push("/pre-onboarding");
+        close();
       }}
       withCloseButton={false}
       padding={24}
@@ -34,7 +34,14 @@ export default function ConfirmationModal({
         </Text>
 
         <Flex justify="end">
-          <PrimaryBtn text="Okay" action={close} fw={600} />
+          <PrimaryBtn
+            text="Okay"
+            action={() => {
+              close();
+              push("/pre-onboarding");
+            }}
+            fw={600}
+          />
         </Flex>
       </Stack>
     </Modal>

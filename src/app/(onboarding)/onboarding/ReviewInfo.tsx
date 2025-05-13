@@ -61,6 +61,7 @@ export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
     "Identity Type": ceoIdType,
     "Proof of Address": ceoPOAType,
   };
+
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
@@ -72,7 +73,7 @@ export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
           <BasicInfoCard setActive={setActive} data={basicInfo} />
         </TabsPanel>
         <TabsPanel value={tabs[1]?.value}>
-          <CEOInfoCard setActive={setActive} data={ceoInfo} />
+          <CEOInfoCard setActive={setActive} data={ceoInfo} form={form} />
         </TabsPanel>
         <TabsPanel value={tabs[2]?.value}>
           <DocumentInfoCard setActive={setActive} form={form} />

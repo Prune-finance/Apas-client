@@ -32,7 +32,7 @@ export const AddShareholdersInfo = ({
     endpoint: "/onboarding/business-shared-holders",
     method: "POST",
     body: {
-      directors: form.getValues().shareholders,
+      shareholders: form.getValues().shareholders,
     },
     onSuccess: (data) => {
       setActive(active + 1);

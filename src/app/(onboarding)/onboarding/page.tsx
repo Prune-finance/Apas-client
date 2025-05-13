@@ -31,7 +31,7 @@ export default function Onboarding() {
   const [directors, setDirectors] = useState<OnboardingType["directors"]>();
   const [shareholders, setShareholders] =
     useState<OnboardingType["shareholders"]>();
-  // const { data, business, setBusiness, setData } = OnboardingStore();
+  const { setBusiness } = OnboardingStore();
 
   const form = useForm<OnboardingType>({
     mode: "controlled",
@@ -53,6 +53,9 @@ export default function Onboarding() {
     method: "GET",
     dependencies: [active],
     enabled: false,
+    onSuccess: (data) => {
+      setBusiness(data);
+    },
   });
 
   const { data } = useAxios<IOnboarding>({

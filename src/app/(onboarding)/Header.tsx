@@ -1,3 +1,4 @@
+import Onboarding from "@/lib/store/onboarding";
 import {
   Container,
   Flex,
@@ -12,12 +13,13 @@ import Link from "next/link";
 import React from "react";
 
 export default function Header() {
+  const { business } = Onboarding();
   return (
     <Container size={1200} h="100%">
       <Flex justify="space-between" align="center" h="100%">
         <Stack gap={4}>
           <Text fz={16} fw={500} c="var(--prune-text-gray-700)" lh={1}>
-            Hello, 1905 Transports
+            Hello, {business?.businessName || ""}
           </Text>
           <Text fz={14} fw={400} c="var(--prune-text-gray-500)" lh={1}>
             You’re one step closer to your API account

@@ -6,14 +6,35 @@ import { DocumentPreview } from "./DocumentPreview";
 import { camelCaseToTitleCase } from "@/lib/utils";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
+import dayjs from "dayjs";
 
 interface CEOInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
-  data: Record<string, string | null | undefined>;
   form: UseFormReturnType<OnboardingType>;
 }
 
-function CEOInfoCard({ setActive, data, form }: CEOInfoCard) {
+function CEOInfoCard({ setActive, form }: CEOInfoCard) {
+  const {
+    ceoFirstName,
+    ceoLastName,
+    ceoDOB,
+    ceoEmail,
+    ceoIdType,
+    ceoIdUrl,
+    ceoIdUrlBack,
+    ceoPOAType,
+    ceoPOAUrl,
+  } = form.values;
+
+  const ceoInfo = {
+    "First name": ceoFirstName,
+    "Last Name": ceoLastName,
+    "Date of Birth": dayjs(ceoDOB).format("DD-MM-YYYY"),
+    Email: ceoEmail,
+    "Identity Type": ceoIdType,
+    "Proof of Address": ceoPOAType,
+  };
+
   return (
     <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">
@@ -31,7 +52,7 @@ function CEOInfoCard({ setActive, data, form }: CEOInfoCard) {
         />
       </Flex>
       <Stack gap={10} mt={20}>
-        {Object.entries(data).map(([key, value]) => (
+        {Object.entries(ceoInfo).map(([key, value]) => (
           <Group key={key} justify="space-between" align="start">
             <Text c="#667085" fz={12}>
               {key}:
@@ -58,13 +79,13 @@ function CEOInfoCard({ setActive, data, form }: CEOInfoCard) {
         <Flex gap={24} w="100%" mt={16}>
           <DocumentPreview
             label="Identity Document"
-            title={form.values.ceoIdType || ""}
-            value={form.values.ceoIdUrl}
+            title={ceoIdType || ""}
+            value={ceoIdUrl}
           />
           <DocumentPreview
             label="Proof of Address"
-            title={form.values.ceoPOAType || ""}
-            value={form.values.ceoPOAUrl}
+            title={ceoPOAType || ""}
+            value={ceoPOAUrl}
           />
         </Flex>
       </Box>

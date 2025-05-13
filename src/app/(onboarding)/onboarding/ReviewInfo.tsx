@@ -21,47 +21,6 @@ interface ReviewInfo {
 }
 
 export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
-  const {
-    businessName: name,
-    businessTradingName: tradingName,
-    contactPersonPhoneNumber: contactNumber,
-    businessAddress: address,
-    businessDescription: businessBio,
-    businessIndustry,
-    businessPhoneNumber: businessNumber,
-    ceoDOB,
-    ceoEmail,
-    ceoFirstName,
-    ceoIdType,
-    ceoLastName,
-    ceoPOAType,
-    businessEmail: contactEmail,
-    businessCountry: country,
-    businessWebsite: domain,
-    businessType: legalEntity,
-  } = form.getValues();
-
-  const basicInfo = {
-    "Business Name": name,
-    "Trading Name": tradingName,
-    "Phone number": businessNumber,
-    Email: contactEmail,
-    "Business Type": legalEntity,
-    "Business Industry": businessIndustry,
-    "Business Website (URL)": domain,
-    Country: country,
-    "Business Address": address,
-    "Business Bio": businessBio,
-  };
-  const ceoInfo = {
-    "First name": ceoFirstName,
-    "Last Name": ceoLastName,
-    "Date of Birth": dayjs(ceoDOB).format("DD-MM-YYYY"),
-    Email: ceoEmail,
-    "Identity Type": ceoIdType,
-    "Proof of Address": ceoPOAType,
-  };
-
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
@@ -69,11 +28,19 @@ export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
       </Text>
 
       <TabsComponent tabs={tabs} mt={24} tt="capitalize">
-        <TabsPanel value={tabs[0]?.value}>
-          <BasicInfoCard setActive={setActive} data={basicInfo} />
-        </TabsPanel>
-        <TabsPanel value={tabs[1]?.value}>
-          <CEOInfoCard setActive={setActive} data={ceoInfo} form={form} />
+        {[
+          BasicInfoCard,
+          CEOInfoCard,
+          DocumentInfoCard,
+          DirectorInfoCard,
+          ShareholderInfoCard,
+        ].map((Component, index) => (
+          <TabsPanel value={tabs[index]?.value} key={index}>
+            <Component setActive={setActive} form={form} />
+          </TabsPanel>
+        ))}
+        {/* <TabsPanel value={tabs[1]?.value}>
+          <CEOInfoCard setActive={setActive} form={form} />
         </TabsPanel>
         <TabsPanel value={tabs[2]?.value}>
           <DocumentInfoCard setActive={setActive} form={form} />
@@ -83,7 +50,7 @@ export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
         </TabsPanel>
         <TabsPanel value={tabs[4]?.value}>
           <ShareholderInfoCard setActive={setActive} form={form} />
-        </TabsPanel>
+        </TabsPanel> */}
       </TabsComponent>
 
       <Flex align="center" justify="flex-end" w="100%" mt={20}>

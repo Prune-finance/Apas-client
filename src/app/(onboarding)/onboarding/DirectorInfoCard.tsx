@@ -13,6 +13,7 @@ interface DirectorInfoCard {
 }
 
 function DirectorInfoCard({ setActive, form }: DirectorInfoCard) {
+  const { directors } = form.values;
   const data = form.getValues().directors.map((director, index) => ({
     "First name": director.firstName,
     "Last Name": director.lastName,
@@ -76,11 +77,13 @@ function DirectorInfoCard({ setActive, form }: DirectorInfoCard) {
               <Flex gap={24} w="100%" mt={16}>
                 <DocumentPreview
                   label="Identity Document"
-                  title="File.pdf....."
+                  title={directors[directorIndex].identityType || ""}
+                  value={directors[directorIndex].identityFileUrl || ""}
                 />
                 <DocumentPreview
                   label="Proof of Address"
-                  title="File.pdf....."
+                  title={directors[directorIndex].proofOfAddress || ""}
+                  value={directors[directorIndex].proofOfAddressFileUrl || ""}
                 />
               </Flex>
             </Box>

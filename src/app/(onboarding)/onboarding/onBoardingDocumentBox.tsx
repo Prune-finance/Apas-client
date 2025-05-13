@@ -45,7 +45,7 @@ export default function OnBoardingDocumentBox<T>({
         otherForm={form}
         formKey={formKey}
         uploadedFileUrl={uploadedFileUrl}
-        isUser
+        isOnboarding
       />
       {form?.errors[formKey || "cacCertificate"] && (
         <Text fz={12} c="var(--prune-warning)" mt={5}>

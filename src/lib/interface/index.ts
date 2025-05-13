@@ -53,6 +53,7 @@ export interface OnboardingBusiness {
   contactPersonPOAUrl: string | null;
   contactPersonIdType: string | null;
   contactPersonIdUrl: string | null;
+  contactPersonIdUrlBack: string | null;
   makeContactPersonInitiator: boolean;
   cacCertificate: string | null;
   mermat: string | null;
@@ -66,6 +67,7 @@ export interface OnboardingBusiness {
   ceoPOAUrl: string | null;
   ceoIdType: string | null;
   ceoIdUrl: string | null;
+  ceoIdUrlBack: string | null;
   directors: Director[];
   shareholders: Director[];
   createdAt: Date;
@@ -75,4 +77,15 @@ export interface OnboardingBusiness {
   questionnaireId: string;
 }
 
-export interface Director {}
+export interface Director {
+  id: string;
+  firstName: string;
+  lastName: string;
+  dob: string | Date | null;
+  email: string;
+  identityType: string | null;
+  proofOfAddress: string | null;
+  identityFileUrl: string;
+  identityFileUrlBack: string;
+  proofOfAddressFileUrl: string;
+}

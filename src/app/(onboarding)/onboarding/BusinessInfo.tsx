@@ -1,4 +1,5 @@
 import {
+  MakeInitiator,
   PhoneNumberInput,
   SelectInputWithInsideLabel,
   TextareaWithInsideLabel,
@@ -12,6 +13,8 @@ import { OnboardingType } from "@/lib/schema";
 import countries from "@/assets/countries.json";
 import { useState } from "react";
 import { businessIndustries } from "@/lib/static";
+import useAxios from "@/lib/hooks/useAxios";
+import useNotification from "@/lib/hooks/notification";
 
 interface BusinessInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -20,14 +23,15 @@ interface BusinessInfo {
 }
 
 export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
-  const { contactIdType, contactPOAType } = form.getValues();
+  const { handleSuccess } = useNotification();
+  const { contactPersonIdType, contactPersonPOAType } = form.getValues();
   const [IdCheck, setIdCheck] = useState({
-    isContactIdType: Boolean(contactIdType) || false,
-    isContactPOAType: Boolean(contactPOAType) || false,
-    isPassport: contactIdType === "Passport" ? true : false,
+    isContactIdType: Boolean(contactPersonIdType) || false,
+    isContactPOAType: Boolean(contactPersonPOAType) || false,
+    isPassport: contactPersonIdType === "Passport" ? true : false,
   });
 
-  form.watch("contactIdType", ({ value }) => {
+  form.watch("contactPersonIdType", ({ value }) => {
     if (value) {
       setIdCheck({
         ...IdCheck,
@@ -55,7 +59,7 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
     }
   });
 
-  form.watch("contactPOAType", ({ value }) => {
+  form.watch("contactPersonPOAType", ({ value }) => {
     if (value) return setIdCheck({ ...IdCheck, isContactPOAType: true });
 
     setIdCheck({
@@ -63,13 +67,40 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
       isContactPOAType: false,
     });
   });
+
+  const { queryFn, loading } = useAxios({
+    baseURL: "auth",
+    endpoint: "/onboarding/business-information",
+    method: "POST",
+    body: {
+      businessName: form.getValues().businessName,
+      businessTradingName: form.getValues().businessTradingName,
+      businessType: form.getValues().businessType,
+      businessIndustry: form.getValues().businessIndustry,
+      businessCountry: form.getValues().businessCountry,
+      businessAddress: form.getValues().businessAddress,
+      businessEmail: form.getValues().businessEmail,
+      businessPhoneNumber: form.getValues().businessPhoneNumber,
+      businessWebsite: form.getValues().businessWebsite,
+      businessDescription: form.getValues().businessDescription,
+      contactPersonFirstName: form.getValues().contactPersonFirstName,
+      contactPersonLastName: form.getValues().contactPersonLastName,
+      contactPersonEmail: form.getValues().contactPersonEmail,
+      contactPersonPhoneNumber: form.getValues().contactPersonPhoneNumber,
+      contactPersonPOAType: form.getValues().contactPersonPOAType,
+      contactPersonPOAUrl: form.getValues().contactPersonPOAUrl,
+      contactPersonIdType: form.getValues().contactPersonIdType,
+      contactPersonIdUrl: form.getValues().contactPersonIdUrl,
+      makeContactPersonInitiator: form.getValues().makeContactPersonInitiator,
+    },
+    onSuccess: (data) => {
+      setActive(active + 1);
+      handleSuccess("Business Information", "Business information saved");
+    },
+  });
+
   return (
-    <Box
-      component="form"
-      onSubmit={form.onSubmit(() => {
-        setActive(active + 1);
-      })}
-    >
+    <Box component="form" onSubmit={form.onSubmit(() => queryFn())}>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
         Business Information
       </Text>
@@ -79,12 +110,14 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
           <TextInputWithInsideLabel
             label="Business Name"
             w="100%"
-            {...form.getInputProps("name")}
+            placeholder="Enter Business Name"
+            {...form.getInputProps("businessName")}
           />
           <TextInputWithInsideLabel
             label="Trading Name"
             w="100%"
-            {...form.getInputProps("tradingName")}
+            placeholder="Enter Trading Name"
+            {...form.getInputProps("businessTradingName")}
           />
         </Flex>
 
@@ -93,12 +126,15 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
             label="Business Type"
             data={["Corporate"]}
             w="100%"
-            {...form.getInputProps("legalEntity")}
+            searchable
+            placeholder="Select Business Type"
+            {...form.getInputProps("businessType")}
           />
           <SelectInputWithInsideLabel
             label="Business Industry"
             w="100%"
             searchable
+            placeholder="Select Business Industry"
             data={businessIndustries}
             {...form.getInputProps("businessIndustry")}
           />
@@ -109,13 +145,15 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
             label="Country"
             w="100%"
             searchable
+            placeholder="Select Country"
             data={countries.map((country) => country.name)}
-            {...form.getInputProps("country")}
+            {...form.getInputProps("businessCountry")}
           />
           <TextInputWithInsideLabel
             label="Address"
             w="100%"
-            {...form.getInputProps("address")}
+            placeholder="Enter Address"
+            {...form.getInputProps("businessAddress")}
           />
         </Flex>
 
@@ -123,26 +161,25 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
           <TextInputWithInsideLabel
             label="Email"
             w="100%"
-            {...form.getInputProps("contactEmail")}
+            placeholder="Enter Email"
+            {...form.getInputProps("businessEmail")}
           />
-          {/* <TextInputWithInsideLabel
-            label="Phone Number"
-            w="100%"
-            {...form.getInputProps("businessNumber")}
-          /> */}
 
-          <PhoneNumberInput<OnboardingType>
-            form={form}
-            phoneNumberKey="businessNumber"
-            countryCodeKey="businessNumberCode"
-          />
+          <Box w="100%">
+            <PhoneNumberInput<OnboardingType>
+              form={form}
+              phoneNumberKey="businessPhoneNumber"
+              countryCodeKey="businessPhoneNumberCode"
+            />
+          </Box>
         </Flex>
 
         <Flex gap={24} w="50%">
           <TextInputWithInsideLabel
             label="Business Website"
             w="100%"
-            {...form.getInputProps("domain")}
+            placeholder="Enter Business Website"
+            {...form.getInputProps("businessWebsite")}
           />
         </Flex>
 
@@ -153,7 +190,8 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
             autosize
             maxRows={7}
             minRows={5}
-            {...form.getInputProps("businessBio")}
+            placeholder="Enter Company's Description"
+            {...form.getInputProps("businessDescription")}
           />
         </Flex>
       </Stack>
@@ -167,12 +205,14 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
           <TextInputWithInsideLabel
             label="First Name"
             w="100%"
-            {...form.getInputProps("contactFirstName")}
+            placeholder="Enter First Name"
+            {...form.getInputProps("contactPersonFirstName")}
           />
           <TextInputWithInsideLabel
             label="Last Name"
             w="100%"
-            {...form.getInputProps("contactLastName")}
+            placeholder="Enter Last Name"
+            {...form.getInputProps("contactPersonLastName")}
           />
         </Flex>
 
@@ -180,18 +220,21 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
           <TextInputWithInsideLabel
             label="Email"
             w="100%"
-            {...form.getInputProps("contactEmail")}
+            placeholder="Enter Email"
+            {...form.getInputProps("contactPersonEmail")}
           />
           {/* <TextInputWithInsideLabel
             label="Phone Number"
             w="100%"
             {...form.getInputProps("contactNumber")}
           /> */}
-          <PhoneNumberInput<OnboardingType>
-            form={form}
-            phoneNumberKey="contactNumber"
-            countryCodeKey="contactCountryCode"
-          />
+          <Box w="100%">
+            <PhoneNumberInput<OnboardingType>
+              form={form}
+              phoneNumberKey="contactPersonPhoneNumber"
+              countryCodeKey="contactPersonPhoneNumberCode"
+            />
+          </Box>
         </Flex>
 
         <Flex gap={24} w="100%">
@@ -199,49 +242,61 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
             label="Identity Type"
             data={["ID Card", "Passport", "Residence Permit"]}
             w="100%"
-            {...form.getInputProps("contactIdType")}
+            searchable
+            placeholder="Select Identity Type"
+            {...form.getInputProps("contactPersonIdType")}
           />
           <SelectInputWithInsideLabel
             label="Proof of Address"
             w="100%"
+            searchable
+            placeholder="Select Proof of Address"
             data={["Utility Bill"]}
-            {...form.getInputProps("contactPOAType")}
+            {...form.getInputProps("contactPersonPOAType")}
           />
         </Flex>
 
         <Flex gap={24} w="100%">
-          {IdCheck.isContactIdType && (
+          {form.values.contactPersonIdType && (
             <>
               <OnBoardingDocumentBox
                 title="Upload Identity Document"
                 formKey="contactIdUrl"
                 form={form}
-                uploadedFileUrl={form.getValues().contactIdUrl || ""}
-                {...form.getInputProps("contactIdUrl")}
+                uploadedFileUrl={form.getValues().contactPersonIdUrl || ""}
+                {...form.getInputProps("contactPersonIdUrl")}
               />
 
-              {!IdCheck.isPassport && (
+              {form.values.contactPersonIdType !== "Passport" && (
                 <OnBoardingDocumentBox
                   title="Upload Identity Document (Back)"
                   formKey="contactIdUrlBack"
                   form={form}
-                  uploadedFileUrl={form.getValues().contactIdUrlBack || ""}
-                  {...form.getInputProps("contactIdUrlBack")}
+                  uploadedFileUrl={
+                    form.getValues().contactPersonIdUrlBack || ""
+                  }
+                  {...form.getInputProps("contactPersonIdUrlBack")}
                 />
               )}
             </>
           )}
 
-          {IdCheck.isContactPOAType && (
+          {form.values.contactPersonPOAType && (
             <OnBoardingDocumentBox
               title="Upload Proof of Address"
               formKey="contactPOAUrl"
               form={form}
-              uploadedFileUrl={form.getValues().contactPOAUrl || ""}
-              {...form.getInputProps("contactPOAUrl")}
+              uploadedFileUrl={form.getValues().contactPersonPOAUrl || ""}
+              {...form.getInputProps("contactPersonPOAUrl")}
             />
           )}
         </Flex>
+
+        <MakeInitiator
+          {...form.getInputProps("makeContactPersonInitiator", {
+            type: "checkbox",
+          })}
+        />
       </Stack>
 
       <Flex align="center" justify="space-between" w="100%" mt={20}>
@@ -259,10 +314,7 @@ export const BusinessInfo = ({ setActive, active, form }: BusinessInfo) => {
             w={126}
             fw={600}
             type="submit"
-            // action={() => {
-            //   if (form.validate().hasErrors) return;
-            //   setActive(active + 1);
-            // }}
+            loading={loading}
           />
         </Flex>
       </Flex>

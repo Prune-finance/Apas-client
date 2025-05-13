@@ -23,9 +23,9 @@ const Director = z.object({
   ),
   identityType: z.string().nullable(),
   proofOfAddress: z.string().nullable(),
-  identityFileUrl: z.string(),
-  identityFileUrlBack: z.string(),
-  proofOfAddressFileUrl: z.string(),
+  identityFileUrl: z.string().nullable(),
+  identityFileUrlBack: z.string().nullable(),
+  proofOfAddressFileUrl: z.string().nullable(),
 });
 
 export const onboardingDirectors = z.object({
@@ -73,9 +73,9 @@ export const onboardingShareholders = z.object({
         ),
         identityType: z.string().nullable(),
         proofOfAddress: z.string().nullable(),
-        identityFileUrl: z.string(),
-        identityFileUrlBack: z.string(),
-        proofOfAddressFileUrl: z.string(),
+        identityFileUrl: z.string().nullable(),
+        identityFileUrlBack: z.string().nullable(),
+        proofOfAddressFileUrl: z.string().nullable(),
       })
     )
     .optional()
@@ -104,33 +104,37 @@ const handleNullableString = (fieldName: string) =>
     });
 
 export const onboardingBasicInfoSchema = z.object({
-  name: z
+  businessName: z
     .string()
     .trim()
     .min(3, "Business name must be a minimum of 3 characters"),
-  tradingName: z.string().trim().optional(),
-  country: handleNullableString("Country"),
-  legalEntity: handleNullableString("Business Type"),
+  businessTradingName: z.string().trim().optional(),
+  businessCountry: handleNullableString("Country"),
+  businessType: handleNullableString("Business Type"),
   businessIndustry: handleNullableString("Business Industry"),
-  businessNumber: z.string().min(1, "Contact number is required"),
-  contactNumber: z.string().min(1, "Contact number is required"),
-  address: z.string().min(1, "Business Address is required"),
-  businessBio: z.string(),
-  contactEmail: z
+  businessPhoneNumber: z.string().min(1, "Contact number is required"),
+  contactPersonPhoneNumber: z.string().min(1, "Contact number is required"),
+  businessAddress: z.string().min(1, "Business Address is required"),
+  businessDescription: z.string(),
+  businessEmail: z
     .string()
     .email("Please provide a valid contact email")
     .min(1, "Contact Email is required"),
-  domain: z.string().url("Please provide a valid url"),
-  // pricingPlan: handleNullableString("Pricing Plan"),
-  contactFirstName: z.string().min(1, "Contact first name is required"),
-  contactLastName: z.string().min(1, "Contact last name is required"),
-  contactIdType: z.string().nullable(),
-  contactPOAType: z.string().nullable(),
-  contactIdUrl: z.string(),
-  contactIdUrlBack: z.string(),
-  contactPOAUrl: z.string(),
-  contactCountryCode: z.string(),
-  businessNumberCode: z.string(),
+  contactPersonEmail: z
+    .string()
+    .email("Please provide a valid contact email")
+    .min(1, "Contact Email is required"),
+  businessWebsite: z.string().url("Please provide a valid url"),
+  contactPersonFirstName: z.string().min(1, "Contact first name is required"),
+  contactPersonLastName: z.string().min(1, "Contact last name is required"),
+  contactPersonIdType: z.string().nullable(),
+  contactPersonPOAType: z.string().nullable(),
+  contactPersonIdUrl: z.string(),
+  contactPersonIdUrlBack: z.string(),
+  contactPersonPOAUrl: z.string(),
+  contactPersonPhoneNumberCode: z.string(),
+  businessPhoneNumberCode: z.string(),
+  makeContactPersonInitiator: z.boolean().default(false),
 });
 
 export type OnboardingBasicInfoType = z.infer<typeof onboardingBasicInfoSchema>;
@@ -183,9 +187,9 @@ export const OnboardingDirectorValues: DirectorType = {
   dob: null,
   identityType: null,
   proofOfAddress: null,
-  identityFileUrl: "",
-  identityFileUrlBack: "",
-  proofOfAddressFileUrl: "",
+  identityFileUrl: null,
+  identityFileUrlBack: null,
+  proofOfAddressFileUrl: null,
 };
 
 export const OnboardingShareholderValues: DirectorType = {
@@ -196,41 +200,39 @@ export const OnboardingShareholderValues: DirectorType = {
   dob: null,
   identityType: null,
   proofOfAddress: null,
-  identityFileUrl: "",
-  identityFileUrlBack: "",
-  proofOfAddressFileUrl: "",
+  identityFileUrl: null,
+  identityFileUrlBack: null,
+  proofOfAddressFileUrl: null,
 };
 
 export const newOnboardingValue: OnboardingType = {
-  name: "",
-  domain: "https://",
-  country: null,
-  legalEntity: null,
-  // pricingPlan: null,
+  businessName: "",
+  businessTradingName: "",
+  businessWebsite: "https://",
+  businessCountry: null,
+  businessType: null,
   businessIndustry: null,
-  contactNumber: "+234",
-  businessNumber: "+234",
-  contactEmail: "",
-  businessBio: "",
-  contactFirstName: "",
-  contactLastName: "",
-  contactIdType: "",
-  contactPOAType: "",
-  contactIdUrl: "",
-  contactIdUrlBack: "",
-  contactPOAUrl: "",
+  contactPersonPhoneNumber: "+234",
+  businessPhoneNumber: "+234",
+  businessEmail: "",
+  businessDescription: "",
+  contactPersonFirstName: "",
+  contactPersonLastName: "",
+  contactPersonEmail: "",
+  contactPersonIdType: "",
+  contactPersonPOAType: "",
+  contactPersonIdUrl: "",
+  contactPersonIdUrlBack: "",
+  contactPersonPOAUrl: "",
   cacCertificate: "",
-  address: "",
+  businessAddress: "",
   mermat: "",
-  // companyPOAUrl: "",
-  // shareholderParticular: null,
-  // directorParticular: null,
   amlCompliance: "",
   operationalLicense: null,
   directors: [OnboardingDirectorValues],
   shareholders: [OnboardingShareholderValues],
-  contactCountryCode: "+234",
-  businessNumberCode: "+234",
+  contactPersonPhoneNumberCode: "+234",
+  businessPhoneNumberCode: "+234",
   ceoFirstName: "",
   ceoLastName: "",
   ceoEmail: "",
@@ -240,4 +242,5 @@ export const newOnboardingValue: OnboardingType = {
   ceoIdUrlBack: "",
   ceoPOAUrl: "",
   ceoPOAType: "",
+  makeContactPersonInitiator: false,
 };

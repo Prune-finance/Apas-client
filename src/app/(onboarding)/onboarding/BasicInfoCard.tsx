@@ -36,6 +36,7 @@ function BasicInfoCard({ setActive, data }: BasicInfoCard) {
               ta="right"
               w={244}
               fz={12}
+              tt="none"
               // miw="100%"
             >
               {value}

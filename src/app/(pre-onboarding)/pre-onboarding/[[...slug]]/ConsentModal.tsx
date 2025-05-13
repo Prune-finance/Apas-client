@@ -40,7 +40,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
     initialValues: {
       contactPersonName: "",
       contactPersonDesignation: "",
-      contactPersonPhoneNumber: "",
+      contactPersonPhoneNumber: "+234",
       contactPersonEmail: "",
       contactCountryCode: "+234",
     },

@@ -96,7 +96,7 @@ function EligibilityCenter() {
         />
 
         <EmptyTable
-          rows={[]}
+          rows={data || []}
           loading={loading}
           title="There are no profiles"
           text="When a profile is created, it will appear here."
@@ -112,7 +112,7 @@ const tableHeaders = [
   "Country",
   "Services",
   "Stage",
-  "Actions",
+  // "Actions",
 ];
 
 export default function EligibilityCenterSus() {
@@ -129,18 +129,23 @@ const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
       <TableTd>{row.businessName}</TableTd>
       <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>{row.businessCountry}</TableTd>
-      <TableTd>{"services"}</TableTd>
       <TableTd>
-        <BadgeComponent status={row.status} active />
+        <BadgeComponent
+          tier
+          status={
+            row.services?.some((s) => s.name === "Remittance")
+              ? "Tier 1"
+              : "Tier 2"
+          }
+          variant="filled"
+        />
       </TableTd>
       <TableTd>
-        <Menu>
-          <MenuTarget>
-            <UnstyledButton>
-              <IconDots />
-            </UnstyledButton>
-          </MenuTarget>
-        </Menu>
+        <BadgeComponent
+          status={row.status}
+          stage
+          c={row.status === "ACTIVATION" ? "var(--prune-text-gray-800)" : ""}
+        />
       </TableTd>
     </TableTr>
   ));

@@ -56,29 +56,20 @@ export default function Onboarding() {
     enabled: false,
     onSuccess: (data) => {
       setBusiness(data);
-      setActive(data.stageIdentifier || 0);
-      // TODO: Confirm that stageIdentifier has been added the business object.
+      setActive((prev) =>
+        prev === 6 && data.stageIdentifier === 6 ? 6 : data.stageIdentifier
+      );
     },
-  });
-
-  const { data } = useAxios<IOnboarding>({
-    baseURL: "auth",
-    endpoint: `/onboarding/questionnaire/${business?.questionnaireId}`,
-    method: "GET",
-    dependencies: [active, business?.questionnaireId],
-    enabled: !!!business?.questionnaireId,
   });
 
   useEffect(() => {
     const formValues = {
       // Basic business info - prioritize data over business
-      businessName: data?.businessName || business?.businessName || "",
-      businessTradingName:
-        data?.businessTradingName || business?.businessTradingName || "",
-      businessAddress: data?.businessAddress || business?.businessAddress || "",
-      businessPhoneNumber:
-        data?.businessPhoneNumber || business?.businessPhoneNumber || "",
-      businessEmail: data?.businessEmail || business?.businessEmail || "",
+      businessName: business?.businessName || "",
+      businessTradingName: business?.businessTradingName || "",
+      businessAddress: business?.businessAddress || "",
+      businessPhoneNumber: business?.businessPhoneNumber || "",
+      businessEmail: business?.businessEmail || "",
       makeContactPersonInitiator: business?.makeContactPersonInitiator || false,
 
       // Business-only fields with defaults
@@ -151,7 +142,7 @@ export default function Onboarding() {
 
     form.setValues(formValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, business]);
+  }, [business]);
 
   return (
     <Box>

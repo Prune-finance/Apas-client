@@ -18,6 +18,7 @@ interface DocumentBoxProps<T = OnboardingType> {
   formKey?: string;
   uploadedFileUrl?: string;
   required?: boolean;
+  isAdmin?: boolean;
 }
 
 export default function OnBoardingDocumentBox<T>({
@@ -26,6 +27,7 @@ export default function OnBoardingDocumentBox<T>({
   formKey,
   uploadedFileUrl,
   required,
+  isAdmin = false,
 }: DocumentBoxProps<T>) {
   return (
     <Box flex={1}>
@@ -45,7 +47,7 @@ export default function OnBoardingDocumentBox<T>({
         otherForm={form}
         formKey={formKey}
         uploadedFileUrl={uploadedFileUrl}
-        isOnboarding
+        isOnboarding={!isAdmin}
       />
       {form?.errors[formKey || "cacCertificate"] && (
         <Text fz={12} c="var(--prune-warning)" mt={5}>

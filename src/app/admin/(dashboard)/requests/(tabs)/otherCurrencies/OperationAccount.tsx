@@ -79,7 +79,7 @@ function OperationAccount() {
     >
       <TableTd>{element?.accountName}</TableTd>
       <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
-      <TableTd>-</TableTd>
+      <TableTd>EUR</TableTd>
 
       <TableTd>
         <BadgeComponent status={element.status} />

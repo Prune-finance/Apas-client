@@ -3,14 +3,42 @@
 import React, { Suspense } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
-import { Box, Flex, Grid, GridCol, Text } from "@mantine/core";
+import {
+  Box,
+  Flex,
+  Grid,
+  GridCol,
+  Menu,
+  MenuTarget,
+  Skeleton,
+  TableTd,
+  TableTr,
+  Text,
+  UnstyledButton,
+} from "@mantine/core";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
 import { switzer } from "@/ui/fonts";
+import {
+  OnboardingBusinessData,
+  useOnboardingBusiness,
+} from "@/lib/hooks/eligibility-center";
+import dayjs from "dayjs";
+import { BadgeComponent } from "@/ui/components/Badge";
+import { IconDots } from "@tabler/icons-react";
 
 function EligibilityCenter() {
+  const { data, meta, loading, revalidate } = useOnboardingBusiness();
+
+  const InfoCards = [
+    { title: "Total leads", num: meta?.total },
+    { title: "Total approved", num: meta?.approved },
+    { title: "Total onboarded", num: meta?.total },
+    { title: "Pending", num: meta?.pending },
+  ];
+
   return (
     <main className={styles.main}>
       <div className={styles.table__container}>
@@ -21,7 +49,7 @@ function EligibilityCenter() {
         </div>
 
         <Grid align="center" justify="center" mt={26}>
-          {data?.map((d, i) => (
+          {InfoCards?.map((d, i) => (
             <GridCol span={3} key={i}>
               <Box className={classes.card} p={24}>
                 <Flex
@@ -30,12 +58,16 @@ function EligibilityCenter() {
                   direction="column"
                   gap={10}
                 >
-                  <Text fz={14} fw={400} c="#667085">
+                  <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
                     {d?.title}
                   </Text>
-                  <Text fz={24} fw={500} c="#344054">
-                    {d?.num}
-                  </Text>
+                  {loading ? (
+                    <Skeleton w={50} h={24} />
+                  ) : (
+                    <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
+                      {d?.num}
+                    </Text>
+                  )}
                 </Flex>
               </Box>
             </GridCol>
@@ -57,11 +89,15 @@ function EligibilityCenter() {
           </Flex>
         </div>
 
-        <TableComponent head={tableHeaders} rows={[]} loading={false} />
+        <TableComponent
+          head={tableHeaders}
+          rows={<Rows data={data} />}
+          loading={loading}
+        />
 
         <EmptyTable
           rows={[]}
-          loading={false}
+          loading={loading}
           title="There are no profiles"
           text="When a profile is created, it will appear here."
         />
@@ -79,13 +115,6 @@ const tableHeaders = [
   "Actions",
 ];
 
-const data = [
-  { title: "Total leads", num: 0 },
-  { title: "Total approved", num: 0 },
-  { title: "Total onboarded", num: 0 },
-  { title: "Pending", num: 0 },
-];
-
 export default function EligibilityCenterSus() {
   return (
     <Suspense>
@@ -93,3 +122,26 @@ export default function EligibilityCenterSus() {
     </Suspense>
   );
 }
+
+const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
+  return data?.map((row, i) => (
+    <TableTr key={i}>
+      <TableTd>{row.businessName}</TableTd>
+      <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
+      <TableTd>{row.businessCountry}</TableTd>
+      <TableTd>{"services"}</TableTd>
+      <TableTd>
+        <BadgeComponent status={row.status} active />
+      </TableTd>
+      <TableTd>
+        <Menu>
+          <MenuTarget>
+            <UnstyledButton>
+              <IconDots />
+            </UnstyledButton>
+          </MenuTarget>
+        </Menu>
+      </TableTd>
+    </TableTr>
+  ));
+};

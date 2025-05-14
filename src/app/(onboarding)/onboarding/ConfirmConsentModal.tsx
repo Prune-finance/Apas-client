@@ -49,26 +49,6 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
     validate: zodResolver(schema),
   });
 
-  //   useEffect(() => {
-  //     if (firstLoad) {
-  //       setFirstLoad(false);
-  //       return;
-  //     }
-
-  //     if (form.values.contactCountryCode) {
-  //       const [code] = form.values.contactCountryCode.split("-");
-  //       form.setFieldValue("contactNumber", `${code}`);
-  //     }
-  //     // eslint-disable-next-line react-hooks/exhaustive-deps
-  //   }, [form.values.contactCountryCode]);
-
-  //   const select = (
-  //     <SelectCountryDialCode
-  //       value={form.values.contactCountryCode}
-  //       setValue={(value) => form.setFieldValue("contactCountryCode", value)}
-  //     />
-  //   );
-
   const handleSubmit = async (values: z.infer<typeof schema>) => {
     setLoading(true);
     try {
@@ -126,18 +106,21 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
         >
           <TextInputWithInsideLabel
             label="Signed by"
+            placeholder="Enter Name"
             w="100%"
             {...form.getInputProps("name")}
           />
 
           <TextInputWithInsideLabel
             label="Designation"
+            placeholder="Enter Designation"
             w="100%"
             {...form.getInputProps("designation")}
           />
 
           <TextInputWithInsideLabel
             label="Signature"
+            placeholder="Enter Signature"
             w="100%"
             {...form.getInputProps("signature")}
           />
@@ -174,6 +157,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
 
           <TextInputWithInsideLabel
             label="Email"
+            placeholder="Enter Email"
             w="100%"
             {...form.getInputProps("email")}
           />

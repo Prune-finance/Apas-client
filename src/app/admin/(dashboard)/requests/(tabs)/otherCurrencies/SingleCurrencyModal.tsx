@@ -96,7 +96,10 @@ function SingleCurrencyModal({
         <Flex justify="center" gap={15} px={32} py={15} bg="#F9F9F9">
           <SecondaryBtn
             text="Reject"
-            action={currencyRejectedApprove}
+            action={() => {
+              currencyRejectedApprove();
+              closeApprove();
+            }}
             fullWidth
           />
 

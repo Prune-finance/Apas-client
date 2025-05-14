@@ -1,28 +1,26 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Box, Flex, Modal, NumberInput, rem, Text } from "@mantine/core";
-import React, { useEffect, useState } from "react";
+import { Box, Flex, Modal, Text } from "@mantine/core";
 
-import { SelectCountryDialCode } from "@/ui/components/SelectDropdownSearch";
-import styles from "./styles.module.scss";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
-import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import { useDisclosure } from "@mantine/hooks";
+
 import {
   PhoneNumberInput,
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
+import useAxios from "@/lib/hooks/useAxios";
 
 interface ConsentModalProps {
   opened: boolean;
   close: () => void;
+  openConfirm: () => void;
 }
 
-export default function ConsentModal({ opened, close }: ConsentModalProps) {
-  const [firstLoad, setFirstLoad] = useState(true);
-  const [loading, setLoading] = useState(false);
-  const [openedConfirm, { open, close: closeConfirm }] = useDisclosure(false);
-
+export default function ConsentModal({
+  opened,
+  close,
+  openConfirm,
+}: ConsentModalProps) {
   const schema = z.object({
     name: z.string().min(1, "Name is required"),
     designation: z.string().min(1, "Designation is required"),
@@ -49,23 +47,24 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
     validate: zodResolver(schema),
   });
 
-  const handleSubmit = async (values: z.infer<typeof schema>) => {
-    setLoading(true);
-    try {
-      close();
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-      console.log({ values });
-      form.reset();
+  const {} = form.values;
 
-      open();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { queryFn, loading } = useAxios({
+    baseURL: "auth",
+    endpoint: "/onboarding/consent",
+    method: "POST",
+    body: {
+      consentDesignation: form.getValues().designation,
+      consentEmail: form.getValues().email,
+      consentSignature: form.getValues().signature,
+      consentSignedBy: form.getValues().name,
+      consentPhoneNumber: form.getValues().contactNumber,
+    },
+    onSuccess: () => {
+      close();
+      openConfirm();
+    },
+  });
 
   return (
     <>
@@ -102,7 +101,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
             gap: 24,
           }}
           component="form"
-          onSubmit={form.onSubmit((values) => handleSubmit(values))}
+          onSubmit={form.onSubmit((values) => queryFn())}
         >
           <TextInputWithInsideLabel
             label="Signed by"
@@ -124,30 +123,6 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
             w="100%"
             {...form.getInputProps("signature")}
           />
-
-          {/* <NumberInput
-            classNames={{ input: styles.input, label: styles.label }}
-            flex={1}
-            withAsterisk
-            type="tel"
-            //   label="Contact Phone Number"
-            placeholder="00000000"
-            // {...form.getInputProps("contactNumber")}
-            value={form.values.contactNumber}
-            onChange={(value) =>
-              form.setFieldValue("contactNumber", String(`+${value}`))
-            }
-            error={form.errors.contactNumber}
-            prefix={"+"}
-            leftSection={select}
-            hideControls
-            leftSectionWidth={50}
-            styles={{
-              input: {
-                paddingLeft: rem(60),
-              },
-            }}
-          /> */}
 
           <PhoneNumberInput<FormValues>
             form={form}

@@ -75,6 +75,7 @@ export interface OnboardingBusiness {
   updatedAt: Date;
   migrated: boolean;
   questionnaireId: string;
+  stageIdentifier: number;
 }
 
 export interface Director {

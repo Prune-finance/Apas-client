@@ -218,8 +218,8 @@ function OperationAccount() {
         close={currencyCloseApprove}
         action={handleApprovedCurrencyRequest}
         processing={processing}
-        title="GBP Account Request Approval"
-        text="This means you are approving the request for GBP account for this business."
+        title={`${selectedRequest?.Currency?.symbol} Account Request Approval`}
+        text={`This means you are approving the request for ${selectedRequest?.Currency?.symbol} account for this business.`}
         customApproveMessage="Yes, Approve"
       />
 
@@ -230,8 +230,8 @@ function OperationAccount() {
         close={currencyRejectApprove}
         action={handleRejectCurrencyRequest}
         processing={processing}
-        title="Reject This Account Issuance Request?"
-        text="This means you are rejecting the account issuance request of this business."
+        title={`Reject This ${selectedRequest?.Currency?.symbol} Account Request?`}
+        text={`This means you are rejecting the ${selectedRequest?.Currency?.symbol} account request of this business.`}
         customApproveMessage="Yes, Reject"
         form={requestForm}
       />

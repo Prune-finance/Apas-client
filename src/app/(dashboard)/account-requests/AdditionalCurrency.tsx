@@ -70,7 +70,7 @@ function AdditionalCurrency() {
       style={{ cursor: "pointer" }}
     >
       <TableTd>{element?.accountName}</TableTd>
-      <TableTd>-</TableTd>
+      <TableTd>EUR</TableTd>
       <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
       <TableTd tt="capitalize">
         {element?.createdAt &&

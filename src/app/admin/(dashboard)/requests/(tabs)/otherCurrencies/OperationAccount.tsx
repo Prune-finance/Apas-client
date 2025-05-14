@@ -79,7 +79,7 @@ function OperationAccount() {
     >
       <TableTd>{element?.accountName}</TableTd>
       <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
-      <TableTd>-</TableTd>
+      <TableTd>EUR</TableTd>
 
       <TableTd>
         <BadgeComponent status={element.status} />
@@ -188,7 +188,7 @@ function OperationAccount() {
         rows={rows}
         loading={loading}
         title="There are no requests"
-        text="When an account is freezed, it will appear here"
+        text="When an Operation account is requested, it will appear here"
       />
 
       <PaginationComponent

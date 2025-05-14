@@ -79,7 +79,7 @@ function PayoutCurrencyAccount() {
     >
       <TableTd>{element?.accountName}</TableTd>
       <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
-      <TableTd>-</TableTd>
+      <TableTd>EUR</TableTd>
       <TableTd>-</TableTd>
 
       <TableTd>
@@ -183,17 +183,18 @@ function PayoutCurrencyAccount() {
         />
       </Filter>
 
-      <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+      <TableComponent head={tableHeaders} rows={[]} loading={loading} />
 
       <EmptyTable
-        rows={rows}
+        rows={[]}
         loading={loading}
         title="There are no requests"
-        text="When an account is freezed, it will appear here"
+        text="When a payout account is requested, it will appear here"
       />
 
       <PaginationComponent
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={1}
+        // total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}

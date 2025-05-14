@@ -56,7 +56,8 @@ export default function Onboarding() {
     enabled: false,
     onSuccess: (data) => {
       setBusiness(data);
-      // setActive(data.stageIdentifier || 0); // TODO: Remove the comment when backend is merged
+      setActive(data.stageIdentifier || 0);
+      // TODO: Confirm that stageIdentifier has been added the business object.
     },
   });
 

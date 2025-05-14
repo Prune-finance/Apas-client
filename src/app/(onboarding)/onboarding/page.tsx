@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Flex } from "@mantine/core";
+import { Alert, Box, Flex, ThemeIcon } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { CustomPaper } from "../CustomPaper";
 import Navbar from "../Navbar";
@@ -25,6 +25,7 @@ import OnboardingStore from "@/lib/store/onboarding";
 import useAxios from "@/lib/hooks/useAxios";
 import { OnboardingBusiness, Onboarding as IOnboarding } from "@/lib/interface";
 import dayjs from "dayjs";
+import { IconExclamationMark } from "@tabler/icons-react";
 
 export default function Onboarding() {
   const [active, setActive] = useState(0);
@@ -55,6 +56,7 @@ export default function Onboarding() {
     enabled: false,
     onSuccess: (data) => {
       setBusiness(data);
+      // setActive(data.stageIdentifier || 0); // TODO: Remove the comment when backend is merged
     },
   });
 
@@ -193,6 +195,46 @@ export default function Onboarding() {
                 active={active}
                 form={form}
               />
+            )}
+
+            {active === 7 && (
+              <Box>
+                <Alert
+                  title="Awaiting Admin Approval"
+                  mb={64}
+                  color="#D67507"
+                  p={16}
+                  variant="outline"
+                  icon={
+                    <ThemeIcon radius="xl" size={24} color="#D67507">
+                      <IconExclamationMark />
+                    </ThemeIcon>
+                  }
+                  styles={{
+                    root: { background: "#FFF9E6", padding: "16px" },
+                    title: {
+                      color: "var(--prune-text-gray-700)",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                    },
+                    message: {
+                      color: "var(--prune-text-gray-500)",
+                      fontSize: "12px",
+                      fontWeight: 400,
+                    },
+                  }}
+                >
+                  You will get an email regarding your application status within
+                  24-48 hours, once account creation has been approved
+                </Alert>
+
+                <ReviewInfo
+                  setActive={setActive}
+                  active={active}
+                  form={form}
+                  title="Summary"
+                />
+              </Box>
             )}
           </CustomPaper>
         </Box>

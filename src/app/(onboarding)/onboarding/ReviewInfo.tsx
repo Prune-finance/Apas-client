@@ -18,13 +18,14 @@ interface ReviewInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
   form: UseFormReturnType<OnboardingType>;
+  title?: string;
 }
 
-export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
+export const ReviewInfo = ({ setActive, active, form, title }: ReviewInfo) => {
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
-        Review
+        {title || "Review"}
       </Text>
 
       <TabsComponent tabs={tabs} mt={24} tt="capitalize">
@@ -39,36 +40,25 @@ export const ReviewInfo = ({ setActive, active, form }: ReviewInfo) => {
             <Component setActive={setActive} form={form} />
           </TabsPanel>
         ))}
-        {/* <TabsPanel value={tabs[1]?.value}>
-          <CEOInfoCard setActive={setActive} form={form} />
-        </TabsPanel>
-        <TabsPanel value={tabs[2]?.value}>
-          <DocumentInfoCard setActive={setActive} form={form} />
-        </TabsPanel>
-        <TabsPanel value={tabs[3]?.value}>
-          <DirectorInfoCard setActive={setActive} form={form} />
-        </TabsPanel>
-        <TabsPanel value={tabs[4]?.value}>
-          <ShareholderInfoCard setActive={setActive} form={form} />
-        </TabsPanel> */}
       </TabsComponent>
 
-      <Flex align="center" justify="flex-end" w="100%" mt={20}>
-        <Flex align="center" justify="center" gap={20}>
-          <SecondaryBtn
-            text="Previous"
-            fw={600}
-            action={() => setActive(active - 1)}
-            disabled={active === 0}
-          />
-          <PrimaryBtn
-            text="Next"
-            w={126}
-            fw={600}
-            action={() => setActive(active + 1)}
-          />
+      {active === 5 && (
+        <Flex align="center" justify="flex-end" w="100%" mt={20}>
+          <Flex align="center" justify="center" gap={20}>
+            <SecondaryBtn
+              text="Previous"
+              fw={600}
+              action={() => setActive(active - 1)}
+            />
+            <PrimaryBtn
+              text="Next"
+              w={126}
+              fw={600}
+              action={() => setActive(active + 1)}
+            />
+          </Flex>
         </Flex>
-      </Flex>
+      )}
     </Box>
   );
 };

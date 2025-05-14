@@ -13,6 +13,7 @@ interface ShareholderInfoCard {
 }
 
 function ShareholderInfoCard({ setActive, form }: ShareholderInfoCard) {
+  const { shareholders } = form.values;
   const data = form.getValues().shareholders?.map((shareholder, index) => ({
     "First name": shareholder.firstName,
     "Last Name": shareholder.lastName,
@@ -75,11 +76,15 @@ function ShareholderInfoCard({ setActive, form }: ShareholderInfoCard) {
               <Flex gap={24} w="100%" mt={16}>
                 <DocumentPreview
                   label="Identity Document"
-                  title="File.pdf....."
+                  title={shareholders?.[shareholderIdx].identityType || ""}
+                  value={shareholders?.[shareholderIdx].identityFileUrl || ""}
                 />
                 <DocumentPreview
                   label="Proof of Address"
-                  title="File.pdf....."
+                  title={shareholders?.[shareholderIdx].proofOfAddress || ""}
+                  value={
+                    shareholders?.[shareholderIdx].proofOfAddressFileUrl || ""
+                  }
                 />
               </Flex>
             </Box>

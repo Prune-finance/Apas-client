@@ -13,12 +13,13 @@ import Cookies from "js-cookie";
 import useNotification from "@/lib/hooks/notification";
 import User from "@/lib/store/user";
 import { isAxiosError } from "axios";
+import Onboarding from "@/lib/store/onboarding";
 
 export default function OnboardingLogin() {
   const axios = createAxiosInstance("auth");
   const { push } = useRouter();
   const { handleSuccess, handleError } = useNotification();
-  const { setUser } = User();
+  const { setBusiness } = Onboarding();
 
   const [loading, setLoading] = useState(false);
   const form = useForm<LoginType>({
@@ -31,14 +32,15 @@ export default function OnboardingLogin() {
     setLoading(true);
 
     try {
-      const { data } = await axios.post("/onboarding/login", {
+      const { data: res } = await axios.post("/onboarding/login", {
         ...values,
         businessEmail: values.email,
       });
 
-      Cookies.set("auth", data.meta.token, { expires: 0.25 });
+      Cookies.set("auth", res.meta.token, { expires: 0.25 });
       handleSuccess("Authentication Successful", "Welcome back");
-      setUser({ ...data.data });
+      setBusiness({ ...res.data.business });
+      // setUser({ ...data.data });
       push("/onboarding");
     } catch (error) {
       if (isAxiosError(error))
@@ -113,7 +115,7 @@ export default function OnboardingLogin() {
 
       <PrimaryBtn
         fullWidth
-        text="Sign up"
+        text="Log In"
         fw={600}
         mt="md"
         loading={loading}
@@ -121,7 +123,7 @@ export default function OnboardingLogin() {
       />
 
       <Text fz={14} c="var(--prune-text-gray-400)" fw={400} ta="center" mt={40}>
-        Have an account?{" "}
+        Have a business account?{" "}
         <Text
           inherit
           span

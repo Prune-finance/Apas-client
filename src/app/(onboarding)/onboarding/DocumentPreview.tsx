@@ -17,9 +17,10 @@ import PDFICON from "@/assets/pdf-icon.png";
 interface DocumentPreview {
   label: string;
   title: string;
+  value?: string;
 }
 
-export const DocumentPreview = ({ label, title }: DocumentPreview) => {
+export const DocumentPreview = ({ label, title, value }: DocumentPreview) => {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFile, { open: openFile, close: closeFile }] =
     useDisclosure(false);
@@ -69,7 +70,7 @@ export const DocumentPreview = ({ label, title }: DocumentPreview) => {
         }
       >
         <Box>
-          <FileDisplay fileUrl={""} />
+          <FileDisplay fileUrl={value || ""} />
         </Box>
       </Modal>
     </Box>

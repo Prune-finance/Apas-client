@@ -10,6 +10,8 @@ import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { OnboardingDirectorValues, OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
 import { useState } from "react";
+import useNotification from "@/lib/hooks/notification";
+import useAxios from "@/lib/hooks/useAxios";
 
 interface AddDirectorsInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -22,13 +24,23 @@ export const AddDirectorsInfo = ({
   active,
   form,
 }: AddDirectorsInfo) => {
+  const { handleSuccess } = useNotification();
+
+  const { queryFn, loading } = useAxios({
+    baseURL: "auth",
+    endpoint: "/onboarding/business-directors",
+    method: "POST",
+    body: {
+      directors: form.getValues().directors,
+    },
+    onSuccess: (data) => {
+      setActive(active + 1);
+      handleSuccess("Business Directors", "Business directors saved");
+    },
+  });
+
   return (
-    <Box
-      component="form"
-      onSubmit={form.onSubmit((values) => {
-        setActive(active + 1);
-      })}
-    >
+    <Box component="form" onSubmit={form.onSubmit((values) => queryFn())}>
       <Flex align="center" justify="space-between" w="100%">
         <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
           Add Directors
@@ -122,7 +134,7 @@ export const AddDirectorsInfo = ({
                   title="Upload Identity Document"
                   formKey={`directors.${index}.identityFileUrl`}
                   form={form}
-                  uploadedFileUrl={director.identityFileUrl}
+                  uploadedFileUrl={director.identityFileUrl || ""}
                   key={form.key(`directors.${index}.identityFileUrl`)}
                   {...form.getInputProps(`directors.${index}.identityFileUrl`)}
                 />
@@ -131,7 +143,7 @@ export const AddDirectorsInfo = ({
                     title="Upload Identity Document"
                     formKey={`directors.${index}.identityFileUrlBack`}
                     form={form}
-                    uploadedFileUrl={director.identityFileUrlBack}
+                    uploadedFileUrl={director.identityFileUrlBack || ""}
                     key={form.key(`directors.${index}.identityFileUrlBack`)}
                     {...form.getInputProps(
                       `directors.${index}.identityFileUrlBack`
@@ -146,7 +158,7 @@ export const AddDirectorsInfo = ({
                 title="Upload Identity Document"
                 formKey={`directors.${index}.proofOfAddressFileUrl`}
                 form={form}
-                uploadedFileUrl={director.proofOfAddressFileUrl}
+                uploadedFileUrl={director.proofOfAddressFileUrl || ""}
                 key={form.key(`directors.${index}.proofOfAddressFileUrl`)}
                 {...form.getInputProps(
                   `directors.${index}.proofOfAddressFileUrl`
@@ -167,7 +179,13 @@ export const AddDirectorsInfo = ({
             action={() => setActive(active - 1)}
             disabled={active === 0}
           />
-          <PrimaryBtn text="Next" w={126} fw={600} type="submit" />
+          <PrimaryBtn
+            text="Next"
+            w={126}
+            fw={600}
+            type="submit"
+            loading={loading}
+          />
         </Flex>
       </Flex>
     </Box>

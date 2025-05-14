@@ -5,6 +5,7 @@ import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 import ConsentModal from "./ConfirmConsentModal";
+import ConfirmationModal from "./ConfirmationModal";
 
 interface TermsOfUseInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -14,6 +15,8 @@ interface TermsOfUseInfo {
 
 export const TermsOfUseInfo = ({ setActive, active, form }: TermsOfUseInfo) => {
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
+    useDisclosure(false);
   return (
     <Box>
       <Text fz={24} fw={600} c="#344054">
@@ -78,7 +81,14 @@ export const TermsOfUseInfo = ({ setActive, active, form }: TermsOfUseInfo) => {
         </Flex>
       </Flex>
 
-      <ConsentModal opened={opened} close={close} />
+      <ConsentModal opened={opened} close={close} openConfirm={openConfirm} />
+      <ConfirmationModal
+        opened={openedConfirm}
+        close={() => {
+          closeConfirm();
+          setActive((prev) => prev + 1);
+        }}
+      />
     </Box>
   );
 };

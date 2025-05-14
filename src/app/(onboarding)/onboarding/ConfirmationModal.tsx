@@ -1,8 +1,7 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Flex, Modal, Stack, Text } from "@mantine/core";
-import { useRouter } from "next/navigation";
+import { Center, Flex, Image, Modal, Stack, Text } from "@mantine/core";
+import CompleteIcon from "@/assets/CompleteOnboardingIcon.png";
 
-import React from "react";
 interface ConfirmationModalProps {
   opened: boolean;
   close: () => void;
@@ -12,13 +11,10 @@ export default function ConfirmationModal({
   opened,
   close,
 }: ConfirmationModalProps) {
-  const { push } = useRouter();
-
   return (
     <Modal
       opened={opened}
       onClose={() => {
-        push("/pre-onboarding");
         close();
       }}
       withCloseButton={false}
@@ -26,11 +22,14 @@ export default function ConfirmationModal({
       centered
     >
       <Stack gap={24}>
+        <Center>
+          <Image src={CompleteIcon.src} alt="COmplete icon" w={278} h={156} />
+        </Center>
         <Text fz={24} fw={700} c="var(--prune-text-gray-700)">
-          We have received your request
+          We have received your company details
         </Text>
         <Text fz={16} fw={400} c="var(--prune-text-gray-700)">
-          You will get a feedback from us about the state of your request.
+          We will be in touch regarding your application.
         </Text>
 
         <Flex justify="end">
@@ -38,7 +37,6 @@ export default function ConfirmationModal({
             text="Okay"
             action={() => {
               close();
-              push("/pre-onboarding");
             }}
             fw={600}
           />

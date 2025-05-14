@@ -9,6 +9,8 @@ import {
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { OnboardingShareholderValues, OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
+import useNotification from "@/lib/hooks/notification";
+import useAxios from "@/lib/hooks/useAxios";
 
 interface AddShareholdersInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -23,13 +25,23 @@ export const AddShareholdersInfo = ({
   form,
   shareholders,
 }: AddShareholdersInfo) => {
+  const { handleSuccess } = useNotification();
+
+  const { queryFn, loading } = useAxios({
+    baseURL: "auth",
+    endpoint: "/onboarding/business-shared-holders",
+    method: "POST",
+    body: {
+      shareholders: form.getValues().shareholders,
+    },
+    onSuccess: (data) => {
+      setActive(active + 1);
+      handleSuccess("Business Shareholders", "Business shareholders saved");
+    },
+  });
+
   return (
-    <Box
-      component="form"
-      onSubmit={form.onSubmit(() => {
-        setActive(active + 1);
-      })}
-    >
+    <Box component="form" onSubmit={form.onSubmit(() => queryFn())}>
       <Flex align="center" justify="space-between" w="100%">
         <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
           Add Shareholder
@@ -122,6 +134,9 @@ export const AddShareholdersInfo = ({
                 <OnBoardingDocumentBox
                   title="Upload Identity Document"
                   key={form.key(`shareholders.${index}.identityFileUrl`)}
+                  uploadedFileUrl={shareholder.identityFileUrl || ""}
+                  formKey={`shareholders.${index}.identityFileUrl`}
+                  form={form}
                   {...form.getInputProps(
                     `shareholders.${index}.identityFileUrl`
                   )}
@@ -130,6 +145,9 @@ export const AddShareholdersInfo = ({
                   <OnBoardingDocumentBox
                     title="Upload Identity Document (Back)"
                     key={form.key(`shareholders.${index}.identityFileUrlBack`)}
+                    uploadedFileUrl={shareholder.identityFileUrlBack || ""}
+                    formKey={`shareholders.${index}.identityFileUrlBack`}
+                    form={form}
                     {...form.getInputProps(
                       `shareholders.${index}.identityFileUrlBack`
                     )}
@@ -141,6 +159,9 @@ export const AddShareholdersInfo = ({
               <OnBoardingDocumentBox
                 title="Upload Proof of Address"
                 key={form.key(`shareholders.${index}.proofOfAddressFileUrl`)}
+                uploadedFileUrl={shareholder.proofOfAddressFileUrl || ""}
+                formKey={`shareholders.${index}.proofOfAddressFileUrl`}
+                form={form}
                 {...form.getInputProps(
                   `shareholders.${index}.proofOfAddressFileUrl`
                 )}
@@ -159,7 +180,13 @@ export const AddShareholdersInfo = ({
             action={() => setActive(active - 1)}
             disabled={active === 0}
           />
-          <PrimaryBtn text="Next" w={126} fw={600} type="submit" />
+          <PrimaryBtn
+            text="Next"
+            w={126}
+            fw={600}
+            type="submit"
+            loading={loading}
+          />
         </Flex>
       </Flex>
     </Box>

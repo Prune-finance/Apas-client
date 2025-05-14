@@ -10,6 +10,8 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
 import { useState } from "react";
+import useAxios from "@/lib/hooks/useAxios";
+import useNotification from "@/lib/hooks/notification";
 
 interface CEOInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
@@ -18,6 +20,7 @@ interface CEOInfo {
 }
 
 export const CEOInfo = ({ setActive, active, form }: CEOInfo) => {
+  const { handleSuccess } = useNotification();
   const { ceoIdType, ceoPOAType } = form.getValues();
   const [IdCheck, setIdCheck] = useState({
     isCeoIdType: Boolean(ceoIdType) || false,
@@ -62,13 +65,28 @@ export const CEOInfo = ({ setActive, active, form }: CEOInfo) => {
     });
   });
 
+  const { queryFn, loading } = useAxios({
+    baseURL: "auth",
+    endpoint: "/onboarding/business-ceo",
+    method: "POST",
+    body: {
+      ceoFirstName: form.getValues().ceoFirstName,
+      ceoLastName: form.getValues().ceoLastName,
+      ceoEmail: form.getValues().ceoEmail,
+      ceoDOB: form.getValues().ceoDOB,
+      ceoPOAType: form.getValues().ceoPOAType,
+      ceoPOAUrl: form.getValues().ceoPOAUrl,
+      ceoIdType: form.getValues().ceoIdType,
+      ceoIdUrl: form.getValues().ceoIdUrl,
+    },
+    onSuccess: (data) => {
+      setActive(active + 1);
+      handleSuccess("CEO Details", "CEO Details saved");
+    },
+  });
+
   return (
-    <Box
-      component="form"
-      onSubmit={form.onSubmit(() => {
-        setActive(active + 1);
-      })}
-    >
+    <Box component="form" onSubmit={form.onSubmit(() => queryFn())}>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
         CEO Details
       </Text>
@@ -116,23 +134,32 @@ export const CEOInfo = ({ setActive, active, form }: CEOInfo) => {
         </Flex>
 
         <Flex gap={24} w="100%">
-          {IdCheck.isCeoIdType && (
+          {form.values.ceoIdType && (
             <>
               <OnBoardingDocumentBox
                 title="Upload Identity Document"
+                form={form}
+                formKey="ceoIdUrl"
+                uploadedFileUrl={form.values.ceoIdUrl}
                 {...form.getInputProps("ceoIdUrl")}
               />
-              {!IdCheck.isPassport && (
+              {form.values.ceoIdType !== "Passport" && (
                 <OnBoardingDocumentBox
                   title="Upload Identity Document (Back)"
+                  form={form}
+                  formKey="ceoIdUrlBack"
+                  uploadedFileUrl={form.values.ceoIdUrlBack}
                   {...form.getInputProps("ceoIdUrlBack")}
                 />
               )}
             </>
           )}
-          {IdCheck.isCeoPOAType && (
+          {form.values.ceoPOAType && (
             <OnBoardingDocumentBox
               title="Upload Proof of Address"
+              formKey="ceoPOAUrl"
+              form={form}
+              uploadedFileUrl={form.values.ceoPOAUrl}
               {...form.getInputProps("ceoPOAUrl")}
             />
           )}
@@ -154,7 +181,7 @@ export const CEOInfo = ({ setActive, active, form }: CEOInfo) => {
             w={126}
             fw={600}
             type="submit"
-            // action={() => setActive(active + 1)}
+            loading={loading}
           />
         </Flex>
       </Flex>

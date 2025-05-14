@@ -1,21 +1,12 @@
-import {
-  Text,
-  Modal,
-  Flex,
-  Button,
-  Stack,
-  Select,
-  Textarea,
-} from "@mantine/core";
-import { IconTrash, IconX } from "@tabler/icons-react";
+import { Text, Modal, Flex, Textarea, Select } from "@mantine/core";
+import { IconX } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
-import DropzoneComponent from "./dropzone";
 import { UseFormReturnType } from "@mantine/form";
-import { Dispatch, SetStateAction } from "react";
-import { PrimaryBtn, SecondaryBtn } from "../Buttons";
+import DropzoneComponent from "@/ui/components/Dropzone";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 
-export default function ModalComponent({
+export default function RejectModalComponent({
   opened,
   close,
   title,
@@ -25,10 +16,7 @@ export default function ModalComponent({
   customApproveMessage,
   processing,
   action,
-  reason,
-  setReason,
-  addReason,
-  size,
+  form,
 }: ModalProps) {
   return (
     <Modal
@@ -37,19 +25,25 @@ export default function ModalComponent({
       onClose={close}
       centered
       withCloseButton={false}
-      size={size}
+      padding={0}
     >
       <Flex className={styles.modal} direction="column">
-        <Flex justify="flex-end">
+        <Flex justify="flex-end" mr={20} mt={20}>
           <div
             className={styles.close__icon}
             onClick={!processing ? close : () => {}}
           >
-            <IconX color="#667085" />
+            <IconX color="#667085" size={16} />
           </div>
         </Flex>
 
-        <Flex direction="column" className={styles.top__flex} mt={0}>
+        <Flex
+          direction="column"
+          className={styles.top__flex}
+          mt={0}
+          px={32}
+          mb={32}
+        >
           <Flex justify="center">
             <div
               className={styles.top__flex__icon}
@@ -59,25 +53,36 @@ export default function ModalComponent({
             </div>
           </Flex>
 
-          <Text ta="center" fz={18} fw={600} mt={25} tt="capitalize">
+          <Text ta="center" fz={18} fw={600} mt={25}>
             {title}
           </Text>
 
           <Text ta="center" className={styles.sub__text} fz={12} fw={500}>
             {text}
           </Text>
-        </Flex>
 
-        {addReason && setReason && (
           <Textarea
-            minRows={4}
-            maxRows={5}
-            autosize
-            value={reason}
-            onChange={(e) => setReason(e.currentTarget.value)}
+            my={20}
             placeholder="Give reason here..."
+            {...form.getInputProps("reason")}
           />
-        )}
+
+          {/* <Select
+            mb={20}
+            placeholder="Select Supporting Document (Optional)"
+            flex={1}
+            data={["Utility Bill"]}
+            classNames={{ input: styles.input }}
+            size="lg"
+            {...form.getInputProps("supportingDocumentName")}
+          /> */}
+
+          <DropzoneComponent<typeof reqValues>
+            otherForm={form}
+            formKey="supportingDocumentUrl"
+            uploadedFileUrl={form.values.supportingDocumentUrl}
+          />
+        </Flex>
 
         <Flex className={styles.bottom__flex} justify="center" gap={15}>
           <SecondaryBtn
@@ -89,8 +94,10 @@ export default function ModalComponent({
           <PrimaryBtn
             text={customApproveMessage || "Proceed"}
             action={action}
-            loading={processing}
             fullWidth
+            loading={processing}
+            bg="#D92D20"
+            c="#fff"
           />
         </Flex>
       </Flex>
@@ -114,8 +121,5 @@ interface ModalProps {
   customApproveMessage?: string;
   action?: () => void;
   processing?: boolean;
-  reason?: string;
-  setReason?: Dispatch<SetStateAction<string>>;
-  addReason?: boolean;
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "full" | number;
+  form: UseFormReturnType<typeof reqValues>;
 }

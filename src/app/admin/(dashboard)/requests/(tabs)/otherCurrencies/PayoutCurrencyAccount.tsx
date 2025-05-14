@@ -27,7 +27,7 @@ import axios from "axios";
 import { parseError } from "@/lib/actions/auth";
 import Cookies from "js-cookie";
 
-function OperationAccount() {
+function PayoutCurrencyAccount() {
   const searchParams = useSearchParams();
 
   const { status, date, endDate, business } = Object.fromEntries(
@@ -80,6 +80,7 @@ function OperationAccount() {
       <TableTd>{element?.accountName}</TableTd>
       <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
       <TableTd>EUR</TableTd>
+      <TableTd>-</TableTd>
 
       <TableTd>
         <BadgeComponent status={element.status} />
@@ -120,6 +121,7 @@ function OperationAccount() {
 
       revalidate();
       currencyRejectApprove();
+
       handleSuccess(
         `${selectedRequest?.Currency?.symbol} Operations account Rejected`,
         `Request for ${selectedRequest?.Currency?.symbol} rejected`
@@ -144,7 +146,6 @@ function OperationAccount() {
 
       revalidate();
       currencyCloseApprove();
-      closeApprove();
       handleSuccess(
         `${selectedRequest?.Currency?.symbol} Operations account Approved`,
         `Request for ${selectedRequest?.Currency?.symbol} approved`
@@ -160,7 +161,7 @@ function OperationAccount() {
   return (
     <Fragment>
       <Group justify="space-between">
-        <SearchInput search={search} setSearch={setSearch} />
+        <SearchInput />
 
         <SecondaryBtn
           text="Filter"
@@ -182,17 +183,18 @@ function OperationAccount() {
         />
       </Filter>
 
-      <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+      <TableComponent head={tableHeaders} rows={[]} loading={loading} />
 
       <EmptyTable
-        rows={rows}
+        rows={[]}
         loading={loading}
         title="There are no requests"
-        text="When an Operation account is requested, it will appear here"
+        text="When a payout account is requested, it will appear here"
       />
 
       <PaginationComponent
-        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={1}
+        // total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}
@@ -243,7 +245,8 @@ const tableHeaders = [
   "Business Name",
   "Requested Currency",
   "Existing Currencies",
+  "Date Created",
   "Status",
 ];
 
-export default OperationAccount;
+export default PayoutCurrencyAccount;

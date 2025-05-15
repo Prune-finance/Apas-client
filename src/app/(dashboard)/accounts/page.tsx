@@ -105,7 +105,6 @@ function Accounts() {
 
   const { currencyAccount, loading: currencyLoading } =
     useUserCurrencyAccount();
-  console.log("currencyAccount", currencyAccount);
 
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -437,7 +436,7 @@ function Accounts() {
                     currency={data?.AccountRequests?.Currency?.symbol}
                     companyName={data?.accountName ?? "No Default Account"}
                     link={`/accounts/default/${data?.id}`}
-                    sortCode="567890"
+                    sortCode="041719"
                     accountNumber={data?.accountNumber}
                     balance={data?.accountBalance ?? 0}
                     loading={currencyLoading}

@@ -35,6 +35,7 @@ interface Props extends CardProps {
   children?: React.ReactNode;
   refresh?: boolean;
   revalidate?: () => Promise<void>;
+  key?: string;
 }
 
 function NewAccountCard({
@@ -50,6 +51,7 @@ function NewAccountCard({
   disable,
   children,
   refresh,
+  key,
   revalidate,
   ...props
 }: Props) {
@@ -77,7 +79,8 @@ function NewAccountCard({
 
   return (
     <BackgroundImage
-      src={newAccountImageEuro.src}
+      key={key}
+      src={config.background}
       h="100%"
       style={{ borderRadius: 6, overflow: "hidden" }}
       w="100%"
@@ -192,9 +195,7 @@ function NewAccountCard({
                   value={
                     currency === "EUR"
                       ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
-                      : currency === "GBP"
-                      ? `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
-                      : `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
+                      : `Sort Code: ${sortCode},\nAccount Number: ${accountNumber},\nAccount Name: ${companyName}`
                   }
                 >
                   {({ copied, copy }) => (

@@ -30,7 +30,11 @@ import {
 } from "@tabler/icons-react";
 
 import ModalComponent from "./modal";
-import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  useUserAccounts,
+  useUserCurrencyAccount,
+  useUserDefaultAccount,
+} from "@/lib/hooks/accounts";
 import { formatNumber, getUserType } from "@/lib/utils";
 
 import useNotification from "@/lib/hooks/notification";
@@ -98,6 +102,9 @@ function Accounts() {
     loading: loadingDftAcct,
     revalidate: revalidateDftAcct,
   } = useUserDefaultAccount();
+
+  const { currencyAccount } = useUserCurrencyAccount();
+  console.log("currencyAccount", currencyAccount);
 
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -407,6 +414,37 @@ function Accounts() {
                 refresh
                 revalidate={revalidateDftAcct}
               />
+
+              <NewAccountCard
+                currency={"EUR"}
+                companyName={account?.accountName ?? "No Default Account"}
+                link={`/accounts/default`}
+                iban={account?.accountNumber ?? "No Default Account"}
+                bic={"ARPYGB21XXX"}
+                balance={account?.accountBalance ?? 0}
+                loading={loadingDftAcct}
+                business={false}
+                refresh
+                revalidate={revalidateDftAcct}
+              />
+
+              {currencyAccount &&
+                currencyAccount?.length > 0 &&
+                currencyAccount?.map((data) => (
+                  <NewAccountCard
+                    key={data?.id}
+                    currency={data?.AccountRequests?.Currency?.symbol}
+                    companyName={data?.accountName ?? "No Default Account"}
+                    link={`/accounts/default/${data?.id}`}
+                    sortCode="567890"
+                    accountNumber={data?.accountNumber}
+                    balance={data?.accountBalance ?? 0}
+                    loading={loadingDftAcct}
+                    business={false}
+                    refresh
+                    revalidate={revalidateDftAcct}
+                  />
+                ))}
             </SimpleGrid>
           </TabsPanel>
 

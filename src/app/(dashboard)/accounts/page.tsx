@@ -103,7 +103,8 @@ function Accounts() {
     revalidate: revalidateDftAcct,
   } = useUserDefaultAccount();
 
-  const { currencyAccount } = useUserCurrencyAccount();
+  const { currencyAccount, loading: currencyLoading } =
+    useUserCurrencyAccount();
   console.log("currencyAccount", currencyAccount);
 
   const { handleSuccess, handleError } = useNotification();
@@ -439,7 +440,7 @@ function Accounts() {
                     sortCode="567890"
                     accountNumber={data?.accountNumber}
                     balance={data?.accountBalance ?? 0}
-                    loading={loadingDftAcct}
+                    loading={currencyLoading}
                     business={false}
                     refresh
                     revalidate={revalidateDftAcct}

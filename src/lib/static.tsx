@@ -22,6 +22,11 @@ import {
   IconPremiumRights,
   IconArrowUpRight,
   IconRosetteDiscountCheck,
+  IconArrowsRightLeft,
+  IconCreditCard,
+  IconDatabase,
+  IconMoneybag,
+  IconSearch,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -402,3 +407,43 @@ export const operationsAccountEstimatedBalance = {
   )} - ${formatNumber(500000, true, "GBP")}`,
   "above-500000": `Above ${formatNumber(500000, true, "GBP")}`,
 } as const;
+
+const currencies = ["EUR", "GBP", "USD", "NGN"];
+
+export const serviceCategories = [
+  {
+    title: "Operations Account",
+    description:
+      "Prune Payments payout service gives the business access to payouts.",
+    accounts: currencies,
+    icon: IconDatabase,
+  },
+  {
+    title: "Virtual Account Services",
+    description:
+      "The account service lets businesses issue user accounts to clients.",
+    accounts: currencies,
+    icon: IconCreditCard,
+  },
+  {
+    title: "Payout Services",
+    description:
+      "This helps businesses manage and disburse funds to recipients.",
+    accounts: currencies,
+    icon: IconMoneybag,
+  },
+  {
+    title: "Account Lookup Services",
+    description:
+      "This helps businesses quickly verify and access account details for transactions.",
+    accounts: currencies,
+    icon: IconSearch,
+  },
+  {
+    title: "Remittance",
+    description:
+      "This helps businesses quickly verify and access account details for transactions.",
+    accounts: currencies,
+    icon: IconArrowsRightLeft,
+  },
+];

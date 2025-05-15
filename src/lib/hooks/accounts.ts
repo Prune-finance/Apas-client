@@ -471,6 +471,38 @@ export function useUserDefaultAccount() {
 
   return { loading, account, revalidate };
 }
+
+export function useUserCurrencyAccountByID(id: string) {
+  const [currencyAccount, setCurrencyAccount] =
+    useState<CurrencyAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/accounts/currency-accounts/${id}`);
+      console.log(data);
+      setCurrencyAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, currencyAccount, revalidate };
+}
+
 export function useUserCurrencyAccount() {
   const [currencyAccount, setCurrencyAccount] = useState<
     CurrencyAccount[] | null
@@ -481,7 +513,6 @@ export function useUserCurrencyAccount() {
     setLoading(true);
     try {
       const { data } = await axios.get(`/accounts/currency-accounts/list`);
-      console.log(data);
 
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -644,7 +675,7 @@ export type Account = UserAccount | CorporateAccount;
 
 export type DefaultAccount = UserAccount | DefaultCorporateAccount;
 
-interface CurrencyAccount {
+export interface CurrencyAccount {
   id: string;
   firstName: string;
   lastName: string;

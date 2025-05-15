@@ -2,7 +2,10 @@
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "../styles.module.scss";
-import { useUserDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  useUserCurrencyAccountByID,
+  useUserDefaultAccount,
+} from "@/lib/hooks/accounts";
 import {
   TransactionType,
   useUserDefaultTransactions,
@@ -14,11 +17,12 @@ import {
 import { Space } from "@mantine/core";
 import { Suspense, useMemo, useState } from "react";
 import { useUserBusiness } from "@/lib/hooks/businesses";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
 
 function Account() {
+  const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -69,6 +73,10 @@ function Account() {
   } = useUserDefaultTransactions(param);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
+
+  const { currencyAccount } = useUserCurrencyAccountByID(params?.id);
+
+  console.log("currencyAccount", currencyAccount);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 

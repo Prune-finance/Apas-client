@@ -11,10 +11,12 @@ import CheckboxCard from "./CheckboxCard";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useRouter } from "next/navigation";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import { serviceCategories } from "@/lib/static";
 
 export default function Services() {
   const { push, back } = useRouter();
   const form = useQuestionnaireFormContext();
+  console.log(form.values.services);
 
   return (
     <Box>
@@ -47,41 +49,3 @@ export default function Services() {
     </Box>
   );
 }
-
-const serviceCategories = [
-  {
-    title: "Operations Account",
-    description:
-      "Prune Payments payout service gives the business access to payouts.",
-    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
-    icon: IconDatabase,
-  },
-  {
-    title: "Virtual Account Services",
-    description:
-      "The account service lets businesses issue user accounts to clients.",
-    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
-    icon: IconCreditCard,
-  },
-  {
-    title: "Payout Services",
-    description:
-      "This helps businesses manage and disburse funds to recipients.",
-    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
-    icon: IconMoneybag,
-  },
-  {
-    title: "Account Lookup Services",
-    description:
-      "This helps businesses quickly verify and access account details for transactions.",
-    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
-    icon: IconSearch,
-  },
-  {
-    title: "Remittance",
-    description:
-      "This helps businesses quickly verify and access account details for transactions.",
-    accounts: ["EUR Account", "GBP Account", "USD Account", "NGN Account"],
-    icon: IconArrowsRightLeft,
-  },
-];

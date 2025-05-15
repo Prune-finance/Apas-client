@@ -1,4 +1,13 @@
-import { Box, Flex, Group, SimpleGrid, Stack, Text } from "@mantine/core";
+import {
+  Box,
+  Checkbox,
+  Flex,
+  Group,
+  Image,
+  SimpleGrid,
+  Stack,
+  Text,
+} from "@mantine/core";
 import dayjs from "dayjs";
 import React, { useState } from "react";
 import PaperContainer from "../PaperContainer";
@@ -11,6 +20,11 @@ import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { PanelWrapper } from "./utils";
 import { IconPencilMinus } from "@tabler/icons-react";
+import { serviceCategories } from "@/lib/static";
+import GBP from "@/assets/GB.png";
+import USD from "@/assets/us.png";
+import EUR from "@/assets/EU-icon.png";
+import NGN from "@/assets/Nigeria.png";
 
 export default function CompanyProfile() {
   const [editing, setEditing] = useState(false);
@@ -69,6 +83,8 @@ export default function CompanyProfile() {
 
       <ContactPerson />
       <CeoDetails />
+
+      <Services />
     </PanelWrapper>
   );
 }
@@ -172,4 +188,51 @@ const CeoDetails = () => {
       </SimpleGrid>
     </PaperContainer>
   );
+};
+
+const Services = () => {
+  return (
+    <PaperContainer title="Services" mt={20}>
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={24}>
+        {serviceCategories.map((service, idx) => (
+          <Stack key={idx}>
+            <Checkbox
+              label={service.title}
+              checked
+              color="var(--prune-primary-500)"
+              iconColor="var(--prune-text-gray-700)"
+            />
+            <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+              Account Type:
+            </Text>
+
+            <Stack>
+              {service.accounts.map((currency, idx) => (
+                <Group key={idx} gap={8} style={{ opacity: 0.6 }}>
+                  <Image
+                    src={
+                      CurrencyIcon[currency as keyof typeof CurrencyIcon].src
+                    }
+                    w={16}
+                    h={16}
+                    alt={currency}
+                  />
+                  <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
+                    {currency}
+                  </Text>
+                </Group>
+              ))}
+            </Stack>
+          </Stack>
+        ))}
+      </SimpleGrid>
+    </PaperContainer>
+  );
+};
+
+const CurrencyIcon = {
+  GBP,
+  USD,
+  EUR,
+  NGN,
 };

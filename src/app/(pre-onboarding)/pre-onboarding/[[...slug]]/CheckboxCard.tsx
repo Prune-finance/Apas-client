@@ -68,7 +68,7 @@ export default function CheckboxCard({
           {accounts.map((item, index) => (
             <Checkbox
               key={form.key(`services.${idx}.currencies.${index}`)}
-              label={item}
+              label={`${item} Account`}
               // value={item}
               onClick={(e) => e.stopPropagation()}
               checked={Boolean(

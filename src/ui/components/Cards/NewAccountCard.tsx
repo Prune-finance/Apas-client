@@ -44,6 +44,7 @@ interface Props extends CardProps {
   sortCode?: string;
   accountNumber?: string;
   revalidate?: () => Promise<void>;
+  key?: string;
 }
 
 type CurrencyConfig = {
@@ -97,6 +98,7 @@ function NewAccountCard({
   disable,
   children,
   refresh,
+  key,
   revalidate,
   ...props
 }: Props) {
@@ -126,6 +128,7 @@ function NewAccountCard({
 
   return (
     <BackgroundImage
+      key={key}
       src={config.background}
       h="100%"
       style={{
@@ -246,9 +249,7 @@ function NewAccountCard({
                   value={
                     currency === "EUR"
                       ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
-                      : currency === "GBP"
-                      ? `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
-                      : `Sort Code: ${bic},\nAccount Number: ${iban},\nAccount Name: ${companyName}`
+                      : `Sort Code: ${sortCode},\nAccount Number: ${accountNumber},\nAccount Name: ${companyName}`
                   }
                 >
                   {({ copied, copy }) => (

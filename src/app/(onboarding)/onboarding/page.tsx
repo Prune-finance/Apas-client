@@ -32,7 +32,7 @@ export default function Onboarding() {
   const [directors, setDirectors] = useState<OnboardingType["directors"]>();
   const [shareholders, setShareholders] =
     useState<OnboardingType["shareholders"]>();
-  const { setBusiness } = OnboardingStore();
+  const { setBusiness, setData } = OnboardingStore();
 
   const form = useForm<OnboardingType>({
     mode: "controlled",
@@ -52,13 +52,27 @@ export default function Onboarding() {
     baseURL: "auth",
     endpoint: "/onboarding/me",
     method: "GET",
-    dependencies: [active],
+    dependencies: [],
+    // dependencies: [active],
     enabled: false,
     onSuccess: (data) => {
       setBusiness(data);
       setActive((prev) =>
         prev === 6 && data.stageIdentifier === 6 ? 6 : data.stageIdentifier
       );
+    },
+  });
+
+  const { data } = useAxios<IOnboarding>({
+    baseURL: "auth",
+    endpoint: `/onboarding/get-questionnaire-by-id/${business?.questionnaireId}`,
+    method: "GET",
+    dependencies: [business?.questionnaireId],
+    enabled: !!!business?.questionnaireId,
+    onSuccess: (data) => {
+      setData(data);
+
+      form.setValues({ ...data });
     },
   });
 

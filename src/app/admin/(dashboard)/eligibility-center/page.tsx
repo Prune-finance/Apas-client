@@ -28,6 +28,7 @@ import {
 import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { IconDots } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 
 function EligibilityCenter() {
   const { data, meta, loading, revalidate } = useOnboardingBusiness();
@@ -35,7 +36,7 @@ function EligibilityCenter() {
   const InfoCards = [
     { title: "Total leads", num: meta?.total },
     { title: "Total approved", num: meta?.approved },
-    { title: "Total onboarded", num: meta?.total },
+    { title: "Total onboarded", num: meta?.onboarded },
     { title: "Pending", num: meta?.pending },
   ];
 
@@ -124,8 +125,14 @@ export default function EligibilityCenterSus() {
 }
 
 const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
-  return data?.map((row, i) => (
-    <TableTr key={i}>
+  const { push } = useRouter();
+
+  return data?.map((row) => (
+    <TableTr
+      key={row.id}
+      onClick={() => push(`/admin/eligibility-center/${row.id}`)}
+      style={{ cursor: "pointer" }}
+    >
       <TableTd>{row.businessName}</TableTd>
       <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>{row.businessCountry}</TableTd>
@@ -133,7 +140,7 @@ const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
         <BadgeComponent
           tier
           status={
-            row.services?.some((s) => s.name === "Remittance")
+            row.services?.every((s) => s.name === "Remittance")
               ? "Tier 1"
               : "Tier 2"
           }
@@ -142,9 +149,10 @@ const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
       </TableTd>
       <TableTd>
         <BadgeComponent
-          status={row.status}
           stage
-          c={row.status === "ACTIVATION" ? "var(--prune-text-gray-800)" : ""}
+          status={row?.status || "QUESTIONNAIRE"}
+          c={row?.status === "ACTIVATION" ? "var(--prune-text-gray-800)" : ""}
+          w={150}
         />
       </TableTd>
     </TableTr>

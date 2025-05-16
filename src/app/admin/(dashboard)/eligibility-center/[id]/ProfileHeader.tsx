@@ -1,10 +1,16 @@
+import { OnboardingBusinessData } from "@/lib/hooks/eligibility-center";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Box, Flex, Group, Text, ThemeIcon } from "@mantine/core";
+import { Flex, Group, Text, ThemeIcon } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import React from "react";
+import Skeleton from "./Skeleton";
 
-export default function ProfileHeader() {
+interface ProfileHeaderProps {
+  data: OnboardingBusinessData | null;
+  loading: boolean;
+}
+export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
   return (
     <Flex
       direction={{ base: "column", md: "row" }}
@@ -14,10 +20,20 @@ export default function ProfileHeader() {
       gap={24}
     >
       <Group gap={10}>
-        <Text c="var(--prune-text-gray-700)" fw={500} fz={18}>
-          1905 Logistics
-        </Text>
-        <BadgeComponent status="PENDING" variant="dot" />
+        <Skeleton loading={loading} w={150}>
+          <Text c="var(--prune-text-gray-700)" fw={500} fz={18}>
+            {data?.businessName}
+          </Text>
+        </Skeleton>
+
+        <Skeleton loading={loading} w={150}>
+          <BadgeComponent
+            status={data?.status || "QUESTIONNAIRE"}
+            stage
+            // variant="dot"
+            w={150}
+          />
+        </Skeleton>
       </Group>
 
       <Group gap={10}>

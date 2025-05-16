@@ -13,6 +13,7 @@ import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { OnboardingBusiness } from "@/lib/interface";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
+import { Director as IDirector } from "@/lib/interface";
 
 interface ComponentProps {
   data: OnboardingBusiness | null;
@@ -23,7 +24,11 @@ interface ComponentProps {
 export default function Directors({ data, loading, form }: ComponentProps) {
   const [rows, setRows] = useState([]);
   return (
-    <PanelWrapper loading={loading} rows={rows} panelName="All Directors">
+    <PanelWrapper
+      loading={loading}
+      rows={data?.onboardingStatus !== "COMPLETED" ? [1] : []}
+      panelName="All Directors"
+    >
       <Flex justify="space-between" align="center">
         <Text fw={600} fz={16} c="var(--prune-text-gray-700)">
           All Directors
@@ -37,8 +42,8 @@ export default function Directors({ data, loading, form }: ComponentProps) {
       </Flex>
 
       <Stack mt={24} gap={24}>
-        {Array.from({ length: 4 }).map((_, idx) => (
-          <Director key={idx} idx={idx + 1} />
+        {data?.directors.map((director, idx) => (
+          <Director key={idx} idx={idx + 1} director={director} />
         ))}
       </Stack>
     </PanelWrapper>
@@ -47,8 +52,9 @@ export default function Directors({ data, loading, form }: ComponentProps) {
 
 interface DirectorProps {
   idx: number;
+  director: IDirector;
 }
-const Director = ({ idx }: DirectorProps) => {
+const Director = ({ idx, director }: DirectorProps) => {
   const [editing, setEditing] = useState(false);
 
   const actionNode = (
@@ -72,28 +78,41 @@ const Director = ({ idx }: DirectorProps) => {
     <PaperContainer title={`Director ${idx}`} actionNode={actionNode}>
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
         <ProfileTextInput
-          label="Name"
-          placeholder="Moses Simon"
+          label="First Name"
+          placeholder={director.first_name}
+          editing={editing}
+        />
+        <ProfileTextInput
+          label="Last Name"
+          placeholder={director.last_name}
           editing={editing}
         />
         <ProfileTextInput
           label="Email"
-          placeholder="moses.simon@1905.com"
+          placeholder={director.email}
           editing={editing}
         />
-        <ProfileTextInput
+        {/* <ProfileTextInput
           label="Phone Number"
-          placeholder="+234123456789"
+          placeholder={director.}
           editing={editing}
-        />
+        /> */}
         <ProfileDateInput
           label="Date of Birth"
-          placeholder={`${dayjs().format("DD-MM-YYYY")}`}
+          placeholder={`${dayjs(director.date_of_birth).format("DD-MM-YYYY")}`}
           editing={editing}
           valueFormat="DD-MM-YYYY"
         />
-        <DocumentPreview label="Identity Document" title="Passport" />
-        <DocumentPreview label="Proof of Address" title="Utility Bill" />
+        <DocumentPreview
+          label="Identity Document"
+          title={director.identityType || ""}
+          value={director.identityFileUrl || ""}
+        />
+        <DocumentPreview
+          label="Proof of Address"
+          title={director.proofOfAddress || ""}
+          value={director.proofOfAddressFileUrl || ""}
+        />
       </SimpleGrid>
     </PaperContainer>
   );

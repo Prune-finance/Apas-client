@@ -10,9 +10,16 @@ import { Flex, Group, SimpleGrid, Stack, Text } from "@mantine/core";
 import { IconPencilMinus, IconPlus, IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import PaperContainer from "../PaperContainer";
+import { OnboardingBusiness } from "@/lib/interface";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
-export default function Shareholders() {
-  const [loading, setLoading] = useState(false);
+interface ComponentProps {
+  data: OnboardingBusiness | null;
+  loading: boolean;
+  form: UseFormReturnType<OnboardingType>;
+}
+export default function Shareholders({ data, loading, form }: ComponentProps) {
   const [rows, setRows] = useState([]);
   return (
     <PanelWrapper loading={loading} rows={rows} panelName="All Shareholders">

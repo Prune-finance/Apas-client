@@ -18,13 +18,29 @@ interface ComponentProps {
 export default function Documents({ data, loading, form }: ComponentProps) {
   const [rows, setRows] = useState([]);
   const businessDocs = [
-    { label: "CAC Certificate", title: "File.pdf", value: "" },
-    { label: "Memart", title: "File.pdf", value: "" },
-    { label: "AML Compliance Framework", title: "File.pdf", value: "" },
-    { label: "Operational License (optional)", title: "File.pdf", value: "" },
+    {
+      label: "CAC Certificate",
+      title: "CAC Certificate",
+      value: data?.cacCertificate,
+    },
+    { label: "Memart", title: "Memart", value: data?.mermat },
+    {
+      label: "AML Compliance Framework",
+      title: "AML Compliance Framework",
+      value: data?.amlCompliance,
+    },
+    {
+      label: "Operational License (optional)",
+      title: "Operational License",
+      value: data?.operationalLicense,
+    },
   ];
   return (
-    <PanelWrapper loading={loading} rows={rows} panelName="Document">
+    <PanelWrapper
+      loading={loading}
+      rows={data?.onboardingStatus === "COMPLETED" ? [1] : []}
+      panelName="Document"
+    >
       <PaperContainer title="Terms of use agreement">
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
           <DocumentPreview label="" title="File.pdf....." />
@@ -45,7 +61,12 @@ export default function Documents({ data, loading, form }: ComponentProps) {
       >
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
           {businessDocs.map((doc, idx) => (
-            <DocumentPreview key={idx} label={doc.label} title={doc.title} />
+            <DocumentPreview
+              key={idx}
+              label={doc.label}
+              title={doc.title}
+              value={doc.value || ""}
+            />
           ))}
         </SimpleGrid>
       </PaperContainer>

@@ -22,8 +22,12 @@ interface Props {
 export default function DefaultAccountDetails({ account, loading }: Props) {
   const accountDetails = {
     "Account Name": account?.accountName,
-    "IBAN/Account Number": account?.accountNumber,
-    BIC: "ARPYGB21XXX",
+    [accountType === "GBP" ? "Sort Code" : "IBAN/Account Number"]:
+      accountType === "GBP" ? account?.sortCode : account?.accountNumber,
+
+    [accountType === "GBP" ? "Account Number" : "BIC"]:
+      accountType === "GBP" ? account?.accountNumber : "ARPYGB21XXX",
+
     "Bank Name": "Prune Payments LTD",
     "Bank Address": "Office 7 35-37 Ludgate Hill, London",
     "Bank Country": "United Kingdom",

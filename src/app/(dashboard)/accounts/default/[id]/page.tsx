@@ -61,11 +61,11 @@ function Account() {
     limit,
   ]);
 
-  const {
-    account,
-    loading,
-    revalidate: revalidateAcct,
-  } = useUserDefaultAccount();
+  // const {
+  //   account,
+  //   loading,
+  //   revalidate: revalidateAcct,
+  // } = useUserDefaultAccount();
   const {
     transactions,
     loading: loadingTrx,
@@ -74,9 +74,13 @@ function Account() {
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
-  const { currencyAccount } = useUserCurrencyAccountByID(params?.id);
+  const {
+    currencyAccount: account,
+    loading,
+    revalidate: revalidateAcct,
+  } = useUserCurrencyAccountByID(params?.id);
 
-  console.log("currencyAccount", currencyAccount);
+  console.log("currencyAccount", account);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
@@ -104,7 +108,7 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
-        accountType="GBP"
+        accountType={account?.AccountRequests?.Currency?.symbol}
         account={account}
         location="own-account"
         transactions={transactions as TransactionType[]}

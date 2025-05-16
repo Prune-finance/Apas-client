@@ -92,24 +92,25 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
           <IconDownload size={24} />
         </ThemeIcon>
 
-        {data?.processStatus === "ONBOARDING" && (
-          <>
-            <PrimaryBtn
-              text="Reject Profile"
-              color="var(--prune-warning)"
-              c="#fff"
-              fw={600}
-              action={rejectProfile}
-              loading={rejectProfileLoading}
-            />
-            <PrimaryBtn
-              text="Approve Profile"
-              fw={600}
-              action={approveProfile}
-              loading={approveProfileLoading}
-            />
-          </>
-        )}
+        {data?.processStatus === "ONBOARDING" &&
+          data.onboardingStatus === "COMPLETED" && (
+            <>
+              <PrimaryBtn
+                text="Reject Profile"
+                color="var(--prune-warning)"
+                c="#fff"
+                fw={600}
+                action={rejectProfile}
+                loading={rejectProfileLoading}
+              />
+              <PrimaryBtn
+                text="Approve Profile"
+                fw={600}
+                action={approveProfile}
+                loading={approveProfileLoading}
+              />
+            </>
+          )}
         {data?.processStatus === "PROFILE" && (
           <PrimaryBtn
             text="Send Questionnaire"
@@ -118,14 +119,15 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
             loading={sendQuestionnaireLinkLoading}
           />
         )}
-        {data?.processStatus === "QUESTIONNAIRE" && (
-          <PrimaryBtn
-            text="Send Onboarding Link"
-            fw={600}
-            action={sendOnboardingLink}
-            loading={sendOnboardingLinkLoading}
-          />
-        )}
+        {data?.processStatus === "QUESTIONNAIRE" &&
+          data.questionnaireStatus === "APPROVED" && (
+            <PrimaryBtn
+              text="Send Onboarding Link"
+              fw={600}
+              action={sendOnboardingLink}
+              loading={sendOnboardingLinkLoading}
+            />
+          )}
       </Group>
     </Flex>
   );

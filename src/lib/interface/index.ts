@@ -79,7 +79,7 @@ export interface OnboardingBusiness {
   questionnaireId: string;
   stageIdentifier: number;
   geoFootprint: string;
-  questionnaireSentAt: null;
+  questionnaireSentAt: Date | null;
   consentDesignation: string;
   consentEmail: string;
   consentSignature: string;
@@ -87,8 +87,8 @@ export interface OnboardingBusiness {
   consentPhoneNumber: string;
   documentData: Document;
   documents: Document[];
-  onboardingStatus: string;
-  questionnaireStatus: string;
+  onboardingStatus: "PENDING" | "PROCESSING" | "COMPLETED";
+  questionnaireStatus: "APPROVED" | "PENDING";
   processStatus: STAGE;
   hasActualBusinessAccount: boolean;
   token: string;
@@ -96,6 +96,7 @@ export interface OnboardingBusiness {
   services: Service[];
   virtualAccounts: VirtualAccounts;
   operationsAccounts: OperationsAccounts;
+  annualTurnover: null | string;
 }
 
 export interface Director {

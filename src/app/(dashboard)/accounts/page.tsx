@@ -30,7 +30,11 @@ import {
 } from "@tabler/icons-react";
 
 import ModalComponent from "./modal";
-import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  useUserAccounts,
+  useUserCurrencyAccount,
+  useUserDefaultAccount,
+} from "@/lib/hooks/accounts";
 import { formatNumber, getUserType } from "@/lib/utils";
 
 import useNotification from "@/lib/hooks/notification";
@@ -99,6 +103,9 @@ function Accounts() {
     loading: loadingDftAcct,
     revalidate: revalidateDftAcct,
   } = useUserDefaultAccount();
+
+  const { currencyAccount, loading: currencyLoading } =
+    useUserCurrencyAccount();
 
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -427,18 +434,23 @@ function Accounts() {
                 revalidate={revalidateDftAcct}
               />
 
-              <NewAccountCard
-                currency={"GBP"}
-                companyName={account?.accountName ?? "No Default Account"}
-                link={`/accounts/default/1`}
-                sortCode="567890"
-                accountNumber="567890"
-                balance={account?.accountBalance ?? 0}
-                loading={loadingDftAcct}
-                business={false}
-                refresh
-                revalidate={revalidateDftAcct}
-              />
+              {currencyAccount &&
+                currencyAccount?.length > 0 &&
+                currencyAccount?.map((data) => (
+                  <NewAccountCard
+                    key={data?.id}
+                    currency={data?.AccountRequests?.Currency?.symbol}
+                    companyName={data?.accountName ?? "No Default Account"}
+                    link={`/accounts/default/${data?.id}`}
+                    sortCode="041719"
+                    accountNumber={data?.accountNumber}
+                    balance={data?.accountBalance ?? 0}
+                    loading={currencyLoading}
+                    business={false}
+                    refresh
+                    revalidate={revalidateDftAcct}
+                  />
+                ))}
             </SimpleGrid>
           </TabsPanel>
 

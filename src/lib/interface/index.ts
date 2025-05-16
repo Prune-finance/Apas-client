@@ -64,7 +64,7 @@ export interface OnboardingBusiness {
   ceoFirstName: string | null;
   ceoLastName: string | null;
   ceoEmail: string | null;
-  ceoDOB: string | null;
+  ceoDOB: Date | null;
   ceoPOAType: string | null;
   ceoPOAUrl: string | null;
   ceoIdType: string | null;
@@ -89,7 +89,7 @@ export interface OnboardingBusiness {
   documents: Document[];
   onboardingStatus: string;
   questionnaireStatus: string;
-  processStatus: string;
+  processStatus: STAGE;
   hasActualBusinessAccount: boolean;
   token: string;
   status: STAGE;

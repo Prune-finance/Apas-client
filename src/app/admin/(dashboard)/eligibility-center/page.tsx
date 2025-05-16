@@ -150,7 +150,7 @@ const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
       <TableTd>
         <BadgeComponent
           stage
-          status={row?.status || "QUESTIONNAIRE"}
+          status={row?.processStatus || "QUESTIONNAIRE"}
           c={row?.status === "ACTIVATION" ? "var(--prune-text-gray-800)" : ""}
           w={150}
         />

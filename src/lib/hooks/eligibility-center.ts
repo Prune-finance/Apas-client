@@ -22,7 +22,6 @@ export function useOnboardingBusiness(customParams: IParams = {}) {
 export function useSingleOnboardingBusiness(id: string) {
   const {
     data,
-
     loading,
     queryFn: revalidate,
   } = useAxios<OnboardingBusinessData>({

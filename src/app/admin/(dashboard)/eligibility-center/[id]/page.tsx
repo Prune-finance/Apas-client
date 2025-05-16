@@ -17,21 +17,27 @@ import Financial from "./(tabs)/Financial";
 import Documents from "./(tabs)/Documents";
 import Directors from "./(tabs)/Directors";
 import Shareholders from "./(tabs)/Shareholders";
+import { useSingleOnboardingBusiness } from "@/lib/hooks/eligibility-center";
 
-export default function OnboardingProfile() {
+export default function OnboardingProfile({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { data, loading, revalidate } = useSingleOnboardingBusiness(params.id);
   return (
     <Box>
       <Breadcrumbs
         items={[
           { title: "Eligibility Center", href: "/admin/eligibility-center" },
           {
-            title: "1905 Logistics",
-            href: "/admin/eligibility-center/1",
-            loading: false,
+            title: data?.businessName || "",
+            href: `/admin/eligibility-center/${data?.id}`,
+            loading: loading,
           },
         ]}
       />
-      <ProfileHeader />
+      <ProfileHeader data={data} loading={loading} />
       <Tabs
         tabs={tabs}
         tt="capitalize"

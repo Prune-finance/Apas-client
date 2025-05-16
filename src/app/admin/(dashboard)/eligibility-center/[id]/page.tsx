@@ -45,7 +45,7 @@ export default function OnboardingProfile({
     ceoIdUrlBack: data?.ceoIdUrlBack || "",
     ceoPOAType: data?.ceoPOAType || "",
     ceoPOAUrl: data?.ceoPOAUrl || "",
-    ceoDOB: data?.ceoDOB || "",
+    ceoDOB: data?.ceoDOB ? new Date(data.ceoDOB) : null,
     contactPersonIdType: data?.contactPersonIdType || "",
     contactPersonPOAType: data?.contactPersonPOAType || "",
     contactPersonIdUrl: data?.contactPersonIdUrl || "",

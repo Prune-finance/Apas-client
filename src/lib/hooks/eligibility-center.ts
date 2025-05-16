@@ -102,4 +102,5 @@ export interface Meta {
   approved: number;
   currentPage: number;
   totalPages: number;
+  onboarded: number;
 }

@@ -76,7 +76,7 @@ export const stageColor = (stage: STAGE) => {
     case "PROFILE":
       return "#FFA940";
     case "QUESTIONNAIRE":
-      return "var(----prune-primary-700)";
+      return "var(--prune-primary-700)";
     case "ONBOARDING":
       return "#DB340B";
     case "ACTIVATION":

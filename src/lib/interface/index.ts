@@ -101,9 +101,12 @@ export interface OnboardingBusiness {
 
 export interface Director {
   id: string;
-  firstName: string;
-  lastName: string;
-  dob: string | Date | null;
+  // firstName: string;
+  // lastName: string;
+  // dob: string | Date | null;
+  last_name: string;
+  first_name: string;
+  date_of_birth: Date | null;
   email: string;
   identityType: string | null;
   proofOfAddress: string | null;

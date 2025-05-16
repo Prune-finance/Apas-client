@@ -1,13 +1,13 @@
-import { OnboardingBusinessData } from "@/lib/hooks/eligibility-center";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Flex, Group, Text, ThemeIcon } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
 import React from "react";
 import Skeleton from "./Skeleton";
+import { OnboardingBusiness } from "@/lib/interface";
 
 interface ProfileHeaderProps {
-  data: OnboardingBusinessData | null;
+  data: OnboardingBusiness | null;
   loading: boolean;
 }
 export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {

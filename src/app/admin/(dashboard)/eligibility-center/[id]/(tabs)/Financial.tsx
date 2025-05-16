@@ -1,4 +1,4 @@
-import { Box, Radio, SimpleGrid, Stack, Text } from "@mantine/core";
+import { Radio, SimpleGrid, Stack, Text } from "@mantine/core";
 import PaperContainer from "../PaperContainer";
 import {
   CustomRadioCard,
@@ -8,9 +8,17 @@ import { formatNumber } from "@/lib/utils";
 import { operationsAccountEstimatedBalance } from "@/lib/static";
 import { useState } from "react";
 import { PanelWrapper } from "./utils";
+import { OnboardingBusiness } from "@/lib/interface";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
-export default function Financial() {
-  const [loading, setLoading] = useState(false);
+interface ComponentProps {
+  data: OnboardingBusiness | null;
+  loading: boolean;
+  form: UseFormReturnType<OnboardingType>;
+}
+
+export default function Financial({ data, loading, form }: ComponentProps) {
   const [rows, setRows] = useState([]);
   const boldLabel = (boldText: string, normalText: string) => (
     <Text inherit span>

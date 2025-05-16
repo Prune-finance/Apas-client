@@ -5,9 +5,17 @@ import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { IconPlus } from "@tabler/icons-react";
 import { PanelWrapper } from "./utils";
+import { OnboardingBusiness } from "@/lib/interface";
+import { OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
 
-export default function Documents() {
-  const [loading, setLoading] = useState(false);
+interface ComponentProps {
+  data: OnboardingBusiness | null;
+  loading: boolean;
+  form: UseFormReturnType<OnboardingType>;
+}
+
+export default function Documents({ data, loading, form }: ComponentProps) {
   const [rows, setRows] = useState([]);
   const businessDocs = [
     { label: "CAC Certificate", title: "File.pdf", value: "" },

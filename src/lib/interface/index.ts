@@ -1,3 +1,5 @@
+import { STAGE } from "../utils";
+
 export interface Onboarding {
   id: string;
   businessEmail: string;
@@ -76,6 +78,24 @@ export interface OnboardingBusiness {
   migrated: boolean;
   questionnaireId: string;
   stageIdentifier: number;
+  geoFootprint: string;
+  questionnaireSentAt: null;
+  consentDesignation: string;
+  consentEmail: string;
+  consentSignature: string;
+  consentSignedBy: string;
+  consentPhoneNumber: string;
+  documentData: Document;
+  documents: Document[];
+  onboardingStatus: string;
+  questionnaireStatus: string;
+  processStatus: string;
+  hasActualBusinessAccount: boolean;
+  token: string;
+  status: STAGE;
+  services: Service[];
+  virtualAccounts: VirtualAccounts;
+  operationsAccounts: OperationsAccounts;
 }
 
 export interface Director {
@@ -90,3 +110,5 @@ export interface Director {
   identityFileUrlBack: string;
   proofOfAddressFileUrl: string;
 }
+
+export interface Document {}

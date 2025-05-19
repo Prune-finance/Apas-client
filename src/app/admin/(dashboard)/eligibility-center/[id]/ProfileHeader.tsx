@@ -23,7 +23,7 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
     method: "GET",
     onSuccess: () => {
       handleSuccess(
-        `Questionnaire link sent to ${data?.businessEmail}`,
+        `Questionnaire link sent to ${data?.contactPersonEmail}`,
         "Questionnaire sent successfully"
       );
     },
@@ -36,7 +36,7 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
       onSuccess: () => {
         handleSuccess(
           "Onboarding link sent successfully",
-          `Onboarding link sent to ${data?.businessEmail}`
+          `Onboarding link sent to ${data?.contactPersonEmail}`
         );
       },
     });

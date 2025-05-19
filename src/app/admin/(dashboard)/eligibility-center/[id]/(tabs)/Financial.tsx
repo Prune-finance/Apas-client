@@ -63,7 +63,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("Single", "account limit - Daily")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.max_value_per_transaction.daily || 0,
+              data?.virtualAccounts?.max_value_per_transaction?.daily || 0,
               true,
               "GBP"
             )}`}
@@ -71,15 +71,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("Single", "account limit - Monthly")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.max_value_per_transaction.monthly || 0,
-              true,
-              "GBP"
-            )}`}
-          />
-          <ProfileTextInput
-            label={boldLabel("Single", "account limit - Annually")}
-            placeholder={`${formatNumber(
-              data?.virtualAccounts?.max_value_per_transaction.annually || 0,
+              data?.virtualAccounts?.max_value_per_transaction?.annually || 0,
               true,
               "GBP"
             )}`}
@@ -90,7 +82,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("All", "account limit - Daily")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.max_value_all_virtual_accounts.daily || 0,
+              data?.virtualAccounts?.max_value_all_virtual_accounts?.daily || 0,
               true,
               "GBP"
             )}`}
@@ -98,7 +90,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("All", "account limit - Monthly")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.max_value_all_virtual_accounts.monthly ||
+              data?.virtualAccounts?.max_value_all_virtual_accounts?.monthly ||
                 0,
               true,
               "GBP"
@@ -107,7 +99,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("All", "account limit - Annually")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.max_value_all_virtual_accounts.annually ||
+              data?.virtualAccounts?.max_value_all_virtual_accounts?.annually ||
                 0,
               true,
               "GBP"
@@ -118,7 +110,8 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("Highest", "transaction count - Daily")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.total_highest_transaction_count.daily || 0,
+              data?.virtualAccounts?.total_highest_transaction_count?.daily ||
+                0,
               true,
               "GBP"
             )}`}
@@ -126,7 +119,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("Highest", "transaction count - Monthly")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.total_highest_transaction_count.monthly ||
+              data?.virtualAccounts?.total_highest_transaction_count?.monthly ||
                 0,
               true,
               "GBP"
@@ -135,8 +128,8 @@ export default function Financial({ data, loading, form }: ComponentProps) {
           <ProfileTextInput
             label={boldLabel("Highest", "transaction count - Annually")}
             placeholder={`${formatNumber(
-              data?.virtualAccounts?.total_highest_transaction_count.annually ||
-                0,
+              data?.virtualAccounts?.total_highest_transaction_count
+                ?.annually || 0,
               true,
               "GBP"
             )}`}
@@ -146,7 +139,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
 
       <PaperContainer title="Operations Account Service">
         <Radio.Group
-          value={data?.operationsAccounts.estimated_balance}
+          value={data?.operationsAccounts?.estimated_balance}
           onChange={() => {}}
         >
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>

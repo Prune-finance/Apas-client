@@ -26,7 +26,7 @@ export default function Directors({ data, loading, form }: ComponentProps) {
   return (
     <PanelWrapper
       loading={loading}
-      rows={data?.onboardingStatus !== "COMPLETED" ? [1] : []}
+      rows={data?.onboardingStatus === "COMPLETED" ? [1] : []}
       panelName="All Directors"
     >
       <Flex justify="space-between" align="center">

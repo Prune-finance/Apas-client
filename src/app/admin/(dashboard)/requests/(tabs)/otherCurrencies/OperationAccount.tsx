@@ -109,7 +109,7 @@ function OperationAccount() {
         requestForm.values;
 
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-account/admin-reject-business-currency-account-request/${selectedRequest?.id}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-accounts/requests/admin-reject-business-currency-account-request/${selectedRequest?.id}`,
         {
           rejectComment: reason,
           ...(supportingDocumentName && { supportingDocumentName }),
@@ -137,7 +137,7 @@ function OperationAccount() {
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-account/admin-approve-business-currency-account-request/${selectedRequest?.id}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-accounts/requests/admin-approve-business-currency-account-request/${selectedRequest?.id}`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );

@@ -6,7 +6,7 @@ import SuccessModal from "../../SuccessModal";
 import PreviewState from "../previewState";
 import SendMoneyModal from "../sendMoneyModal";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { DefaultAccount } from "@/lib/hooks/accounts";
+import { DefaultAccount, useUserDefaultAccount } from "@/lib/hooks/accounts";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
@@ -18,15 +18,11 @@ interface Props {
   opened: boolean;
   openSendMoney: () => void;
   closeMoney: () => void;
-  account: DefaultAccount | null;
 }
 
-export const SendMoney = ({
-  opened,
-  closeMoney,
-  account,
-  openSendMoney,
-}: Props) => {
+export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
+  const { account, loading, revalidate } = useUserDefaultAccount();
+
   const matches = useMediaQuery("(max-width: 768px)");
   const axios = createAxiosInstance("payouts");
 
@@ -59,18 +55,6 @@ export const SendMoney = ({
     invoice: "",
     narration: "",
   });
-
-  // const [debtorRequestForm, setDebtorRequestForm] = useState<DebtorForm>({
-  //   location: "self",
-  //   fullName: "",
-  //   address: "",
-  //   country: "",
-  //   postCode: "",
-  //   state: "",
-  //   city: "",
-  //   website: "",
-  //   businessRegNo: "",
-  // });
 
   const [companyRequestForm, setCompanyRequestForm] = useState({
     amount: "",
@@ -236,6 +220,7 @@ export const SendMoney = ({
       >
         <SendMoneyModal
           account={account}
+          loading={loading}
           close={closeMoney}
           openPreview={openPreview}
           setRequestForm={setRequestForm}

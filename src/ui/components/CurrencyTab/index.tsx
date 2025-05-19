@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useRef, useState, useMemo, useEffect } from "react";
 import { Flex, FloatingIndicator, Image, UnstyledButton } from "@mantine/core";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
 import classes from "./styles.module.scss";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 const data = [
   {
@@ -11,8 +12,8 @@ const data = [
       <Image
         src={EUImage.src}
         alt="EUR"
-        width={20}
-        height={20}
+        width={18}
+        height={18}
         style={{ zIndex: 1 }}
       />
     ),
@@ -23,8 +24,8 @@ const data = [
       <Image
         src={GBImage.src}
         alt="GBP"
-        width={20}
-        height={20}
+        width={18}
+        height={18}
         style={{ zIndex: 1 }}
       />
     ),
@@ -32,15 +33,26 @@ const data = [
 ];
 
 function CurrencyTab() {
-  const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
-  const [controlsRefs, setControlsRefs] = useState<
-    Record<string, HTMLButtonElement | null>
-  >({});
-  const [active, setActive] = useState(0);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const controlsRefs = useRef<Record<number, HTMLButtonElement | null>>({});
+  const [mounted, setMounted] = useState(false);
 
-  const setControlRef = (index: number) => (node: HTMLButtonElement) => {
-    controlsRefs[index] = node;
-    setControlsRefs(controlsRefs);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const { switchCurrency, setSwitchCurrency } = useCurrencySwitchStore();
+
+  // Convert switchCurrency to an index
+  const active = useMemo(
+    () => data.findIndex((item) => item?.title === switchCurrency),
+    [switchCurrency]
+  );
+
+  const setControlRef = (index: number) => (node: HTMLButtonElement | null) => {
+    if (node) {
+      controlsRefs.current[index] = node;
+    }
   };
 
   const controls = data.map((item, index) => (
@@ -48,27 +60,29 @@ function CurrencyTab() {
       key={item?.title}
       className={classes.control}
       ref={setControlRef(index)}
-      onClick={() => setActive(index)}
+      onClick={() => setSwitchCurrency(item?.title as "EUR" | "GBP")}
       mod={{ active: active === index }}
       fz={14}
       w={63}
     >
       <Flex align="center" gap={4}>
-        {item?.icon}
-        <span className={classes.controlLabel}>{item?.title}</span>
+        {item.icon}
+        <span className={classes.controlLabel}>{item.title}</span>
       </Flex>
     </UnstyledButton>
   ));
 
   return (
-    <div className={classes.root} ref={setRootRef}>
+    <div className={classes.root} ref={rootRef}>
       {controls}
 
-      <FloatingIndicator
-        target={controlsRefs[active]}
-        parent={rootRef}
-        className={classes.indicator}
-      />
+      {mounted && controlsRefs.current[active] && rootRef.current && (
+        <FloatingIndicator
+          target={controlsRefs.current[active]}
+          parent={rootRef.current}
+          className={classes.indicator}
+        />
+      )}
     </div>
   );
 }

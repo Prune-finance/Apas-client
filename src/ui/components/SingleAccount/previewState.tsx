@@ -17,6 +17,7 @@ import { PrimaryBtn } from "../Buttons";
 import FileDisplay from "../DocumentViewer";
 import { useDisclosure } from "@mantine/hooks";
 import useDebtorStore from "@/lib/store/debtor";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 interface PreviewStateProps {
   requestForm?: any;
@@ -40,6 +41,8 @@ function PreviewState({
   const { debtorRequestForm } = useDebtorStore();
   const [opened, { open, close }] = useDisclosure(false);
   const [fileUrl, setFileUrl] = useState<string>("");
+  const { switchCurrency } = useCurrencySwitchStore();
+
   const beneficiaryDetails = {
     "First Name": requestForm?.firstName,
     "Last Name": requestForm?.lastName,
@@ -151,8 +154,16 @@ function PreviewState({
             </Text>
             <Text fz={32} fw={600} c="#97ad05" mt={0}>
               {sectionState === "Individual"
-                ? formatNumber(requestForm?.amount ?? 0, true, "EUR")
-                : formatNumber(companyRequestForm?.amount ?? 0, true, "EUR")}
+                ? formatNumber(
+                    requestForm?.amount ?? 0,
+                    true,
+                    switchCurrency ?? "EUR"
+                  )
+                : formatNumber(
+                    companyRequestForm?.amount ?? 0,
+                    true,
+                    switchCurrency ?? "EUR"
+                  )}
             </Text>
           </Flex>
 

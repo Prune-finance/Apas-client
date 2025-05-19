@@ -8,6 +8,7 @@ import {
 } from "@/lib/hooks/accounts";
 import {
   TransactionType,
+  useUserCurrencyTransactions,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
 import {
@@ -61,16 +62,13 @@ function Account() {
     limit,
   ]);
 
-  // const {
-  //   account,
-  //   loading,
-  //   revalidate: revalidateAcct,
-  // } = useUserDefaultAccount();
   const {
     transactions,
     loading: loadingTrx,
     meta: trxMeta,
-  } = useUserDefaultTransactions(param);
+  } = useUserCurrencyTransactions(param);
+
+  console.log(transactions);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
@@ -79,8 +77,6 @@ function Account() {
     loading,
     revalidate: revalidateAcct,
   } = useUserCurrencyAccountByID(params?.id);
-
-  console.log("currencyAccount", account);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 

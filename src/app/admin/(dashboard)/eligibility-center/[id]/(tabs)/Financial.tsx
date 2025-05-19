@@ -40,7 +40,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
             Annual Turnover
           </Text>
           <Text fz={32} fw={500} c="var(--prune-text-gray-700)">
-            {data?.annualTurnover}
+            {data?.annualTurnover?.split("-").join(" ")}
           </Text>
         </Stack>
       </PaperContainer>

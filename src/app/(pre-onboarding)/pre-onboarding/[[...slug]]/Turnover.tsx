@@ -52,5 +52,5 @@ const turnoverOptions = {
     true,
     "GBP"
   )}`,
-  "less-than-1000000": `More than ${formatNumber(500000, true, "GBP")}`,
+  "above-500000": `More than ${formatNumber(500000, true, "GBP")}`,
 } as const;

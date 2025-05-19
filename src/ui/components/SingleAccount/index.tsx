@@ -729,6 +729,7 @@ export const SingleDefaultAccountBody = ({
             // children={children}
             location={location ?? "default"}
             isUser={isUser}
+            currencyType={account?.AccountRequests?.Currency?.symbol}
           >
             {children}
           </Transactions>
@@ -737,6 +738,7 @@ export const SingleDefaultAccountBody = ({
           <Analytics
             transactions={transactions}
             setChartFrequency={setChartFrequency}
+            currencyType={account?.AccountRequests?.Currency?.symbol}
           />
         </TabsPanel>
         {!payout && (

@@ -687,6 +687,23 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
   return { loading, transactions: data || [], meta, revalidate };
 }
 
+export function useUserCurrencyTransactions(customParams: ITrx = {}) {
+  const {
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<TransactionType[], Meta>({
+    endpoint:
+      "currency-accounts/transactions/get-company-currency-account-transactions/GBP",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
 export function useUserPayoutTransactions(customParams: ITrx = {}) {
   const { data, meta, loading, queryFn } = useAxios<TransactionType[], Meta>({
     endpoint: "/payout/transactions",

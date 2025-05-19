@@ -231,7 +231,7 @@ export function useCurrencyRequests(customParams: IParams = {}) {
     try {
       const params = new URLSearchParams(obj as Record<string, string>);
       const { data } = await acctAxiosInstance.get(
-        `/currency-account/admin-get-business-currency-account-requests`,
+        `/currency-accounts/requests/admin-get-business-currency-account-requests`,
         {
           params,
         }
@@ -318,7 +318,7 @@ export function useBusinessCurrencyRequests(customParams: IParams = {}) {
     try {
       const params = new URLSearchParams(obj as Record<string, string>);
       const { data } = await acctAxiosInstance.get(
-        `/currency-account/get-business-currency-account-requests`,
+        `/currency-accounts/requests/get-business-currency-account-requests`,
         {
           params,
         }

@@ -8,6 +8,7 @@ import {
 } from "@/lib/hooks/accounts";
 import {
   TransactionType,
+  useUserCurrencyTransactions,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
 import {
@@ -62,21 +63,20 @@ function Account() {
   ]);
 
   const {
-    account,
-    loading,
-    revalidate: revalidateAcct,
-  } = useUserDefaultAccount();
-  const {
     transactions,
     loading: loadingTrx,
     meta: trxMeta,
-  } = useUserDefaultTransactions(param);
+  } = useUserCurrencyTransactions(param);
+
+  console.log(transactions);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
-  const { currencyAccount } = useUserCurrencyAccountByID(params?.id);
-
-  console.log("currencyAccount", currencyAccount);
+  const {
+    currencyAccount: account,
+    loading,
+    revalidate: revalidateAcct,
+  } = useUserCurrencyAccountByID(params?.id);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
@@ -104,7 +104,7 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
-        accountType="GBP"
+        accountType={account?.AccountRequests?.Currency?.symbol}
         account={account}
         location="own-account"
         transactions={transactions as TransactionType[]}

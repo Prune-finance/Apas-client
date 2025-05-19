@@ -31,10 +31,10 @@ export default function DefaultAccountDetails({
   const accountDetails = {
     "Account Name": account?.accountName,
     [accountType === "GBP" ? "Sort Code" : "IBAN/Account Number"]:
-      accountType === "GBP" ? account?.accountNumber : account?.accountNumber,
+      accountType === "GBP" ? account?.sortCode : account?.accountNumber,
 
     [accountType === "GBP" ? "Account Number" : "BIC"]:
-      accountType === "GBP" ? "678902" : "ARPYGB21XXX",
+      accountType === "GBP" ? account?.accountNumber : "ARPYGB21XXX",
 
     "Bank Name": "Prune Payments LTD",
 

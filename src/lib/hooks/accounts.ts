@@ -473,14 +473,15 @@ export function useUserDefaultAccount() {
 }
 
 export function useUserCurrencyAccountByID(id: string) {
-  const [currencyAccount, setCurrencyAccount] =
-    useState<CurrencyAccount | null>(null);
+  const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
+    null
+  );
   const [loading, setLoading] = useState(true);
 
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/currency-accounts/${id}`);
+      const { data } = await axios.get(`/currency-accounts/${id}`);
       console.log(data);
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -512,7 +513,7 @@ export function useUserCurrencyAccount() {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/currency-accounts/list`);
+      const { data } = await axios.get(`/currency-accounts/list`);
 
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -639,6 +640,10 @@ export interface BaseAccount {
   companyName?: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
   isTrusted?: boolean;
+  sortCode: string;
+  AccountRequests?: {
+    Currency: Record<string, any>;
+  };
 }
 
 export interface UserAccount extends BaseAccount {
@@ -679,6 +684,7 @@ export interface CurrencyAccount {
   id: string;
   firstName: string;
   lastName: string;
+  isTrusted: boolean;
   accountRequestId: string;
   accountIdentifier: string;
   accountName: string;

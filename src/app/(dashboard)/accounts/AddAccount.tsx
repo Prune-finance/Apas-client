@@ -59,7 +59,7 @@ function AddAccount({ onClose, openSuccess }: AddAccountProps) {
 
       setLoading(true);
       const { data: res } = await axios.post(
-        `/currency-account/request-business-currency-account`,
+        `/currency-accounts/requests/request-business-currency-account`,
         data
       );
       console.log(res);

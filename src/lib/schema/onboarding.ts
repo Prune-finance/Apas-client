@@ -177,7 +177,7 @@ export const onboardingSchema = onboardingBasicInfoSchema
 
 export type OnboardingType = z.infer<typeof onboardingSchema>;
 
-type DirectorType = z.infer<typeof Director>;
+export type DirectorType = z.infer<typeof Director>;
 
 export const OnboardingDirectorValues: DirectorType = {
   id: crypto.randomUUID(),

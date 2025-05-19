@@ -601,7 +601,6 @@ function Accounts() {
         <SendMoney
           opened={sendMoneyOpened}
           closeMoney={sendMoneyClose}
-          account={account}
           openSendMoney={sendMoneyOpen}
         />
 

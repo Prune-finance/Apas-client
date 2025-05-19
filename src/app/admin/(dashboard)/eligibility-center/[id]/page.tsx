@@ -63,8 +63,20 @@ export default function OnboardingProfile({
     contactPersonFirstName: data?.contactPersonFirstName || "",
     contactPersonLastName: data?.contactPersonLastName || "",
     contactPersonEmail: data?.contactPersonEmail || "",
-    directors: data?.directors || [],
-    shareholders: data?.shareholders || [],
+    directors:
+      data?.directors.map((director) => ({
+        ...director,
+        date_of_birth: director.date_of_birth
+          ? new Date(director.date_of_birth)
+          : null,
+      })) || [],
+    shareholders:
+      data?.shareholders.map((shareholder) => ({
+        ...shareholder,
+        date_of_birth: shareholder.date_of_birth
+          ? new Date(shareholder.date_of_birth)
+          : null,
+      })) || [],
   };
 
   const form = useForm<OnboardingType>({

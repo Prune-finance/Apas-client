@@ -2,48 +2,51 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Flex, Group, Text, ThemeIcon } from "@mantine/core";
 import { IconDownload } from "@tabler/icons-react";
-import React from "react";
+import React, { useState } from "react";
 import Skeleton from "./Skeleton";
 import { OnboardingBusiness } from "@/lib/interface";
 import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import createAxiosInstance from "@/lib/axios";
 
 interface ProfileHeaderProps {
   data: OnboardingBusiness | null;
   loading: boolean;
 }
 export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
-  const { handleSuccess } = useNotification();
-  const {
-    queryFn: sendQuestionnaireLink,
-    loading: sendQuestionnaireLinkLoading,
-  } = useAxios({
-    baseURL: "auth",
-    endpoint: `/admin/onboardings/questionnaire/${data?.id}/link`,
-    method: "GET",
-    onSuccess: () => {
-      handleSuccess(
-        `Questionnaire link sent to ${data?.contactPersonEmail}`,
-        "Questionnaire sent successfully"
-      );
-    },
-  });
-  const { queryFn: sendOnboardingLink, loading: sendOnboardingLinkLoading } =
-    useAxios({
-      baseURL: "auth",
-      endpoint: `/admin/onboardings/${data?.id}/link`,
-      method: "GET",
-      onSuccess: () => {
-        handleSuccess(
-          "Onboarding link sent successfully",
-          `Onboarding link sent to ${data?.contactPersonEmail}`
-        );
-      },
-    });
+  const [loadingLink, setLoadingLink] = useState(false);
+  const { handleSuccess, handleError } = useNotification();
+  const axios = createAxiosInstance("auth");
+
+  const handleSendingLink = async (reqType: "questionnaire" | "onboarding") => {
+    setLoadingLink(true);
+    try {
+      const path = reqType === "questionnaire" ? `/questionnaire` : "";
+      await axios.get(`/admin/onboardings${path}/${data?.id}/link`);
+
+      const title =
+        reqType === "questionnaire"
+          ? `Questionnaire link sent to ${data?.contactPersonEmail}`
+          : "Onboarding link sent successfully";
+
+      const msg =
+        reqType === "questionnaire"
+          ? "Questionnaire sent successfully"
+          : `Onboarding link sent to ${data?.contactPersonEmail}`;
+
+      handleSuccess(title, msg);
+    } catch (error) {
+      return handleError("An Error occurred", parseError(error));
+    } finally {
+      setLoadingLink(false);
+    }
+  };
   const { queryFn: approveProfile, loading: approveProfileLoading } = useAxios({
     baseURL: "auth",
     endpoint: `/admin/onboardings/${data?.id}/approve`,
     method: "PATCH",
+    enabled: true,
     onSuccess: () => {
       handleSuccess(
         "Business has been approved.",
@@ -55,6 +58,7 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
     baseURL: "auth",
     endpoint: `/admin/onboardings/${data?.id}/approve`,
     method: "PATCH",
+    enabled: true,
     onSuccess: () => {
       handleSuccess(
         "Business has been rejected.",
@@ -115,8 +119,8 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
           <PrimaryBtn
             text="Send Questionnaire"
             fw={600}
-            action={sendQuestionnaireLink}
-            loading={sendQuestionnaireLinkLoading}
+            action={() => handleSendingLink("questionnaire")}
+            loading={loadingLink}
           />
         )}
         {data?.processStatus === "QUESTIONNAIRE" &&
@@ -124,8 +128,8 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
             <PrimaryBtn
               text="Send Onboarding Link"
               fw={600}
-              action={sendOnboardingLink}
-              loading={sendOnboardingLinkLoading}
+              action={() => handleSendingLink("onboarding")}
+              loading={loadingLink}
             />
           )}
       </Group>

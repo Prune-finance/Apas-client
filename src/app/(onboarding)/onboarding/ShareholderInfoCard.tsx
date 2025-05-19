@@ -15,9 +15,9 @@ interface ShareholderInfoCard {
 function ShareholderInfoCard({ setActive, form }: ShareholderInfoCard) {
   const { shareholders } = form.values;
   const data = form.getValues().shareholders?.map((shareholder, index) => ({
-    "First name": shareholder.firstName,
-    "Last Name": shareholder.lastName,
-    "Date of Birth": dayjs(shareholder.dob).format("DD-MM-YYYY"),
+    "First name": shareholder.first_name,
+    "Last Name": shareholder.last_name,
+    "Date of Birth": dayjs(shareholder.date_of_birth).format("DD-MM-YYYY"),
     Email: shareholder.email,
     "Identity Type": shareholder.identityType,
     "Proof of Address": shareholder.proofOfAddress,

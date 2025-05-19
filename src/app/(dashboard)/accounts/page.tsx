@@ -586,7 +586,7 @@ function Accounts() {
           style={{ height: 190, width: "100%", marginBottom: 10 }}
           desc={
             <Text fz={14} c="#667085">
-              You have successfully requested a naira account.
+              You have successfully requested a GBP account.
             </Text>
           }
           title="Account Requested Successfully."

@@ -729,6 +729,7 @@ export const SingleDefaultAccountBody = ({
             // children={children}
             location={location ?? "default"}
             isUser={isUser}
+            currencyType={account?.AccountRequests?.Currency?.symbol}
           >
             {children}
           </Transactions>

@@ -47,6 +47,7 @@ export const Transactions = ({
   accountID,
   location,
   isUser,
+  currencyType,
 }: Props) => {
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -95,7 +96,7 @@ export const Transactions = ({
       //     .filter((trx) => trx.type === "CREDIT")
       //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       value: meta?.in,
-      currency: "EUR",
+      currency: currencyType ?? "EUR",
       formatted: true,
     },
     {
@@ -105,7 +106,7 @@ export const Transactions = ({
       //     .filter((trx) => trx.type === "DEBIT")
       //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       value: meta?.out,
-      currency: "EUR",
+      currency: currencyType ?? "EUR",
       formatted: true,
     },
   ];
@@ -369,6 +370,7 @@ interface Props {
   accountID?: string;
   location?: string;
   isUser?: boolean;
+  currencyType?: string;
 }
 
 export interface BalanceDetail {

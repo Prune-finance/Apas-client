@@ -513,7 +513,7 @@ export function useUserCurrencyAccount() {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/currency-accounts/list`);
+      const { data } = await axios.get(`/currency-accounts/list`);
 
       setCurrencyAccount(data?.data);
     } catch (error) {

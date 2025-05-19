@@ -19,9 +19,14 @@ import { useTrxAnalytics } from "@/lib/hooks/useTrxAnalytics";
 interface Props {
   setChartFrequency: Dispatch<SetStateAction<string>>;
   transactions: TransactionType[];
+  currencyType?: string;
 }
 
-export const Analytics = ({ setChartFrequency, transactions }: Props) => {
+export const Analytics = ({
+  setChartFrequency,
+  transactions,
+  currencyType,
+}: Props) => {
   const {
     cashFlowData: monthlyData,
     donutData,
@@ -80,7 +85,11 @@ export const Analytics = ({ setChartFrequency, transactions }: Props) => {
               }
               startAngle={180}
               endAngle={0}
-              withLabels={formatNumber(totalTrxVolume, true, "EUR")}
+              withLabels={formatNumber(
+                totalTrxVolume,
+                true,
+                currencyType ?? "EUR"
+              )}
             />
           </Flex>
 
@@ -98,7 +107,7 @@ export const Analytics = ({ setChartFrequency, transactions }: Props) => {
                   </Text>
 
                   <Text fz={16} fw={700} c="var(--prune-text-gray-800)">
-                    {formatNumber(item.value, true, "EUR")}
+                    {formatNumber(item.value, true, currencyType ?? "EUR")}
                   </Text>
                 </Stack>
               );

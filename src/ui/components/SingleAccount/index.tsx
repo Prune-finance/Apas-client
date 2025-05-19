@@ -737,6 +737,7 @@ export const SingleDefaultAccountBody = ({
           <Analytics
             transactions={transactions}
             setChartFrequency={setChartFrequency}
+            currencyType={account?.AccountRequests?.Currency?.symbol}
           />
         </TabsPanel>
         {!payout && (

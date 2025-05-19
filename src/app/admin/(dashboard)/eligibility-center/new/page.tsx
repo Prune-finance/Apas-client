@@ -77,7 +77,12 @@ function EligibilityCenterNew() {
     baseURL: "auth",
     endpoint: "/admin/onboardings/create-business-profile",
     method: "POST",
-    body: { ...rest },
+    body: {
+      ...rest,
+      services: [],
+      virtualAccounts: {},
+      operationsAccounts: {},
+    },
     onSuccess: (data) => {
       handleSuccess("New Profile", "Profile created successfully");
       form.reset();

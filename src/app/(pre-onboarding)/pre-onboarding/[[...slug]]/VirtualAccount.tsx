@@ -1,16 +1,10 @@
 import { Box, Group, NumberInput, Stack, Text } from "@mantine/core";
 import { NumberInputWithInsideLabel } from "./TextInputWithInsideLabel";
 import { IconCurrencyPound } from "@tabler/icons-react";
-import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import { useRouter } from "next/navigation";
-import ConsentModal from "./ConsentModal";
-import { useDisclosure } from "@mantine/hooks";
 
 export default function VirtualAccount() {
   const form = useQuestionnaireFormContext();
-  const { back } = useRouter();
-  const [opened, { open, close }] = useDisclosure(false);
 
   console.log(form.errors);
 
@@ -85,10 +79,6 @@ export default function VirtualAccount() {
           </Stack>
         ))}
       </Stack>
-
-      <QuestionnaireNav nextText="Submit" onPrevious={back} onNext={open} />
-
-      <ConsentModal opened={opened} close={close} />
     </Box>
   );
 }

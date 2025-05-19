@@ -1,14 +1,12 @@
 import { Box, Text, RadioGroup, Stack } from "@mantine/core";
 import React from "react";
 import CustomRadio from "./CustomRadio";
-import { QuestionnaireNav } from "./QuestionnaireNav";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import { useRouter } from "next/navigation";
 import { formatNumber } from "@/lib/utils";
 
 export default function Turnover() {
   const form = useQuestionnaireFormContext();
-  const { push, back } = useRouter();
+
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
@@ -33,10 +31,6 @@ export default function Turnover() {
           ))}
         </Stack>
       </RadioGroup>
-      <QuestionnaireNav
-        onNext={() => push("/pre-onboarding/services")}
-        onPrevious={back}
-      />
     </Box>
   );
 }

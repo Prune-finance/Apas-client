@@ -10,6 +10,7 @@ export interface Onboarding {
   services: Service[];
   virtualAccounts: VirtualAccounts;
   operationsAccounts: OperationsAccounts;
+  isRegulated: boolean;
 }
 
 export interface OperationsAccounts {

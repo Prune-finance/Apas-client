@@ -1,22 +1,10 @@
 import { Box, SimpleGrid, Text } from "@mantine/core";
-import {
-  IconCreditCard,
-  IconMoneybag,
-  IconArrowsRightLeft,
-  IconSearch,
-  IconDatabase,
-} from "@tabler/icons-react";
-import { useState } from "react";
 import CheckboxCard from "./CheckboxCard";
-import { QuestionnaireNav } from "./QuestionnaireNav";
-import { useRouter } from "next/navigation";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { serviceCategories } from "@/lib/static";
 
 export default function Services() {
-  const { push, back } = useRouter();
   const form = useQuestionnaireFormContext();
-  console.log(form.values.services);
 
   return (
     <Box>
@@ -41,11 +29,6 @@ export default function Services() {
           {form.errors.services}
         </Text>
       )}
-
-      <QuestionnaireNav
-        onNext={() => push("/pre-onboarding/services/operations-account")}
-        onPrevious={back}
-      />
     </Box>
   );
 }

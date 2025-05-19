@@ -699,6 +699,8 @@ export const SingleDefaultAccountBody = ({
     ...(!payout ? [{ value: "Documents" }] : []),
   ];
 
+  console.log(transactions);
+
   return (
     <Box mt={32}>
       <AccountInfo

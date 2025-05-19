@@ -445,6 +445,22 @@ function Accounts() {
                     revalidate={revalidateDftAcct}
                   />
                 ))}
+
+              {currencyLoading && (
+                <NewAccountCard
+                  key="1"
+                  currency={"GBP"}
+                  companyName={""}
+                  link={`/accounts/default/`}
+                  sortCode=""
+                  accountNumber={""}
+                  balance={0}
+                  loading={currencyLoading}
+                  business={false}
+                  refresh
+                  revalidate={revalidateDftAcct}
+                />
+              )}
             </SimpleGrid>
           </TabsPanel>
 

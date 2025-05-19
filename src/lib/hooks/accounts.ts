@@ -481,7 +481,7 @@ export function useUserCurrencyAccountByID(id: string) {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/currency-accounts/${id}`);
+      const { data } = await axios.get(`/currency-accounts/${id}`);
       console.log(data);
       setCurrencyAccount(data?.data);
     } catch (error) {

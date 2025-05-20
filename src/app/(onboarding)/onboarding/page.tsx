@@ -128,9 +128,11 @@ export default function Onboarding() {
         business?.directors?.map((director) => ({
           ...director,
           id: crypto.randomUUID(),
-          dob: director.dob ? new Date(director.dob) : null,
-          firstName: director.firstName || "",
-          lastName: director.lastName || "",
+          date_of_birth: director.date_of_birth
+            ? new Date(director.date_of_birth)
+            : null,
+          first_name: director.first_name || "",
+          last_name: director.last_name || "",
           email: director.email || "",
           identityType: director.identityType || null,
           proofOfAddress: director.proofOfAddress || null,
@@ -142,9 +144,11 @@ export default function Onboarding() {
         business?.shareholders?.map((shareholder) => ({
           ...shareholder,
           id: crypto.randomUUID(),
-          dob: shareholder.dob ? new Date(shareholder.dob) : null,
-          firstName: shareholder.firstName || "",
-          lastName: shareholder.lastName || "",
+          date_of_birth: shareholder.date_of_birth
+            ? new Date(shareholder.date_of_birth)
+            : null,
+          first_name: shareholder.first_name || "",
+          last_name: shareholder.last_name || "",
           email: shareholder.email || "",
           identityType: shareholder.identityType || null,
           proofOfAddress: shareholder.proofOfAddress || null,

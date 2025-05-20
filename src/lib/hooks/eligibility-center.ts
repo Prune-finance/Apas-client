@@ -1,6 +1,6 @@
 import { OnboardingBusiness } from "../interface";
 import { IParams } from "../schema";
-import { sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL } from "../utils";
 import useAxios from "./useAxios";
 
 export function useOnboardingBusiness(customParams: IParams = {}) {
@@ -12,9 +12,9 @@ export function useOnboardingBusiness(customParams: IParams = {}) {
   } = useAxios<OnboardingBusinessData[], Meta>({
     baseURL: "auth",
     endpoint: "/admin/onboardings",
-    params: sanitizeURL(customParams),
-    dependencies: [...Object.values(customParams)],
-    enabled: false,
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+    // enabled: false,
   });
 
   return { loading, data, meta, revalidate };

@@ -89,7 +89,7 @@ export interface OnboardingBusiness {
   documentData: Document;
   documents: Document[];
   onboardingStatus: "PENDING" | "PROCESSING" | "COMPLETED";
-  questionnaireStatus: "APPROVED" | "PENDING";
+  questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED";
   processStatus: STAGE;
   hasActualBusinessAccount: boolean;
   token: string;

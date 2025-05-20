@@ -844,6 +844,7 @@ export interface Inquiry {
 
 export interface TransactionType {
   id: string;
+  accessId: string;
   senderIban: string;
   beneficiaryName: string;
   beneficiaryAccountNumber: string;

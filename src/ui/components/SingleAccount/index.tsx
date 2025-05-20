@@ -1007,7 +1007,6 @@ export const DefaultAccountHead = ({
       <SendMoney
         opened={opened}
         closeMoney={closeMoney}
-        account={account}
         openSendMoney={openMoney}
       />
     </>

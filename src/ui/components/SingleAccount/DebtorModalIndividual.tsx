@@ -143,7 +143,10 @@ function DebtorModalIndividual({
       <Flex gap={20} mt={24}>
         <Select
           searchable
-          data={countries.map((c) => c?.name)}
+          data={countries.map((c) => ({
+            label: c?.name,
+            value: c?.code,
+          }))}
           classNames={{
             input: styles.input,
             label: styles.label,

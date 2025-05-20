@@ -536,6 +536,38 @@ export function useUserCurrencyAccount() {
   return { loading, currencyAccount, revalidate };
 }
 
+export function useUserCurrencyGBPAccount() {
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/get-account-by-currency/GBP`
+      );
+
+      setAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+
 export function useUserDefaultPayoutAccount() {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);

@@ -66,7 +66,7 @@ function AddAccount({ onClose, openSuccess }: AddAccountProps) {
       form.reset();
       handleSuccess(
         "Account Requested Successfully",
-        "You have successfully requested a naira account."
+        `You have successfully requested a ${type} account.`
       );
 
       onClose();

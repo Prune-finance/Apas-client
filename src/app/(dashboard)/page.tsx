@@ -60,8 +60,9 @@ export default function Home() {
       limit: 3,
     });
 
-  const isInitiator = useHasPermission("INITIATOR")
-  const canSendMoney = useHasPermission("Transaction Initiation") || isInitiator;
+  const isInitiator = useHasPermission("INITIATOR");
+  const canSendMoney =
+    useHasPermission("Transaction Initiation") || isInitiator;
 
   const {
     account,
@@ -474,7 +475,6 @@ export default function Home() {
       <SendMoney
         opened={openedSendMoney}
         closeMoney={closeSendMoney}
-        account={account}
         openSendMoney={openSendMoney}
       />
     </main>

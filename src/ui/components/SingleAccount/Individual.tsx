@@ -31,6 +31,7 @@ import { sendMoneyIndividualValidate } from "@/lib/schema";
 import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -77,6 +78,7 @@ function Individual({
   const [disableBank, setDisableBank] = useState(false);
   const [disableAddress, setDisableAddress] = useState(false);
   const [disableCountry, setDisableCountry] = useState(false);
+  const { switchCurrency } = useCurrencySwitchStore();
 
   const form = useForm({
     initialValues: {
@@ -169,7 +171,7 @@ function Individual({
                 placeholder="Enter first name"
                 {...form.getInputProps("firstName")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
 
@@ -185,7 +187,7 @@ function Individual({
                 placeholder="Enter last name"
                 {...form.getInputProps("lastName")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
             </Flex>
@@ -197,13 +199,17 @@ function Individual({
                 size="lg"
                 label={
                   <Text fz={14} c="#667085">
-                    IBAN
+                    {switchCurrency === "EUR" ? "IBAN" : "Account Number"}
                   </Text>
                 }
-                placeholder="Enter IBAN"
+                placeholder={
+                  switchCurrency === "EUR"
+                    ? "Enter IBAN"
+                    : "Enter Account Number"
+                }
                 {...form.getInputProps("destinationIBAN")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
 
@@ -213,13 +219,15 @@ function Individual({
                 size="lg"
                 label={
                   <Text fz={14} c="#667085">
-                    BIC
+                    {switchCurrency === "EUR" ? "BIC" : "Sort Code"}
                   </Text>
                 }
-                placeholder="Enter BIC"
+                placeholder={
+                  switchCurrency === "EUR" ? "Enter BIC" : "Enter Sort Code"
+                }
                 {...form.getInputProps("destinationBIC")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
             </Flex>
@@ -280,7 +288,7 @@ function Individual({
                     disabled={disableBank}
                     {...form.getInputProps("destinationBank")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                   />
                 </Flex>
@@ -298,7 +306,7 @@ function Individual({
                     disabled={disableAddress}
                     {...form.getInputProps("bankAddress")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                   />
                 </Flex>
@@ -336,7 +344,7 @@ function Individual({
                     placeholder="Enter amount"
                     {...form.getInputProps("amount")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                     // error={account?.accountBalance < form.values.amount}
                   />
@@ -380,7 +388,7 @@ function Individual({
                     placeholder="Enter narration"
                     {...form.getInputProps("narration")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                   />
                 </Flex>

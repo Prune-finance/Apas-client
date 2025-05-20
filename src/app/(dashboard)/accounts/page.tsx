@@ -371,6 +371,11 @@ function Accounts() {
           </div>
 
           <Flex align="center" gap={16}>
+            <SecondaryBtn
+              text="Request Account"
+              action={addAccountOpen}
+              fw={600}
+            />
             {/* <SecondaryBtn
               text="Create Account"
               action={addAccountOpen}

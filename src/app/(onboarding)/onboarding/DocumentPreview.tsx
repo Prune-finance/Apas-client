@@ -8,6 +8,9 @@ import {
   Text,
   Image,
   FileButton,
+  Flex,
+  ThemeIcon,
+  ActionIcon,
 } from "@mantine/core";
 import useNotification from "@/lib/hooks/notification";
 import FileDisplay from "@/ui/components/DocumentViewer";
@@ -17,6 +20,8 @@ import { PrimaryBtn } from "@/ui/components/Buttons";
 import { useState } from "react";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
+import { IconDownload } from "@tabler/icons-react";
+import Link from "next/link";
 
 const axios = createAxiosInstance("auth");
 
@@ -30,6 +35,7 @@ interface DocumentPreview {
   setType?: (value: string | null) => void;
   isUser?: boolean;
   isOnboarding?: boolean;
+  showActions?: boolean;
 }
 
 export const DocumentPreview = ({
@@ -42,6 +48,7 @@ export const DocumentPreview = ({
   isOnboarding = false,
   type,
   setType,
+  showActions = false,
 }: DocumentPreview) => {
   const [openedFile, { open: openFile, close: closeFile }] =
     useDisclosure(false);
@@ -142,7 +149,31 @@ export const DocumentPreview = ({
         }
       >
         <Box>
-          <FileDisplay fileUrl={value || ""} />
+          <FileDisplay fileUrl={value || ""} download={!showActions} />
+          {showActions && (
+            <Flex justify="end" align="center" my={16} gap={20}>
+              {value && (
+                <ActionIcon
+                  color="var(--prune-text-gray-700)"
+                  variant="light"
+                  radius="md"
+                  size={40}
+                  component={Link}
+                  href={value}
+                  download
+                >
+                  <IconDownload />
+                </ActionIcon>
+              )}
+              <PrimaryBtn
+                text="Reject"
+                color="var(--prune-warning)"
+                fw={600}
+                c="#fff"
+              />
+              <PrimaryBtn text="Approve Document" fw={600} />
+            </Flex>
+          )}
         </Box>
       </Modal>
     </Box>

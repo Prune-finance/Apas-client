@@ -1,19 +1,16 @@
-import { Alert, Group, SimpleGrid, Stack } from "@mantine/core";
-import React, { useState } from "react";
+import { Alert, SimpleGrid } from "@mantine/core";
+
 import PaperContainer from "../PaperContainer";
 import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import {
-  IconAlertTriangle,
-  IconCheck,
-  IconPlus,
-  IconX,
-} from "@tabler/icons-react";
+import { IconAlertTriangle, IconPlus } from "@tabler/icons-react";
 import { PanelWrapper } from "./utils";
 import { OnboardingBusiness } from "@/lib/interface";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
-import { FileRows } from "../../../account-requests/[id]/[requestId]/FileTextInput";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+import createAxiosInstance from "@/lib/axios";
 
 interface ComponentProps {
   data: OnboardingBusiness | null;
@@ -22,25 +19,60 @@ interface ComponentProps {
 }
 
 export default function Documents({ data, loading, form }: ComponentProps) {
-  const [rows, setRows] = useState([]);
+  const { handleError, handleSuccess } = useNotification();
+  const axios = createAxiosInstance("auth");
+
   const businessDocs = [
     {
       label: "CAC Certificate",
       title: "CAC Certificate",
       value: data?.cacCertificate,
+      formKey: "cacCertificate",
     },
-    { label: "Memart", title: "Memart", value: data?.mermat },
+    {
+      label: "Memart",
+      title: "Memart",
+      value: data?.mermat,
+      formKey: "mermat",
+    },
     {
       label: "AML Compliance Framework",
       title: "AML Compliance Framework",
       value: data?.amlCompliance,
+      formKey: "amlCompliance",
     },
     {
       label: "Operational License (optional)",
       title: "Operational License",
       value: data?.operationalLicense,
+      formKey: "operationalLicense",
     },
   ];
+
+  const handleDocumentApproval = async (
+    type: "approve" | "reject",
+    formKey:
+      | "cacCertificate"
+      | "amlCompliance"
+      | "mermat"
+      | "operationalLicense"
+      | (string & {})
+  ) => {
+    try {
+      await axios.patch(`/admin/onboardings/${data?.id}/approve-documents`, {
+        ...data?.documentData,
+        [formKey]: type === "approve",
+      });
+
+      handleSuccess(
+        "Document",
+        type === "approve" ? "Document approved" : "Document rejected"
+      );
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    }
+  };
+
   return (
     <PanelWrapper
       loading={loading}
@@ -90,6 +122,8 @@ export default function Documents({ data, loading, form }: ComponentProps) {
               title={doc.title}
               value={doc.value || ""}
               showActions
+              formKey={doc.formKey}
+              handleDocumentApproval={handleDocumentApproval}
             />
           ))}
         </SimpleGrid>

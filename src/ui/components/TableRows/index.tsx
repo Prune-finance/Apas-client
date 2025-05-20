@@ -71,7 +71,7 @@ export const BusinessTransactionTableRows = ({
         {formatNumber(element.amount, true, element?.currencyType ?? "EUR")}
       </TableTd>
 
-      <TableTd w="15%">{element.centrolinkRef ?? "-"}</TableTd>
+      <TableTd w="15%">{element.centrolinkRef ?? element?.accessId}</TableTd>
 
       <TableTd>
         <Stack gap={0}>
@@ -139,7 +139,7 @@ export const IssuedTransactionTableRows = ({
         </Stack>
       </TableTd>
 
-      <TableTd w="15%">{element?.centrolinkRef ?? "-"}</TableTd>
+      <TableTd w="15%">{element?.centrolinkRef ?? element?.accessId}</TableTd>
 
       <TableTd>
         <AmountGroup type={element?.type} fz={12} fw={400} />

@@ -16,7 +16,6 @@ dayjs.extend(relativeTime);
 
 import styles from "@/ui/styles/business.module.scss";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
-import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
@@ -41,6 +40,7 @@ import { parseError } from "@/lib/actions/auth";
 import { calculateTotalPages } from "@/lib/utils";
 import AddUserModal from "./AddUserModal";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { switzer } from "@/ui/fonts";
 
 export default function AllBusinessUsers() {
   const searchParams = useSearchParams();

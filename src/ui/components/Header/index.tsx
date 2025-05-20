@@ -24,10 +24,6 @@ import localFont from "next/font/local";
 import { Fragment, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-const switzer = localFont({
-  src: "../../../assets/fonts/Switzer-Regular.woff2",
-});
-
 import AdminAvatar from "@/assets/avatar.png";
 import styles from "./styles.module.scss";
 import User from "@/lib/store/user";
@@ -50,6 +46,7 @@ import { NotificationStore } from "@/lib/store/notification";
 import { usePathname, useRouter } from "next/navigation";
 import { useUserBusinessServices } from "@/lib/hooks/businesses";
 import NoticeBanner from "../NoticeBanner";
+import { switzer } from "@/ui/fonts";
 
 export default function Header() {
   const { user, setUser } = User();

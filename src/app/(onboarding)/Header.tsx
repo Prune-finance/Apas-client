@@ -1,3 +1,6 @@
+// "use client";
+
+import Onboarding from "@/lib/store/onboarding";
 import {
   Container,
   Flex,
@@ -9,15 +12,31 @@ import {
 } from "@mantine/core";
 import { IconHeadset, IconLogout } from "@tabler/icons-react";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
+import { PrimaryBtn } from "@/ui/components/Buttons";
 
 export default function Header() {
+  const { business } = Onboarding();
+  const { push } = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const handleLogout = () => {
+    setLoading(true);
+    setTimeout(() => {
+      Cookies.remove("auth");
+      push("/auth/onboarding/login");
+      setLoading(false);
+    }, 2000);
+  };
+
   return (
     <Container size={1200} h="100%">
       <Flex justify="space-between" align="center" h="100%">
         <Stack gap={4}>
           <Text fz={16} fw={500} c="var(--prune-text-gray-700)" lh={1}>
-            Hello, 1905 Transports
+            Hello, {business?.businessName || ""}
           </Text>
           <Text fz={14} fw={400} c="var(--prune-text-gray-500)" lh={1}>
             You’re one step closer to your API account
@@ -48,15 +67,16 @@ export default function Header() {
             </Text>
           </Group>
 
-          <Button
+          <PrimaryBtn
+            text="Logout"
+            action={handleLogout}
             rightSection={<IconLogout />}
             variant="transparent"
             fz={14}
             fw={500}
-            color="var(--prune-warning)"
-          >
-            Logout
-          </Button>
+            c="var(--prune-warning)"
+            loading={loading}
+          />
         </Group>
       </Flex>
     </Container>

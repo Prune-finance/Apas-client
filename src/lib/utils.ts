@@ -52,6 +52,44 @@ export const approvedBadgeColor = (status: string) => {
   }
 };
 
+export const tierColor = (tier: string) => {
+  switch (tier) {
+    case "Tier 1":
+      return "var(--prune-text-gray-700)";
+    case "Tier 2":
+      return "#12B76A";
+    default:
+      return "var(--prune-text-gray-700)";
+  }
+};
+
+export type STAGE =
+  | "PROFILE"
+  | "QUESTIONNAIRE"
+  | "ONBOARDING"
+  | "ACTIVATION"
+  | "OFFBOARDED"
+  | "COMPLETED";
+
+export const stageColor = (stage: STAGE) => {
+  switch (stage) {
+    case "PROFILE":
+      return "#FFA940";
+    case "QUESTIONNAIRE":
+      return "var(----prune-primary-700)";
+    case "ONBOARDING":
+      return "#DB340B";
+    case "ACTIVATION":
+      return "#FFA940";
+    case "OFFBOARDED":
+      return "var(--prune-text-gray-500)";
+    case "COMPLETED":
+      return "#12B76A";
+    default:
+      return "#FFA940";
+  }
+};
+
 export const serialNumber = (
   pageNumber: number,
   index: number,

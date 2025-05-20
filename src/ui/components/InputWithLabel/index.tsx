@@ -2,23 +2,26 @@ import {
   Checkbox,
   CheckboxProps,
   Flex,
+  Group,
   NumberInput,
   NumberInputProps,
+  Radio,
   rem,
   Select,
   SelectProps,
+  Text,
   Textarea,
   TextareaProps,
   TextInput,
   TextInputProps,
   ThemeIcon,
   Tooltip,
-  useMantineTheme,
 } from "@mantine/core";
 import classes from "./input.module.scss";
 import styles from "./styles.module.scss";
+import profile_styles from "./profile.module.scss";
 import { DateInput, DateInputProps } from "@mantine/dates";
-import React, { useEffect, useState } from "react";
+
 import { SelectCountryDialCode } from "../SelectDropdownSearch";
 import { UseFormReturnType } from "@mantine/form";
 import { IconHelp } from "@tabler/icons-react";
@@ -27,7 +30,7 @@ interface TextInputWithInsideLabelProps extends TextInputProps {}
 export const TextInputWithInsideLabel = ({
   ...props
 }: TextInputWithInsideLabelProps) => {
-  return <TextInput {...props} classNames={classes} className="Switzer" />;
+  return <TextInput {...props} classNames={classes} />;
 };
 
 interface NumberInputWithInsideLabelProps extends NumberInputProps {}
@@ -38,7 +41,6 @@ export const NumberInputWithInsideLabel = ({
   return (
     <NumberInput
       {...props}
-      className="Switzer"
       placeholder="Enter number"
       classNames={classes}
       thousandSeparator=","
@@ -49,7 +51,6 @@ export const NumberInputWithInsideLabel = ({
 export const SelectInputWithInsideLabel = ({ ...props }: SelectProps) => {
   return (
     <Select
-      className="Switzer"
       placeholder="Select"
       classNames={classes}
       styles={{ input: { paddingTop: rem(18) } }}
@@ -60,12 +61,7 @@ export const SelectInputWithInsideLabel = ({ ...props }: SelectProps) => {
 
 export const DateInputWithInsideLabel = ({ ...props }: DateInputProps) => {
   return (
-    <DateInput
-      {...props}
-      className="Switzer"
-      placeholder="Select Date"
-      classNames={classes}
-    />
+    <DateInput {...props} placeholder="Select Date" classNames={classes} />
   );
 };
 
@@ -73,7 +69,7 @@ interface TextareaWithInsideLabelProps extends TextareaProps {}
 export const TextareaWithInsideLabel = ({
   ...props
 }: TextareaWithInsideLabelProps) => {
-  return <Textarea {...props} classNames={classes} className="Switzer" />;
+  return <Textarea {...props} classNames={classes} />;
 };
 
 interface PhoneNumberInputProps<T> {
@@ -144,6 +140,7 @@ export const MakeInitiator = ({ ...props }: MakeInitiatorProps) => {
       <Checkbox
         label="Make this contact an initiator"
         labelPosition="right"
+        color="var(--prune-primary-600)"
         styles={{
           label: { fontSize: "14px", fontWeight: 500 },
         }}
@@ -160,5 +157,106 @@ export const MakeInitiator = ({ ...props }: MakeInitiatorProps) => {
         </ThemeIcon>
       </Tooltip>
     </Flex>
+  );
+};
+
+interface ProfileTextInputProps extends TextInputProps {
+  editing?: boolean;
+}
+export const ProfileTextInput = ({
+  editing = false,
+  ...props
+}: ProfileTextInputProps) => {
+  return (
+    <TextInput
+      styles={{
+        input: {
+          border: editing ? "1px solid var(--prune-text-gray-200)" : "none",
+        },
+      }}
+      classNames={{
+        input: profile_styles.profile_input,
+        label: profile_styles.profile_label,
+      }}
+      w="100%"
+      readOnly={!editing}
+      {...props}
+    />
+  );
+};
+
+interface ProfileDateInputProps extends DateInputProps {
+  editing?: boolean;
+}
+export const ProfileDateInput = ({
+  editing = false,
+  ...props
+}: ProfileDateInputProps) => {
+  return (
+    <DateInput
+      styles={{
+        input: {
+          border: editing ? "1px solid var(--prune-text-gray-200)" : "none",
+        },
+      }}
+      classNames={{
+        input: profile_styles.profile_input,
+        label: profile_styles.profile_label,
+      }}
+      w="100%"
+      maxDate={new Date()}
+      readOnly={!editing}
+      {...props}
+    />
+  );
+};
+
+interface ProfileTextareaProps extends TextareaProps {
+  editing?: boolean;
+}
+export const ProfileTextarea = ({
+  editing = false,
+  ...props
+}: ProfileTextareaProps) => {
+  return (
+    <Textarea
+      styles={{
+        input: {
+          border: editing ? "1px solid var(--prune-text-gray-200)" : "none",
+        },
+      }}
+      classNames={{
+        input: profile_styles.profile_input,
+        label: profile_styles.profile_label,
+      }}
+      w="100%"
+      readOnly={!editing}
+      minRows={4}
+      maxRows={5}
+      autosize
+      {...props}
+    />
+  );
+};
+
+interface CustomRadioCardProps {
+  label: string;
+  value: string | number;
+}
+
+export const CustomRadioCard = ({ label, value }: CustomRadioCardProps) => {
+  return (
+    <Radio.Card
+      value={String(value)}
+      color="var(--prune-primary-700)"
+      classNames={{ card: profile_styles.card }}
+    >
+      <Group wrap="nowrap" align="center" justify="space-between">
+        <Text fz={14} fw={500} c="var(--prune-text-gray-800)">
+          {label}
+        </Text>
+        <Radio.Indicator color="var(--prune-primary-700)" />
+      </Group>
+    </Radio.Card>
   );
 };

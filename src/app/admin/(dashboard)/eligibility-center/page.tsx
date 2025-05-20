@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
 import {
@@ -29,9 +29,15 @@ import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { IconDots } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
+import { useDebouncedValue } from "@mantine/hooks";
 
 function EligibilityCenter() {
-  const { data, meta, loading, revalidate } = useOnboardingBusiness();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const { data, meta, loading, revalidate } = useOnboardingBusiness({
+    search: debouncedSearch,
+  });
 
   const InfoCards = [
     { title: "Total leads", num: meta?.total },
@@ -78,7 +84,7 @@ function EligibilityCenter() {
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}
         >
-          <SearchInput />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <Flex gap={12}>
             <PrimaryBtn

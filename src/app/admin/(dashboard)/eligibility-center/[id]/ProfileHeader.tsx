@@ -66,6 +66,7 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
       );
     },
   });
+
   return (
     <Flex
       direction={{ base: "column", md: "row" }}
@@ -96,8 +97,8 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
           <IconDownload size={24} />
         </ThemeIcon>
 
-        {data?.processStatus === "ONBOARDING" &&
-          data.onboardingStatus === "COMPLETED" && (
+        {data?.processStatus === "QUESTIONNAIRE" &&
+          data.questionnaireStatus === "SUBMITTED" && (
             <>
               <PrimaryBtn
                 text="Reject Profile"
@@ -109,6 +110,25 @@ export default function ProfileHeader({ data, loading }: ProfileHeaderProps) {
               />
               <PrimaryBtn
                 text="Approve Profile"
+                fw={600}
+                action={approveProfile}
+                loading={approveProfileLoading}
+              />
+            </>
+          )}
+        {data?.processStatus === "ACTIVATION" &&
+          data.onboardingStatus === "COMPLETED" && (
+            <>
+              <PrimaryBtn
+                text="Reject Business"
+                color="var(--prune-warning)"
+                c="#fff"
+                fw={600}
+                action={rejectProfile}
+                loading={rejectProfileLoading}
+              />
+              <PrimaryBtn
+                text="Activate Business"
                 fw={600}
                 action={approveProfile}
                 loading={approveProfileLoading}

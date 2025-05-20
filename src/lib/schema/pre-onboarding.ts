@@ -83,7 +83,12 @@ export const BizBasicInfoSchema = z.object({
     .regex(/^\+?[0-9]*$/, "Phone number must be a valid number"),
   countryCode: z.string().min(1, "Country code is required"),
   isRegulated: z.enum(["yes", "no"]),
-  geoFootprint: z.string().min(1, "Geo footprint is required"),
+  geoFootprint: z
+    .string({
+      invalid_type_error:
+        "Description of your geographic footprint is required",
+    })
+    .min(1, "Geo footprint is required"),
   businessDescription: z.string().min(1, "Business description is required"),
 });
 

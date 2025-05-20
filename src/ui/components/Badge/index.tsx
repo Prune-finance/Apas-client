@@ -41,7 +41,7 @@ export const BadgeComponent = ({
       fz={props.fz ? props.fz : 12}
       {...props}
     >
-      {status.toLowerCase()}
+      {status?.toLowerCase()}
     </Badge>
   );
 };

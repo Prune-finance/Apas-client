@@ -15,9 +15,9 @@ interface DirectorInfoCard {
 function DirectorInfoCard({ setActive, form }: DirectorInfoCard) {
   const { directors } = form.values;
   const data = form.getValues().directors.map((director, index) => ({
-    "First name": director.firstName,
-    "Last Name": director.lastName,
-    "Date of Birth": dayjs(director.dob).format("DD-MM-YYYY"),
+    "First name": director.first_name,
+    "Last Name": director.last_name,
+    "Date of Birth": dayjs(director.date_of_birth).format("DD-MM-YYYY"),
     Email: director.email,
     "Identity Type": director.identityType,
     "Proof of Address": director.proofOfAddress,

@@ -1,23 +1,10 @@
 import { Box, RadioGroup, Stack, Text } from "@mantine/core";
-import React, { useState } from "react";
 import CustomRadio from "./CustomRadio";
-import { QuestionnaireNav } from "./QuestionnaireNav";
-import { useRouter } from "next/navigation";
-import { formatNumber } from "@/lib/utils";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import { useDisclosure } from "@mantine/hooks";
-import ConsentModal from "./ConsentModal";
 import { operationsAccountEstimatedBalance } from "@/lib/static";
 
 export default function OperationsAccount() {
-  const { push, back } = useRouter();
-  const [opened, { open, close }] = useDisclosure(false);
   const form = useQuestionnaireFormContext();
-  const isVirtualAccount = Boolean(
-    form
-      .getValues()
-      .services.find((service) => service.name === "Virtual Account Services")
-  );
 
   return (
     <Box>
@@ -46,16 +33,6 @@ export default function OperationsAccount() {
           )}
         </Stack>
       </RadioGroup>
-      <QuestionnaireNav
-        nextText={!isVirtualAccount ? "Submit" : "Next"}
-        onNext={() => {
-          if (!isVirtualAccount) return open();
-          push("/pre-onboarding/services/virtual-account");
-        }}
-        onPrevious={back}
-      />
-
-      <ConsentModal opened={opened} close={close} />
     </Box>
   );
 }

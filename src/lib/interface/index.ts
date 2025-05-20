@@ -1,3 +1,5 @@
+import { STAGE } from "../utils";
+
 export interface Onboarding {
   id: string;
   businessEmail: string;
@@ -8,6 +10,7 @@ export interface Onboarding {
   services: Service[];
   virtualAccounts: VirtualAccounts;
   operationsAccounts: OperationsAccounts;
+  isRegulated: boolean;
 }
 
 export interface OperationsAccounts {
@@ -62,7 +65,7 @@ export interface OnboardingBusiness {
   ceoFirstName: string | null;
   ceoLastName: string | null;
   ceoEmail: string | null;
-  ceoDOB: string | null;
+  ceoDOB: Date | null;
   ceoPOAType: string | null;
   ceoPOAUrl: string | null;
   ceoIdType: string | null;
@@ -76,13 +79,35 @@ export interface OnboardingBusiness {
   migrated: boolean;
   questionnaireId: string;
   stageIdentifier: number;
+  geoFootprint: string;
+  questionnaireSentAt: Date | null;
+  consentDesignation: string;
+  consentEmail: string;
+  consentSignature: string;
+  consentSignedBy: string;
+  consentPhoneNumber: string;
+  documentData: Document;
+  documents: Document[];
+  onboardingStatus: "PENDING" | "PROCESSING" | "COMPLETED";
+  questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED";
+  processStatus: STAGE;
+  hasActualBusinessAccount: boolean;
+  token: string;
+  status: STAGE;
+  services: Service[];
+  virtualAccounts: VirtualAccounts;
+  operationsAccounts: OperationsAccounts;
+  annualTurnover: null | string;
 }
 
 export interface Director {
   id: string;
-  firstName: string;
-  lastName: string;
-  dob: string | Date | null;
+  // firstName: string;
+  // lastName: string;
+  // dob: string | Date | null;
+  last_name: string;
+  first_name: string;
+  date_of_birth: Date | null;
   email: string;
   identityType: string | null;
   proofOfAddress: string | null;
@@ -90,3 +115,5 @@ export interface Director {
   identityFileUrlBack: string;
   proofOfAddressFileUrl: string;
 }
+
+export interface Document {}

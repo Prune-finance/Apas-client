@@ -25,6 +25,12 @@ import Link from "next/link";
 
 const axios = createAxiosInstance("auth");
 
+type FormKey =
+  | "cacCertificate"
+  | "amlCompliance"
+  | "mermat"
+  | "operationalLicense"
+  | (string & {});
 interface DocumentPreview {
   label: string;
   title: string;
@@ -36,6 +42,11 @@ interface DocumentPreview {
   isUser?: boolean;
   isOnboarding?: boolean;
   showActions?: boolean;
+  formKey?: FormKey;
+  handleDocumentApproval?: (
+    type: "approve" | "reject",
+    formKey: FormKey
+  ) => void;
 }
 
 export const DocumentPreview = ({
@@ -49,6 +60,8 @@ export const DocumentPreview = ({
   type,
   setType,
   showActions = false,
+  formKey,
+  handleDocumentApproval,
 }: DocumentPreview) => {
   const [openedFile, { open: openFile, close: closeFile }] =
     useDisclosure(false);
@@ -170,8 +183,21 @@ export const DocumentPreview = ({
                 color="var(--prune-warning)"
                 fw={600}
                 c="#fff"
+                action={() => {
+                  handleDocumentApproval &&
+                    formKey &&
+                    handleDocumentApproval("reject", formKey);
+                }}
               />
-              <PrimaryBtn text="Approve Document" fw={600} />
+              <PrimaryBtn
+                text="Approve Document"
+                fw={600}
+                action={() => {
+                  handleDocumentApproval &&
+                    formKey &&
+                    handleDocumentApproval("approve", formKey);
+                }}
+              />
             </Flex>
           )}
         </Box>

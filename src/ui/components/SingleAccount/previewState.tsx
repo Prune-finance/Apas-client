@@ -46,8 +46,15 @@ function PreviewState({
   const beneficiaryDetails = {
     "First Name": requestForm?.firstName,
     "Last Name": requestForm?.lastName,
-    IBAN: requestForm?.destinationIBAN,
-    BIC: requestForm?.destinationBIC,
+    ...(switchCurrency === "GBP"
+      ? {
+          "Account Number": requestForm?.destinationIBAN,
+          "Sort Code": requestForm?.destinationBIC,
+        }
+      : {
+          IBAN: requestForm?.destinationIBAN,
+          BIC: requestForm?.destinationBIC,
+        }),
     Bank: requestForm?.destinationBank,
     "Bank Address": requestForm?.bankAddress,
     Country: requestForm?.destinationCountry,
@@ -73,8 +80,16 @@ function PreviewState({
 
   const companyRequestFormDetails = {
     "Company Name": companyRequestForm?.companyName,
-    IBAN: companyRequestForm?.destinationIBAN,
-    BIC: companyRequestForm?.destinationBIC,
+
+    ...(switchCurrency === "GBP"
+      ? {
+          "Account Number": companyRequestForm?.destinationIBAN,
+          "Sort Code": companyRequestForm?.destinationBIC,
+        }
+      : {
+          IBAN: companyRequestForm?.destinationIBAN,
+          BIC: companyRequestForm?.destinationBIC,
+        }),
     Bank: companyRequestForm?.destinationBank,
     "Bank Address": companyRequestForm?.bankAddress,
     // amount: companyRequestForm?.amount,

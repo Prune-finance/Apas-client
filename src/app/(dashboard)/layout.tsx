@@ -52,7 +52,7 @@ export default function RootLayout({
           </AppShellNavbar>
 
           <AppShellMain>
-            <Container p={0} fluid mt={80}>
+            <Container p={0} fluid mt={80} style={{ zIndex: 0 }}>
               {children}
             </Container>
           </AppShellMain>

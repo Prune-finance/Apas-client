@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
 import SendMoneyBanner from "@/assets/sendMoney-new-bg.png";
@@ -143,7 +143,7 @@ function SendMoneyModal({
             </Text>
 
             {loading ? (
-              <Skeleton h={40} w={100} />
+              <Skeleton h={30} my={10} w={200} />
             ) : (
               <Text fz={32} fw={600} c="#344054" mt={0} mb={16}>
                 {formatNumber(

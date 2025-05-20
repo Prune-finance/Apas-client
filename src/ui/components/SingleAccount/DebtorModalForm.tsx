@@ -145,7 +145,10 @@ function DebtorModalForm({
               Country
             </Text>
           }
-          data={countries.map((c) => c?.name)}
+          data={countries.map((c) => ({
+            label: c?.name,
+            value: c?.code,
+          }))}
           placeholder="Enter Country"
           {...form.getInputProps("country")}
           errorProps={{

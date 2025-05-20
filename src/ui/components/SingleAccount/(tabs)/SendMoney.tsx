@@ -6,13 +6,18 @@ import SuccessModal from "../../SuccessModal";
 import PreviewState from "../previewState";
 import SendMoneyModal from "../sendMoneyModal";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { DefaultAccount, useUserDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  DefaultAccount,
+  useUserCurrencyGBPAccount,
+  useUserDefaultAccount,
+} from "@/lib/hooks/accounts";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import PendingModalImage from "@/assets/pending-image.png";
 import DebtorModal from "../DebtorModal";
 import useDebtorStore from "@/lib/store/debtor";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 interface Props {
   opened: boolean;
@@ -22,6 +27,13 @@ interface Props {
 
 export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
   const { account, loading, revalidate } = useUserDefaultAccount();
+  const {
+    account: gbpAccount,
+    loading: gbpLoading,
+    revalidate: gbpRevalidate,
+  } = useUserCurrencyGBPAccount();
+
+  const { switchCurrency } = useCurrencySwitchStore();
 
   const matches = useMediaQuery("(max-width: 768px)");
   const axios = createAxiosInstance("payouts");
@@ -85,42 +97,57 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         narration,
       } = requestForm;
 
-      const { data } = await axios.post(`/payout/send-money`, {
-        amount,
-        destinationIBAN: removeWhitespace(destinationIBAN),
-        destinationBIC: removeWhitespace(destinationBIC),
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        reference: crypto.randomUUID(),
-        beneficiaryFullName: `${firstName} ${lastName}`,
-        invoice,
-        narration,
-        // Debtor details
-        debtorFullName: `${debtorRequestForm?.fullName}`,
-        debtorAddress: `${debtorRequestForm?.address}`,
-        debtorCountryCode: `${debtorRequestForm?.country}`,
-        debtorPostCode: `${debtorRequestForm?.postCode}`,
-        debtorState: `${debtorRequestForm?.state}`,
-        debtorCity: `${debtorRequestForm?.city}`,
-        debtorType: `${
-          debtorRequestForm?.location === "self" ||
+      const { data } = await axios.post(
+        switchCurrency === "GBP" ? "/payout/send-gbp" : "/payout/send-money",
+        {
+          ...(switchCurrency === "GBP"
+            ? {
+                beneficiaryAccountNumber: removeWhitespace(destinationIBAN),
+                beneficiarySortCode: removeWhitespace(destinationBIC),
+                beneficiaryBank: destinationBank,
+                beneficiaryCountry: destinationCountry,
+                beneficiaryFullName: `${firstName} ${lastName}`,
+              }
+            : {
+                destinationIBAN: removeWhitespace(destinationIBAN),
+                destinationBIC: removeWhitespace(destinationBIC),
+                destinationBank,
+                destinationCountry,
+                beneficiaryFullName: `${firstName} ${lastName}`,
+              }),
+
+          bankAddress,
+          amount,
+          reference: crypto.randomUUID(),
+          invoice,
+          narration,
+
+          // Debtor details
+          debtorFullName: `${debtorRequestForm?.fullName}`,
+          debtorAddress: `${debtorRequestForm?.address}`,
+          debtorCountryCode: `${debtorRequestForm?.country}`,
+          debtorPostCode: `${debtorRequestForm?.postCode}`,
+          debtorState: `${debtorRequestForm?.state}`,
+          debtorCity: `${debtorRequestForm?.city}`,
+          debtorType: `${
+            debtorRequestForm?.location === "self" ||
+            debtorRequestForm.location === "company"
+              ? "COMPANY"
+              : "INDIVIDUAL"
+          }`,
+          ...(debtorRequestForm?.location === "individual" && {
+            debtorIdType: `${debtorRequestForm?.idType}`,
+            debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+          }),
+          ...(debtorRequestForm?.location === "self" ||
           debtorRequestForm.location === "company"
-            ? "COMPANY"
-            : "INDIVIDUAL"
-        }`,
-        ...(debtorRequestForm?.location === "individual" && {
-          debtorIdType: `${debtorRequestForm?.idType}`,
-          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
-        }),
-        ...(debtorRequestForm?.location === "self" ||
-        debtorRequestForm.location === "company"
-          ? {
-              debtorWebsite: `${debtorRequestForm?.website}`,
-              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
-            }
-          : {}),
-      });
+            ? {
+                debtorWebsite: `${debtorRequestForm?.website}`,
+                debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+              }
+            : {}),
+        }
+      );
 
       console.log({ sendMoney: data });
       setMoneySent(Number(amount));
@@ -152,42 +179,57 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         narration,
         reference,
       } = companyRequestForm;
-      const { data } = await axios.post(`/payout/send-money`, {
-        amount,
-        destinationIBAN: removeWhitespace(destinationIBAN),
-        destinationBIC: removeWhitespace(destinationBIC),
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        reference: crypto.randomUUID(),
-        beneficiaryFullName: companyName,
-        invoice,
-        narration,
-        // Debtor details
-        debtorFullName: `${debtorRequestForm?.fullName}`,
-        debtorAddress: `${debtorRequestForm?.address}`,
-        debtorCountryCode: `${debtorRequestForm?.country}`,
-        debtorPostCode: `${debtorRequestForm?.postCode}`,
-        debtorState: `${debtorRequestForm?.state}`,
-        debtorCity: `${debtorRequestForm?.city}`,
-        debtorType: `${
-          debtorRequestForm?.location === "self" ||
+
+      const { data } = await axios.post(
+        switchCurrency === "GBP" ? "/payout/send-gbp" : "/payout/send-money",
+        {
+          ...(switchCurrency === "GBP"
+            ? {
+                beneficiaryAccountNumber: removeWhitespace(destinationIBAN),
+                beneficiarySortCode: removeWhitespace(destinationBIC),
+                beneficiaryBank: destinationBank,
+                beneficiaryCountry: destinationCountry,
+                beneficiaryFullName: companyName,
+              }
+            : {
+                destinationIBAN: removeWhitespace(destinationIBAN),
+                destinationBIC: removeWhitespace(destinationBIC),
+                destinationBank,
+                destinationCountry,
+                beneficiaryFullName: companyName,
+              }),
+
+          bankAddress,
+          amount,
+          reference: crypto.randomUUID(),
+          invoice,
+          narration,
+          // Debtor details
+          debtorFullName: `${debtorRequestForm?.fullName}`,
+          debtorAddress: `${debtorRequestForm?.address}`,
+          debtorCountryCode: `${debtorRequestForm?.country}`,
+          debtorPostCode: `${debtorRequestForm?.postCode}`,
+          debtorState: `${debtorRequestForm?.state}`,
+          debtorCity: `${debtorRequestForm?.city}`,
+          debtorType: `${
+            debtorRequestForm?.location === "self" ||
+            debtorRequestForm.location === "company"
+              ? "COMPANY"
+              : "INDIVIDUAL"
+          }`,
+          ...(debtorRequestForm?.location === "individual" && {
+            debtorIdType: `${debtorRequestForm?.idType}`,
+            debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+          }),
+          ...(debtorRequestForm?.location === "self" ||
           debtorRequestForm.location === "company"
-            ? "COMPANY"
-            : "INDIVIDUAL"
-        }`,
-        ...(debtorRequestForm?.location === "individual" && {
-          debtorIdType: `${debtorRequestForm?.idType}`,
-          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
-        }),
-        ...(debtorRequestForm?.location === "self" ||
-        debtorRequestForm.location === "company"
-          ? {
-              debtorWebsite: `${debtorRequestForm?.website}`,
-              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
-            }
-          : {}),
-      });
+            ? {
+                debtorWebsite: `${debtorRequestForm?.website}`,
+                debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+              }
+            : {}),
+        }
+      );
       setMoneySent(Number(amount));
       setReceiverName(companyName);
       closeMoney();
@@ -219,8 +261,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         withCloseButton={false}
       >
         <SendMoneyModal
-          account={account}
-          loading={loading}
+          account={switchCurrency === "EUR" ? account : gbpAccount}
+          loading={loading || gbpLoading}
           close={closeMoney}
           openPreview={openPreview}
           setRequestForm={setRequestForm}
@@ -290,7 +332,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           <Text fz={12}>
             Your transfer of{" "}
             <Text inherit span fw={600} c="#97AD05">
-              {formatNumber(moneySent, true, "EUR")}
+              {formatNumber(moneySent, true, switchCurrency ?? "EUR")}
             </Text>{" "}
             to {receiverName} is in progress. It will be processed shortly. You
             will be notified on resolution of payment.

@@ -30,6 +30,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -77,6 +78,7 @@ function Company({
   const [disableBank, setDisableBank] = useState(false);
   const [disableAddress, setDisableAddress] = useState(false);
   const [disableCountry, setDisableCountry] = useState(false);
+  const { switchCurrency } = useCurrencySwitchStore();
 
   const form2 = useForm({
     initialValues: {
@@ -171,7 +173,7 @@ function Company({
               placeholder="Enter company Name"
               {...form2.getInputProps("companyName")}
               errorProps={{
-                fz: 12,
+                fz: 0,
               }}
             />
           </Flex>
@@ -182,13 +184,15 @@ function Company({
               size="lg"
               label={
                 <Text fz={14} c="#667085">
-                  IBAN
+                  {switchCurrency === "EUR" ? "IBAN" : "Account Number"}
                 </Text>
               }
-              placeholder="Enter IBAN"
+              placeholder={
+                switchCurrency === "EUR" ? "Enter IBAN" : "Enter Account Number"
+              }
               {...form2.getInputProps("destinationIBAN")}
               errorProps={{
-                fz: 12,
+                fz: 0,
               }}
             />
 
@@ -198,13 +202,15 @@ function Company({
               size="lg"
               label={
                 <Text fz={14} c="#667085">
-                  BIC
+                  {switchCurrency === "EUR" ? "BIC" : "Sort Code"}
                 </Text>
               }
-              placeholder="Enter BIC"
+              placeholder={
+                switchCurrency === "EUR" ? "Enter BIC" : "Enter Sort Code"
+              }
               {...form2.getInputProps("destinationBIC")}
               errorProps={{
-                fz: 12,
+                fz: 0,
               }}
             />
           </Flex>
@@ -264,7 +270,7 @@ function Company({
                   disabled={disableBank}
                   {...form2.getInputProps("destinationBank")}
                   errorProps={{
-                    fz: 12,
+                    fz: 0,
                   }}
                 />
               </Flex>
@@ -283,7 +289,7 @@ function Company({
                   placeholder="Bank Address"
                   {...form2.getInputProps("bankAddress")}
                   errorProps={{
-                    fz: 12,
+                    fz: 0,
                   }}
                 />
               </Flex>
@@ -335,7 +341,7 @@ function Company({
                   placeholder="Enter amount"
                   {...form2.getInputProps("amount")}
                   errorProps={{
-                    fz: 12,
+                    fz: 0,
                   }}
                 />
               </Flex>
@@ -368,7 +374,7 @@ function Company({
                   placeholder="Enter narration"
                   {...form2.getInputProps("narration")}
                   errorProps={{
-                    fz: 12,
+                    fz: 0,
                   }}
                 />
               </Flex>

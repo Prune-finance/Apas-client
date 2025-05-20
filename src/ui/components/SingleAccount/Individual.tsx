@@ -171,7 +171,7 @@ function Individual({
                 placeholder="Enter first name"
                 {...form.getInputProps("firstName")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
 
@@ -187,7 +187,7 @@ function Individual({
                 placeholder="Enter last name"
                 {...form.getInputProps("lastName")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
             </Flex>
@@ -209,7 +209,7 @@ function Individual({
                 }
                 {...form.getInputProps("destinationIBAN")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
 
@@ -227,7 +227,7 @@ function Individual({
                 }
                 {...form.getInputProps("destinationBIC")}
                 errorProps={{
-                  fz: 12,
+                  fz: 0,
                 }}
               />
             </Flex>
@@ -288,7 +288,7 @@ function Individual({
                     disabled={disableBank}
                     {...form.getInputProps("destinationBank")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                   />
                 </Flex>
@@ -306,7 +306,7 @@ function Individual({
                     disabled={disableAddress}
                     {...form.getInputProps("bankAddress")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                   />
                 </Flex>
@@ -344,7 +344,7 @@ function Individual({
                     placeholder="Enter amount"
                     {...form.getInputProps("amount")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                     // error={account?.accountBalance < form.values.amount}
                   />
@@ -388,7 +388,7 @@ function Individual({
                     placeholder="Enter narration"
                     {...form.getInputProps("narration")}
                     errorProps={{
-                      fz: 12,
+                      fz: 0,
                     }}
                   />
                 </Flex>

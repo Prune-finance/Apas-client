@@ -1059,7 +1059,11 @@ export const AccountInfo = ({
   const handleReload = async (): Promise<void> => {
     setProcessing(true);
     try {
-      await axios.get(`/accounts/${account?.accountNumber}/balance/dashboard`);
+      await axios.get(
+        currencyType === "GBP"
+          ? `/accounts/${account?.accountNumber}/balance/dashboard?currency=GBP`
+          : `/accounts/${account?.accountNumber}/balance/dashboard`
+      );
       revalidate && (await revalidate());
     } catch (error) {
       handleError("An error occurred", parseError(error));

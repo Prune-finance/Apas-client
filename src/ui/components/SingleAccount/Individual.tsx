@@ -517,6 +517,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                 ) : (
                   <>
                     <TextInput
+                      type="number"
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
                       size="lg"
@@ -530,6 +531,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       errorProps={{ fz: 12 }}
                     />
                     <TextInput
+                      type="number"
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
                       size="lg"

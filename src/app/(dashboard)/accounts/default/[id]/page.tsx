@@ -68,8 +68,6 @@ function Account() {
     meta: trxMeta,
   } = useUserCurrencyTransactions(param);
 
-  console.log(transactions);
-
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
   const {

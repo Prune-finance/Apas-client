@@ -1064,7 +1064,11 @@ export const AccountInfo = ({
   const handleReload = async (): Promise<void> => {
     setProcessing(true);
     try {
-      await axios.get(`/accounts/${account?.accountNumber}/balance/dashboard`);
+      await axios.get(
+        currencyType === "GBP"
+          ? `/accounts/${account?.accountNumber}/balance/dashboard?currency=GBP`
+          : `/accounts/${account?.accountNumber}/balance/dashboard`
+      );
       revalidate && (await revalidate());
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -1099,7 +1103,7 @@ export const AccountInfo = ({
               <Skeleton w={100} h={30} />
             )}
 
-            {isUser && (
+            {!loading && isUser && (
               <PrimaryBtn
                 text="Refresh Balance"
                 color="var(--prune-primary-600)"

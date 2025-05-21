@@ -1,6 +1,12 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  forwardRef,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { IconCheck } from "@tabler/icons-react";
 
 import styles from "./sendMoney.module.scss";
@@ -60,20 +66,23 @@ export const sendMoneyRequest = {
   narration: "",
 };
 
-function Company({
-  account,
-  close,
-  openPreview,
-  setCompanyRequestForm,
-  setSectionState,
-  validated,
-  setValidated,
-  showBadge,
-  setShowBadge,
-  openDebtor,
-  paymentType,
-  setPaymentType,
-}: CompanyProps) {
+const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
+  {
+    account,
+    close,
+    openPreview,
+    setCompanyRequestForm,
+    setSectionState,
+    validated,
+    setValidated,
+    showBadge,
+    setShowBadge,
+    openDebtor,
+    paymentType,
+    setPaymentType,
+  },
+  ref
+) {
   const [processing, setProcessing] = useState(false);
   const [disableBank, setDisableBank] = useState(false);
   const [disableAddress, setDisableAddress] = useState(false);
@@ -137,6 +146,13 @@ function Company({
         if (data.country) setDisableCountry(true);
       } else {
         setValidated(false);
+        // Scroll to top of container
+        if (ref && typeof ref !== "function" && ref.current) {
+          ref.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
       }
     } finally {
       setProcessing(false);
@@ -436,6 +452,6 @@ function Company({
       </Box>
     </TabsPanel>
   );
-}
+});
 
 export default Company;

@@ -1,6 +1,12 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  forwardRef,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { IconCheck } from "@tabler/icons-react";
 
 import styles from "./sendMoney.module.scss";
@@ -52,28 +58,34 @@ export const sendMoneyRequest = {
   companyName: "",
   destinationIBAN: "",
   destinationBIC: "",
+  destinationAccountNumber: "",
+  destinationSortCode: "",
   destinationBank: "",
   bankAddress: "",
   destinationCountry: "",
   invoice: "",
   reference: crypto.randomUUID(),
   narration: "",
+  currency: "",
 };
 
-function Company({
-  account,
-  close,
-  openPreview,
-  setCompanyRequestForm,
-  setSectionState,
-  validated,
-  setValidated,
-  showBadge,
-  setShowBadge,
-  openDebtor,
-  paymentType,
-  setPaymentType,
-}: CompanyProps) {
+const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
+  {
+    account,
+    close,
+    openPreview,
+    setCompanyRequestForm,
+    setSectionState,
+    validated,
+    setValidated,
+    showBadge,
+    setShowBadge,
+    openDebtor,
+    paymentType,
+    setPaymentType,
+  },
+  ref
+) {
   const [processing, setProcessing] = useState(false);
   const [disableBank, setDisableBank] = useState(false);
   const [disableAddress, setDisableAddress] = useState(false);
@@ -87,14 +99,41 @@ function Company({
     validate: zodResolver(sendMoneyCompanyValidate),
   });
 
+  useEffect(() => {
+    form2.setFieldValue("currency", switchCurrency);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [switchCurrency]);
+
   const [{ bic, iban }] = useDebouncedValue(
     { iban: form2.values.destinationIBAN, bic: form2.values.destinationBIC },
     2000
   );
 
+  const [{ accountNumber, sortCode }] = useDebouncedValue(
+    {
+      accountNumber: form2.values.destinationAccountNumber,
+      sortCode: form2.values.destinationSortCode,
+    },
+    2000
+  );
+
   const handlePreviewState = () => {
-    const { hasErrors } = form2.validate();
-    if (hasErrors) return;
+    // const { hasErrors } = form2.validate();
+    // if (hasErrors) return;
+
+    const result = sendMoneyCompanyValidate.safeParse(form2.values);
+
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      Object.entries(errors).forEach(([field, messages]) => {
+        if (messages?.[0]) {
+          console.log(messages);
+          form2.setFieldError(field, messages[0]);
+        }
+      });
+      return;
+    }
+
     if (
       account?.accountBalance &&
       account?.accountBalance < Number(form2.values.amount)
@@ -120,8 +159,8 @@ function Company({
     setShowBadge(true);
     try {
       const data = await validateAccount({
-        iban: removeWhitespace(iban),
-        bic: removeWhitespace(bic),
+        iban: removeWhitespace(iban ?? accountNumber),
+        bic: removeWhitespace(bic ?? sortCode),
       });
 
       if (data) {
@@ -137,6 +176,12 @@ function Company({
         if (data.country) setDisableCountry(true);
       } else {
         setValidated(false);
+        if (ref && typeof ref !== "function" && ref.current) {
+          ref.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
       }
     } finally {
       setProcessing(false);
@@ -145,12 +190,19 @@ function Company({
 
   useEffect(() => {
     if (iban && bic) {
-      console.log({ bic, iban });
       handleIbanValidation();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bic, iban]);
+
+  useEffect(() => {
+    if (accountNumber && sortCode) {
+      handleIbanValidation();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountNumber, sortCode]);
 
   return (
     <TabsPanel value="To A Company">
@@ -173,46 +225,71 @@ function Company({
               placeholder="Enter company Name"
               {...form2.getInputProps("companyName")}
               errorProps={{
-                fz: 0,
+                fz: 12,
               }}
             />
           </Flex>
-          <Flex gap={20} mt={24}>
-            <TextInput
-              classNames={{ input: styles.input, label: styles.label }}
-              flex={1}
-              size="lg"
-              label={
-                <Text fz={14} c="#667085">
-                  {switchCurrency === "EUR" ? "IBAN" : "Account Number"}
-                </Text>
-              }
-              placeholder={
-                switchCurrency === "EUR" ? "Enter IBAN" : "Enter Account Number"
-              }
-              {...form2.getInputProps("destinationIBAN")}
-              errorProps={{
-                fz: 0,
-              }}
-            />
 
-            <TextInput
-              classNames={{ input: styles.input, label: styles.label }}
-              flex={1}
-              size="lg"
-              label={
-                <Text fz={14} c="#667085">
-                  {switchCurrency === "EUR" ? "BIC" : "Sort Code"}
-                </Text>
-              }
-              placeholder={
-                switchCurrency === "EUR" ? "Enter BIC" : "Enter Sort Code"
-              }
-              {...form2.getInputProps("destinationBIC")}
-              errorProps={{
-                fz: 0,
-              }}
-            />
+          <Flex gap={20} mt={24}>
+            {switchCurrency === "EUR" ? (
+              <>
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      IBAN
+                    </Text>
+                  }
+                  placeholder="Enter IBAN"
+                  {...form2.getInputProps("destinationIBAN")}
+                  errorProps={{ fz: 12 }}
+                />
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      BIC
+                    </Text>
+                  }
+                  placeholder="Enter BIC"
+                  {...form2.getInputProps("destinationBIC")}
+                  errorProps={{ fz: 12 }}
+                />
+              </>
+            ) : (
+              <>
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      Account Number
+                    </Text>
+                  }
+                  placeholder="Enter Account Number"
+                  {...form2.getInputProps("destinationAccountNumber")}
+                  errorProps={{ fz: 12 }}
+                />
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      Sort Code
+                    </Text>
+                  }
+                  placeholder="Enter Sort Code"
+                  {...form2.getInputProps("destinationSortCode")}
+                  errorProps={{ fz: 12 }}
+                />
+              </>
+            )}
           </Flex>
 
           {(processing || validated) && showBadge && (
@@ -270,7 +347,7 @@ function Company({
                   disabled={disableBank}
                   {...form2.getInputProps("destinationBank")}
                   errorProps={{
-                    fz: 0,
+                    fz: 12,
                   }}
                 />
               </Flex>
@@ -289,7 +366,7 @@ function Company({
                   placeholder="Bank Address"
                   {...form2.getInputProps("bankAddress")}
                   errorProps={{
-                    fz: 0,
+                    fz: 12,
                   }}
                 />
               </Flex>
@@ -341,7 +418,7 @@ function Company({
                   placeholder="Enter amount"
                   {...form2.getInputProps("amount")}
                   errorProps={{
-                    fz: 0,
+                    fz: 12,
                   }}
                 />
               </Flex>
@@ -374,7 +451,7 @@ function Company({
                   placeholder="Enter narration"
                   {...form2.getInputProps("narration")}
                   errorProps={{
-                    fz: 0,
+                    fz: 12,
                   }}
                 />
               </Flex>
@@ -436,6 +513,6 @@ function Company({
       </Box>
     </TabsPanel>
   );
-}
+});
 
 export default Company;

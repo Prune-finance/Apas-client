@@ -48,8 +48,8 @@ function PreviewState({
     "Last Name": requestForm?.lastName,
     ...(switchCurrency === "GBP"
       ? {
-          "Account Number": requestForm?.destinationIBAN,
-          "Sort Code": requestForm?.destinationBIC,
+          "Account Number": requestForm?.destinationAccountNumber,
+          "Sort Code": requestForm?.destinationSortCode,
         }
       : {
           IBAN: requestForm?.destinationIBAN,
@@ -83,8 +83,8 @@ function PreviewState({
 
     ...(switchCurrency === "GBP"
       ? {
-          "Account Number": companyRequestForm?.destinationIBAN,
-          "Sort Code": companyRequestForm?.destinationBIC,
+          "Account Number": companyRequestForm?.destinationAccountNumber,
+          "Sort Code": companyRequestForm?.destinationSortCode,
         }
       : {
           IBAN: companyRequestForm?.destinationIBAN,

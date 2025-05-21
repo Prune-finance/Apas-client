@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
 import SendMoneyBanner from "@/assets/sendMoney-new-bg.png";
@@ -54,9 +54,10 @@ function SendMoneyModal({
   const [validated, setValidated] = useState<boolean | null>(null);
   const [showBadge, setShowBadge] = useState(false);
   const { switchCurrency } = useCurrencySwitchStore();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <main className={styles.main}>
+    <main className={styles.main} ref={containerRef}>
       <Paper className={styles.form__container} px={30} pt={0} pb={10}>
         <Flex gap={10} align="center" justify="space-between" w="100%">
           <Text
@@ -168,6 +169,7 @@ function SendMoneyModal({
           keepMounted={false}
         >
           <Individual
+            ref={containerRef}
             account={account}
             close={close}
             openPreview={openPreview}
@@ -182,6 +184,7 @@ function SendMoneyModal({
             setPaymentType={setPaymentType}
           />
           <Company
+            ref={containerRef}
             account={account}
             close={close}
             openPreview={openPreview}

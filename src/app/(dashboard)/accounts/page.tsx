@@ -103,8 +103,11 @@ function Accounts() {
     revalidate: revalidateDftAcct,
   } = useUserDefaultAccount();
 
-  const { currencyAccount, loading: currencyLoading } =
-    useUserCurrencyAccount();
+  const {
+    currencyAccount,
+    loading: currencyLoading,
+    revalidate: currencyRevalidate,
+  } = useUserCurrencyAccount();
 
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -447,11 +450,11 @@ function Accounts() {
                     loading={currencyLoading}
                     business={false}
                     refresh
-                    revalidate={revalidateDftAcct}
+                    revalidate={currencyRevalidate}
                   />
                 ))}
 
-              {currencyLoading && (
+              {/* {currencyLoading && (
                 <NewAccountCard
                   key="1"
                   currency={"GBP"}
@@ -465,7 +468,7 @@ function Accounts() {
                   refresh
                   revalidate={revalidateDftAcct}
                 />
-              )}
+              )} */}
             </SimpleGrid>
           </TabsPanel>
 

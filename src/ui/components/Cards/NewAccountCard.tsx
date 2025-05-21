@@ -162,24 +162,28 @@ function NewAccountCard({
             )}
           </Group>
 
-          <Group gap={8} align="center">
-            <Group
-              gap={2}
-              align="center"
-              justify="end"
-              c="var(--prune-text-gray-900)"
-            >
-              {link && (
-                <Link href={link}>
-                  <Box bg="#596603" px={8} p={2} style={{ borderRadius: 12 }}>
-                    <Text fz={10} fw={500} c="#fff">
-                      See More
-                    </Text>
-                  </Box>
-                </Link>
-              )}
+          {!loading ? (
+            <Group gap={8} align="center">
+              <Group
+                gap={2}
+                align="center"
+                justify="end"
+                c="var(--prune-text-gray-900)"
+              >
+                {link && (
+                  <Link href={link}>
+                    <Box bg="#596603" px={8} p={2} style={{ borderRadius: 12 }}>
+                      <Text fz={10} fw={500} c="#fff">
+                        See More
+                      </Text>
+                    </Box>
+                  </Link>
+                )}
+              </Group>
             </Group>
-          </Group>
+          ) : (
+            <Skeleton h={20} w={80} />
+          )}
         </Flex>
 
         <Flex direction="column" align="flex-start" w={"100%"}>

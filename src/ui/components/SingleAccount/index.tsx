@@ -54,7 +54,7 @@ import { TableComponent } from "../Table";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
 import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
@@ -78,6 +78,7 @@ import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
 import { useHasPermission } from "@/lib/hooks/checkPermission";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 type Param = { id: string };
 interface Props {
@@ -867,6 +868,8 @@ export const DefaultAccountHead = ({
 
   const { user } = User();
 
+  const { setSwitchCurrency } = useCurrencySwitchStore();
+
   const axios = createAxiosInstance("payouts");
 
   const handleAccountTrust = async () => {
@@ -888,6 +891,11 @@ export const DefaultAccountHead = ({
       setProcessingTrust(false);
     }
   };
+
+  useEffect(() => {
+    setSwitchCurrency("GBP");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>

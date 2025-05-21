@@ -1,5 +1,6 @@
+import { OnboardingBusiness } from "../interface";
 import { IParams } from "../schema";
-import { sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL } from "../utils";
 import useAxios from "./useAxios";
 
 export function useOnboardingBusiness(customParams: IParams = {}) {
@@ -11,9 +12,9 @@ export function useOnboardingBusiness(customParams: IParams = {}) {
   } = useAxios<OnboardingBusinessData[], Meta>({
     baseURL: "auth",
     endpoint: "/admin/onboardings",
-    params: sanitizeURL(customParams),
-    dependencies: [...Object.values(customParams)],
-    enabled: false,
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+    // enabled: false,
   });
 
   return { loading, data, meta, revalidate };
@@ -22,10 +23,9 @@ export function useOnboardingBusiness(customParams: IParams = {}) {
 export function useSingleOnboardingBusiness(id: string) {
   const {
     data,
-
     loading,
     queryFn: revalidate,
-  } = useAxios<OnboardingBusinessData>({
+  } = useAxios<OnboardingBusiness>({
     baseURL: "auth",
     endpoint: `/admin/onboardings/${id}`,
     dependencies: [id],
@@ -45,6 +45,8 @@ export interface OnboardingBusinessData {
   businessPhoneNumber: string;
   businessCountry: string;
   businessDescription: string;
+  makeContactPersonInitiator?: boolean;
+  businessWebsite?: string;
   isRegulated: boolean;
   annualTurnover: string;
   services: Service[];
@@ -63,14 +65,19 @@ export interface OnboardingBusinessData {
   contactPersonPhoneNumber: string;
   geoFootprint: string;
   OnboardingBusiness: OnboardingBusiness[];
+  questionnaireSentAt: null;
+  consentDesignation: string;
+  consentEmail: string;
+  consentSignature: string;
+  consentSignedBy: string;
+  consentPhoneNumber: string;
+  documentData: Document;
+  documents: Document[];
+  questionnaireStatus: string;
+  processStatus: string;
 }
 
-export interface OnboardingBusiness {
-  id: string;
-  businessName: string;
-  businessCountry: string;
-  createdAt: Date;
-}
+export interface Document {}
 
 export interface OperationsAccounts {
   estimated_balance: string;
@@ -102,4 +109,5 @@ export interface Meta {
   approved: number;
   currentPage: number;
   totalPages: number;
+  onboarded: number;
 }

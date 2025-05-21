@@ -68,7 +68,7 @@ export type STAGE =
   | "QUESTIONNAIRE"
   | "ONBOARDING"
   | "ACTIVATION"
-  | "OFFBOARDED"
+  | "REJECTED"
   | "COMPLETED";
 
 export const stageColor = (stage: STAGE) => {
@@ -76,12 +76,12 @@ export const stageColor = (stage: STAGE) => {
     case "PROFILE":
       return "#FFA940";
     case "QUESTIONNAIRE":
-      return "var(----prune-primary-700)";
+      return "var(--prune-primary-700)";
     case "ONBOARDING":
       return "#DB340B";
     case "ACTIVATION":
       return "#FFA940";
-    case "OFFBOARDED":
+    case "REJECTED":
       return "var(--prune-text-gray-500)";
     case "COMPLETED":
       return "#12B76A";

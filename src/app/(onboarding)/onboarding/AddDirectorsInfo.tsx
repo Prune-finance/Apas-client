@@ -84,14 +84,14 @@ export const AddDirectorsInfo = ({
             <TextInputWithInsideLabel
               label="First Name"
               w="100%"
-              key={form.key(`directors.${index}.firstName`)}
-              {...form.getInputProps(`directors.${index}.firstName`)}
+              key={form.key(`directors.${index}.first_name`)}
+              {...form.getInputProps(`directors.${index}.first_name`)}
             />
             <TextInputWithInsideLabel
               label="Last Name"
               w="100%"
-              key={form.key(`directors.${index}.lastName`)}
-              {...form.getInputProps(`directors.${index}.lastName`)}
+              key={form.key(`directors.${index}.last_name`)}
+              {...form.getInputProps(`directors.${index}.last_name`)}
             />
           </Flex>
 
@@ -105,8 +105,10 @@ export const AddDirectorsInfo = ({
             <DateInputWithInsideLabel
               label="Date of Birth"
               w="100%"
-              key={form.key(`directors.${index}.dob`)}
-              {...form.getInputProps(`directors.${index}.dob`)}
+              minDate={new Date("1900-01-01")}
+              maxDate={new Date()}
+              key={form.key(`directors.${index}.date_of_birth`)}
+              {...form.getInputProps(`directors.${index}.date_of_birth`)}
             />
           </Flex>
 

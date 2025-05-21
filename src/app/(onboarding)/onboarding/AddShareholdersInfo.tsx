@@ -86,13 +86,13 @@ export const AddShareholdersInfo = ({
               label="First Name"
               w="100%"
               key={form.key(`shareholders.${index}.firstName`)}
-              {...form.getInputProps(`shareholders.${index}.firstName`)}
+              {...form.getInputProps(`shareholders.${index}.first_name`)}
             />
             <TextInputWithInsideLabel
               label="Last Name"
               w="100%"
               key={form.key(`shareholders.${index}.lastName`)}
-              {...form.getInputProps(`shareholders.${index}.lastName`)}
+              {...form.getInputProps(`shareholders.${index}.last_name`)}
             />
           </Flex>
 
@@ -106,8 +106,10 @@ export const AddShareholdersInfo = ({
             <DateInputWithInsideLabel
               label="Date of Birth"
               w="100%"
+              minDate={new Date("1900-01-01")}
+              maxDate={new Date()}
               key={form.key(`shareholders.${index}.dob`)}
-              {...form.getInputProps(`shareholders.${index}.dob`)}
+              {...form.getInputProps(`shareholders.${index}.date_of_birth`)}
             />
           </Flex>
 

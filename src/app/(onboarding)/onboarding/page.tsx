@@ -17,6 +17,7 @@ import {
   newOnboardingValue,
   onboardingBasicInfoSchema,
   onboardingDirectors,
+  OnboardingDirectorValues,
   onboardingDocumentSchema,
   onboardingShareholders,
   OnboardingType,
@@ -32,7 +33,7 @@ export default function Onboarding() {
   const [directors, setDirectors] = useState<OnboardingType["directors"]>();
   const [shareholders, setShareholders] =
     useState<OnboardingType["shareholders"]>();
-  const { setBusiness } = OnboardingStore();
+  const { setBusiness, setData } = OnboardingStore();
 
   const form = useForm<OnboardingType>({
     mode: "controlled",
@@ -52,7 +53,8 @@ export default function Onboarding() {
     baseURL: "auth",
     endpoint: "/onboarding/me",
     method: "GET",
-    dependencies: [active],
+    dependencies: [],
+    // dependencies: [active],
     enabled: false,
     onSuccess: (data) => {
       setBusiness(data);
@@ -111,33 +113,41 @@ export default function Onboarding() {
 
       // Arrays
       directors:
-        business?.directors?.map((director) => ({
-          ...director,
-          id: crypto.randomUUID(),
-          dob: director.dob ? new Date(director.dob) : null,
-          firstName: director.firstName || "",
-          lastName: director.lastName || "",
-          email: director.email || "",
-          identityType: director.identityType || null,
-          proofOfAddress: director.proofOfAddress || null,
-          identityFileUrl: director.identityFileUrl || null,
-          identityFileUrlBack: director.identityFileUrlBack || null,
-          proofOfAddressFileUrl: director.proofOfAddressFileUrl || null,
-        })) || [],
+        (business?.directors || []).length > 0
+          ? business?.directors?.map((director) => ({
+              ...director,
+              id: crypto.randomUUID(),
+              date_of_birth: director.date_of_birth
+                ? new Date(director.date_of_birth)
+                : null,
+              first_name: director.first_name || "",
+              last_name: director.last_name || "",
+              email: director.email || "",
+              identityType: director.identityType || null,
+              proofOfAddress: director.proofOfAddress || null,
+              identityFileUrl: director.identityFileUrl || null,
+              identityFileUrlBack: director.identityFileUrlBack || null,
+              proofOfAddressFileUrl: director.proofOfAddressFileUrl || null,
+            }))
+          : [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }],
       shareholders:
-        business?.shareholders?.map((shareholder) => ({
-          ...shareholder,
-          id: crypto.randomUUID(),
-          dob: shareholder.dob ? new Date(shareholder.dob) : null,
-          firstName: shareholder.firstName || "",
-          lastName: shareholder.lastName || "",
-          email: shareholder.email || "",
-          identityType: shareholder.identityType || null,
-          proofOfAddress: shareholder.proofOfAddress || null,
-          identityFileUrl: shareholder.identityFileUrl || null,
-          identityFileUrlBack: shareholder.identityFileUrlBack || null,
-          proofOfAddressFileUrl: shareholder.proofOfAddressFileUrl || null,
-        })) || [],
+        (business?.shareholders || []).length > 0
+          ? business?.shareholders?.map((shareholder) => ({
+              ...shareholder,
+              id: crypto.randomUUID(),
+              date_of_birth: shareholder.date_of_birth
+                ? new Date(shareholder.date_of_birth)
+                : null,
+              first_name: shareholder.first_name || "",
+              last_name: shareholder.last_name || "",
+              email: shareholder.email || "",
+              identityType: shareholder.identityType || null,
+              proofOfAddress: shareholder.proofOfAddress || null,
+              identityFileUrl: shareholder.identityFileUrl || null,
+              identityFileUrlBack: shareholder.identityFileUrlBack || null,
+              proofOfAddressFileUrl: shareholder.proofOfAddressFileUrl || null,
+            }))
+          : [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }],
     };
 
     form.setValues(formValues);

@@ -4,9 +4,9 @@ const emailSchema = z.string().email();
 
 const Director = z.object({
   id: z.string().uuid(),
-  firstName: z.string().min(1, "Director's first name is required"),
-  lastName: z.string().min(1, "Director's last name is required"),
-  dob: z
+  first_name: z.string().min(1, "Director's first name is required"),
+  last_name: z.string().min(1, "Director's last name is required"),
+  date_of_birth: z
     .union([
       z.date({ required_error: "Director's Date of birth is required" }),
       z.string().nullable(),
@@ -52,9 +52,9 @@ export const onboardingShareholders = z.object({
     .array(
       z.object({
         id: z.string().uuid(),
-        firstName: z.string().min(1, "Shareholder's first name is required"),
-        lastName: z.string().min(1, "Shareholder's last name is required"),
-        dob: z
+        first_name: z.string().min(1, "Shareholder's first name is required"),
+        last_name: z.string().min(1, "Shareholder's last name is required"),
+        date_of_birth: z
           .union([
             z.date({
               required_error: "Shareholder's Date of birth is required",
@@ -177,14 +177,14 @@ export const onboardingSchema = onboardingBasicInfoSchema
 
 export type OnboardingType = z.infer<typeof onboardingSchema>;
 
-type DirectorType = z.infer<typeof Director>;
+export type DirectorType = z.infer<typeof Director>;
 
 export const OnboardingDirectorValues: DirectorType = {
   id: crypto.randomUUID(),
-  firstName: "",
-  lastName: "",
+  first_name: "",
+  last_name: "",
   email: "",
-  dob: null,
+  date_of_birth: null,
   identityType: null,
   proofOfAddress: null,
   identityFileUrl: null,
@@ -194,10 +194,10 @@ export const OnboardingDirectorValues: DirectorType = {
 
 export const OnboardingShareholderValues: DirectorType = {
   id: crypto.randomUUID(),
-  firstName: "",
-  lastName: "",
+  first_name: "",
+  last_name: "",
   email: "",
-  dob: null,
+  date_of_birth: null,
   identityType: null,
   proofOfAddress: null,
   identityFileUrl: null,

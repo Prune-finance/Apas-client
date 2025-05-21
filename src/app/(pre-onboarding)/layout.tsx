@@ -93,7 +93,7 @@ export default function QuestionnaireLayout({
         <Navbar />
       </AppShell.Navbar>
       <AppShell.Main pb="lg">
-        <Box pos="sticky" top={0} style={{ zIndex: 100 }} bg="#FCFCFD">
+        {/* <Box pos="sticky" top={0} style={{ zIndex: 100 }} bg="#FCFCFD">
           <Container size={1200} pt={30} pb={20}>
             <Text
               ta="left"
@@ -109,13 +109,13 @@ export default function QuestionnaireLayout({
               color="var(--prune-primary-600)"
             />
           </Container>
-        </Box>
+        </Box> */}
 
-        <Container size={1200}>
-          <QuestionnaireFormProvider form={form}>
-            {children}
-          </QuestionnaireFormProvider>
-        </Container>
+        {/* <Container size={1200}> */}
+        {/* <QuestionnaireFormProvider form={form}> */}
+        {children}
+        {/* </QuestionnaireFormProvider> */}
+        {/* </Container> */}
       </AppShell.Main>
     </AppShell>
   );

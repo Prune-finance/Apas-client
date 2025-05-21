@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { Suspense, useState } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
 import {
@@ -28,14 +28,21 @@ import {
 import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { IconDots } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+import { useDebouncedValue } from "@mantine/hooks";
 
 function EligibilityCenter() {
-  const { data, meta, loading, revalidate } = useOnboardingBusiness();
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const { data, meta, loading, revalidate } = useOnboardingBusiness({
+    search: debouncedSearch,
+  });
 
   const InfoCards = [
     { title: "Total leads", num: meta?.total },
     { title: "Total approved", num: meta?.approved },
-    { title: "Total onboarded", num: meta?.total },
+    { title: "Total onboarded", num: meta?.onboarded },
     { title: "Pending", num: meta?.pending },
   ];
 
@@ -77,7 +84,7 @@ function EligibilityCenter() {
         <div
           className={`${styles.container__search__filter} ${switzer.className}`}
         >
-          <SearchInput />
+          <SearchInput search={search} setSearch={setSearch} />
 
           <Flex gap={12}>
             <PrimaryBtn
@@ -124,8 +131,14 @@ export default function EligibilityCenterSus() {
 }
 
 const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
-  return data?.map((row, i) => (
-    <TableTr key={i}>
+  const { push } = useRouter();
+
+  return data?.map((row) => (
+    <TableTr
+      key={row.id}
+      onClick={() => push(`/admin/eligibility-center/${row.id}`)}
+      style={{ cursor: "pointer" }}
+    >
       <TableTd>{row.businessName}</TableTd>
       <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>{row.businessCountry}</TableTd>
@@ -133,7 +146,7 @@ const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
         <BadgeComponent
           tier
           status={
-            row.services?.some((s) => s.name === "Remittance")
+            row.services?.every((s) => s.name === "Remittance")
               ? "Tier 1"
               : "Tier 2"
           }
@@ -142,9 +155,10 @@ const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
       </TableTd>
       <TableTd>
         <BadgeComponent
-          status={row.status}
           stage
-          c={row.status === "ACTIVATION" ? "var(--prune-text-gray-800)" : ""}
+          status={row?.processStatus || "QUESTIONNAIRE"}
+          c={row?.status === "ACTIVATION" ? "var(--prune-text-gray-800)" : ""}
+          w={150}
         />
       </TableTd>
     </TableTr>

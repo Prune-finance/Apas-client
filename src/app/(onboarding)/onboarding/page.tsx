@@ -17,6 +17,7 @@ import {
   newOnboardingValue,
   onboardingBasicInfoSchema,
   onboardingDirectors,
+  OnboardingDirectorValues,
   onboardingDocumentSchema,
   onboardingShareholders,
   OnboardingType,
@@ -60,19 +61,6 @@ export default function Onboarding() {
       setActive((prev) =>
         prev === 6 && data.stageIdentifier === 6 ? 6 : data.stageIdentifier
       );
-    },
-  });
-
-  const { data } = useAxios<IOnboarding>({
-    baseURL: "auth",
-    endpoint: `/onboarding/get-questionnaire-by-id/${business?.questionnaireId}`,
-    method: "GET",
-    dependencies: [business?.questionnaireId],
-    enabled: !!!business?.questionnaireId,
-    onSuccess: (data) => {
-      setData(data);
-
-      form.setValues({ ...data });
     },
   });
 
@@ -125,37 +113,41 @@ export default function Onboarding() {
 
       // Arrays
       directors:
-        business?.directors?.map((director) => ({
-          ...director,
-          id: crypto.randomUUID(),
-          date_of_birth: director.date_of_birth
-            ? new Date(director.date_of_birth)
-            : null,
-          first_name: director.first_name || "",
-          last_name: director.last_name || "",
-          email: director.email || "",
-          identityType: director.identityType || null,
-          proofOfAddress: director.proofOfAddress || null,
-          identityFileUrl: director.identityFileUrl || null,
-          identityFileUrlBack: director.identityFileUrlBack || null,
-          proofOfAddressFileUrl: director.proofOfAddressFileUrl || null,
-        })) || [],
+        (business?.directors || []).length > 0
+          ? business?.directors?.map((director) => ({
+              ...director,
+              id: crypto.randomUUID(),
+              date_of_birth: director.date_of_birth
+                ? new Date(director.date_of_birth)
+                : null,
+              first_name: director.first_name || "",
+              last_name: director.last_name || "",
+              email: director.email || "",
+              identityType: director.identityType || null,
+              proofOfAddress: director.proofOfAddress || null,
+              identityFileUrl: director.identityFileUrl || null,
+              identityFileUrlBack: director.identityFileUrlBack || null,
+              proofOfAddressFileUrl: director.proofOfAddressFileUrl || null,
+            }))
+          : [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }],
       shareholders:
-        business?.shareholders?.map((shareholder) => ({
-          ...shareholder,
-          id: crypto.randomUUID(),
-          date_of_birth: shareholder.date_of_birth
-            ? new Date(shareholder.date_of_birth)
-            : null,
-          first_name: shareholder.first_name || "",
-          last_name: shareholder.last_name || "",
-          email: shareholder.email || "",
-          identityType: shareholder.identityType || null,
-          proofOfAddress: shareholder.proofOfAddress || null,
-          identityFileUrl: shareholder.identityFileUrl || null,
-          identityFileUrlBack: shareholder.identityFileUrlBack || null,
-          proofOfAddressFileUrl: shareholder.proofOfAddressFileUrl || null,
-        })) || [],
+        (business?.shareholders || []).length > 0
+          ? business?.shareholders?.map((shareholder) => ({
+              ...shareholder,
+              id: crypto.randomUUID(),
+              date_of_birth: shareholder.date_of_birth
+                ? new Date(shareholder.date_of_birth)
+                : null,
+              first_name: shareholder.first_name || "",
+              last_name: shareholder.last_name || "",
+              email: shareholder.email || "",
+              identityType: shareholder.identityType || null,
+              proofOfAddress: shareholder.proofOfAddress || null,
+              identityFileUrl: shareholder.identityFileUrl || null,
+              identityFileUrlBack: shareholder.identityFileUrlBack || null,
+              proofOfAddressFileUrl: shareholder.proofOfAddressFileUrl || null,
+            }))
+          : [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }],
     };
 
     form.setValues(formValues);

@@ -100,7 +100,7 @@ export default function OnboardingProfile({
           },
         ]}
       />
-      <ProfileHeader data={data} loading={loading} />
+      <ProfileHeader data={data} loading={loading} revalidate={revalidate} />
       <Tabs
         tabs={tabs}
         tt="capitalize"

@@ -31,7 +31,7 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "../../Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import DownloadStatement from "@/ui/components/DownloadStatement";
-import { handlePdfStatement } from "@/lib/actions/auth";
+import { handlePdfStatement, parseError } from "@/lib/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { DatePickerInput } from "@mantine/dates";
@@ -173,7 +173,7 @@ export const Transactions = ({
       handleError(
         "Account Statement",
         error instanceof Error
-          ? error.message
+          ? parseError(error)
           : "error downloading account statement"
       );
     } finally {

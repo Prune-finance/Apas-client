@@ -127,7 +127,7 @@ export const sendMoneyIndividualValidate = z
       .refine((val) => Number(val.toFixed(2)) === val, {
         message: "Amount can have maximum 2 decimal places",
       }),
-    invoice: z.string(),
+    invoice: z.string().optional(),
 
     narration: z
       .string()
@@ -269,7 +269,7 @@ export const sendMoneyCompanyValidate = z
       .refine((val) => Number(val.toFixed(2)) === val, {
         message: "Amount can have maximum 2 decimal places",
       }),
-    invoice: z.string(),
+    invoice: z.string().optional(),
 
     narration: z
       .string()

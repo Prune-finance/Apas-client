@@ -9,8 +9,8 @@ const Onboarding = create<OnboardingState>((set) => ({
 }));
 
 interface OnboardingState {
-  data: IOnboarding | null;
-  setData: (data: IOnboarding) => void;
+  data: OnboardingBusiness | null;
+  setData: (data: OnboardingBusiness) => void;
   business: OnboardingBusiness | null;
   setBusiness: (data: OnboardingBusiness) => void;
 }

@@ -31,7 +31,12 @@ export default function Financial({ data, loading, form }: ComponentProps) {
   return (
     <PanelWrapper
       loading={loading}
-      rows={data?.questionnaireStatus === "APPROVED" ? [1] : []}
+      rows={
+        data?.questionnaireStatus === "SUBMITTED" ||
+        data?.questionnaireStatus === "APPROVED"
+          ? [1]
+          : []
+      }
       panelName="Financial"
     >
       <PaperContainer title="Finance">

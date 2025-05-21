@@ -13,7 +13,7 @@ import Cookies from "js-cookie";
 import useNotification from "@/lib/hooks/notification";
 import { isAxiosError } from "axios";
 import useAxios from "@/lib/hooks/useAxios";
-import { Onboarding } from "@/lib/interface";
+import { Onboarding, OnboardingBusiness } from "@/lib/interface";
 import OnboardingStore from "@/lib/store/onboarding";
 
 export default function OnboardingRegister() {
@@ -23,7 +23,6 @@ export default function OnboardingRegister() {
   const { handleSuccess, handleError } = useNotification();
   // const { setUser } = User();
   const { setData } = OnboardingStore();
-  console.log({ id });
 
   const [loading, setLoading] = useState(false);
   const form = useForm<RegisterType>({
@@ -32,17 +31,17 @@ export default function OnboardingRegister() {
     validate: zodResolver(validateRegister),
   });
 
-  const { data, error, queryFn } = useAxios<Onboarding>({
+  const { data } = useAxios<OnboardingBusiness>({
     baseURL: "auth",
     endpoint: `/onboarding/questionnaire/${id}`,
     dependencies: [id],
     enabled: !!!id,
     method: "GET",
     onSuccess: (data) => {
-      console.log(data);
       setData(data);
       form.initialize({
         email: data.businessEmail || "",
+        // email: data.contactPersonEmail || "",  // TODO: Return contactPersonEmail
         password: "",
         confirmPassword: "",
       });

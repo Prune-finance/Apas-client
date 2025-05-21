@@ -86,7 +86,7 @@ export interface OnboardingBusiness {
   consentSignature: string;
   consentSignedBy: string;
   consentPhoneNumber: string;
-  documentData: Document;
+  documentData: Record<string, boolean>;
   documents: Document[];
   onboardingStatus: "PENDING" | "PROCESSING" | "COMPLETED";
   questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED";
@@ -116,4 +116,7 @@ export interface Director {
   proofOfAddressFileUrl: string;
 }
 
-export interface Document {}
+export interface Document {
+  title: string;
+  url: string;
+}

@@ -1103,7 +1103,7 @@ export const AccountInfo = ({
               <Skeleton w={100} h={30} />
             )}
 
-            {isUser && (
+            {!loading && isUser && (
               <PrimaryBtn
                 text="Refresh Balance"
                 color="var(--prune-primary-600)"

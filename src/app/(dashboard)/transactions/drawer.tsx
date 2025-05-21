@@ -291,6 +291,7 @@ export const TransactionDrawer = ({
           }
           details={details}
           receiptRef={pdfRef}
+          currencyType={selectedRequest?.currencyType}
         />
       </Box>
     </Drawer>

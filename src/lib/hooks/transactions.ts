@@ -848,11 +848,6 @@ export interface TransactionType {
   senderIban: string;
   beneficiaryName: string;
   beneficiaryAccountNumber: string;
-  beneficiarySortCode: string;
-  beneficiaryInstitutionName: string;
-  beneficiaryAddress: string;
-  senderAccountNumber: string;
-  senderSortCode: string;
   currencyType: string;
   senderName: string;
   senderBic: string;

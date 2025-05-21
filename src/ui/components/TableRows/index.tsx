@@ -145,7 +145,9 @@ export const IssuedTransactionTableRows = ({
         <AmountGroup type={element?.type} fz={12} fw={400} />
       </TableTd>
 
-      <TableTd>{formatNumber(element?.amount, true, "EUR")}</TableTd>
+      <TableTd>
+        {formatNumber(element?.amount, true, element?.currencyType ?? "EUR")}
+      </TableTd>
 
       <TableTd w="15%">{element?.reference}</TableTd>
 

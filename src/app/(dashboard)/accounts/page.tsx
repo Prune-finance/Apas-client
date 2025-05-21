@@ -1,7 +1,7 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -61,6 +61,11 @@ import { useHasPermission } from "@/lib/hooks/checkPermission";
 import AddAccount from "./AddAccount";
 import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
+<<<<<<< HEAD
+=======
+import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
+>>>>>>> c24c2e8 (feat: integrate currency switch functionality in Accounts and NewAccountCard components)
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -74,6 +79,7 @@ function Accounts() {
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const { setSwitchCurrency } = useCurrencySwitchStore();
 
   const queryParams = {
     date: date ? dayjs(date).format("YYYY-MM-DD") : "",
@@ -165,6 +171,11 @@ function Accounts() {
 
     return { pendingRequest: hasPending, approvedRequest: hasApproved };
   }, [issuanceRequests]);
+
+  useEffect(() => {
+    setSwitchCurrency("EUR");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const requestForm = useForm({
     initialValues: {

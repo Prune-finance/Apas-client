@@ -76,28 +76,12 @@ export const TransactionDrawer = ({
   };
 
   const beneficiaryDetails = {
-    "Account Name":
-      selectedRequest?.recipientName ??
-      selectedRequest?.beneficiaryName ??
-      "N/A",
-    ...(selectedRequest?.currencyType === "GBP"
-      ? {
-          "Account Number": selectedRequest?.beneficiaryAccountNumber,
-          "Sort Code": selectedRequest?.beneficiarySortCode,
-        }
-      : {
-          IBAN: selectedRequest?.recipientIban,
-          BIC: selectedRequest?.recipientBic,
-        }),
-    "Bank Name":
-      selectedRequest?.recipientBankAddress ??
-      selectedRequest?.beneficiaryInstitutionName ??
-      "N/A",
-    "Bank Address":
-      selectedRequest?.recipientBankAddress ??
-      selectedRequest?.beneficiaryAddress ??
-      "N/A",
-    Country: selectedRequest?.recipientBankCountry ?? "N/A",
+    "Account Name": selectedRequest?.recipientName || "N/A",
+    IBAN: selectedRequest?.recipientIban,
+    BIC: selectedRequest?.recipientBic,
+    "Bank Name": selectedRequest?.recipientBankAddress,
+    "Bank Address": selectedRequest?.recipientBankAddress,
+    Country: selectedRequest?.recipientBankCountry,
     "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
@@ -107,15 +91,8 @@ export const TransactionDrawer = ({
     ) : (
       selectedRequest?.senderName
     ),
-    ...(selectedRequest?.currencyType === "GBP"
-      ? {
-          "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
-          "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
-        }
-      : {
-          IBAN: selectedRequest?.recipientIban,
-          BIC: selectedRequest?.recipientBic,
-        }),
+    IBAN: selectedRequest?.senderIban,
+    BIC: selectedRequest?.senderBic,
     Bank:
       selectedRequest?.type === "DEBIT"
         ? "Prune Payments LTD"
@@ -129,8 +106,7 @@ export const TransactionDrawer = ({
   };
 
   const otherDetails = {
-    "Prune Reference":
-      selectedRequest?.centrolinkRef ?? selectedRequest?.accessId ?? "N/A",
+    "Prune Reference": selectedRequest?.centrolinkRef ?? "N/A",
     "C-L Reference": selectedRequest?.id,
     "Date & Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
@@ -174,11 +150,7 @@ export const TransactionDrawer = ({
               </Text>
 
               <Text c="#97AD05" fz={32} fw={600}>
-                {formatNumber(
-                  selectedRequest?.amount || 0,
-                  true,
-                  selectedRequest?.currencyType ?? "EUR"
-                )}
+                {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
               </Text>
             </Flex>
 
@@ -285,12 +257,7 @@ export const TransactionDrawer = ({
       <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
         <TransactionReceipt
           amount={selectedRequest?.amount ?? 0}
-          currencyType={selectedRequest?.currencyType}
-          amountType={
-            selectedRequest?.type === "DEBIT"
-              ? "Amount Sent"
-              : "Amount Received"
-          }
+          amountType="Amount Sent"
           details={details}
           receiptRef={pdfRef}
         />

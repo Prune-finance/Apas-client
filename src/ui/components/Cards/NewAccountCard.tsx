@@ -117,7 +117,11 @@ function NewAccountCard({
   const handleReload = async () => {
     setProcessing(true);
     try {
-      await axios.get(`/accounts/${iban}/balance/dashboard`);
+      await axios.get(
+        currency === "GBP"
+          ? `/accounts/${accountNumber}/balance/dashboard?currency=GBP`
+          : `/accounts/${iban}/balance/dashboard`
+      );
       revalidate && (await revalidate());
     } catch (error) {
       handleError("An error occurred", parseError(error));

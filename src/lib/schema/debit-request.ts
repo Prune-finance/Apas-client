@@ -127,9 +127,8 @@ export const sendMoneyIndividualValidate = z
       .refine((val) => Number(val.toFixed(2)) === val, {
         message: "Amount can have maximum 2 decimal places",
       }),
-    invoice: z
-      .string()
-      .max(50, "Invoice reference cannot exceed 50 characters"),
+    invoice: z.string().optional(),
+
     narration: z
       .string()
       .min(2, "Narration must be at least 2 characters")
@@ -270,9 +269,8 @@ export const sendMoneyCompanyValidate = z
       .refine((val) => Number(val.toFixed(2)) === val, {
         message: "Amount can have maximum 2 decimal places",
       }),
-    invoice: z
-      .string()
-      .max(50, "Invoice reference cannot exceed 50 characters"),
+    invoice: z.string().optional(),
+
     narration: z
       .string()
       .min(2, "Narration must be at least 2 characters")

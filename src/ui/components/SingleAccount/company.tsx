@@ -219,7 +219,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
               size="lg"
               label={
                 <Text fz={14} c="#667085">
-                  Company Name
+                  Company Name <span style={{ color: "red" }}>*</span>
                 </Text>
               }
               placeholder="Enter company Name"
@@ -239,7 +239,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      IBAN
+                      IBAN <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter IBAN"
@@ -252,7 +252,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      BIC
+                      BIC <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter BIC"
@@ -269,7 +269,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      Account Number
+                      Account Number <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter Account Number"
@@ -283,7 +283,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      Sort Code
+                      Sort Code <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter Sort Code"
@@ -343,7 +343,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      Bank
+                      Bank <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   disabled={disableBank}
@@ -379,11 +379,12 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   placeholder="Select Country"
                   classNames={{ input: styles.input, label: styles.label }}
                   flex={1}
-                  label="Country"
-                  data={countries.map((c) => ({
-                    label: c?.name,
-                    value: c?.code,
-                  }))}
+                  label={
+                    <Text fz={14} c="#667086">
+                      Country <span style={{ color: "red" }}>*</span>
+                    </Text>
+                  }
+                  data={countries.map((c) => c.name)}
                   disabled={disableCountry}
                   {...form2.getInputProps("destinationCountry")}
                 />
@@ -415,7 +416,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   }}
                   label={
                     <Text fz={14} c="#667085">
-                      Amount
+                      Amount <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   hideControls
@@ -450,7 +451,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   classNames={{ input: styles.textarea, label: styles.label }}
                   label={
                     <Text fz={14} c="#667085">
-                      Narration
+                      Narration <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter narration"

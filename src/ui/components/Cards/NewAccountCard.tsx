@@ -194,29 +194,33 @@ function NewAccountCard({
                 )}
               </Group>
 
-              <Box onClick={handlePropagation}>
-                <CopyButton
-                  value={
-                    currency === "EUR"
-                      ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
-                      : `Sort Code: ${sortCode},\nAccount Number: ${accountNumber},\nAccount Name: ${companyName}`
-                  }
-                >
-                  {({ copied, copy }) => (
-                    <SecondaryBtn
-                      icon={copied ? IconCheck : IconCopy}
-                      text={copied ? "Copied" : "Copy Details"}
-                      fz={12}
-                      action={copy}
-                      m={0}
-                      px={0}
-                      variant="transparent"
-                      c="#596603"
-                      style={{ border: "none" }}
-                    />
-                  )}
-                </CopyButton>
-              </Box>
+              {!loading ? (
+                <Box onClick={handlePropagation}>
+                  <CopyButton
+                    value={
+                      currency === "EUR"
+                        ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
+                        : `Sort Code: ${sortCode},\nAccount Number: ${accountNumber},\nAccount Name: ${companyName}`
+                    }
+                  >
+                    {({ copied, copy }) => (
+                      <SecondaryBtn
+                        icon={copied ? IconCheck : IconCopy}
+                        text={copied ? "Copied" : "Copy Details"}
+                        fz={12}
+                        action={copy}
+                        m={0}
+                        px={0}
+                        variant="transparent"
+                        c="#596603"
+                        style={{ border: "none" }}
+                      />
+                    )}
+                  </CopyButton>
+                </Box>
+              ) : (
+                <Skeleton h={20} w={100} />
+              )}
             </Flex>
           </Group>
         </Flex>

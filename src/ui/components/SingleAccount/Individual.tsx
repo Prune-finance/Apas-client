@@ -59,11 +59,14 @@ export const sendMoneyIndividualRequest = {
   destinationIBAN: "",
   destinationBIC: "",
   destinationBank: "",
+  destinationAccountNumber: "",
+  destinationSortCode: "",
   bankAddress: "",
   destinationCountry: "",
   amount: "",
   invoice: "",
   narration: "",
+  currency: "",
 };
 
 const Individual = forwardRef<HTMLDivElement, IndividualProps>(
@@ -97,8 +100,21 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       validate: zodResolver(sendMoneyIndividualValidate),
     });
 
+    useEffect(() => {
+      form.setFieldValue("currency", switchCurrency);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [switchCurrency]);
+
     const [{ bic, iban }] = useDebouncedValue(
       { iban: form.values.destinationIBAN, bic: form.values.destinationBIC },
+      2000
+    );
+
+    const [{ accountNumber, sortCode }] = useDebouncedValue(
+      {
+        accountNumber: form.values.destinationAccountNumber,
+        sortCode: form.values.destinationSortCode,
+      },
       2000
     );
 
@@ -111,8 +127,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       setShowBadge(true);
       try {
         const data = await validateAccount({
-          iban: removeWhitespace(iban),
-          bic: removeWhitespace(bic),
+          iban: removeWhitespace(iban ?? accountNumber),
+          bic: removeWhitespace(bic ?? sortCode),
         });
 
         if (data) {
@@ -149,9 +165,31 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bic, iban]);
 
+    useEffect(() => {
+      if (accountNumber && sortCode) {
+        handleIbanValidation();
+      }
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [accountNumber, sortCode]);
+
     const handleDebtorState = () => {
-      const { hasErrors } = form.validate();
-      if (hasErrors) return;
+      // const { hasErrors } = form.validate();
+      // if (hasErrors) return;
+
+      const result = sendMoneyIndividualValidate.safeParse(form.values);
+
+      if (!result.success) {
+        const errors = result.error.flatten().fieldErrors;
+        Object.entries(errors).forEach(([field, messages]) => {
+          if (messages?.[0]) {
+            console.log(messages);
+            form.setFieldError(field, messages[0]);
+          }
+        });
+        return;
+      }
+
       if (
         account?.accountBalance &&
         account?.accountBalance < Number(form.values.amount)
@@ -188,7 +226,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   placeholder="Enter first name"
                   {...form.getInputProps("firstName")}
                   errorProps={{
-                    fz: 0,
+                    fz: 12,
                   }}
                 />
 
@@ -204,49 +242,71 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   placeholder="Enter last name"
                   {...form.getInputProps("lastName")}
                   errorProps={{
-                    fz: 0,
+                    fz: 12,
                   }}
                 />
               </Flex>
 
               <Flex gap={20} mt={24}>
-                <TextInput
-                  classNames={{ input: styles.input, label: styles.label }}
-                  flex={1}
-                  size="lg"
-                  label={
-                    <Text fz={14} c="#667085">
-                      {switchCurrency === "EUR" ? "IBAN" : "Account Number"}
-                    </Text>
-                  }
-                  placeholder={
-                    switchCurrency === "EUR"
-                      ? "Enter IBAN"
-                      : "Enter Account Number"
-                  }
-                  {...form.getInputProps("destinationIBAN")}
-                  errorProps={{
-                    fz: 0,
-                  }}
-                />
-
-                <TextInput
-                  classNames={{ input: styles.input, label: styles.label }}
-                  flex={1}
-                  size="lg"
-                  label={
-                    <Text fz={14} c="#667085">
-                      {switchCurrency === "EUR" ? "BIC" : "Sort Code"}
-                    </Text>
-                  }
-                  placeholder={
-                    switchCurrency === "EUR" ? "Enter BIC" : "Enter Sort Code"
-                  }
-                  {...form.getInputProps("destinationBIC")}
-                  errorProps={{
-                    fz: 0,
-                  }}
-                />
+                {switchCurrency === "EUR" ? (
+                  <>
+                    <TextInput
+                      classNames={{ input: styles.input, label: styles.label }}
+                      flex={1}
+                      size="lg"
+                      label={
+                        <Text fz={14} c="#667085">
+                          IBAN
+                        </Text>
+                      }
+                      placeholder="Enter IBAN"
+                      {...form.getInputProps("destinationIBAN")}
+                      errorProps={{ fz: 12 }}
+                    />
+                    <TextInput
+                      classNames={{ input: styles.input, label: styles.label }}
+                      flex={1}
+                      size="lg"
+                      label={
+                        <Text fz={14} c="#667085">
+                          BIC
+                        </Text>
+                      }
+                      placeholder="Enter BIC"
+                      {...form.getInputProps("destinationBIC")}
+                      errorProps={{ fz: 12 }}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <TextInput
+                      classNames={{ input: styles.input, label: styles.label }}
+                      flex={1}
+                      size="lg"
+                      label={
+                        <Text fz={14} c="#667085">
+                          Account Number
+                        </Text>
+                      }
+                      placeholder="Enter Account Number"
+                      {...form.getInputProps("destinationAccountNumber")}
+                      errorProps={{ fz: 12 }}
+                    />
+                    <TextInput
+                      classNames={{ input: styles.input, label: styles.label }}
+                      flex={1}
+                      size="lg"
+                      label={
+                        <Text fz={14} c="#667085">
+                          Sort Code
+                        </Text>
+                      }
+                      placeholder="Enter Sort Code"
+                      {...form.getInputProps("destinationSortCode")}
+                      errorProps={{ fz: 12 }}
+                    />
+                  </>
+                )}
               </Flex>
 
               {(processing || validated) && showBadge && (
@@ -307,7 +367,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       disabled={disableBank}
                       {...form.getInputProps("destinationBank")}
                       errorProps={{
-                        fz: 0,
+                        fz: 12,
                       }}
                     />
                   </Flex>
@@ -325,7 +385,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       disabled={disableAddress}
                       {...form.getInputProps("bankAddress")}
                       errorProps={{
-                        fz: 0,
+                        fz: 12,
                       }}
                     />
                   </Flex>
@@ -363,7 +423,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Enter amount"
                       {...form.getInputProps("amount")}
                       errorProps={{
-                        fz: 0,
+                        fz: 12,
                       }}
                       // error={account?.accountBalance < form.values.amount}
                     />
@@ -410,7 +470,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Enter narration"
                       {...form.getInputProps("narration")}
                       errorProps={{
-                        fz: 0,
+                        fz: 12,
                       }}
                     />
                   </Flex>

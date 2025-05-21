@@ -61,6 +61,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     destinationIBAN: "",
     destinationBIC: "",
     destinationBank: "",
+    destinationAccountNumber: "",
+    destinationSortCode: "",
     bankAddress: "",
     destinationCountry: "",
     reference: crypto.randomUUID(),
@@ -73,6 +75,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     companyName: "",
     destinationIBAN: "",
     destinationBIC: "",
+    destinationAccountNumber: "",
+    destinationSortCode: "",
     destinationBank: "",
     bankAddress: "",
     destinationCountry: "",
@@ -89,6 +93,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         lastName,
         destinationIBAN,
         destinationBIC,
+        destinationAccountNumber,
+        destinationSortCode,
         destinationBank,
         bankAddress,
         destinationCountry,
@@ -102,8 +108,10 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         {
           ...(switchCurrency === "GBP"
             ? {
-                beneficiaryAccountNumber: removeWhitespace(destinationIBAN),
-                beneficiarySortCode: removeWhitespace(destinationBIC),
+                beneficiaryAccountNumber: removeWhitespace(
+                  destinationAccountNumber
+                ),
+                beneficiarySortCode: removeWhitespace(destinationSortCode),
                 beneficiaryBank: destinationBank,
                 beneficiaryCountry: destinationCountry,
                 beneficiaryFullName: `${firstName} ${lastName}`,
@@ -171,6 +179,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         companyName,
         destinationIBAN,
         destinationBIC,
+        destinationAccountNumber,
+        destinationSortCode,
         destinationBank,
         bankAddress,
         destinationCountry,
@@ -185,8 +195,10 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         {
           ...(switchCurrency === "GBP"
             ? {
-                beneficiaryAccountNumber: removeWhitespace(destinationIBAN),
-                beneficiarySortCode: removeWhitespace(destinationBIC),
+                beneficiaryAccountNumber: removeWhitespace(
+                  destinationAccountNumber
+                ),
+                beneficiarySortCode: removeWhitespace(destinationSortCode),
                 beneficiaryBank: destinationBank,
                 beneficiaryCountry: destinationCountry,
                 beneficiaryFullName: companyName,
@@ -349,6 +361,8 @@ export interface RequestForm {
   destinationIBAN: string;
   destinationBIC: string;
   destinationBank: string;
+  destinationAccountNumber: string;
+  destinationSortCode: string;
   bankAddress: string;
   destinationCountry: string;
   reference: string; // generated using crypto.randomUUID()

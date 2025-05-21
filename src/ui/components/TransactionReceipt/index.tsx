@@ -27,6 +27,7 @@ interface Props {
   amountType: string;
   details: ReceiptDetails[];
   receiptRef: RefObject<HTMLDivElement>;
+  currencyType?: string;
 }
 
 export const TransactionReceipt = ({
@@ -34,6 +35,7 @@ export const TransactionReceipt = ({
   amountType,
   details,
   receiptRef,
+  currencyType,
 }: Props) => {
   return (
     <Paper withBorder ref={receiptRef} bg="#fff" w="100%">
@@ -58,7 +60,7 @@ export const TransactionReceipt = ({
                 {amountType}
               </Text>
               <Text c="var(--prune-text-gray-800)" fw={900} fz={28}>
-                {formatNumber(amount, true, "EUR")}
+                {formatNumber(amount, true, currencyType ?? "EUR")}
               </Text>
             </Stack>
           </BackgroundImage>

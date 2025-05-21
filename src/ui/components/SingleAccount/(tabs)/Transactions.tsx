@@ -187,6 +187,8 @@ export const Transactions = ({
     notifications.clean();
   };
 
+  console.log(data);
+
   return (
     <>
       <InfoCards title="Overview" details={overviewDetails} />

@@ -263,6 +263,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
             ) : (
               <>
                 <TextInput
+                  type="number"
                   classNames={{ input: styles.input, label: styles.label }}
                   flex={1}
                   size="lg"
@@ -276,6 +277,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   errorProps={{ fz: 12 }}
                 />
                 <TextInput
+                  type="number"
                   classNames={{ input: styles.input, label: styles.label }}
                   flex={1}
                   size="lg"

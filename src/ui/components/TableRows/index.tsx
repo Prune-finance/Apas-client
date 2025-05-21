@@ -122,7 +122,11 @@ export const IssuedTransactionTableRows = ({
         }}
       >
         <Link
-          href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
+          href={`${!isUser ? "/admin" : ""}/transactions/${
+            element?.currencyType === "GBP"
+              ? element?.beneficiaryAccountNumber
+              : element.senderIban
+          }`}
         >
           {element?.senderName || "N/A"}
         </Link>

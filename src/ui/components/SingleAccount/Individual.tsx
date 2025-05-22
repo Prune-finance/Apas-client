@@ -528,6 +528,16 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       }
                       placeholder="Enter Account Number"
                       {...form.getInputProps("destinationAccountNumber")}
+                      onKeyDown={(e) => {
+                        const isDigit = /^\d$/.test(e.key);
+                        const currentLength =
+                          form.values.destinationAccountNumber.length;
+
+                        if (isDigit && currentLength >= 8) {
+                          e.preventDefault(); // stop more digits from being typed
+                          return;
+                        }
+                      }}
                       errorProps={{ fz: 12 }}
                     />
                     <TextInput
@@ -542,6 +552,16 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       }
                       placeholder="Enter Sort Code"
                       {...form.getInputProps("destinationSortCode")}
+                      onKeyDown={(e) => {
+                        const isDigit = /^\d$/.test(e.key);
+                        const currentLength =
+                          form.values.destinationSortCode.length;
+
+                        if (isDigit && currentLength >= 6) {
+                          e.preventDefault(); // stop more digits from being typed
+                          return;
+                        }
+                      }}
                       errorProps={{ fz: 12 }}
                     />
                   </>

@@ -21,6 +21,7 @@ import { useUserBusiness } from "@/lib/hooks/businesses";
 import { useParams, useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
+import { useDebouncedValue } from "@mantine/hooks";
 
 function Account() {
   const params = useParams<{ id: string }>();
@@ -36,7 +37,10 @@ function Account() {
     endDate,
     recipientName,
     recipientIban,
+    search,
   } = Object.fromEntries(searchParams.entries());
+
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const param = useMemo(() => {
     return {
@@ -47,6 +51,7 @@ function Account() {
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { beneficiaryName: recipientName }),
       ...(recipientIban && { beneficiaryAccountNumber: recipientIban }),
+      ...(debouncedSearch && { search: debouncedSearch }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -60,6 +65,7 @@ function Account() {
     recipientIban,
     active,
     limit,
+    debouncedSearch,
   ]);
 
   const {

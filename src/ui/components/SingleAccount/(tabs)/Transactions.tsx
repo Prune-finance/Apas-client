@@ -73,7 +73,7 @@ export const Transactions = ({
   const [search, setSearch] = useQueryState("search", {
     defaultValue: "",
     history: "push",
-    throttleMs: 3000,
+    throttleMs: 500,
     shallow: false,
   });
 

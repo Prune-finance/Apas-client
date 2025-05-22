@@ -104,7 +104,7 @@ function Account() {
       <SingleDefaultAccountBody
         accountType={account?.AccountRequests?.Currency?.symbol}
         account={account}
-        location="own-account"
+        location="gbp-account"
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

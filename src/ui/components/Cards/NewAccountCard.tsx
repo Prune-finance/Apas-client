@@ -145,9 +145,13 @@ function NewAccountCard({
       <Stack align="flex-start" justify="space-between" gap={20} p={16}>
         <Flex align="center" justify="space-between" w="100%">
           <Group gap={8}>
-            <ThemeIcon color="transparent" radius="xl">
-              {config.icon}
-            </ThemeIcon>
+            {!loading ? (
+              <ThemeIcon color="transparent" radius="xl">
+                {config.icon}
+              </ThemeIcon>
+            ) : (
+              <Skeleton h={20} w={20} />
+            )}
 
             {!loading ? (
               <Text c="#1D2939" fw={600}>{`${currency} ${
@@ -158,24 +162,28 @@ function NewAccountCard({
             )}
           </Group>
 
-          <Group gap={8} align="center">
-            <Group
-              gap={2}
-              align="center"
-              justify="end"
-              c="var(--prune-text-gray-900)"
-            >
-              {link && (
-                <Link href={link}>
-                  <Box bg="#596603" px={8} p={2} style={{ borderRadius: 12 }}>
-                    <Text fz={10} fw={500} c="#fff">
-                      See More
-                    </Text>
-                  </Box>
-                </Link>
-              )}
+          {!loading ? (
+            <Group gap={8} align="center">
+              <Group
+                gap={2}
+                align="center"
+                justify="end"
+                c="var(--prune-text-gray-900)"
+              >
+                {link && (
+                  <Link href={link}>
+                    <Box bg="#596603" px={8} p={2} style={{ borderRadius: 12 }}>
+                      <Text fz={10} fw={500} c="#fff">
+                        See More
+                      </Text>
+                    </Box>
+                  </Link>
+                )}
+              </Group>
             </Group>
-          </Group>
+          ) : (
+            <Skeleton h={20} w={80} />
+          )}
         </Flex>
 
         <Flex direction="column" align="flex-start" w={"100%"}>
@@ -248,29 +256,33 @@ function NewAccountCard({
                 )}
               </Group>
 
-              <Box onClick={handlePropagation}>
-                <CopyButton
-                  value={
-                    currency === "EUR"
-                      ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
-                      : `Sort Code: ${sortCode},\nAccount Number: ${accountNumber},\nAccount Name: ${companyName}`
-                  }
-                >
-                  {({ copied, copy }) => (
-                    <SecondaryBtn
-                      icon={copied ? IconCheck : IconCopy}
-                      text={copied ? "Copied" : "Copy Details"}
-                      fz={12}
-                      action={copy}
-                      m={0}
-                      px={0}
-                      variant="transparent"
-                      c="#596603"
-                      style={{ border: "none" }}
-                    />
-                  )}
-                </CopyButton>
-              </Box>
+              {!loading ? (
+                <Box onClick={handlePropagation}>
+                  <CopyButton
+                    value={
+                      currency === "EUR"
+                        ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
+                        : `Sort Code: ${sortCode},\nAccount Number: ${accountNumber},\nAccount Name: ${companyName}`
+                    }
+                  >
+                    {({ copied, copy }) => (
+                      <SecondaryBtn
+                        icon={copied ? IconCheck : IconCopy}
+                        text={copied ? "Copied" : "Copy Details"}
+                        fz={12}
+                        action={copy}
+                        m={0}
+                        px={0}
+                        variant="transparent"
+                        c="#596603"
+                        style={{ border: "none" }}
+                      />
+                    )}
+                  </CopyButton>
+                </Box>
+              ) : (
+                <Skeleton h={20} w={100} />
+              )}
             </Flex>
           </Group>
         </Flex>

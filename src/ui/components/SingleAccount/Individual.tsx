@@ -219,7 +219,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      First Name
+                      First Name <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter first name"
@@ -235,7 +235,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      Last Name
+                      Last Name <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter last name"
@@ -255,7 +255,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          IBAN
+                          IBAN <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       placeholder="Enter IBAN"
@@ -268,7 +268,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          BIC
+                          BIC <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       placeholder="Enter BIC"
@@ -279,12 +279,13 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                 ) : (
                   <>
                     <TextInput
+                      type="number"
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          Account Number
+                          Account Number <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       placeholder="Enter Account Number"
@@ -292,12 +293,13 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       errorProps={{ fz: 12 }}
                     />
                     <TextInput
+                      type="number"
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          Sort Code
+                          Sort Code <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       placeholder="Enter Sort Code"
@@ -360,7 +362,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          Bank
+                          Bank <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       disabled={disableBank}
@@ -414,7 +416,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       }}
                       label={
                         <Text fz={14} c="#667085">
-                          Amount
+                          Amount <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       hideControls
@@ -433,7 +435,11 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Select Country"
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
-                      label="Country"
+                      label={
+                        <Text fz={14} c="#667086">
+                          Country <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       data={countries.map((c) => c?.name)}
                       disabled={disableCountry}
                       {...form.getInputProps("destinationCountry")}
@@ -463,7 +469,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       }}
                       label={
                         <Text fz={14} c="#667085">
-                          Narration
+                          Narration <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       placeholder="Enter narration"

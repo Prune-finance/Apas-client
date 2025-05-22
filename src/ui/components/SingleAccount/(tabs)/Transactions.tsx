@@ -232,7 +232,9 @@ export const Transactions = ({
           {...form.getInputProps("recipientName")}
         />
         <TextBox
-          placeholder="Beneficiary IBAN"
+          placeholder={
+            currencyType === "GBP" ? "Account Number" : "Beneficiary IBAN"
+          }
           {...form.getInputProps("recipientIban")}
         />
         <SelectBox

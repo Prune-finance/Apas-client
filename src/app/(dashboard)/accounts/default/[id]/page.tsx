@@ -45,8 +45,8 @@ function Account() {
       ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
       ...(type && { type: type }),
       ...(senderName && { senderName: senderName }),
-      ...(recipientName && { recipientName: recipientName }),
-      ...(recipientIban && { recipientIban: recipientIban }),
+      ...(recipientName && { beneficiaryName: recipientName }),
+      ...(recipientIban && { beneficiaryAccountNumber: recipientIban }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };

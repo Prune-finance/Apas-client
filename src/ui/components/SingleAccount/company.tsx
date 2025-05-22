@@ -274,6 +274,16 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   }
                   placeholder="Enter Account Number"
                   {...form2.getInputProps("destinationAccountNumber")}
+                  onKeyDown={(e) => {
+                    const isDigit = /^\d$/.test(e.key);
+                    const currentLength =
+                      form2.values.destinationAccountNumber.length;
+
+                    if (isDigit && currentLength >= 8) {
+                      e.preventDefault(); // stop more digits from being typed
+                      return;
+                    }
+                  }}
                   errorProps={{ fz: 12 }}
                 />
                 <TextInput
@@ -288,6 +298,16 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   }
                   placeholder="Enter Sort Code"
                   {...form2.getInputProps("destinationSortCode")}
+                  onKeyDown={(e) => {
+                    const isDigit = /^\d$/.test(e.key);
+                    const currentLength =
+                      form2.values.destinationSortCode.length;
+
+                    if (isDigit && currentLength >= 6) {
+                      e.preventDefault(); // stop more digits from being typed
+                      return;
+                    }
+                  }}
                   errorProps={{ fz: 12 }}
                 />
               </>

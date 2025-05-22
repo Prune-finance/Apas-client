@@ -165,10 +165,17 @@
   resolved "https://registry.npmjs.org/@mantine/store/-/store-7.10.2.tgz"
   integrity sha512-izT4ivE2Ka2NBTjy5Ck31F3sSybCBLXJhX/ESDCasVR9MKD2Ci2Y6nbm0UtBdPf4+PrDPZtaPwqQzL92uZLtCQ==
 
+<<<<<<< HEAD
 "@mapbox/node-pre-gyp@^1.0.0":
   version "1.0.11"
   resolved "https://registry.yarnpkg.com/@mapbox/node-pre-gyp/-/node-pre-gyp-1.0.11.tgz#417db42b7f5323d79e93b34a6d7a2a12c0df43fa"
   integrity sha512-Yhlar6v9WQgUp/He7BdgzOz8lqMQ8sU+jkCq7Wx8Myc5YFJLbEe7lgui/V7G1qB1DJykHSGwreceSaD60Y0PUQ==
+=======
+"@napi-rs/wasm-runtime@^0.2.8":
+  version "0.2.8"
+  resolved "https://registry.yarnpkg.com/@napi-rs/wasm-runtime/-/wasm-runtime-0.2.8.tgz#642e8390ee78ed21d6b79c467aa610e249224ed6"
+  integrity sha512-OBlgKdX7gin7OIq4fadsjpg+cp2ZphvAIKucHsNfTdJiqdOmOEwQd/bHi0VwNrcw5xpBJyUw6cK/QilCqy1BSg==
+>>>>>>> 75d7ec7 (build: update pdfjs-dist to 4.8.69 and remove unused dependencies)
   dependencies:
     detect-libc "^2.0.0"
     https-proxy-agent "^5.0.0"
@@ -2641,6 +2648,7 @@ pdfjs-dist@4.4.168:
     canvas "^2.11.2"
     path2d "^0.2.0"
 
+<<<<<<< HEAD
 pdfjs-dist@^4.7.76:
   version "4.7.76"
   resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-4.7.76.tgz#abd1df2b94d22b4a467f91b89e33f3b45b60330f"
@@ -2649,6 +2657,8 @@ pdfjs-dist@^4.7.76:
     canvas "^2.11.2"
     path2d "^0.2.1"
 
+=======
+>>>>>>> 75d7ec7 (build: update pdfjs-dist to 4.8.69 and remove unused dependencies)
 performance-now@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"

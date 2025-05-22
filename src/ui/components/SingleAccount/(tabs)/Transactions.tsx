@@ -128,6 +128,7 @@ export const Transactions = ({
       dayjs(date).format("YYYY-MM-DD")
     );
     const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
+
     const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
 
     // Define the possible URLs based on location
@@ -138,6 +139,7 @@ export const Transactions = ({
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`,
+      "gbp-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction/account-statement/${accountID}?date=${startDate}&endDate=${endDate}`,
     };
 
     // Use the default URL if location is undefined or not in urlMap
@@ -154,6 +156,8 @@ export const Transactions = ({
           "No transactions found for the selected date range"
         );
       }
+
+      console.log(res?.data);
 
       setDownloadData(res.data);
       setDownloadMeta(res.meta);
@@ -232,7 +236,9 @@ export const Transactions = ({
           {...form.getInputProps("recipientName")}
         />
         <TextBox
-          placeholder="Beneficiary IBAN"
+          placeholder={
+            currencyType === "GBP" ? "Account Number" : "Beneficiary IBAN"
+          }
           {...form.getInputProps("recipientIban")}
         />
         <SelectBox

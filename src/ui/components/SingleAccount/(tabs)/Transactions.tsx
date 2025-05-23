@@ -225,7 +225,13 @@ export const Transactions = ({
         opened={openedFilter}
         toggle={toggle}
         form={form}
-        customStatusOption={["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"]}
+        customStatusOption={[
+          "PENDING",
+          "CONFIRMED",
+          "REJECTED",
+          "CANCELLED",
+          "FAILED",
+        ]}
       >
         <TextBox
           placeholder="Sender Name"

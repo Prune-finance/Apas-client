@@ -335,7 +335,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Enter Account Number"
                       {...form.getInputProps("destinationAccountNumber")}
                       onKeyDown={(e) => {
-                        if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                        if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
                           e.preventDefault(); // Prevent increment/decrement via arrow keys
                         }
 
@@ -364,7 +364,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Enter Sort Code"
                       {...form.getInputProps("destinationSortCode")}
                       onKeyDown={(e) => {
-                        if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                        if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
                           e.preventDefault(); // Prevent increment/decrement via arrow keys
                         }
 
@@ -376,6 +376,21 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           e.preventDefault(); // stop more digits from being typed
                           return;
                         }
+                      }}
+                      onPaste={(e) => {
+                        e.preventDefault();
+                        const pasted = e.clipboardData
+                          .getData("Text")
+                          .replace(/-/g, ""); // remove dashes
+                        const digitsOnly = pasted.replace(/\D/g, ""); // keep only digits
+
+                        const currentValue = form.values.destinationSortCode;
+                        const newValue = (currentValue + digitsOnly).slice(
+                          0,
+                          6
+                        ); // limit to 6 digits
+
+                        form.setFieldValue("destinationSortCode", newValue);
                       }}
                       onWheel={(event) => event.currentTarget.blur()}
                       errorProps={{ fz: 12 }}

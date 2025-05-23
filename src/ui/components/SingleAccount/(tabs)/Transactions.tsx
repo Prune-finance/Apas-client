@@ -404,6 +404,7 @@ export interface AccountDetails {
   country: string;
   accountName: string;
   createdAt: string;
+  sortCode?: string;
 }
 
 export interface DownloadStatementData {

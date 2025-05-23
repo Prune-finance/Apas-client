@@ -53,6 +53,13 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
       : {
           "Account Number": meta?.accountDetails?.iban ?? "N/A",
         }),
+
+    ...(currencyType === "GBP"
+      ? {
+          "Sort Code": meta?.accountDetails?.sortCode,
+        }
+      : {}),
+
     Country: meta?.accountDetails?.country ?? "N/A",
     "Account Name": meta?.accountDetails?.accountName ?? "N/A",
   };
@@ -61,7 +68,7 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
     "Opening Balance": formatNumber(
       meta?.summary?.openingBalance?.balance ?? 0,
       true,
-      "EUR"
+      currencyType ?? "EUR"
     ),
     "Money Out": formatNumber(meta?.out ?? 0, true, currencyType ?? "EUR"),
     "Money In": formatNumber(meta?.in ?? 0, true, currencyType ?? "EUR"),
@@ -131,7 +138,7 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
             px={24}
             py={28}
             w={318}
-            h={200}
+            h={240}
             radius={12}
           >
             <Flex align="center" justify="flex-start" gap={4} mb={24}>

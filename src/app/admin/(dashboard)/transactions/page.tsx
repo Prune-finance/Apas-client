@@ -20,7 +20,13 @@ function TransactionForAccount() {
 
   const { data, close, opened: openedDrawer } = Transaction();
 
-  const customStatusOption = ["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"];
+  const customStatusOption = [
+    "PENDING",
+    "CONFIRMED",
+    "REJECTED",
+    "CANCELLED",
+    "FAILED",
+  ];
 
   return (
     <main>

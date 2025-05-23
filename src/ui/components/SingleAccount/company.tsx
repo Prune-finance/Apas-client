@@ -28,7 +28,11 @@ import {
 import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
+import {
+  DefaultAccount,
+  validateAccount,
+  validateAccountGBP,
+} from "@/lib/hooks/accounts";
 import DropzoneComponent from "../Dropzone";
 import { sendMoneyCompanyValidate } from "@/lib/schema";
 // import { countries } from "@/lib/static";
@@ -189,6 +193,45 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     }
   };
 
+  const handleIbanValidationGBP = async () => {
+    setProcessing(true);
+    setValidated(null);
+    setDisableAddress(false);
+    setDisableBank(false);
+    setDisableCountry(false);
+    setShowBadge(true);
+
+    try {
+      const data = await validateAccountGBP({
+        accountNumber: removeWhitespace(accountNumber),
+        sortCode: removeWhitespace(sortCode),
+      });
+
+      if (data) {
+        form2.setValues({
+          bankAddress: data.bankAddress || data.city,
+          destinationBank: data.bankName,
+          // destinationCountry: data.bankTown,
+        });
+
+        setValidated(true);
+        if (data.bankAddress || data.city) setDisableAddress(true);
+        if (data.bankName) setDisableBank(true);
+        // if (data.bankTown) setDisableCountry(true);
+      } else {
+        setValidated(false);
+        if (ref && typeof ref !== "function" && ref.current) {
+          ref.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   useEffect(() => {
     if (iban && bic) {
       handleIbanValidation();
@@ -199,7 +242,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
   useEffect(() => {
     if (accountNumber && sortCode) {
-      handleIbanValidation();
+      handleIbanValidationGBP();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -1,7 +1,7 @@
 import { formatNumber, removeWhitespace } from "@/lib/utils";
 import { Modal, Text } from "@mantine/core";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SuccessModal from "../../SuccessModal";
 import PreviewState from "../previewState";
 import SendMoneyModal from "../sendMoneyModal";
@@ -263,6 +263,14 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     closeDebtor();
     closeSuccess();
   };
+
+  useEffect(() => {
+    revalidate();
+    gbpRevalidate();
+
+    console.log("I Ran");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened]);
 
   return (
     <>

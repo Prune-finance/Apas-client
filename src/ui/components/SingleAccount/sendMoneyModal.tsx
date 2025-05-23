@@ -144,7 +144,7 @@ function SendMoneyModal({
             </Text>
 
             {loading ? (
-              <Skeleton h={30} my={10} w={200} />
+              <Skeleton h={40} my={10} w={140} />
             ) : (
               <Text fz={32} fw={600} c="#344054" mt={0} mb={16}>
                 {formatNumber(

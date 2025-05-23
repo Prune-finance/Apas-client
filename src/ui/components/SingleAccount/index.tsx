@@ -667,6 +667,8 @@ interface SingleDefaultAccountProps
   extends Omit<SingleAccountProps, "account"> {
   account: DefaultAccount | null;
   location?: string;
+  accountType?: string;
+  revalidateTrx?: () => void;
 }
 
 export const SingleDefaultAccountBody = ({
@@ -683,6 +685,7 @@ export const SingleDefaultAccountBody = ({
   children,
   location,
   revalidate,
+  revalidateTrx,
   isUser,
 }: SingleDefaultAccountProps) => {
   /**
@@ -692,6 +695,8 @@ export const SingleDefaultAccountBody = ({
    * @returns {Array<{ value: string }>} - An array of objects with the value key
    * @example - [{ value: "Account Details" }, { value: "Transactions" }, { value: "Statistics" }, { value: "Documents" }]
    */
+
+  const [tab, setTab] = useState<string | null>("Account Details");
 
   const tabs: Array<{ value: string }> = [
     { value: "Account Details" },
@@ -714,7 +719,16 @@ export const SingleDefaultAccountBody = ({
         business={business}
       />
 
-      <TabsComponent tabs={tabs} mt={40}>
+      <TabsComponent
+        tabs={tabs}
+        mt={40}
+        showRefreshBtn
+        refreshButtonIndex={tab}
+        value={tab}
+        onChange={setTab}
+        loading={loadingTrx}
+        revalidate={revalidateTrx}
+      >
         <TabsPanel value={tabs[0].value} mt={28}>
           <DefaultAccountDetails account={account} loading={loading} />
         </TabsPanel>

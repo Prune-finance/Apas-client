@@ -114,7 +114,8 @@ export default function OnboardingRegister() {
         }}
         label="Password"
         flex={1}
-        placeholder="Enter Password"
+        // placeholder="Enter Password"
+        placeholder="Create Password" //FIXME: BILKIS ASKED FOR ENTER TO BE CHANGED TO CREATE
         size="xs"
         {...form.getInputProps("password")}
         key={form.key("password")}

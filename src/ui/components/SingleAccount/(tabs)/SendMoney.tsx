@@ -268,7 +268,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     revalidate();
     gbpRevalidate();
 
-    console.log("I Ran");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 

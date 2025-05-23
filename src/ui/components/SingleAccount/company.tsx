@@ -276,6 +276,10 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   placeholder="Enter Account Number"
                   {...form2.getInputProps("destinationAccountNumber")}
                   onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                      e.preventDefault(); // Prevent increment/decrement via arrow keys
+                    }
+
                     const isDigit = /^\d$/.test(e.key);
                     const currentLength =
                       form2.values.destinationAccountNumber.length;
@@ -285,6 +289,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       return;
                     }
                   }}
+                  onWheel={(event) => event.currentTarget.blur()}
                   errorProps={{ fz: 12 }}
                 />
                 <TextInput
@@ -300,6 +305,10 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   placeholder="Enter Sort Code"
                   {...form2.getInputProps("destinationSortCode")}
                   onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                      e.preventDefault(); // Prevent increment/decrement via arrow keys
+                    }
+
                     const isDigit = /^\d$/.test(e.key);
                     const currentLength =
                       form2.values.destinationSortCode.length;
@@ -309,6 +318,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       return;
                     }
                   }}
+                  onWheel={(event) => event.currentTarget.blur()}
                   errorProps={{ fz: 12 }}
                 />
               </>

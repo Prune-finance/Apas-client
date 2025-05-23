@@ -292,6 +292,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Enter Account Number"
                       {...form.getInputProps("destinationAccountNumber")}
                       onKeyDown={(e) => {
+                        if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                          e.preventDefault(); // Prevent increment/decrement via arrow keys
+                        }
+
                         const isDigit = /^\d$/.test(e.key);
                         const currentLength =
                           form.values.destinationAccountNumber.length;
@@ -301,6 +305,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           return;
                         }
                       }}
+                      onWheel={(event) => event.currentTarget.blur()}
                       errorProps={{ fz: 12 }}
                     />
                     <TextInput
@@ -316,6 +321,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Enter Sort Code"
                       {...form.getInputProps("destinationSortCode")}
                       onKeyDown={(e) => {
+                        if (["ArrowUp", "ArrowDown"].includes(e.key)) {
+                          e.preventDefault(); // Prevent increment/decrement via arrow keys
+                        }
+
                         const isDigit = /^\d$/.test(e.key);
                         const currentLength =
                           form.values.destinationSortCode.length;
@@ -325,6 +334,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           return;
                         }
                       }}
+                      onWheel={(event) => event.currentTarget.blur()}
                       errorProps={{ fz: 12 }}
                     />
                   </>

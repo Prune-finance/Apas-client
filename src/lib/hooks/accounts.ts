@@ -323,10 +323,30 @@ export async function validateAccount({
     return null;
   }
 }
+export async function validateAccountGBP({
+  accountNumber,
+  sortCode,
+}: {
+  accountNumber: string;
+  sortCode: string;
+}): Promise<ValidatedIban | null> {
+  try {
+    const { data } = await axios.post(`/accounts/validate/dashboard`, {
+      accountNumber,
+      sortCode,
+      currency: "GBP",
+    });
+    return data.data;
+  } catch (error) {
+    return null;
+  }
+}
 
 export interface ValidatedIban {
   swiftCodes: string;
   bankName: string;
+  bankTown: string;
+  bankAddress: string;
   bankBranch: string;
   address: string;
   city: string;

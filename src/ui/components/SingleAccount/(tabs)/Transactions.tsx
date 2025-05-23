@@ -157,7 +157,7 @@ export const Transactions = ({
         );
       }
 
-      console.log(res?.data);
+      console.log(res?.data, res?.meta);
 
       setDownloadData(res.data);
       setDownloadMeta(res.meta);

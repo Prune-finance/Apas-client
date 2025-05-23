@@ -44,12 +44,12 @@ export const AccountsTab = () => {
 
 const tabs = [
   {
-    title: "Euro Transaction",
+    title: "EUR Transaction",
     value: "eur-account",
     icon: <Image src={EUIcon.src} alt="icon" h={20} w={20} />,
   },
   {
-    title: "Pounds Transactions",
+    title: "GBP Transactions",
     value: "gbp-accounts",
     icon: <Image src={GBPIcon.src} alt="icon" h={20} w={20} />,
   },

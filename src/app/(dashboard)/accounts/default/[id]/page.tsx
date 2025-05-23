@@ -90,7 +90,7 @@ function Account() {
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
-          { title: "Own Accounts", href: "/accounts/default" },
+          { title: "Own Accounts", href: "/accounts" },
           {
             title: account?.accountName || "",
             href: `/accounts/default`,

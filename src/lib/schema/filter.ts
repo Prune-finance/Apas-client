@@ -84,6 +84,7 @@ export interface IParams {
   query?: string;
   bank?: string;
   beneficiaryName?: string;
+  beneficiaryAccountNumber?: string;
   destinationIban?: string;
   destinationBank?: string;
   firstName?: string;

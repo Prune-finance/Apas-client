@@ -8,13 +8,10 @@ import {
   Flex,
   Grid,
   GridCol,
-  Menu,
-  MenuTarget,
   Skeleton,
   TableTd,
   TableTr,
   Text,
-  UnstyledButton,
 } from "@mantine/core";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -27,13 +24,37 @@ import {
 } from "@/lib/hooks/eligibility-center";
 import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { IconDots } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { calculateTotalPages } from "@/lib/utils";
+import PaginationComponent from "@/ui/components/Pagination";
 
 function EligibilityCenter() {
+  // const [search, setSearch] = useState("");
+  // const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const searchParams = useSearchParams();
+  const [opened, { toggle }] = useDisclosure(false);
+
+  const [active, setActive] = useState(1);
+  const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+
+  const { status, date, endDate, name, contactEmail } = Object.fromEntries(
+    searchParams.entries()
+  );
+
+  const queryParams = {
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
+    status: status ? status.toUpperCase() : "",
+    business: name,
+    email: contactEmail,
+    limit: parseInt(limit ?? "10", 10),
+    page: active,
+    search: debouncedSearch,
+  };
 
   const { data, meta, loading, revalidate } = useOnboardingBusiness({
     search: debouncedSearch,
@@ -107,6 +128,14 @@ function EligibilityCenter() {
           loading={loading}
           title="There are no profiles"
           text="When a profile is created, it will appear here."
+        />
+
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={calculateTotalPages(limit, meta?.total)}
         />
       </div>
     </main>

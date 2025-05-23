@@ -25,6 +25,7 @@ import {
 import { formatNumber } from "@/lib/utils";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
+import GBP from "@/assets/GB.png";
 
 dayjs.extend(advancedFormat);
 
@@ -40,11 +41,18 @@ interface Props {
   receiptRef?: RefObject<HTMLDivElement>;
   data?: DownloadStatementData[];
   meta?: downloadStatementMeta | null;
+  currencyType?: string;
 }
 
-function DownloadStatement({ receiptRef, data, meta }: Props) {
+function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
   const accountDetails = {
-    IBAN: meta?.accountDetails?.iban ?? "N/A",
+    ...(currencyType === "EUR"
+      ? {
+          IBAN: meta?.accountDetails?.iban ?? "N/A",
+        }
+      : {
+          "Account Number": meta?.accountDetails?.iban ?? "N/A",
+        }),
     Country: meta?.accountDetails?.country ?? "N/A",
     "Account Name": meta?.accountDetails?.accountName ?? "N/A",
   };
@@ -55,12 +63,12 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
       true,
       "EUR"
     ),
-    "Money Out": formatNumber(meta?.out ?? 0, true, "EUR"),
-    "Money In": formatNumber(meta?.in ?? 0, true, "EUR"),
+    "Money Out": formatNumber(meta?.out ?? 0, true, currencyType ?? "EUR"),
+    "Money In": formatNumber(meta?.in ?? 0, true, currencyType ?? "EUR"),
     "Closing Balance": formatNumber(
       meta?.summary?.closingBalance?.balance ?? 0,
       true,
-      "EUR"
+      currencyType ?? "EUR"
     ),
   };
 
@@ -131,13 +139,13 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
                 <Image
                   width={36}
                   height={35}
-                  src={EUIcon.src}
+                  src={currencyType === "EUR" ? EUIcon.src : GBP.src}
                   alt="eu-icon"
                   fit="contain"
                 />
               </Box>
               <Text fz={16} fw={600} c="#1D2939">
-                EUR Account
+                {currencyType === "EUR" ? "EUR" : "GBP"} Account
               </Text>
             </Flex>
 
@@ -211,14 +219,14 @@ function DownloadStatement({ receiptRef, data, meta }: Props) {
               dayjs(item?.createdAt).format("Do MMMM YYYY"),
               item?.description ?? item?.ref ?? "-",
               item?.type === "CREDIT"
-                ? formatNumber(item?.amount ?? 0, true, "EUR")
-                : formatNumber(0, true, "EUR"),
+                ? formatNumber(item?.amount ?? 0, true, currencyType ?? "EUR")
+                : formatNumber(0, true, currencyType ?? "EUR"),
               item?.type === "DEBIT"
-                ? formatNumber(item?.amount ?? 0, true, "EUR")
-                : formatNumber(0, true, "EUR"),
+                ? formatNumber(item?.amount ?? 0, true, currencyType ?? "EUR")
+                : formatNumber(0, true, currencyType ?? "EUR"),
               item?.balance
-                ? formatNumber(item?.balance, true, "EUR")
-                : formatNumber(0, true, "EUR"),
+                ? formatNumber(item?.balance, true, currencyType ?? "EUR")
+                : formatNumber(0, true, currencyType ?? "EUR"),
             ]),
           }}
           w="100%"

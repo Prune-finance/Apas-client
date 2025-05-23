@@ -549,6 +549,75 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
   return { loading, transactions, meta, revalidate };
 }
 
+export function useDefaultAccountTransactionsGBP(customParams: IParams = {}) {
+  console.log(customParams);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.beneficiaryName && {
+        beneficiaryName: customParams.beneficiaryName,
+      }),
+      ...(customParams.recipientIban && {
+        beneficiaryAccountNumber: customParams.recipientIban,
+      }),
+      ...(customParams.search && { search: customParams.search }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+    try {
+      setLoading(true);
+
+      const { data } = await axios.get(`/admin/accounts/transactions/gbp`, {
+        params,
+      });
+
+      console.log(data);
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    customParams.limit,
+    customParams.page,
+    customParams.date,
+    customParams.endDate,
+    customParams.status,
+    customParams.type,
+    customParams.recipientIban,
+    customParams.beneficiaryName,
+    customParams.senderName,
+    customParams.not,
+    customParams.search,
+  ]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
 export function usePayoutTransactions(customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);

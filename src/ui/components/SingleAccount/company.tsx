@@ -37,6 +37,7 @@ import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import TransactionProcessTimeGBP from "./TransactionProcessTimeGBP";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -514,7 +515,11 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
             </Box>
           </Flex>
 
-          <TransactionProcessingTimes />
+          {switchCurrency === "EUR" ? (
+            <TransactionProcessingTimes />
+          ) : (
+            <TransactionProcessTimeGBP />
+          )}
         </ScrollArea>
 
         <Flex mt={24} justify="flex-end" gap={15}>

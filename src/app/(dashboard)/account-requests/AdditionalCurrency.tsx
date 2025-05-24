@@ -3,7 +3,6 @@ import {
   useBusinessCurrencyRequests,
 } from "@/lib/hooks/requests";
 import {
-  currencyRequest,
   FilterSchema,
   FilterType,
   FilterValues,

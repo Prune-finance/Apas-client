@@ -74,11 +74,6 @@ import { BusinessData } from "@/lib/hooks/businesses";
 import { Documents } from "./(tabs)/Documents";
 import DefaultAccountDetails from "./(defaultTabs)/DefaultAccountDetails";
 import { DefaultDocuments } from "./(defaultTabs)/DefaultDocuments";
-import SendMoneyModal from "./sendMoneyModal";
-import PreviewState from "./previewState";
-import SuccessModal from "../SuccessModal";
-// import SuccessModalImage from "@/assets/success-modal-image.png";
-import PendingModalImage from "@/assets/pending-image.png";
 import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
@@ -687,6 +682,7 @@ export const SingleDefaultAccountBody = ({
   revalidate,
   revalidateTrx,
   isUser,
+  accountType,
 }: SingleDefaultAccountProps) => {
   /**
    * @description - Tabs for the default account
@@ -717,6 +713,7 @@ export const SingleDefaultAccountBody = ({
         revalidate={revalidate}
         main={location === "own-account" || location === "admin-default"}
         business={business}
+        currencyType={accountType}
       />
 
       <TabsComponent
@@ -730,7 +727,11 @@ export const SingleDefaultAccountBody = ({
         revalidate={revalidateTrx}
       >
         <TabsPanel value={tabs[0].value} mt={28}>
-          <DefaultAccountDetails account={account} loading={loading} />
+          <DefaultAccountDetails
+            account={account}
+            loading={loading}
+            accountType={accountType}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
@@ -874,10 +875,11 @@ export const DefaultAccountHead = ({
     useDisclosure(false);
   const { handleError, handleSuccess } = useNotification();
   const [processingTrust, setProcessingTrust] = useState(false);
+  const isInitiator = useHasPermission("INITIATOR");
+  const canSendMoney =
+    useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
-  const isInitiator = useHasPermission("INITIATOR")
-  const canSendMoney = useHasPermission("Transaction Initiation") || isInitiator;
 
   const { setSwitchCurrency } = useCurrencySwitchStore();
 
@@ -1042,6 +1044,7 @@ interface AccountInfoProps {
   isUser?: boolean;
   revalidate?: () => Promise<void>;
   business: BusinessData | null;
+  currencyType?: string;
 }
 
 export const AccountInfo = ({
@@ -1054,6 +1057,7 @@ export const AccountInfo = ({
   isUser,
   revalidate,
   business,
+  currencyType,
 }: AccountInfoProps) => {
   const [processing, setProcessing] = useState(false);
   const { handleError } = useNotification();
@@ -1064,7 +1068,7 @@ export const AccountInfo = ({
       "Do MMMM, YYYY"
     ),
     "No. of Transaction": trxMeta?.total ?? 0,
-    Currency: "EUR",
+    Currency: currencyType ?? "EUR",
   };
 
   const accountType = payout
@@ -1110,7 +1114,11 @@ export const AccountInfo = ({
 
             {!loading || !loadingTrx ? (
               <Text fz={24} fw={600} c="var(--prune-text-gray-800)" mt={8}>
-                {formatNumber(account?.accountBalance ?? 0, true, "EUR")}
+                {formatNumber(
+                  account?.accountBalance ?? 0,
+                  true,
+                  currencyType ?? "EUR"
+                )}
               </Text>
             ) : (
               <Skeleton w={100} h={30} />

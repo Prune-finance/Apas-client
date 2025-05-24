@@ -538,8 +538,6 @@ export function UserHeader() {
           </Stack>
         </div>
       </header>
-
-      <NoticeBanner />
     </>
   );
 }

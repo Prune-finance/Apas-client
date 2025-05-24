@@ -9,17 +9,24 @@ import {
   Stack,
   Skeleton,
   Text,
+  Image,
 } from "@mantine/core";
 import { GiEuropeanFlag } from "react-icons/gi";
 import { PrimaryBtn } from "../../Buttons";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
-
+import GBImage from "@/assets/GB.png";
+import EUImage from "@/assets/EU-icon.png";
 interface Props {
   account: DefaultAccount | null;
   loading: boolean;
+  accountType?: string;
 }
 
-export default function DefaultAccountDetails({ account, loading }: Props) {
+export default function DefaultAccountDetails({
+  account,
+  loading,
+  accountType,
+}: Props) {
   const accountDetails = {
     "Account Name": account?.accountName,
     [accountType === "GBP" ? "Sort Code" : "IBAN/Account Number"]:

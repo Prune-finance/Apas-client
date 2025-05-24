@@ -61,11 +61,8 @@ import { useHasPermission } from "@/lib/hooks/checkPermission";
 import AddAccount from "./AddAccount";
 import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
-<<<<<<< HEAD
-=======
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
->>>>>>> c24c2e8 (feat: integrate currency switch functionality in Accounts and NewAccountCard components)
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -421,7 +418,7 @@ function Accounts() {
         >
           <TabsPanel value={tabs[0].value}>
             <SimpleGrid cols={3} mt={32}>
-              <AccountCard
+              {/* <AccountCard
                 balance={account?.accountBalance ?? 0}
                 currency="EUR"
                 companyName={account?.accountName ?? "No Default Account"}
@@ -432,7 +429,7 @@ function Accounts() {
                 business={false}
                 refresh
                 revalidate={revalidateDftAcct}
-              />
+              /> */}
 
               <NewAccountCard
                 currency={"EUR"}

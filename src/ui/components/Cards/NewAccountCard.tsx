@@ -6,6 +6,8 @@ import {
   CopyButton,
   Flex,
   Group,
+  Image,
+  Loader,
   Skeleton,
   Stack,
   Text,
@@ -16,16 +18,21 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import createAxiosInstance from "@/lib/axios";
 import newAccountImageEuro from "@/assets/new-account-card.png";
-import { GiEuropeanFlag } from "react-icons/gi";
+import AccountImageGBP from "@/assets/gbp-account-card.png";
+import { GiEuropeanFlag, GiNigeria } from "react-icons/gi";
 import { formatNumber } from "@/lib/utils";
 import { SecondaryBtn } from "../Buttons";
-import { IconCheck, IconCopy } from "@tabler/icons-react";
+import { IconCheck, IconCopy, IconReload } from "@tabler/icons-react";
+import GBImage from "@/assets/GB.png";
+import EUImage from "@/assets/EU-icon.png";
+import { SeeAll } from ".";
+import Link from "next/link";
 
 interface Props extends CardProps {
   currency: string;
   companyName?: string;
-  iban: string;
-  bic: string;
+  iban?: string;
+  bic?: string;
   balance: number;
   link?: string;
   loading: boolean;
@@ -34,15 +41,55 @@ interface Props extends CardProps {
   disable?: boolean;
   children?: React.ReactNode;
   refresh?: boolean;
+  sortCode?: string;
+  accountNumber?: string;
   revalidate?: () => Promise<void>;
   key?: string;
 }
+
+type CurrencyConfig = {
+  background: string;
+  icon: React.ReactNode;
+  bankIdLabel: string;
+  accountIdLabel: string;
+  currencySymbol: string;
+  currencyCode: string;
+};
+
+const currencyConfigs: Record<string, CurrencyConfig> = {
+  EUR: {
+    background: newAccountImageEuro.src,
+    icon: <Image src={EUImage.src} alt="EUR" width={20} height={20} />,
+    bankIdLabel: "BIC",
+    accountIdLabel: "IBAN",
+    currencySymbol: "€",
+    currencyCode: "EUR",
+  },
+  GBP: {
+    background: AccountImageGBP.src,
+    icon: <Image src={GBImage.src} alt="GBP" width={20} height={20} />,
+    bankIdLabel: "Sort Code",
+    accountIdLabel: "Account Number",
+    currencySymbol: "£",
+    currencyCode: "GBP",
+  },
+  NGN: {
+    background: newAccountImageEuro.src,
+    icon: <GiNigeria />,
+    bankIdLabel: "Sort Code",
+    accountIdLabel: "Account Number",
+    currencySymbol: "₦",
+    currencyCode: "NGN",
+  },
+};
 
 function NewAccountCard({
   currency,
   companyName,
   iban,
   bic,
+  sortCode,
+  accountNumber,
   balance,
   link,
   loading,
@@ -55,6 +102,8 @@ function NewAccountCard({
   revalidate,
   ...props
 }: Props) {
+  const config = currencyConfigs[currency] || currencyConfigs.EUR;
+
   const [processing, setProcessing] = useState(false);
   const { handleError, handleSuccess } = useNotification();
   const axios = createAxiosInstance("accounts");
@@ -86,23 +135,32 @@ function NewAccountCard({
       key={key}
       src={config.background}
       h="100%"
-      style={{ borderRadius: 6, overflow: "hidden" }}
+      style={{
+        borderRadius: 6,
+        overflow: "hidden",
+        border: "0.773px solid #ededed",
+      }}
       w="100%"
     >
       <Stack align="flex-start" justify="space-between" gap={20} p={16}>
-        <Group gap={8}>
-          <ThemeIcon color="#0052B4" radius="xl">
-            <GiEuropeanFlag />
-          </ThemeIcon>
+        <Flex align="center" justify="space-between" w="100%">
+          <Group gap={8}>
+            {!loading ? (
+              <ThemeIcon color="transparent" radius="xl">
+                {config.icon}
+              </ThemeIcon>
+            ) : (
+              <Skeleton h={20} w={20} />
+            )}
 
-          {!loading ? (
-            <Text c="#1D2939" fw={600}>{`${currency} ${
-              companyName ? "- " + companyName : ""
-            }`}</Text>
-          ) : (
-            <Skeleton h={10} w={100} />
-          )}
-        </Group>
+            {!loading ? (
+              <Text c="#1D2939" fw={600}>{`${currency} ${
+                companyName ? "- " + companyName : ""
+              }`}</Text>
+            ) : (
+              <Skeleton h={10} w={100} />
+            )}
+          </Group>
 
           {!loading ? (
             <Group gap={8} align="center">

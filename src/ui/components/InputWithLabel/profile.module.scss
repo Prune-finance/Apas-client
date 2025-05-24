@@ -1,0 +1,21 @@
+.profile_input {
+  background-color: #fcfcfd;
+
+  &::placeholder {
+    color: var(--prune-text-gray-800);
+    font-weight: 500;
+    font-size: 14px !important;
+  }
+}
+
+.profile_label {
+  font-size: 12px;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.card {
+  background: #fcfcfd;
+  border: none;
+  padding: 16px;
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import createAxiosInstance from "@/lib/axios";
 import { BusinessData } from "./businesses";
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 import useAxios from "./useAxios";
 import { sanitizedQueryParams, sanitizeURL } from "../utils";
 
@@ -549,6 +549,75 @@ export function useDefaultAccountTransactions(customParams: IParams = {}) {
   return { loading, transactions, meta, revalidate };
 }
 
+export function useDefaultAccountTransactionsGBP(customParams: IParams = {}) {
+  console.log(customParams);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
+  const [meta, setMeta] = useState<Meta | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchTrx() {
+    const queryParams = {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.type && { type: customParams.type }),
+      ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.beneficiaryName && {
+        beneficiaryName: customParams.beneficiaryName,
+      }),
+      ...(customParams.recipientIban && {
+        beneficiaryAccountNumber: customParams.recipientIban,
+      }),
+      ...(customParams.search && { search: customParams.search }),
+    };
+
+    const params = new URLSearchParams(queryParams as Record<string, string>);
+    try {
+      setLoading(true);
+
+      const { data } = await axios.get(`/admin/accounts/transactions/gbp`, {
+        params,
+      });
+
+      console.log(data);
+
+      setTransactions(data.data);
+      setMeta(data.meta);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchTrx();
+
+  useEffect(() => {
+    fetchTrx();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    customParams.limit,
+    customParams.page,
+    customParams.date,
+    customParams.endDate,
+    customParams.status,
+    customParams.type,
+    customParams.recipientIban,
+    customParams.beneficiaryName,
+    customParams.senderName,
+    customParams.not,
+    customParams.search,
+  ]);
+
+  return { loading, transactions, meta, revalidate };
+}
+
 export function usePayoutTransactions(customParams: IParams = {}) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -651,7 +720,10 @@ interface ITrx extends IParams {
   id?: string;
 }
 
-export function useUserTransactions(id: string = "", customParams: ITrx = {}) {
+export function useUserTransactions(
+  id: string = "",
+  customParams: IParams = {}
+) {
   const path = id ? `${id}/transactions` : "transactions";
   const {
     data,
@@ -676,6 +748,23 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
     endpoint: "/accounts/company/transactions",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useUserCurrencyTransactions(customParams: ITrx = {}) {
+  const {
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<TransactionType[], Meta>({
+    endpoint:
+      "currency-accounts/transactions/get-company-currency-account-transactions/GBP",
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -824,7 +913,16 @@ export interface Inquiry {
 
 export interface TransactionType {
   id: string;
+  accessId: string;
   senderIban: string;
+  beneficiaryName: string;
+  beneficiaryAccountNumber: string;
+  beneficiarySortCode: string;
+  beneficiaryInstitutionName: string;
+  beneficiaryAddress: string;
+  senderAccountNumber: string;
+  senderSortCode: string;
+  currencyType: string;
   senderName: string;
   senderBic: string;
   recipientIban: string;

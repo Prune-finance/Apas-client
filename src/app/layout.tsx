@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ColorSchemeScript, createTheme, MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
 
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
@@ -14,15 +14,23 @@ import "@mantine/notifications/styles.css";
 import "@/ui/styles/globals.scss";
 import { NotificationProvider } from "@/ui/components/NotificationProvider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { switzer } from "@/ui/fonts";
 
-export const switzer = localFont({
-  src: "../assets/fonts/Switzer-Regular.woff2",
-});
+// export const switzer = localFont({
+//   src: "../assets/fonts/Switzer-Regular.woff2",
+// });
 
 const metadata: Metadata = {
   title: "Prune",
   description: "Seamless payment across borders",
 };
+
+const theme = createTheme({
+  fontFamily: switzer.className,
+  headings: {
+    fontFamily: switzer.style.fontFamily,
+  },
+});
 
 export default function RootLayout({
   children,
@@ -35,7 +43,7 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={switzer.className}>
-        <MantineProvider>
+        <MantineProvider theme={theme}>
           <NotificationProvider />
           {/* <Notifications
             position={"top-center"}

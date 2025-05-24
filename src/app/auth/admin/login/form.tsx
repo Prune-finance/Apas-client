@@ -6,7 +6,6 @@ import useNotification from "@/lib/hooks/notification";
 import { LoginType, loginValues, validateLogin } from "@/lib/schema";
 import User from "@/lib/store/user";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { LoginInput } from "@/ui/components/Inputs";
 import { Box, Checkbox, PasswordInput, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";

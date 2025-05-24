@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Meta } from "./transactions";
+
 import { useState, useEffect, useMemo } from "react";
-import { IParams } from "../schema";
-import { custom } from "zod";
+import { IParams } from "@/lib/schema";
 
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "./useAxios";
@@ -324,10 +323,30 @@ export async function validateAccount({
     return null;
   }
 }
+export async function validateAccountGBP({
+  accountNumber,
+  sortCode,
+}: {
+  accountNumber: string;
+  sortCode: string;
+}): Promise<ValidatedIban | null> {
+  try {
+    const { data } = await axios.post(`/accounts/validate/dashboard`, {
+      accountNumber,
+      sortCode,
+      currency: "GBP",
+    });
+    return data.data;
+  } catch (error) {
+    return null;
+  }
+}
 
 export interface ValidatedIban {
   swiftCodes: string;
   bankName: string;
+  bankTown: string;
+  bankAddress: string;
   bankBranch: string;
   address: string;
   city: string;
@@ -473,6 +492,102 @@ export function useUserDefaultAccount() {
   return { loading, account, revalidate };
 }
 
+export function useUserCurrencyAccountByID(id: string) {
+  const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/currency-accounts/${id}`);
+      console.log(data);
+      setCurrencyAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, currencyAccount, revalidate };
+}
+
+export function useUserCurrencyAccount() {
+  const [currencyAccount, setCurrencyAccount] = useState<
+    CurrencyAccount[] | null
+  >(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/currency-accounts/list`);
+
+      setCurrencyAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, currencyAccount, revalidate };
+}
+
+export function useUserCurrencyGBPAccount() {
+  const [account, setAccount] = useState<DefaultAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/get-account-by-currency/GBP`
+      );
+
+      setAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+
 export function useUserDefaultPayoutAccount() {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
@@ -577,6 +692,10 @@ export interface BaseAccount {
   companyName?: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
   isTrusted?: boolean;
+  sortCode: string;
+  AccountRequests?: {
+    Currency: Record<string, any>;
+  };
 }
 
 export interface UserAccount extends BaseAccount {
@@ -612,6 +731,30 @@ export interface Director {
 export type Account = UserAccount | CorporateAccount;
 
 export type DefaultAccount = UserAccount | DefaultCorporateAccount;
+
+export interface CurrencyAccount {
+  id: string;
+  firstName: string;
+  lastName: string;
+  isTrusted: boolean;
+  accountRequestId: string;
+  accountIdentifier: string;
+  accountName: string;
+  accountNumber: string;
+  accountIban: string;
+  accountType: "COMPANY_ACCOUNT" | string;
+  accountBalance: number;
+  accountDocuments: Record<string, any>;
+  companyId: string;
+  staging: "TEST" | "PRODUCTION" | string;
+  status: "ACTIVE" | "PENDING" | "REJECTED" | string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  AccountRequests: {
+    Currency: Record<string, any>;
+  };
+}
 
 export interface AccountStatsMeta {
   activeAccountCount: number;

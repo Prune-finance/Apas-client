@@ -1,18 +1,9 @@
 import { Center, Grid, GridCol, Text, TextInput } from "@mantine/core";
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessData } from "@/lib/hooks/businesses";
-import { usePricingPlan } from "@/lib/hooks/pricing-plan";
-import { BasicInfoType } from "@/lib/schema";
-import { UseFormReturnType } from "@mantine/form";
-import { useState } from "react";
+
 import dayjs from "dayjs";
-import { BadgeComponent } from "@/ui/components/Badge";
 import { approvedBadgeColor } from "@/lib/utils";
-import {
-  useAllCompanyRequests,
-  useCompanyRequests,
-  usePayoutRequests,
-} from "@/lib/hooks/requests";
+import { useAllCompanyRequests, usePayoutRequests } from "@/lib/hooks/requests";
 import { useParams } from "next/navigation";
 import EmptyTable from "@/ui/components/EmptyTable";
 

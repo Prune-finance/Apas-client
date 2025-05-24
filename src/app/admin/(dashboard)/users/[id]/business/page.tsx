@@ -16,24 +16,17 @@ dayjs.extend(relativeTime);
 
 import styles from "@/ui/styles/business.module.scss";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
-import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { filteredSearch } from "@/lib/search";
+import { useState } from "react";
 
 import { TableComponent } from "@/ui/components/Table";
 
 import PaginationComponent from "@/ui/components/Pagination";
-import {
-  FilterSchema,
-  FilterType,
-  FilterValues,
-  newAdmin,
-  validateNewAdmin,
-} from "@/lib/schema";
+import { newAdmin, validateNewAdmin } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
@@ -44,10 +37,10 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
-import ModalComponent from "@/app/(dashboard)/users/modal";
-import { calculateTotalPages, sanitizeURL } from "@/lib/utils";
+import { calculateTotalPages } from "@/lib/utils";
 import AddUserModal from "./AddUserModal";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { switzer } from "@/ui/fonts";
 
 export default function AllBusinessUsers() {
   const searchParams = useSearchParams();

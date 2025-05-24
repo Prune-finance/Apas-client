@@ -7,16 +7,12 @@ import {
   Container,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import localFont from "next/font/local";
 
 import Header from "@/ui/components/Header";
 import Navbar from "@/ui/components/Navbar";
 
-const switzer = localFont({
-  src: "../../../assets/fonts/Switzer-Regular.woff2",
-});
-
 import styles from "@/ui/styles/layout.module.scss";
+import { switzer } from "@/ui/fonts";
 
 export default function RootLayout({
   children,

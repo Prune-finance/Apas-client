@@ -21,12 +21,19 @@ import {
   IconArrowsSort,
   IconPremiumRights,
   IconArrowUpRight,
+  IconRosetteDiscountCheck,
+  IconArrowsRightLeft,
+  IconCreditCard,
+  IconDatabase,
+  IconMoneybag,
+  IconSearch,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
 import businessStyles from "@/ui/styles/business.module.scss";
 import { TransactionType } from "./hooks/transactions";
 import { Notification } from "./hooks/notifications";
+import { formatNumber } from "./utils";
 
 export const AdminMainLinks = [
   {
@@ -48,6 +55,11 @@ export const AdminMainLinks = [
     text: "Account Creation",
     link: "/admin/account-requests",
     icon: <IconUserPlus size={16} />,
+  },
+  {
+    text: "Eligibility Center",
+    link: "/admin/eligibility-center",
+    icon: <IconRosetteDiscountCheck size={16} />,
   },
   {
     text: "Transactions",
@@ -342,4 +354,96 @@ export const PayoutRequestsTableHeaders = [
   "Amount",
   "Date",
   "Status",
+];
+
+export const businessIndustries: string[] = [
+  "Agriculture",
+  "Automotive",
+  "Banking & Financial Services",
+  "Construction",
+  "Consulting",
+  "Consumer Goods",
+  "E-commerce",
+  "Education",
+  "Energy & Utilities",
+  "Entertainment & Media",
+  "Environmental Services",
+  "Fashion & Apparel",
+  "Food & Beverage",
+  "Government",
+  "Healthcare & Medical",
+  "Hospitality",
+  "Insurance",
+  "Legal Services",
+  "Logistics & Transportation",
+  "Manufacturing",
+  "Marketing & Advertising",
+  "Nonprofit & NGOs",
+  "Pharmaceuticals & Biotechnology",
+  "Real Estate",
+  "Retail",
+  "Software & Technology",
+  "Telecommunications",
+  "Travel & Tourism",
+  "Wholesale & Distribution",
+];
+
+export const operationsAccountEstimatedBalance = {
+  "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
+  "between-10000-50000": `Between ${formatNumber(
+    10000,
+    true,
+    "GBP"
+  )} - ${formatNumber(50000, true, "GBP")}`,
+  "between-50000-100000": `Between ${formatNumber(
+    50000,
+    true,
+    "GBP"
+  )} - ${formatNumber(100000, true, "GBP")}`,
+  "between-100000-500000": `Between ${formatNumber(
+    100000,
+    true,
+    "GBP"
+  )} - ${formatNumber(500000, true, "GBP")}`,
+  "above-500000": `Above ${formatNumber(500000, true, "GBP")}`,
+} as const;
+
+const currencies = ["EUR", "GBP", "USD", "NGN"];
+
+export const serviceCategories = [
+  {
+    title: "Operations Account",
+    description:
+      "Prune Payments payout service gives the business access to payouts.",
+    accounts: currencies,
+    icon: IconDatabase,
+  },
+  {
+    title: "Virtual Account Services",
+    description:
+      "The account service lets businesses issue user accounts to clients.",
+    accounts: currencies,
+    icon: IconCreditCard,
+  },
+  {
+    title: "Payout Services",
+    description:
+      "This helps businesses manage and disburse funds to recipients.",
+    accounts: currencies,
+    icon: IconMoneybag,
+  },
+  {
+    title: "Account Lookup Services",
+    description:
+      "This helps businesses quickly verify and access account details for transactions.",
+    accounts: currencies,
+    icon: IconSearch,
+  },
+  {
+    title: "Remittance",
+    description:
+      "This helps businesses quickly verify and access account details for transactions.",
+    accounts: currencies,
+    icon: IconArrowsRightLeft,
+  },
 ];

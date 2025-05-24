@@ -14,7 +14,6 @@ import {
   IconCheck,
   IconDotsVertical,
   IconListTree,
-  IconPlus,
   IconUserCheck,
   IconUserX,
   IconX,
@@ -30,28 +29,17 @@ import { AdminData, useUsers } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  FilterSchema,
-  FilterType,
-  FilterValues,
-  inviteUser,
-  InviteUserType,
-  newAdmin,
-  validateInviteUser,
-  validateNewAdmin,
-} from "@/lib/schema";
-import { Suspense, useState } from "react";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 
 import Filter from "@/ui/components/Filter";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
-import MainModalComponent from "../modal";
 import UserDrawer from "../drawer";
 import PaginationComponent from "@/ui/components/Pagination";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { BadgeComponent } from "@/ui/components/Badge";
 import ModalComponent from "@/ui/components/Modal";

@@ -1,32 +1,40 @@
 import { formatNumber, removeWhitespace } from "@/lib/utils";
 import { Modal, Text } from "@mantine/core";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SuccessModal from "../../SuccessModal";
 import PreviewState from "../previewState";
 import SendMoneyModal from "../sendMoneyModal";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
-import { DefaultAccount } from "@/lib/hooks/accounts";
+import {
+  DefaultAccount,
+  useUserCurrencyGBPAccount,
+  useUserDefaultAccount,
+} from "@/lib/hooks/accounts";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import PendingModalImage from "@/assets/pending-image.png";
 import DebtorModal from "../DebtorModal";
 import useDebtorStore from "@/lib/store/debtor";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 interface Props {
   opened: boolean;
   openSendMoney: () => void;
   closeMoney: () => void;
-  account: DefaultAccount | null;
 }
 
-export const SendMoney = ({
-  opened,
-  closeMoney,
-  account,
-  openSendMoney,
-}: Props) => {
+export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
+  const { account, loading, revalidate } = useUserDefaultAccount();
+  const {
+    account: gbpAccount,
+    loading: gbpLoading,
+    revalidate: gbpRevalidate,
+  } = useUserCurrencyGBPAccount();
+
+  const { switchCurrency } = useCurrencySwitchStore();
+
   const matches = useMediaQuery("(max-width: 768px)");
   const axios = createAxiosInstance("payouts");
 
@@ -53,6 +61,8 @@ export const SendMoney = ({
     destinationIBAN: "",
     destinationBIC: "",
     destinationBank: "",
+    destinationAccountNumber: "",
+    destinationSortCode: "",
     bankAddress: "",
     destinationCountry: "",
     reference: crypto.randomUUID(),
@@ -60,23 +70,13 @@ export const SendMoney = ({
     narration: "",
   });
 
-  // const [debtorRequestForm, setDebtorRequestForm] = useState<DebtorForm>({
-  //   location: "self",
-  //   fullName: "",
-  //   address: "",
-  //   country: "",
-  //   postCode: "",
-  //   state: "",
-  //   city: "",
-  //   website: "",
-  //   businessRegNo: "",
-  // });
-
   const [companyRequestForm, setCompanyRequestForm] = useState({
     amount: "",
     companyName: "",
     destinationIBAN: "",
     destinationBIC: "",
+    destinationAccountNumber: "",
+    destinationSortCode: "",
     destinationBank: "",
     bankAddress: "",
     destinationCountry: "",
@@ -93,6 +93,8 @@ export const SendMoney = ({
         lastName,
         destinationIBAN,
         destinationBIC,
+        destinationAccountNumber,
+        destinationSortCode,
         destinationBank,
         bankAddress,
         destinationCountry,
@@ -101,42 +103,59 @@ export const SendMoney = ({
         narration,
       } = requestForm;
 
-      const { data } = await axios.post(`/payout/send-money`, {
-        amount,
-        destinationIBAN: removeWhitespace(destinationIBAN),
-        destinationBIC: removeWhitespace(destinationBIC),
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        reference: crypto.randomUUID(),
-        beneficiaryFullName: `${firstName} ${lastName}`,
-        invoice,
-        narration,
-        // Debtor details
-        debtorFullName: `${debtorRequestForm?.fullName}`,
-        debtorAddress: `${debtorRequestForm?.address}`,
-        debtorCountryCode: `${debtorRequestForm?.country}`,
-        debtorPostCode: `${debtorRequestForm?.postCode}`,
-        debtorState: `${debtorRequestForm?.state}`,
-        debtorCity: `${debtorRequestForm?.city}`,
-        debtorType: `${
-          debtorRequestForm?.location === "self" ||
+      const { data } = await axios.post(
+        switchCurrency === "GBP" ? "/payout/send-gbp" : "/payout/send-money",
+        {
+          ...(switchCurrency === "GBP"
+            ? {
+                beneficiaryAccountNumber: removeWhitespace(
+                  destinationAccountNumber
+                ),
+                beneficiarySortCode: removeWhitespace(destinationSortCode),
+                beneficiaryBank: destinationBank,
+                beneficiaryCountry: destinationCountry,
+                beneficiaryFullName: `${firstName} ${lastName}`,
+              }
+            : {
+                destinationIBAN: removeWhitespace(destinationIBAN),
+                destinationBIC: removeWhitespace(destinationBIC),
+                destinationBank,
+                destinationCountry,
+                beneficiaryFullName: `${firstName} ${lastName}`,
+              }),
+
+          bankAddress,
+          amount,
+          reference: crypto.randomUUID(),
+          invoice,
+          narration,
+
+          // Debtor details
+          debtorFullName: `${debtorRequestForm?.fullName}`,
+          debtorAddress: `${debtorRequestForm?.address}`,
+          debtorCountryCode: `${debtorRequestForm?.country}`,
+          debtorPostCode: `${debtorRequestForm?.postCode}`,
+          debtorState: `${debtorRequestForm?.state}`,
+          debtorCity: `${debtorRequestForm?.city}`,
+          debtorType: `${
+            debtorRequestForm?.location === "self" ||
+            debtorRequestForm.location === "company"
+              ? "COMPANY"
+              : "INDIVIDUAL"
+          }`,
+          ...(debtorRequestForm?.location === "individual" && {
+            debtorIdType: `${debtorRequestForm?.idType}`,
+            debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+          }),
+          ...(debtorRequestForm?.location === "self" ||
           debtorRequestForm.location === "company"
-            ? "COMPANY"
-            : "INDIVIDUAL"
-        }`,
-        ...(debtorRequestForm?.location === "individual" && {
-          debtorIdType: `${debtorRequestForm?.idType}`,
-          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
-        }),
-        ...(debtorRequestForm?.location === "self" ||
-        debtorRequestForm.location === "company"
-          ? {
-              debtorWebsite: `${debtorRequestForm?.website}`,
-              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
-            }
-          : {}),
-      });
+            ? {
+                debtorWebsite: `${debtorRequestForm?.website}`,
+                debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+              }
+            : {}),
+        }
+      );
 
       console.log({ sendMoney: data });
       setMoneySent(Number(amount));
@@ -160,6 +179,8 @@ export const SendMoney = ({
         companyName,
         destinationIBAN,
         destinationBIC,
+        destinationAccountNumber,
+        destinationSortCode,
         destinationBank,
         bankAddress,
         destinationCountry,
@@ -168,42 +189,59 @@ export const SendMoney = ({
         narration,
         reference,
       } = companyRequestForm;
-      const { data } = await axios.post(`/payout/send-money`, {
-        amount,
-        destinationIBAN: removeWhitespace(destinationIBAN),
-        destinationBIC: removeWhitespace(destinationBIC),
-        destinationBank,
-        bankAddress,
-        destinationCountry,
-        reference: crypto.randomUUID(),
-        beneficiaryFullName: companyName,
-        invoice,
-        narration,
-        // Debtor details
-        debtorFullName: `${debtorRequestForm?.fullName}`,
-        debtorAddress: `${debtorRequestForm?.address}`,
-        debtorCountryCode: `${debtorRequestForm?.country}`,
-        debtorPostCode: `${debtorRequestForm?.postCode}`,
-        debtorState: `${debtorRequestForm?.state}`,
-        debtorCity: `${debtorRequestForm?.city}`,
-        debtorType: `${
-          debtorRequestForm?.location === "self" ||
+
+      const { data } = await axios.post(
+        switchCurrency === "GBP" ? "/payout/send-gbp" : "/payout/send-money",
+        {
+          ...(switchCurrency === "GBP"
+            ? {
+                beneficiaryAccountNumber: removeWhitespace(
+                  destinationAccountNumber
+                ),
+                beneficiarySortCode: removeWhitespace(destinationSortCode),
+                beneficiaryBank: destinationBank,
+                beneficiaryCountry: destinationCountry,
+                beneficiaryFullName: companyName,
+              }
+            : {
+                destinationIBAN: removeWhitespace(destinationIBAN),
+                destinationBIC: removeWhitespace(destinationBIC),
+                destinationBank,
+                destinationCountry,
+                beneficiaryFullName: companyName,
+              }),
+
+          bankAddress,
+          amount,
+          reference: crypto.randomUUID(),
+          invoice,
+          narration,
+          // Debtor details
+          debtorFullName: `${debtorRequestForm?.fullName}`,
+          debtorAddress: `${debtorRequestForm?.address}`,
+          debtorCountryCode: `${debtorRequestForm?.country}`,
+          debtorPostCode: `${debtorRequestForm?.postCode}`,
+          debtorState: `${debtorRequestForm?.state}`,
+          debtorCity: `${debtorRequestForm?.city}`,
+          debtorType: `${
+            debtorRequestForm?.location === "self" ||
+            debtorRequestForm.location === "company"
+              ? "COMPANY"
+              : "INDIVIDUAL"
+          }`,
+          ...(debtorRequestForm?.location === "individual" && {
+            debtorIdType: `${debtorRequestForm?.idType}`,
+            debtorIdNumber: `${debtorRequestForm?.idNumber}`,
+          }),
+          ...(debtorRequestForm?.location === "self" ||
           debtorRequestForm.location === "company"
-            ? "COMPANY"
-            : "INDIVIDUAL"
-        }`,
-        ...(debtorRequestForm?.location === "individual" && {
-          debtorIdType: `${debtorRequestForm?.idType}`,
-          debtorIdNumber: `${debtorRequestForm?.idNumber}`,
-        }),
-        ...(debtorRequestForm?.location === "self" ||
-        debtorRequestForm.location === "company"
-          ? {
-              debtorWebsite: `${debtorRequestForm?.website}`,
-              debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
-            }
-          : {}),
-      });
+            ? {
+                debtorWebsite: `${debtorRequestForm?.website}`,
+                debtorBusinessRegNo: `${debtorRequestForm?.businessRegNo}`,
+              }
+            : {}),
+        }
+      );
       setMoneySent(Number(amount));
       setReceiverName(companyName);
       closeMoney();
@@ -226,6 +264,13 @@ export const SendMoney = ({
     closeSuccess();
   };
 
+  useEffect(() => {
+    revalidate();
+    gbpRevalidate();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened]);
+
   return (
     <>
       <Modal
@@ -235,7 +280,8 @@ export const SendMoney = ({
         withCloseButton={false}
       >
         <SendMoneyModal
-          account={account}
+          account={switchCurrency === "EUR" ? account : gbpAccount}
+          loading={loading || gbpLoading}
           close={closeMoney}
           openPreview={openPreview}
           setRequestForm={setRequestForm}
@@ -305,7 +351,7 @@ export const SendMoney = ({
           <Text fz={12}>
             Your transfer of{" "}
             <Text inherit span fw={600} c="#97AD05">
-              {formatNumber(moneySent, true, "EUR")}
+              {formatNumber(moneySent, true, switchCurrency ?? "EUR")}
             </Text>{" "}
             to {receiverName} is in progress. It will be processed shortly. You
             will be notified on resolution of payment.
@@ -322,6 +368,8 @@ export interface RequestForm {
   destinationIBAN: string;
   destinationBIC: string;
   destinationBank: string;
+  destinationAccountNumber: string;
+  destinationSortCode: string;
   bankAddress: string;
   destinationCountry: string;
   reference: string; // generated using crypto.randomUUID()

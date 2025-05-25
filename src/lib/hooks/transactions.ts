@@ -940,6 +940,7 @@ export interface TransactionType {
   dpsId: number;
   destinationFirstName: string;
   destinationLastName: string;
+  senderInstitutionName?: string
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
   company: BusinessData;

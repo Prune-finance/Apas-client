@@ -123,7 +123,7 @@ export const TransactionDrawer = ({
     "Bank Address":
       selectedRequest?.type === "DEBIT"
         ? "Office 7 35-37 Ludgate Hill, London"
-        : "Office 7 35-37 Ludgate Hill, London",
+        : selectedRequest?.senderInstitutionName,
     Country:
       selectedRequest?.type === "DEBIT" ? "United Kingdom" : "United Kingdom",
   };

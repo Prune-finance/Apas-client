@@ -89,15 +89,15 @@ export const TransactionDrawer = ({
           IBAN: selectedRequest?.recipientIban,
           BIC: selectedRequest?.recipientBic,
         }),
-    "Bank Name":
-      selectedRequest?.recipientBankAddress ??
+      "Bank Name": selectedRequest?.recipientBankAddress ??
       selectedRequest?.beneficiaryInstitutionName ??
       "N/A",
-    "Bank Address":
-      selectedRequest?.recipientBankAddress ??
+    "Bank Address": selectedRequest?.type === "CREDIT" ?
+        "Office 7 35-37 Ludgate Hill, London"
+      : selectedRequest?.recipientBankAddress ??
       selectedRequest?.beneficiaryAddress ??
       "N/A",
-    Country: selectedRequest?.recipientBankCountry ?? "N/A",
+    Country: selectedRequest?.type === "CREDIT" ? "United Kingdom" : selectedRequest?.recipientBankCountry ?? "N/A",
     "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
@@ -119,11 +119,11 @@ export const TransactionDrawer = ({
     Bank:
       selectedRequest?.type === "DEBIT"
         ? "Prune Payments LTD"
-        : "Prune Payments LTD",
+        : selectedRequest?.senderInstitutionName ?? "N/A",
     "Bank Address":
       selectedRequest?.type === "DEBIT"
         ? "Office 7 35-37 Ludgate Hill, London"
-        : selectedRequest?.senderInstitutionName,
+        : selectedRequest?.senderInstitutionName ?? "N/A",
     Country:
       selectedRequest?.type === "DEBIT" ? "United Kingdom" : "United Kingdom",
   };

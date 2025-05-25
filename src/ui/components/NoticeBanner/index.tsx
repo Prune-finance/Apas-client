@@ -19,7 +19,7 @@ function NoticeBanner() {
             System Review in Progress
           </Text>
           <Text fz={14} fw={400} c="#8D7700">
-            We&apos;re currently performing a system review to ensure the safety
+            We&apos;re currently performing a system review on our EURO accounts to ensure the safety
             and reliability of our services. Access to funds will be restored
             shortly. We appreciate your patience and understanding, everything
             is on track, and you&apos;ll be able to use your funds soon.

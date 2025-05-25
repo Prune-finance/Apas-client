@@ -46,7 +46,6 @@ export default function RootLayout({
         >
           <AppShellHeader withBorder={false}>
             <UserHeader />
-            <NoticeBanner />
           </AppShellHeader>
 
           <AppShellNavbar p="md">

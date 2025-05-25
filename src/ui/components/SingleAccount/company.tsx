@@ -581,7 +581,11 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
             </Box>
           </Flex>
 
-          { switchCurrency === "EUR" && <NoticeBanner /> }
+          { switchCurrency === "EUR" &&
+            <Flex pt={12} w="100%">
+              <NoticeBanner /> 
+            </Flex>
+          }
           {switchCurrency === "EUR" ? (
             <TransactionProcessingTimes />
           ) : (
@@ -602,6 +606,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
             action={handlePreviewState}
             // loading={processing}
             text="Continue"
+            disabled={switchCurrency === "EUR" ? true : false}
             fullWidth
             fw={600}
             h={48}

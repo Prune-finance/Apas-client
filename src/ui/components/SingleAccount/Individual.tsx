@@ -38,6 +38,7 @@ import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import NoticeBanner from "../NoticeBanner";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -448,6 +449,12 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               </Flex>
 
               <TransactionProcessingTimes />
+
+              { switchCurrency === "EUR" &&
+                <Flex pt={12} w="100%">
+                  <NoticeBanner /> 
+                </Flex>
+              }
             </ScrollArea>
 
             <Flex mt={24} justify="flex-end" gap={15}>
@@ -465,6 +472,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                 // loading={processing}
                 text="Continue"
                 fullWidth
+                disabled={switchCurrency === "EUR" ? true : false}
                 fw={600}
                 h={48}
                 // w={126}

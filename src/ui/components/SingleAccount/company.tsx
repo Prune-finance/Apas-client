@@ -42,6 +42,7 @@ import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import TransactionProcessTimeGBP from "./TransactionProcessTimeGBP";
+import NoticeBanner from "../NoticeBanner";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -580,6 +581,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
             </Box>
           </Flex>
 
+          { switchCurrency === "EUR" && <NoticeBanner /> }
           {switchCurrency === "EUR" ? (
             <TransactionProcessingTimes />
           ) : (

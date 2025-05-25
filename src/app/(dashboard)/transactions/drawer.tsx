@@ -119,11 +119,11 @@ export const TransactionDrawer = ({
     Bank:
       selectedRequest?.type === "DEBIT"
         ? "Prune Payments LTD"
-        : "Prune Payments LTD",
+        : selectedRequest?.senderInstitutionName ?? "N/A",
     "Bank Address":
       selectedRequest?.type === "DEBIT"
         ? "Office 7 35-37 Ludgate Hill, London"
-        : selectedRequest?.senderInstitutionName,
+        : selectedRequest?.senderInstitutionName ?? "N/A",
     Country:
       selectedRequest?.type === "DEBIT" ? "United Kingdom" : "United Kingdom",
   };

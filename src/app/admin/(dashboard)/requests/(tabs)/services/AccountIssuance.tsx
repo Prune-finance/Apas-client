@@ -26,7 +26,6 @@ import { parseError } from "@/lib/actions/auth";
 import { useForm, zodResolver } from "@mantine/form";
 import Filter from "@/ui/components/Filter";
 import { useRouter, useSearchParams } from "next/navigation";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
@@ -34,12 +33,8 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { closeButtonProps } from "../../../businesses/[id]/(tabs)/utils";
-import {
-  FilterSchema,
-  FilterType,
-  FilterValues,
-  validateRequest,
-} from "@/lib/schema";
+import { validateRequest } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Link from "next/link";
 import RejectModalComponent from "@/ui/components/Modal/RejectModalComponent";
 import ModalComponent from "@/ui/components/Modal";

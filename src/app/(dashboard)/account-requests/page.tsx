@@ -6,13 +6,13 @@ dayjs.extend(advancedFormat);
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { Group, Paper } from "@mantine/core";
+import { Box, Group, Image, Paper, TabsPanel } from "@mantine/core";
 
 import { Text, Pagination } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
 // Tabler Imports
-import { IconX } from "@tabler/icons-react";
+import { IconCircleDashedPlus, IconUsers, IconX } from "@tabler/icons-react";
 import { IconTrash, IconListTree, IconSearch } from "@tabler/icons-react";
 
 // Lib Imports
@@ -45,6 +45,9 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import { getUserType } from "@/lib/utils";
 import createAxiosInstance from "@/lib/axios";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import TabsComponent from "@/ui/components/Tabs";
+import AccountRequestIcon from "@/assets/account-req-icon.png";
+import AdditionalCurrency from "./AdditionalCurrency";
 
 const axios = createAxiosInstance("accounts");
 
@@ -140,65 +143,90 @@ function AccountRequests() {
     <main className={styles.main}>
       <Paper className={styles.table__container}>
         <div className={styles.container__header}>
-          <Text fz={18} fw={600}>
-            Account Requests
-          </Text>
+          <Box>
+            <Text fz={18} fw={600}>
+              Account Requests
+            </Text>
+
+            <Text fz={14} fw={400} c="#667085" mt={4}>
+              Here’s an overview of your requested accounts
+            </Text>
+          </Box>
         </div>
 
-        <Group justify="space-between" mt={30}>
-          <SearchInput search={search} setSearch={setSearch} />
-
-          <SecondaryBtn
-            text="Filter"
-            action={toggle}
-            icon={IconListTree}
-            fw={600}
-          />
-        </Group>
-
-        <Filter<FilterType>
-          opened={openedFilter}
-          toggle={toggle}
-          form={form}
-          approvalStatus
-          customStatusOption={["Approved", "Pending", "Rejected"]}
+        <TabsComponent
+          tabs={accountRequestTabs}
+          mt={30}
+          tt="capitalize"
+          fz={12}
+          style={{ position: "relative" }}
         >
-          <TextBox
-            placeholder="First Name"
-            {...form.getInputProps("firstName")}
-          />
+          <TabsPanel value={accountRequestTabs[0].value}>
+            <AdditionalCurrency />
+          </TabsPanel>
 
-          <TextBox
-            placeholder="Last Name"
-            {...form.getInputProps("lastName")}
-          />
+          <TabsPanel value={accountRequestTabs[1].value}>
+            <Group justify="space-between" mt={30}>
+              <SearchInput search={search} setSearch={setSearch} />
 
-          <TextBox placeholder="Country" {...form.getInputProps("country")} />
+              <SecondaryBtn
+                text="Filter"
+                action={toggle}
+                icon={IconListTree}
+                fw={600}
+              />
+            </Group>
 
-          <SelectBox
-            placeholder="Type"
-            {...form.getInputProps("type")}
-            data={["Corporate", "Individual"]}
-            clearable
-          />
-        </Filter>
+            <Filter<FilterType>
+              opened={openedFilter}
+              toggle={toggle}
+              form={form}
+              approvalStatus
+              customStatusOption={["Approved", "Pending", "Rejected"]}
+            >
+              <TextBox
+                placeholder="First Name"
+                {...form.getInputProps("firstName")}
+              />
 
-        <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+              <TextBox
+                placeholder="Last Name"
+                {...form.getInputProps("lastName")}
+              />
 
-        <EmptyTable
-          rows={rows}
-          loading={loading}
-          title="There are no account requests"
-          text="When a request is created, it will appear here"
-        />
+              <TextBox
+                placeholder="Country"
+                {...form.getInputProps("country")}
+              />
 
-        <PaginationComponent
-          total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
-          active={active}
-          setActive={setActive}
-          limit={limit}
-          setLimit={setLimit}
-        />
+              <SelectBox
+                placeholder="Type"
+                {...form.getInputProps("type")}
+                data={["Corporate", "Individual"]}
+                clearable
+              />
+            </Filter>
+
+            <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+
+            <EmptyTable
+              rows={rows}
+              loading={loading}
+              title="There are no account requests"
+              text="When a request is created, it will appear here"
+            />
+
+            <PaginationComponent
+              total={Math.ceil(
+                (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
+              )}
+              active={active}
+              setActive={setActive}
+              limit={limit}
+              setLimit={setLimit}
+            />
+          </TabsPanel>
+        </TabsComponent>
       </Paper>
 
       <ModalComponent
@@ -231,6 +259,14 @@ function AccountRequests() {
     </main>
   );
 }
+
+const accountRequestTabs = [
+  { value: "Additional Currency", icon: <IconCircleDashedPlus size={18} /> },
+  {
+    value: "Issued Account Request",
+    icon: <Image src={AccountRequestIcon.src} h={18} w={18} alt="icon" />,
+  },
+];
 
 const tableHeaders = [
   "First Name",

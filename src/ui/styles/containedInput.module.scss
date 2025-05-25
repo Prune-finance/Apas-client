@@ -27,6 +27,11 @@
 }
 
 .innerInput {
+  // border: none !important;
+  // outline: none !important;
+  // padding-top: 18px;
+  // height: 100%;
+
   &::placeholder {
     font-size: 12px;
   }

@@ -15,15 +15,13 @@ import styles from "@/ui/styles/business.module.scss";
 
 import EmptyImage from "@/assets/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
-import { switzer } from "@/app/layout";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { filteredSearch } from "@/lib/search";
+import { useState } from "react";
 
-import { sanitizeURL, serialNumber } from "@/lib/utils";
+import { serialNumber } from "@/lib/utils";
 import { TableComponent } from "@/ui/components/Table";
 
 import PaginationComponent from "@/ui/components/Pagination";
@@ -32,6 +30,7 @@ import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
+import { switzer } from "@/ui/fonts";
 
 export default function BusinessUsers() {
   const searchParams = useSearchParams();

@@ -1,19 +1,8 @@
-import {
-  Box,
-  Flex,
-  Modal,
-  Select,
-  TabsPanel,
-  Text,
-  TextInput,
-} from "@mantine/core";
-import { IconX } from "@tabler/icons-react";
-import React, { useState } from "react";
+import { Flex, Select, TabsPanel, Text, TextInput } from "@mantine/core";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import styles from "./debtor.module.scss";
 import useDebtorStore, { DebtorFormState } from "@/lib/store/debtor";
 import { useForm, zodResolver } from "@mantine/form";
-import { countriesShortCode } from "@/lib/countries-short-code";
 import { DebtorFormCompany } from "@/lib/schema";
 import countries from "@/assets/countries.json";
 
@@ -78,7 +67,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Company Name
+              Company Name <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter company name"
@@ -96,7 +85,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Address
+              Address <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Address"
@@ -114,7 +103,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              City
+              City <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter City"
@@ -130,7 +119,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              State
+              State <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter State"
@@ -157,7 +146,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Country
+              Country <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Country"
@@ -173,7 +162,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Post Code
+              Post Code <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Post Code"
@@ -191,7 +180,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Website
+              Website <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Website"
@@ -207,7 +196,7 @@ function DebtorModalCompany({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Business Reg No
+              Business Reg No <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Business Reg No"

@@ -3,17 +3,15 @@ import {
   Modal,
   Flex,
   Button,
-  Stack,
   TextInput,
   Select,
   Box,
-  PasswordInput,
 } from "@mantine/core";
 import { IconMail, IconTrash, IconX } from "@tabler/icons-react";
 
 import styles from "./modal.module.scss";
 import { UseFormReturnType } from "@mantine/form";
-import { newAdmin, newUser } from "@/lib/schema";
+import { newUser } from "@/lib/schema";
 
 export default function ModalComponent({
   opened,

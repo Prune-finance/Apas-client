@@ -2,17 +2,9 @@
 
 import {
   TransactionType,
-  TrxData,
-  useTransactions,
   useTransactionsByIBAN,
-  useUserDefaultTransactions,
-  useUserTransactions,
-  useUserTransactionsByIBAN,
 } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { filteredSearch } from "@/lib/search";
-import { frontendPagination, formatNumber } from "@/lib/utils";
-import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -20,20 +12,10 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import {
-  Avatar,
-  Flex,
-  Group,
-  Skeleton,
-  Stack,
-  TableTd,
-  TableTr,
-  Text,
-} from "@mantine/core";
+import { Avatar, Group, Skeleton, Stack, Text } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import {
-  IconArrowUpRight,
   IconListTree,
   IconRosetteDiscountCheckFilled,
 } from "@tabler/icons-react";
@@ -48,8 +30,7 @@ import { useParams } from "next/navigation";
 import { useSingleAccountByIBAN } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
-import { AmountGroup } from "@/ui/components/AmountGroup";
-import { useSingleBusiness, useUserBusiness } from "@/lib/hooks/businesses";
+import { useSingleBusiness } from "@/lib/hooks/businesses";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 import Link from "next/link";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";

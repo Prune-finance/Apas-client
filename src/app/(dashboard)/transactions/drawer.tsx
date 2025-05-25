@@ -76,12 +76,28 @@ export const TransactionDrawer = ({
   };
 
   const beneficiaryDetails = {
-    "Account Name": selectedRequest?.recipientName || "N/A",
-    IBAN: selectedRequest?.recipientIban,
-    BIC: selectedRequest?.recipientBic,
-    "Bank Name": selectedRequest?.recipientBankAddress,
-    "Bank Address": selectedRequest?.recipientBankAddress,
-    Country: selectedRequest?.recipientBankCountry,
+    "Account Name":
+      selectedRequest?.recipientName ??
+      selectedRequest?.beneficiaryName ??
+      "N/A",
+    ...(selectedRequest?.currencyType === "GBP"
+      ? {
+          "Account Number": selectedRequest?.beneficiaryAccountNumber,
+          "Sort Code": selectedRequest?.beneficiarySortCode,
+        }
+      : {
+          IBAN: selectedRequest?.recipientIban,
+          BIC: selectedRequest?.recipientBic,
+        }),
+    "Bank Name":
+      selectedRequest?.recipientBankAddress ??
+      selectedRequest?.beneficiaryInstitutionName ??
+      "N/A",
+    "Bank Address":
+      selectedRequest?.recipientBankAddress ??
+      selectedRequest?.beneficiaryAddress ??
+      "N/A",
+    Country: selectedRequest?.recipientBankCountry ?? "N/A",
     "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
@@ -91,8 +107,15 @@ export const TransactionDrawer = ({
     ) : (
       selectedRequest?.senderName
     ),
-    IBAN: selectedRequest?.senderIban,
-    BIC: selectedRequest?.senderBic,
+    ...(selectedRequest?.currencyType === "GBP"
+      ? {
+          "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
+          "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
+        }
+      : {
+          IBAN: selectedRequest?.recipientIban,
+          BIC: selectedRequest?.recipientBic,
+        }),
     Bank:
       selectedRequest?.type === "DEBIT"
         ? "Prune Payments LTD"
@@ -150,7 +173,11 @@ export const TransactionDrawer = ({
               </Text>
 
               <Text c="#97AD05" fz={32} fw={600}>
-                {formatNumber(selectedRequest?.amount || 0, true, "EUR")}
+                {formatNumber(
+                  selectedRequest?.amount || 0,
+                  true,
+                  selectedRequest?.currencyType ?? "EUR"
+                )}
               </Text>
             </Flex>
 
@@ -257,9 +284,14 @@ export const TransactionDrawer = ({
       <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>
         <TransactionReceipt
           amount={selectedRequest?.amount ?? 0}
-          amountType="Amount Sent"
+          amountType={
+            selectedRequest?.type === "DEBIT"
+              ? "Amount Sent"
+              : "Amount Received"
+          }
           details={details}
           receiptRef={pdfRef}
+          currencyType={selectedRequest?.currencyType}
         />
       </Box>
     </Drawer>

@@ -2,7 +2,6 @@
 
 import { usePayoutAccount } from "@/lib/hooks/accounts";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { filteredSearch } from "@/lib/search";
 import { calculateTotalPages } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";

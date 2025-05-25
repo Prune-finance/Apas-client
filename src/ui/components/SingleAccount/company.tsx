@@ -1,6 +1,12 @@
 "use client";
 
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  forwardRef,
+  SetStateAction,
+  useEffect,
+  useState,
+} from "react";
 import { IconCheck } from "@tabler/icons-react";
 
 import styles from "./sendMoney.module.scss";
@@ -22,7 +28,11 @@ import {
 import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
+import {
+  DefaultAccount,
+  validateAccount,
+  validateAccountGBP,
+} from "@/lib/hooks/accounts";
 import DropzoneComponent from "../Dropzone";
 import { sendMoneyCompanyValidate } from "@/lib/schema";
 // import { countries } from "@/lib/static";
@@ -30,6 +40,8 @@ import { useDebouncedValue } from "@mantine/hooks";
 import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import TransactionProcessTimeGBP from "./TransactionProcessTimeGBP";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -51,32 +63,39 @@ export const sendMoneyRequest = {
   companyName: "",
   destinationIBAN: "",
   destinationBIC: "",
+  destinationAccountNumber: "",
+  destinationSortCode: "",
   destinationBank: "",
   bankAddress: "",
   destinationCountry: "",
   invoice: "",
   reference: crypto.randomUUID(),
   narration: "",
+  currency: "",
 };
 
-function Company({
-  account,
-  close,
-  openPreview,
-  setCompanyRequestForm,
-  setSectionState,
-  validated,
-  setValidated,
-  showBadge,
-  setShowBadge,
-  openDebtor,
-  paymentType,
-  setPaymentType,
-}: CompanyProps) {
+const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
+  {
+    account,
+    close,
+    openPreview,
+    setCompanyRequestForm,
+    setSectionState,
+    validated,
+    setValidated,
+    showBadge,
+    setShowBadge,
+    openDebtor,
+    paymentType,
+    setPaymentType,
+  },
+  ref
+) {
   const [processing, setProcessing] = useState(false);
   const [disableBank, setDisableBank] = useState(false);
   const [disableAddress, setDisableAddress] = useState(false);
   const [disableCountry, setDisableCountry] = useState(false);
+  const { switchCurrency } = useCurrencySwitchStore();
 
   const form2 = useForm({
     initialValues: {
@@ -85,14 +104,41 @@ function Company({
     validate: zodResolver(sendMoneyCompanyValidate),
   });
 
+  useEffect(() => {
+    form2.setFieldValue("currency", switchCurrency);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [switchCurrency]);
+
   const [{ bic, iban }] = useDebouncedValue(
     { iban: form2.values.destinationIBAN, bic: form2.values.destinationBIC },
     2000
   );
 
+  const [{ accountNumber, sortCode }] = useDebouncedValue(
+    {
+      accountNumber: form2.values.destinationAccountNumber,
+      sortCode: form2.values.destinationSortCode,
+    },
+    2000
+  );
+
   const handlePreviewState = () => {
-    const { hasErrors } = form2.validate();
-    if (hasErrors) return;
+    // const { hasErrors } = form2.validate();
+    // if (hasErrors) return;
+
+    const result = sendMoneyCompanyValidate.safeParse(form2.values);
+
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      Object.entries(errors).forEach(([field, messages]) => {
+        if (messages?.[0]) {
+          console.log(messages);
+          form2.setFieldError(field, messages[0]);
+        }
+      });
+      return;
+    }
+
     if (
       account?.accountBalance &&
       account?.accountBalance < Number(form2.values.amount)
@@ -118,8 +164,8 @@ function Company({
     setShowBadge(true);
     try {
       const data = await validateAccount({
-        iban: removeWhitespace(iban),
-        bic: removeWhitespace(bic),
+        iban: removeWhitespace(iban ?? accountNumber),
+        bic: removeWhitespace(bic ?? sortCode),
       });
 
       if (data) {
@@ -135,6 +181,51 @@ function Company({
         if (data.country) setDisableCountry(true);
       } else {
         setValidated(false);
+        if (ref && typeof ref !== "function" && ref.current) {
+          ref.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleIbanValidationGBP = async () => {
+    setProcessing(true);
+    setValidated(null);
+    setDisableAddress(false);
+    setDisableBank(false);
+    setDisableCountry(false);
+    setShowBadge(true);
+
+    try {
+      const data = await validateAccountGBP({
+        accountNumber: removeWhitespace(accountNumber),
+        sortCode: removeWhitespace(sortCode),
+      });
+
+      if (data) {
+        form2.setValues({
+          bankAddress: data.bankAddress || data.city,
+          destinationBank: data.bankName,
+          // destinationCountry: data.bankTown,
+        });
+
+        setValidated(true);
+        if (data.bankAddress || data.city) setDisableAddress(true);
+        if (data.bankName) setDisableBank(true);
+        // if (data.bankTown) setDisableCountry(true);
+      } else {
+        setValidated(false);
+        if (ref && typeof ref !== "function" && ref.current) {
+          ref.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
       }
     } finally {
       setProcessing(false);
@@ -143,12 +234,19 @@ function Company({
 
   useEffect(() => {
     if (iban && bic) {
-      console.log({ bic, iban });
       handleIbanValidation();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bic, iban]);
+
+  useEffect(() => {
+    if (accountNumber && sortCode) {
+      handleIbanValidationGBP();
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountNumber, sortCode]);
 
   return (
     <TabsPanel value="To A Company">
@@ -165,7 +263,7 @@ function Company({
               size="lg"
               label={
                 <Text fz={14} c="#667085">
-                  Company Name
+                  Company Name <span style={{ color: "red" }}>*</span>
                 </Text>
               }
               placeholder="Enter company Name"
@@ -175,38 +273,111 @@ function Company({
               }}
             />
           </Flex>
-          <Flex gap={20} mt={24}>
-            <TextInput
-              classNames={{ input: styles.input, label: styles.label }}
-              flex={1}
-              size="lg"
-              label={
-                <Text fz={14} c="#667085">
-                  IBAN
-                </Text>
-              }
-              placeholder="Enter IBAN"
-              {...form2.getInputProps("destinationIBAN")}
-              errorProps={{
-                fz: 12,
-              }}
-            />
 
-            <TextInput
-              classNames={{ input: styles.input, label: styles.label }}
-              flex={1}
-              size="lg"
-              label={
-                <Text fz={14} c="#667085">
-                  BIC
-                </Text>
-              }
-              placeholder="Enter BIC"
-              {...form2.getInputProps("destinationBIC")}
-              errorProps={{
-                fz: 12,
-              }}
-            />
+          <Flex gap={20} mt={24}>
+            {switchCurrency === "EUR" ? (
+              <>
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      IBAN <span style={{ color: "red" }}>*</span>
+                    </Text>
+                  }
+                  placeholder="Enter IBAN"
+                  {...form2.getInputProps("destinationIBAN")}
+                  errorProps={{ fz: 12 }}
+                />
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      BIC <span style={{ color: "red" }}>*</span>
+                    </Text>
+                  }
+                  placeholder="Enter BIC"
+                  {...form2.getInputProps("destinationBIC")}
+                  errorProps={{ fz: 12 }}
+                />
+              </>
+            ) : (
+              <>
+                <TextInput
+                  type="number"
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      Account Number <span style={{ color: "red" }}>*</span>
+                    </Text>
+                  }
+                  placeholder="Enter Account Number"
+                  {...form2.getInputProps("destinationAccountNumber")}
+                  onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
+                      e.preventDefault(); // Prevent increment/decrement via arrow keys
+                    }
+
+                    const isDigit = /^\d$/.test(e.key);
+                    const currentLength =
+                      form2.values.destinationAccountNumber.length;
+
+                    if (isDigit && currentLength >= 8) {
+                      e.preventDefault(); // stop more digits from being typed
+                      return;
+                    }
+                  }}
+                  onWheel={(event) => event.currentTarget.blur()}
+                  errorProps={{ fz: 12 }}
+                />
+                <TextInput
+                  type="number"
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      Sort Code <span style={{ color: "red" }}>*</span>
+                    </Text>
+                  }
+                  placeholder="Enter Sort Code"
+                  {...form2.getInputProps("destinationSortCode")}
+                  onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
+                      e.preventDefault(); // Prevent increment/decrement via arrow keys
+                    }
+
+                    const isDigit = /^\d$/.test(e.key);
+                    const currentLength =
+                      form2.values.destinationSortCode.length;
+
+                    if (isDigit && currentLength >= 6) {
+                      e.preventDefault(); // stop more digits from being typed
+                      return;
+                    }
+                  }}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    const pasted = e.clipboardData
+                      .getData("Text")
+                      .replace(/-/g, ""); // remove dashes
+                    const digitsOnly = pasted.replace(/\D/g, ""); // keep only digits
+
+                    const currentValue = form2.values.destinationSortCode;
+                    const newValue = (currentValue + digitsOnly).slice(0, 6); // limit to 6 digits
+
+                    form2.setFieldValue("destinationSortCode", newValue);
+                  }}
+                  onWheel={(event) => event.currentTarget.blur()}
+                  errorProps={{ fz: 12 }}
+                />
+              </>
+            )}
           </Flex>
 
           {(processing || validated) && showBadge && (
@@ -258,7 +429,7 @@ function Company({
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      Bank
+                      Bank <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   disabled={disableBank}
@@ -294,11 +465,12 @@ function Company({
                   placeholder="Select Country"
                   classNames={{ input: styles.input, label: styles.label }}
                   flex={1}
-                  label="Country"
-                  data={countries.map((c) => ({
-                    label: c?.name,
-                    value: c?.code,
-                  }))}
+                  label={
+                    <Text fz={14} c="#667086">
+                      Country <span style={{ color: "red" }}>*</span>
+                    </Text>
+                  }
+                  data={countries.map((c) => c.name)}
                   disabled={disableCountry}
                   {...form2.getInputProps("destinationCountry")}
                 />
@@ -330,7 +502,7 @@ function Company({
                   }}
                   label={
                     <Text fz={14} c="#667085">
-                      Amount
+                      Amount <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   hideControls
@@ -365,7 +537,7 @@ function Company({
                   classNames={{ input: styles.textarea, label: styles.label }}
                   label={
                     <Text fz={14} c="#667085">
-                      Narration
+                      Narration <span style={{ color: "red" }}>*</span>
                     </Text>
                   }
                   placeholder="Enter narration"
@@ -408,7 +580,11 @@ function Company({
             </Box>
           </Flex>
 
-          <TransactionProcessingTimes />
+          {switchCurrency === "EUR" ? (
+            <TransactionProcessingTimes />
+          ) : (
+            <TransactionProcessTimeGBP />
+          )}
         </ScrollArea>
 
         <Flex mt={24} justify="flex-end" gap={15}>
@@ -433,6 +609,6 @@ function Company({
       </Box>
     </TabsPanel>
   );
-}
+});
 
 export default Company;

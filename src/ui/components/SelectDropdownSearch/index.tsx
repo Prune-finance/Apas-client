@@ -71,6 +71,7 @@ interface Props {
   label?: string;
   accountsData?: AccountData[];
   disabled?: boolean;
+  height?: number;
 }
 
 export function SelectDropdownSearch({
@@ -171,7 +172,7 @@ export function SelectDropdownSearch({
   );
 }
 
-export function SelectCountryDialCode({ value, setValue }: Props) {
+export function SelectCountryDialCode({ value, setValue, height }: Props) {
   const [search, setSearch] = useState("");
   const combobox = useCombobox({
     onDropdownClose: () => {
@@ -201,7 +202,7 @@ export function SelectCountryDialCode({ value, setValue }: Props) {
     <Combobox
       width={300}
       store={combobox}
-      withinPortal={false}
+      withinPortal
       onOptionSubmit={(val) => {
         setValue(val);
         combobox.closeDropdown();
@@ -225,6 +226,7 @@ export function SelectCountryDialCode({ value, setValue }: Props) {
               marginLeft: rem(-2),
               // border: "1px solid var(--prune-primary-700)",
               fontSize: rem(12),
+              height: height ? rem(height) : "100%",
             },
 
             section: {

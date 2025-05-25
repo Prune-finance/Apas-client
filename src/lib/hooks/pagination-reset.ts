@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useEffect } from "react";
 import { sanitizeURL } from "../utils";
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 
 interface Props {
   queryParams: IParams;

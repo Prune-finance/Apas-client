@@ -17,6 +17,7 @@ import { PrimaryBtn } from "../Buttons";
 import FileDisplay from "../DocumentViewer";
 import { useDisclosure } from "@mantine/hooks";
 import useDebtorStore from "@/lib/store/debtor";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 interface PreviewStateProps {
   requestForm?: any;
@@ -40,11 +41,20 @@ function PreviewState({
   const { debtorRequestForm } = useDebtorStore();
   const [opened, { open, close }] = useDisclosure(false);
   const [fileUrl, setFileUrl] = useState<string>("");
+  const { switchCurrency } = useCurrencySwitchStore();
+
   const beneficiaryDetails = {
     "First Name": requestForm?.firstName,
     "Last Name": requestForm?.lastName,
-    IBAN: requestForm?.destinationIBAN,
-    BIC: requestForm?.destinationBIC,
+    ...(switchCurrency === "GBP"
+      ? {
+          "Account Number": requestForm?.destinationAccountNumber,
+          "Sort Code": requestForm?.destinationSortCode,
+        }
+      : {
+          IBAN: requestForm?.destinationIBAN,
+          BIC: requestForm?.destinationBIC,
+        }),
     Bank: requestForm?.destinationBank,
     "Bank Address": requestForm?.bankAddress,
     Country: requestForm?.destinationCountry,
@@ -70,8 +80,16 @@ function PreviewState({
 
   const companyRequestFormDetails = {
     "Company Name": companyRequestForm?.companyName,
-    IBAN: companyRequestForm?.destinationIBAN,
-    BIC: companyRequestForm?.destinationBIC,
+
+    ...(switchCurrency === "GBP"
+      ? {
+          "Account Number": companyRequestForm?.destinationAccountNumber,
+          "Sort Code": companyRequestForm?.destinationSortCode,
+        }
+      : {
+          IBAN: companyRequestForm?.destinationIBAN,
+          BIC: companyRequestForm?.destinationBIC,
+        }),
     Bank: companyRequestForm?.destinationBank,
     "Bank Address": companyRequestForm?.bankAddress,
     // amount: companyRequestForm?.amount,
@@ -151,8 +169,16 @@ function PreviewState({
             </Text>
             <Text fz={32} fw={600} c="#97ad05" mt={0}>
               {sectionState === "Individual"
-                ? formatNumber(requestForm?.amount ?? 0, true, "EUR")
-                : formatNumber(companyRequestForm?.amount ?? 0, true, "EUR")}
+                ? formatNumber(
+                    requestForm?.amount ?? 0,
+                    true,
+                    switchCurrency ?? "EUR"
+                  )
+                : formatNumber(
+                    companyRequestForm?.amount ?? 0,
+                    true,
+                    switchCurrency ?? "EUR"
+                  )}
             </Text>
           </Flex>
 

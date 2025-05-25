@@ -29,7 +29,6 @@ import { notifications } from "@mantine/notifications";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
-import { PayoutReqSearchProps } from ".";
 
 interface Props {
   requests: PayoutTransactionRequest[];

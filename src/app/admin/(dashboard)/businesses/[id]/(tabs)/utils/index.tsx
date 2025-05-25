@@ -2,9 +2,9 @@ import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 
 import styles from "@/ui/styles/singlebusiness.module.scss";
+import { directorEtShareholderSchema } from "@/lib/schema";
 import {
   BasicInfoType,
-  directorEtShareholderSchema,
   removeDirectorSchema,
   removeDirectorValues,
 } from "@/lib/schema";
@@ -17,16 +17,14 @@ import {
   Modal,
   Flex,
   Text,
-  Button,
   Stack,
   Textarea,
   ThemeIcon,
 } from "@mantine/core";
-import { IconFileInfo, IconFileTypePdf, IconX } from "@tabler/icons-react";
+import { IconFileTypePdf, IconX } from "@tabler/icons-react";
 import DropzoneComponent from "@/ui/components/Dropzone";
 import { useState } from "react";
 import useNotification from "@/lib/hooks/notification";
-import { notifications } from "@mantine/notifications";
 import FileDisplay from "@/ui/components/DocumentViewer";
 
 interface IDirector {

@@ -1,7 +1,7 @@
 "use client";
 
 import Cookies from "js-cookie";
-import { Box, Checkbox, PasswordInput, TextInput } from "@mantine/core";
+import { Box, PasswordInput, TextInput } from "@mantine/core";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
@@ -13,7 +13,6 @@ import { registerValues, validateRegister } from "@/lib/schema";
 
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import { RegisterInput } from "@/ui/components/Inputs";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 
 export default function FormComponent({ email }: { email: string }) {

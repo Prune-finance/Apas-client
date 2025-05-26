@@ -4,6 +4,7 @@ import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect } from "react";
 import {
   AccountData,
+  useAdminGetCompanyCurrencyAccountsList,
   useBusinessDefaultAccount,
   useBusinessPayoutAccount,
 } from "@/lib/hooks/accounts";
@@ -30,6 +31,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import EmptyTable from "@/ui/components/EmptyTable";
 import createAxiosInstance from "@/lib/axios";
+import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -73,11 +75,16 @@ export default function Accounts({
     meta: bizTrxMeta,
   } = useBusinessTransactions(params.id, customParams);
 
-  const { account: defaultAccount, loading: loadingDefault } =
+  const { account: defaultAccount, loading: loadingDefault, revalidate: revalidateDftAcct  } =
     useBusinessDefaultAccount(params.id);
   const { account: payoutAccount, loading: loadingPayout } =
     useBusinessPayoutAccount(params.id);
   const { services } = useBusinessServices(params.id);
+  const {
+    currencyAccount,
+    loading: currencyLoading,
+    revalidate: currencyRevalidate,
+  } = useAdminGetCompanyCurrencyAccountsList(params.id);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -195,7 +202,7 @@ export default function Accounts({
     <TabsComponent tabs={tabs} mt={24}>
       <TabsPanel value={tabs[0].value} mt={24}>
         <SimpleGrid cols={3}>
-          <AccountCard
+          {/* <AccountCard
             currency="EUR"
             bic="ARPYGB21XXX"
             balance={defaultAccount?.accountBalance ?? 0}
@@ -204,7 +211,38 @@ export default function Accounts({
             badgeText="Main Account"
             link={`/admin/businesses/${params.id}/default?accountId=${defaultAccount?.id}`}
             business
+          /> */}
+
+          <NewAccountCard
+            currency={"EUR"}
+            companyName={defaultAccount?.accountName ?? "No Default Account"}
+            link={`/admin/businesses/${params.id}/default?accountId=${defaultAccount?.id}`}
+            iban={defaultAccount?.accountNumber ?? "No Default Account"}
+            bic={"ARPYGB21XXX"}
+            balance={defaultAccount?.accountBalance ?? 0}
+            loading={loadingDefault}
+            business={false}
+            refresh
+            revalidate={revalidateDftAcct}
           />
+
+          {currencyAccount &&
+          currencyAccount?.length > 0 &&
+          currencyAccount?.map((data) => (
+            <NewAccountCard
+              key={data?.id}
+              currency={data?.AccountRequests?.Currency?.symbol}
+              companyName={data?.accountName ?? "No Default Account"}
+              link={`/admin/businesses/${params.id}/default/${data?.id}`}
+              sortCode="041917"
+              accountNumber={data?.accountNumber}
+              balance={data?.accountBalance ?? 0}
+              loading={currencyLoading}
+              business={false}
+              refresh
+              revalidate={currencyRevalidate}
+            />
+          ))}
 
           {payoutAccount && (
             <AccountCard

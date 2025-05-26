@@ -30,7 +30,7 @@ export default function DefaultAccountDetails({
   const accountDetails = {
     "Account Name": account?.accountName,
     [accountType === "GBP" ? "Sort Code" : "IBAN/Account Number"]:
-      accountType === "GBP" ? account?.sortCode : account?.accountNumber,
+      accountType === "GBP" ? account?.sortCode || "041917" : account?.accountNumber,
 
     [accountType === "GBP" ? "Account Number" : "BIC"]:
       accountType === "GBP" ? account?.accountNumber : "ARPYGB21XXX",

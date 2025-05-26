@@ -3,9 +3,8 @@
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "../styles.module.scss";
 import {
-  adminGetCompanyCurrencyAccountByID,
-  useUserCurrencyAccountByID,
-  useUserDefaultAccount,
+  useAdminGetCompanyCurrencyAccountByID,
+
 } from "@/lib/hooks/accounts";
 import {
   TransactionType,
@@ -76,7 +75,7 @@ function Account() {
     currencyAccount: account,
     loading,
     revalidate: revalidateAcct,
-  } = adminGetCompanyCurrencyAccountByID(params?.account);
+  } = useAdminGetCompanyCurrencyAccountByID(params?.account);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 

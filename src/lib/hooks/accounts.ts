@@ -523,7 +523,8 @@ export function useUserCurrencyAccountByID(id: string) {
 
   return { loading, currencyAccount, revalidate };
 }
-export function adminGetCompanyCurrencyAccountByID(id: string) {
+
+export function useAdminGetCompanyCurrencyAccountByID(id: string) {
   const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
     null
   );

@@ -9,6 +9,7 @@ import {
   Grid,
   GridCol,
   Skeleton,
+  Stack,
   TableTd,
   TableTr,
   Text,
@@ -168,7 +169,16 @@ const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
       onClick={() => push(`/admin/eligibility-center/${row.id}`)}
       style={{ cursor: "pointer" }}
     >
-      <TableTd>{row.businessName}</TableTd>
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={14} fw={400}>
+            {row.businessName}
+          </Text>
+          <Text fz={12} fw={400} c="var(--prune-text-gray-500)">
+            {row.businessEmail}
+          </Text>
+        </Stack>
+      </TableTd>
       <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>{row.businessCountry}</TableTd>
       <TableTd>

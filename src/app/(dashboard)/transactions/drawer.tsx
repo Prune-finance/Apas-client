@@ -89,15 +89,20 @@ export const TransactionDrawer = ({
           IBAN: selectedRequest?.recipientIban,
           BIC: selectedRequest?.recipientBic,
         }),
-      "Bank Name": selectedRequest?.recipientBankAddress ??
+    "Bank Name":
+      selectedRequest?.recipientBankAddress ??
       selectedRequest?.beneficiaryInstitutionName ??
       "N/A",
-    "Bank Address": selectedRequest?.type === "CREDIT" ?
-        "Office 7 35-37 Ludgate Hill, London"
-      : selectedRequest?.recipientBankAddress ??
-      selectedRequest?.beneficiaryAddress ??
-      "N/A",
-    Country: selectedRequest?.type === "CREDIT" ? "United Kingdom" : selectedRequest?.recipientBankCountry ?? "N/A",
+    "Bank Address":
+      selectedRequest?.type === "CREDIT"
+        ? "Office 7 35-37 Ludgate Hill, London"
+        : selectedRequest?.recipientBankAddress ??
+          selectedRequest?.beneficiaryAddress ??
+          "N/A",
+    Country:
+      selectedRequest?.type === "CREDIT"
+        ? "United Kingdom"
+        : selectedRequest?.recipientBankCountry ?? "N/A",
     "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
@@ -266,7 +271,18 @@ export const TransactionDrawer = ({
             ))}
           </Stack>
 
-          <Divider mt={30} mb={20} />
+          {selectedRequest?.rejectionReason && (
+            <Box bg="#FF4D4F1A" px={12} py={8} mt={14}>
+              <Text fz={14} c="#FF4D4F" fw={600}>
+                Reason for failure
+              </Text>
+
+              <Text fz={12} c="#FF4D4F" mt={4}>
+                {selectedRequest?.rejectionReason}
+              </Text>
+            </Box>
+          )}
+          {/* <Divider mt={30} mb={20} /> */}
         </ScrollArea>
 
         <Box mr={28}>

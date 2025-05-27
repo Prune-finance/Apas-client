@@ -9,9 +9,10 @@ import { OnboardingType } from "@/lib/schema";
 interface DocumentInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   form: UseFormReturnType<OnboardingType>;
+  active: number;
 }
 
-function DocumentInfoCard({ setActive, form }: DocumentInfoCard) {
+function DocumentInfoCard({ setActive, form, active }: DocumentInfoCard) {
   const { mermat, cacCertificate, amlCompliance, operationalLicense } =
     form.values;
   return (
@@ -28,6 +29,7 @@ function DocumentInfoCard({ setActive, form }: DocumentInfoCard) {
           rightSection={<IconEdit size={18} color="#758604" />}
           fw={600}
           action={() => setActive(2)}
+          disabled={active === 7}
         />
       </Flex>
 

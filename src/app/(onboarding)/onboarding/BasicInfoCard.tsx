@@ -8,9 +8,10 @@ import React from "react";
 interface BasicInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   form: UseFormReturnType<OnboardingType>;
+  active: number;
 }
 
-function BasicInfoCard({ setActive, form }: BasicInfoCard) {
+function BasicInfoCard({ setActive, form, active }: BasicInfoCard) {
   const {
     businessName,
     businessType,
@@ -50,6 +51,7 @@ function BasicInfoCard({ setActive, form }: BasicInfoCard) {
           rightSection={<IconEdit size={18} color="#758604" />}
           fw={600}
           action={() => setActive(0)}
+          disabled={active === 7}
         />
       </Flex>
       <Stack gap={10} mt={20}>

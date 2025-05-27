@@ -1,4 +1,4 @@
-import { Box, Flex, Group, Stack, TabsPanel, Text } from "@mantine/core";
+import { Box, Flex, TabsPanel, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { IconEdit } from "@tabler/icons-react";
@@ -37,7 +37,7 @@ export const ReviewInfo = ({ setActive, active, form, title }: ReviewInfo) => {
           ShareholderInfoCard,
         ].map((Component, index) => (
           <TabsPanel value={tabs[index]?.value} key={index}>
-            <Component setActive={setActive} form={form} />
+            <Component setActive={setActive} form={form} active={active} />
           </TabsPanel>
         ))}
       </TabsComponent>

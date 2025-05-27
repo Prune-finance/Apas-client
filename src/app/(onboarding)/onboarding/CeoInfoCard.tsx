@@ -11,9 +11,10 @@ import dayjs from "dayjs";
 interface CEOInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   form: UseFormReturnType<OnboardingType>;
+  active: number;
 }
 
-function CEOInfoCard({ setActive, form }: CEOInfoCard) {
+function CEOInfoCard({ setActive, form, active }: CEOInfoCard) {
   const {
     ceoFirstName,
     ceoLastName,
@@ -49,6 +50,7 @@ function CEOInfoCard({ setActive, form }: CEOInfoCard) {
           rightSection={<IconEdit size={18} color="#758604" />}
           fw={600}
           action={() => setActive(1)}
+          disabled={active === 7}
         />
       </Flex>
       <Stack gap={10} mt={20}>

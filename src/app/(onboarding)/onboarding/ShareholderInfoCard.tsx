@@ -10,9 +10,10 @@ import dayjs from "dayjs";
 interface ShareholderInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   form: UseFormReturnType<OnboardingType>;
+  active: number;
 }
 
-function ShareholderInfoCard({ setActive, form }: ShareholderInfoCard) {
+function ShareholderInfoCard({ setActive, form, active }: ShareholderInfoCard) {
   const { shareholders } = form.values;
   const data = form.getValues().shareholders?.map((shareholder, index) => ({
     "First name": shareholder.first_name,
@@ -36,6 +37,7 @@ function ShareholderInfoCard({ setActive, form }: ShareholderInfoCard) {
           rightSection={<IconEdit size={18} color="#758604" />}
           fw={600}
           action={() => setActive(4)}
+          disabled={active === 7}
         />
       </Flex>
 

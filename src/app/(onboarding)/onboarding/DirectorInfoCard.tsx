@@ -10,9 +10,10 @@ import dayjs from "dayjs";
 interface DirectorInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   form: UseFormReturnType<OnboardingType>;
+  active: number;
 }
 
-function DirectorInfoCard({ setActive, form }: DirectorInfoCard) {
+function DirectorInfoCard({ setActive, form, active }: DirectorInfoCard) {
   const { directors } = form.values;
   const data = form.getValues().directors.map((director, index) => ({
     "First name": director.first_name,
@@ -37,6 +38,7 @@ function DirectorInfoCard({ setActive, form }: DirectorInfoCard) {
           rightSection={<IconEdit size={18} color="#758604" />}
           fw={600}
           action={() => setActive(3)}
+          disabled={active === 7}
         />
       </Flex>
 

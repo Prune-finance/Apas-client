@@ -27,7 +27,7 @@ function ShareholderInfoCard({ setActive, form, active }: ShareholderInfoCard) {
     <Box p={24} bg="#F2F4F7" mt={24} style={{ borderRadius: 8 }}>
       <Flex align="center" justify="space-between" w="100%">
         <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
-          Shareholder
+          Key Shareholders
         </Text>
 
         <PrimaryBtn

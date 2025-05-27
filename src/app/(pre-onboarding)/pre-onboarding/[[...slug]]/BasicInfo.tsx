@@ -121,6 +121,17 @@ export default function BasicInfo() {
           <Radio label="No" value="no" color="var(--prune-primary-600)" />
         </Stack>
       </RadioGroup>
+
+      {form.values.isRegulated === "yes" && (
+        <TextareaWithInsideLabel
+          label="Provide details of regulatory license (Name and reference number)"
+          minRows={4}
+          autosize
+          maxRows={4}
+          {...form.getInputProps("regulatoryLicense")}
+          key={form.key("regulatoryLicense")}
+        />
+      )}
     </Box>
   );
 }

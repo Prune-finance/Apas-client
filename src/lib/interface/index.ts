@@ -98,6 +98,7 @@ export interface OnboardingBusiness {
   virtualAccounts: VirtualAccounts;
   operationsAccounts: OperationsAccounts;
   annualTurnover: null | string;
+  regulatoryLicense?: string | null;
 }
 
 export interface Director {

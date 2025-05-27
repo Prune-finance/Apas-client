@@ -90,6 +90,7 @@ export const BizBasicInfoSchema = z.object({
     })
     .min(1, "Geo footprint is required"),
   businessDescription: z.string().min(1, "Business description is required"),
+  regulatoryLicense: z.string().optional(),
 });
 
 export const ContactPerson = z.object({
@@ -158,4 +159,5 @@ export const questionnaireValues: QuestionnaireType = {
   operationsAccounts: {
     estimated_balance: "",
   },
+  regulatoryLicense: "",
 };

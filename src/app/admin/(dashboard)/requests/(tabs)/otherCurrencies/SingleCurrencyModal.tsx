@@ -5,6 +5,7 @@ import { Box, Flex, Modal, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { CurrencyRequest } from "@/lib/hooks/requests";
 import AdvancedFormat from "dayjs/plugin/advancedFormat";
+import Link from "next/link";
 
 dayjs.extend(AdvancedFormat);
 
@@ -63,6 +64,7 @@ function SingleCurrencyModal({
               dayjs(selectedRequest?.createdAt).format("Do MMMM, YYYY")}
           </Text>
         </Flex>
+
         <Flex justify="space-between" align="center" gap={5}>
           <Text fz={12} fw={400} c="#667085">
             Status:
@@ -73,6 +75,29 @@ function SingleCurrencyModal({
             )}
           </Text>
         </Flex>
+        {/* {selectedRequest?.supportingDocumentUrl && ( */}
+        <Flex justify="space-between" align="center" gap={5} mt={16}>
+          <Text fz={12} fw={400} c="#667085">
+            supporting Document:
+          </Text>
+
+          <a
+            href={selectedRequest?.supportingDocumentUrl}
+            download
+            style={{
+              fontSize: 12,
+              fontWeight: 500,
+              color: "blue",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Download
+          </a>
+        </Flex>
+        {/* )} */}
 
         <Flex direction="column" align="flex-start" mt={20} gap={8}>
           <Text fz={12} fw={400} c="#667085">

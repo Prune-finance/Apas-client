@@ -533,7 +533,9 @@ export function useAdminGetCompanyCurrencyAccountByID(id: string) {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/currency-accounts/admin-get-account-by-id/${id}`);
+      const { data } = await axios.get(
+        `/currency-accounts/admin-get-account-by-id/${id}`
+      );
       setCurrencyAccount(data?.data);
     } catch (error) {
       console.log(error);
@@ -564,7 +566,9 @@ export function useUserCurrencyAccount() {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/currency-accounts/list`);
+      const { data } = await axios.get(
+        `/currency-accounts/list?type=COMPANY_ACCOUNT`
+      );
 
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -661,6 +665,37 @@ export function useUserDefaultPayoutAccount() {
     setLoading(true);
     try {
       const { data } = await axios.get(`/accounts/payout`);
+
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+export function useUserDefaultPayoutAccountGBP() {
+  const [account, setAccount] = useState<DefaultAccount[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/list?type=PAYOUT_ACCOUNT`
+      );
 
       setAccount(data.data);
     } catch (error) {

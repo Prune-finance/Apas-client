@@ -3,7 +3,10 @@
 import { Center, SimpleGrid } from "@mantine/core";
 
 import EmptyTable from "@/ui/components/EmptyTable";
-import { useUserDefaultPayoutAccount } from "@/lib/hooks/accounts";
+import {
+  useUserDefaultPayoutAccount,
+  useUserDefaultPayoutAccountGBP,
+} from "@/lib/hooks/accounts";
 
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
 
@@ -21,9 +24,29 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
     account,
     revalidate,
   } = useUserDefaultPayoutAccount();
+  const {
+    loading: loadingAcctGBP,
+    account: currencyAccount,
+    revalidate: revalidateGBP,
+  } = useUserDefaultPayoutAccountGBP();
 
   return (
     <main>
+      {loading && (
+        <SimpleGrid cols={3} mt={32}>
+          <NewAccountCard
+            currency={""}
+            companyName={""}
+            link={`/accounts/default/1`}
+            sortCode=""
+            accountNumber=""
+            balance={0}
+            loading={loading}
+            business={false}
+          />
+        </SimpleGrid>
+      )}
+
       {Boolean(meta?.hasPayoutAccount) && (
         <SimpleGrid cols={3} mt={32}>
           <NewAccountCard
@@ -39,31 +62,23 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             revalidate={revalidate}
           />
 
-          {/* <NewAccountCard
-            currency={"GBP"}
-            companyName={account?.accountName ?? "No Default Account"}
-            link={`/accounts/default/1`}
-            sortCode="567890"
-            accountNumber="567890"
-            balance={account?.accountBalance ?? 0}
-            loading={loadingAcct}
-            business={false}
-            refresh
-            revalidate={revalidate}
-          /> */}
-
-          {/* <AccountCard
-            balance={account?.accountBalance ?? 0}
-            currency="EUR"
-            companyName={account?.accountName ?? "No Default Account"}
-            badgeText="Payout Account"
-            iban={account?.accountNumber ?? "No Default Account"}
-            bic={"ARPYGB21XXX"}
-            loading={loadingAcct}
-            link={`/payouts/${account?.id}/account`}
-            refresh
-            revalidate={revalidate}
-          /> */}
+          {currencyAccount &&
+            currencyAccount?.length > 0 &&
+            currencyAccount?.map((data) => (
+              <NewAccountCard
+                key={data?.id}
+                currency={data?.AccountRequests?.Currency?.symbol}
+                companyName={data?.accountName ?? "No Default Account"}
+                link={`/accounts/default/${data?.id}`}
+                sortCode="041917"
+                accountNumber={data?.accountNumber}
+                balance={data?.accountBalance ?? 0}
+                loading={loadingAcctGBP}
+                business={false}
+                refresh
+                revalidate={revalidateGBP}
+              />
+            ))}
         </SimpleGrid>
       )}
 

@@ -71,11 +71,15 @@ export default function DefaultAccountDetails({
 
         {!loading && (
           <CopyButton
-            value={`Account Name: ${
-              account?.accountName ?? ""
-            },\nIBAN/Account Number: ${
-              account?.accountNumber ?? ""
-            },\nBIC: ARPYGB21XXX,\nBank Name: Prune Payments LTD,\nBank Address: Office 7 35-37 Ludgate Hill, London,\nBank Country: United Kingdom`}
+            value={`Account Name: ${account?.accountName ?? ""},\n${
+              accountType === "GBP"
+                ? `Sort Code: ${account?.sortCode ?? ""},\nAccount Number: ${
+                    account?.accountNumber ?? ""
+                  }`
+                : `IBAN/Account Number: ${
+                    account?.accountNumber ?? ""
+                  },\nBIC: ARPYGB21XXX`
+            },\nBank Name: Prune Payments LTD,\nBank Address: Office 7 35-37 Ludgate Hill, London,\nBank Country: United Kingdom`}
           >
             {({ copied, copy }) => (
               <PrimaryBtn

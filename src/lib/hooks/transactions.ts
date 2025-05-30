@@ -773,15 +773,18 @@ export function useUserCurrencyTransactions(customParams: ITrx = {}) {
   return { loading, transactions: data || [], meta, revalidate };
 }
 
-export function useAdminGetCurrencyTransactions(customParams: ITrx = {}, id: string, symbol: string) {
+export function useAdminGetCurrencyTransactions(
+  customParams: ITrx = {},
+  id: string,
+  symbol: string
+) {
   const {
     data,
     meta,
     loading,
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
-    endpoint:
-      `currency-accounts/admin-get-account-transactions-by-id/${id}/${symbol}`,
+    endpoint: `currency-accounts/admin-get-account-transactions-by-id/${id}/${symbol}`,
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -957,7 +960,8 @@ export interface TransactionType {
   dpsId: number;
   destinationFirstName: string;
   destinationLastName: string;
-  senderInstitutionName?: string
+  senderInstitutionName?: string;
+  rejectionReason?: string;
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
   company: BusinessData;

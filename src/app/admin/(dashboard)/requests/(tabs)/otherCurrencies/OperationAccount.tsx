@@ -64,9 +64,12 @@ function OperationAccount() {
     search: debouncedSearch,
   };
 
-  const { currencyRequests, revalidate, loading, meta } = useCurrencyRequests({
-    ...queryParams,
-  });
+  const { currencyRequests, revalidate, loading, meta } = useCurrencyRequests(
+    {
+      ...queryParams,
+    },
+    "COMPANY_ACCOUNT"
+  );
 
   const rows = currencyRequests.map((element, index) => (
     <TableTr

@@ -17,6 +17,7 @@ const switzer = localFont({
 });
 
 import styles from "@/ui/styles/layout.module.scss";
+import NoticeBanner from "@/ui/components/NoticeBanner";
 
 export default function RootLayout({
   children,

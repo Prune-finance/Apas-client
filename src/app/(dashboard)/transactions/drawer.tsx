@@ -94,10 +94,15 @@ export const TransactionDrawer = ({
       selectedRequest?.beneficiaryInstitutionName ??
       "N/A",
     "Bank Address":
-      selectedRequest?.recipientBankAddress ??
-      selectedRequest?.beneficiaryAddress ??
-      "N/A",
-    Country: selectedRequest?.recipientBankCountry ?? "N/A",
+      selectedRequest?.type === "CREDIT"
+        ? "Office 7 35-37 Ludgate Hill, London"
+        : selectedRequest?.recipientBankAddress ??
+          selectedRequest?.beneficiaryAddress ??
+          "N/A",
+    Country:
+      selectedRequest?.type === "CREDIT"
+        ? "United Kingdom"
+        : selectedRequest?.recipientBankCountry ?? "N/A",
     "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
@@ -119,11 +124,11 @@ export const TransactionDrawer = ({
     Bank:
       selectedRequest?.type === "DEBIT"
         ? "Prune Payments LTD"
-        : "Prune Payments LTD",
+        : selectedRequest?.senderInstitutionName ?? "N/A",
     "Bank Address":
       selectedRequest?.type === "DEBIT"
         ? "Office 7 35-37 Ludgate Hill, London"
-        : "Office 7 35-37 Ludgate Hill, London",
+        : selectedRequest?.senderInstitutionName ?? "N/A",
     Country:
       selectedRequest?.type === "DEBIT" ? "United Kingdom" : "United Kingdom",
   };

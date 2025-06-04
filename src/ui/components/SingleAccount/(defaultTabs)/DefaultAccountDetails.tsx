@@ -16,7 +16,6 @@ import { PrimaryBtn } from "../../Buttons";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
-
 interface Props {
   account: DefaultAccount | null;
   loading: boolean;
@@ -37,9 +36,7 @@ export default function DefaultAccountDetails({
       accountType === "GBP" ? account?.accountNumber : "ARPYGB21XXX",
 
     "Bank Name": "Prune Payments LTD",
-
     "Bank Address": "Office 7 35-37 Ludgate Hill, London",
-
     "Bank Country": "United Kingdom",
   };
 

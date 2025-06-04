@@ -157,7 +157,7 @@ export const Transactions = ({
         );
       }
 
-      console.log(res?.data);
+      console.log(res?.data, res?.meta);
 
       setDownloadData(res.data);
       setDownloadMeta(res.meta);
@@ -225,7 +225,13 @@ export const Transactions = ({
         opened={openedFilter}
         toggle={toggle}
         form={form}
-        customStatusOption={["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"]}
+        customStatusOption={[
+          "PENDING",
+          "CONFIRMED",
+          "REJECTED",
+          "CANCELLED",
+          "FAILED",
+        ]}
       >
         <TextBox
           placeholder="Sender Name"
@@ -342,6 +348,7 @@ export const Transactions = ({
 
       <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
         <DownloadStatement
+          currencyType={currencyType}
           receiptRef={pdfRef}
           data={downloadData}
           meta={downloadMeta}
@@ -397,6 +404,7 @@ export interface AccountDetails {
   country: string;
   accountName: string;
   createdAt: string;
+  sortCode?: string;
 }
 
 export interface DownloadStatementData {

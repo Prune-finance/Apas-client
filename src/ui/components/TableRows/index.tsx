@@ -112,7 +112,7 @@ export const IssuedTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd
-        td={noLink || isDummyIBAN(element.senderIban) ? "none" : "underline"}
+        // td={noLink || isDummyIBAN(element.senderIban) ? "none" : "underline"}
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -121,15 +121,15 @@ export const IssuedTransactionTableRows = ({
             noLink || isDummyIBAN(element.senderIban) ? "none" : "auto",
         }}
       >
-        <Link
+        {/* <Link
           href={`${!isUser ? "/admin" : ""}/transactions/${
             element?.currencyType === "GBP"
               ? element?.beneficiaryAccountNumber
               : element.senderIban
           }`}
-        >
-          {element?.senderName || "N/A"}
-        </Link>
+        > */}
+        {element?.senderName || "N/A"}
+        {/* </Link> */}
       </TableTd>
 
       <TableTd>

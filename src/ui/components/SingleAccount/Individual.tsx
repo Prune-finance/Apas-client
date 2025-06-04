@@ -38,6 +38,7 @@ import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import NoticeBanner from "../NoticeBanner";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -100,21 +101,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       validate: zodResolver(sendMoneyIndividualValidate),
     });
 
-    useEffect(() => {
-      form.setFieldValue("currency", switchCurrency);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [switchCurrency]);
-
     const [{ bic, iban }] = useDebouncedValue(
       { iban: form.values.destinationIBAN, bic: form.values.destinationBIC },
-      2000
-    );
-
-    const [{ accountNumber, sortCode }] = useDebouncedValue(
-      {
-        accountNumber: form.values.destinationAccountNumber,
-        sortCode: form.values.destinationSortCode,
-      },
       2000
     );
 
@@ -127,8 +115,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       setShowBadge(true);
       try {
         const data = await validateAccount({
-          iban: removeWhitespace(iban ?? accountNumber),
-          bic: removeWhitespace(bic ?? sortCode),
+          iban: removeWhitespace(iban),
+          bic: removeWhitespace(bic),
         });
 
         if (data) {
@@ -144,6 +132,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           if (data.country) setDisableCountry(true);
         } else {
           setValidated(false);
+          // Scroll to top of container
           if (ref && typeof ref !== "function" && ref.current) {
             ref.current.scrollIntoView({
               behavior: "smooth",
@@ -164,31 +153,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [bic, iban]);
 
-    useEffect(() => {
-      if (accountNumber && sortCode) {
-        handleIbanValidation();
-      }
-
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [accountNumber, sortCode]);
-
     const handleDebtorState = () => {
-      // const { hasErrors } = form.validate();
-      // if (hasErrors) return;
-
-      const result = sendMoneyIndividualValidate.safeParse(form.values);
-
-      if (!result.success) {
-        const errors = result.error.flatten().fieldErrors;
-        Object.entries(errors).forEach(([field, messages]) => {
-          if (messages?.[0]) {
-            console.log(messages);
-            form.setFieldError(field, messages[0]);
-          }
-        });
-        return;
-      }
-
+      const { hasErrors } = form.validate();
+      if (hasErrors) return;
       if (
         account?.accountBalance &&
         account?.accountBalance < Number(form.values.amount)
@@ -219,13 +186,13 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      First Name <span style={{ color: "red" }}>*</span>
+                      First Name
                     </Text>
                   }
                   placeholder="Enter first name"
                   {...form.getInputProps("firstName")}
                   errorProps={{
-                    fz: 12,
+                    fz: 0,
                   }}
                 />
 
@@ -235,99 +202,55 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   size="lg"
                   label={
                     <Text fz={14} c="#667085">
-                      Last Name <span style={{ color: "red" }}>*</span>
+                      Last Name
                     </Text>
                   }
                   placeholder="Enter last name"
                   {...form.getInputProps("lastName")}
                   errorProps={{
-                    fz: 12,
+                    fz: 0,
                   }}
                 />
               </Flex>
 
               <Flex gap={20} mt={24}>
-                {switchCurrency === "EUR" ? (
-                  <>
-                    <TextInput
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          IBAN <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter IBAN"
-                      {...form.getInputProps("destinationIBAN")}
-                      errorProps={{ fz: 12 }}
-                    />
-                    <TextInput
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          BIC <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter BIC"
-                      {...form.getInputProps("destinationBIC")}
-                      errorProps={{ fz: 12 }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <TextInput
-                      type="number"
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          Account Number <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter Account Number"
-                      {...form.getInputProps("destinationAccountNumber")}
-                      onKeyDown={(e) => {
-                        const isDigit = /^\d$/.test(e.key);
-                        const currentLength =
-                          form.values.destinationAccountNumber.length;
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      {switchCurrency === "EUR" ? "IBAN" : "Account Number"}
+                    </Text>
+                  }
+                  placeholder={
+                    switchCurrency === "EUR"
+                      ? "Enter IBAN"
+                      : "Enter Account Number"
+                  }
+                  {...form.getInputProps("destinationIBAN")}
+                  errorProps={{
+                    fz: 0,
+                  }}
+                />
 
-                        if (isDigit && currentLength >= 8) {
-                          e.preventDefault(); // stop more digits from being typed
-                          return;
-                        }
-                      }}
-                      errorProps={{ fz: 12 }}
-                    />
-                    <TextInput
-                      type="number"
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          Sort Code <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter Sort Code"
-                      {...form.getInputProps("destinationSortCode")}
-                      onKeyDown={(e) => {
-                        const isDigit = /^\d$/.test(e.key);
-                        const currentLength =
-                          form.values.destinationSortCode.length;
-
-                        if (isDigit && currentLength >= 6) {
-                          e.preventDefault(); // stop more digits from being typed
-                          return;
-                        }
-                      }}
-                      errorProps={{ fz: 12 }}
-                    />
-                  </>
-                )}
+                <TextInput
+                  classNames={{ input: styles.input, label: styles.label }}
+                  flex={1}
+                  size="lg"
+                  label={
+                    <Text fz={14} c="#667085">
+                      {switchCurrency === "EUR" ? "BIC" : "Sort Code"}
+                    </Text>
+                  }
+                  placeholder={
+                    switchCurrency === "EUR" ? "Enter BIC" : "Enter Sort Code"
+                  }
+                  {...form.getInputProps("destinationBIC")}
+                  errorProps={{
+                    fz: 0,
+                  }}
+                />
               </Flex>
 
               {(processing || validated) && showBadge && (
@@ -382,13 +305,13 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          Bank <span style={{ color: "red" }}>*</span>
+                          Bank
                         </Text>
                       }
                       disabled={disableBank}
                       {...form.getInputProps("destinationBank")}
                       errorProps={{
-                        fz: 12,
+                        fz: 0,
                       }}
                     />
                   </Flex>
@@ -406,7 +329,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       disabled={disableAddress}
                       {...form.getInputProps("bankAddress")}
                       errorProps={{
-                        fz: 12,
+                        fz: 0,
                       }}
                     />
                   </Flex>
@@ -436,7 +359,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       }}
                       label={
                         <Text fz={14} c="#667085">
-                          Amount <span style={{ color: "red" }}>*</span>
+                          Amount
                         </Text>
                       }
                       hideControls
@@ -444,7 +367,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Enter amount"
                       {...form.getInputProps("amount")}
                       errorProps={{
-                        fz: 12,
+                        fz: 0,
                       }}
                       // error={account?.accountBalance < form.values.amount}
                     />
@@ -455,11 +378,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       placeholder="Select Country"
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
-                      label={
-                        <Text fz={14} c="#667086">
-                          Country <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
+                      label="Country"
                       data={countries.map((c) => c?.name)}
                       disabled={disableCountry}
                       {...form.getInputProps("destinationCountry")}
@@ -489,13 +408,13 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       }}
                       label={
                         <Text fz={14} c="#667085">
-                          Narration <span style={{ color: "red" }}>*</span>
+                          Narration
                         </Text>
                       }
                       placeholder="Enter narration"
                       {...form.getInputProps("narration")}
                       errorProps={{
-                        fz: 12,
+                        fz: 0,
                       }}
                     />
                   </Flex>
@@ -533,6 +452,12 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               </Flex>
 
               <TransactionProcessingTimes />
+
+              {switchCurrency === "EUR" && (
+                <Flex pt={12} w="100%">
+                  <NoticeBanner />
+                </Flex>
+              )}
             </ScrollArea>
 
             <Flex mt={24} justify="flex-end" gap={15}>
@@ -550,6 +475,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                 // loading={processing}
                 text="Continue"
                 fullWidth
+                disabled={switchCurrency === "EUR" ? true : false}
                 fw={600}
                 h={48}
                 // w={126}

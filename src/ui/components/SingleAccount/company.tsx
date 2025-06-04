@@ -28,7 +28,11 @@ import {
 import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
-import { DefaultAccount, validateAccount } from "@/lib/hooks/accounts";
+import {
+  DefaultAccount,
+  validateAccount,
+  validateAccountGBP,
+} from "@/lib/hooks/accounts";
 import DropzoneComponent from "../Dropzone";
 import { sendMoneyCompanyValidate } from "@/lib/schema";
 // import { countries } from "@/lib/static";
@@ -37,6 +41,8 @@ import { removeWhitespace } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import TransactionProcessTimeGBP from "./TransactionProcessTimeGBP";
+import NoticeBanner from "../NoticeBanner";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -188,6 +194,45 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     }
   };
 
+  const handleIbanValidationGBP = async () => {
+    setProcessing(true);
+    setValidated(null);
+    setDisableAddress(false);
+    setDisableBank(false);
+    setDisableCountry(false);
+    setShowBadge(true);
+
+    try {
+      const data = await validateAccountGBP({
+        accountNumber: removeWhitespace(accountNumber),
+        sortCode: removeWhitespace(sortCode),
+      });
+
+      if (data) {
+        form2.setValues({
+          bankAddress: data.bankAddress || data.city,
+          destinationBank: data.bankName,
+          // destinationCountry: data.bankTown,
+        });
+
+        setValidated(true);
+        if (data.bankAddress || data.city) setDisableAddress(true);
+        if (data.bankName) setDisableBank(true);
+        // if (data.bankTown) setDisableCountry(true);
+      } else {
+        setValidated(false);
+        if (ref && typeof ref !== "function" && ref.current) {
+          ref.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   useEffect(() => {
     if (iban && bic) {
       handleIbanValidation();
@@ -198,7 +243,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
   useEffect(() => {
     if (accountNumber && sortCode) {
-      handleIbanValidation();
+      handleIbanValidationGBP();
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -275,6 +320,10 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   placeholder="Enter Account Number"
                   {...form2.getInputProps("destinationAccountNumber")}
                   onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
+                      e.preventDefault(); // Prevent increment/decrement via arrow keys
+                    }
+
                     const isDigit = /^\d$/.test(e.key);
                     const currentLength =
                       form2.values.destinationAccountNumber.length;
@@ -284,6 +333,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       return;
                     }
                   }}
+                  onWheel={(event) => event.currentTarget.blur()}
                   errorProps={{ fz: 12 }}
                 />
                 <TextInput
@@ -299,6 +349,10 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   placeholder="Enter Sort Code"
                   {...form2.getInputProps("destinationSortCode")}
                   onKeyDown={(e) => {
+                    if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
+                      e.preventDefault(); // Prevent increment/decrement via arrow keys
+                    }
+
                     const isDigit = /^\d$/.test(e.key);
                     const currentLength =
                       form2.values.destinationSortCode.length;
@@ -308,6 +362,19 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       return;
                     }
                   }}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    const pasted = e.clipboardData
+                      .getData("Text")
+                      .replace(/-/g, ""); // remove dashes
+                    const digitsOnly = pasted.replace(/\D/g, ""); // keep only digits
+
+                    const currentValue = form2.values.destinationSortCode;
+                    const newValue = (currentValue + digitsOnly).slice(0, 6); // limit to 6 digits
+
+                    form2.setFieldValue("destinationSortCode", newValue);
+                  }}
+                  onWheel={(event) => event.currentTarget.blur()}
                   errorProps={{ fz: 12 }}
                 />
               </>
@@ -514,7 +581,12 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
             </Box>
           </Flex>
 
-          <TransactionProcessingTimes />
+          {switchCurrency === "EUR" && <NoticeBanner />}
+          {switchCurrency === "EUR" ? (
+            <TransactionProcessingTimes />
+          ) : (
+            <TransactionProcessTimeGBP />
+          )}
         </ScrollArea>
 
         <Flex mt={24} justify="flex-end" gap={15}>

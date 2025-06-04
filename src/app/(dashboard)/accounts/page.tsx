@@ -452,7 +452,7 @@ function Accounts() {
                     currency={data?.AccountRequests?.Currency?.symbol}
                     companyName={data?.accountName ?? "No Default Account"}
                     link={`/accounts/default/${data?.id}`}
-                    sortCode="041719"
+                    sortCode="041917"
                     accountNumber={data?.accountNumber}
                     balance={data?.accountBalance ?? 0}
                     loading={currencyLoading}

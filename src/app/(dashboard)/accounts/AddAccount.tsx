@@ -22,7 +22,7 @@ interface AddAccountProps {
 const data = [
   { value: "EUR", label: "🇪🇺 EUR Account (Euros)" },
   { value: "GBP", label: "🇬🇧 GBP Account (Pounds)" },
-  { value: "NGN", label: "🇳🇬 NGN Account (Naira)" },
+  // { value: "NGN", label: "🇳🇬 NGN Account (Naira)" },
 ];
 
 const accountType = [

@@ -72,6 +72,7 @@ function Account() {
     transactions,
     loading: loadingTrx,
     meta: trxMeta,
+    revalidate: revalidateTrx,
   } = useUserCurrencyTransactions(param);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
@@ -89,7 +90,7 @@ function Account() {
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
-          { title: "Own Accounts", href: "/accounts/default" },
+          { title: "Own Accounts", href: "/accounts" },
           {
             title: account?.accountName || "",
             href: `/accounts/default`,
@@ -117,6 +118,7 @@ function Account() {
         setChartFrequency={setChartFrequency}
         trxMeta={trxMeta}
         revalidate={revalidateAcct}
+        revalidateTrx={revalidateTrx}
         business={business}
         isUser
       >

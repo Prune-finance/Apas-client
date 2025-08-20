@@ -722,9 +722,10 @@ interface ITrx extends IParams {
 
 export function useUserTransactions(
   id: string = "",
+  currency: string = "EUR",
   customParams: IParams = {}
 ) {
-  const path = id ? `${id}/transactions` : "transactions";
+  const path = id ? `${id}/transactions?currency=${currency}` : `transactions?currency=${currency}`;
   const {
     data,
     meta,

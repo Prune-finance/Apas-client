@@ -586,6 +586,7 @@ interface SingleAccountProps {
   location?: string;
   isUser?: boolean;
   revalidate: () => Promise<void>;
+  currency?: string;
 }
 
 export const SingleAccountBody = ({
@@ -594,6 +595,7 @@ export const SingleAccountBody = ({
   loading,
   loadingTrx,
   setChartFrequency,
+  currency = "EUR",
   business,
   admin,
   payout,
@@ -615,6 +617,7 @@ export const SingleAccountBody = ({
   return (
     <Box mt={32}>
       <AccountInfo
+        currencyType={currency}
         account={account}
         loading={loading}
         loadingTrx={loadingTrx}
@@ -628,7 +631,7 @@ export const SingleAccountBody = ({
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
-          <AccountDetails account={account} loading={loading} />
+          <AccountDetails account={account} loading={loading} currency={currency} />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
@@ -650,9 +653,9 @@ export const SingleAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
-        <TabsPanel value={tabs[3].value} mt={28}>
+        {/* <TabsPanel value={tabs[3].value} mt={28}>
           <Documents account={account} admin={admin} />
-        </TabsPanel>
+        </TabsPanel> */}
       </TabsComponent>
     </Box>
   );

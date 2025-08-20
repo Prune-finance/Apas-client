@@ -57,6 +57,7 @@ export const IssuedAccountsTab = () => {
 
   const { transactions, loading, meta } = useUserTransactions(
     undefined,
+    "EUR",
     queryParams
   );
   usePaginationReset({ queryParams, setActive });

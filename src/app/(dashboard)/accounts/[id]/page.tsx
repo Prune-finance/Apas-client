@@ -42,11 +42,11 @@ import { useUserBusiness } from "@/lib/hooks/businesses";
 
 export default function Account() {
   const params = useParams<{ id: string }>();
+  const searchParams = useSearchParams()
+  const currency = searchParams.get('currency') || "EUR";
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const axios = createAxiosInstance("accounts");
-
-  const searchParams = useSearchParams();
 
   const {
     status,
@@ -71,14 +71,14 @@ export default function Account() {
   };
 
   const { account, loading, revalidate, meta } = useSingleUserAccount(
-    params.id
+    params.id, currency
   );
   const { handleSuccess, handleError } = useNotification();
   const {
     loading: trxLoading,
     transactions,
     meta: txrMeta,
-  } = useUserTransactions(params.id, customParams);
+  } = useUserTransactions(params.id, currency, customParams);
   const { business } = useUserBusiness();
   const [chartFrequency, setChartFrequency] = useState("Monthly");
   const [processing, setProcessing] = useState(false);
@@ -265,6 +265,7 @@ export default function Account() {
       </Flex>
 
       <SingleAccountBody
+        currency={currency}
         account={account}
         accountID={params?.id}
         transactions={transactions as TransactionType[]}

@@ -1135,6 +1135,9 @@ interface BaseData {
     legalEntity: string;
     domain: string;
   };
+  Currency?: {
+    symbol?: string;
+  };
   documentApprovals: Record<string, any>;
   country: string;
   Account?: Account;

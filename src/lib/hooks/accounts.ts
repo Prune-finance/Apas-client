@@ -363,7 +363,7 @@ interface MetaAccount {
   hasPendingFreeze: boolean;
 }
 
-export function useSingleUserAccount(id: string) {
+export function useSingleUserAccount(id: string, currency: string = "EUR") {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
   const [meta, setMeta] = useState<MetaAccount | null>(null);
@@ -371,7 +371,7 @@ export function useSingleUserAccount(id: string) {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/${id}/dashboard`);
+      const { data } = await axios.get(`/accounts/${id}/dashboard?currency=${currency}`);
 
       setAccount(data.data);
       setMeta(data.meta);
@@ -732,6 +732,7 @@ export interface AccountData {
   lastName: string;
   accountId: number;
   accountName: string;
+  accountIban?: string;
   accountNumber: string;
   accountDocuments: AccountDocuments;
   createdAt: Date;

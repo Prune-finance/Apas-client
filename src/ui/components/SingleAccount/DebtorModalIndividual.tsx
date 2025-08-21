@@ -77,7 +77,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Full Name
+              Full Name <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter full name"
@@ -95,7 +95,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Address
+              Address <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Address"
@@ -113,7 +113,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              City
+              City <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter City"
@@ -129,7 +129,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              State
+              State <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter State"
@@ -143,7 +143,10 @@ function DebtorModalIndividual({
       <Flex gap={20} mt={24}>
         <Select
           searchable
-          data={countries.map((c) => c?.name)}
+          data={countries.map((c) => ({
+            label: c?.name,
+            value: c?.code,
+          }))}
           classNames={{
             input: styles.input,
             label: styles.label,
@@ -153,7 +156,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Country
+              Country <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Country"
@@ -169,7 +172,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              Post Code
+              Post Code <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter Post Code"
@@ -201,7 +204,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              ID Type
+              ID Type <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter ID Type"
@@ -217,7 +220,7 @@ function DebtorModalIndividual({
           size="lg"
           label={
             <Text fz={14} c="#667085">
-              ID Number
+              ID Number <span style={{ color: "red" }}>*</span>
             </Text>
           }
           placeholder="Enter ID Number"

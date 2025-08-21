@@ -39,7 +39,7 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             revalidate={revalidate}
           />
 
-          <NewAccountCard
+          {/* <NewAccountCard
             currency={"GBP"}
             companyName={account?.accountName ?? "No Default Account"}
             link={`/accounts/default/1`}
@@ -50,7 +50,7 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             business={false}
             refresh
             revalidate={revalidate}
-          />
+          /> */}
 
           {/* <AccountCard
             balance={account?.accountBalance ?? 0}

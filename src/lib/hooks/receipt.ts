@@ -18,9 +18,18 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
       value: {
         "Account Name":
           senderAccount?.accountName ?? selectedRequest?.senderName ?? "N/A",
-        "Account Number": selectedRequest?.senderIban ?? "",
+        "Account Number":
+          selectedRequest?.senderIban ??
+          selectedRequest?.senderAccountNumber ??
+          "",
         "Bank Name": "Prune Payments LTD",
-        BIC: "ARPYGB21XXX",
+        ...(selectedRequest?.currencyType === "GBP"
+          ? {
+              "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
+            }
+          : {
+              BIC: "ARPYGB21XXX",
+            }),
       },
     },
     {
@@ -29,13 +38,26 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
         "Amount Received": formatNumber(
           selectedRequest?.amount ?? 0,
           true,
-          "EUR"
+          selectedRequest?.currencyType ?? "EUR"
         ),
-        Name: selectedRequest?.recipientName || "N/A",
-        IBAN: selectedRequest?.recipientIban ?? "",
-        "Bank Name": selectedRequest?.recipientBankAddress ?? "",
-        Country: selectedRequest?.recipientBankCountry ?? "",
-        "Bank Address": "N/A",
+        Name:
+          selectedRequest?.recipientName ??
+          selectedRequest?.beneficiaryName ??
+          "N/A",
+
+        ...(selectedRequest?.currencyType === "GBP"
+          ? {
+              "Account Number":
+                selectedRequest?.beneficiaryAccountNumber ?? "N/A",
+              "Sort Code": selectedRequest?.beneficiarySortCode ?? "N/A",
+            }
+          : {
+              IBAN: selectedRequest?.recipientIban ?? "",
+              "Bank Name": selectedRequest?.recipientBankAddress ?? "",
+            }),
+
+        Country: selectedRequest?.recipientBankCountry ?? "N/A",
+        "Bank Address": selectedRequest?.beneficiaryAddress ?? "N/A",
         Narration: selectedRequest?.narration ?? "",
       },
     },

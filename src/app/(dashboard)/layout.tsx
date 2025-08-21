@@ -17,6 +17,7 @@ const switzer = localFont({
 });
 
 import styles from "@/ui/styles/layout.module.scss";
+import NoticeBanner from "@/ui/components/NoticeBanner";
 
 export default function RootLayout({
   children,
@@ -52,7 +53,7 @@ export default function RootLayout({
           </AppShellNavbar>
 
           <AppShellMain>
-            <Container p={0} fluid>
+            <Container p={0} fluid mt={85} style={{ zIndex: 0 }}>
               {children}
             </Container>
           </AppShellMain>

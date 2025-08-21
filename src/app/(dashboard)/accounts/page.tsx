@@ -1,7 +1,7 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, { Suspense, useMemo, useState } from "react";
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -30,20 +30,19 @@ import {
 } from "@tabler/icons-react";
 
 import ModalComponent from "./modal";
-import { useUserAccounts, useUserDefaultAccount } from "@/lib/hooks/accounts";
+import {
+  useUserAccounts,
+  useUserCurrencyAccount,
+  useUserDefaultAccount,
+} from "@/lib/hooks/accounts";
 import { formatNumber, getUserType } from "@/lib/utils";
 
 import useNotification from "@/lib/hooks/notification";
 import { useForm, zodResolver } from "@mantine/form";
-import {
-  FilterValues,
-  FilterSchema,
-  FilterType,
-  validateRequest,
-} from "@/lib/schema";
+import { validateRequest } from "@/lib/schema";
+import { FilterValues, FilterSchema, FilterType } from "@/lib/schema";
 import { useRouter, useSearchParams } from "next/navigation";
 import Filter from "@/ui/components/Filter";
-import { filteredSearch } from "@/lib/search";
 import DebitRequestModal from "../debit-requests/new/modal";
 import { BadgeComponent } from "@/ui/components/Badge";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -52,7 +51,6 @@ import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { TableComponent } from "@/ui/components/Table";
 import TabsComponent from "@/ui/components/Tabs";
-import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import { parseError } from "@/lib/actions/auth";
 import { PendingAccounts } from "./PendingAccounts";
 import RequestModalComponent from "@/ui/components/Modal";
@@ -64,6 +62,7 @@ import AddAccount from "./AddAccount";
 import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -77,6 +76,7 @@ function Accounts() {
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const { setSwitchCurrency } = useCurrencySwitchStore();
 
   const queryParams = {
     date: date ? dayjs(date).format("YYYY-MM-DD") : "",
@@ -106,6 +106,12 @@ function Accounts() {
     revalidate: revalidateDftAcct,
   } = useUserDefaultAccount();
 
+  const {
+    currencyAccount,
+    loading: currencyLoading,
+    revalidate: currencyRevalidate,
+  } = useUserCurrencyAccount();
+
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -134,8 +140,9 @@ function Accounts() {
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
 
-  const isInitiator = useHasPermission("INITIATOR")
-  const canSendMoney = useHasPermission("Transaction Initiation") || isInitiator;
+  const isInitiator = useHasPermission("INITIATOR");
+  const canSendMoney =
+    useHasPermission("Transaction Initiation") || isInitiator;
 
   const { user } = User();
   const stage =
@@ -161,6 +168,11 @@ function Accounts() {
 
     return { pendingRequest: hasPending, approvedRequest: hasApproved };
   }, [issuanceRequests]);
+
+  useEffect(() => {
+    setSwitchCurrency("EUR");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const requestForm = useForm({
     initialValues: {
@@ -371,7 +383,7 @@ function Accounts() {
 
           <Flex align="center" gap={16}>
             <SecondaryBtn
-              text="Create Account"
+              text="Request Account"
               action={addAccountOpen}
               fw={600}
             />
@@ -432,18 +444,39 @@ function Accounts() {
                 revalidate={revalidateDftAcct}
               />
 
-              <NewAccountCard
-                currency={"GBP"}
-                companyName={account?.accountName ?? "No Default Account"}
-                link={`/accounts/default/1`}
-                sortCode="567890"
-                accountNumber="567890"
-                balance={account?.accountBalance ?? 0}
-                loading={loadingDftAcct}
-                business={false}
-                refresh
-                revalidate={revalidateDftAcct}
-              />
+              {currencyAccount &&
+                currencyAccount?.length > 0 &&
+                currencyAccount?.map((data) => (
+                  <NewAccountCard
+                    key={data?.id}
+                    currency={data?.AccountRequests?.Currency?.symbol}
+                    companyName={data?.accountName ?? "No Default Account"}
+                    link={`/accounts/default/${data?.id}`}
+                    sortCode="041917"
+                    accountNumber={data?.accountNumber}
+                    balance={data?.accountBalance ?? 0}
+                    loading={currencyLoading}
+                    business={false}
+                    refresh
+                    revalidate={currencyRevalidate}
+                  />
+                ))}
+
+              {/* {currencyLoading && (
+                <NewAccountCard
+                  key="1"
+                  currency={"GBP"}
+                  companyName={""}
+                  link={`/accounts/default/`}
+                  sortCode=""
+                  accountNumber={""}
+                  balance={0}
+                  loading={currencyLoading}
+                  business={false}
+                  refresh
+                  revalidate={revalidateDftAcct}
+                />
+              )} */}
             </SimpleGrid>
           </TabsPanel>
 
@@ -569,7 +602,7 @@ function Accounts() {
           style={{ height: 190, width: "100%", marginBottom: 10 }}
           desc={
             <Text fz={14} c="#667085">
-              You have successfully requested a naira account.
+              You have successfully requested a GBP account.
             </Text>
           }
           title="Account Requested Successfully."
@@ -578,7 +611,6 @@ function Accounts() {
         <SendMoney
           opened={sendMoneyOpened}
           closeMoney={sendMoneyClose}
-          account={account}
           openSendMoney={sendMoneyOpen}
         />
 

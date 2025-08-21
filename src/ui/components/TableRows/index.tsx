@@ -55,10 +55,10 @@ export const BusinessTransactionTableRows = ({
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {element.recipientName}
+            {element.recipientName ?? element?.beneficiaryName}
           </Text>
           <Text fz={10} fw={400}>
-            {element.recipientIban}
+            {element.recipientIban ?? element?.beneficiaryAccountNumber}
           </Text>
         </Stack>
       </TableTd>
@@ -67,9 +67,11 @@ export const BusinessTransactionTableRows = ({
         <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
 
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>
+        {formatNumber(element.amount, true, element?.currencyType ?? "EUR")}
+      </TableTd>
 
-      <TableTd w="15%">{element.centrolinkRef}</TableTd>
+      <TableTd w="15%">{element.centrolinkRef ?? element?.accessId}</TableTd>
 
       <TableTd>
         <Stack gap={0}>
@@ -110,7 +112,7 @@ export const IssuedTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       <TableTd
-        td={noLink || isDummyIBAN(element.senderIban) ? "none" : "underline"}
+        // td={noLink || isDummyIBAN(element.senderIban) ? "none" : "underline"}
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -119,31 +121,37 @@ export const IssuedTransactionTableRows = ({
             noLink || isDummyIBAN(element.senderIban) ? "none" : "auto",
         }}
       >
-        <Link
-          href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
-        >
-          {element?.senderName || "N/A"}
-        </Link>
+        {/* <Link
+          href={`${!isUser ? "/admin" : ""}/transactions/${
+            element?.currencyType === "GBP"
+              ? element?.beneficiaryAccountNumber
+              : element.senderIban
+          }`}
+        > */}
+        {element?.senderName || "N/A"}
+        {/* </Link> */}
       </TableTd>
 
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {element?.recipientName}
+            {element?.recipientName ?? element?.beneficiaryName}
           </Text>
           <Text fz={10} fw={400}>
-            {element?.recipientIban}
+            {element?.recipientIban ?? element?.beneficiaryAccountNumber}
           </Text>
         </Stack>
       </TableTd>
 
-      <TableTd w="15%">{element?.centrolinkRef}</TableTd>
+      <TableTd w="15%">{element?.centrolinkRef ?? element?.accessId}</TableTd>
 
       <TableTd>
         <AmountGroup type={element?.type} fz={12} fw={400} />
       </TableTd>
 
-      <TableTd>{formatNumber(element?.amount, true, "EUR")}</TableTd>
+      <TableTd>
+        {formatNumber(element?.amount, true, element?.currencyType ?? "EUR")}
+      </TableTd>
 
       <TableTd w="15%">{element?.reference}</TableTd>
 

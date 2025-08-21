@@ -1,6 +1,6 @@
 "use client";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
 import SendMoneyBanner from "@/assets/sendMoney-new-bg.png";
@@ -15,6 +15,7 @@ import {
   Group,
   Alert,
   BackgroundImage,
+  Skeleton,
 } from "@mantine/core";
 import { PrimaryBtn } from "../Buttons";
 import { formatNumber } from "@/lib/utils";
@@ -23,9 +24,11 @@ import TabsComponent from "../Tabs";
 import Individual from "./Individual";
 import Company from "./company";
 import CurrencyTab from "../CurrencyTab";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 interface SendMoneyModalProps {
   account: DefaultAccount | null;
+  loading?: boolean;
   close: () => void;
   openPreview: () => void;
   setRequestForm: any;
@@ -38,6 +41,7 @@ interface SendMoneyModalProps {
 
 function SendMoneyModal({
   account,
+  loading,
   close,
   openPreview,
   setRequestForm,
@@ -49,9 +53,11 @@ function SendMoneyModal({
 }: SendMoneyModalProps) {
   const [validated, setValidated] = useState<boolean | null>(null);
   const [showBadge, setShowBadge] = useState(false);
+  const { switchCurrency } = useCurrencySwitchStore();
+  const containerRef = useRef<HTMLDivElement>(null);
 
   return (
-    <main className={styles.main}>
+    <main className={styles.main} ref={containerRef}>
       <Paper className={styles.form__container} px={30} pt={0} pb={10}>
         <Flex gap={10} align="center" justify="space-between" w="100%">
           <Text
@@ -136,9 +142,18 @@ function SendMoneyModal({
             <Text fz={14} fw={500} c="#667085" mb={0}>
               Account Balance
             </Text>
-            <Text fz={32} fw={600} c="#344054" mt={0} mb={16}>
-              {formatNumber(account?.accountBalance ?? 0, true, "EUR")}
-            </Text>
+
+            {loading ? (
+              <Skeleton h={40} my={10} w={140} />
+            ) : (
+              <Text fz={32} fw={600} c="#344054" mt={0} mb={16}>
+                {formatNumber(
+                  account?.accountBalance ?? 0,
+                  true,
+                  switchCurrency ?? "EUR"
+                )}
+              </Text>
+            )}
 
             <CurrencyTab />
           </Flex>
@@ -154,6 +169,7 @@ function SendMoneyModal({
           keepMounted={false}
         >
           <Individual
+            ref={containerRef}
             account={account}
             close={close}
             openPreview={openPreview}
@@ -168,6 +184,7 @@ function SendMoneyModal({
             setPaymentType={setPaymentType}
           />
           <Company
+            ref={containerRef}
             account={account}
             close={close}
             openPreview={openPreview}

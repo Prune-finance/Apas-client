@@ -1,16 +1,6 @@
-import {
-  Box,
-  Drawer,
-  Flex,
-  Group,
-  Modal,
-  TableTd,
-  TableTr,
-  Text,
-} from "@mantine/core";
+import { Box, Flex, Group, Modal, Text } from "@mantine/core";
 import {
   IconListTree,
-  IconArrowUpRight,
   IconCircleArrowDown,
   IconCalendarMonth,
 } from "@tabler/icons-react";
@@ -20,34 +10,28 @@ import EmptyTable from "../../EmptyTable";
 import { SearchInput, SelectBox, TextBox } from "../../Inputs";
 import { TableComponent } from "../../Table";
 import { TransactionType } from "@/lib/hooks/transactions";
-import { formatNumber } from "@/lib/utils";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
-import { useRouter } from "next/navigation";
-import { BadgeComponent } from "../../Badge";
 import Transaction from "@/lib/store/transaction";
-import { AccountTransactionDrawer } from "./drawer";
-import { PayoutDrawer } from "@/app/(dashboard)/payouts/drawer";
 import { IssuedAccountTableHeaders, PayoutTableHeaders } from "@/lib/static";
-import { AmountGroup } from "../../AmountGroup";
+
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 import {
   IssuedTransactionTableRows,
   PayoutTransactionTableRows,
 } from "../../TableRows";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { filteredSearch } from "@/lib/search";
-import PaginationComponent from "../../Pagination";
+import { useRef, useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
+
 import { PayoutTransactionDrawer } from "@/app/(dashboard)/payouts/PayoutDrawer";
-import form from "@/app/auth/login/form";
+
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "../../Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import DownloadStatement from "@/ui/components/DownloadStatement";
-import { handlePdfDownload, handlePdfStatement } from "@/lib/actions/auth";
+import { handlePdfStatement, parseError } from "@/lib/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { DatePickerInput } from "@mantine/dates";
@@ -63,6 +47,7 @@ export const Transactions = ({
   accountID,
   location,
   isUser,
+  currencyType,
 }: Props) => {
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -88,7 +73,7 @@ export const Transactions = ({
   const [search, setSearch] = useQueryState("search", {
     defaultValue: "",
     history: "push",
-    throttleMs: 3000,
+    throttleMs: 500,
     shallow: false,
   });
 
@@ -111,7 +96,7 @@ export const Transactions = ({
       //     .filter((trx) => trx.type === "CREDIT")
       //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       value: meta?.in,
-      currency: "EUR",
+      currency: currencyType ?? "EUR",
       formatted: true,
     },
     {
@@ -121,7 +106,7 @@ export const Transactions = ({
       //     .filter((trx) => trx.type === "DEBIT")
       //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       value: meta?.out,
-      currency: "EUR",
+      currency: currencyType ?? "EUR",
       formatted: true,
     },
   ];
@@ -143,6 +128,7 @@ export const Transactions = ({
       dayjs(date).format("YYYY-MM-DD")
     );
     const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
+
     const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
 
     // Define the possible URLs based on location
@@ -153,6 +139,7 @@ export const Transactions = ({
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`,
+      "gbp-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${accountID}?date=${startDate}&endDate=${endDate}`,
     };
 
     // Use the default URL if location is undefined or not in urlMap
@@ -169,6 +156,8 @@ export const Transactions = ({
           "No transactions found for the selected date range"
         );
       }
+
+      console.log(res?.data, res?.meta);
 
       setDownloadData(res.data);
       setDownloadMeta(res.meta);
@@ -188,7 +177,7 @@ export const Transactions = ({
       handleError(
         "Account Statement",
         error instanceof Error
-          ? error.message
+          ? parseError(error)
           : "error downloading account statement"
       );
     } finally {
@@ -236,7 +225,13 @@ export const Transactions = ({
         opened={openedFilter}
         toggle={toggle}
         form={form}
-        customStatusOption={["PENDING", "CONFIRMED", "REJECTED", "CANCELLED"]}
+        customStatusOption={[
+          "PENDING",
+          "CONFIRMED",
+          "REJECTED",
+          "CANCELLED",
+          "FAILED",
+        ]}
       >
         <TextBox
           placeholder="Sender Name"
@@ -247,7 +242,9 @@ export const Transactions = ({
           {...form.getInputProps("recipientName")}
         />
         <TextBox
-          placeholder="Beneficiary IBAN"
+          placeholder={
+            currencyType === "GBP" ? "Account Number" : "Beneficiary IBAN"
+          }
           {...form.getInputProps("recipientIban")}
         />
         <SelectBox
@@ -351,6 +348,7 @@ export const Transactions = ({
 
       <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
         <DownloadStatement
+          currencyType={currencyType}
           receiptRef={pdfRef}
           data={downloadData}
           meta={downloadMeta}
@@ -385,6 +383,7 @@ interface Props {
   accountID?: string;
   location?: string;
   isUser?: boolean;
+  currencyType?: string;
 }
 
 export interface BalanceDetail {
@@ -405,6 +404,7 @@ export interface AccountDetails {
   country: string;
   accountName: string;
   createdAt: string;
+  sortCode?: string;
 }
 
 export interface DownloadStatementData {

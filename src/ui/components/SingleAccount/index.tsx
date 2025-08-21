@@ -28,17 +28,13 @@ import { usePathname, useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 
 import {
-  IconAlertTriangle,
   IconArrowLeft,
   IconArrowUpRight,
   IconBrandLinktree,
   IconCheck,
-  IconCircleArrowDown,
   IconCircleFilled,
   IconCopy,
   IconExclamationCircle,
-  IconInfoCircle,
-  IconListTree,
   IconReload,
   IconRosetteDiscountCheckFilled,
   IconShieldCheck,
@@ -49,28 +45,18 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 dayjs.extend(advancedFormat);
 
 import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
-import {
-  approvedBadgeColor,
-  formatNumber,
-  getInitials,
-  getUserType,
-} from "@/lib/utils";
+import { formatNumber, getInitials } from "@/lib/utils";
 import Link from "next/link";
 import InfoCards from "../Cards/InfoCards";
 import { DonutChartComponent } from "../Charts";
 import EmptyTable from "../EmptyTable";
 import { TableComponent } from "../Table";
-import {
-  Account,
-  AccountData,
-  DefaultAccount,
-  useSingleAccount,
-} from "@/lib/hooks/accounts";
+import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
 import { TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
-import { useDisclosure, useMediaQuery } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import axios from "axios";
 import { useForm, zodResolver } from "@mantine/form";
 import { validateRequest } from "@/lib/schema";
@@ -80,8 +66,7 @@ import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
 import OriginalModalComponent from "../Modal";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import TabsComponent from "../Tabs";
-import { GiEuropeanFlag } from "react-icons/gi";
-import { SearchInput } from "../Inputs";
+
 import AccountDetails from "./(tabs)/AccountDetails";
 import { Transactions } from "./(tabs)/Transactions";
 import { Analytics } from "./(tabs)/Analytics";
@@ -93,6 +78,7 @@ import createAxiosInstance from "@/lib/axios";
 import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
 import { useHasPermission } from "@/lib/hooks/checkPermission";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 type Param = { id: string };
 interface Props {
@@ -677,6 +663,7 @@ interface SingleDefaultAccountProps
   account: DefaultAccount | null;
   location?: string;
   accountType?: string;
+  revalidateTrx?: () => void;
 }
 
 export const SingleDefaultAccountBody = ({
@@ -693,6 +680,7 @@ export const SingleDefaultAccountBody = ({
   children,
   location,
   revalidate,
+  revalidateTrx,
   isUser,
   accountType,
 }: SingleDefaultAccountProps) => {
@@ -703,6 +691,8 @@ export const SingleDefaultAccountBody = ({
    * @returns {Array<{ value: string }>} - An array of objects with the value key
    * @example - [{ value: "Account Details" }, { value: "Transactions" }, { value: "Statistics" }, { value: "Documents" }]
    */
+
+  const [tab, setTab] = useState<string | null>("Account Details");
 
   const tabs: Array<{ value: string }> = [
     { value: "Account Details" },
@@ -726,7 +716,16 @@ export const SingleDefaultAccountBody = ({
         currencyType={accountType}
       />
 
-      <TabsComponent tabs={tabs} mt={40}>
+      <TabsComponent
+        tabs={tabs}
+        mt={40}
+        showRefreshBtn
+        refreshButtonIndex={tab}
+        value={tab}
+        onChange={setTab}
+        loading={loadingTrx}
+        revalidate={revalidateTrx}
+      >
         <TabsPanel value={tabs[0].value} mt={28}>
           <DefaultAccountDetails
             account={account}
@@ -744,6 +743,7 @@ export const SingleDefaultAccountBody = ({
             // children={children}
             location={location ?? "default"}
             isUser={isUser}
+            currencyType={account?.AccountRequests?.Currency?.symbol}
           >
             {children}
           </Transactions>
@@ -752,6 +752,7 @@ export const SingleDefaultAccountBody = ({
           <Analytics
             transactions={transactions}
             setChartFrequency={setChartFrequency}
+            currencyType={account?.AccountRequests?.Currency?.symbol}
           />
         </TabsPanel>
         {!payout && (
@@ -880,6 +881,8 @@ export const DefaultAccountHead = ({
 
   const { user } = User();
 
+  const { setSwitchCurrency } = useCurrencySwitchStore();
+
   const axios = createAxiosInstance("payouts");
 
   const handleAccountTrust = async () => {
@@ -901,6 +904,11 @@ export const DefaultAccountHead = ({
       setProcessingTrust(false);
     }
   };
+
+  useEffect(() => {
+    setSwitchCurrency("GBP");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
@@ -1020,7 +1028,6 @@ export const DefaultAccountHead = ({
       <SendMoney
         opened={opened}
         closeMoney={closeMoney}
-        account={account}
         openSendMoney={openMoney}
       />
     </>
@@ -1078,7 +1085,11 @@ export const AccountInfo = ({
   const handleReload = async (): Promise<void> => {
     setProcessing(true);
     try {
-      await axios.get(`/accounts/${account?.accountNumber}/balance/dashboard`);
+      await axios.get(
+        currencyType === "GBP"
+          ? `/accounts/${account?.accountNumber}/balance/dashboard?currency=GBP`
+          : `/accounts/${account?.accountNumber}/balance/dashboard`
+      );
       revalidate && (await revalidate());
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -1113,7 +1124,7 @@ export const AccountInfo = ({
               <Skeleton w={100} h={30} />
             )}
 
-            {isUser && (
+            {!loading && isUser && (
               <PrimaryBtn
                 text="Refresh Balance"
                 color="var(--prune-primary-600)"

@@ -18,12 +18,8 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-import {
-  directorEtShareholderSchema,
-  NewBusinessType,
-  OtherDocumentType,
-  RemoveDirectorType,
-} from "@/lib/schema";
+import { directorEtShareholderSchema, OtherDocumentType } from "@/lib/schema";
+import { NewBusinessType, RemoveDirectorType } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 
 interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
@@ -36,6 +32,7 @@ interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   uploadedFileUrl?: string;
   otherForm?: UseFormReturnType<T>;
   isUser?: boolean;
+  isOnboarding?: boolean;
 }
 
 export default function DropzoneComponent<T>(
@@ -48,6 +45,7 @@ export default function DropzoneComponent<T>(
   const extensionKey = props.extensionKey;
   const uploadedFileUrl = props.uploadedFileUrl;
   const isUser = props.isUser;
+  const isOnboarding = props.isOnboarding;
 
   function getNestedValue(obj: any, path: string) {
     return path.split(".").reduce((acc, part) => acc && acc[part], obj);
@@ -68,7 +66,7 @@ export default function DropzoneComponent<T>(
       const formData = new FormData();
       formData.append("file", file);
 
-      const path = isUser ? "auth" : "admin";
+      const path = isUser ? "auth" : isOnboarding ? "onboarding" : "admin";
 
       const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/${path}/upload`,

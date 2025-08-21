@@ -1,4 +1,4 @@
-import { Flex, Group, Loader, rem, Stack, Text } from "@mantine/core";
+import { Flex, Loader, rem, Text } from "@mantine/core";
 
 import {
   Dropzone,
@@ -10,13 +10,11 @@ import { UseFormReturnType } from "@mantine/form";
 import {
   IconUpload,
   IconX,
-  IconPhoto,
   IconCloudUpload,
   IconCloudCheck,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 
-import { newBusiness } from "@/lib/schema";
 import createAxiosInstance from "@/lib/axios";
 
 const reqValues = {

@@ -1,7 +1,7 @@
 "use client";
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconArrowLeft, IconPlus } from "@tabler/icons-react";
+import { IconArrowLeft } from "@tabler/icons-react";
 
 import {
   Flex,
@@ -18,11 +18,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
 
-import {
-  newBusiness,
-  validateDebitRequest,
-  validateNewBusiness,
-} from "@/lib/schema";
+import { validateDebitRequest } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useUserAccounts } from "@/lib/hooks/accounts";

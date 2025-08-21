@@ -20,7 +20,8 @@ import { BusinessData, Director } from "@/lib/hooks/businesses";
 
 import { useDisclosure } from "@mantine/hooks";
 import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
-import { directorEtShareholderSchema, validateDirectors } from "@/lib/schema";
+import { directorEtShareholderSchema } from "@/lib/schema";
+import { validateDirectors } from "@/lib/schema";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import classes from "@/ui/styles/containedInput.module.scss";

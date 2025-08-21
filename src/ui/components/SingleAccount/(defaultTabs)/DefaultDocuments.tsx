@@ -2,6 +2,7 @@ import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import { splitCamelCase } from "@/lib/utils";
 import { Box, Paper, SimpleGrid, Stack, Text } from "@mantine/core";
 import { TextInputWithFile } from "../../TextInputWithFile";
+import EmptyTable from "../../EmptyTable";
 
 interface Props {
   account: DefaultAccount | null;
@@ -9,7 +10,6 @@ interface Props {
 }
 
 export const DefaultDocuments = ({ account, isDefault }: Props) => {
-  console.log({ account });
   return (
     <Box>
       {account?.type === "USER" && (
@@ -105,6 +105,19 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
           </Paper>
         </Stack>
       )}
+
+      <EmptyTable
+        loading={false}
+        rows={
+          !account?.accountDocuments ||
+          (typeof account.accountDocuments === "object" &&
+            Object.keys(account.accountDocuments).length === 0)
+            ? []
+            : [1, 2]
+        }
+        title="There is no data here for now."
+        text="When a document is uploaded, it will appear here"
+      />
     </Box>
   );
 };

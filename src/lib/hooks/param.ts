@@ -1,4 +1,4 @@
-import { IParams } from "../schema";
+import { IParams } from "@/lib/schema";
 import { useMemo } from "react";
 
 export const useParam = (customParams: IParams = {}) => {

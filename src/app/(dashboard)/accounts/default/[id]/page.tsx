@@ -70,6 +70,7 @@ function Account() {
     debouncedSearch,
   ]);
 
+  
   const {
     transactions,
     loading: loadingTrx,

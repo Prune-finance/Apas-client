@@ -69,7 +69,7 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
                 key={data?.id}
                 currency={data?.AccountRequests?.Currency?.symbol}
                 companyName={data?.accountName ?? "No Default Account"}
-                link={`/accounts/default/${data?.id}?type=PAYOUT_ACCOUNT`}
+                link={`/accounts/default/${data?.id}?accountType=PAYOUT_ACCOUNT`}
                 sortCode="041917"
                 accountNumber={data?.accountNumber}
                 balance={data?.accountBalance ?? 0}

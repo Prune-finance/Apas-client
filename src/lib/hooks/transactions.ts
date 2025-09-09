@@ -756,15 +756,17 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
   return { loading, transactions: data || [], meta, revalidate };
 }
 
-export function useUserCurrencyTransactions(customParams: ITrx = {}) {
+export function useUserCurrencyTransactions(
+  customParams: ITrx = {},
+  currency: string
+) {
   const {
     data,
     meta,
     loading,
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
-    endpoint:
-      "currency-accounts/transactions/get-company-currency-account-transactions/GBP",
+    endpoint: `currency-accounts/transactions/get-company-currency-account-transactions?currency=${currency}`,
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -940,7 +942,7 @@ export interface TransactionType {
   dpsId: number;
   destinationFirstName: string;
   destinationLastName: string;
-  senderInstitutionName?: string
+  senderInstitutionName?: string;
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
   company: BusinessData;

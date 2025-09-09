@@ -2,20 +2,54 @@ import dayjs from "dayjs";
 import { RequestData } from "./hooks/requests";
 import { IParams } from "./schema";
 
+// Currency to locale mapping for better formatting
+const currencyLocaleMap: Record<string, string> = {
+  NGN: "en-NG", // Nigerian Naira
+  GHS: "en-GH", // Ghanaian Cedi
+  CAD: "en-CA", // Canadian Dollar
+  USD: "en-US", // US Dollar
+  EUR: "en-EU", // Euro
+  GBP: "en-GB", // British Pound
+};
+
 export const formatNumber = (
   number: number,
   currency: boolean = true,
   type: string = "NGN",
-  locale: string = "en-NG"
+  locale?: string
 ) => {
+  // Use provided locale or auto-detect based on currency
+  const formatLocale = locale || currencyLocaleMap[type] || "en-US";
+  
   if (!currency) {
-    return new Intl.NumberFormat(locale, {}).format(number);
+    return new Intl.NumberFormat(formatLocale, {}).format(number);
   }
-  return new Intl.NumberFormat(locale, {
+  
+  // Custom formatting for GHS to show ₵1000 format
+  if (type === "GHS") {
+    return `₵${new Intl.NumberFormat(formatLocale, {}).format(number)}`;
+  }
+  
+  return new Intl.NumberFormat(formatLocale, {
     style: "currency",
     currency: type,
   }).format(number);
 };
+
+// export const formatNumber = (
+//   number: number,
+//   currency: boolean = true,
+//   type: string = "NGN",
+//   locale: string = "en-NG"
+// ) => {
+//   if (!currency) {
+//     return new Intl.NumberFormat(locale, {}).format(number);
+//   }
+//   return new Intl.NumberFormat(locale, {
+//     style: "currency",
+//     currency: type,
+//   }).format(number);
+// };
 
 export const activeBadgeColor = (status: string) => {
   if (status === "ACTIVE") return "#12B76A";

@@ -17,7 +17,10 @@ export default function IssuedAccounts() {
       {accountList.map((account) => (
         <TabsPanel value={account.value} key={account.id}>
           {account.active ? (
-            <IssuedAccountsComponent />
+            <IssuedAccountsComponent
+              currency={account.currency}
+              locale={account.locale}
+            />
           ) : (
             <Center h="calc(100dvh - 400px)">Coming Soon</Center>
           )}

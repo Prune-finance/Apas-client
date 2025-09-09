@@ -117,6 +117,8 @@ export default function AccountInfoCards({
               percentage={0}
               gain
               frequency={frequency}
+              currency={currency}
+              locale={locale}
             />
           </GridCol>
           <GridCol span={6}>
@@ -125,6 +127,8 @@ export default function AccountInfoCards({
               total={meta?.totalOutflow || 0}
               percentage={0}
               frequency={frequency}
+              currency={currency}
+              locale={locale}
             />
           </GridCol>
         </Grid>

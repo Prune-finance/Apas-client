@@ -49,7 +49,12 @@ import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Link from "next/link";
 
-export default function IssuedAccountsComponent() {
+interface Props {
+  currency?: string;
+  locale?: string;
+}
+
+export default function IssuedAccountsComponent({ currency, locale }: Props) {
   const searchParams = useSearchParams();
   const axios = createAxiosInstance("accounts");
 
@@ -268,6 +273,8 @@ export default function IssuedAccountsComponent() {
         open={openFilter}
         close={closeFilter}
         opened={filterOpened}
+        currency={currency}
+        locale={locale}
       />
       <Group
         justify="space-between"

@@ -17,7 +17,10 @@ export default function PayoutAccounts() {
       {accountList.map((account) => (
         <TabsPanel value={account.value} key={account.id}>
           {account.active ? (
-            <PayoutAccountsComponent />
+            <PayoutAccountsComponent
+              currency={account.currency}
+              locale={account.locale}
+            />
           ) : (
             <Center h="calc(100dvh - 400px)">Coming Soon</Center>
           )}

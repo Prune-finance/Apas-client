@@ -70,7 +70,7 @@ import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
 
-interface DefaultComponentProps extends CardProps {
+interface DefaultComponentProps {
   currency?: string;
   locale?: string;
 }

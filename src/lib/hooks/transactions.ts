@@ -766,7 +766,7 @@ export function useUserCurrencyTransactions(
     loading,
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
-    endpoint: `currency-accounts/transactions/get-company-currency-account-transactions?currency=${currency}`,
+    endpoint: `currency-accounts/transactions/get-company-currency-account-transactions/${currency}`,
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],

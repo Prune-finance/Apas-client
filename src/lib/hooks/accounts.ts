@@ -743,6 +743,7 @@ export interface CurrencyAccount {
   accountIdentifier: string;
   accountName: string;
   accountNumber: string;
+  walletId: string;
   accountIban: string;
   accountType: "COMPANY_ACCOUNT" | string;
   accountBalance: number;

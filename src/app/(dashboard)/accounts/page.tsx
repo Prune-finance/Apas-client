@@ -112,8 +112,6 @@ function Accounts() {
     revalidate: currencyRevalidate,
   } = useUserCurrencyAccount();
 
-  console.log(currencyAccount);
-
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -441,7 +439,7 @@ function Accounts() {
                     currency={data?.AccountRequests?.Currency?.symbol}
                     companyName={data?.accountName ?? "No Default Account"}
                     walletOwner={data?.accountName ?? "No Default Account"}
-                    walletId={data?.accountIban ?? "No Default Account"}
+                    walletId={data?.walletId ?? "No Default Account"}
                     link={`/accounts/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                     sortCode="041917"
                     accountNumber={data?.accountNumber}

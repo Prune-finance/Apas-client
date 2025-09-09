@@ -684,6 +684,7 @@ export interface BaseAccount {
   firstName: string;
   lastName: string;
   accountId: number;
+  walletId: string;
   accountName: string;
   accountNumber: string;
   createdAt: Date;

@@ -16,25 +16,69 @@ import { PrimaryBtn } from "../../Buttons";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
+import NGNImage from "@/assets/cedis-icon.png";
+import GHSImage from "@/assets/cedis-icon.png";
+
+interface CurrencyConfig {
+  icon: string;
+  name: string;
+  bankIdLabel: string;
+  accountIdLabel: string;
+  getBankIdValue: (account: DefaultAccount | null) => string;
+  getAccountIdValue: (account: DefaultAccount | null) => string;
+}
 interface Props {
   account: DefaultAccount | null;
   loading: boolean;
   accountType?: string;
 }
 
+const currencyConfigs: Record<string, CurrencyConfig> = {
+  EUR: {
+    icon: EUImage.src,
+    name: "EUR",
+    bankIdLabel: "BIC",
+    accountIdLabel: "IBAN/Account Number",
+    getBankIdValue: () => "ARPYGB21XXX",
+    getAccountIdValue: (account) => account?.accountNumber ?? "",
+  },
+  GBP: {
+    icon: GBImage.src,
+    name: "GBP",
+    bankIdLabel: "Sort Code",
+    accountIdLabel: "Account Number",
+    getBankIdValue: (account) => account?.sortCode ?? "",
+    getAccountIdValue: (account) => account?.accountNumber ?? "",
+  },
+  NGN: {
+    icon: NGNImage.src,
+    name: "NGN",
+    bankIdLabel: "Bank Code",
+    accountIdLabel: "Account Number",
+    getBankIdValue: (account) => account?.sortCode ?? "",
+    getAccountIdValue: (account) => account?.accountNumber ?? "",
+  },
+  GHS: {
+    icon: GHSImage.src,
+    name: "GHS",
+    bankIdLabel: "Wallet Owner",
+    accountIdLabel: "Wallet ID",
+    getBankIdValue: (account) => account?.accountName ?? "",
+    getAccountIdValue: (account) => account?.walletId ?? "",
+  },
+};
+
 export default function DefaultAccountDetails({
   account,
   loading,
-  accountType,
+  accountType = "EUR",
 }: Props) {
+  const config = currencyConfigs[accountType] || currencyConfigs.EUR;
+
   const accountDetails = {
     "Account Name": account?.accountName,
-    [accountType === "GBP" ? "Sort Code" : "IBAN/Account Number"]:
-      accountType === "GBP" ? account?.sortCode : account?.accountNumber,
-
-    [accountType === "GBP" ? "Account Number" : "BIC"]:
-      accountType === "GBP" ? account?.accountNumber : "ARPYGB21XXX",
-
+    [config.bankIdLabel]: config.getBankIdValue(account),
+    [config.accountIdLabel]: config.getAccountIdValue(account),
     "Bank Name": "Prune Payments LTD",
     "Bank Address": "Office 7 35-37 Ludgate Hill, London",
     "Bank Country": "United Kingdom",
@@ -43,19 +87,9 @@ export default function DefaultAccountDetails({
   return (
     <>
       <Group gap={7}>
-        <ThemeIcon
-          radius="xl"
-          // color="#0052B4"
-          color="transparent"
-        >
+        <ThemeIcon radius="xl" color="transparent">
           {!loading ? (
-            <>
-              {accountType === "GBP" ? (
-                <Image src={GBImage.src} alt="GBP" w={20} h={20} />
-              ) : (
-                <Image src={EUImage.src} alt="EUR" w={20} h={20} />
-              )}
-            </>
+            <Image src={config.icon} alt={config.name} w={20} h={20} />
           ) : (
             <Skeleton w={20} h={20} />
           )}
@@ -63,7 +97,7 @@ export default function DefaultAccountDetails({
 
         {!loading ? (
           <Text fz={16} fw={500}>
-            {accountType ?? "EUR"} Account Details
+            {config.name} Account Details
           </Text>
         ) : (
           <Skeleton w={100} h={20} />
@@ -71,11 +105,12 @@ export default function DefaultAccountDetails({
 
         {!loading && (
           <CopyButton
-            value={`Account Name: ${
-              account?.accountName ?? ""
-            },\nIBAN/Account Number: ${
-              account?.accountNumber ?? ""
-            },\nBIC: ARPYGB21XXX,\nBank Name: Prune Payments LTD,\nBank Address: Office 7 35-37 Ludgate Hill, London,\nBank Country: United Kingdom`}
+            value={`Account Name: ${account?.accountName ?? ""},
+${config.accountIdLabel}: ${config.getAccountIdValue(account)},
+${config.bankIdLabel}: ${config.getBankIdValue(account)},
+Bank Name: Prune Payments LTD,
+Bank Address: Office 7 35-37 Ludgate Hill, London,
+Bank Country: United Kingdom`}
           >
             {({ copied, copy }) => (
               <PrimaryBtn

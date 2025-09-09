@@ -1,13 +1,4 @@
-import {
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-  Skeleton,
-  TableTd,
-  TableTr,
-  UnstyledButton,
-} from "@mantine/core";
+import { ActionIcon, Image, Skeleton, TableTd, TableTr } from "@mantine/core";
 import {
   IconHome2,
   IconBuildingSkyscraper,
@@ -16,8 +7,6 @@ import {
   IconCreditCardPay,
   IconSettings,
   IconArrowsUpDown,
-  IconDots,
-  IconPointFilled,
   IconArrowsSort,
   IconPremiumRights,
   IconArrowUpRight,
@@ -28,12 +17,14 @@ import {
   IconMoneybag,
   IconSearch,
 } from "@tabler/icons-react";
-import dayjs from "dayjs";
-import Link from "next/link";
 import businessStyles from "@/ui/styles/business.module.scss";
-import { TransactionType } from "./hooks/transactions";
-import { Notification } from "./hooks/notifications";
 import { formatNumber } from "./utils";
+import EUIcon from "@/assets/flags/eu.png";
+import GBPIcon from "@/assets/flags/gb.png";
+import NGNIcon from "@/assets/flags/nigeria.png";
+import USDIcon from "@/assets/flags/us.png";
+import CADIcon from "@/assets/flags/canada.png";
+import GHSIcon from "@/assets/flags/gh.png";
 
 export const AdminMainLinks = [
   {
@@ -445,5 +436,128 @@ export const serviceCategories = [
       "This helps businesses quickly verify and access account details for transactions.",
     accounts: currencies,
     icon: IconArrowsRightLeft,
+  },
+];
+
+export const accountList = [
+  {
+    id: 1,
+    title: "EUR",
+    name: "Euro",
+    value: "EUR",
+    currency: "EUR",
+    locale: "en-GB",
+    active: true,
+    wallet: false,
+    icon: (
+      <Image
+        // src={"https://flagcdn.com/w1280/eu.jpg"}
+        src={EUIcon.src}
+        alt="icon"
+        h={20}
+        w={20}
+        radius="lg"
+      />
+    ),
+  },
+  {
+    id: 2,
+    title: "GBP",
+    value: "GBP",
+    name: "Pounds",
+    currency: "GBP",
+    locale: "en-GB",
+    active: true,
+    wallet: false,
+    icon: (
+      <Image
+        // src={"https://flagcdn.com/w320/gb.png"}
+        src={GBPIcon.src}
+        alt="icon"
+        h={20}
+        w={20}
+        radius="lg"
+      />
+    ),
+  },
+  {
+    id: 3,
+    title: "NGN",
+    value: "NGN",
+    name: "Naira",
+    currency: "NGN",
+    locale: "en-NG",
+    active: false,
+    wallet: false,
+    icon: (
+      <Image
+        // src={"https://flagcdn.com/w160/ng.jpg"}
+        src={NGNIcon.src}
+        alt="icon"
+        h={20}
+        w={20}
+        radius="lg"
+      />
+    ),
+  },
+  {
+    id: 4,
+    title: "USD",
+    value: "USD",
+    name: "United States Dollar",
+    currency: "USD",
+    locale: "en-US",
+    active: false,
+    wallet: false,
+    icon: (
+      <Image
+        // src={"https://flagcdn.com/w160/us.jpg"}
+        src={USDIcon.src}
+        alt="icon"
+        h={20}
+        w={20}
+        radius="lg"
+      />
+    ),
+  },
+  {
+    id: 5,
+    title: "CAD",
+    value: "CAD",
+    name: "Canadian Dollar",
+    currency: "CAD",
+    locale: "en-CA",
+    active: true,
+    wallet: true,
+    icon: (
+      <Image
+        // src={"https://flagcdn.com/h20/ca.webp"}
+        src={CADIcon.src}
+        alt="icon"
+        h={20}
+        w={20}
+        radius="lg"
+      />
+    ),
+  },
+  {
+    id: 6,
+    title: "GHS",
+    value: "GHS",
+    name: "Cedis",
+    currency: "GHS",
+    locale: "en-GH",
+    active: true,
+    wallet: true,
+    icon: (
+      <Image
+        // src={"https://flagcdn.com/h240/gh.webp"}
+        src={GHSIcon.src}
+        alt="icon"
+        h={20}
+        w={20}
+        radius="lg"
+      />
+    ),
   },
 ];

@@ -16,6 +16,8 @@ interface FlowChartProps {
   setFrequency: Dispatch<SetStateAction<string | null>>;
   chartData: ChartData[]; // Add chartData prop
   accountType: "Issued" | "Payout" | "Business";
+  currency?: string;
+  locale?: string;
 }
 export default function FlowChart({
   balance,
@@ -23,6 +25,8 @@ export default function FlowChart({
   setFrequency,
   chartData,
   accountType,
+  currency = "EUR",
+  locale = "en-US",
 }: FlowChartProps) {
   return (
     <AccountCustomCard>
@@ -38,10 +42,10 @@ export default function FlowChart({
         <Group justify="space-between">
           <Stack gap={8}>
             <Text fz={24} c="var(--prune-text-gray-700)" fw={600}>
-              {formatNumber(balance, true, "EUR")}
+              {formatNumber(balance, true, currency, locale)}
             </Text>
 
-            <ThisMonth percentage={2.3} gain />
+            <ThisMonth percentage={2.3} gain frequency={frequency} />
           </Stack>
 
           <Group gap={12}>

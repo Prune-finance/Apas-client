@@ -983,3 +983,9 @@ export const validateEditUser = z.object({
 });
 
 export type InviteUserType = z.infer<typeof validateInviteUser>;
+
+export interface Tab {
+  title?: string;
+  value: string;
+  icon?: React.ReactNode;
+}

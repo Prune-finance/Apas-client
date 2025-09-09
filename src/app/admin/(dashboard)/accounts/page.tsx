@@ -33,7 +33,7 @@ function Accounts() {
           tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
             ?.value ?? tabs[0].value
         }
-        tt="capitalize"
+        // tt="capitalize"
         keepMounted={false}
       >
         <TabsPanel value={tabs[0].value}>

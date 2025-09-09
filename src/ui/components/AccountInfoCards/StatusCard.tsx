@@ -9,6 +9,7 @@ interface StatusCardProps {
   percentage: number;
   gain?: boolean;
   viewAction?: () => void;
+  frequency?: string | null;
 }
 
 export default function StatusCard({
@@ -17,6 +18,7 @@ export default function StatusCard({
   percentage,
   gain,
   viewAction,
+  frequency,
 }: StatusCardProps) {
   return (
     <AccountCustomCard>
@@ -44,7 +46,11 @@ export default function StatusCard({
             {total}
           </Text>
 
-          <ThisMonth percentage={percentage} gain={gain} />
+          <ThisMonth
+            percentage={percentage}
+            gain={gain}
+            frequency={frequency}
+          />
         </Flex>
       </Stack>
     </AccountCustomCard>

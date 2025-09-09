@@ -20,6 +20,7 @@ interface Props extends TabsProps {
   loading?: boolean;
   revalidate?: () => void;
   refreshButtonIndex?: string | null;
+  additionalTile?: string;
 }
 
 export default function TabsComponent({
@@ -29,6 +30,7 @@ export default function TabsComponent({
   refreshButtonIndex,
   loading,
   revalidate,
+  additionalTile,
   ...props
 }: Props) {
   return (
@@ -54,6 +56,7 @@ export default function TabsComponent({
               {...(props.fz && { fz: props.fz })}
             >
               {tab.title || tab.value}
+              {additionalTile}
             </TabsTab>
           </>
         ))}

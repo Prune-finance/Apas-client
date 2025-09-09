@@ -19,6 +19,8 @@ interface Props {
   opened: boolean;
   open: () => void;
   close: () => void;
+  currency?: string;
+  locale?: string;
 }
 export default function AccountInfoCards({
   frequency,
@@ -30,6 +32,8 @@ export default function AccountInfoCards({
   opened,
   open,
   close,
+  currency,
+  locale,
 }: Props) {
   const pathname = usePathname();
   const [_status, setStatus] = useState<string | null>(null);
@@ -63,6 +67,8 @@ export default function AccountInfoCards({
           frequency={frequency}
           setFrequency={setFrequency}
           accountType={accountType}
+          currency={currency}
+          locale={locale}
           chartData={
             [
               // { month: "Jan", inflow: 1000, outflow: 500 },
@@ -110,6 +116,7 @@ export default function AccountInfoCards({
               total={meta?.totalInflow || 0}
               percentage={0}
               gain
+              frequency={frequency}
             />
           </GridCol>
           <GridCol span={6}>
@@ -117,6 +124,7 @@ export default function AccountInfoCards({
               title="Total Outflow"
               total={meta?.totalOutflow || 0}
               percentage={0}
+              frequency={frequency}
             />
           </GridCol>
         </Grid>
@@ -129,6 +137,7 @@ export default function AccountInfoCards({
               total={meta?.activeAccountCount || 0}
               percentage={0}
               gain
+              frequency={frequency}
               viewAction={
                 opened && _status === "Active"
                   ? () => handleClose("Active")
@@ -141,6 +150,7 @@ export default function AccountInfoCards({
               title="Inactive Account"
               total={meta?.inactiveAccountCount || 0}
               percentage={0}
+              frequency={frequency}
               viewAction={
                 opened && _status === "Inactive"
                   ? () => handleClose("Inactive")

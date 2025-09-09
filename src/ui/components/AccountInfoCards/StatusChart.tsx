@@ -42,7 +42,7 @@ export default function StatusChart({
             {total}
           </Text>
 
-          <ThisMonth percentage={23} gain />
+          <ThisMonth percentage={23} gain frequency={frequency} />
         </Group>
 
         <Center w="100%">

@@ -85,9 +85,10 @@ export const LegendBadge = ({ title, ...props }: LegendBadgeProps) => {
 interface ThisMonthProps {
   percentage: number;
   gain?: boolean;
+  frequency?: string | null;
 }
 
-export const ThisMonth = ({ percentage, gain }: ThisMonthProps) => {
+export const ThisMonth = ({ percentage, gain, frequency }: ThisMonthProps) => {
   return (
     <Flex align="center" gap={8}>
       <Badge
@@ -100,7 +101,10 @@ export const ThisMonth = ({ percentage, gain }: ThisMonthProps) => {
         {percentage}%
       </Badge>
       <Text fz={10} fw={400} c="var(--prune-text-gray-400)">
-        This Month
+        This{" "}
+        {frequency
+          ? FREQUENCY_OPTIONS[frequency as keyof typeof FREQUENCY_OPTIONS]
+          : "Month"}
       </Text>
     </Flex>
   );
@@ -118,4 +122,10 @@ export const AccountCustomCard = ({ children }: { children: ReactNode }) => {
       {children}
     </Card>
   );
+};
+
+const FREQUENCY_OPTIONS = {
+  Weekly: "Week",
+  Monthly: "Month",
+  Yearly: "Year",
 };

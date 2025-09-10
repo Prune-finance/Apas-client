@@ -11,7 +11,7 @@ import {
   Tooltip,
   UnstyledButton,
 } from "@mantine/core";
-import { IconAB2, IconInfoCircle } from "@tabler/icons-react";
+import { IconAB2, IconCheck, IconInfoCircle } from "@tabler/icons-react";
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "next/navigation";
 
@@ -188,7 +188,7 @@ export default function Keys() {
               </Tooltip>
             </Group>
 
-            {/* {!Boolean(meta?.hasLiveKey) && (
+            {!Boolean(meta?.hasLiveKey) && (
               <PrimaryBtn
                 text={
                   Boolean(meta?.activeLKReq)
@@ -205,7 +205,7 @@ export default function Keys() {
                 justify="center"
                 action={openModal}
               />
-            )} */}
+            )}
           </Group>
 
           <Paper

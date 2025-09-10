@@ -355,6 +355,8 @@ export default function DefaultAccountComponents({
             freezeOpen={freezeOpen}
             open={open}
             setRowId={setRowId}
+            currency={currency}
+            locale={locale}
           />
         }
         loading={loading}
@@ -444,11 +446,14 @@ type RowProps = {
   freezeOpen: () => void;
   unfreezeOpen: () => void;
   open: () => void;
+  currency?: string;
+  locale?: string;
 };
 
 const RowComponent = ({
   accounts,
-
+  currency,
+  locale,
   setRowId,
   activateOpen,
   freezeOpen,
@@ -480,7 +485,9 @@ const RowComponent = ({
         </Link>
       </TableTd>
       <TableTd>{element.accountNumber}</TableTd>
-      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
+      <TableTd>
+        {formatNumber(element.accountBalance, true, currency, locale)}
+      </TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>
       <TableTd>{element.Company?.issuedAccountCount}</TableTd>

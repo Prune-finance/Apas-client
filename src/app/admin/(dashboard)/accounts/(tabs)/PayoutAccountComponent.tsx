@@ -1,24 +1,11 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, {
-  Dispatch,
-  SetStateAction,
-  Suspense,
-  useMemo,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 
 // Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import {
-  Badge,
-  Group,
-  Menu,
-  MenuDropdown,
-  MenuItem,
-  MenuTarget,
-} from "@mantine/core";
+import { Group, Menu, MenuDropdown, MenuItem, MenuTarget } from "@mantine/core";
 import { UnstyledButton, rem, Text } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
@@ -47,7 +34,6 @@ import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -343,6 +329,8 @@ export default function PayoutAccountsComponent({ currency, locale }: Props) {
             freezeOpen={freezeOpen}
             open={open}
             setRowId={setRowId}
+            currency={currency}
+            locale={locale}
           />
         }
         loading={loading}
@@ -430,6 +418,8 @@ type RowProps = {
   freezeOpen: () => void;
   unfreezeOpen: () => void;
   open: () => void;
+  currency?: string;
+  locale?: string;
 };
 
 const RowComponent = ({
@@ -439,6 +429,8 @@ const RowComponent = ({
   freezeOpen,
   unfreezeOpen,
   open,
+  currency,
+  locale,
 }: RowProps) => {
   const { push } = useRouter();
 
@@ -459,7 +451,9 @@ const RowComponent = ({
         </Link>
       </TableTd>
       <TableTd>{element.accountNumber}</TableTd>
-      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
+      <TableTd>
+        {formatNumber(element.accountBalance, true, currency, locale)}
+      </TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd>
         <BadgeComponent status={element.status} active />

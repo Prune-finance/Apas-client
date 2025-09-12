@@ -19,7 +19,8 @@ import {
   ServicesSchema,
   TurnoverSchema,
   VirtualAccountSchema,
-} from "@/lib/schema";
+} from "@/lib/schema/pre-onboarding";
+// import { questionnaireValues } from "@/lib/schema";
 import { useState } from "react";
 import { zodResolver } from "@mantine/form";
 import { z } from "zod";
@@ -38,7 +39,7 @@ export default function Questionnaire() {
   const questionnaireId = params?.slug?.[0];
 
   const form = useQuestionnaireForm({
-    initialValues: questionnaireValues,
+    initialValues: questionnaireValues as any,
     mode: "controlled",
     validate: (values) => {
       if (active === 0) return zodResolver(BizBasicInfoSchema)(values);
@@ -71,20 +72,20 @@ export default function Questionnaire() {
     endpoint: `/onboarding/get-questionnaire-by-id/${questionnaireId}`,
     enabled: !!!questionnaireId,
     dependencies: [questionnaireId],
-    onSuccess: (data) => {
-      form.setValues({
-        ...data,
-        isRegulated: data.isRegulated ? "yes" : "no",
-        virtualAccounts:
-          Object.keys(data.virtualAccounts).length === 0
-            ? questionnaireValues.virtualAccounts
-            : data.virtualAccounts,
-        operationsAccounts:
-          Object.keys(data.operationsAccounts).length === 0
-            ? questionnaireValues.operationsAccounts
-            : data.operationsAccounts,
-      });
-    },
+    // onSuccess: (data) => {
+    //   form.setValues({
+    //     ...data,
+    //     isRegulated: data.isRegulated ? "yes" : "no",
+    //     virtualAccounts: data?.virtualAccounts &&
+    //       Object.keys(data.virtualAccounts).length === 0
+    //         ? questionnaireValues.virtualAccounts
+    //         : data.virtualAccounts,
+    //     operationsAccounts:
+    //       Object.keys(data.operationsAccounts).length === 0
+    //         ? questionnaireValues.operationsAccounts
+    //         : data.operationsAccounts,
+    //   });
+    // },
   });
 
   return (

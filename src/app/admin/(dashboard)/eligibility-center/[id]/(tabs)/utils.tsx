@@ -22,7 +22,7 @@ import {
 } from "@/ui/components/InputWithLabel";
 import { IconTrash } from "@tabler/icons-react";
 import { useForm, zodResolver } from "@mantine/form";
-import { DirectorType, OnboardingDirectorValues } from "@/lib/schema";
+import { DirectorType, OnboardingDirectorValues } from "@/lib/schema/";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { z } from "zod";
 

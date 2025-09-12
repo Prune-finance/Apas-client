@@ -1,6 +1,7 @@
 import { Box, Text } from "@mantine/core";
 import DropzoneComponent from "@/ui/components/Dropzone";
-import { NewBusinessType, OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
+
 import { UseFormReturnType } from "@mantine/form";
 
 interface DocumentBoxProps<T = OnboardingType> {

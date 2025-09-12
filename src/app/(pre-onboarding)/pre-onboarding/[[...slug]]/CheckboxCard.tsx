@@ -75,7 +75,7 @@ export default function CheckboxCard({
                 form
                   .getValues()
                   .services.find((service) => service.name === title)
-                  ?.currencies?.includes(item)
+                  ?.accounts?.includes(item)
               )}
               onChange={(e) => {
                 const { services } = form.getValues();
@@ -93,18 +93,15 @@ export default function CheckboxCard({
 
                 // Only proceed if services[removeIdx] exists and has currencies
                 const currentService = services[removeIdx];
-                if (
-                  !currentService ||
-                  !Array.isArray(currentService.currencies)
-                )
+                if (!currentService || !Array.isArray(currentService?.accounts))
                   return;
 
-                const acctIndex = currentService.currencies.findIndex(
+                const acctIndex = currentService.accounts.findIndex(
                   (acct) => acct === item
                 );
 
                 if (!e.target.checked) {
-                  if (currentService.currencies.length <= 1) {
+                  if (currentService.accounts.length <= 1) {
                     form.removeListItem("services", removeIdx);
                     return;
                   }

@@ -1,4 +1,4 @@
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";

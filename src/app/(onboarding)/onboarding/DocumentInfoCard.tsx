@@ -4,7 +4,7 @@ import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
 import { UseFormReturnType } from "@mantine/form";
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 
 interface DocumentInfoCard {
   setActive: React.Dispatch<React.SetStateAction<number>>;

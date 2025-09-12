@@ -1,5 +1,5 @@
-import form from "@/app/auth/login/form";
-import { QuestionnaireType } from "@/lib/schema";
+// import form from "@/app/auth/login/form";
+import { QuestionnaireType } from "@/lib/schema/pre-onboarding";
 import { businessIndustries } from "@/lib/static";
 import {
   SelectInputWithInsideLabel,
@@ -82,7 +82,7 @@ export default function BasicInfo() {
         />
 
         <Box w="100%">
-          <PhoneNumberInput<QuestionnaireType>
+          <PhoneNumberInput<any>
             form={form}
             countryCodeKey="countryCode"
             phoneNumberKey="businessPhoneNumber"

@@ -5,7 +5,7 @@ import {
   FilterSchema,
   FilterType,
   FilterValues,
-} from "@/lib/schema";
+} from "@/lib/schema/";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";

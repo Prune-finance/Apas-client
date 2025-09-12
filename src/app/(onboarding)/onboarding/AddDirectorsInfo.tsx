@@ -7,7 +7,10 @@ import {
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { OnboardingDirectorValues, OnboardingType } from "@/lib/schema";
+import {
+  OnboardingDirectorValues,
+  OnboardingType,
+} from "@/lib/schema/onboarding";
 import { UseFormReturnType } from "@mantine/form";
 import { useState } from "react";
 import useNotification from "@/lib/hooks/notification";

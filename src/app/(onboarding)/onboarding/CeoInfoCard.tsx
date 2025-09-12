@@ -4,7 +4,7 @@ import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
 import { camelCaseToTitleCase } from "@/lib/utils";
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 import { UseFormReturnType } from "@mantine/form";
 import dayjs from "dayjs";
 

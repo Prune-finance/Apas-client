@@ -21,7 +21,7 @@ import {
   onboardingDocumentSchema,
   onboardingShareholders,
   OnboardingType,
-} from "@/lib/schema";
+} from "@/lib/schema/onboarding";
 import OnboardingStore from "@/lib/store/onboarding";
 import useAxios from "@/lib/hooks/useAxios";
 import { OnboardingBusiness, Onboarding as IOnboarding } from "@/lib/interface";

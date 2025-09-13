@@ -10,7 +10,7 @@ import {
 } from "@mantine/core";
 import styles from "./styles.module.scss";
 import { ReactNode } from "react";
-import { Tab } from "@/lib/schema";
+import { Tab } from "@/lib/schema/";
 import { IconReload } from "@tabler/icons-react";
 
 interface Props extends TabsProps {

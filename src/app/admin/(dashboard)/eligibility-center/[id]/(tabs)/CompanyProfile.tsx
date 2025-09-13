@@ -29,7 +29,7 @@ import NGN from "@/assets/Nigeria.png";
 
 import Skeleton from "../Skeleton";
 import { UseFormReturnType } from "@mantine/form";
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 import { OnboardingBusiness } from "@/lib/interface";
 import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";

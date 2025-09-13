@@ -24,7 +24,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import {
   onboardingBasicInfoSchema,
   OnboardingBasicInfoType,
-} from "@/lib/schema";
+} from "@/lib/schema/";
 import OnBoardingDocumentBox from "@/app/(onboarding)/onboarding/onBoardingDocumentBox";
 import { IconHelp, IconQuestionMark } from "@tabler/icons-react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";

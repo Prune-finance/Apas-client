@@ -10,7 +10,7 @@ import DirectorInfoCard from "./DirectorInfoCard";
 import ShareholderInfoCard from "./ShareholderInfoCard";
 import { FiFileText, FiUser, FiUsers } from "react-icons/fi";
 import { TbBuilding } from "react-icons/tb";
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 import { UseFormReturnType } from "@mantine/form";
 import dayjs from "dayjs";
 

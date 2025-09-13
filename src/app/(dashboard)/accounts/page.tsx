@@ -417,20 +417,7 @@ function Accounts() {
           }}
         >
           <TabsPanel value={tabs[0].value}>
-            <SimpleGrid cols={3} mt={32}>
-              {/* <AccountCard
-                balance={account?.accountBalance ?? 0}
-                currency="EUR"
-                companyName={account?.accountName ?? "No Default Account"}
-                iban={account?.accountNumber ?? "No Default Account"}
-                bic={"ARPYGB21XXX"}
-                loading={loadingDftAcct}
-                link={`/accounts/default`}
-                business={false}
-                refresh
-                revalidate={revalidateDftAcct}
-              /> */}
-
+            <SimpleGrid cols={3} mt={32} h="100%">
               <NewAccountCard
                 currency={"EUR"}
                 companyName={account?.accountName ?? "No Default Account"}
@@ -451,7 +438,9 @@ function Accounts() {
                     key={data?.id}
                     currency={data?.AccountRequests?.Currency?.symbol}
                     companyName={data?.accountName ?? "No Default Account"}
-                    link={`/accounts/default/${data?.id}`}
+                    walletOwner={data?.accountName ?? "No Default Account"}
+                    walletId={data?.walletId ?? "No Default Account"}
+                    link={`/accounts/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                     sortCode="041917"
                     accountNumber={data?.accountNumber}
                     balance={data?.accountBalance ?? 0}
@@ -462,21 +451,19 @@ function Accounts() {
                   />
                 ))}
 
-              {/* {currencyLoading && (
-                <NewAccountCard
-                  key="1"
-                  currency={"GBP"}
-                  companyName={""}
-                  link={`/accounts/default/`}
-                  sortCode=""
-                  accountNumber={""}
-                  balance={0}
-                  loading={currencyLoading}
-                  business={false}
-                  refresh
-                  revalidate={revalidateDftAcct}
-                />
-              )} */}
+              {/* <NewAccountCard
+                key="1"
+                currency={"GHS"}
+                companyName={"C80 Limited"}
+                link={`/accounts/default/`}
+                sortCode=""
+                accountNumber={""}
+                balance={100}
+                loading={currencyLoading}
+                business={false}
+                refresh
+                revalidate={revalidateDftAcct}
+              /> */}
             </SimpleGrid>
           </TabsPanel>
 

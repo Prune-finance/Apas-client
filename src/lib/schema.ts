@@ -238,6 +238,8 @@ export const OperationsAccountSchema = z.object({
 
 export const questionnaireSchema = z.object({
   turnover: z.string().min(1, "Turnover is required"),
+  countryCode: z.string().min(1, "Country code is required"),
+  isRegulated: z.union([z.literal("no"), z.literal("yes")]),
   services: ServicesSchema,
   virtualAccount: VirtualAccountSchema,
   operationsAccount: OperationsAccountSchema,
@@ -250,6 +252,8 @@ export type ServicesType = z.infer<typeof ServicesSchema>;
 export type TurnoverType = z.infer<typeof TurnoverSchema>;
 
 export const questionnaireValues: QuestionnaireType = {
+  countryCode: "",
+  isRegulated: "" as "no" | "yes",
   turnover: "",
   services: [],
   virtualAccount: {

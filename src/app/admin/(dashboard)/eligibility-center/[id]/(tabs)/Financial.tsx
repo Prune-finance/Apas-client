@@ -9,7 +9,7 @@ import { operationsAccountEstimatedBalance } from "@/lib/static";
 import { useState } from "react";
 import { PanelWrapper } from "./utils";
 import { OnboardingBusiness } from "@/lib/interface";
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 import { UseFormReturnType } from "@mantine/form";
 
 interface ComponentProps {

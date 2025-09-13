@@ -15,7 +15,7 @@ import {
   DirectorType,
   OnboardingDirectorValues,
   OnboardingType,
-} from "@/lib/schema";
+} from "@/lib/schema/onboarding";
 import { UseFormReturnType } from "@mantine/form";
 import { Director as IDirector } from "@/lib/interface";
 import { useDisclosure } from "@mantine/hooks";

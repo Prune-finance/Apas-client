@@ -25,7 +25,7 @@ import {
   otherDocumentSchema,
   OtherDocumentType,
   otherDocumentValues,
-} from "@/lib/schema";
+} from "@/lib/schema/";
 import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";

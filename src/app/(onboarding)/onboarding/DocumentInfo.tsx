@@ -5,7 +5,7 @@ import {
 import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 import { UseFormReturnType } from "@mantine/form";
 import useNotification from "@/lib/hooks/notification";
 import useAxios from "@/lib/hooks/useAxios";

@@ -4,15 +4,17 @@ import "@/ui/styles/globals.scss";
 import {
   BizBasicInfoSchema,
   OperationsAccountSchema,
-  questionnaireValues,
+  // questionnaireValues,
   ServicesSchema,
   TurnoverSchema,
   VirtualAccountSchema,
-} from "@/lib/schema";
+} from "@/lib/schema/pre-onboarding";
 import {
   QuestionnaireFormProvider,
   useQuestionnaireForm,
 } from "@/lib/store/questionnaire";
+import { questionnaireValues } from "@/lib/schema";
+import { QuestionnaireType } from "@/lib/schema/pre-onboarding";
 import { AppShell, Box, Container, Progress, Text } from "@mantine/core";
 import { zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";

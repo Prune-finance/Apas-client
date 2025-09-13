@@ -9,7 +9,7 @@ import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { UseFormReturnType } from "@mantine/form";
-import { OnboardingType } from "@/lib/schema";
+import { OnboardingType } from "@/lib/schema/onboarding";
 import countries from "@/assets/countries.json";
 import { useState } from "react";
 import { businessIndustries } from "@/lib/static";

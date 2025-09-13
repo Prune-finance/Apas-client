@@ -35,8 +35,15 @@ export const GBPAccount = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { status, date, endDate, type, recipientName, recipientIban } =
-    Object.fromEntries(searchParams.entries());
+  const {
+    status,
+    date,
+    endDate,
+    type,
+    recipientName,
+    recipientIban,
+    currency,
+  } = Object.fromEntries(searchParams.entries());
 
   const queryParams = {
     date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
@@ -50,8 +57,10 @@ export const GBPAccount = () => {
     search: debouncedSearch,
   };
 
-  const { transactions, loading, meta } =
-    useUserCurrencyTransactions(queryParams);
+  const { transactions, loading, meta } = useUserCurrencyTransactions(
+    queryParams,
+    "GBP"
+  );
   usePaginationReset({ queryParams, setActive });
 
   const form = useForm<FilterType>({

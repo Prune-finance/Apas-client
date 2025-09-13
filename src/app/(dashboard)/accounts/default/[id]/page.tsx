@@ -26,6 +26,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 function Account() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams();
+
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
@@ -38,6 +39,7 @@ function Account() {
     recipientName,
     recipientIban,
     search,
+    currency,
   } = Object.fromEntries(searchParams.entries());
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -73,7 +75,7 @@ function Account() {
     loading: loadingTrx,
     meta: trxMeta,
     revalidate: revalidateTrx,
-  } = useUserCurrencyTransactions(param);
+  } = useUserCurrencyTransactions(param, currency);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
@@ -81,7 +83,7 @@ function Account() {
     currencyAccount: account,
     loading,
     revalidate: revalidateAcct,
-  } = useUserCurrencyAccountByID(params?.id);
+  } = useUserCurrencyAccountByID(params?.id, currency);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 

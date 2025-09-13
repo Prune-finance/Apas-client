@@ -4,7 +4,7 @@ import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { Box, TabsPanel, Text } from "@mantine/core";
 import React, { useEffect } from "react";
 import ProfileHeader from "./ProfileHeader";
-import { newOnboardingValue, OnboardingType, Tab } from "@/lib/schema";
+import { newOnboardingValue, OnboardingType, Tab } from "@/lib/schema/";
 import {
   IconBuildingSkyscraper,
   IconCoins,

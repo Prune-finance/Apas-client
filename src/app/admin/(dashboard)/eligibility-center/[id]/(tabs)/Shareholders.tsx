@@ -11,7 +11,7 @@ import { IconPencilMinus, IconPlus, IconTrash } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import PaperContainer from "../PaperContainer";
 import { Director, OnboardingBusiness } from "@/lib/interface";
-import { DirectorType, OnboardingType } from "@/lib/schema";
+import { DirectorType, OnboardingType } from "@/lib/schema/";
 import { UseFormReturnType } from "@mantine/form";
 import { parseError } from "@/lib/actions/auth";
 import createAxiosInstance from "@/lib/axios";

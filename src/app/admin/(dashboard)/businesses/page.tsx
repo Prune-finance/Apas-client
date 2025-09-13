@@ -1,4 +1,4 @@
-import { Tab } from "@/lib/schema";
+import { Tab } from "@/lib/schema/";
 import TabsComponent from "@/ui/components/Tabs";
 import { Box, TabsPanel, Title } from "@mantine/core";
 import { Suspense } from "react";

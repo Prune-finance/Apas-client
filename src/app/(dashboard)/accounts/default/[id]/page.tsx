@@ -39,6 +39,7 @@ function Account() {
     recipientName,
     recipientIban,
     search,
+    currency
   } = Object.fromEntries(searchParams.entries());
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -76,7 +77,7 @@ function Account() {
     loading: loadingTrx,
     meta: trxMeta,
     revalidate: revalidateTrx,
-  } = useUserCurrencyTransactions(param);
+  } = useUserCurrencyTransactions(param, currency);
 
   const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
@@ -84,7 +85,7 @@ function Account() {
     currencyAccount: account,
     loading,
     revalidate: revalidateAcct,
-  } = useUserCurrencyAccountByID(params?.id);
+  } = useUserCurrencyAccountByID(params?.id, currency);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 

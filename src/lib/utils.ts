@@ -2,16 +2,32 @@ import dayjs from "dayjs";
 import { RequestData } from "./hooks/requests";
 import { IParams } from "./schema";
 
+const currencyLocaleMap: Record<string, string> = {
+  NGN: "en-NG", // Nigerian Naira
+  GHS: "en-GH", // Ghanaian Cedi
+  CAD: "en-CA", // Canadian Dollar
+  USD: "en-US", // US Dollar
+  EUR: "en-EU", // Euro
+  GBP: "en-GB", // British Pound
+};
+
 export const formatNumber = (
   number: number,
   currency: boolean = true,
   type: string = "NGN",
-  locale: string = "en-NG"
+  locale?: string
 ) => {
+  const formatLocale = locale || currencyLocaleMap[type] || "en-US";
+
   if (!currency) {
-    return new Intl.NumberFormat(locale, {}).format(number);
+    return new Intl.NumberFormat(formatLocale, {}).format(number);
   }
-  return new Intl.NumberFormat(locale, {
+
+  if (type === "GHS") {
+    return `₵${new Intl.NumberFormat(formatLocale, {}).format(number)}`;
+  }
+
+  return new Intl.NumberFormat(formatLocale, {
     style: "currency",
     currency: type,
   }).format(number);

@@ -25,6 +25,8 @@ import { SecondaryBtn } from "../Buttons";
 import { IconCheck, IconCopy, IconReload } from "@tabler/icons-react";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
+import CediIcon from "@/assets/cedis-icon.png";
+import CediBgImage from "@/assets/cedi-background-image.png";
 import { SeeAll } from ".";
 import Link from "next/link";
 
@@ -34,6 +36,8 @@ interface Props extends CardProps {
   iban?: string;
   bic?: string;
   balance: number;
+  walletOwner?: string;
+  walletId?: string;
   link?: string;
   loading: boolean;
   badgeText?: string;
@@ -54,6 +58,8 @@ type CurrencyConfig = {
   accountIdLabel: string;
   currencySymbol: string;
   currencyCode: string;
+  getBankIdValue: (props: Props) => string | undefined;
+  getAccountIdValue: (props: Props) => string | undefined;
 };
 
 const currencyConfigs: Record<string, CurrencyConfig> = {
@@ -64,6 +70,8 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     accountIdLabel: "IBAN",
     currencySymbol: "€",
     currencyCode: "EUR",
+    getBankIdValue: (props) => props.bic,
+    getAccountIdValue: (props) => props.iban,
   },
   GBP: {
     background: AccountImageGBP.src,
@@ -72,6 +80,18 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     accountIdLabel: "Account Number",
     currencySymbol: "£",
     currencyCode: "GBP",
+    getBankIdValue: (props) => props.sortCode,
+    getAccountIdValue: (props) => props.accountNumber,
+  },
+  GHS: {
+    background: CediBgImage.src,
+    icon: <Image src={CediIcon.src} alt="GHS" width={20} height={20} />,
+    bankIdLabel: "Wallet Owner",
+    accountIdLabel: "Wallet ID",
+    currencySymbol: "₵",
+    currencyCode: "GHS",
+    getBankIdValue: (props) => props.walletOwner,
+    getAccountIdValue: (props) => props.walletId,
   },
   NGN: {
     background: newAccountImageEuro.src,
@@ -80,6 +100,8 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     accountIdLabel: "Account Number",
     currencySymbol: "₦",
     currencyCode: "NGN",
+    getBankIdValue: (props) => props.sortCode,
+    getAccountIdValue: (props) => props.accountNumber,
   },
 };
 
@@ -95,6 +117,8 @@ function NewAccountCard({
   loading,
   badgeText,
   business,
+  walletOwner,
+  walletId,
   disable,
   children,
   refresh,
@@ -138,7 +162,7 @@ function NewAccountCard({
       style={{
         borderRadius: 6,
         overflow: "hidden",
-        border: "0.773px solid #ededed",
+        border: "1px solid #EAECF0",
       }}
       w="100%"
     >
@@ -221,7 +245,7 @@ function NewAccountCard({
         </Flex>
 
         <Flex align="flex-end" justify="space-between" w="100%">
-          <Group w="100%" gap={10}>
+          <Group w="100%" gap={4}>
             <Group align="flex-end" justify="space-between" gap={4} w={"100%"}>
               {!loading ? (
                 <>
@@ -231,7 +255,18 @@ function NewAccountCard({
                     </Text>
 
                     <Text fz={14} fw={600} c="#1D2939" lh="100%">
-                      {config.bankIdLabel === "BIC" ? bic : sortCode}
+                      {config.getBankIdValue({
+                        currency,
+                        companyName,
+                        walletOwner,
+                        walletId,
+                        iban,
+                        bic,
+                        sortCode,
+                        accountNumber,
+                        balance,
+                        loading
+                      })}
                     </Text>
                   </Flex>
                 </>
@@ -248,7 +283,18 @@ function NewAccountCard({
                       {config.accountIdLabel}:
                     </Text>
                     <Text fz={14} fw={600} c="#1D2939" lh="100%">
-                      {config.accountIdLabel === "IBAN" ? iban : accountNumber}
+                      {config.getAccountIdValue({
+                        currency,
+                        companyName,
+                        walletOwner,
+                        walletId,
+                        iban,
+                        bic,
+                        sortCode,
+                        accountNumber,
+                        balance,
+                        loading
+                      })}
                     </Text>
                   </>
                 ) : (
@@ -260,9 +306,29 @@ function NewAccountCard({
                 <Box onClick={handlePropagation}>
                   <CopyButton
                     value={
-                      currency === "EUR"
-                        ? `IBAN: ${iban},\nAccount Name: ${companyName},\nBIC: ${bic}`
-                        : `Sort Code: ${sortCode},\nAccount Number: ${accountNumber},\nAccount Name: ${companyName}`
+                      `${config.bankIdLabel}: ${config.getBankIdValue({
+                        currency,
+                        companyName,
+                        walletOwner,
+                        walletId,
+                        iban,
+                        bic,
+                        sortCode,
+                        accountNumber,
+                        balance,
+                        loading
+                      })},\nAccount Name: ${companyName},\n${config.accountIdLabel}: ${config.getAccountIdValue({
+                        currency,
+                        companyName,
+                        walletOwner,
+                        walletId,
+                        iban,
+                        bic,
+                        sortCode,
+                        accountNumber,
+                        balance,
+                        loading
+                      })}`
                     }
                   >
                     {({ copied, copy }) => (

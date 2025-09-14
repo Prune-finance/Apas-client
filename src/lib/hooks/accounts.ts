@@ -492,7 +492,7 @@ export function useUserDefaultAccount() {
   return { loading, account, revalidate };
 }
 
-export function useUserCurrencyAccountByID(id: string) {
+export function useUserCurrencyAccountByID(id: string, currency: string) {
   const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
     null
   );
@@ -501,7 +501,9 @@ export function useUserCurrencyAccountByID(id: string) {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/currency-accounts/${id}`);
+      const { data } = await axios.get(
+        `/currency-accounts/${id}?currency=${currency}`
+      );
       console.log(data);
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -783,6 +785,7 @@ export interface BaseAccount {
   accountId: number;
   accountName: string;
   accountNumber: string;
+  walletId: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
@@ -838,6 +841,7 @@ export interface CurrencyAccount {
   isTrusted: boolean;
   accountRequestId: string;
   accountIdentifier: string;
+  walletId: string;
   accountName: string;
   accountNumber: string;
   accountIban: string;

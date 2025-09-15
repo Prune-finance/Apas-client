@@ -31,7 +31,15 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     account: gbpAccount,
     loading: gbpLoading,
     revalidate: gbpRevalidate,
-  } = useUserCurrencyGBPAccount();
+  } = useUserCurrencyGBPAccount("GBP");
+
+  const {
+    account: GHSAccount,
+    loading: GHSLoading,
+    revalidate: GHSRevalidate,
+  } = useUserCurrencyGBPAccount("GHS");
+
+  console.log(GHSAccount);
 
   const { switchCurrency } = useCurrencySwitchStore();
 
@@ -267,6 +275,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
   useEffect(() => {
     revalidate();
     gbpRevalidate();
+    GHSRevalidate();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
@@ -280,8 +289,14 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         withCloseButton={false}
       >
         <SendMoneyModal
-          account={switchCurrency === "EUR" ? account : gbpAccount}
-          loading={loading || gbpLoading}
+          account={
+            switchCurrency === "EUR"
+              ? account
+              : switchCurrency === "GBP"
+              ? gbpAccount
+              : GHSAccount
+          }
+          loading={loading || gbpLoading || GHSLoading}
           close={closeMoney}
           openPreview={openPreview}
           setRequestForm={setRequestForm}

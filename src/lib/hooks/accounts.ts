@@ -625,7 +625,7 @@ export function useAdminGetCompanyCurrencyAccountsList(id: string) {
   return { loading, currencyAccount, revalidate };
 }
 
-export function useUserCurrencyGBPAccount() {
+export function useUserCurrencyGBPAccount(currency: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -633,7 +633,7 @@ export function useUserCurrencyGBPAccount() {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/currency-accounts/get-account-by-currency/GBP`
+        `/currency-accounts/get-account-by-currency/${currency}`
       );
 
       setAccount(data?.data);

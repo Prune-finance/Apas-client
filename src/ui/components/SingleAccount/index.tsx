@@ -631,7 +631,11 @@ export const SingleAccountBody = ({
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
-          <AccountDetails account={account} loading={loading} currency={currency} />
+          <AccountDetails
+            account={account}
+            loading={loading}
+            currency={currency}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
@@ -1089,8 +1093,10 @@ export const AccountInfo = ({
     setProcessing(true);
     try {
       await axios.get(
-        currencyType === "GBP"
-          ? `/accounts/${account?.accountNumber}/balance/dashboard?currency=GBP`
+        currencyType
+          ? `/accounts/${
+              account?.accountNumber ?? account?.walletId
+            }/balance/dashboard?currency=${currencyType}`
           : `/accounts/${account?.accountNumber}/balance/dashboard`
       );
       revalidate && (await revalidate());

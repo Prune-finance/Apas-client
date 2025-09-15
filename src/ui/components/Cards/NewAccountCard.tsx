@@ -305,7 +305,31 @@ function NewAccountCard({
               {!loading ? (
                 <Box onClick={handlePropagation}>
                   <CopyButton
-                    value={`${config.bankIdLabel}: ${config.getBankIdValue({
+                    value={currency === 'GHS' ? 
+                    `${config.bankIdLabel}: ${config.getBankIdValue({
+                      currency,
+                      companyName,
+                      walletOwner,
+                      walletId,
+                      iban,
+                      bic,
+                      sortCode,
+                      accountNumber,
+                      balance,
+                      loading,
+                    })},\n${config.accountIdLabel}: ${config.getAccountIdValue({
+                      currency,
+                      companyName,
+                      walletOwner,
+                      walletId,
+                      iban,
+                      bic,
+                      sortCode,
+                      accountNumber,
+                      balance,
+                      loading,
+                    })}` :
+                    `${config.bankIdLabel}: ${config.getBankIdValue({
                       currency,
                       companyName,
                       walletOwner,

@@ -69,7 +69,9 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
                 key={data?.id}
                 currency={data?.AccountRequests?.Currency?.symbol}
                 companyName={data?.accountName ?? "No Default Account"}
-                link={`/accounts/default/${data?.id}?accountType=PAYOUT_ACCOUNT`}
+                walletOwner={data?.accountName ?? "No Default Account"}
+                walletId={data?.walletId ?? "No Default Account"}
+                link={`/accounts/default/${data?.id}?accountType=PAYOUT_ACCOUNT&currency=${data?.AccountRequests?.Currency?.symbol}`}
                 sortCode="041917"
                 accountNumber={data?.accountNumber}
                 balance={data?.accountBalance ?? 0}

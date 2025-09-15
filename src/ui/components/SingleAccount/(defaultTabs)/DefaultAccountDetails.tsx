@@ -69,7 +69,6 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
   },
 };
 
-
 export default function DefaultAccountDetails({
   account,
   loading,
@@ -106,7 +105,7 @@ export default function DefaultAccountDetails({
 
         {!loading && (
           <CopyButton
-             value={`Account Name: ${account?.accountName ?? ""},
+            value={`Account Name: ${account?.accountName ?? ""},
             ${config.accountIdLabel}: ${config.getAccountIdValue(account)},
             ${config.bankIdLabel}: ${config.getBankIdValue(account)},
             Bank Name: Prune Payments LTD,

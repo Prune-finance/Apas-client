@@ -39,8 +39,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     revalidate: GHSRevalidate,
   } = useUserCurrencyGBPAccount("GHS");
 
-  console.log(GHSAccount);
-
   const { switchCurrency } = useCurrencySwitchStore();
 
   const matches = useMediaQuery("(max-width: 768px)");

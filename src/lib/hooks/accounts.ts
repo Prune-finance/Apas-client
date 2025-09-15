@@ -371,7 +371,9 @@ export function useSingleUserAccount(id: string, currency: string = "EUR") {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/${id}/dashboard?currency=${currency}`);
+      const { data } = await axios.get(
+        `/accounts/${id}/dashboard?currency=${currency}`
+      );
 
       setAccount(data.data);
       setMeta(data.meta);
@@ -655,6 +657,35 @@ export function useUserCurrencyGBPAccount(currency: string) {
   }, []);
 
   return { loading, account, revalidate };
+}
+export function useUserListOfBanks() {
+  const [banks, setBanks] = useState<DefaultAccount | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/accounts/banks`);
+
+      console.log(data);
+
+      setBanks(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, banks };
 }
 
 export function useUserDefaultPayoutAccount() {

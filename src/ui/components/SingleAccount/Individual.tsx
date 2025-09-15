@@ -31,6 +31,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { PrimaryBtn } from "../Buttons";
 import {
   DefaultAccount,
+  useUserListOfBanks,
   validateAccount,
   validateAccountGBP,
 } from "@/lib/hooks/accounts";
@@ -93,6 +94,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     },
     ref
   ) {
+    const { banks, loading } = useUserListOfBanks();
+
     const [processing, setProcessing] = useState(false);
     const [disableBank, setDisableBank] = useState(false);
     const [disableAddress, setDisableAddress] = useState(false);
@@ -602,11 +605,11 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                 </Box>
               </Flex>
 
-              { switchCurrency === "EUR" &&
+              {switchCurrency === "EUR" && (
                 <Flex pt={12} w="100%">
-                  <NoticeBanner /> 
+                  <NoticeBanner />
                 </Flex>
-              }
+              )}
               {switchCurrency === "EUR" ? (
                 <TransactionProcessingTimes />
               ) : (
@@ -615,24 +618,13 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
             </ScrollArea>
 
             <Flex mt={24} justify="flex-end" gap={15}>
-              {/* <SecondaryBtn
-              text="Cancel"
-              w={126}
-              fw={600}
-              action={() => {
-                close();
-              }}
-            /> */}
               <PrimaryBtn
-                // action={handlePreviewState}
                 action={handleDebtorState}
-                // loading={processing}
                 text="Continue"
                 disabled={switchCurrency === "EUR" ? true : false}
                 fullWidth
                 fw={600}
                 h={48}
-                // w={126}
               />
             </Flex>
           </Box>

@@ -5,6 +5,7 @@ import {
   forwardRef,
   SetStateAction,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { IconCheck } from "@tabler/icons-react";
@@ -25,6 +26,7 @@ import {
   ScrollArea,
   Checkbox,
   Modal,
+  Skeleton,
 } from "@mantine/core";
 import { TextInput, Select } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
@@ -45,6 +47,7 @@ import TransactionProcessingTimes from "./TransactionProcessingTimes";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import TransactionProcessTimeGBP from "./TransactionProcessTimeGBP";
 import NoticeBanner from "../NoticeBanner";
+import SelectTypeOfTransfer from "@/app/(dashboard)/accounts/SelectTypeOfTransfer";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -95,6 +98,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     ref
   ) {
     const { banks, loading } = useUserListOfBanks();
+
+    console.log(banks);
 
     const [processing, setProcessing] = useState(false);
     const [disableBank, setDisableBank] = useState(false);
@@ -251,6 +256,14 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       openDebtor();
     };
 
+    const memorizedData = useMemo(() => {
+      if (!banks || !Array.isArray(banks)) return [];
+      return banks.map((item) => ({
+        label: item?.bankName || "",
+        value: item?.bankName || "",
+      }));
+    }, [banks]);
+
     return (
       <>
         <TabsPanel value="To Individual">
@@ -260,74 +273,38 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               scrollbarSize={3}
               // pr={20}
             >
-              <Flex gap={20}>
-                <TextInput
-                  classNames={{ input: styles.input, label: styles.label }}
-                  flex={1}
-                  size="lg"
-                  label={
-                    <Text fz={14} c="#667085">
-                      First Name <span style={{ color: "red" }}>*</span>
-                    </Text>
-                  }
-                  placeholder="Enter first name"
-                  {...form.getInputProps("firstName")}
-                  errorProps={{
-                    fz: 12,
-                  }}
-                />
+              {switchCurrency === "GHS" ? (
+                <>
+                  <SelectTypeOfTransfer />
 
-                <TextInput
-                  classNames={{ input: styles.input, label: styles.label }}
-                  flex={1}
-                  size="lg"
-                  label={
-                    <Text fz={14} c="#667085">
-                      Last Name <span style={{ color: "red" }}>*</span>
-                    </Text>
-                  }
-                  placeholder="Enter last name"
-                  {...form.getInputProps("lastName")}
-                  errorProps={{
-                    fz: 12,
-                  }}
-                />
-              </Flex>
+                  {loading ? (
+                    <Skeleton h={50} w={"100%"} />
+                  ) : (
+                    <Flex gap={20}>
+                      <Select
+                        searchable
+                        label={
+                          <Text fz={14} c="#667085">
+                            Bank
+                            <span style={{ color: "red" }}>*</span>
+                          </Text>
+                        }
+                        classNames={{
+                          input: styles.input,
+                          label: styles.label,
+                        }}
+                        flex={1}
+                        data={memorizedData}
+                        placeholder="Select Bank"
+                        errorProps={{
+                          fz: 12,
+                        }}
+                      />
+                    </Flex>
+                  )}
 
-              <Flex gap={20} mt={24}>
-                {switchCurrency === "EUR" ? (
-                  <>
+                  <Flex gap={20} mt={24}>
                     <TextInput
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          IBAN <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter IBAN"
-                      {...form.getInputProps("destinationIBAN")}
-                      errorProps={{ fz: 12 }}
-                    />
-                    <TextInput
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          BIC <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter BIC"
-                      {...form.getInputProps("destinationBIC")}
-                      errorProps={{ fz: 12 }}
-                    />
-                  </>
-                ) : (
-                  <>
-                    <TextInput
-                      type="number"
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
                       size="lg"
@@ -336,242 +313,356 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           Account Number <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
-                      placeholder="Enter Account Number"
-                      {...form.getInputProps("destinationAccountNumber")}
-                      onKeyDown={(e) => {
-                        if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
-                          e.preventDefault(); // Prevent increment/decrement via arrow keys
-                        }
-
-                        const isDigit = /^\d$/.test(e.key);
-                        const currentLength =
-                          form.values.destinationAccountNumber.length;
-
-                        if (isDigit && currentLength >= 8) {
-                          e.preventDefault(); // stop more digits from being typed
-                          return;
-                        }
+                      placeholder="Enter account number"
+                      // {...form.getInputProps("accountNumber")}
+                      errorProps={{
+                        fz: 12,
                       }}
-                      onWheel={(event) => event.currentTarget.blur()}
-                      errorProps={{ fz: 12 }}
                     />
-                    <TextInput
-                      type="number"
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          Sort Code <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter Sort Code"
-                      {...form.getInputProps("destinationSortCode")}
-                      onKeyDown={(e) => {
-                        if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
-                          e.preventDefault(); // Prevent increment/decrement via arrow keys
-                        }
-
-                        const isDigit = /^\d$/.test(e.key);
-                        const currentLength =
-                          form.values.destinationSortCode.length;
-
-                        if (isDigit && currentLength >= 6) {
-                          e.preventDefault(); // stop more digits from being typed
-                          return;
-                        }
-                      }}
-                      onPaste={(e) => {
-                        e.preventDefault();
-                        const pasted = e.clipboardData
-                          .getData("Text")
-                          .replace(/-/g, ""); // remove dashes
-                        const digitsOnly = pasted.replace(/\D/g, ""); // keep only digits
-
-                        const currentValue = form.values.destinationSortCode;
-                        const newValue = (currentValue + digitsOnly).slice(
-                          0,
-                          6
-                        ); // limit to 6 digits
-
-                        form.setFieldValue("destinationSortCode", newValue);
-                      }}
-                      onWheel={(event) => event.currentTarget.blur()}
-                      errorProps={{ fz: 12 }}
-                    />
-                  </>
-                )}
-              </Flex>
-
-              {(processing || validated) && showBadge && (
-                <Group
-                  justify="space-between"
-                  bg="#ECFDF3"
-                  w="100%"
-                  px={20}
-                  py={8}
-                  my={32}
-                >
-                  <Badge
-                    fz={14}
-                    px={0}
-                    c="#12B76A"
-                    variant="transparent"
-                    fw={600}
-                    color="#12B76A"
-                    tt="capitalize"
-                    rightSection={
-                      validated ? (
-                        <ActionIcon
-                          variant="light"
-                          radius="xl"
-                          color="#12B76A"
-                          size={23}
-                        >
-                          <IconCheck />
-                        </ActionIcon>
-                      ) : null
-                    }
-                  >
-                    {validated
-                      ? "Information Validated "
-                      : "Verifying Account Details"}
-                  </Badge>
-
-                  {processing && (
-                    <Loader type="oval" size={24} color="#12B76A" />
-                  )}
-                </Group>
-              )}
-
-              {validated && (
+                  </Flex>
+                </>
+              ) : (
                 <>
-                  {" "}
-                  <Flex gap={20} mt={24}>
-                    <TextInput
-                      placeholder="Enter Bank Name"
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          Bank <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      disabled={disableBank}
-                      {...form.getInputProps("destinationBank")}
-                      errorProps={{
-                        fz: 12,
-                      }}
-                    />
-                  </Flex>
-                  <Flex gap={20} mt={24}>
+                  <Flex gap={20}>
                     <TextInput
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          Bank Address
+                          First Name <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
-                      placeholder="Bank Address"
-                      disabled={disableAddress}
-                      {...form.getInputProps("bankAddress")}
+                      placeholder="Enter first name"
+                      {...form.getInputProps("firstName")}
                       errorProps={{
                         fz: 12,
                       }}
                     />
-                  </Flex>
-                  <Flex gap={20} mt={24}>
-                    <NumberInput
-                      flex={1}
-                      classNames={{ input: styles.input, label: styles.label }}
-                      description={
-                        <Text fz={12}>
-                          {Number(form.values.amount) >
-                          Number(account?.accountBalance)
-                            ? `Insufficient Balance`
-                            : ""}
-                        </Text>
-                      }
-                      styles={{
-                        description: {
-                          color: "var(--prune-warning)",
-                        },
-                        input: {
-                          border:
-                            Number(form.values.amount) >
-                            Number(account?.accountBalance)
-                              ? "1px solid red"
-                              : "1px solid #eaecf0",
-                        },
-                      }}
-                      label={
-                        <Text fz={14} c="#667085">
-                          Amount <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      hideControls
-                      size="lg"
-                      placeholder="Enter amount"
-                      {...form.getInputProps("amount")}
-                      errorProps={{
-                        fz: 12,
-                      }}
-                      // error={account?.accountBalance < form.values.amount}
-                    />
-                  </Flex>
-                  <Flex gap={20} mt={24}>
-                    <Select
-                      searchable
-                      placeholder="Select Country"
+
+                    <TextInput
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
-                      label={
-                        <Text fz={14} c="#667086">
-                          Country <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      data={countries.map((c) => c?.name)}
-                      disabled={disableCountry}
-                      {...form.getInputProps("destinationCountry")}
-                    />
-                  </Flex>
-                  <Flex gap={20} mt={24} direction="column">
-                    <Text fz={14} c="#667085" m={0} p={0}>
-                      Upload supporting document (Optional)
-                    </Text>
-                    <DropzoneComponent<typeof sendMoneyIndividualRequest>
-                      style={{ flex: 1 }}
-                      otherForm={form}
-                      formKey="invoice"
-                      uploadedFileUrl={form.values.invoice}
-                      isUser
-                    />
-                  </Flex>
-                  <Flex gap={20} mt={24}>
-                    <Textarea
-                      flex={1}
-                      autosize
-                      minRows={3}
                       size="lg"
-                      classNames={{
-                        input: styles.textarea,
-                        label: styles.label,
-                      }}
                       label={
                         <Text fz={14} c="#667085">
-                          Narration <span style={{ color: "red" }}>*</span>
+                          Last Name <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
-                      placeholder="Enter narration"
-                      {...form.getInputProps("narration")}
+                      placeholder="Enter last name"
+                      {...form.getInputProps("lastName")}
                       errorProps={{
                         fz: 12,
                       }}
                     />
                   </Flex>
+
+                  <Flex gap={20} mt={24}>
+                    {switchCurrency === "EUR" ? (
+                      <>
+                        <TextInput
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              IBAN <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter IBAN"
+                          {...form.getInputProps("destinationIBAN")}
+                          errorProps={{ fz: 12 }}
+                        />
+                        <TextInput
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              BIC <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter BIC"
+                          {...form.getInputProps("destinationBIC")}
+                          errorProps={{ fz: 12 }}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <TextInput
+                          type="number"
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              Account Number{" "}
+                              <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter Account Number"
+                          {...form.getInputProps("destinationAccountNumber")}
+                          onKeyDown={(e) => {
+                            if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
+                              e.preventDefault(); // Prevent increment/decrement via arrow keys
+                            }
+
+                            const isDigit = /^\d$/.test(e.key);
+                            const currentLength =
+                              form.values.destinationAccountNumber.length;
+
+                            if (isDigit && currentLength >= 8) {
+                              e.preventDefault(); // stop more digits from being typed
+                              return;
+                            }
+                          }}
+                          onWheel={(event) => event.currentTarget.blur()}
+                          errorProps={{ fz: 12 }}
+                        />
+                        <TextInput
+                          type="number"
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              Sort Code <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter Sort Code"
+                          {...form.getInputProps("destinationSortCode")}
+                          onKeyDown={(e) => {
+                            if (["ArrowUp", "ArrowDown", "-"].includes(e.key)) {
+                              e.preventDefault(); // Prevent increment/decrement via arrow keys
+                            }
+
+                            const isDigit = /^\d$/.test(e.key);
+                            const currentLength =
+                              form.values.destinationSortCode.length;
+
+                            if (isDigit && currentLength >= 6) {
+                              e.preventDefault(); // stop more digits from being typed
+                              return;
+                            }
+                          }}
+                          onPaste={(e) => {
+                            e.preventDefault();
+                            const pasted = e.clipboardData
+                              .getData("Text")
+                              .replace(/-/g, ""); // remove dashes
+                            const digitsOnly = pasted.replace(/\D/g, ""); // keep only digits
+
+                            const currentValue =
+                              form.values.destinationSortCode;
+                            const newValue = (currentValue + digitsOnly).slice(
+                              0,
+                              6
+                            ); // limit to 6 digits
+
+                            form.setFieldValue("destinationSortCode", newValue);
+                          }}
+                          onWheel={(event) => event.currentTarget.blur()}
+                          errorProps={{ fz: 12 }}
+                        />
+                      </>
+                    )}
+                  </Flex>
+
+                  {(processing || validated) && showBadge && (
+                    <Group
+                      justify="space-between"
+                      bg="#ECFDF3"
+                      w="100%"
+                      px={20}
+                      py={8}
+                      my={32}
+                    >
+                      <Badge
+                        fz={14}
+                        px={0}
+                        c="#12B76A"
+                        variant="transparent"
+                        fw={600}
+                        color="#12B76A"
+                        tt="capitalize"
+                        rightSection={
+                          validated ? (
+                            <ActionIcon
+                              variant="light"
+                              radius="xl"
+                              color="#12B76A"
+                              size={23}
+                            >
+                              <IconCheck />
+                            </ActionIcon>
+                          ) : null
+                        }
+                      >
+                        {validated
+                          ? "Information Validated "
+                          : "Verifying Account Details"}
+                      </Badge>
+
+                      {processing && (
+                        <Loader type="oval" size={24} color="#12B76A" />
+                      )}
+                    </Group>
+                  )}
+
+                  {validated && (
+                    <>
+                      {" "}
+                      <Flex gap={20} mt={24}>
+                        <TextInput
+                          placeholder="Enter Bank Name"
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              Bank <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          disabled={disableBank}
+                          {...form.getInputProps("destinationBank")}
+                          errorProps={{
+                            fz: 12,
+                          }}
+                        />
+                      </Flex>
+                      <Flex gap={20} mt={24}>
+                        <TextInput
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              Bank Address
+                            </Text>
+                          }
+                          placeholder="Bank Address"
+                          disabled={disableAddress}
+                          {...form.getInputProps("bankAddress")}
+                          errorProps={{
+                            fz: 12,
+                          }}
+                        />
+                      </Flex>
+                      <Flex gap={20} mt={24}>
+                        <NumberInput
+                          flex={1}
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          description={
+                            <Text fz={12}>
+                              {Number(form.values.amount) >
+                              Number(account?.accountBalance)
+                                ? `Insufficient Balance`
+                                : ""}
+                            </Text>
+                          }
+                          styles={{
+                            description: {
+                              color: "var(--prune-warning)",
+                            },
+                            input: {
+                              border:
+                                Number(form.values.amount) >
+                                Number(account?.accountBalance)
+                                  ? "1px solid red"
+                                  : "1px solid #eaecf0",
+                            },
+                          }}
+                          label={
+                            <Text fz={14} c="#667085">
+                              Amount <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          hideControls
+                          size="lg"
+                          placeholder="Enter amount"
+                          {...form.getInputProps("amount")}
+                          errorProps={{
+                            fz: 12,
+                          }}
+                          // error={account?.accountBalance < form.values.amount}
+                        />
+                      </Flex>
+                      <Flex gap={20} mt={24}>
+                        <Select
+                          searchable
+                          placeholder="Select Country"
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          label={
+                            <Text fz={14} c="#667086">
+                              Country <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          data={countries.map((c) => c?.name)}
+                          disabled={disableCountry}
+                          {...form.getInputProps("destinationCountry")}
+                        />
+                      </Flex>
+                      <Flex gap={20} mt={24} direction="column">
+                        <Text fz={14} c="#667085" m={0} p={0}>
+                          Upload supporting document (Optional)
+                        </Text>
+                        <DropzoneComponent<typeof sendMoneyIndividualRequest>
+                          style={{ flex: 1 }}
+                          otherForm={form}
+                          formKey="invoice"
+                          uploadedFileUrl={form.values.invoice}
+                          isUser
+                        />
+                      </Flex>
+                      <Flex gap={20} mt={24}>
+                        <Textarea
+                          flex={1}
+                          autosize
+                          minRows={3}
+                          size="lg"
+                          classNames={{
+                            input: styles.textarea,
+                            label: styles.label,
+                          }}
+                          label={
+                            <Text fz={14} c="#667085">
+                              Narration <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter narration"
+                          {...form.getInputProps("narration")}
+                          errorProps={{
+                            fz: 12,
+                          }}
+                        />
+                      </Flex>
+                    </>
+                  )}
                 </>
               )}
 

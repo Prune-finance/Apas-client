@@ -700,8 +700,6 @@ export function useUserListOfBanks() {
     try {
       const { data } = await axios.get(`/accounts/banks`);
 
-      console.log(data);
-
       setBanks(data?.data);
     } catch (error) {
       console.log(error);

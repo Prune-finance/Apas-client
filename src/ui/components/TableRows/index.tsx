@@ -167,7 +167,7 @@ export const IssuedTransactionTableRows = ({
       </TableTd>
 
       <TableTd>
-        <BadgeComponent status={element?.status} />
+        <BadgeComponent w={"auto"} status={element?.status} />
       </TableTd>
     </TableTr>
   ));

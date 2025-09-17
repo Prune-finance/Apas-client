@@ -108,6 +108,7 @@ function Account() {
         business={business}
         loadingBiz={loadingBiz}
         loading={loading}
+        currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN"}
         open={() => {}}
       />
 

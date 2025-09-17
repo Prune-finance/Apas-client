@@ -692,7 +692,7 @@ export function useUserCurrencyGBPAccount(currency: string) {
   return { loading, account, revalidate };
 }
 export function useUserListOfBanks() {
-  const [banks, setBanks] = useState<DefaultAccount | null>(null);
+  const [banks, setBanks] = useState<ListOfBanks[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchDefaultAccount() {
@@ -921,6 +921,12 @@ export interface CurrencyAccount {
   AccountRequests: {
     Currency: Record<string, any>;
   };
+}
+
+export interface ListOfBanks {
+  bankCode: string;
+  bankName: string;
+  payoutType: "MobileMoney" | "BankTransfer" | string;
 }
 
 export interface ListCurrencyAccount {

@@ -143,7 +143,9 @@ function NewAccountCard({
     try {
       await axios.get(
         currency
-          ? `/accounts/${accountNumber}/balance/dashboard?currency=${currency}`
+          ? `/accounts/${
+              accountNumber ?? walletId
+            }/balance/dashboard?currency=${currency}`
           : `/accounts/${iban}/balance/dashboard`
       );
       revalidate && (await revalidate());
@@ -305,55 +307,59 @@ function NewAccountCard({
               {!loading ? (
                 <Box onClick={handlePropagation}>
                   <CopyButton
-                    value={currency === 'GHS' ? 
-                    `${config.bankIdLabel}: ${config.getBankIdValue({
-                      currency,
-                      companyName,
-                      walletOwner,
-                      walletId,
-                      iban,
-                      bic,
-                      sortCode,
-                      accountNumber,
-                      balance,
-                      loading,
-                    })},\n${config.accountIdLabel}: ${config.getAccountIdValue({
-                      currency,
-                      companyName,
-                      walletOwner,
-                      walletId,
-                      iban,
-                      bic,
-                      sortCode,
-                      accountNumber,
-                      balance,
-                      loading,
-                    })}` :
-                    `${config.bankIdLabel}: ${config.getBankIdValue({
-                      currency,
-                      companyName,
-                      walletOwner,
-                      walletId,
-                      iban,
-                      bic,
-                      sortCode,
-                      accountNumber,
-                      balance,
-                      loading,
-                    })},\nAccount Name: ${companyName},\n${
-                      config.accountIdLabel
-                    }: ${config.getAccountIdValue({
-                      currency,
-                      companyName,
-                      walletOwner,
-                      walletId,
-                      iban,
-                      bic,
-                      sortCode,
-                      accountNumber,
-                      balance,
-                      loading,
-                    })}`}
+                    value={
+                      currency === "GHS"
+                        ? `${config.bankIdLabel}: ${config.getBankIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })},\n${
+                            config.accountIdLabel
+                          }: ${config.getAccountIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })}`
+                        : `${config.bankIdLabel}: ${config.getBankIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })},\nAccount Name: ${companyName},\n${
+                            config.accountIdLabel
+                          }: ${config.getAccountIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })}`
+                    }
                   >
                     {({ copied, copy }) => (
                       <SecondaryBtn

@@ -238,7 +238,7 @@ export const PayoutTransactionTableRows = ({
         </Stack>
       </TableTd>
       <TableTd>
-        <BadgeComponent status={element.status} />
+        <BadgeComponent w={"100%"} status={element.status} />
       </TableTd>
     </TableTr>
   ));

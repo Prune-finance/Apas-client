@@ -140,6 +140,7 @@ export const Transactions = ({
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`,
       "gbp-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${accountID}?date=${startDate}&endDate=${endDate}`,
+      "ghs-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${currencyType}/${accountID}?date=${startDate}&endDate=${endDate}`,
     };
 
     // Use the default URL if location is undefined or not in urlMap

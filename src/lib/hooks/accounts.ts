@@ -595,6 +595,39 @@ export function useUserCurrencyAccount() {
   return { loading, currencyAccount, revalidate };
 }
 
+export function useUserListCurrencyAccount() {
+  const [listCurrency, setListCurrency] = useState<
+    ListCurrencyAccount[] | null
+  >(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchListAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/requests/get-business-currency-account-request-status`
+      );
+
+      setListCurrency(data?.data);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchListAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, listCurrency };
+}
+
 export function useAdminGetCompanyCurrencyAccountsList(id: string) {
   const [currencyAccount, setCurrencyAccount] = useState<
     CurrencyAccount[] | null
@@ -888,6 +921,14 @@ export interface CurrencyAccount {
   AccountRequests: {
     Currency: Record<string, any>;
   };
+}
+
+export interface ListCurrencyAccount {
+  Currency: "GHS" | "GBP" | "NGN" | "EUR" | string;
+  accountType: "PAYOUT_ACCOUNT" | "COMPANY_ACCOUNT" | string;
+  companyId: "d1dfc7e9-12b7-4dff-9822-028384b302a5";
+  stage: "TEST" | "PRODUCTION" | string;
+  status: "APPROVED" | "PENDING" | "REJECTED" | "ISSUED" | string;
 }
 
 export interface AccountStatsMeta {

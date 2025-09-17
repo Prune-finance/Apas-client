@@ -865,10 +865,12 @@ interface DefaultAccountHeadProps
   business: BusinessData | null;
   loadingBiz: boolean;
   revalidate?: () => void;
+  currencyType?: "GBP" | "GHS" | "EUR" | "NGN";
 }
 
 export const DefaultAccountHead = ({
   loading,
+  currencyType,
   account,
   open,
   payout,
@@ -913,7 +915,7 @@ export const DefaultAccountHead = ({
   };
 
   useEffect(() => {
-    setSwitchCurrency("GBP");
+    setSwitchCurrency(currencyType ?? "EUR");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

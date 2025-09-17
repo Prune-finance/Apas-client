@@ -39,7 +39,7 @@ function Account() {
     recipientName,
     recipientIban,
     search,
-    currency
+    currency,
   } = Object.fromEntries(searchParams.entries());
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -71,7 +71,6 @@ function Account() {
     debouncedSearch,
   ]);
 
-  
   const {
     transactions,
     loading: loadingTrx,
@@ -109,13 +108,14 @@ function Account() {
         business={business}
         loadingBiz={loadingBiz}
         loading={loading}
+        currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN"}
         open={() => {}}
       />
 
       <SingleDefaultAccountBody
         accountType={account?.AccountRequests?.Currency?.symbol}
         account={account}
-        location="gbp-account"
+        location={currency === "GBP" ? "gbp-account" : "ghs-account"}
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

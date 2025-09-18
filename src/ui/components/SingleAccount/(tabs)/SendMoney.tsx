@@ -74,6 +74,10 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     reference: crypto.randomUUID(),
     invoice: "",
     narration: "",
+    phoneNumber: "",
+    accountNumber: "",
+    gshTransferType: "",
+    beneficiaryBankCode: "",
   });
 
   const [companyRequestForm, setCompanyRequestForm] = useState({
@@ -89,6 +93,10 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     invoice: "",
     reference: crypto.randomUUID(),
     narration: "",
+    phoneNumber: "",
+    accountNumber: "",
+    gshTransferType: "",
+    beneficiaryBankCode: "",
   });
 
   const sendMoneyRequest = async () => {
@@ -107,28 +115,51 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         amount,
         invoice,
         narration,
+        gshTransferType,
+        accountNumber,
+        beneficiaryBankCode,
       } = requestForm;
 
+      // Helper function to get beneficiary details based on currency
+      const getBeneficiaryDetails = (currency: string, fullName: string) => {
+        if (currency === "GBP") {
+          return {
+            beneficiaryAccountNumber: removeWhitespace(
+              destinationAccountNumber
+            ),
+            beneficiarySortCode: removeWhitespace(destinationSortCode),
+            beneficiaryBank: destinationBank,
+            beneficiaryCountry: destinationCountry,
+            beneficiaryFullName: fullName,
+          };
+        } else if (currency === "GHS") {
+          return {
+            payoutType: gshTransferType,
+            beneficiaryAccountNumber: accountNumber,
+            beneficiaryBankCode: beneficiaryBankCode,
+            beneficiaryBankName: destinationBank,
+            beneficiaryCountry: destinationCountry,
+            beneficiaryName: fullName,
+          };
+        } else {
+          return {
+            destinationIBAN: removeWhitespace(destinationIBAN),
+            destinationBIC: removeWhitespace(destinationBIC),
+            destinationBank,
+            destinationCountry,
+            beneficiaryFullName: fullName,
+          };
+        }
+      };
+
       const { data } = await axios.post(
-        switchCurrency === "GBP" ? "/payout/send-gbp" : "/payout/send-money",
+        switchCurrency === "GBP"
+          ? "/payout/send-gbp"
+          : switchCurrency === "GHS"
+          ? "/payout/send-ghs"
+          : "/payout/send-money",
         {
-          ...(switchCurrency === "GBP"
-            ? {
-                beneficiaryAccountNumber: removeWhitespace(
-                  destinationAccountNumber
-                ),
-                beneficiarySortCode: removeWhitespace(destinationSortCode),
-                beneficiaryBank: destinationBank,
-                beneficiaryCountry: destinationCountry,
-                beneficiaryFullName: `${firstName} ${lastName}`,
-              }
-            : {
-                destinationIBAN: removeWhitespace(destinationIBAN),
-                destinationBIC: removeWhitespace(destinationBIC),
-                destinationBank,
-                destinationCountry,
-                beneficiaryFullName: `${firstName} ${lastName}`,
-              }),
+          ...getBeneficiaryDetails(switchCurrency, `${firstName} ${lastName}`),
 
           bankAddress,
           amount,
@@ -193,29 +224,52 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         amount,
         invoice,
         narration,
+        gshTransferType,
+        accountNumber,
+        beneficiaryBankCode,
         reference,
       } = companyRequestForm;
 
+      // Reuse the helper function from above
+      const getBeneficiaryDetails = (currency: string, fullName: string) => {
+        if (currency === "GBP") {
+          return {
+            beneficiaryAccountNumber: removeWhitespace(
+              destinationAccountNumber
+            ),
+            beneficiarySortCode: removeWhitespace(destinationSortCode),
+            beneficiaryBank: destinationBank,
+            beneficiaryCountry: destinationCountry,
+            beneficiaryFullName: fullName,
+          };
+        } else if (currency === "GHS") {
+          return {
+            payoutType: gshTransferType,
+            beneficiaryAccountNumber: accountNumber,
+            beneficiaryBank: destinationBank,
+            beneficiaryBankCode: beneficiaryBankCode,
+            beneficiaryCountry: destinationCountry,
+            beneficiaryFullName: fullName,
+          };
+        } else {
+          return {
+            destinationIBAN: removeWhitespace(destinationIBAN),
+            destinationBIC: removeWhitespace(destinationBIC),
+            destinationBank,
+            destinationCountry,
+            beneficiaryFullName: fullName,
+          };
+        }
+      };
+
       const { data } = await axios.post(
-        switchCurrency === "GBP" ? "/payout/send-gbp" : "/payout/send-money",
+        switchCurrency === "GBP"
+          ? "/payout/send-gbp"
+          : switchCurrency === "GHS"
+          ? "/payout/send-ghs"
+          : "/payout/send-money",
         {
-          ...(switchCurrency === "GBP"
-            ? {
-                beneficiaryAccountNumber: removeWhitespace(
-                  destinationAccountNumber
-                ),
-                beneficiarySortCode: removeWhitespace(destinationSortCode),
-                beneficiaryBank: destinationBank,
-                beneficiaryCountry: destinationCountry,
-                beneficiaryFullName: companyName,
-              }
-            : {
-                destinationIBAN: removeWhitespace(destinationIBAN),
-                destinationBIC: removeWhitespace(destinationBIC),
-                destinationBank,
-                destinationCountry,
-                beneficiaryFullName: companyName,
-              }),
+          ...getBeneficiaryDetails(switchCurrency, companyName),
 
           bankAddress,
           amount,
@@ -390,4 +444,8 @@ export interface RequestForm {
   lastName: string;
   invoice: string;
   narration: string;
+  phoneNumber: string;
+  accountNumber: string;
+  gshTransferType: string;
+  beneficiaryBankCode: string;
 }

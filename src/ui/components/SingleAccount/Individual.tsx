@@ -71,8 +71,6 @@ export const sendMoneyIndividualRequest = {
   destinationBIC: "",
   destinationBank: "",
   destinationAccountNumber: "",
-  phoneNumber: "",
-  accountNumber: "",
   destinationSortCode: "",
   bankAddress: "",
   destinationCountry: "",
@@ -80,6 +78,9 @@ export const sendMoneyIndividualRequest = {
   invoice: "",
   narration: "",
   currency: "",
+  phoneNumber: "",
+  accountNumber: "",
+  beneficiaryBankCode: "",
   gshTransferType: "",
 };
 
@@ -259,6 +260,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           `Insufficient funds: The amount entered exceeds your balance`
         );
       // close();
+      console.log(form.values);
       setRequestForm(form.values);
       setSectionState("Individual");
       openDebtor();
@@ -307,6 +309,23 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         data={memorizedData}
                         placeholder="Select Bank"
                         {...form.getInputProps("destinationBank")}
+                        onChange={(value) => {
+                          form.setFieldValue("destinationBank", value!);
+                          // Find the selected bank and update beneficiaryBankCode
+                          if (value && banks && Array.isArray(banks)) {
+                            const selectedBank = banks.find(
+                              (bank) =>
+                                bank.bankName === value &&
+                                transferCurrency === bank.payoutType
+                            );
+                            if (selectedBank) {
+                              form.setFieldValue(
+                                "beneficiaryBankCode",
+                                selectedBank.bankCode
+                              );
+                            }
+                          }
+                        }}
                         errorProps={{
                           fz: 12,
                         }}

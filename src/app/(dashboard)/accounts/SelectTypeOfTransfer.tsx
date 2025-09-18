@@ -81,10 +81,10 @@ const SelectTypeOfTransfer = () => {
         />
         <Stack gap={0}>
           <Text fz={14} c="#1D2939">
-            Bank Transfer
+            Mobile Money
           </Text>
           <Text fz={12} c="#475467">
-            Send Directly to bank account
+            Send Directly to mobile wallet
           </Text>
         </Stack>
       </Flex>

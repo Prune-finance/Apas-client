@@ -66,6 +66,9 @@ export const Transactions = ({
   const { handleSuccess, handleError, handleInfo } = useNotification();
 
   const [downloadData, setDownloadData] = useState<DownloadStatementData[]>([]);
+
+  console.log(downloadData);
+
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);

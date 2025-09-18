@@ -725,7 +725,9 @@ export function useUserTransactions(
   currency: string = "EUR",
   customParams: IParams = {}
 ) {
-  const path = id ? `${id}/transactions?currency=${currency}` : `transactions?currency=${currency}`;
+  const path = id
+    ? `${id}/transactions?currency=${currency}`
+    : `transactions?currency=${currency}`;
   const {
     data,
     meta,
@@ -760,7 +762,8 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
 export function useUserCurrencyTransactions(
   customParams: ITrx = {},
   currency: string
-) {  const {
+) {
+  const {
     data,
     meta,
     loading,
@@ -939,6 +942,7 @@ export interface TransactionType {
   senderIban: string;
   beneficiaryName: string;
   beneficiaryAccountNumber: string;
+  beneficiaryWalletId: string;
   beneficiarySortCode: string;
   beneficiaryInstitutionName: string;
   beneficiaryAddress: string;

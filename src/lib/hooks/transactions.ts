@@ -943,6 +943,7 @@ export interface TransactionType {
   beneficiaryName: string;
   beneficiaryAccountNumber: string;
   beneficiaryWalletId: string;
+  senderWalletId: string;
   beneficiarySortCode: string;
   beneficiaryInstitutionName: string;
   beneficiaryAddress: string;

@@ -54,8 +54,6 @@ export const Transactions = ({
   const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
   const { data, opened, close } = Transaction();
 
-  console.log(data);
-
   // const [search, setSearch] = useState("");
   // const [debouncedSearch] = useDebouncedValue(search, 500);
   const [openedFilter, { toggle }] = useDisclosure(false);

@@ -47,7 +47,6 @@ export const TransactionDrawer = ({
   opened,
 }: TransactionDrawerProps) => {
   const pdfRef = useRef<HTMLDivElement>(null);
-
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.id ?? ""
   );
@@ -123,7 +122,7 @@ export const TransactionDrawer = ({
         }
       : selectedRequest?.currencyType === "GHS"
       ? {
-          "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
+          "Wallet ID": selectedRequest?.senderWalletId ?? "N/A",
         }
       : {
           IBAN: selectedRequest?.recipientIban,

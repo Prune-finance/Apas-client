@@ -51,6 +51,15 @@ function PreviewState({
           "Account Number": requestForm?.destinationAccountNumber,
           "Sort Code": requestForm?.destinationSortCode,
         }
+      : switchCurrency === "GHS"
+      ? {
+          [requestForm?.gshTransferType === "MobileMoney"
+            ? "Phone Number"
+            : "Account Number"]:
+            requestForm?.gshTransferType === "MobileMoney"
+              ? requestForm?.phoneNumber
+              : requestForm?.accountNumber,
+        }
       : {
           IBAN: requestForm?.destinationIBAN,
           BIC: requestForm?.destinationBIC,
@@ -85,6 +94,15 @@ function PreviewState({
       ? {
           "Account Number": companyRequestForm?.destinationAccountNumber,
           "Sort Code": companyRequestForm?.destinationSortCode,
+        }
+      : switchCurrency === "GHS"
+      ? {
+          [companyRequestForm?.gshTransferType === "MobileMoney"
+            ? "Phone Number"
+            : "Account Number"]:
+            companyRequestForm?.gshTransferType === "MobileMoney"
+              ? companyRequestForm?.phoneNumber
+              : companyRequestForm?.accountNumber,
         }
       : {
           IBAN: companyRequestForm?.destinationIBAN,

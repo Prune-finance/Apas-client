@@ -766,7 +766,7 @@ export function useUserCurrencyTransactions(
   const {
     data,
     meta,
-    loading,
+    loading: boolean,
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
     endpoint: `currency-accounts/transactions/get-company-currency-account-transactions/${currency}`,
@@ -775,7 +775,7 @@ export function useUserCurrencyTransactions(
     dependencies: [sanitizeURL(customParams)],
   });
 
-  return { loading, transactions: data || [], meta, revalidate };
+  return { loading: boolean, transactions: data || [], meta, revalidate };
 }
 
 export function useAdminGetCurrencyTransactions(
@@ -943,6 +943,7 @@ export interface TransactionType {
   beneficiaryName: string;
   beneficiaryAccountNumber: string;
   beneficiaryWalletId: string;
+  senderWalletId: string;
   beneficiarySortCode: string;
   beneficiaryInstitutionName: string;
   beneficiaryAddress: string;

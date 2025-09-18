@@ -144,7 +144,7 @@ function NewAccountCard({
       await axios.get(
         currency
           ? `/accounts/${
-              accountNumber ?? walletId
+              accountNumber ?? walletId ?? iban
             }/balance/dashboard?currency=${currency}`
           : `/accounts/${iban}/balance/dashboard`
       );

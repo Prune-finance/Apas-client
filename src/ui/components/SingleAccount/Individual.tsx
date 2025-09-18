@@ -451,6 +451,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       }}
                     />
                   </Flex>
+
                   <Flex gap={20} mt={24} direction="column">
                     <Text fz={14} c="#667085" m={0} p={0}>
                       Upload supporting document (Optional)

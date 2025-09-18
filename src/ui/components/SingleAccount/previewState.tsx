@@ -55,7 +55,10 @@ function PreviewState({
       ? {
           [requestForm?.gshTransferType === "MobileMoney"
             ? "Phone Number"
-            : "Account Number"]: requestForm?.accountNumber,
+            : "Account Number"]:
+            requestForm?.gshTransferType === "MobileMoney"
+              ? requestForm?.phoneNumber
+              : requestForm?.accountNumber,
         }
       : {
           IBAN: requestForm?.destinationIBAN,
@@ -96,7 +99,10 @@ function PreviewState({
       ? {
           [companyRequestForm?.gshTransferType === "MobileMoney"
             ? "Phone Number"
-            : "Account Number"]: companyRequestForm?.accountNumber,
+            : "Account Number"]:
+            companyRequestForm?.gshTransferType === "MobileMoney"
+              ? companyRequestForm?.phoneNumber
+              : companyRequestForm?.accountNumber,
         }
       : {
           IBAN: companyRequestForm?.destinationIBAN,

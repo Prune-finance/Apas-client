@@ -304,6 +304,20 @@ export const sendMoneyCompanyValidate = z
         "Sort code must be in format 00-00-00 or 000000"
       ) // Allows empty string
       .optional(),
+
+    accountNumber: z
+      .string()
+      .regex(
+        /^$|^[0-9]{8,17}$|^PR-GH\d+$/,
+        "Invalid account number format (8-17 digits or PR-GH format for GHS)"
+      ) // Allows empty string or PR-GH format
+      .optional(),
+
+    phoneNumber: z
+      .string()
+      .regex(/^$|^[0-9]{10,15}$/, "Invalid phone number format (10-15 digits)") // Allows empty string
+      .optional(),
+
     destinationBank: z
       .string()
       .min(2, "Bank name must be at least 2 characters")
@@ -314,8 +328,9 @@ export const sendMoneyCompanyValidate = z
       .optional(),
     destinationCountry: z
       .string()
-      .min(2, "Country must be at least 2 characters")
-      .max(50, "Country cannot exceed 50 characters"),
+      // .min(2, "Country must be at least 2 characters")
+      // .max(50, "Country cannot exceed 50 characters")
+      .optional(),
     amount: z
       .number({ invalid_type_error: "Amount must be a number" })
       .positive("Amount must be positive")
@@ -329,8 +344,13 @@ export const sendMoneyCompanyValidate = z
       .string()
       .min(2, "Narration must be at least 2 characters")
       .max(100, "Narration cannot exceed 100 characters"),
-    currency: z.enum(["EUR", "GBP"], {
-      errorMap: () => ({ message: "Currency must be either EUR or GBP" }),
+    currency: z.enum(["EUR", "GBP", "GHS"], {
+      errorMap: () => ({ message: "Currency must be either EUR, GBP or GHS" }),
+    }),
+    gshTransferType: z.enum(["BankTransfer", "MobileMoney"], {
+      errorMap: () => ({
+        message: "Transfer type must be either BankTransfer or MobileMoney",
+      }),
     }),
   })
   .superRefine((data, ctx) => {
@@ -367,6 +387,26 @@ export const sendMoneyCompanyValidate = z
           path: ["destinationSortCode"],
           code: z.ZodIssueCode.custom,
           message: "Sort Code is required for GBP transfers",
+        });
+      }
+    }
+
+    if (data.currency === "GHS" && data.gshTransferType === "BankTransfer") {
+      if (!data.accountNumber || data.accountNumber.trim() === "") {
+        ctx.addIssue({
+          path: ["accountNumber"],
+          code: z.ZodIssueCode.custom,
+          message: "Account Number is required for GHS bank transfers",
+        });
+      }
+    }
+
+    if (data.currency === "GHS" && data.gshTransferType === "MobileMoney") {
+      if (!data.phoneNumber || data.phoneNumber.trim() === "") {
+        ctx.addIssue({
+          path: ["phoneNumber"],
+          code: z.ZodIssueCode.custom,
+          message: "Phone Number is required for GHS MobileMoney transfers",
         });
       }
     }

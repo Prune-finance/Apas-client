@@ -118,6 +118,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         gshTransferType,
         accountNumber,
         beneficiaryBankCode,
+        phoneNumber,
       } = requestForm;
 
       // Helper function to get beneficiary details based on currency
@@ -135,7 +136,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         } else if (currency === "GHS") {
           return {
             payoutType: gshTransferType,
-            beneficiaryAccountNumber: accountNumber,
+            beneficiaryAccountNumber:
+              gshTransferType === "MobileMoney" ? phoneNumber : accountNumber,
             beneficiaryBankCode: beneficiaryBankCode,
             beneficiaryBankName: destinationBank,
             beneficiaryCountry: destinationCountry,
@@ -227,6 +229,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         gshTransferType,
         accountNumber,
         beneficiaryBankCode,
+        phoneNumber,
         reference,
       } = companyRequestForm;
 
@@ -245,11 +248,12 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         } else if (currency === "GHS") {
           return {
             payoutType: gshTransferType,
-            beneficiaryAccountNumber: accountNumber,
-            beneficiaryBank: destinationBank,
+            beneficiaryAccountNumber:
+              gshTransferType === "MobileMoney" ? phoneNumber : accountNumber,
+            beneficiaryBankName: destinationBank,
             beneficiaryBankCode: beneficiaryBankCode,
             beneficiaryCountry: destinationCountry,
-            beneficiaryFullName: fullName,
+            beneficiaryName: fullName,
           };
         } else {
           return {

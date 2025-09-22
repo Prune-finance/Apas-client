@@ -57,17 +57,17 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
           : selectedRequest?.currencyType === "GHS"
           ? {
               "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
-              "Bank Name": selectedRequest?.recipientBankAddress ?? "",
+              "Bank Name": selectedRequest?.beneficiaryInstitutionName ?? "N/A",
             }
           : {
               IBAN: selectedRequest?.recipientIban ?? "",
-              "Bank Name": selectedRequest?.recipientBankAddress ?? "",
+              "Bank Name": selectedRequest?.beneficiaryInstitutionName ?? "",
             }),
 
         Country: selectedRequest?.recipientBankCountry ?? "N/A",
         "Bank Address":
           selectedRequest?.beneficiaryAddress ??
-          selectedRequest?.beneficiaryInstitutionName ??
+          selectedRequest?.recipientBankAddress ??
           "N/A",
         Narration: selectedRequest?.narration ?? "",
       },

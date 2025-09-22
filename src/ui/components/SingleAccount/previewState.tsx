@@ -64,9 +64,9 @@ function PreviewState({
           IBAN: requestForm?.destinationIBAN,
           BIC: requestForm?.destinationBIC,
         }),
-    Bank: requestForm?.destinationBank,
-    "Bank Address": requestForm?.bankAddress,
-    Country: requestForm?.destinationCountry,
+    Bank: requestForm?.destinationBank ?? "N/A",
+    "Bank Address": requestForm?.bankAddress ?? "N/A",
+    Country: requestForm?.destinationCountry ?? "N/A",
     "Supporting document": requestForm?.invoice ? (
       <Text
         fz={12}

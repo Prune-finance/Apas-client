@@ -276,6 +276,11 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
         }));
     }, [banks, transferCurrency]);
 
+    useEffect(() => {
+      form.setFieldValue("destinationBank", null!);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [transferCurrency]);
+
     return (
       <>
         <TabsPanel value="To Individual">
@@ -297,7 +302,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         searchable
                         label={
                           <Text fz={14} c="#667085">
-                            Bank
+                            {transferCurrency === "BankTransfer"
+                              ? "Bank"
+                              : "Provider"}
                             <span style={{ color: "red" }}>*</span>
                           </Text>
                         }
@@ -307,7 +314,11 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         }}
                         flex={1}
                         data={memorizedData}
-                        placeholder="Select Bank"
+                        placeholder={
+                          transferCurrency === "BankTransfer"
+                            ? "Select Bank"
+                            : "Select Provider"
+                        }
                         {...form.getInputProps("destinationBank")}
                         onChange={(value) => {
                           form.setFieldValue("destinationBank", value!);
@@ -342,6 +353,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         }}
                         flex={1}
                         size="lg"
+                        minLength={10}
+                        maxLength={16}
                         label={
                           <Text fz={14} c="#667085">
                             Account Number{" "}
@@ -356,6 +369,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       />
                     ) : (
                       <TextInput
+                        type="number"
+                        minLength={10}
+                        maxLength={13}
                         classNames={{
                           input: styles.input,
                           label: styles.label,
@@ -367,7 +383,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                             Phone Number <span style={{ color: "red" }}>*</span>
                           </Text>
                         }
-                        placeholder="Enter phone number"
+                        placeholder="Enter phone number (e.g. 234XXXXXXXXX)"
                         {...form.getInputProps("phoneNumber")}
                         errorProps={{
                           fz: 12,
@@ -471,6 +487,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                       autosize
                       minRows={3}
                       size="lg"
+                      maxLength={24}
                       classNames={{
                         input: styles.textarea,
                         label: styles.label,
@@ -808,6 +825,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           <Textarea
                             flex={1}
                             autosize
+                            maxLength={24}
                             minRows={3}
                             size="lg"
                             classNames={{
@@ -870,7 +888,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               )}
               {switchCurrency === "EUR" ? (
                 <TransactionProcessingTimes />
-              ) : (
+              ) : switchCurrency === "GHS" ? null : (
                 <TransactionProcessTimeGBP />
               )}
             </ScrollArea>

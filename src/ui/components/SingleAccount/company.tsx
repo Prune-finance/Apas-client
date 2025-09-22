@@ -492,7 +492,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
               <Flex gap={20} mt={24}>
                 {switchCurrency === "EUR" ? (
-                  <>
+                  <Flex gap={20} w="100%">
                     <TextInput
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
@@ -519,7 +519,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       {...form2.getInputProps("destinationBIC")}
                       errorProps={{ fz: 12 }}
                     />
-                  </>
+                  </Flex>
                 ) : (
                   <>
                     <TextInput

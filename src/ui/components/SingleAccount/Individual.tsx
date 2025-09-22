@@ -524,9 +524,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                     />
                   </Flex>
 
-                  <Flex gap={20} mt={24}>
+                  <Flex gap={20} mt={24} direction={"column"}>
                     {switchCurrency === "EUR" ? (
-                      <>
+                      <Flex direction="column" style={{ flex: 1 }} gap={20}>
                         <TextInput
                           classNames={{
                             input: styles.input,
@@ -559,7 +559,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           {...form.getInputProps("destinationBIC")}
                           errorProps={{ fz: 12 }}
                         />
-                      </>
+                      </Flex>
                     ) : (
                       <>
                         <TextInput
@@ -652,7 +652,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         w="100%"
                         px={20}
                         py={8}
-                        my={32}
+                        my={switchCurrency === "EUR" ? 0 : 32}                        
                       >
                         <Badge
                           fz={14}

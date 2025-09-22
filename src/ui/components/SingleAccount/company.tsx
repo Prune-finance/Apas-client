@@ -276,6 +276,11 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
       }));
   }, [banks, transferCurrency]);
 
+  useEffect(() => {
+    form2.setFieldValue("destinationBank", null!);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transferCurrency]);
+
   return (
     <TabsPanel value="To A Company">
       <Box mt={20}>
@@ -296,7 +301,9 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                     searchable
                     label={
                       <Text fz={14} c="#667085">
-                        Bank
+                        {transferCurrency === "BankTransfer"
+                          ? "Bank"
+                          : "Provider"}
                         <span style={{ color: "red" }}>*</span>
                       </Text>
                     }
@@ -306,7 +313,11 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                     }}
                     flex={1}
                     data={memorizedData}
-                    placeholder="Select Bank"
+                    placeholder={
+                      transferCurrency === "BankTransfer"
+                        ? "Select Bank"
+                        : "Select Provider"
+                    }
                     {...form2.getInputProps("destinationBank")}
                     onChange={(value) => {
                       form2.setFieldValue("destinationBank", value!);
@@ -335,6 +346,9 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
               <Flex gap={20} mt={24}>
                 {transferCurrency === "BankTransfer" ? (
                   <TextInput
+                    type="number"
+                    minLength={10}
+                    maxLength={13}
                     classNames={{
                       input: styles.input,
                       label: styles.label,
@@ -354,6 +368,9 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   />
                 ) : (
                   <TextInput
+                    type="number"
+                    minLength={10}
+                    maxLength={13}
                     classNames={{
                       input: styles.input,
                       label: styles.label,
@@ -365,7 +382,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                         Phone Number <span style={{ color: "red" }}>*</span>
                       </Text>
                     }
-                    placeholder="Enter phone number"
+                    placeholder="Enter phone number (e.g. 234XXXXXXXXX)"
                     {...form2.getInputProps("phoneNumber")}
                     errorProps={{
                       fz: 12,
@@ -452,6 +469,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   flex={1}
                   autosize
                   minRows={3}
+                  maxLength={24}
                   size="lg"
                   classNames={{
                     input: styles.textarea,
@@ -754,6 +772,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       flex={1}
                       autosize
                       minRows={3}
+                      maxLength={24}
                       size="lg"
                       classNames={{
                         input: styles.textarea,
@@ -808,7 +827,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
           {switchCurrency === "EUR" ? (
             <TransactionProcessingTimes />
-          ) : (
+          ) : switchCurrency === "GHS" ? null : (
             <TransactionProcessTimeGBP />
           )}
         </ScrollArea>

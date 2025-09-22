@@ -137,7 +137,9 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           return {
             payoutType: gshTransferType,
             beneficiaryAccountNumber:
-              gshTransferType === "MobileMoney" ? phoneNumber : accountNumber,
+              gshTransferType === "MobileMoney"
+                ? phoneNumber.toString()
+                : accountNumber.toString(),
             beneficiaryBankCode: beneficiaryBankCode,
             beneficiaryBankName: destinationBank,
             beneficiaryCountry: destinationCountry,
@@ -249,7 +251,9 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           return {
             payoutType: gshTransferType,
             beneficiaryAccountNumber:
-              gshTransferType === "MobileMoney" ? phoneNumber : accountNumber,
+              gshTransferType === "MobileMoney"
+                ? phoneNumber.toString()
+                : accountNumber.toString(),
             beneficiaryBankName: destinationBank,
             beneficiaryBankCode: beneficiaryBankCode,
             beneficiaryCountry: destinationCountry,

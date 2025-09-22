@@ -84,11 +84,19 @@ export default function Filter<T>({
           })
       ) as Record<string, string>;
 
-      const params = new URLSearchParams(filteredValues).toString();
+      // Get current URL and its search params
+      const currentUrl = new URL(window.location.href);
+      const currentSearchParams = new URLSearchParams(currentUrl.search);
+      
+      // Add new filter values to the existing search params
+      Object.entries(filteredValues).forEach(([key, value]) => {
+        currentSearchParams.set(key, value);
+      });
+      
+      // Create new URL with the combined parameters
+      const newUrl = `${pathname}?${currentSearchParams.toString()}`;
 
-      const newUrl = `${pathname}?${params}`;
-
-      // push(`${pathname}?${params}`);
+      // push(`${newUrl}`);
       window.history.pushState({}, "", newUrl);
     } finally {
       setProcessing(false);
@@ -166,8 +174,16 @@ export default function Filter<T>({
             color="var(--prune-text-gray-700)"
             onClick={() => {
               form.reset();
-              // push(pathname);
-              window.history.pushState({}, "", pathname);
+              // Get current URL to check for currency parameter
+              const currentUrl = new URL(window.location.href);
+              const currencyParam = currentUrl.searchParams.get('currency');
+              
+              // If currency parameter exists, preserve it when clearing
+              if (currencyParam) {
+                window.history.pushState({}, "", `${pathname}?currency=${currencyParam}`);
+              } else {
+                window.history.pushState({}, "", pathname);
+              }
             }}
             // w={62}
             // h={36}

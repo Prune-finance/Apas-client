@@ -67,8 +67,6 @@ export const Transactions = ({
 
   const [downloadData, setDownloadData] = useState<DownloadStatementData[]>([]);
 
-  console.log(downloadData);
-
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
@@ -247,7 +245,11 @@ export const Transactions = ({
         />
         <TextBox
           placeholder={
-            currencyType === "GBP" ? "Account Number" : "Beneficiary IBAN"
+            currencyType === "GBP"
+              ? "Account Number"
+              : currencyType === "GHS"
+              ? "Wallet ID"
+              : "Beneficiary IBAN"
           }
           {...form.getInputProps("recipientIban")}
         />

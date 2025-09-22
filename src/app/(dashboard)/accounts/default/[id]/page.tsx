@@ -30,6 +30,7 @@ function Account() {
   const [limit, setLimit] = useState<string | null>("10");
 
   const {
+    currency,
     status,
     date,
     type,
@@ -39,7 +40,6 @@ function Account() {
     recipientName,
     recipientIban,
     search,
-    currency,
   } = Object.fromEntries(searchParams.entries());
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);

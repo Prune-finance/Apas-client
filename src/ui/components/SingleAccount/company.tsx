@@ -348,7 +348,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   <TextInput
                     type="number"
                     minLength={10}
-                    maxLength={13}
+                    maxLength={16}
                     classNames={{
                       input: styles.input,
                       label: styles.label,

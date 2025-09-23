@@ -353,6 +353,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         }}
                         flex={1}
                         size="lg"
+                        type="number"
                         minLength={10}
                         maxLength={16}
                         label={

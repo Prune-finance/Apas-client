@@ -1034,11 +1034,13 @@ export const DefaultAccountHead = ({
         color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
-      <SendMoney
-        opened={opened}
-        closeMoney={closeMoney}
-        openSendMoney={openMoney}
-      />
+      { !payout &&
+        <SendMoney
+          opened={opened}
+          closeMoney={closeMoney}
+          openSendMoney={openMoney}
+        />
+      }
     </>
   );
 };

@@ -383,7 +383,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                             Phone Number <span style={{ color: "red" }}>*</span>
                           </Text>
                         }
-                        placeholder="Enter phone number (e.g. 234XXXXXXXXX)"
+                        placeholder="Enter phone number (e.g. 233XXXXXXXXX)"
                         {...form.getInputProps("phoneNumber")}
                         errorProps={{
                           fz: 12,

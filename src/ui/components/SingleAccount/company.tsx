@@ -382,7 +382,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                         Phone Number <span style={{ color: "red" }}>*</span>
                       </Text>
                     }
-                    placeholder="Enter phone number (e.g. 234XXXXXXXXX)"
+                    placeholder="Enter phone number (e.g. 233XXXXXXXXX)"
                     {...form2.getInputProps("phoneNumber")}
                     errorProps={{
                       fz: 12,

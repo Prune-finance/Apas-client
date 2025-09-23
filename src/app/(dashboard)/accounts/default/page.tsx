@@ -65,6 +65,7 @@ function Account() {
   const {
     transactions,
     loading: loadingTrx,
+    revalidate: revalidateTrx,
     meta: trxMeta,
   } = useUserDefaultTransactions(param);
 
@@ -104,6 +105,7 @@ function Account() {
         setChartFrequency={setChartFrequency}
         trxMeta={trxMeta}
         revalidate={revalidateAcct}
+        revalidateTrx={revalidateTrx}
         business={business}
         isUser
       >

@@ -88,6 +88,7 @@ export default function BusinessPayoutAccount() {
 
   const {
     loading: loadingTrx,
+    revalidate: revalidateTrx,
     transactions,
     meta,
   } = usePayoutAccountTransactions(accountId ?? account?.id, param);
@@ -132,6 +133,7 @@ export default function BusinessPayoutAccount() {
           admin
           payout
           trxMeta={meta}
+          revalidateTrx={revalidateTrx}
           revalidate={revalidateAcct}
         >
           <PaginationComponent

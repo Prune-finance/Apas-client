@@ -354,7 +354,7 @@ export const Transactions = ({
 
       <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
         <DownloadStatement
-          currencyType={currencyType}
+          currencyType={currencyType || "EUR"}
           receiptRef={pdfRef}
           data={downloadData}
           meta={downloadMeta}

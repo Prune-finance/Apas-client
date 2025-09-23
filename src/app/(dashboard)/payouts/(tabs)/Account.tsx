@@ -52,7 +52,7 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
           <NewAccountCard
             currency={"EUR"}
             companyName={account?.accountName ?? "No Default Account"}
-            link={`/accounts/default`}
+            link={`/payouts/${account?.accountNumber}/account`}
             iban={account?.accountNumber ?? "No Default Account"}
             bic={"ARPYGB21XXX"}
             balance={account?.accountBalance ?? 0}

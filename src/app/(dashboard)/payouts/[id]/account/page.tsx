@@ -61,6 +61,7 @@ export default function SingleUserPayoutAccount() {
   const {
     transactions,
     loading: trxLoading,
+    revalidate: revalidateTrx,
     meta,
   } = useUserPayoutTransactions(param);
   usePaginationReset({ queryParams: param, setActive });
@@ -94,6 +95,7 @@ export default function SingleUserPayoutAccount() {
         account={account}
         location="payout"
         transactions={transactions as TransactionType[]}
+        revalidateTrx={revalidateTrx}
         loading={loading}
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}

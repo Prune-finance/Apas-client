@@ -631,7 +631,11 @@ export const SingleAccountBody = ({
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
-          <AccountDetails account={account} loading={loading} currency={currency} />
+          <AccountDetails
+            account={account}
+            loading={loading}
+            currency={currency}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
@@ -861,10 +865,12 @@ interface DefaultAccountHeadProps
   business: BusinessData | null;
   loadingBiz: boolean;
   revalidate?: () => void;
+  currencyType?: "GBP" | "GHS" | "EUR" | "NGN";
 }
 
 export const DefaultAccountHead = ({
   loading,
+  currencyType,
   account,
   open,
   payout,
@@ -909,7 +915,7 @@ export const DefaultAccountHead = ({
   };
 
   useEffect(() => {
-    setSwitchCurrency("GBP");
+    setSwitchCurrency(currencyType ?? "EUR");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1028,11 +1034,13 @@ export const DefaultAccountHead = ({
         color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
-      <SendMoney
-        opened={opened}
-        closeMoney={closeMoney}
-        openSendMoney={openMoney}
-      />
+      { !payout &&
+        <SendMoney
+          opened={opened}
+          closeMoney={closeMoney}
+          openSendMoney={openMoney}
+        />
+      }
     </>
   );
 };
@@ -1089,8 +1097,10 @@ export const AccountInfo = ({
     setProcessing(true);
     try {
       await axios.get(
-        currencyType === "GBP"
-          ? `/accounts/${account?.accountNumber}/balance/dashboard?currency=GBP`
+        currencyType
+          ? `/accounts/${
+              account?.accountNumber ?? account?.walletId
+            }/balance/dashboard?currency=${currencyType}`
           : `/accounts/${account?.accountNumber}/balance/dashboard`
       );
       revalidate && (await revalidate());

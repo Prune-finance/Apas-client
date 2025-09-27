@@ -83,6 +83,7 @@ export default function BusinessPayoutAccount() {
 
   const {
     data: transactions,
+    queryFn: revalidateTrx,
     meta,
     loading: loadingTrx,
   } = useAxios<TransactionType[], Meta>({
@@ -130,6 +131,7 @@ export default function BusinessPayoutAccount() {
           loading={loading}
           loadingTrx={loadingTrx}
           setChartFrequency={setChartFrequency}
+          revalidateTrx={revalidateTrx}
           business={business}
           admin
           payout

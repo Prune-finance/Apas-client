@@ -66,6 +66,7 @@ export const Transactions = ({
   const { handleSuccess, handleError, handleInfo } = useNotification();
 
   const [downloadData, setDownloadData] = useState<DownloadStatementData[]>([]);
+
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
@@ -140,6 +141,7 @@ export const Transactions = ({
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`,
       "gbp-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${accountID}?date=${startDate}&endDate=${endDate}`,
+      "ghs-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${currencyType}/${accountID}?date=${startDate}&endDate=${endDate}`,
     };
 
     // Use the default URL if location is undefined or not in urlMap
@@ -227,7 +229,7 @@ export const Transactions = ({
         form={form}
         customStatusOption={[
           "PENDING",
-          "CONFIRMED",
+          currencyType === "GBP" ? "CONFIRMED" : "COMPLETED",
           "REJECTED",
           "CANCELLED",
           "FAILED",
@@ -243,7 +245,11 @@ export const Transactions = ({
         />
         <TextBox
           placeholder={
-            currencyType === "GBP" ? "Account Number" : "Beneficiary IBAN"
+            currencyType === "GBP"
+              ? "Account Number"
+              : currencyType === "GHS"
+              ? "Wallet ID"
+              : "Beneficiary IBAN"
           }
           {...form.getInputProps("recipientIban")}
         />
@@ -348,7 +354,7 @@ export const Transactions = ({
 
       <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
         <DownloadStatement
-          currencyType={currencyType}
+          currencyType={currencyType || "EUR"}
           receiptRef={pdfRef}
           data={downloadData}
           meta={downloadMeta}

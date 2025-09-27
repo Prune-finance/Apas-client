@@ -725,7 +725,9 @@ export function useUserTransactions(
   currency: string = "EUR",
   customParams: IParams = {}
 ) {
-  const path = id ? `${id}/transactions?currency=${currency}` : `transactions?currency=${currency}`;
+  const path = id
+    ? `${id}/transactions?currency=${currency}`
+    : `transactions?currency=${currency}`;
   const {
     data,
     meta,
@@ -760,10 +762,11 @@ export function useUserDefaultTransactions(customParams: ITrx = {}) {
 export function useUserCurrencyTransactions(
   customParams: ITrx = {},
   currency: string
-) {  const {
+) {
+  const {
     data,
     meta,
-    loading,
+    loading: boolean,
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
     endpoint: `currency-accounts/transactions/get-company-currency-account-transactions/${currency}`,
@@ -772,7 +775,7 @@ export function useUserCurrencyTransactions(
     dependencies: [sanitizeURL(customParams)],
   });
 
-  return { loading, transactions: data || [], meta, revalidate };
+  return { loading: boolean, transactions: data || [], meta, revalidate };
 }
 
 export function useAdminGetCurrencyTransactions(
@@ -939,6 +942,8 @@ export interface TransactionType {
   senderIban: string;
   beneficiaryName: string;
   beneficiaryAccountNumber: string;
+  beneficiaryWalletId: string;
+  senderWalletId: string;
   beneficiarySortCode: string;
   beneficiaryInstitutionName: string;
   beneficiaryAddress: string;

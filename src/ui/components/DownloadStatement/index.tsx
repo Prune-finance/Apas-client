@@ -26,6 +26,7 @@ import { formatNumber } from "@/lib/utils";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import GBP from "@/assets/GB.png";
+import GHS from "@/assets/GH.png";
 
 dayjs.extend(advancedFormat);
 
@@ -144,15 +145,26 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
             <Flex align="center" justify="flex-start" gap={4} mb={24}>
               <Box h={35} w={36}>
                 <Image
-                  width={36}
-                  height={35}
-                  src={currencyType === "EUR" ? EUIcon.src : GBP.src}
+                  width={30}
+                  height={30}
+                  src={
+                    currencyType === "EUR"
+                      ? EUIcon.src
+                      : currencyType === "GHS"
+                      ? GHS.src
+                      : GBP.src
+                  }
                   alt="eu-icon"
                   fit="contain"
                 />
               </Box>
               <Text fz={16} fw={600} c="#1D2939">
-                {currencyType === "EUR" ? "EUR" : "GBP"} Account
+                {currencyType === "EUR"
+                  ? "EUR"
+                  : currencyType === "GHS"
+                  ? "GHS"
+                  : "GBP"}{" "}
+                Account
               </Text>
             </Flex>
 

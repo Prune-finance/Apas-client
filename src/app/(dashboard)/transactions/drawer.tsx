@@ -47,7 +47,6 @@ export const TransactionDrawer = ({
   opened,
 }: TransactionDrawerProps) => {
   const pdfRef = useRef<HTMLDivElement>(null);
-
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.id ?? ""
   );
@@ -85,6 +84,10 @@ export const TransactionDrawer = ({
           "Account Number": selectedRequest?.beneficiaryAccountNumber,
           "Sort Code": selectedRequest?.beneficiarySortCode,
         }
+      : selectedRequest?.currencyType === "GHS"
+      ? {
+          "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
+        }
       : {
           IBAN: selectedRequest?.recipientIban,
           BIC: selectedRequest?.recipientBic,
@@ -117,6 +120,10 @@ export const TransactionDrawer = ({
           "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
           "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
         }
+      : selectedRequest?.currencyType === "GHS"
+      ? {
+          "Wallet ID": selectedRequest?.senderWalletId ?? "N/A",
+        }
       : {
           IBAN: selectedRequest?.recipientIban,
           BIC: selectedRequest?.recipientBic,
@@ -139,7 +146,9 @@ export const TransactionDrawer = ({
     "Date & Time": dayjs(selectedRequest?.createdAt).format(
       "Do MMMM, YYYY - HH:mma"
     ),
-    "Status:": <BadgeComponent status={selectedRequest?.status ?? ""} />,
+    "Status:": (
+      <BadgeComponent w={"auto"} status={selectedRequest?.status ?? ""} />
+    ),
   };
 
   return (

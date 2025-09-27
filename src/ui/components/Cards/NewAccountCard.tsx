@@ -142,8 +142,10 @@ function NewAccountCard({
     setProcessing(true);
     try {
       await axios.get(
-        currency === "GBP"
-          ? `/accounts/${accountNumber}/balance/dashboard?currency=GBP`
+        currency
+          ? `/accounts/${
+              accountNumber ?? walletId ?? iban
+            }/balance/dashboard?currency=${currency}`
           : `/accounts/${iban}/balance/dashboard`
       );
       revalidate && (await revalidate());
@@ -265,7 +267,7 @@ function NewAccountCard({
                         sortCode,
                         accountNumber,
                         balance,
-                        loading
+                        loading,
                       })}
                     </Text>
                   </Flex>
@@ -293,7 +295,7 @@ function NewAccountCard({
                         sortCode,
                         accountNumber,
                         balance,
-                        loading
+                        loading,
                       })}
                     </Text>
                   </>
@@ -306,29 +308,57 @@ function NewAccountCard({
                 <Box onClick={handlePropagation}>
                   <CopyButton
                     value={
-                      `${config.bankIdLabel}: ${config.getBankIdValue({
-                        currency,
-                        companyName,
-                        walletOwner,
-                        walletId,
-                        iban,
-                        bic,
-                        sortCode,
-                        accountNumber,
-                        balance,
-                        loading
-                      })},\nAccount Name: ${companyName},\n${config.accountIdLabel}: ${config.getAccountIdValue({
-                        currency,
-                        companyName,
-                        walletOwner,
-                        walletId,
-                        iban,
-                        bic,
-                        sortCode,
-                        accountNumber,
-                        balance,
-                        loading
-                      })}`
+                      currency === "GHS"
+                        ? `${config.bankIdLabel}: ${config.getBankIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })},\n${
+                            config.accountIdLabel
+                          }: ${config.getAccountIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })}`
+                        : `${config.bankIdLabel}: ${config.getBankIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })},\nAccount Name: ${companyName},\n${
+                            config.accountIdLabel
+                          }: ${config.getAccountIdValue({
+                            currency,
+                            companyName,
+                            walletOwner,
+                            walletId,
+                            iban,
+                            bic,
+                            sortCode,
+                            accountNumber,
+                            balance,
+                            loading,
+                          })}`
                     }
                   >
                     {({ copied, copy }) => (

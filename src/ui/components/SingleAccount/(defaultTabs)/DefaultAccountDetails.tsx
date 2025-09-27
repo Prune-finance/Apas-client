@@ -69,7 +69,6 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
   },
 };
 
-
 export default function DefaultAccountDetails({
   account,
   loading,
@@ -106,12 +105,12 @@ export default function DefaultAccountDetails({
 
         {!loading && (
           <CopyButton
-             value={`Account Name: ${account?.accountName ?? ""},
-            ${config.accountIdLabel}: ${config.getAccountIdValue(account)},
-            ${config.bankIdLabel}: ${config.getBankIdValue(account)},
-            Bank Name: Prune Payments LTD,
-            Bank Address: Office 7 35-37 Ludgate Hill, London,
-            Bank Country: United Kingdom`}
+            value={`Account Name: ${account?.accountName ?? ""}
+${config.accountIdLabel}: ${config.getAccountIdValue(account)}
+${config.bankIdLabel}: ${config.getBankIdValue(account)}
+Bank Name: Prune Payments LTD
+Bank Address: Office 7 35-37 Ludgate Hill, London
+Bank Country: United Kingdom`}
           >
             {({ copied, copy }) => (
               <PrimaryBtn

@@ -371,7 +371,9 @@ export function useSingleUserAccount(id: string, currency: string = "EUR") {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/${id}/dashboard?currency=${currency}`);
+      const { data } = await axios.get(
+        `/accounts/${id}/dashboard?currency=${currency}`
+      );
 
       setAccount(data.data);
       setMeta(data.meta);
@@ -593,6 +595,39 @@ export function useUserCurrencyAccount() {
   return { loading, currencyAccount, revalidate };
 }
 
+export function useUserListCurrencyAccount() {
+  const [listCurrency, setListCurrency] = useState<
+    ListCurrencyAccount[] | null
+  >(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchListAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/requests/get-business-currency-account-request-status`
+      );
+
+      setListCurrency(data?.data);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchListAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, listCurrency };
+}
+
 export function useAdminGetCompanyCurrencyAccountsList(id: string) {
   const [currencyAccount, setCurrencyAccount] = useState<
     CurrencyAccount[] | null
@@ -625,7 +660,7 @@ export function useAdminGetCompanyCurrencyAccountsList(id: string) {
   return { loading, currencyAccount, revalidate };
 }
 
-export function useUserCurrencyGBPAccount() {
+export function useUserCurrencyGBPAccount(currency: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -633,7 +668,7 @@ export function useUserCurrencyGBPAccount() {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/currency-accounts/get-account-by-currency/GBP`
+        `/currency-accounts/get-account-by-currency/${currency}`
       );
 
       setAccount(data?.data);
@@ -655,6 +690,33 @@ export function useUserCurrencyGBPAccount() {
   }, []);
 
   return { loading, account, revalidate };
+}
+export function useUserListOfBanks() {
+  const [banks, setBanks] = useState<ListOfBanks[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/accounts/banks`);
+
+      setBanks(data?.data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, banks };
 }
 
 export function useUserDefaultPayoutAccount() {
@@ -857,6 +919,20 @@ export interface CurrencyAccount {
   AccountRequests: {
     Currency: Record<string, any>;
   };
+}
+
+export interface ListOfBanks {
+  bankCode: string;
+  bankName: string;
+  payoutType: "MobileMoney" | "BankTransfer" | string;
+}
+
+export interface ListCurrencyAccount {
+  Currency: "GHS" | "GBP" | "NGN" | "EUR" | string;
+  accountType: "PAYOUT_ACCOUNT" | "COMPANY_ACCOUNT" | string;
+  companyId: "d1dfc7e9-12b7-4dff-9822-028384b302a5";
+  stage: "TEST" | "PRODUCTION" | string;
+  status: "APPROVED" | "PENDING" | "REJECTED" | "ISSUED" | string;
 }
 
 export interface AccountStatsMeta {

@@ -125,8 +125,8 @@ export const TransactionDrawer = ({
           "Wallet ID": selectedRequest?.senderWalletId ?? "N/A",
         }
       : {
-          IBAN: selectedRequest?.recipientIban,
-          BIC: selectedRequest?.recipientBic,
+          IBAN: selectedRequest?.senderIban,
+          BIC: selectedRequest?.senderBic || "ARPYGB21",
         }),
     Bank:
       selectedRequest?.type === "DEBIT"

@@ -229,7 +229,7 @@ export const Transactions = ({
         form={form}
         customStatusOption={[
           "PENDING",
-          currencyType === "GBP" ? "CONFIRMED" : "COMPLETED",
+          currencyType === "GHS" ? "COMPLETED" : "CONFIRMED",
           "REJECTED",
           "CANCELLED",
           "FAILED",

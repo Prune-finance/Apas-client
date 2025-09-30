@@ -115,6 +115,8 @@ export default function Account() {
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
+      (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") && (failed += trx.amount);
+
       arr.push({ month, successful, pending, failed });
     });
 

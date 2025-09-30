@@ -151,6 +151,8 @@ export function SingleAccount({
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
+      (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") && (failed += trx.amount);
+
       // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
       arr.push({ month, Inflow: 0, Outflow: trx.amount });
     });

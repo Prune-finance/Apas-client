@@ -117,7 +117,7 @@ export default function Account() {
 
       (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") && (failed += trx.amount);
 
-      arr.push({ month, successful, pending, failed });
+      arr.push({ month, successful, pending, failed: successful });
     });
 
     return arr;
@@ -144,7 +144,7 @@ export default function Account() {
     return [
       { name: "Completed", value: completed, color: "#039855" },
       { name: "Pending", value: pending, color: "#F79009" },
-      { name: "Failed", value: failed, color: "#D92D20" },
+      { name: "Failed", value: completed, color: "#D92D20" },
     ];
   }, [transactions]);
 

@@ -131,6 +131,14 @@ export default function Account() {
       if (trx.status === "PENDING") {
         pending += trx.amount;
       }
+
+      if (trx.status.toUpperCase() === "COMPLETED" || trx.status.toUpperCase() === "SUCCESSFUL") {
+        completed += trx.amount;
+      }
+
+      if (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") {
+        failed += trx.amount;
+      }
     });
 
     return [

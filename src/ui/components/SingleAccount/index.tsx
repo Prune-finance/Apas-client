@@ -167,7 +167,7 @@ export function SingleAccount({
     transactions.map((trx) => {
       trx.status === "PENDING"
         ? (pending += trx.amount)
-        : trx.status === "REJECTED"
+        : (trx.status === "REJECTED" || trx.status.toUpperCase() === "FAILED")
         ? (failed += trx.amount)
         : (completed += trx.amount);
     });

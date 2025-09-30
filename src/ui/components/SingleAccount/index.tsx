@@ -175,7 +175,7 @@ export function SingleAccount({
     return [
       { name: "Completed", value: completed, color: "#039855" },
       { name: "Pending", value: pending, color: "#F79009" },
-      { name: "Failed", value: failed, color: "#D92D20" },
+      { name: "Failed", value: completed, color: "#D92D20" },
     ];
   }, [transactions]);
 

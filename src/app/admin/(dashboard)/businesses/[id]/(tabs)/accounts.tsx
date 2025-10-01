@@ -81,10 +81,18 @@ export default function Accounts({
     useBusinessPayoutAccount(params.id);
   const { services } = useBusinessServices(params.id);
   const {
-    currencyAccount,
-    loading: currencyLoading,
-    revalidate: currencyRevalidate,
-  } = useAdminGetCompanyCurrencyAccountsList(params.id);
+    currencyAccount: companyCurrencyAccounts,
+    loading: companyCurrencyAccountsLoading,
+    revalidate: companyCurrencyAccountsRevalidate,
+  } = useAdminGetCompanyCurrencyAccountsList(params.id, { type: "COMPANY_ACCOUNT"});
+  
+
+  const {
+    currencyAccount: payoutCurrencyAccounts,
+    loading: payoutCurrencyAccountsLoading,
+    revalidate: payoutCurrencyAccountsRevalidate,
+  } = useAdminGetCompanyCurrencyAccountsList(params.id, { type: "PAYOUT_ACCOUNT"});
+  
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -226,23 +234,7 @@ export default function Accounts({
             revalidate={revalidateDftAcct}
           />
 
-          {currencyAccount &&
-          currencyAccount?.length > 0 &&
-          currencyAccount?.map((data) => (
-            <NewAccountCard
-              key={data?.id}
-              currency={data?.AccountRequests?.Currency?.symbol}
-              companyName={data?.accountName ?? "No Default Account"}
-              link={`/admin/businesses/${params.id}/default/${data?.id}`}
-              sortCode="041917"
-              accountNumber={data?.accountNumber}
-              balance={data?.accountBalance ?? 0}
-              loading={currencyLoading}
-              business={false}
-              refresh
-              revalidate={currencyRevalidate}
-            />
-          ))}
+        
 
           {payoutAccount && (
             <AccountCard
@@ -269,6 +261,42 @@ export default function Accounts({
                 size="xs"
                 labelPosition="left"
               /> */}
+
+              {payoutCurrencyAccounts &&
+                payoutCurrencyAccounts?.length > 0 &&
+                payoutCurrencyAccounts?.map((data) => (
+                  <NewAccountCard
+                    key={data?.id}
+                    currency={data?.AccountRequests?.Currency?.symbol}
+                    companyName={data?.accountName ?? "No Default Account"}
+                    link={`/admin/businesses/${params.id}/default/${data?.id}`}
+                    sortCode="041917"
+                    accountNumber={data?.accountNumber}
+                    balance={data?.accountBalance ?? 0}
+                    loading={payoutCurrencyAccountsLoading}
+                    business={false}
+                    refresh
+                    revalidate={payoutCurrencyAccountsRevalidate}
+                  />
+              ))}
+
+                {companyCurrencyAccounts &&
+                companyCurrencyAccounts?.length > 0 &&
+                companyCurrencyAccounts?.map((data) => (
+                  <NewAccountCard
+                    key={data?.id}
+                    currency={data?.AccountRequests?.Currency?.symbol}
+                    companyName={data?.accountName ?? "No Default Account"}
+                    link={`/admin/businesses/${params.id}/default/${data?.id}`}
+                    sortCode="041917"
+                    accountNumber={data?.accountNumber}
+                    balance={data?.accountBalance ?? 0}
+                    loading={companyCurrencyAccountsLoading}
+                    business={false}
+                    refresh
+                    revalidate={companyCurrencyAccountsRevalidate}
+                  />
+                ))}
             </AccountCard>
           )}
         </SimpleGrid>

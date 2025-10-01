@@ -206,6 +206,8 @@ export default function Accounts({
     </TableTr>
   ));
 
+  console.log({ defaultAccount, payoutAccount });
+  console.log({ companyCurrencyAccounts, payoutCurrencyAccounts });
   return (
     <TabsComponent tabs={tabs} mt={24}>
       <TabsPanel value={tabs[0].value} mt={24}>
@@ -261,44 +263,44 @@ export default function Accounts({
                 size="xs"
                 labelPosition="left"
               /> */}
-
-              {payoutCurrencyAccounts &&
-                payoutCurrencyAccounts?.length > 0 &&
-                payoutCurrencyAccounts?.map((data) => (
-                  <NewAccountCard
-                    key={data?.id}
-                    currency={data?.AccountRequests?.Currency?.symbol}
-                    companyName={data?.accountName ?? "No Default Account"}
-                    link={`/admin/businesses/${params.id}/default/${data?.id}`}
-                    sortCode="041917"
-                    accountNumber={data?.accountNumber}
-                    balance={data?.accountBalance ?? 0}
-                    loading={payoutCurrencyAccountsLoading}
-                    business={false}
-                    refresh
-                    revalidate={payoutCurrencyAccountsRevalidate}
-                  />
-              ))}
-
-                {companyCurrencyAccounts &&
-                companyCurrencyAccounts?.length > 0 &&
-                companyCurrencyAccounts?.map((data) => (
-                  <NewAccountCard
-                    key={data?.id}
-                    currency={data?.AccountRequests?.Currency?.symbol}
-                    companyName={data?.accountName ?? "No Default Account"}
-                    link={`/admin/businesses/${params.id}/default/${data?.id}`}
-                    sortCode="041917"
-                    accountNumber={data?.accountNumber}
-                    balance={data?.accountBalance ?? 0}
-                    loading={companyCurrencyAccountsLoading}
-                    business={false}
-                    refresh
-                    revalidate={companyCurrencyAccountsRevalidate}
-                  />
-                ))}
             </AccountCard>
           )}
+
+           {payoutCurrencyAccounts &&
+              payoutCurrencyAccounts?.length > 0 &&
+              payoutCurrencyAccounts?.map((data) => (
+                <NewAccountCard
+                  key={data?.id}
+                  currency={data?.AccountRequests?.Currency?.symbol}
+                  companyName={data?.accountName ?? "No Default Account"}
+                  link={`/admin/businesses/${params.id}/default/${data?.id}`}
+                  sortCode="041917"
+                  accountNumber={data?.accountNumber}
+                  balance={data?.accountBalance ?? 0}
+                  loading={payoutCurrencyAccountsLoading}
+                  business={false}
+                  refresh
+                  revalidate={payoutCurrencyAccountsRevalidate}
+                />
+            ))}
+
+            {companyCurrencyAccounts &&
+            companyCurrencyAccounts?.length > 0 &&
+            companyCurrencyAccounts?.map((data) => (
+              <NewAccountCard
+                key={data?.id}
+                currency={data?.AccountRequests?.Currency?.symbol}
+                companyName={data?.accountName ?? "No Default Account"}
+                link={`/admin/businesses/${params.id}/default/${data?.id}`}
+                sortCode="041917"
+                accountNumber={data?.accountNumber}
+                balance={data?.accountBalance ?? 0}
+                loading={companyCurrencyAccountsLoading}
+                business={false}
+                refresh
+                revalidate={companyCurrencyAccountsRevalidate}
+              />
+            ))}
         </SimpleGrid>
       </TabsPanel>
 

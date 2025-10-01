@@ -628,7 +628,7 @@ export function useUserListCurrencyAccount() {
   return { loading, listCurrency };
 }
 
-export function useAdminGetCompanyCurrencyAccountsList(id: string) {
+export function useAdminGetCompanyCurrencyAccountsList(id: string, params?: IParams) {
   const [currencyAccount, setCurrencyAccount] = useState<
     CurrencyAccount[] | null
   >(null);
@@ -637,7 +637,11 @@ export function useAdminGetCompanyCurrencyAccountsList(id: string) {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/currency-accounts/list/${id}`);
+      const query = new URLSearchParams(
+        params as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(`/currency-accounts/list/${id}?${query}`);
 
       setCurrencyAccount(data?.data);
     } catch (error) {

@@ -32,8 +32,6 @@ import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import EmptyTable from "@/ui/components/EmptyTable";
 import createAxiosInstance from "@/lib/axios";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
-import { issuedAccountSubTabs } from "@/app/(dashboard)/accounts/page";
-
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
 });
@@ -404,4 +402,9 @@ const tableHead = [
   "Date Created",
   // "Transactions",
   "Status",
+];
+
+const issuedAccountSubTabs = [
+  { value: "eur-account", title: "EUR Accounts" },
+  { value: "gbp-accounts", title: "GBP Accounts" },
 ];

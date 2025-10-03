@@ -84,8 +84,7 @@ function Account() {
     loading: loadingTrx,
     meta: trxMeta,
     revalidate: revalidateTrx,
-  } = useAdminGetCurrencyTransactions(param, params.account, account?.AccountRequests?.Currency?.symbol || "GBP");
-
+  } = useAdminGetCurrencyTransactions({ ...param, queryAccountType: account?.accountType }, params.account, account?.AccountRequests?.Currency?.symbol || "GBP", account?.accountType);
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -110,7 +109,7 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
-        accountType={account?.AccountRequests?.Currency?.symbol}
+        accountType={account?.AccountRequests?.Currency?.symbol || account?.currencyType}
         account={account}
         location="gbp-account"
         transactions={transactions as TransactionType[]}

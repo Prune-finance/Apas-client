@@ -44,6 +44,7 @@ export default function Account() {
     endDate,
     recipientName,
     recipientIban,
+    accountType,
     search,
   } = Object.fromEntries(searchParams.entries());
 
@@ -57,6 +58,7 @@ export default function Account() {
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
       ...(search && { search: search }),
+      ...(accountType && { accountType: accountType }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };

@@ -851,11 +851,13 @@ export interface BaseAccount {
   accountId: number;
   accountName: string;
   accountNumber: string;
+  accountType?: string;
   walletId: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
+  currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
   companyId: string;
   companyName?: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
@@ -912,6 +914,7 @@ export interface CurrencyAccount {
   accountNumber: string;
   accountIban: string;
   accountType: "COMPANY_ACCOUNT" | string;
+  currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
   accountBalance: number;
   accountDocuments: Record<string, any>;
   companyId: string;

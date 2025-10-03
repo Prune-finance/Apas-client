@@ -718,6 +718,7 @@ export interface Hva {
 
 interface ITrx extends IParams {
   id?: string;
+  queryAccountType?: string;
 }
 
 export function useUserTransactions(
@@ -781,7 +782,8 @@ export function useUserCurrencyTransactions(
 export function useAdminGetCurrencyTransactions(
   customParams: ITrx = {},
   id: string,
-  symbol: string
+  symbol: string,
+  queryAccountType?: string
 ) {
   const {
     data,

@@ -130,8 +130,8 @@ export const getInitials = (name: string) => {
     .join("");
 };
 
-export const getUserType = (userType: "USER" | "CORPORATE") => {
-  if (userType === "USER") return "Individual";
+export const getUserType = (userType: "USER" | "CORPORATE" | "ISSUED_ACCOUNT") => {
+  if (userType === "USER" || userType === "ISSUED_ACCOUNT") return "Individual";
   return "Corporate";
 };
 

@@ -32,6 +32,7 @@ import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import EmptyTable from "@/ui/components/EmptyTable";
 import createAxiosInstance from "@/lib/axios";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
+import { issuedAccountSubTabs } from "@/app/(dashboard)/accounts/page";
 
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
@@ -92,6 +93,12 @@ export default function Accounts({
     loading: payoutCurrencyAccountsLoading,
     revalidate: payoutCurrencyAccountsRevalidate,
   } = useAdminGetCompanyCurrencyAccountsList(params.id, { type: "PAYOUT_ACCOUNT"});
+
+  const {
+    currencyAccount: issuedCurrencyAccounts,
+    loading: issuedCurrencyAccountsLoading,
+    revalidate: issuedCurrencyAccountsRevalidate,
+  } = useAdminGetCompanyCurrencyAccountsList(params.id, { type: "ISSUED_ACCOUNT"});
   
 
   const form = useForm<FilterType>({
@@ -186,6 +193,43 @@ export default function Accounts({
       <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
       <TableTd className={styles.table__td}>
         {getUserType(element.type)}
+      </TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={activeBadgeColor(element.status)}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
+        >
+          {element.status.toLowerCase()}
+        </Badge>
+      </TableTd>
+    </TableTr>
+  ));
+
+  const issuedAccountRows = filteredSearch(
+    issuedCurrencyAccounts || [],
+    ["accountName", "accountNumber", "Company.name"],
+    debouncedSearch
+  ).map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => push(`/admin/businesses/${params.id}/default/${element.id}?accountType=${element.accountType}`)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd className={styles.table__td}>
+        {serialNumber(active, index, customParams.limit)}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.accountName}</TableTd>
+      <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
+      <TableTd className={styles.table__td}>
+        {getUserType(element.accountType as any)}
       </TableTd>
       <TableTd className={`${styles.table__td}`}>
         {dayjs(element.createdAt).format("Do MMMM, YYYY")}
@@ -305,24 +349,46 @@ export default function Accounts({
       </TabsPanel>
 
       <TabsPanel value={tabs[1].value}>
-        <TableComponent head={tableHead} rows={rows} loading={loading} />
+        <TabsComponent tabs={issuedAccountSubTabs} mt={24}>
+          <TabsPanel value={issuedAccountSubTabs[0].value}>
+              <TableComponent head={tableHead} rows={rows} loading={loading} />
+              <EmptyTable
+                rows={rows}
+                loading={loading}
+                text="When an account is created, it will appear here"
+                title="There are no accounts"
+              />
 
-        <EmptyTable
-          rows={rows}
-          loading={loading}
-          text="When an account is created, it will appear here"
-          title="There are no accounts"
-        />
+              <PaginationComponent
+                active={active}
+                setActive={setActive}
+                setLimit={setLimit}
+                limit={limit}
+                total={Math.ceil(
+                  (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+                )}
+              />
+          </TabsPanel>
+          <TabsPanel value={issuedAccountSubTabs[1].value}>
+            <TableComponent head={tableHead} rows={issuedAccountRows} loading={loading} />
+            <EmptyTable
+              rows={issuedAccountRows}
+              loading={issuedCurrencyAccountsLoading}
+              text="When an account is created, it will appear here"
+              title="There are no accounts"
+            />
 
-        <PaginationComponent
-          active={active}
-          setActive={setActive}
-          setLimit={setLimit}
-          limit={limit}
-          total={Math.ceil(
-            (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
-          )}
-        />
+            <PaginationComponent
+              active={active}
+              setActive={setActive}
+              setLimit={setLimit}
+              limit={limit}
+              total={Math.ceil(
+                (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+              )}
+            />
+          </TabsPanel>
+        </TabsComponent>
       </TabsPanel>
     </TabsComponent>
   );

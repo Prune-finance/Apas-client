@@ -44,7 +44,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               {`Director's Documents`}
             </Text>
 
-            {account.accountDocuments.directors.map((director, index) => (
+            {(account.accountDocuments.directors || []).map((director, index) => (
               <Box mb={20} key={index}>
                 <Text fz={12} fw={500} c="dimmed" mb={20}>
                   Director {index + 1}
@@ -64,7 +64,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               </Box>
             ))}
 
-            {account.accountDocuments.directors.length === 0 && (
+            {(account.accountDocuments.directors || []).length === 0 && (
               <NoContent text="No Director Documents" />
             )}
           </Paper>
@@ -79,7 +79,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
             >
               {`Shareholder's Documents`}
             </Text>
-            {account.accountDocuments.shareholders.map((director, index) => (
+            {(account.accountDocuments.shareholders || []).map((director, index) => (
               <Box mb={20} key={index}>
                 <Text fz={12} fw={500} c="dimmed" mb={20}>
                   Shareholder {index + 1}
@@ -99,7 +99,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               </Box>
             ))}
 
-            {account.accountDocuments.shareholders.length === 0 && (
+            {(account.accountDocuments.shareholders || []).length === 0 && (
               <NoContent text="No Shareholder Documents" />
             )}
           </Paper>

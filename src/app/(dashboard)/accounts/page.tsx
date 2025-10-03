@@ -802,7 +802,7 @@ const issuedAccountTabs = [
   { value: "Pending Accounts", icon: <IconUsers size={14} /> },
 ];
 
-const issuedAccountSubTabs = [
+export const issuedAccountSubTabs = [
   { value: "eur-account", title: "EUR Accounts" },
   { value: "gbp-accounts", title: "GBP Accounts" },
 ];

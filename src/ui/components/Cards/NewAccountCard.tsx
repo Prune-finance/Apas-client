@@ -19,6 +19,8 @@ import { parseError } from "@/lib/actions/auth";
 import createAxiosInstance from "@/lib/axios";
 import newAccountImageEuro from "@/assets/new-account-card.png";
 import AccountImageGBP from "@/assets/gbp-account-card.png";
+import CediBgImage from "@/assets/cedi-background-image.png";
+import USDBgImage from "@/assets/usd-background.png";
 import { GiEuropeanFlag, GiNigeria } from "react-icons/gi";
 import { formatNumber } from "@/lib/utils";
 import { SecondaryBtn } from "../Buttons";
@@ -26,7 +28,7 @@ import { IconCheck, IconCopy, IconReload } from "@tabler/icons-react";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
 import CediIcon from "@/assets/cedis-icon.png";
-import CediBgImage from "@/assets/cedi-background-image.png";
+import USDImage from "@/assets/USD.png";
 import { SeeAll } from ".";
 import Link from "next/link";
 
@@ -93,6 +95,18 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     getBankIdValue: (props) => props.walletOwner,
     getAccountIdValue: (props) => props.walletId,
   },
+
+  USD: {
+    background: USDBgImage.src,
+    icon: <Image src={USDImage.src} alt="USD" width={20} height={20} />,
+    bankIdLabel: "SWIFT/BIC",
+    accountIdLabel: "IBAN",
+    currencySymbol: "$",
+    currencyCode: "USD",
+    getBankIdValue: (props) => props.bic,
+    getAccountIdValue: (props) => props.iban,
+  },
+
   NGN: {
     background: newAccountImageEuro.src,
     icon: <GiNigeria />,

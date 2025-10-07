@@ -24,6 +24,7 @@ const data = [
   { value: "EUR", label: "🇪🇺 EUR Account (Euros)" },
   { value: "GBP", label: "🇬🇧 GBP Account (Pounds)" },
   { value: "GHS", label: "🇬🇭 GHS Account (Cedi)" },
+  { value: "USD", label: "🇺🇸 USD Account (Dollars)" },
   // { value: "NGN", label: "🇳🇬 NGN Account (Naira)" },
 ];
 

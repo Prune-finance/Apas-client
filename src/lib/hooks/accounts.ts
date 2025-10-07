@@ -628,7 +628,10 @@ export function useUserListCurrencyAccount() {
   return { loading, listCurrency };
 }
 
-export function useAdminGetCompanyCurrencyAccountsList(id: string, params?: IParams) {
+export function useAdminGetCompanyCurrencyAccountsList(
+  id: string,
+  params?: IParams
+) {
   const [currencyAccount, setCurrencyAccount] = useState<
     CurrencyAccount[] | null
   >(null);
@@ -641,7 +644,9 @@ export function useAdminGetCompanyCurrencyAccountsList(id: string, params?: IPar
         params as Record<string, string>
       ).toString();
 
-      const { data } = await axios.get(`/currency-accounts/list/${id}?${query}`);
+      const { data } = await axios.get(
+        `/currency-accounts/list/${id}?${query}`
+      );
 
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -913,6 +918,7 @@ export interface CurrencyAccount {
   accountName: string;
   accountNumber: string;
   accountIban: string;
+  accountBic: string;
   accountType: "COMPANY_ACCOUNT" | string;
   currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
   accountBalance: number;

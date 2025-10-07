@@ -39,6 +39,7 @@ function Account() {
     recipientName,
     recipientIban,
     search,
+    currency
   } = Object.fromEntries(searchParams.entries());
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -75,7 +76,7 @@ function Account() {
     currencyAccount: account,
     loading,
     revalidate: revalidateAcct,
-  } = useAdminGetCompanyCurrencyAccountByID(params?.account);
+  } = useAdminGetCompanyCurrencyAccountByID(params?.account, currency || undefined);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 

@@ -318,6 +318,8 @@ export default function Accounts({
                   link={`/admin/businesses/${params.id}/default/${data?.id}`}
                   sortCode="041917"
                   accountNumber={data?.accountNumber}
+                  walletId={data?.walletId ?? "No Default Account"}
+                  walletOwner={data?.accountName ?? "No Default Account"}
                   balance={data?.accountBalance ?? 0}
                   loading={payoutCurrencyAccountsLoading}
                   business={false}
@@ -333,7 +335,7 @@ export default function Accounts({
                 key={data?.id}
                 currency={data?.AccountRequests?.Currency?.symbol}
                 companyName={data?.accountName ?? "No Default Account"}
-                link={`/admin/businesses/${params.id}/default/${data?.id}`}
+                link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                 sortCode="041917"
                 accountNumber={data?.accountNumber}
                 balance={data?.accountBalance ?? 0}

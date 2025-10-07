@@ -123,6 +123,8 @@ function Accounts() {
     revalidate: currencyRevalidate,
   } = useUserCurrencyAccount();
 
+  console.log(currencyAccount);
+
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -420,7 +422,7 @@ function Accounts() {
         <MenuComponent id={element.id} status={element.status} />
       </TableTd> */}
     </TableTr>
-  ))
+  ));
 
   const handleRequestAccess = async () => {
     setProcessing(true);
@@ -515,6 +517,8 @@ function Accounts() {
                     walletId={data?.walletId ?? "No Default Account"}
                     link={`/accounts/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                     sortCode="041917"
+                    bic={data?.accountBic}
+                    iban={data?.accountIban}
                     accountNumber={data?.accountNumber}
                     balance={data?.accountBalance ?? 0}
                     loading={currencyLoading}
@@ -560,8 +564,7 @@ function Accounts() {
                   fz={12}
                   style={{ position: "relative" }}
                 >
-
-                   <Group justify="space-between" mt={30}>
+                  <Group justify="space-between" mt={30}>
                     <SearchInput search={search} setSearch={setSearch} />
 
                     <SecondaryBtn
@@ -570,32 +573,31 @@ function Accounts() {
                       icon={IconListTree}
                       fw={600}
                     />
-                </Group>
+                  </Group>
 
-                <Filter<FilterType>
-                  opened={openedFilter}
-                  toggle={toggle}
-                  form={form}
-                >
-                  <TextBox
-                    placeholder="Account Name"
-                    {...form.getInputProps("accountName")}
-                  />
+                  <Filter<FilterType>
+                    opened={openedFilter}
+                    toggle={toggle}
+                    form={form}
+                  >
+                    <TextBox
+                      placeholder="Account Name"
+                      {...form.getInputProps("accountName")}
+                    />
 
-                  <TextBox
-                    placeholder="Account Number"
-                    {...form.getInputProps("accountNumber")}
-                  />
+                    <TextBox
+                      placeholder="Account Number"
+                      {...form.getInputProps("accountNumber")}
+                    />
 
-                  <SelectBox
-                    placeholder="Type"
-                    {...form.getInputProps("type")}
-                    data={["Corporate", "Individual"]}
-                    clearable
-                  />
-                </Filter>
+                    <SelectBox
+                      placeholder="Type"
+                      {...form.getInputProps("type")}
+                      data={["Corporate", "Individual"]}
+                      clearable
+                    />
+                  </Filter>
 
-                
                   <TabsPanel value={issuedAccountSubTabs[0].value}>
                     <TableComponent
                       head={tableHeaders}
@@ -636,7 +638,8 @@ function Accounts() {
 
                     <PaginationComponent
                       total={Math.ceil(
-                        (metaGbpAccounts?.total ?? 0) / parseInt(limit ?? "10", 10)
+                        (metaGbpAccounts?.total ?? 0) /
+                          parseInt(limit ?? "10", 10)
                       )}
                       active={active}
                       setActive={setActive}
@@ -644,7 +647,6 @@ function Accounts() {
                       setLimit={setLimit}
                     />
                   </TabsPanel>
-
                 </TabsComponent>
               </TabsPanel>
 

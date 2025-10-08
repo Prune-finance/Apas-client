@@ -151,7 +151,9 @@ export function SingleAccount({
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
-      (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") && (failed += trx.amount);
+      (trx.status.toUpperCase() === "FAILED" ||
+        trx.status.toUpperCase() === "REJECTED") &&
+        (failed += trx.amount);
 
       // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
       arr.push({ month, Inflow: 0, Outflow: trx.amount });
@@ -167,7 +169,7 @@ export function SingleAccount({
     transactions.map((trx) => {
       trx.status === "PENDING"
         ? (pending += trx.amount)
-        : (trx.status === "REJECTED" || trx.status.toUpperCase() === "FAILED")
+        : trx.status === "REJECTED" || trx.status.toUpperCase() === "FAILED"
         ? (failed += trx.amount)
         : (completed += trx.amount);
     });
@@ -868,7 +870,7 @@ interface DefaultAccountHeadProps
   business: BusinessData | null;
   loadingBiz: boolean;
   revalidate?: () => void;
-  currencyType?: "GBP" | "GHS" | "EUR" | "NGN";
+  currencyType?: "GBP" | "GHS" | "EUR" | "NGN" | "USD";
 }
 
 export const DefaultAccountHead = ({
@@ -1037,13 +1039,13 @@ export const DefaultAccountHead = ({
         color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
-      { !payout &&
+      {!payout && (
         <SendMoney
           opened={opened}
           closeMoney={closeMoney}
           openSendMoney={openMoney}
         />
-      }
+      )}
     </>
   );
 };

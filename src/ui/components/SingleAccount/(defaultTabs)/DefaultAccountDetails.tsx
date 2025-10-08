@@ -18,6 +18,7 @@ import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
 import NGNImage from "@/assets/cedis-icon.png";
 import GHSImage from "@/assets/cedis-icon.png";
+import USDImage from "@/assets/USD.png";
 
 interface CurrencyConfig {
   icon: string;
@@ -66,6 +67,14 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     accountIdLabel: "Wallet ID",
     getBankIdValue: (account) => account?.accountName ?? "",
     getAccountIdValue: (account) => account?.walletId ?? "",
+  },
+  USD: {
+    icon: USDImage.src,
+    name: "USD",
+    bankIdLabel: "SWIFT/BIC",
+    accountIdLabel: "IBAN/Account Number",
+    getBankIdValue: (account) => account?.accountBic ?? "",
+    getAccountIdValue: (account) => account?.accountIban ?? "",
   },
 };
 

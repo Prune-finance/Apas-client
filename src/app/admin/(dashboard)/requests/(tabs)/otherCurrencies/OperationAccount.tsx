@@ -23,9 +23,11 @@ import { useSearchParams } from "next/navigation";
 import React, { Fragment, useState } from "react";
 import SingleCurrencyModal from "./SingleCurrencyModal";
 import RejectModalComponent from "./RejectCurrencyModal";
-import axios from "axios";
+import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
 import Cookies from "js-cookie";
+
+const axios = createAxiosInstance("accounts");
 
 function OperationAccount() {
   const searchParams = useSearchParams();
@@ -112,7 +114,7 @@ function OperationAccount() {
         requestForm.values;
 
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-accounts/requests/admin-reject-business-currency-account-request/${selectedRequest?.id}`,
+        `/currency-accounts/requests/admin-reject-business-currency-account-request/${selectedRequest?.id}`,
         {
           rejectComment: reason,
           ...(supportingDocumentName && { supportingDocumentName }),

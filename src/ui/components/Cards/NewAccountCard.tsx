@@ -40,8 +40,6 @@ interface Props extends CardProps {
   iban?: string;
   bic?: string;
   balance: number;
-  walletOwner?: string;
-  walletId?: string;
   link?: string;
   loading: boolean;
   badgeText?: string;
@@ -135,8 +133,6 @@ function NewAccountCard({
   loading,
   badgeText,
   business,
-  walletOwner,
-  walletId,
   disable,
   children,
   refresh,

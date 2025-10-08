@@ -816,6 +816,7 @@ export interface IParams {
   page?: number;
   companyId?: string;
   not?: string;
+  currency?: string;
   query?: string;
   bank?: string;
   beneficiaryName?: string;

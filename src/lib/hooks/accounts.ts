@@ -528,7 +528,10 @@ export function useUserCurrencyAccountByID(id: string, currency: string) {
   return { loading, currencyAccount, revalidate };
 }
 
-export function useAdminGetCompanyCurrencyAccountByID(id: string, currency?: string) {
+export function useAdminGetCompanyCurrencyAccountByID(
+  id: string,
+  currency?: string
+) {
   const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
     null
   );
@@ -538,7 +541,9 @@ export function useAdminGetCompanyCurrencyAccountByID(id: string, currency?: str
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/currency-accounts/admin-get-account-by-id/${id}${currency ? `?currency=${currency}` : ""}`
+        `/currency-accounts/admin-get-account-by-id/${id}${
+          currency ? `?currency=${currency}` : ""
+        }`
       );
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -858,7 +863,6 @@ export interface BaseAccount {
   accountName: string;
   accountNumber: string;
   accountType?: string;
-  walletId: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
@@ -918,7 +922,6 @@ export interface CurrencyAccount {
   walletId: string;
   accountName: string;
   accountNumber: string;
-  walletId: string;
   accountIban: string;
   accountBic: string;
   accountType: "COMPANY_ACCOUNT" | string;

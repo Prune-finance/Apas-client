@@ -31,9 +31,11 @@ function Account() {
   const [limit, setLimit] = useState<string | null>("10");
 
   const {
+    currency,
     status,
     date,
     type,
+    accountType,
     senderName,
     endDate,
     recipientName,
@@ -50,6 +52,7 @@ function Account() {
       ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
       ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
       ...(type && { type: type }),
+      ...(accountType && { accountType: accountType }),
       ...(senderName && { senderName: senderName }),
       ...(recipientName && { beneficiaryName: recipientName }),
       ...(recipientIban && { beneficiaryAccountNumber: recipientIban }),
@@ -107,13 +110,15 @@ function Account() {
         business={business}
         loadingBiz={loadingBiz}
         loading={loading}
+        payout={accountType === "PAYOUT_ACCOUNT"}
+        currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN"}
         open={() => {}}
       />
 
       <SingleDefaultAccountBody
         accountType={account?.AccountRequests?.Currency?.symbol}
         account={account}
-        location="gbp-account"
+        location={currency === "GBP" ? "gbp-account" : "ghs-account"}
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

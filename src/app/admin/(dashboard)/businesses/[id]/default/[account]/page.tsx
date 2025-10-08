@@ -1,10 +1,15 @@
 "use client";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import styles from "./styles.module.scss";
-import { useUserDefaultAccount } from "@/lib/hooks/accounts";
+import styles from "../styles.module.scss";
+import {
+  useAdminGetCompanyCurrencyAccountByID,
+
+} from "@/lib/hooks/accounts";
 import {
   TransactionType,
+  useAdminGetCurrencyTransactions,
+  useUserCurrencyTransactions,
   useUserDefaultTransactions,
 } from "@/lib/hooks/transactions";
 import {
@@ -14,11 +19,13 @@ import {
 import { Space } from "@mantine/core";
 import { Suspense, useMemo, useState } from "react";
 import { useUserBusiness } from "@/lib/hooks/businesses";
-import { useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
+import { useDebouncedValue } from "@mantine/hooks";
 
 function Account() {
+  const params = useParams<{ account: string }>();
   const searchParams = useSearchParams();
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -31,7 +38,11 @@ function Account() {
     endDate,
     recipientName,
     recipientIban,
+    search,
+    currency
   } = Object.fromEntries(searchParams.entries());
+
+  const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const param = useMemo(() => {
     return {
@@ -40,8 +51,9 @@ function Account() {
       ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
       ...(type && { type: type }),
       ...(senderName && { senderName: senderName }),
-      ...(recipientName && { recipientName: recipientName }),
-      ...(recipientIban && { recipientIban: recipientIban }),
+      ...(recipientName && { beneficiaryName: recipientName }),
+      ...(recipientIban && { beneficiaryAccountNumber: recipientIban }),
+      ...(debouncedSearch && { search: debouncedSearch }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -55,30 +67,31 @@ function Account() {
     recipientIban,
     active,
     limit,
+    debouncedSearch,
   ]);
+ 
+  const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
 
   const {
-    account,
+    currencyAccount: account,
     loading,
     revalidate: revalidateAcct,
-  } = useUserDefaultAccount();
-  const {
-    transactions,
-    loading: loadingTrx,
-    revalidate: revalidateTrx,
-    meta: trxMeta,
-  } = useUserDefaultTransactions(param);
-
-  const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
+  } = useAdminGetCompanyCurrencyAccountByID(params?.account, currency || undefined);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
+  const {
+    transactions,
+    loading: loadingTrx,
+    meta: trxMeta,
+    revalidate: revalidateTrx,
+  } = useAdminGetCurrencyTransactions({ ...param, queryAccountType: account?.accountType }, params.account, account?.AccountRequests?.Currency?.symbol || "GBP", account?.accountType);
   return (
     <main className={styles.main}>
       <Breadcrumbs
         items={[
           { title: "Accounts", href: "/accounts" },
-          { title: "Own Accounts", href: "/accounts/default" },
+          { title: "Own Accounts", href: "/accounts" },
           {
             title: account?.accountName || "",
             href: `/accounts/default`,
@@ -97,8 +110,9 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
+        accountType={account?.AccountRequests?.Currency?.symbol || account?.currencyType}
         account={account}
-        location="own-account"
+        location="gbp-account"
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

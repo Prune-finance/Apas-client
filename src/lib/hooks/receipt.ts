@@ -21,12 +21,15 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
         "Account Number":
           selectedRequest?.senderIban ??
           selectedRequest?.senderAccountNumber ??
+          selectedRequest?.senderWalletId ??
           "",
         "Bank Name": "Prune Payments LTD",
         ...(selectedRequest?.currencyType === "GBP"
           ? {
               "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
             }
+          : selectedRequest?.currencyType === "GHS"
+          ? {}
           : {
               BIC: "ARPYGB21XXX",
             }),
@@ -51,13 +54,21 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
                 selectedRequest?.beneficiaryAccountNumber ?? "N/A",
               "Sort Code": selectedRequest?.beneficiarySortCode ?? "N/A",
             }
+          : selectedRequest?.currencyType === "GHS"
+          ? {
+              "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
+              "Bank Name": selectedRequest?.beneficiaryInstitutionName ?? "N/A",
+            }
           : {
               IBAN: selectedRequest?.recipientIban ?? "",
-              "Bank Name": selectedRequest?.recipientBankAddress ?? "",
+              "Bank Name": selectedRequest?.beneficiaryInstitutionName ?? "",
             }),
 
         Country: selectedRequest?.recipientBankCountry ?? "N/A",
-        "Bank Address": selectedRequest?.beneficiaryAddress ?? "N/A",
+        "Bank Address":
+          selectedRequest?.beneficiaryAddress ??
+          selectedRequest?.recipientBankAddress ??
+          "N/A",
         Narration: selectedRequest?.narration ?? "",
       },
     },

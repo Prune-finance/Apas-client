@@ -661,7 +661,7 @@ const Services = ({
                 setServiceId(service.serviceIdentifier);
                 service.serviceIdentifier === "LIVE_MODE_SERVICE"
                   ? handleServiceChange(service)
-                  : null;
+                  : handleServiceChange(service);
               }}
               disabled={serviceId === service.serviceIdentifier}
               // indeterminate={serviceId === service.serviceIdentifier}

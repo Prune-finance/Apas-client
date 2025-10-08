@@ -4,6 +4,7 @@ import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect } from "react";
 import {
   AccountData,
+  useAdminGetCompanyCurrencyAccountsList,
   useBusinessDefaultAccount,
   useBusinessPayoutAccount,
 } from "@/lib/hooks/accounts";
@@ -30,7 +31,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import EmptyTable from "@/ui/components/EmptyTable";
 import createAxiosInstance from "@/lib/axios";
-
+import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 const switzer = localFont({
   src: "../../../../../../assets/fonts/Switzer-Regular.woff2",
 });
@@ -73,11 +74,30 @@ export default function Accounts({
     meta: bizTrxMeta,
   } = useBusinessTransactions(params.id, customParams);
 
-  const { account: defaultAccount, loading: loadingDefault } =
+  const { account: defaultAccount, loading: loadingDefault, revalidate: revalidateDftAcct  } =
     useBusinessDefaultAccount(params.id);
   const { account: payoutAccount, loading: loadingPayout } =
     useBusinessPayoutAccount(params.id);
   const { services } = useBusinessServices(params.id);
+  const {
+    currencyAccount: companyCurrencyAccounts,
+    loading: companyCurrencyAccountsLoading,
+    revalidate: companyCurrencyAccountsRevalidate,
+  } = useAdminGetCompanyCurrencyAccountsList(params.id, { type: "COMPANY_ACCOUNT"});
+  
+
+  const {
+    currencyAccount: payoutCurrencyAccounts,
+    loading: payoutCurrencyAccountsLoading,
+    revalidate: payoutCurrencyAccountsRevalidate,
+  } = useAdminGetCompanyCurrencyAccountsList(params.id, { type: "PAYOUT_ACCOUNT"});
+
+  const {
+    currencyAccount: issuedCurrencyAccounts,
+    loading: issuedCurrencyAccountsLoading,
+    revalidate: issuedCurrencyAccountsRevalidate,
+  } = useAdminGetCompanyCurrencyAccountsList(params.id, { type: "ISSUED_ACCOUNT"});
+  
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -191,11 +211,50 @@ export default function Accounts({
     </TableTr>
   ));
 
+  const issuedAccountRows = filteredSearch(
+    issuedCurrencyAccounts || [],
+    ["accountName", "accountNumber", "Company.name"],
+    debouncedSearch
+  ).map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => push(`/admin/businesses/${params.id}/default/${element.id}?accountType=${element.accountType}`)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd className={styles.table__td}>
+        {serialNumber(active, index, customParams.limit)}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.accountName}</TableTd>
+      <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
+      <TableTd className={styles.table__td}>
+        {getUserType(element.accountType as any)}
+      </TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={activeBadgeColor(element.status)}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
+        >
+          {element.status.toLowerCase()}
+        </Badge>
+      </TableTd>
+    </TableTr>
+  ));
+
+  console.log({ defaultAccount, payoutAccount });
+  console.log({ companyCurrencyAccounts, payoutCurrencyAccounts });
   return (
     <TabsComponent tabs={tabs} mt={24}>
       <TabsPanel value={tabs[0].value} mt={24}>
         <SimpleGrid cols={3}>
-          <AccountCard
+          {/* <AccountCard
             currency="EUR"
             bic="ARPYGB21XXX"
             balance={defaultAccount?.accountBalance ?? 0}
@@ -204,7 +263,22 @@ export default function Accounts({
             badgeText="Main Account"
             link={`/admin/businesses/${params.id}/default?accountId=${defaultAccount?.id}`}
             business
+          /> */}
+
+          <NewAccountCard
+            currency={"EUR"}
+            companyName={defaultAccount?.accountName ?? "No Default Account"}
+            link={`/admin/businesses/${params.id}/default?accountId=${defaultAccount?.id}`}
+            iban={defaultAccount?.accountNumber ?? "No Default Account"}
+            bic={"ARPYGB21XXX"}
+            balance={defaultAccount?.accountBalance ?? 0}
+            loading={loadingDefault}
+            business={false}
+            refresh
+            revalidate={revalidateDftAcct}
           />
+
+        
 
           {payoutAccount && (
             <AccountCard
@@ -233,28 +307,88 @@ export default function Accounts({
               /> */}
             </AccountCard>
           )}
+
+           {payoutCurrencyAccounts &&
+              payoutCurrencyAccounts?.length > 0 &&
+              payoutCurrencyAccounts?.map((data) => (
+                <NewAccountCard
+                  key={data?.id}
+                  currency={data?.AccountRequests?.Currency?.symbol}
+                  companyName={data?.accountName ?? "No Default Account"}
+                  link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
+                  sortCode="041917"
+                  accountNumber={data?.accountNumber}
+                  walletId={data?.walletId ?? "No Default Account"}
+                  walletOwner={data?.accountName ?? "No Default Account"}
+                  balance={data?.accountBalance ?? 0}
+                  loading={payoutCurrencyAccountsLoading}
+                  business={false}
+                  refresh
+                  revalidate={payoutCurrencyAccountsRevalidate}
+                />
+            ))}
+
+            {companyCurrencyAccounts &&
+            companyCurrencyAccounts?.length > 0 &&
+            companyCurrencyAccounts?.map((data) => (
+              <NewAccountCard
+                key={data?.id}
+                currency={data?.AccountRequests?.Currency?.symbol}
+                companyName={data?.accountName ?? "No Default Account"}
+                link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
+                sortCode="041917"
+                accountNumber={data?.accountNumber}
+                balance={data?.accountBalance ?? 0}
+                loading={companyCurrencyAccountsLoading}
+                business={false}
+                refresh
+                revalidate={companyCurrencyAccountsRevalidate}
+              />
+            ))}
         </SimpleGrid>
       </TabsPanel>
 
       <TabsPanel value={tabs[1].value}>
-        <TableComponent head={tableHead} rows={rows} loading={loading} />
+        <TabsComponent tabs={issuedAccountSubTabs} mt={24}>
+          <TabsPanel value={issuedAccountSubTabs[0].value}>
+              <TableComponent head={tableHead} rows={rows} loading={loading} />
+              <EmptyTable
+                rows={rows}
+                loading={loading}
+                text="When an account is created, it will appear here"
+                title="There are no accounts"
+              />
 
-        <EmptyTable
-          rows={rows}
-          loading={loading}
-          text="When an account is created, it will appear here"
-          title="There are no accounts"
-        />
+              <PaginationComponent
+                active={active}
+                setActive={setActive}
+                setLimit={setLimit}
+                limit={limit}
+                total={Math.ceil(
+                  (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+                )}
+              />
+          </TabsPanel>
+          <TabsPanel value={issuedAccountSubTabs[1].value}>
+            <TableComponent head={tableHead} rows={issuedAccountRows} loading={loading} />
+            <EmptyTable
+              rows={issuedAccountRows}
+              loading={issuedCurrencyAccountsLoading}
+              text="When an account is created, it will appear here"
+              title="There are no accounts"
+            />
 
-        <PaginationComponent
-          active={active}
-          setActive={setActive}
-          setLimit={setLimit}
-          limit={limit}
-          total={Math.ceil(
-            (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
-          )}
-        />
+            <PaginationComponent
+              active={active}
+              setActive={setActive}
+              setLimit={setLimit}
+              limit={limit}
+              total={Math.ceil(
+                (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+              )}
+            />
+          </TabsPanel>
+        </TabsComponent>
       </TabsPanel>
     </TabsComponent>
   );
@@ -270,4 +404,9 @@ const tableHead = [
   "Date Created",
   // "Transactions",
   "Status",
+];
+
+const issuedAccountSubTabs = [
+  { value: "eur-account", title: "EUR Accounts" },
+  { value: "gbp-accounts", title: "GBP Accounts" },
 ];

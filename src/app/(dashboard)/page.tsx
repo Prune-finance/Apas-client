@@ -52,9 +52,12 @@ export default function Home() {
   const { loading, meta } = useUserAccounts();
   const { loading: debitLoading, requests } = useUserDebitRequests();
   const { loading: balanceLoading, balance } = useUserBalances();
-  const { transactions, loading: loadingTrx } = useUserTransactions(undefined, {
-    limit: 1000,
-  });
+  const { transactions, loading: loadingTrx } = useUserTransactions(undefined, 
+    "EUR",
+    {
+      limit: 1000,
+    }
+  );
   const { transactions: defaultTrx, loading: loadingDefaultTrx } =
     useUserDefaultTransactions({
       limit: 3,

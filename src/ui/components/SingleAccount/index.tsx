@@ -151,6 +151,8 @@ export function SingleAccount({
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
+      (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") && (failed += trx.amount);
+
       // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
       arr.push({ month, Inflow: 0, Outflow: trx.amount });
     });
@@ -165,7 +167,7 @@ export function SingleAccount({
     transactions.map((trx) => {
       trx.status === "PENDING"
         ? (pending += trx.amount)
-        : trx.status === "REJECTED"
+        : (trx.status === "REJECTED" || trx.status.toUpperCase() === "FAILED")
         ? (failed += trx.amount)
         : (completed += trx.amount);
     });
@@ -173,7 +175,7 @@ export function SingleAccount({
     return [
       { name: "Completed", value: completed, color: "#039855" },
       { name: "Pending", value: pending, color: "#F79009" },
-      { name: "Failed", value: failed, color: "#D92D20" },
+      { name: "Failed", value: completed, color: "#D92D20" },
     ];
   }, [transactions]);
 
@@ -586,6 +588,7 @@ interface SingleAccountProps {
   location?: string;
   isUser?: boolean;
   revalidate: () => Promise<void>;
+  currency?: string;
 }
 
 export const SingleAccountBody = ({
@@ -594,6 +597,7 @@ export const SingleAccountBody = ({
   loading,
   loadingTrx,
   setChartFrequency,
+  currency = "EUR",
   business,
   admin,
   payout,
@@ -615,6 +619,7 @@ export const SingleAccountBody = ({
   return (
     <Box mt={32}>
       <AccountInfo
+        currencyType={currency}
         account={account}
         loading={loading}
         loadingTrx={loadingTrx}
@@ -628,7 +633,11 @@ export const SingleAccountBody = ({
 
       <TabsComponent tabs={tabs} mt={40}>
         <TabsPanel value={tabs[0].value} mt={28}>
-          <AccountDetails account={account} loading={loading} />
+          <AccountDetails
+            account={account}
+            loading={loading}
+            currency={currency}
+          />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
@@ -650,9 +659,9 @@ export const SingleAccountBody = ({
             setChartFrequency={setChartFrequency}
           />
         </TabsPanel>
-        <TabsPanel value={tabs[3].value} mt={28}>
+        {/* <TabsPanel value={tabs[3].value} mt={28}>
           <Documents account={account} admin={admin} />
-        </TabsPanel>
+        </TabsPanel> */}
       </TabsComponent>
     </Box>
   );
@@ -858,10 +867,12 @@ interface DefaultAccountHeadProps
   business: BusinessData | null;
   loadingBiz: boolean;
   revalidate?: () => void;
+  currencyType?: "GBP" | "GHS" | "EUR" | "NGN";
 }
 
 export const DefaultAccountHead = ({
   loading,
+  currencyType,
   account,
   open,
   payout,
@@ -906,7 +917,7 @@ export const DefaultAccountHead = ({
   };
 
   useEffect(() => {
-    setSwitchCurrency("GBP");
+    setSwitchCurrency(currencyType ?? "EUR");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -1025,11 +1036,13 @@ export const DefaultAccountHead = ({
         color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
-      <SendMoney
-        opened={opened}
-        closeMoney={closeMoney}
-        openSendMoney={openMoney}
-      />
+      { !payout &&
+        <SendMoney
+          opened={opened}
+          closeMoney={closeMoney}
+          openSendMoney={openMoney}
+        />
+      }
     </>
   );
 };
@@ -1086,8 +1099,10 @@ export const AccountInfo = ({
     setProcessing(true);
     try {
       await axios.get(
-        currencyType === "GBP"
-          ? `/accounts/${account?.accountNumber}/balance/dashboard?currency=GBP`
+        currencyType
+          ? `/accounts/${
+              account?.accountNumber ?? account?.walletId
+            }/balance/dashboard?currency=${currencyType}`
           : `/accounts/${account?.accountNumber}/balance/dashboard`
       );
       revalidate && (await revalidate());

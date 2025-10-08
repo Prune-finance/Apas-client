@@ -44,7 +44,7 @@ export const Documents = ({ account, admin = false }: Props) => {
             >
               {`Director's Documents`}
             </Text>
-            {Object.values(account.accountDocuments.directors).map(
+            {Object.values(account.accountDocuments.directors || {}).map(
               (director, index) => (
                 <Box mb={20} key={index}>
                   <Text fz={12} fw={500} c="dimmed" mb={20}>
@@ -68,7 +68,7 @@ export const Documents = ({ account, admin = false }: Props) => {
               )
             )}
 
-            {Object.keys(account.accountDocuments.directors).length === 0 && (
+            {Object.keys(account.accountDocuments.directors || {}).length === 0 && (
               <NoContent text="No Director Documents" />
             )}
           </Paper>
@@ -83,7 +83,7 @@ export const Documents = ({ account, admin = false }: Props) => {
             >
               {`Shareholder's Documents`}
             </Text>
-            {Object.values(account.accountDocuments.shareholders).map(
+            {Object.values(account.accountDocuments.shareholders || {}).map(
               (director, index) => (
                 <Box mb={20} key={index}>
                   <Text fz={12} fw={500} c="dimmed" mb={20}>
@@ -107,7 +107,7 @@ export const Documents = ({ account, admin = false }: Props) => {
               )
             )}
 
-            {Object.keys(account.accountDocuments.shareholders).length ===
+            {Object.keys(account.accountDocuments.shareholders || {}).length ===
               0 && <NoContent text="No Shareholder Documents" />}
           </Paper>
         </Stack>

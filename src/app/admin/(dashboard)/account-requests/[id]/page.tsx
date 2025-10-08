@@ -118,6 +118,7 @@ function BusinessAccountRequests() {
       <TableTd tt="capitalize">{element.lastName}</TableTd>
       <TableTd tt="capitalize">{getUserType(element.accountType)}</TableTd>
       <TableTd>{element?.country}</TableTd>
+      <TableTd>{element?.Currency?.symbol}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd>
         <BadgeComponent status={element.status} />
@@ -255,6 +256,7 @@ const tableHeaders = [
   "Last Name",
   "User Type",
   "Country",
+  "Currency",
   "Date Created",
   "Status",
   // "Action",

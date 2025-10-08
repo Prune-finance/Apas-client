@@ -106,6 +106,7 @@ export default function BusinessDefaultAccount() {
   const {
     loading: loadingTrx,
     transactions,
+    revalidate: revalidateTrx,
     meta,
   } = useBusinessAccountTransactions(accountId ?? account?.id, customParams);
 
@@ -138,6 +139,7 @@ export default function BusinessDefaultAccount() {
           accountID={params?.id}
           location="admin-default"
           transactions={transactions as TransactionType[]}
+          revalidateTrx={revalidateTrx}
           loading={loading}
           loadingTrx={loadingTrx}
           setChartFrequency={setChartFrequency}

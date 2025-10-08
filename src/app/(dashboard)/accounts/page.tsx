@@ -88,7 +88,18 @@ function Accounts() {
     page: active,
     limit: parseInt(limit ?? "10", 10),
     search: debouncedSearch,
+    currency: "EUR",
   };
+
+  const {
+    loading: loadingGbpAccounts,
+    accounts: gbpAccounts,
+    revalidate: revalidateGbpAccounts,
+    meta: metaGbpAccounts,
+    statusLoading: statusLoadingGbpAccounts,
+    issuanceRequests: gbpIssuanceRequests,
+    revalidateIssuance: revalidateGbpIssuance,
+  } = useUserAccounts({ ...queryParams, currency: "GBP" });
 
   const {
     loading,
@@ -111,6 +122,8 @@ function Accounts() {
     loading: currencyLoading,
     revalidate: currencyRevalidate,
   } = useUserCurrencyAccount();
+
+  console.log(currencyAccount);
 
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -197,6 +210,7 @@ function Accounts() {
       });
 
       revalidate();
+      revalidateGbpAccounts();
       handleSuccess("Action Completed", "Freeze request submitted");
       freezeClose();
       requestForm.reset();
@@ -223,6 +237,7 @@ function Accounts() {
 
       requestForm.reset();
       revalidate();
+      revalidateGbpAccounts();
       handleSuccess(
         "Action Completed",
         "Account Deactivation request submitted"
@@ -349,6 +364,66 @@ function Accounts() {
     </TableTr>
   ));
 
+  const gbpRows = (gbpAccounts ?? []).map((element, index) => (
+    <TableTr key={index} style={{ cursor: "pointer" }}>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=GBP`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
+        {/* {`${element.accountName}`}{" "} */}
+        <Text fz={12} inline tt="capitalize">
+          {element.accountName}
+
+          <Text span inherit fz={12} c="#c6a700" fw={600}>
+            {element.staging === "TEST" ? " (TEST)" : ""}
+          </Text>
+        </Text>
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=GBP`)}
+        className={styles.table__td}
+      >
+        {element.accountIban ?? element.accountNumber}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=GBP`)}
+        className={styles.table__td}
+      >
+        {formatNumber(element.accountBalance, true, "GBP")}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=GBP`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
+        {getUserType(element.type ?? "USER")}
+      </TableTd>
+      {/* <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+      >
+        {element.Company.name}
+      </TableTd> */}
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=GBP`)}
+        className={`${styles.table__td}`}
+      >
+        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=GBP`)}
+        className={styles.table__td}
+      >
+        <BadgeComponent status={element.status} active />
+      </TableTd>
+
+      {/* <TableTd className={`${styles.table__td}`}>
+        <MenuComponent id={element.id} status={element.status} />
+      </TableTd> */}
+    </TableTr>
+  ));
+
   const handleRequestAccess = async () => {
     setProcessing(true);
     try {
@@ -417,7 +492,7 @@ function Accounts() {
           }}
         >
           <TabsPanel value={tabs[0].value}>
-            <SimpleGrid cols={3} mt={32} h="100%">
+            <SimpleGrid cols={3} mt={32}>
               <NewAccountCard
                 currency={"EUR"}
                 companyName={account?.accountName ?? "No Default Account"}
@@ -442,6 +517,8 @@ function Accounts() {
                     walletId={data?.walletId ?? "No Default Account"}
                     link={`/accounts/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                     sortCode="041917"
+                    bic={data?.accountBic}
+                    iban={data?.accountIban}
                     accountNumber={data?.accountNumber}
                     balance={data?.accountBalance ?? 0}
                     loading={currencyLoading}
@@ -450,26 +527,13 @@ function Accounts() {
                     revalidate={currencyRevalidate}
                   />
                 ))}
-
-              {/* <NewAccountCard
-                key="1"
-                currency={"GHS"}
-                companyName={"C80 Limited"}
-                link={`/accounts/default/`}
-                sortCode=""
-                accountNumber={""}
-                balance={100}
-                loading={currencyLoading}
-                business={false}
-                refresh
-                revalidate={revalidateDftAcct}
-              /> */}
             </SimpleGrid>
           </TabsPanel>
 
           <TabsPanel value={tabs[1].value}>
             {stage !== "LIVE" &&
               !statusLoading &&
+              !statusLoadingGbpAccounts &&
               !approvedRequest &&
               openedAlert && (
                 <Alert
@@ -493,62 +557,97 @@ function Accounts() {
               style={{ position: "relative" }}
             >
               <TabsPanel value={issuedAccountTabs[0].value}>
-                <Group justify="space-between" mt={30}>
-                  <SearchInput search={search} setSearch={setSearch} />
-
-                  <SecondaryBtn
-                    text="Filter"
-                    action={toggle}
-                    icon={IconListTree}
-                    fw={600}
-                  />
-                </Group>
-
-                <Filter<FilterType>
-                  opened={openedFilter}
-                  toggle={toggle}
-                  form={form}
+                <TabsComponent
+                  tabs={issuedAccountSubTabs}
+                  mt={30}
+                  tt="capitalize"
+                  fz={12}
+                  style={{ position: "relative" }}
                 >
-                  <TextBox
-                    placeholder="Account Name"
-                    {...form.getInputProps("accountName")}
-                  />
+                  <Group justify="space-between" mt={30}>
+                    <SearchInput search={search} setSearch={setSearch} />
 
-                  <TextBox
-                    placeholder="Account Number"
-                    {...form.getInputProps("accountNumber")}
-                  />
+                    <SecondaryBtn
+                      text="Filter"
+                      action={toggle}
+                      icon={IconListTree}
+                      fw={600}
+                    />
+                  </Group>
 
-                  <SelectBox
-                    placeholder="Type"
-                    {...form.getInputProps("type")}
-                    data={["Corporate", "Individual"]}
-                    clearable
-                  />
-                </Filter>
+                  <Filter<FilterType>
+                    opened={openedFilter}
+                    toggle={toggle}
+                    form={form}
+                  >
+                    <TextBox
+                      placeholder="Account Name"
+                      {...form.getInputProps("accountName")}
+                    />
 
-                <TableComponent
-                  head={tableHeaders}
-                  rows={rows}
-                  loading={loading}
-                />
+                    <TextBox
+                      placeholder="Account Number"
+                      {...form.getInputProps("accountNumber")}
+                    />
 
-                <EmptyTable
-                  rows={rows}
-                  loading={loading}
-                  title="There are no accounts"
-                  text="When an account is created, it will appear here"
-                />
+                    <SelectBox
+                      placeholder="Type"
+                      {...form.getInputProps("type")}
+                      data={["Corporate", "Individual"]}
+                      clearable
+                    />
+                  </Filter>
 
-                <PaginationComponent
-                  total={Math.ceil(
-                    (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
-                  )}
-                  active={active}
-                  setActive={setActive}
-                  limit={limit}
-                  setLimit={setLimit}
-                />
+                  <TabsPanel value={issuedAccountSubTabs[0].value}>
+                    <TableComponent
+                      head={tableHeaders}
+                      rows={rows}
+                      loading={loading}
+                    />
+
+                    <EmptyTable
+                      rows={rows}
+                      loading={loading}
+                      title="There are no accounts"
+                      text="When an account is created, it will appear here"
+                    />
+
+                    <PaginationComponent
+                      total={Math.ceil(
+                        (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
+                      )}
+                      active={active}
+                      setActive={setActive}
+                      limit={limit}
+                      setLimit={setLimit}
+                    />
+                  </TabsPanel>
+                  <TabsPanel value={issuedAccountSubTabs[1].value}>
+                    <TableComponent
+                      head={tableHeaders}
+                      rows={gbpRows}
+                      loading={loadingGbpAccounts}
+                    />
+
+                    <EmptyTable
+                      rows={gbpRows}
+                      loading={loadingGbpAccounts}
+                      title="There are no accounts"
+                      text="When an account is created, it will appear here"
+                    />
+
+                    <PaginationComponent
+                      total={Math.ceil(
+                        (metaGbpAccounts?.total ?? 0) /
+                          parseInt(limit ?? "10", 10)
+                      )}
+                      active={active}
+                      setActive={setActive}
+                      limit={limit}
+                      setLimit={setLimit}
+                    />
+                  </TabsPanel>
+                </TabsComponent>
               </TabsPanel>
 
               <TabsPanel value={issuedAccountTabs[1].value}>
@@ -703,4 +802,9 @@ const tabs = [{ value: "Own Account" }, { value: "Issued Accounts" }];
 const issuedAccountTabs = [
   { value: "All Accounts", icon: <IconUsers size={14} /> },
   { value: "Pending Accounts", icon: <IconUsers size={14} /> },
+];
+
+const issuedAccountSubTabs = [
+  { value: "eur-account", title: "EUR Accounts" },
+  { value: "gbp-accounts", title: "GBP Accounts" },
 ];

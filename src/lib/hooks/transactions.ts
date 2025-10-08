@@ -718,13 +718,17 @@ export interface Hva {
 
 interface ITrx extends IParams {
   id?: string;
+  queryAccountType?: string;
 }
 
 export function useUserTransactions(
   id: string = "",
+  currency: string = "EUR",
   customParams: IParams = {}
 ) {
-  const path = id ? `${id}/transactions` : "transactions";
+  const path = id
+    ? `${id}/transactions?currency=${currency}`
+    : `transactions?currency=${currency}`;
   const {
     data,
     meta,
@@ -763,10 +767,31 @@ export function useUserCurrencyTransactions(
   const {
     data,
     meta,
-    loading,
+    loading: boolean,
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
     endpoint: `currency-accounts/transactions/get-company-currency-account-transactions/${currency}`,
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+
+  return { loading: boolean, transactions: data || [], meta, revalidate };
+}
+
+export function useAdminGetCurrencyTransactions(
+  customParams: ITrx = {},
+  id: string,
+  symbol: string,
+  queryAccountType?: string
+) {
+  const {
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<TransactionType[], Meta>({
+    endpoint: `currency-accounts/admin-get-account-transactions-by-id/${id}/${symbol}`,
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -919,6 +944,8 @@ export interface TransactionType {
   senderIban: string;
   beneficiaryName: string;
   beneficiaryAccountNumber: string;
+  beneficiaryWalletId: string;
+  senderWalletId: string;
   beneficiarySortCode: string;
   beneficiaryInstitutionName: string;
   beneficiaryAddress: string;
@@ -943,6 +970,7 @@ export interface TransactionType {
   destinationFirstName: string;
   destinationLastName: string;
   senderInstitutionName?: string;
+  rejectionReason?: string;
   intermediary?: string;
   type: "DEBIT" | "CREDIT";
   company: BusinessData;

@@ -39,7 +39,7 @@ export const useTrxAnalytics = (transactions: TransactionType[]) => {
       (acc, trx) => {
         if (trx.status === "PENDING") {
           acc.pending += trx.amount;
-        } else if (trx.status === "REJECTED") {
+        } else if (trx.status === "REJECTED" || trx.status.toUpperCase() === "FAILED") {
           acc.failed += trx.amount;
         } else {
           acc.completed += trx.amount;

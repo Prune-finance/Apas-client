@@ -64,9 +64,12 @@ function PayoutCurrencyAccount() {
     search: debouncedSearch,
   };
 
-  const { currencyRequests, revalidate, loading, meta } = useCurrencyRequests({
-    ...queryParams,
-  });
+  const { currencyRequests, revalidate, loading, meta } = useCurrencyRequests(
+    {
+      ...queryParams,
+    },
+    "PAYOUT_ACCOUNT"
+  );
 
   const rows = currencyRequests.map((element, index) => (
     <TableTr
@@ -80,7 +83,6 @@ function PayoutCurrencyAccount() {
       <TableTd>{element?.accountName}</TableTd>
       <TableTd tt="capitalize">{element?.Currency?.symbol}</TableTd>
       <TableTd>EUR</TableTd>
-      <TableTd>-</TableTd>
 
       <TableTd>
         <BadgeComponent status={element.status} />
@@ -110,7 +112,7 @@ function PayoutCurrencyAccount() {
         requestForm.values;
 
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-account/admin-reject-business-currency-account-request/${selectedRequest?.id}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-accounts/requests/admin-reject-business-currency-account-request/${selectedRequest?.id}`,
         {
           rejectComment: reason,
           ...(supportingDocumentName && { supportingDocumentName }),
@@ -121,7 +123,6 @@ function PayoutCurrencyAccount() {
 
       revalidate();
       currencyRejectApprove();
-
       handleSuccess(
         `${selectedRequest?.Currency?.symbol} Operations account Rejected`,
         `Request for ${selectedRequest?.Currency?.symbol} rejected`
@@ -139,13 +140,14 @@ function PayoutCurrencyAccount() {
     setProcessing(true);
     try {
       await axios.patch(
-        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-account/admin-approve-business-currency-account-request/${selectedRequest?.id}`,
+        `${process.env.NEXT_PUBLIC_ACCOUNTS_URL}/currency-accounts/requests/admin-approve-business-currency-account-request/${selectedRequest?.id}`,
         {},
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
       revalidate();
       currencyCloseApprove();
+      closeApprove();
       handleSuccess(
         `${selectedRequest?.Currency?.symbol} Operations account Approved`,
         `Request for ${selectedRequest?.Currency?.symbol} approved`
@@ -161,7 +163,7 @@ function PayoutCurrencyAccount() {
   return (
     <Fragment>
       <Group justify="space-between">
-        <SearchInput />
+        <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
           text="Filter"
@@ -183,18 +185,17 @@ function PayoutCurrencyAccount() {
         />
       </Filter>
 
-      <TableComponent head={tableHeaders} rows={[]} loading={loading} />
+      <TableComponent head={tableHeaders} rows={rows} loading={loading} />
 
       <EmptyTable
-        rows={[]}
+        rows={rows}
         loading={loading}
         title="There are no requests"
-        text="When a payout account is requested, it will appear here"
+        text="When an Operation account is requested, it will appear here"
       />
 
       <PaginationComponent
-        total={1}
-        // total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
+        total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))}
         active={active}
         setActive={setActive}
         limit={limit}
@@ -220,8 +221,8 @@ function PayoutCurrencyAccount() {
         close={currencyCloseApprove}
         action={handleApprovedCurrencyRequest}
         processing={processing}
-        title="GBP Account Request Approval"
-        text="This means you are approving the request for GBP account for this business."
+        title={`${selectedRequest?.Currency?.symbol} Account Request Approval`}
+        text={`This means you are approving the request for ${selectedRequest?.Currency?.symbol} account for this business.`}
         customApproveMessage="Yes, Approve"
       />
 
@@ -232,8 +233,8 @@ function PayoutCurrencyAccount() {
         close={currencyRejectApprove}
         action={handleRejectCurrencyRequest}
         processing={processing}
-        title="Reject This Account Issuance Request?"
-        text="This means you are rejecting the account issuance request of this business."
+        title={`Reject This ${selectedRequest?.Currency?.symbol} Account Request?`}
+        text={`This means you are rejecting the ${selectedRequest?.Currency?.symbol} account request of this business.`}
         customApproveMessage="Yes, Reject"
         form={requestForm}
       />
@@ -245,7 +246,6 @@ const tableHeaders = [
   "Business Name",
   "Requested Currency",
   "Existing Currencies",
-  "Date Created",
   "Status",
 ];
 

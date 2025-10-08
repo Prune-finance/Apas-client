@@ -2,7 +2,6 @@ import dayjs from "dayjs";
 import { RequestData } from "./hooks/requests";
 import { IParams } from "./schema";
 
-// Currency to locale mapping for better formatting
 const currencyLocaleMap: Record<string, string> = {
   NGN: "en-NG", // Nigerian Naira
   GHS: "en-GH", // Ghanaian Cedi
@@ -20,16 +19,16 @@ export const formatNumber = (
 ) => {
   // Use provided locale or auto-detect based on currency
   const formatLocale = locale || currencyLocaleMap[type] || "en-US";
-  
+
   if (!currency) {
     return new Intl.NumberFormat(formatLocale, {}).format(number);
   }
-  
+
   // Custom formatting for GHS to show ₵1000 format
   if (type === "GHS") {
     return `₵${new Intl.NumberFormat(formatLocale, {}).format(number)}`;
   }
-  
+
   return new Intl.NumberFormat(formatLocale, {
     style: "currency",
     currency: type,
@@ -148,8 +147,10 @@ export const getInitials = (name: string) => {
     .join("");
 };
 
-export const getUserType = (userType: "USER" | "CORPORATE") => {
-  if (userType === "USER") return "Individual";
+export const getUserType = (
+  userType: "USER" | "CORPORATE" | "ISSUED_ACCOUNT"
+) => {
+  if (userType === "USER" || userType === "ISSUED_ACCOUNT") return "Individual";
   return "Corporate";
 };
 

@@ -185,7 +185,10 @@ export function useAllRequests(customParams: IParams = {}) {
   return { loading, requests, meta, revalidate };
 }
 
-export function useCurrencyRequests(customParams: IParams = {}) {
+export function useCurrencyRequests(
+  customParams: IParams = {},
+  location: string
+) {
   const [currencyRequests, setCurrencyRequests] = useState<CurrencyRequest[]>(
     []
   );
@@ -231,7 +234,7 @@ export function useCurrencyRequests(customParams: IParams = {}) {
     try {
       const params = new URLSearchParams(obj as Record<string, string>);
       const { data } = await acctAxiosInstance.get(
-        `/currency-accounts/requests/admin-get-business-currency-account-requests`,
+        `/currency-accounts/requests/admin-get-business-currency-account-requests?type=${location}`,
         {
           params,
         }
@@ -1132,6 +1135,9 @@ interface BaseData {
     legalEntity: string;
     domain: string;
   };
+  Currency?: {
+    symbol?: string;
+  };
   documentApprovals: Record<string, any>;
   country: string;
   Account?: Account;
@@ -1168,6 +1174,7 @@ export interface CurrencyRequest {
     name: string;
   };
   accountIdentifier: string;
+  supportingDocumentUrl: string;
   accountName: string;
   accountType: "COMPANY_ACCOUNT" | string;
   companyId: string;

@@ -363,7 +363,7 @@ interface MetaAccount {
   hasPendingFreeze: boolean;
 }
 
-export function useSingleUserAccount(id: string) {
+export function useSingleUserAccount(id: string, currency: string = "EUR") {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
   const [meta, setMeta] = useState<MetaAccount | null>(null);
@@ -371,7 +371,9 @@ export function useSingleUserAccount(id: string) {
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/${id}/dashboard`);
+      const { data } = await axios.get(
+        `/accounts/${id}/dashboard?currency=${currency}`
+      );
 
       setAccount(data.data);
       setMeta(data.meta);
@@ -526,6 +528,39 @@ export function useUserCurrencyAccountByID(id: string, currency: string) {
   return { loading, currencyAccount, revalidate };
 }
 
+export function useAdminGetCompanyCurrencyAccountByID(id: string, currency?: string) {
+  const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/admin-get-account-by-id/${id}${currency ? `?currency=${currency}` : ""}`
+      );
+      setCurrencyAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, currencyAccount, revalidate };
+}
+
 export function useUserCurrencyAccount() {
   const [currencyAccount, setCurrencyAccount] = useState<
     CurrencyAccount[] | null
@@ -535,7 +570,9 @@ export function useUserCurrencyAccount() {
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/currency-accounts/list`);
+      const { data } = await axios.get(
+        `/currency-accounts/list?type=COMPANY_ACCOUNT`
+      );
 
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -558,7 +595,81 @@ export function useUserCurrencyAccount() {
   return { loading, currencyAccount, revalidate };
 }
 
-export function useUserCurrencyGBPAccount() {
+export function useUserListCurrencyAccount() {
+  const [listCurrency, setListCurrency] = useState<
+    ListCurrencyAccount[] | null
+  >(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchListAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/requests/get-business-currency-account-request-status`
+      );
+
+      setListCurrency(data?.data);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchListAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, listCurrency };
+}
+
+export function useAdminGetCompanyCurrencyAccountsList(
+  id: string,
+  params?: IParams
+) {
+  const [currencyAccount, setCurrencyAccount] = useState<
+    CurrencyAccount[] | null
+  >(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const query = new URLSearchParams(
+        params as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `/currency-accounts/list/${id}?${query}`
+      );
+
+      setCurrencyAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, currencyAccount, revalidate };
+}
+
+export function useUserCurrencyGBPAccount(currency: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -566,7 +677,7 @@ export function useUserCurrencyGBPAccount() {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/currency-accounts/get-account-by-currency/GBP`
+        `/currency-accounts/get-account-by-currency/${currency}`
       );
 
       setAccount(data?.data);
@@ -589,6 +700,33 @@ export function useUserCurrencyGBPAccount() {
 
   return { loading, account, revalidate };
 }
+export function useUserListOfBanks() {
+  const [banks, setBanks] = useState<ListOfBanks[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/accounts/banks`);
+
+      setBanks(data?.data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, banks };
+}
 
 export function useUserDefaultPayoutAccount() {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
@@ -600,6 +738,37 @@ export function useUserDefaultPayoutAccount() {
     setLoading(true);
     try {
       const { data } = await axios.get(`/accounts/payout`);
+
+      setAccount(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = async () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
+export function useUserDefaultPayoutAccountGBP() {
+  const [account, setAccount] = useState<DefaultAccount[] | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/list?type=PAYOUT_ACCOUNT`
+      );
 
       setAccount(data.data);
     } catch (error) {
@@ -636,6 +805,7 @@ export interface AccountData {
   lastName: string;
   accountId: number;
   accountName: string;
+  accountIban?: string;
   accountNumber: string;
   accountDocuments: AccountDocuments;
   createdAt: Date;
@@ -687,10 +857,13 @@ export interface BaseAccount {
   walletId: string;
   accountName: string;
   accountNumber: string;
+  accountType?: string;
+  walletId: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
+  currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
   companyId: string;
   companyName?: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
@@ -742,11 +915,14 @@ export interface CurrencyAccount {
   isTrusted: boolean;
   accountRequestId: string;
   accountIdentifier: string;
+  walletId: string;
   accountName: string;
   accountNumber: string;
   walletId: string;
   accountIban: string;
+  accountBic: string;
   accountType: "COMPANY_ACCOUNT" | string;
+  currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
   accountBalance: number;
   accountDocuments: Record<string, any>;
   companyId: string;
@@ -758,6 +934,20 @@ export interface CurrencyAccount {
   AccountRequests: {
     Currency: Record<string, any>;
   };
+}
+
+export interface ListOfBanks {
+  bankCode: string;
+  bankName: string;
+  payoutType: "MobileMoney" | "BankTransfer" | string;
+}
+
+export interface ListCurrencyAccount {
+  Currency: "GHS" | "GBP" | "NGN" | "EUR" | string;
+  accountType: "PAYOUT_ACCOUNT" | "COMPANY_ACCOUNT" | string;
+  companyId: "d1dfc7e9-12b7-4dff-9822-028384b302a5";
+  stage: "TEST" | "PRODUCTION" | string;
+  status: "APPROVED" | "PENDING" | "REJECTED" | "ISSUED" | string;
 }
 
 export interface AccountStatsMeta {

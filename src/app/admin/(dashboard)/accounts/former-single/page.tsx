@@ -115,7 +115,9 @@ export default function Account() {
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
-      arr.push({ month, successful, pending, failed });
+      (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") && (failed += trx.amount);
+
+      arr.push({ month, successful, pending, failed: successful });
     });
 
     return arr;
@@ -129,12 +131,20 @@ export default function Account() {
       if (trx.status === "PENDING") {
         pending += trx.amount;
       }
+
+      if (trx.status.toUpperCase() === "COMPLETED" || trx.status.toUpperCase() === "SUCCESSFUL") {
+        completed += trx.amount;
+      }
+
+      if (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") {
+        failed += trx.amount;
+      }
     });
 
     return [
       { name: "Completed", value: completed, color: "#039855" },
       { name: "Pending", value: pending, color: "#F79009" },
-      { name: "Failed", value: failed, color: "#D92D20" },
+      { name: "Failed", value: completed, color: "#D92D20" },
     ];
   }, [transactions]);
 

@@ -25,6 +25,7 @@ const createAxiosInstance = (baseURL: keyof typeof BASEURL) => {
       }
 
       config.headers["X-APP-STAGE"] = stage;
+      config.headers["X-App-Stage"] = stage;
 
       return config;
     },

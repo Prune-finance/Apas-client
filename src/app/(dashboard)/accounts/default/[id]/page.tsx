@@ -109,7 +109,7 @@ function Account() {
         loadingBiz={loadingBiz}
         loading={loading}
         payout={accountType === "PAYOUT_ACCOUNT"}
-        currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN"}
+        currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN" | "USD"}
         open={() => {}}
       />
 

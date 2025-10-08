@@ -20,10 +20,12 @@ const createAxiosInstance = (baseURL: keyof typeof BASEURL) => {
           ? window.localStorage.getItem("stage") || "TEST"
           : "TEST";
 
+      console.log("Token:", window.localStorage.getItem("stage"));
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
 
+      console.log("Stage:", stage);
       config.headers["X-APP-STAGE"] = stage;
       config.headers["X-App-Stage"] = stage;
 

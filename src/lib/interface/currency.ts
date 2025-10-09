@@ -4,6 +4,13 @@ export interface AdminCurrencyStatsResponse {
 }
 
 export const currencies = ["EUR", "GBP", "GHS"] as const;
+export const accountType = [
+  "COMPANY_ACCOUNT",
+  "ISSUED_ACCOUNT",
+  "PAYOUT_ACCOUNT",
+] as const;
+
+export type AccountType = (typeof accountType)[number];
 
 // union type "EUR" | "GBP" | "GHS"
 export type Currency = (typeof currencies)[number];
@@ -50,4 +57,9 @@ export interface CurrencyStatsMeta {
   currencies: Currency[];
   generatedAt: Date;
   cacheKey: string;
+}
+
+export interface AccountStatistics {
+  interval: Date;
+  total: number;
 }

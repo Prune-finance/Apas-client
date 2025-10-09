@@ -1,29 +1,36 @@
 import { accountList } from "@/lib/static";
 import TabsComponent from "@/ui/components/Tabs";
-import { Center, TabsPanel } from "@mantine/core";
+import { TabsPanel } from "@mantine/core";
 import React from "react";
 import PayoutAccountsComponent from "./PayoutAccountComponent";
+import { AccountType, Currency } from "@/lib/interface/currency";
 
-export default function PayoutAccounts() {
+interface Props {
+  accountType: AccountType;
+  currencies: Currency[];
+}
+
+export default function PayoutAccounts({ accountType, currencies }: Props) {
+  const availableCurrencies = accountList.filter((account) =>
+    (currencies || []).includes(account.currency as Currency)
+  );
+
   return (
     <TabsComponent
       tt="capitalize"
-      tabs={accountList}
-      defaultValue={accountList[0].value}
+      tabs={availableCurrencies}
+      defaultValue={currencies[0]}
       mt={32}
       keepMounted={false}
       additionalTile=" Account Details"
     >
-      {accountList.map((account) => (
+      {availableCurrencies.map((account) => (
         <TabsPanel value={account.value} key={account.id}>
-          {account.active ? (
-            <PayoutAccountsComponent
-              currency={account.currency}
-              locale={account.locale}
-            />
-          ) : (
-            <Center h="calc(100dvh - 400px)">Coming Soon</Center>
-          )}
+          <PayoutAccountsComponent
+            currency={account.currency}
+            locale={account.locale}
+            accountType={accountType}
+          />
         </TabsPanel>
       ))}
     </TabsComponent>

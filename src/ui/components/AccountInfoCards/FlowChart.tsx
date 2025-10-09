@@ -1,8 +1,10 @@
-import { Group, Stack, Text } from "@mantine/core";
+import { Group, Paper, Skeleton, Stack, Text } from "@mantine/core";
 import { AccountCustomCard, ChartHeader, LegendBadge, ThisMonth } from "./util";
 import { Dispatch, SetStateAction } from "react";
 import { formatNumber } from "@/lib/utils";
-import { BarChart } from "@mantine/charts";
+import { BarChart, ChartTooltipProps } from "@mantine/charts";
+import React from "react";
+import { IconCircleFilled } from "@tabler/icons-react";
 
 export type ChartData = {
   month: string;
@@ -18,6 +20,7 @@ interface FlowChartProps {
   accountType: "Issued" | "Payout" | "Business";
   currency?: string;
   locale?: string;
+  loading?: boolean;
 }
 export default function FlowChart({
   balance,
@@ -27,6 +30,7 @@ export default function FlowChart({
   accountType,
   currency = "EUR",
   locale = "en-US",
+  loading = false,
 }: FlowChartProps) {
   return (
     <AccountCustomCard>
@@ -41,9 +45,13 @@ export default function FlowChart({
 
         <Group justify="space-between">
           <Stack gap={8}>
-            <Text fz={24} c="var(--prune-text-gray-700)" fw={600}>
-              {formatNumber(balance, true, currency, locale)}
-            </Text>
+            {loading ? (
+              <Skeleton w={100} h={24} />
+            ) : (
+              <Text fz={24} c="var(--prune-text-gray-700)" fw={600}>
+                {formatNumber(balance, true, currency, locale)}
+              </Text>
+            )}
 
             <ThisMonth percentage={2.3} gain frequency={frequency} />
           </Stack>
@@ -55,27 +63,38 @@ export default function FlowChart({
           </Group>
         </Group>
 
-        <BarChart
-          h={232}
-          w="100%"
-          mt={10}
-          data={chartData}
-          dataKey="month"
-          series={[
-            {
-              name: "inflow",
-              color: "var(--prune-primary-600)",
-              label: "Inflow",
-            },
-            { name: "outflow", color: "#DE1507", label: "Outflow" },
-          ]}
-          tickLine="none"
-          tooltipProps={{
-            formatter: (value) => [`${formatNumber(value, true, "EUR")}`],
-            payload: [{ name: "05-01", value: 12, unit: "kg" }],
-          }}
-          // valueFormatter={(value) => formatNumber(value, true, "EUR")}
-        />
+        {loading ? (
+          <Skeleton h={232} />
+        ) : (
+          <BarChart
+            h={232}
+            w="100%"
+            mt={10}
+            data={chartData}
+            dataKey="month"
+            maxBarWidth={20}
+            minBarSize={1}
+            series={[
+              {
+                name: "inflow",
+                color: "var(--prune-primary-600)",
+                label: "Inflow",
+              },
+              { name: "outflow", color: "#DE1507", label: "Outflow" },
+            ]}
+            tickLine="none"
+            tooltipProps={{
+              content: ({ label, payload }) => (
+                <ChartTooltip
+                  label={label}
+                  payload={payload}
+                  locale={locale}
+                  currency={currency}
+                />
+              ),
+            }}
+          />
+        )}
       </Stack>
     </AccountCustomCard>
   );
@@ -85,3 +104,40 @@ const legend = {
   inflow: "#D5E855",
   outflow: "#D92D20",
 };
+
+interface IChartTooltipProps extends ChartTooltipProps {
+  locale?: string;
+  currency?: string;
+}
+
+function ChartTooltip({
+  label,
+  payload,
+  locale,
+  currency,
+}: IChartTooltipProps) {
+  if (!payload) return null;
+
+  return (
+    <Paper px="md" py="sm" withBorder shadow="md" radius="md">
+      <Text fw={500} mb={5}>
+        {label}
+      </Text>
+
+      <Stack gap={5}>
+        {payload.map((item: any) => (
+          <Group key={item.name} wrap="nowrap" justify="space-between">
+            <Group gap={10}>
+              <IconCircleFilled size={15} color={item.color} />
+              <Text fz={12}>{item.name}</Text>
+            </Group>
+
+            <Text key={item.name} fz={12} fw={500}>
+              {formatNumber(item.value, true, currency, locale)}
+            </Text>
+          </Group>
+        ))}
+      </Stack>
+    </Paper>
+  );
+}

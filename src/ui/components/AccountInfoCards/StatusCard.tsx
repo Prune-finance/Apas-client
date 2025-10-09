@@ -1,5 +1,5 @@
 import { AccountCustomCard, ThisMonth } from "./util";
-import { Flex, Stack, Text } from "@mantine/core";
+import { Flex, Skeleton, Stack, Text } from "@mantine/core";
 import { PrimaryBtn } from "../Buttons";
 import { IconChevronRight } from "@tabler/icons-react";
 
@@ -10,6 +10,7 @@ interface StatusCardProps {
   gain?: boolean;
   viewAction?: () => void;
   frequency?: string | null;
+  loading?: boolean;
 }
 
 export default function StatusCard({
@@ -19,6 +20,7 @@ export default function StatusCard({
   gain,
   viewAction,
   frequency,
+  loading = false,
 }: StatusCardProps) {
   return (
     <AccountCustomCard>
@@ -42,9 +44,13 @@ export default function StatusCard({
         </Flex>
 
         <Flex align="center" justify="space-between">
-          <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
-            {total}
-          </Text>
+          {loading ? (
+            <Skeleton w={100} h={24} />
+          ) : (
+            <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
+              {total}
+            </Text>
+          )}
 
           <ThisMonth
             percentage={percentage}

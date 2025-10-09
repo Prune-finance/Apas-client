@@ -1,0 +1,115 @@
+@keyframes shimmer {
+  0% {
+    background-position: -400px 0;
+  }
+  100% {
+    background-position: 400px 0;
+  }
+}
+
+.container {
+  padding: 24px;
+}
+
+.cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card {
+  height: 30px;
+  width: 220px;
+  border-radius: 8px;
+  background: #f2f4f7;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.search {
+  height: 40px;
+  width: 320px;
+  border-radius: 8px;
+  background: #f2f4f7;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.button {
+  height: 40px;
+  width: 120px;
+  border-radius: 8px;
+  background: #f2f4f7;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.filter {
+  height: 36px;
+  width: 180px;
+  border-radius: 6px;
+  background: #f2f4f7;
+}
+
+.tableHeader {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.headerCell {
+  height: 32px;
+  width: 160px;
+  border-radius: 6px;
+  background: #f2f4f7;
+}
+
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.cell {
+  height: 28px;
+  border-radius: 6px;
+  background: #f2f4f7;
+}
+
+.pagination {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.page {
+  height: 36px;
+  width: 40px;
+  border-radius: 20px;
+  background: #f2f4f7;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #f2f4f7 0px, #e6e9ee 40px, #f2f4f7 80px);
+  background-size: 800px 104px;
+  animation: shimmer 1.6s linear infinite;
+}

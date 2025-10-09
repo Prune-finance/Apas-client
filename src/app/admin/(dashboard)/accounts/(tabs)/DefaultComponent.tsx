@@ -38,6 +38,7 @@ import {
 import {
   AccountData,
   AccountMeta,
+  useAccountCurrencyStatistics,
   useAccounts,
   useAccountStatistics,
 } from "@/lib/hooks/accounts";
@@ -69,15 +70,18 @@ import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { AccountType } from "@/lib/interface/currency";
 
 interface DefaultComponentProps {
   currency?: string;
   locale?: string;
+  accountType: AccountType;
 }
 
 export default function DefaultAccountComponents({
   currency,
   locale,
+  accountType,
 }: DefaultComponentProps) {
   const searchParams = useSearchParams();
   const axios = createAxiosInstance("accounts");
@@ -101,6 +105,8 @@ export default function DefaultAccountComponents({
     page: activePage,
     limit: parseInt(limit ?? "10", 10),
     search: debouncedSearch,
+    accountType,
+    currency,
   };
 
   const dependencies = [
@@ -113,6 +119,8 @@ export default function DefaultAccountComponents({
     accountNumber,
     type,
     debouncedSearch,
+    accountType,
+    currency,
   ];
 
   const {
@@ -121,13 +129,24 @@ export default function DefaultAccountComponents({
     meta,
     queryFn: revalidate,
   } = useAxios<AccountData[], AccountMeta>({
-    endpoint: "/admin/accounts/default",
+    endpoint: "/currency-accounts/admin/admin-get-currency-account",
+    // endpoint: "/admin/accounts/default",
     baseURL: "accounts",
     params,
     dependencies,
   });
 
-  const { loading: loadingStats, meta: statsMeta } = useAccountStatistics({
+  const { loading: loadingCurrencyStats, data: currencyStats } =
+    useAccountCurrencyStatistics({
+      accountType,
+      frequency: frequency?.toLowerCase() ?? "monthly",
+    });
+
+  const {
+    loading: loadingStats,
+    meta: statsMeta,
+    data: statsData,
+  } = useAccountStatistics({
     frequency: frequency?.toLowerCase() ?? "monthly",
     accountType: "Company",
   });
@@ -290,17 +309,18 @@ export default function DefaultAccountComponents({
   return (
     <div className={styles.table__container}>
       <AccountInfoCards
-        loading={loadingStats}
+        loading={loadingStats || loadingCurrencyStats}
         frequency={frequency}
         setFrequency={setFrequency}
         accountType="Business"
-        meta={statsMeta}
+        meta={currencyStats}
         form={form}
         open={openFilter}
         close={closeFilter}
         opened={filterOpened}
         currency={currency}
         locale={locale}
+        stats={statsData}
       />
 
       <Group

@@ -6,6 +6,12 @@ import { IParams } from "@/lib/schema";
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "./useAxios";
 import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import {
+  AccountStatistics,
+  AccountType,
+  CurrencyStatsData,
+  CurrencyStatsMeta,
+} from "../interface/currency";
 
 const axios = createAxiosInstance("accounts");
 
@@ -227,14 +233,37 @@ export function useAccountStatistics({
   frequency: string;
   accountType: "Accounts" | "Payout" | "Company";
 }) {
-  const { loading, meta, queryFn } = useAxios<unknown, AccountStatsMeta>({
+  const { loading, meta, queryFn, data } = useAxios<
+    AccountStatistics[],
+    AccountStatsMeta
+  >({
     baseURL: "accounts",
     endpoint: "/admin/accounts/statistics",
     params: { frequency, accountType },
     dependencies: [frequency, accountType],
   });
 
-  return { loading, meta, revalidate: queryFn };
+  return { loading, meta, data, revalidate: queryFn };
+}
+
+export function useAccountCurrencyStatistics({
+  frequency,
+  accountType,
+}: {
+  frequency: string;
+  accountType: AccountType;
+}) {
+  const { loading, data, meta, queryFn } = useAxios<
+    CurrencyStatsData,
+    CurrencyStatsMeta
+  >({
+    baseURL: "accounts",
+    endpoint: "/currency-accounts/admin/currency-stats",
+    params: { frequency, accountType },
+    dependencies: [frequency, accountType],
+  });
+
+  return { loading, meta, data, revalidate: queryFn };
 }
 
 export function useUserAccounts(customParams: IParams = {}) {

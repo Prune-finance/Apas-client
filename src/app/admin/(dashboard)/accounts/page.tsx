@@ -10,6 +10,9 @@ import { useSearchParams } from "next/navigation";
 import IssuedAccounts from "./(tabs)/issued";
 import BusinessAccounts from "./(tabs)/default";
 import PayoutAccounts from "./(tabs)/payout";
+import { AccountType } from "@/lib/interface/currency";
+import { useAccountCurrencyStatistics } from "@/lib/hooks/accounts";
+import PayoutAccountsSkeleton from "@/ui/components/Skeletons/PayoutAccountsSkeleton";
 
 function Accounts() {
   const [active, setActive] = useState(1);
@@ -19,6 +22,12 @@ function Accounts() {
   const searchParams = useSearchParams();
 
   const tab = searchParams.get("tab");
+
+  const { loading, meta, data } = useAccountCurrencyStatistics({
+    accountType: "COMPANY_ACCOUNT",
+    frequency: "",
+  });
+
   return (
     <main className={styles.main}>
       <div className={styles.container__header}>
@@ -36,15 +45,21 @@ function Accounts() {
         // tt="capitalize"
         keepMounted={false}
       >
-        <TabsPanel value={tabs[0].value}>
-          <BusinessAccounts />
-        </TabsPanel>
-        <TabsPanel value={tabs[1].value}>
-          <IssuedAccounts />
-        </TabsPanel>
-        <TabsPanel value={tabs[2].value}>
-          <PayoutAccounts />
-        </TabsPanel>
+        {tabs.map((tab) => {
+          const Component = tab.component;
+          return (
+            <TabsPanel value={tab.value} key={tab.value}>
+              {loading ? (
+                <PayoutAccountsSkeleton />
+              ) : (
+                <Component
+                  accountType={tab.value as AccountType}
+                  currencies={meta?.currencies || []}
+                />
+              )}
+            </TabsPanel>
+          );
+        })}
       </TabsComponent>
     </main>
   );
@@ -59,7 +74,19 @@ export default function AccountSuspense() {
 }
 
 const tabs = [
-  { value: "business-accounts", title: "Business Accounts" },
-  { value: "issued-accounts", title: "Issued Accounts" },
-  { value: "payout-accounts", title: "Payout Accounts" },
+  {
+    value: "COMPANY_ACCOUNT",
+    title: "Business Accounts",
+    component: BusinessAccounts,
+  },
+  {
+    value: "ISSUED_ACCOUNT",
+    title: "Issued Accounts",
+    component: IssuedAccounts,
+  },
+  {
+    value: "PAYOUT_ACCOUNT",
+    title: "Payout Accounts",
+    component: PayoutAccounts,
+  },
 ];

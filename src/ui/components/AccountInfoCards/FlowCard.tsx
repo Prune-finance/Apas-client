@@ -1,7 +1,8 @@
 import React from "react";
 import { AccountCustomCard, ThisMonth } from "./util";
-import { Group, Stack, Text } from "@mantine/core";
+import { Group, Skeleton, Stack, Text } from "@mantine/core";
 import { formatNumber } from "@/lib/utils";
+
 interface FlowCardProps {
   title: string;
   total: number;
@@ -10,6 +11,7 @@ interface FlowCardProps {
   frequency?: string | null;
   currency?: string;
   locale?: string;
+  loading?: boolean;
 }
 export default function FlowCard({
   title,
@@ -19,6 +21,7 @@ export default function FlowCard({
   frequency,
   currency = "EUR",
   locale = "en-US",
+  loading = false,
 }: FlowCardProps) {
   return (
     <AccountCustomCard>
@@ -28,9 +31,13 @@ export default function FlowCard({
         </Text>
 
         <Group justify="space-between">
-          <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
-            {formatNumber(total, true, currency, locale)}
-          </Text>
+          {loading ? (
+            <Skeleton w={100} h={24} />
+          ) : (
+            <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
+              {formatNumber(total, true, currency, locale)}
+            </Text>
+          )}
 
           <ThisMonth
             percentage={percentage}

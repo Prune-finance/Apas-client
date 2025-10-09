@@ -24,6 +24,7 @@ import {
 import {
   AccountData,
   AccountMeta,
+  useAccountCurrencyStatistics,
   useAccountStatistics,
 } from "@/lib/hooks/accounts";
 import { camelCaseToTitleCase, formatNumber, getUserType } from "@/lib/utils";
@@ -48,13 +49,19 @@ import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Link from "next/link";
+import { AccountType } from "@/lib/interface/currency";
 
 interface Props {
   currency?: string;
   locale?: string;
+  accountType: AccountType;
 }
 
-export default function IssuedAccountsComponent({ currency, locale }: Props) {
+export default function IssuedAccountsComponent({
+  currency,
+  locale,
+  accountType,
+}: Props) {
   const searchParams = useSearchParams();
   const axios = createAxiosInstance("accounts");
 
@@ -77,6 +84,8 @@ export default function IssuedAccountsComponent({ currency, locale }: Props) {
     page: activePage,
     limit: parseInt(limit ?? "10", 10),
     search: debouncedSearch,
+    accountType,
+    currency,
   };
 
   const dependencies = [
@@ -89,6 +98,8 @@ export default function IssuedAccountsComponent({ currency, locale }: Props) {
     accountNumber,
     type,
     debouncedSearch,
+    accountType,
+    currency,
   ];
 
   const {
@@ -97,13 +108,23 @@ export default function IssuedAccountsComponent({ currency, locale }: Props) {
     meta,
     queryFn: revalidate,
   } = useAxios<AccountData[], AccountMeta>({
-    endpoint: "/admin/accounts",
+    endpoint: "/currency-accounts/admin/admin-get-currency-account",
     baseURL: "accounts",
     params,
     dependencies,
   });
 
-  const { loading: loadingStats, meta: statsMeta } = useAccountStatistics({
+  const { loading: loadingCurrencyStats, data: currencyStats } =
+    useAccountCurrencyStatistics({
+      accountType,
+      frequency: frequency?.toLowerCase() ?? "monthly",
+    });
+
+  const {
+    loading: loadingStats,
+    meta: statsMeta,
+    data: statsData,
+  } = useAccountStatistics({
     frequency: frequency?.toLowerCase() ?? "monthly",
     accountType: "Accounts",
   });
@@ -264,17 +285,18 @@ export default function IssuedAccountsComponent({ currency, locale }: Props) {
   return (
     <div className={styles.table__container}>
       <AccountInfoCards
-        loading={loadingStats}
+        loading={loadingStats || loadingCurrencyStats}
         frequency={frequency}
         setFrequency={setFrequency}
         accountType="Issued"
-        meta={statsMeta}
+        meta={currencyStats}
         form={form}
         open={openFilter}
         close={closeFilter}
         opened={filterOpened}
         currency={currency}
         locale={locale}
+        stats={statsData}
       />
       <Group
         justify="space-between"

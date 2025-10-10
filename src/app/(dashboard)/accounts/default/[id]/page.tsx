@@ -116,7 +116,13 @@ function Account() {
       <SingleDefaultAccountBody
         accountType={account?.AccountRequests?.Currency?.symbol}
         account={account}
-        location={currency === "GBP" ? "gbp-account" : "ghs-account"}
+        location={
+          currency === "GBP"
+            ? "gbp-account"
+            : currency === "USD"
+            ? "usd-account"
+            : "ghs-account"
+        }
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

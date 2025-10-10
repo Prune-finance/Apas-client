@@ -27,6 +27,7 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import GBP from "@/assets/GB.png";
 import GHS from "@/assets/GH.png";
+import USD from "@/assets/USD.png";
 
 dayjs.extend(advancedFormat);
 
@@ -58,6 +59,13 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
     ...(currencyType === "GBP"
       ? {
           "Sort Code": meta?.accountDetails?.sortCode,
+        }
+      : {}),
+
+    ...(currencyType === "USD"
+      ? {
+          IBAN: meta?.accountDetails?.iban ?? "N/A",
+          "Sort Code": meta?.accountDetails?.sortCode ?? "N/A",
         }
       : {}),
 
@@ -152,6 +160,8 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
                       ? EUIcon.src
                       : currencyType === "GHS"
                       ? GHS.src
+                      : currencyType === "USD"
+                      ? USD.src
                       : GBP.src
                   }
                   alt="eu-icon"
@@ -163,6 +173,8 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
                   ? "EUR"
                   : currencyType === "GHS"
                   ? "GHS"
+                  : currencyType === "USD"
+                  ? "USD"
                   : "GBP"}{" "}
                 Account
               </Text>

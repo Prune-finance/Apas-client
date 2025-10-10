@@ -3,6 +3,7 @@ import { Flex, FloatingIndicator, Image, UnstyledButton } from "@mantine/core";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
 import GHSImage from "@/assets/GH.png";
+import USDImage from "@/assets/USD.png";
 import classes from "./styles.module.scss";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
@@ -37,6 +38,18 @@ const data = [
       <Image
         src={GHSImage.src}
         alt="GHS"
+        width={18}
+        height={18}
+        style={{ zIndex: 1 }}
+      />
+    ),
+  },
+  {
+    title: "USD",
+    icon: (
+      <Image
+        src={USDImage.src}
+        alt="USD"
         width={18}
         height={18}
         style={{ zIndex: 1 }}

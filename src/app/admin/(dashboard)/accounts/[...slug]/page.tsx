@@ -5,9 +5,16 @@ import { useParams, useSearchParams } from "next/navigation";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 
 import { useMemo, useState } from "react";
-import { useSingleAccount } from "@/lib/hooks/accounts";
+import {
+  useSingleAccount,
+  useSingleAccountWithCurrency,
+} from "@/lib/hooks/accounts";
 
-import { TransactionType, useTransactions } from "@/lib/hooks/transactions";
+import {
+  TransactionType,
+  useCurrencyTransactions,
+  useTransactions,
+} from "@/lib/hooks/transactions";
 import {
   IssuedAccountHead,
   SingleAccountBody,
@@ -24,9 +31,16 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
 import createAxiosInstance from "@/lib/axios";
+import { Currency } from "@/lib/interface/currency";
 
-export default function Account() {
-  const params = useParams<{ id: string }>();
+interface Props {
+  params: { slug: string[] };
+}
+
+export default function Account({ params }: Props) {
+  const [id, currency] = params.slug ?? [];
+  console.log({ id, currency });
+
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
@@ -73,11 +87,17 @@ export default function Account() {
     loading: trxLoading,
     transactions,
     meta,
-  } = useTransactions(params.id, customParams);
+  } = useCurrencyTransactions(id, currency as Currency, customParams);
   const { handleSuccess, handleError } = useNotification();
   const axios = createAxiosInstance("accounts");
 
-  const { loading, account, revalidate } = useSingleAccount(params.id);
+  console.log({ transactions, meta });
+
+  // const { loading, account, revalidate } = useSingleAccount(id);
+  const { loading, account, revalidate } = useSingleAccountWithCurrency(
+    id,
+    currency as Currency
+  );
 
   const { business } = useSingleBusiness(account?.companyId ?? "");
 
@@ -104,7 +124,7 @@ export default function Account() {
 
       const { reason, supportingDocumentName, supportingDocumentUrl } =
         requestForm.values;
-      await axios.patch(`/admin/accounts/${params.id}/${type}`, {
+      await axios.patch(`/admin/accounts/${id}/${type}`, {
         reason,
         ...(supportingDocumentName && { supportingDocumentName }),
         ...(supportingDocumentUrl && { supportingDocumentUrl }),
@@ -130,7 +150,7 @@ export default function Account() {
 
           {
             title: account?.accountName || "",
-            href: `/admin/accounts/${params.id}`,
+            href: `/admin/accounts/${id}`,
             loading: loading,
           },
         ]}
@@ -157,7 +177,7 @@ export default function Account() {
       />
 
       <SingleAccountBody
-        accountID={params?.id}
+        accountID={id}
         account={account}
         transactions={transactions as TransactionType[]}
         loading={loading}
@@ -167,6 +187,7 @@ export default function Account() {
         business={business}
         trxMeta={meta}
         revalidate={revalidate}
+        currency={account?.currency}
       >
         <PaginationComponent
           active={active}

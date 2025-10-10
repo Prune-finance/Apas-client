@@ -16,6 +16,7 @@ import { PrimaryBtn } from "../../Buttons";
 import { Account } from "@/lib/hooks/accounts";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
+import { accountList } from "@/lib/static";
 
 interface Props {
   account: Account | null;
@@ -23,7 +24,11 @@ interface Props {
   currency?: string;
 }
 
-export default function AccountDetails({ account, loading, currency = "EUR" }: Props) {
+export default function AccountDetails({
+  account,
+  loading,
+  currency = "EUR",
+}: Props) {
   const accountDetails = {
     "Account Name": account?.accountName,
     ...(currency === "EUR" && {
@@ -43,21 +48,13 @@ export default function AccountDetails({ account, loading, currency = "EUR" }: P
     "Bank Country": "United Kingdom",
   };
 
+  const currencyImage = accountList.find((c) => c.currency === currency)?.icon;
+
   return (
     <>
       <Group gap={7}>
         <ThemeIcon radius="xl" color="transparent">
-          {!loading ? (
-            <>
-              {currency === "GBP" ? (
-                <Image src={GBImage.src} alt="GBP" w={20} h={20} />
-              ) : (
-                <Image src={EUImage.src} alt="EUR" w={20} h={20} />
-              )}
-            </>
-          ) : (
-            <Skeleton w={20} h={20} />
-          )}
+          {!loading ? <>{currencyImage}</> : <Skeleton w={20} h={20} />}
         </ThemeIcon>
         {!loading ? (
           <Text fz={16} fw={500}>

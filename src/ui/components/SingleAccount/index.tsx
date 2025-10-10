@@ -44,7 +44,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
-import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[id]/TransactionStats";
+import TransactionStatistics from "@/app/admin/(dashboard)/accounts/[...slug]/TransactionStats";
 import { formatNumber, getInitials } from "@/lib/utils";
 import Link from "next/link";
 import InfoCards from "../Cards/InfoCards";
@@ -53,7 +53,7 @@ import EmptyTable from "../EmptyTable";
 import { TableComponent } from "../Table";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import styles from "./styles.module.scss";
-import { TransactionType, TrxData } from "@/lib/hooks/transactions";
+import { Meta, TransactionType, TrxData } from "@/lib/hooks/transactions";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { BadgeComponent } from "../Badge";
 import { useDisclosure } from "@mantine/hooks";
@@ -79,6 +79,7 @@ import { SendMoney } from "./(tabs)/SendMoney";
 import User from "@/lib/store/user";
 import { useHasPermission } from "@/lib/hooks/checkPermission";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import { Currency } from "@/lib/interface/currency";
 
 type Param = { id: string };
 interface Props {
@@ -151,7 +152,9 @@ export function SingleAccount({
         ? (pending += trx.amount)
         : (successful += trx.amount);
 
-      (trx.status.toUpperCase() === "FAILED" || trx.status.toUpperCase() === "REJECTED") && (failed += trx.amount);
+      (trx.status.toUpperCase() === "FAILED" ||
+        trx.status.toUpperCase() === "REJECTED") &&
+        (failed += trx.amount);
 
       // arr.push({ month, Inflow: 0, Outflow: pending + successful + failed });
       arr.push({ month, Inflow: 0, Outflow: trx.amount });
@@ -167,7 +170,7 @@ export function SingleAccount({
     transactions.map((trx) => {
       trx.status === "PENDING"
         ? (pending += trx.amount)
-        : (trx.status === "REJECTED" || trx.status.toUpperCase() === "FAILED")
+        : trx.status === "REJECTED" || trx.status.toUpperCase() === "FAILED"
         ? (failed += trx.amount)
         : (completed += trx.amount);
     });
@@ -566,12 +569,6 @@ const RowComponent = ({
   ));
 };
 
-interface Meta {
-  out: number;
-  total: number;
-  in: number;
-  totalAmount: number;
-}
 interface SingleAccountProps {
   account: Account | null;
   transactions: TransactionType[];
@@ -588,7 +585,7 @@ interface SingleAccountProps {
   location?: string;
   isUser?: boolean;
   revalidate: () => Promise<void>;
-  currency?: string;
+  currency?: Currency;
 }
 
 export const SingleAccountBody = ({
@@ -1036,13 +1033,13 @@ export const DefaultAccountHead = ({
         color={account?.isTrusted ? "#F9F6E6" : "#ECFDF3"}
       />
 
-      { !payout &&
+      {!payout && (
         <SendMoney
           opened={opened}
           closeMoney={closeMoney}
           openSendMoney={openMoney}
         />
-      }
+      )}
     </>
   );
 };
@@ -1195,7 +1192,8 @@ export const AccountInfo = ({
                   : getUserType(
                       account?.type as "USER" | "CORPORATE"
                     ).toLowerCase()} */}
-                {accountType}
+                {account?.accountType?.split("_").join(" ").toLowerCase() ??
+                  accountType}
               </Badge>
             ) : (
               <Skeleton w={100} h={10} />

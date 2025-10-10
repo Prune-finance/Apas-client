@@ -9,7 +9,7 @@ import InfoCards from "../../Cards/InfoCards";
 import EmptyTable from "../../EmptyTable";
 import { SearchInput, SelectBox, TextBox } from "../../Inputs";
 import { TableComponent } from "../../Table";
-import { TransactionType } from "@/lib/hooks/transactions";
+import { Meta, TransactionType } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -51,7 +51,11 @@ export const Transactions = ({
 }: Props) => {
   const pdfRef = useRef<HTMLDivElement>(null);
 
-  const totalBal = transactions.reduce((prv, curr) => prv + curr.amount, 0);
+  // const totalBal = (transactions ?? []).reduce(
+  //   (prv, curr) => prv + curr.amount,
+  //   0
+  // );
+
   const { data, opened, close } = Transaction();
 
   // const [search, setSearch] = useState("");
@@ -96,7 +100,7 @@ export const Transactions = ({
       //   transactions
       //     .filter((trx) => trx.type === "CREDIT")
       //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
-      value: meta?.in,
+      value: meta?.moneyIn,
       currency: currencyType ?? "EUR",
       formatted: true,
     },
@@ -106,15 +110,13 @@ export const Transactions = ({
       //   transactions
       //     .filter((trx) => trx.type === "DEBIT")
       //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
-      value: meta?.out,
+      value: meta?.moneyOut,
       currency: currencyType ?? "EUR",
       formatted: true,
     },
   ];
 
   const handleDownloadAccountStatement = async () => {
-    console.log(location);
-
     if (!dateRange[0] || !dateRange[1]) {
       return handleInfo(
         "Account Statement",
@@ -374,12 +376,6 @@ export const Transactions = ({
 //   "reference",
 // ];
 
-interface Meta {
-  out: number;
-  total: number;
-  in: number;
-  totalAmount: number;
-}
 interface Props {
   transactions: TransactionType[];
   loading: boolean;

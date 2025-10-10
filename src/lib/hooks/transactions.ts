@@ -4,6 +4,7 @@ import { BusinessData } from "./businesses";
 import { IParams } from "@/lib/schema";
 import useAxios from "./useAxios";
 import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import { Currency } from "../interface/currency";
 
 const axios = createAxiosInstance("accounts");
 const payoutAxiosInstance = createAxiosInstance("payouts");
@@ -74,6 +75,26 @@ export function useTransactions(id: string = "", customParams: IParams = {}) {
   ]);
 
   return { loading, transactions, meta, revalidate };
+}
+
+export function useCurrencyTransactions(
+  id: string = "",
+  currency: Currency,
+  customParams: IParams = {}
+) {
+  const {
+    loading,
+    data: transactions,
+    meta,
+    queryFn,
+  } = useAxios<TransactionType[], Meta>({
+    baseURL: "accounts",
+    endpoint: `/currency-accounts/transactions/${id}/${currency}`,
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+
+  return { loading, meta, transactions, revalidate: queryFn };
 }
 
 export function useSingleTransactions(
@@ -927,8 +948,15 @@ export interface Untitled1 {
 }
 
 export interface Meta {
-  out: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+  totalBalance: number;
+  moneyIn: number;
+  moneyOut: number;
+  net: number;
   total: number;
+  out: number;
   in: number;
   totalAmount: number;
 }

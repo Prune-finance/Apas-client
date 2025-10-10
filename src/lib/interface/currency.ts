@@ -3,7 +3,7 @@ export interface AdminCurrencyStatsResponse {
   meta: CurrencyStatsMeta;
 }
 
-export const currencies = ["EUR", "GBP", "GHS"] as const;
+export const currencies = ["EUR", "GBP", "GHS", "USD"] as const;
 export const accountType = [
   "COMPANY_ACCOUNT",
   "ISSUED_ACCOUNT",

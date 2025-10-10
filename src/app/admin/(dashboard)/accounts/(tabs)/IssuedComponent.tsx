@@ -126,7 +126,7 @@ export default function IssuedAccountsComponent({
     data: statsData,
   } = useAccountStatistics({
     frequency: frequency?.toLowerCase() ?? "monthly",
-    accountType: "Accounts",
+    accountType,
   });
 
   // TODO: Handle the resetting of activePage state when the filter is toggled
@@ -463,11 +463,14 @@ const RowComponent = ({
   return accounts.map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id)}
+      // onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
-        <Link href={`/admin/accounts/${element.id}`}>
+        <Link
+          href={`/admin/accounts/${element.id}/${element.currency}`}
+          // href={`/admin/accounts/${element.id}/`}
+        >
           {element.accountName}
         </Link>
       </TableTd>

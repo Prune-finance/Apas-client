@@ -9,6 +9,7 @@ import { sanitizedQueryParams, sanitizeURL } from "../utils";
 import {
   AccountStatistics,
   AccountType,
+  Currency,
   CurrencyStatsData,
   CurrencyStatsMeta,
 } from "../interface/currency";
@@ -108,6 +109,15 @@ export function useSingleAccount(id: string) {
   }, []);
 
   return { loading, account, revalidate };
+}
+
+export function useSingleAccountWithCurrency(id: string, currency: Currency) {
+  const { loading, data, queryFn } = useAxios<Account>({
+    baseURL: "accounts",
+    endpoint: `/currency-accounts/details/${id}/${currency}`,
+  });
+
+  return { loading, account: data, revalidate: queryFn };
 }
 
 export function useBusinessDefaultAccount(id: string) {
@@ -231,7 +241,7 @@ export function useAccountStatistics({
   accountType,
 }: {
   frequency: string;
-  accountType: "Accounts" | "Payout" | "Company";
+  accountType: AccountType;
 }) {
   const { loading, meta, queryFn, data } = useAxios<
     AccountStatistics[],
@@ -833,28 +843,68 @@ export interface AccountMeta {
   deactivated: number;
 }
 
+// export interface AccountData {
+//   id: string;
+//   firstName: string;
+//   lastName: string;
+//   accountId: number;
+//   accountName: string;
+//   accountIban?: string;
+//   accountNumber: string;
+//   accountDocuments: AccountDocuments;
+//   createdAt: Date;
+//   updatedAt: Date;
+//   deletedAt: null;
+//   accountBalance: number;
+//   Company: {
+//     name: string;
+//     id: string;
+//     issuedAccountCount?: number;
+//   };
+//   staging: "TEST" | "LIVE";
+//   type: "USER" | "CORPORATE";
+//   status: "ACTIVE" | "INACTIVE" | "FROZEN";
+//   isTrusted?: boolean;
+//   currency: Currency
+// }
+
 export interface AccountData {
   id: string;
   firstName: string;
   lastName: string;
-  accountId: number;
   accountName: string;
-  accountIban?: string;
   accountNumber: string;
+  accountIban?: string;
   accountDocuments: AccountDocuments;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: null;
+  createdAt: string; // from JSON: ISO string
+  updatedAt: string;
+  deletedAt: string | null;
   accountBalance: number;
+  companyId: string;
+  status: "ACTIVE" | "INACTIVE" | "FROZEN";
+  accountRequestId: string;
+  issuedAccRequestId: string | null;
+  staging: "TEST" | "LIVE";
+  accountIdentifier: string;
+  accountType: AccountType;
+  type: "USER" | "CORPORATE";
+  isTrusted: boolean;
+  sortCode: string;
+  currency: Currency;
   Company: {
-    name: string;
     id: string;
+    name: string;
+    kycTrusted?: boolean;
     issuedAccountCount?: number;
   };
-  staging: "TEST" | "LIVE";
-  type: "USER" | "CORPORATE";
-  status: "ACTIVE" | "INACTIVE" | "FROZEN";
-  isTrusted?: boolean;
+  AccountRequests?: {
+    Currency: {
+      id: string;
+      symbol: string;
+      name: string;
+    };
+    status: string; // could be "ISSUED" | "PENDING" | etc.
+  };
 }
 
 export interface AccountDocuments {
@@ -891,11 +941,12 @@ export interface BaseAccount {
   walletId: string;
   accountName: string;
   accountNumber: string;
-  accountType?: string;
+  accountType?: AccountType;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
+  currency: Currency;
   currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
   companyId: string;
   companyName?: string;
@@ -953,7 +1004,8 @@ export interface CurrencyAccount {
   accountNumber: string;
   accountIban: string;
   accountBic: string;
-  accountType: "COMPANY_ACCOUNT" | string;
+  accountType: AccountType;
+  currency: Currency;
   currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
   accountBalance: number;
   accountDocuments: Record<string, any>;

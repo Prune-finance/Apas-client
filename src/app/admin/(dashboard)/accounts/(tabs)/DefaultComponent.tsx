@@ -148,7 +148,7 @@ export default function DefaultAccountComponents({
     data: statsData,
   } = useAccountStatistics({
     frequency: frequency?.toLowerCase() ?? "monthly",
-    accountType: "Company",
+    accountType,
   });
 
   // TODO: Handle the resetting of activePage state when the filter is toggled
@@ -494,12 +494,13 @@ const RowComponent = ({
   return accounts.map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id, element.Company.id)}
+      // onClick={() => handleRowClick(element.id, element.Company.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
         <Link
-          href={`/admin/accounts/${element.Company.id}/default?accountId=${element.id}`}
+          href={`/admin/accounts/${element.id}/${element.currency}`}
+          // href={`/admin/accounts/${element.Company.id}/default?accountId=${element.id}`}
         >
           {element.accountName}
         </Link>

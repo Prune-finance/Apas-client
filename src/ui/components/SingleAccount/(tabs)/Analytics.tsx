@@ -31,7 +31,7 @@ export const Analytics = ({
     cashFlowData: monthlyData,
     donutData,
     totalTrxVolume,
-  } = useTrxAnalytics(transactions);
+  } = useTrxAnalytics(transactions ?? []);
 
   return (
     <Grid>

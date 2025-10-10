@@ -39,6 +39,12 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     revalidate: GHSRevalidate,
   } = useUserCurrencyGBPAccount("GHS");
 
+  const {
+    account: USDAccount,
+    loading: USDLoading,
+    revalidate: USDRevalidate,
+  } = useUserCurrencyGBPAccount("USD");
+
   const { switchCurrency } = useCurrencySwitchStore();
 
   const matches = useMediaQuery("(max-width: 768px)");
@@ -336,7 +342,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     revalidate();
     gbpRevalidate();
     GHSRevalidate();
-
+    USDRevalidate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
@@ -354,9 +360,11 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
               ? account
               : switchCurrency === "GBP"
               ? gbpAccount
+              : switchCurrency === "USD"
+              ? USDAccount
               : GHSAccount
           }
-          loading={loading || gbpLoading || GHSLoading}
+          loading={loading || gbpLoading || GHSLoading || USDLoading}
           close={closeMoney}
           openPreview={openPreview}
           setRequestForm={setRequestForm}

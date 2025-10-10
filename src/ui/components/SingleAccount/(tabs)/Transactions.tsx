@@ -73,6 +73,8 @@ export const Transactions = ({
 
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
+
+  console.log(downloadMeta);
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
 
   const [search, setSearch] = useQueryState("search", {
@@ -158,6 +160,7 @@ export const Transactions = ({
       "ghs-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "eur-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "gbp-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
+      "usd-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${currencyType}/${accountID}?date=${startDate}&endDate=${endDate}`,
     };
 
     // Use the default URL if location is undefined or not in urlMap
@@ -332,7 +335,9 @@ export const Transactions = ({
         form={form}
         customStatusOption={[
           "PENDING",
-          currencyType === "GHS" ? "COMPLETED" : "CONFIRMED",
+          currencyType === "GHS" || currencyType === "USD"
+            ? "COMPLETED"
+            : "CONFIRMED",
           "REJECTED",
           "CANCELLED",
           "FAILED",

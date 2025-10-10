@@ -88,6 +88,11 @@ export const TransactionDrawer = ({
       ? {
           "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
         }
+      : selectedRequest?.currencyType === "USD"
+      ? {
+          "Account Number": selectedRequest?.beneficiaryAccountNumber ?? "N/A",
+          "Sort Code": selectedRequest?.beneficiarySortCode ?? "N/A",
+        }
       : {
           IBAN: selectedRequest?.recipientIban,
           BIC: selectedRequest?.recipientBic,
@@ -123,6 +128,11 @@ export const TransactionDrawer = ({
       : selectedRequest?.currencyType === "GHS"
       ? {
           "Wallet ID": selectedRequest?.senderWalletId ?? "N/A",
+        }
+      : selectedRequest?.currencyType === "USD"
+      ? {
+          "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
+          "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
         }
       : {
           IBAN: selectedRequest?.senderIban,

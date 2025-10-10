@@ -858,6 +858,8 @@ export interface BaseAccount {
   accountNumber: string;
   accountType?: string;
   walletId: string;
+  accountBic?: string;
+  accountIban?: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;

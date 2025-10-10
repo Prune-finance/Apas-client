@@ -18,6 +18,7 @@ import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
 import NGNImage from "@/assets/cedis-icon.png";
 import GHSImage from "@/assets/cedis-icon.png";
+import USDImage from "@/assets/USD.png";
 
 interface CurrencyConfig {
   icon: string;
@@ -26,6 +27,8 @@ interface CurrencyConfig {
   accountIdLabel: string;
   getBankIdValue: (account: DefaultAccount | null) => string;
   getAccountIdValue: (account: DefaultAccount | null) => string;
+  accountNumberLabel?: string;
+  getAccountNumberValue?: (account: DefaultAccount | null) => string;
 }
 
 interface Props {
@@ -67,6 +70,16 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     getBankIdValue: (account) => account?.accountName ?? "",
     getAccountIdValue: (account) => account?.walletId ?? "",
   },
+  USD: {
+    icon: USDImage.src,
+    name: "USD",
+    bankIdLabel: "SWIFT/BIC",
+    accountIdLabel: "IBAN",    
+    getBankIdValue: (account) => account?.accountBic ?? "",
+    getAccountIdValue: (account) => account?.accountIban ?? "",
+    accountNumberLabel: "Account Number",
+    getAccountNumberValue: (account) => account?.accountNumber ?? "",
+  },
 };
 
 export default function DefaultAccountDetails({
@@ -79,6 +92,9 @@ export default function DefaultAccountDetails({
     "Account Name": account?.accountName,
     [config.bankIdLabel]: config.getBankIdValue(account),
     [config.accountIdLabel]: config.getAccountIdValue(account),
+    ...(config.accountNumberLabel && config.getAccountNumberValue
+      ? { [config.accountNumberLabel]: config.getAccountNumberValue(account) }
+      : {}),
     "Bank Name": "Prune Payments LTD",
     "Bank Address": "Office 7 35-37 Ludgate Hill, London",
     "Bank Country": "United Kingdom",
@@ -108,7 +124,7 @@ export default function DefaultAccountDetails({
             value={`Account Name: ${account?.accountName ?? ""}
 ${config.accountIdLabel}: ${config.getAccountIdValue(account)}
 ${config.bankIdLabel}: ${config.getBankIdValue(account)}
-Bank Name: Prune Payments LTD
+${config.accountNumberLabel && config.getAccountNumberValue ? `${config.accountNumberLabel}: ${config.getAccountNumberValue(account)}\n` : ""}Bank Name: Prune Payments LTD
 Bank Address: Office 7 35-37 Ludgate Hill, London
 Bank Country: United Kingdom`}
           >

@@ -63,3 +63,32 @@ export interface AccountStatistics {
   interval: Date;
   total: number;
 }
+
+export interface SingleAccountStatisticsData {
+  statistics: Statistic[];
+  totals: Totals;
+  volume: Volume;
+}
+
+interface Statistic {
+  bucket: string;
+  inflow: number;
+  outflow: number;
+}
+
+export interface Totals {
+  inflow: number;
+  outflow: number;
+}
+
+export interface Volume {
+  completed: number;
+  failed: number;
+  cancelled: number;
+  pending: number;
+}
+
+export interface SingleAccountStatisticsMeta {
+  period: string;
+  range: string;
+}

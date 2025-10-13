@@ -4,6 +4,7 @@ import { TabsPanel } from "@mantine/core";
 import React from "react";
 import IssuedAccountsComponent from "./IssuedComponent";
 import { AccountType, Currency } from "@/lib/interface/currency";
+import { useSearchParams } from "next/navigation";
 
 interface Props {
   accountType: AccountType;
@@ -11,6 +12,10 @@ interface Props {
 }
 
 export default function IssuedAccounts({ accountType, currencies }: Props) {
+  const searchParams = useSearchParams();
+
+  const currencyTab = searchParams.get("currencyTab");
+
   const availableCurrencies = accountList.filter((account) =>
     (currencies || []).includes(account.currency as Currency)
   );
@@ -19,7 +24,7 @@ export default function IssuedAccounts({ accountType, currencies }: Props) {
     <TabsComponent
       tt="capitalize"
       tabs={availableCurrencies}
-      defaultValue={currencies[0]}
+      defaultValue={(currencyTab ?? "")?.toUpperCase() || currencies[0]}
       mt={32}
       keepMounted={false}
       additionalTile=" Account Details"

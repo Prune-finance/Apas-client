@@ -419,7 +419,11 @@ export function SingleAccount({
                 }
                 startAngle={180}
                 endAngle={0}
-                withLabels={formatNumber(totalTrxVolume, true, "EUR")}
+                withLabels={formatNumber(
+                  totalTrxVolume,
+                  true,
+                  account?.currency || "EUR"
+                )}
               />
             </Flex>
 
@@ -437,7 +441,11 @@ export function SingleAccount({
                     </Text>
 
                     <Text fz={16} fw={700} c="var(--prune-text-gray-800)">
-                      {formatNumber(item.value, true, "EUR")}
+                      {formatNumber(
+                        item.value,
+                        true,
+                        account?.currency || "EUR"
+                      )}
                     </Text>
                   </Stack>
                 );
@@ -654,6 +662,8 @@ export const SingleAccountBody = ({
           <Analytics
             transactions={transactions}
             setChartFrequency={setChartFrequency}
+            currencyType={account?.currency}
+            accountId={accountID}
           />
         </TabsPanel>
         {/* <TabsPanel value={tabs[3].value} mt={28}>

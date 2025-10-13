@@ -5,6 +5,7 @@ import { formatNumber } from "@/lib/utils";
 import { BarChart, ChartTooltipProps } from "@mantine/charts";
 import React from "react";
 import { IconCircleFilled } from "@tabler/icons-react";
+import ChartTooltip from "../ChartTooltip";
 
 export type ChartData = {
   month: string;
@@ -104,40 +105,3 @@ const legend = {
   inflow: "#D5E855",
   outflow: "#D92D20",
 };
-
-interface IChartTooltipProps extends ChartTooltipProps {
-  locale?: string;
-  currency?: string;
-}
-
-function ChartTooltip({
-  label,
-  payload,
-  locale,
-  currency,
-}: IChartTooltipProps) {
-  if (!payload) return null;
-
-  return (
-    <Paper px="md" py="sm" withBorder shadow="md" radius="md">
-      <Text fw={500} mb={5}>
-        {label}
-      </Text>
-
-      <Stack gap={5}>
-        {payload.map((item: any) => (
-          <Group key={item.name} wrap="nowrap" justify="space-between">
-            <Group gap={10}>
-              <IconCircleFilled size={15} color={item.color} />
-              <Text fz={12}>{item.name}</Text>
-            </Group>
-
-            <Text key={item.name} fz={12} fw={500}>
-              {formatNumber(item.value, true, currency, locale)}
-            </Text>
-          </Group>
-        ))}
-      </Stack>
-    </Paper>
-  );
-}

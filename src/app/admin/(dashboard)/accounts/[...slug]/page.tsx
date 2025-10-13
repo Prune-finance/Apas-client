@@ -39,7 +39,6 @@ interface Props {
 
 export default function Account({ params }: Props) {
   const [id, currency] = params.slug ?? [];
-  console.log({ id, currency });
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -91,13 +90,13 @@ export default function Account({ params }: Props) {
   const { handleSuccess, handleError } = useNotification();
   const axios = createAxiosInstance("accounts");
 
-  console.log({ transactions, meta });
-
   // const { loading, account, revalidate } = useSingleAccount(id);
-  const { loading, account, revalidate } = useSingleAccountWithCurrency(
+  const { loading, account, revalidate, error } = useSingleAccountWithCurrency(
     id,
     currency as Currency
   );
+
+  if (error) throw new Error(parseError(error));
 
   const { business } = useSingleBusiness(account?.companyId ?? "");
 
@@ -146,7 +145,11 @@ export default function Account({ params }: Props) {
     <main>
       <Breadcrumbs
         items={[
-          { title: "Accounts", href: "/admin/accounts?tab=issued-accounts" },
+          {
+            title: "Accounts",
+            href: `/admin/accounts?tab=${account?.accountType}&currencyTab=${currency}`,
+            loading: loading,
+          },
 
           {
             title: account?.accountName || "",

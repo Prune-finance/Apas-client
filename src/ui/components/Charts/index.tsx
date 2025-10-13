@@ -6,7 +6,10 @@ import {
   BarChartProps,
   DonutChart,
 } from "@mantine/charts";
+import React from "react";
 import { ReactNode } from "react";
+import ChartTooltip from "../ChartTooltip";
+import { Currency } from "@/lib/interface/currency";
 
 type Series = { name: string; color: string };
 
@@ -93,6 +96,8 @@ interface IBarChartProps extends BarChartProps {
   series: Series[];
   withDot?: boolean;
   withLegend?: boolean;
+  currency?: Currency;
+  locale?: string;
 }
 
 export function BarChartComponent({
@@ -100,6 +105,8 @@ export function BarChartComponent({
   series,
   withDot,
   withLegend,
+  currency = "EUR",
+  locale,
   ...props
 }: IBarChartProps) {
   const groupedData = data.reduce(
@@ -127,15 +134,22 @@ export function BarChartComponent({
     <BarChart
       h={props.h ? props.h : 300}
       data={result}
-      // dataKey="name"
-      // dataKey="month"
       series={series}
-      // barProps={{ barSize: 20, radius: 3 }}
-      // curveType="natural"
       gridAxis="x"
       withLegend={withLegend}
+      maxBarWidth={20}
+      minBarSize={1}
       barProps={{ barSize: 20, radius: 3 }}
-      // valueFormatter={(value) => formatNumber(value, true, "EUR")}
+      tooltipProps={{
+        content: ({ label, payload }) => (
+          <ChartTooltip
+            label={label}
+            payload={payload}
+            locale={locale}
+            currency={currency}
+          />
+        ),
+      }}
       {...props}
     />
   );

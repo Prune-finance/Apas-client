@@ -102,7 +102,7 @@ export const IssuedTransactionTableRows = ({
   isUser?: boolean;
 }) => {
   const { open, setData } = Transaction();
-  return data.map((element) => (
+  return (data || []).map((element) => (
     <TableTr
       key={element?.id}
       onClick={() => {

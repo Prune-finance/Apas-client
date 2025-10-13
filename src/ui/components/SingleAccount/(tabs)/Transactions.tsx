@@ -91,25 +91,15 @@ export const Transactions = ({
     {
       title: "Total Transactions",
       value: meta?.total,
-      // currency: "EUR",
-      // formatted: true,
     },
     {
       title: "Money In",
-      // value:
-      //   transactions
-      //     .filter((trx) => trx.type === "CREDIT")
-      //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       value: meta?.moneyIn,
       currency: currencyType ?? "EUR",
       formatted: true,
     },
     {
       title: "Money Out",
-      // value:
-      //   transactions
-      //     .filter((trx) => trx.type === "DEBIT")
-      //     .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       value: meta?.moneyOut,
       currency: currencyType ?? "EUR",
       formatted: true,
@@ -160,8 +150,6 @@ export const Transactions = ({
           "No transactions found for the selected date range"
         );
       }
-
-      console.log(res?.data, res?.meta);
 
       setDownloadData(res.data);
       setDownloadMeta(res.meta);
@@ -286,7 +274,7 @@ export const Transactions = ({
 
       <EmptyTable
         loading={loading}
-        rows={transactions}
+        rows={transactions || []}
         title="There are no transactions for this account"
         text="When a transaction is recorded, it will appear here"
       />

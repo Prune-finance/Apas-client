@@ -1,10 +1,20 @@
-import { Paper, Flex, Group, NativeSelect, Text } from "@mantine/core";
+import {
+  Paper,
+  Flex,
+  Group,
+  NativeSelect,
+  Text,
+  Skeleton,
+} from "@mantine/core";
 import { IconCircleFilled } from "@tabler/icons-react";
 
 import styles from "./styles.module.scss";
 
 import { AreaChartComponent, BarChartComponent } from "@/ui/components/Charts";
 import { Dispatch, SetStateAction } from "react";
+import { useQueryState } from "nuqs";
+import { Currency } from "@/lib/interface/currency";
+import React from "react";
 
 interface LineData {
   month: string;
@@ -15,11 +25,19 @@ interface LineData {
 type Props = {
   setChartFrequency: Dispatch<SetStateAction<string>>;
   lineData: LineData[];
+  currency?: Currency;
+  loading?: boolean;
 };
 export default function TransactionStatistics({
   setChartFrequency,
   lineData,
+  currency,
+  loading,
 }: Props) {
+  const [period, setPeriod] = useQueryState("period", {
+    defaultValue: "Monthly",
+  });
+
   return (
     <Paper style={{ border: "1px solid #f5f5f5" }} p={20} pl={40}>
       <Flex justify="space-between" align="center" mb={15}>
@@ -42,8 +60,11 @@ export default function TransactionStatistics({
               wrapper: styles.select__wrapper,
               input: styles.select__input,
             }}
-            onChange={(event) => setChartFrequency(event.currentTarget.value)}
-            data={["Monthly", "Weekly"]}
+            value={period}
+            onChange={(event) => {
+              setPeriod(event.currentTarget.value);
+            }}
+            data={["Daily", "Weekly", "Monthly", "Yearly"]}
           />
         </Group>
       </Flex>
@@ -58,17 +79,21 @@ export default function TransactionStatistics({
           { name: "Outflow", color: "#D92D20" },
         ]}
       /> */}
-
-      <BarChartComponent
-        h={250}
-        mt={30}
-        data={lineData}
-        dataKey="month"
-        series={[
-          { name: "Inflow", color: "#D5E855" },
-          { name: "Outflow", color: "#D92D20" },
-        ]}
-      />
+      {loading ? (
+        <Skeleton h={232} />
+      ) : (
+        <BarChartComponent
+          h={250}
+          mt={30}
+          data={lineData}
+          dataKey="month"
+          series={[
+            { name: "Inflow", color: "#D5E855" },
+            { name: "Outflow", color: "#D92D20" },
+          ]}
+          currency={currency}
+        />
+      )}
     </Paper>
   );
 }

@@ -15,31 +15,71 @@ import styles from "./styles.module.scss";
 import { Dispatch, SetStateAction } from "react";
 import { TransactionType } from "@/lib/hooks/transactions";
 import { useTrxAnalytics } from "@/lib/hooks/useTrxAnalytics";
+import { useSingleAccountStatistics } from "@/lib/hooks/accounts";
+import { Currency } from "@/lib/interface/currency";
+import { useQueryState } from "nuqs";
 
 interface Props {
   setChartFrequency: Dispatch<SetStateAction<string>>;
   transactions: TransactionType[];
-  currencyType?: string;
+  currencyType?: Currency;
+  accountId?: string;
 }
 
 export const Analytics = ({
   setChartFrequency,
   transactions,
   currencyType,
+  accountId,
 }: Props) => {
-  const {
-    cashFlowData: monthlyData,
-    donutData,
-    totalTrxVolume,
-  } = useTrxAnalytics(transactions ?? []);
+  // const {
+  //   cashFlowData: monthlyData,
+  //   donutData,
+  //   totalTrxVolume,
+  // } = useTrxAnalytics(transactions ?? []);
+
+  const [period, setPeriod] = useQueryState("period", {
+    defaultValue: "Monthly",
+  });
+
+  const { data, meta, loading } = useSingleAccountStatistics({
+    id: accountId || "",
+    currency: currencyType || "EUR",
+    period: (period?.toLowerCase() as "daily") || "monthly",
+  });
+
+  const getColor = (key: string) => {
+    switch (key.toLowerCase()) {
+      case "completed":
+        return "#039855";
+      case "failed":
+        return "#D92D20";
+      default:
+        return "#F79009";
+    }
+  };
+
+  const volumeData = Object.entries(data?.volume || {}).map(([key, value]) => ({
+    name: key,
+    value,
+    color: getColor(key),
+  }));
+
+  const totalVolume = volumeData.reduce((acc, cur) => acc + cur.value, 0);
 
   return (
     <Grid>
       <GridCol span={8.3}>
         <TransactionStatistics
           setChartFrequency={setChartFrequency}
-          lineData={monthlyData}
-          // lineData={lineData}
+          // lineData={monthlyData}
+          lineData={(data?.statistics || []).map((item) => ({
+            month: item.bucket,
+            Inflow: item.inflow,
+            Outflow: item.outflow,
+          }))}
+          currency={currencyType}
+          loading={loading}
         />
       </GridCol>
 
@@ -62,10 +102,11 @@ export const Analytics = ({
                   wrapper: styles.select__wrapper,
                   input: styles.select__input,
                 }}
-                onChange={(event) =>
-                  setChartFrequency(event.currentTarget.value)
-                }
-                data={["Monthly", "Weekly"]}
+                value={period}
+                onChange={(event) => {
+                  setPeriod(event.currentTarget.value);
+                }}
+                data={["Daily", "Weekly", "Monthly", "Yearly"]}
               />
             </Flex>
           </Flex>
@@ -73,7 +114,7 @@ export const Analytics = ({
           <Flex justify="center" my={37} h={150}>
             <DonutChartComponent
               data={
-                !totalTrxVolume
+                !totalVolume
                   ? [
                       {
                         name: "No Data",
@@ -81,12 +122,12 @@ export const Analytics = ({
                         color: "var(--prune-text-gray-300)",
                       },
                     ]
-                  : donutData
+                  : volumeData
               }
               startAngle={180}
               endAngle={0}
               withLabels={formatNumber(
-                totalTrxVolume,
+                totalVolume,
                 true,
                 currencyType ?? "EUR"
               )}
@@ -94,7 +135,7 @@ export const Analytics = ({
           </Flex>
 
           <Group justify="space-between" px={10} gap={15}>
-            {donutData.map((item, index) => {
+            {volumeData.map((item, index) => {
               return (
                 <Stack
                   key={index}
@@ -102,7 +143,12 @@ export const Analytics = ({
                   pl={9}
                   style={{ borderLeft: `3px solid ${item.color}` }}
                 >
-                  <Text fz={12} c="var(--prune-text-gray-800)" fw={400}>
+                  <Text
+                    fz={12}
+                    c="var(--prune-text-gray-800)"
+                    fw={400}
+                    tt="capitalize"
+                  >
                     {item.name}
                   </Text>
 

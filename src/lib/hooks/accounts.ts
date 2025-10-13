@@ -12,6 +12,8 @@ import {
   Currency,
   CurrencyStatsData,
   CurrencyStatsMeta,
+  SingleAccountStatisticsData,
+  SingleAccountStatisticsMeta,
 } from "../interface/currency";
 
 const axios = createAxiosInstance("accounts");
@@ -112,12 +114,36 @@ export function useSingleAccount(id: string) {
 }
 
 export function useSingleAccountWithCurrency(id: string, currency: Currency) {
-  const { loading, data, queryFn } = useAxios<Account>({
+  const { loading, data, queryFn, error } = useAxios<Account>({
     baseURL: "accounts",
     endpoint: `/currency-accounts/details/${id}/${currency}`,
+    enabled: !id && !currency,
   });
 
-  return { loading, account: data, revalidate: queryFn };
+  return { loading, account: data, revalidate: queryFn, error };
+}
+
+export function useSingleAccountStatistics({
+  id,
+  currency,
+  period,
+}: {
+  id: string;
+  currency: Currency;
+  period: "daily" | "weekly" | "monthly" | "yearly" | "";
+}) {
+  const { loading, data, queryFn, error, meta } = useAxios<
+    SingleAccountStatisticsData,
+    SingleAccountStatisticsMeta
+  >({
+    baseURL: "accounts",
+    endpoint: `/currency-accounts/statistics/${id}/${currency}`,
+    enabled: !id && !currency,
+    params: { period },
+    dependencies: [id, currency, period],
+  });
+
+  return { loading, data, meta, revalidate: queryFn, error };
 }
 
 export function useBusinessDefaultAccount(id: string) {

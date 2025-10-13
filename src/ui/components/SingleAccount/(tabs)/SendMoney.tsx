@@ -95,6 +95,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     destinationBIC: "",
     destinationAccountNumber: "",
     destinationSortCode: "",
+    routingNumber: "",
     destinationBank: "",
     bankAddress: "",
     destinationCountry: "",
@@ -104,6 +105,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     phoneNumber: "",
     accountNumber: "",
     gshTransferType: "",
+    usdTransferType: "",
     beneficiaryBankCode: "",
   });
 
@@ -254,6 +256,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         destinationBIC,
         destinationAccountNumber,
         destinationSortCode,
+        routingNumber,
         destinationBank,
         bankAddress,
         destinationCountry,
@@ -265,6 +268,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         beneficiaryBankCode,
         phoneNumber,
         reference,
+        usdTransferType,
       } = companyRequestForm;
 
       // Reuse the helper function from above
@@ -291,6 +295,26 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
           };
+        } else if (currency === "USD") {
+          return {
+            paymentMethodType:
+              usdTransferType === "WithinUSA" ? "SWIFT" : "ACH",
+            // if usdTransferType === "WithinUSA"
+            ...(usdTransferType === "WithinUSA" && {
+              beneficiaryBic: removeWhitespace(destinationBIC),
+              beneficiaryIban: removeWhitespace(destinationIBAN),
+            }),
+            // if usdTransferType === "OutsideUSA"
+            ...(usdTransferType === "OutsideUSA" && {
+              beneficiaryRoutingNumber: removeWhitespace(routingNumber),
+              beneficiaryAccountNumber: removeWhitespace(accountNumber),
+            }),
+            beneficiaryBankName: destinationBank,
+            beneficiaryCountry: destinationCountry,
+            beneficiaryName: fullName,
+            recipientBankAddress: "",
+            beneficiaryBankAddress: "",
+          };
         } else {
           return {
             destinationIBAN: removeWhitespace(destinationIBAN),
@@ -307,6 +331,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           ? "/payout/send-gbp"
           : switchCurrency === "GHS"
           ? "/payout/send-ghs"
+          : switchCurrency === "USD"
+          ? "/payout/send-usd"
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, companyName),

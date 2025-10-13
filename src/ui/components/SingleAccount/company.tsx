@@ -4,6 +4,7 @@ import {
   Dispatch,
   forwardRef,
   SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -28,7 +29,7 @@ import {
   Skeleton,
 } from "@mantine/core";
 import { TextInput, Select } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "../Buttons";
 import {
   DefaultAccount,
@@ -48,6 +49,8 @@ import TransactionProcessTimeGBP from "./TransactionProcessTimeGBP";
 import NoticeBanner from "../NoticeBanner";
 import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
 import SelectTypeOfTransfer from "@/app/(dashboard)/accounts/SelectTypeOfTransfer";
+import USDSelectTypeOfTransfer from "@/app/(dashboard)/accounts/USDSelectTypeOfTransfer";
+import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -71,6 +74,7 @@ export const sendMoneyRequest = {
   destinationBIC: "",
   destinationAccountNumber: "",
   destinationSortCode: "",
+  routingNumber: "",
   destinationBank: "",
   bankAddress: "",
   destinationCountry: "",
@@ -82,6 +86,7 @@ export const sendMoneyRequest = {
   accountNumber: "",
   beneficiaryBankCode: "",
   gshTransferType: "",
+  usdTransferType: "",
 };
 
 const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
@@ -109,6 +114,8 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
   const [disableCountry, setDisableCountry] = useState(false);
   const { switchCurrency } = useCurrencySwitchStore();
   const { transferCurrency } = useTransferCurrencySwitchStore();
+  const { transferCurrency: switchCurrencyOutsideUS } =
+    USDuseTransferCurrencySwitchStore();
 
   const form2 = useForm({
     initialValues: {
@@ -126,6 +133,19 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     form2.setFieldValue("gshTransferType", transferCurrency);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transferCurrency]);
+
+  useEffect(() => {
+    form2.setFieldValue("usdTransferType", switchCurrencyOutsideUS);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [switchCurrencyOutsideUS]);
+
+  useEffect(() => {
+    form2.setFieldValue("destinationBIC", "");
+    form2.setFieldValue("destinationIBAN", "");
+    form2.setFieldValue("accountNumber", "");
+    form2.setFieldValue("routingNumber", "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [switchCurrencyOutsideUS]);
 
   const [{ bic, iban }] = useDebouncedValue(
     { iban: form2.values.destinationIBAN, bic: form2.values.destinationBIC },
@@ -281,6 +301,161 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transferCurrency]);
 
+  const CountryField = useCallback(
+    ({ form2 }: { form2: UseFormReturnType<typeof sendMoneyRequest> }) => (
+      <Flex gap={20} mt={24}>
+        <Select
+          searchable
+          placeholder="Select Country"
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          label={
+            <Text fz={14} c="#667086">
+              Country <span style={{ color: "red" }}>*</span>
+            </Text>
+          }
+          data={countries.map((c) => c.name)}
+          disabled={disableCountry}
+          {...form2.getInputProps("destinationCountry")}
+        />
+      </Flex>
+    ),
+    [disableCountry]
+  );
+
+  const AmountField = useCallback(
+    ({ form2 }: { form2: UseFormReturnType<typeof sendMoneyRequest> }) => (
+      <Flex gap={20} mt={24}>
+        <NumberInput
+          flex={1}
+          classNames={{ input: styles.input, label: styles.label }}
+          description={
+            <Text fz={12}>
+              {Number(form2.values.amount) > Number(account?.accountBalance)
+                ? `Insufficient Balance`
+                : ""}
+            </Text>
+          }
+          styles={{
+            description: {
+              color: "var(--prune-warning)",
+            },
+            input: {
+              border:
+                Number(form2.values.amount) > Number(account?.accountBalance)
+                  ? "1px solid red"
+                  : "1px solid #eaecf0",
+            },
+          }}
+          label={
+            <Text fz={14} c="#667085">
+              Amount <span style={{ color: "red" }}>*</span>
+            </Text>
+          }
+          hideControls
+          size="lg"
+          placeholder="Enter amount"
+          {...form2.getInputProps("amount")}
+          errorProps={{ fz: 12 }}
+        />
+      </Flex>
+    ),
+    [account?.accountBalance]
+  );
+
+  const DropzoneOptional = useCallback(
+    ({ form2 }: { form2: UseFormReturnType<typeof sendMoneyRequest> }) => (
+      <Flex gap={20} mt={24} direction="column">
+        <Text fz={14} c="#667085" m={0} p={0}>
+          Upload supporting document (Optional)
+        </Text>
+        <DropzoneComponent<typeof sendMoneyRequest>
+          style={{ flex: 1 }}
+          otherForm={form2}
+          formKey="invoice"
+          uploadedFileUrl={form2.values.invoice}
+          isUser
+        />
+      </Flex>
+    ),
+    []
+  );
+
+  const NarrationField = useCallback(
+    ({ form2 }: { form2: UseFormReturnType<typeof sendMoneyRequest> }) => (
+      <Flex gap={20} mt={24}>
+        <Textarea
+          flex={1}
+          autosize
+          minRows={3}
+          size="lg"
+          maxLength={24}
+          classNames={{ input: styles.textarea, label: styles.label }}
+          label={
+            <Text fz={14} c="#667085">
+              Narration <span style={{ color: "red" }}>*</span>
+            </Text>
+          }
+          placeholder="Enter narration"
+          {...form2.getInputProps("narration")}
+          errorProps={{ fz: 12 }}
+        />
+      </Flex>
+    ),
+    []
+  );
+
+  const BankField = useCallback(
+    ({ form2 }: { form2: UseFormReturnType<typeof sendMoneyRequest> }) => (
+      <Flex gap={20} mt={24}>
+        <TextInput
+          placeholder="Enter Bank Name"
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              Bank <span style={{ color: "red" }}>*</span>
+            </Text>
+          }
+          disabled={disableBank}
+          {...form2.getInputProps("destinationBank")}
+          errorProps={{ fz: 12 }}
+        />
+      </Flex>
+    ),
+    [disableBank]
+  );
+
+  const FullNameField = useCallback(
+    ({
+      form2,
+      mt = 24,
+    }: {
+      form2: UseFormReturnType<typeof sendMoneyRequest>;
+      mt?: number;
+    }) => (
+      <Flex gap={20} mt={mt}>
+        <TextInput
+          classNames={{ input: styles.input, label: styles.label }}
+          flex={1}
+          size="lg"
+          label={
+            <Text fz={14} c="#667085">
+              Company Name <span style={{ color: "red" }}>*</span>
+            </Text>
+          }
+          placeholder="Enter company name"
+          {...form2.getInputProps("companyName")}
+          errorProps={{
+            fz: 12,
+          }}
+        />
+      </Flex>
+    ),
+    []
+  );
+
   return (
     <TabsPanel value="To A Company">
       <Box mt={20}>
@@ -392,23 +567,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                 )}
               </Flex>
 
-              <Flex gap={20} mt={24}>
-                <TextInput
-                  classNames={{ input: styles.input, label: styles.label }}
-                  flex={1}
-                  size="lg"
-                  label={
-                    <Text fz={14} c="#667085">
-                      Company Name <span style={{ color: "red" }}>*</span>
-                    </Text>
-                  }
-                  placeholder="Enter company name"
-                  {...form2.getInputProps("companyName")}
-                  errorProps={{
-                    fz: 12,
-                  }}
-                />
-              </Flex>
+              <FullNameField form2={form2} />
 
               <Flex gap={20} mt={24}>
                 <NumberInput
@@ -451,66 +610,108 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   }}
                 />
               </Flex>
-
-              <Flex gap={20} mt={24} direction="column">
-                <Text fz={14} c="#667085" m={0} p={0}>
-                  Upload supporting document (Optional)
-                </Text>
-                <DropzoneComponent<typeof sendMoneyRequest>
-                  style={{ flex: 1 }}
-                  otherForm={form2}
-                  formKey="invoice"
-                  uploadedFileUrl={form2.values.invoice}
-                  isUser
-                />
-              </Flex>
-
-              <Flex gap={20} mt={24}>
-                <Textarea
-                  flex={1}
-                  autosize
-                  minRows={3}
-                  maxLength={24}
-                  size="lg"
-                  classNames={{
-                    input: styles.textarea,
-                    label: styles.label,
-                  }}
-                  label={
-                    <Text fz={14} c="#667085">
-                      Narration <span style={{ color: "red" }}>*</span>
-                    </Text>
-                  }
-                  placeholder="Enter narration"
-                  {...form2.getInputProps("narration")}
-                  errorProps={{
-                    fz: 12,
-                  }}
-                />
-              </Flex>
             </>
           ) : (
             <>
-              <Flex gap={20}>
-                <TextInput
-                  classNames={{ input: styles.input, label: styles.label }}
-                  flex={1}
-                  size="lg"
-                  label={
-                    <Text fz={14} c="#667085">
-                      Company Name <span style={{ color: "red" }}>*</span>
-                    </Text>
-                  }
-                  placeholder="Enter company Name"
-                  {...form2.getInputProps("companyName")}
-                  errorProps={{
-                    fz: 12,
-                  }}
-                />
-              </Flex>
+              <Flex direction="column">
+                {switchCurrency === "USD" ? (
+                  <>
+                    <USDSelectTypeOfTransfer />
 
-              <Flex gap={20} mt={24}>
-                {switchCurrency === "EUR" ? (
+                    <FullNameField form2={form2} mt={0} />
+
+                    {switchCurrencyOutsideUS === "WithinUSA" ? (
+                      <Flex gap={20} mt={24} w="100%">
+                        <TextInput
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              IBAN <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter IBAN"
+                          {...form2.getInputProps("destinationIBAN")}
+                          errorProps={{ fz: 12 }}
+                        />
+                        <TextInput
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          label={
+                            <Text fz={14} c="#667085">
+                              BIC <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter BIC"
+                          {...form2.getInputProps("destinationBIC")}
+                          errorProps={{ fz: 12 }}
+                        />
+                      </Flex>
+                    ) : (
+                      <Flex align="center" mt={24} gap={20} w="100%">
+                        <TextInput
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          type="number"
+                          minLength={10}
+                          maxLength={16}
+                          label={
+                            <Text fz={14} c="#667085">
+                              Routing Number (ABA){" "}
+                              <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter routing number"
+                          {...form2.getInputProps("routingNumber")}
+                          errorProps={{ fz: 12 }}
+                        />
+
+                        <TextInput
+                          classNames={{
+                            input: styles.input,
+                            label: styles.label,
+                          }}
+                          flex={1}
+                          size="lg"
+                          type="number"
+                          minLength={10}
+                          maxLength={16}
+                          label={
+                            <Text fz={14} c="#667085">
+                              Account Number{" "}
+                              <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
+                          placeholder="Enter account number"
+                          {...form2.getInputProps("accountNumber")}
+                          errorProps={{ fz: 12 }}
+                        />
+                      </Flex>
+                    )}
+
+                    {/* <BankField form2={form2} />
+
+                    <CountryField form2={form2} />
+
+                    <AmountField form2={form2} />
+
+                    <DropzoneOptional form2={form2} />
+
+                    <NarrationField form2={form2} /> */}
+                  </>
+                ) : switchCurrency === "EUR" ? (
                   <Flex gap={20} w="100%">
                     <TextInput
                       classNames={{ input: styles.input, label: styles.label }}
@@ -661,24 +862,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
               {validated && (
                 <>
-                  <Flex gap={20} mt={24}>
-                    <TextInput
-                      placeholder="Enter Bank Name"
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      size="lg"
-                      label={
-                        <Text fz={14} c="#667085">
-                          Bank <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      disabled={disableBank}
-                      {...form2.getInputProps("destinationBank")}
-                      errorProps={{
-                        fz: 12,
-                      }}
-                    />
-                  </Flex>
+                  <BankField form2={form2} />
 
                   <Flex gap={20} mt={24}>
                     <TextInput
@@ -693,104 +877,17 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       disabled={disableAddress}
                       placeholder="Bank Address"
                       {...form2.getInputProps("bankAddress")}
-                      errorProps={{
-                        fz: 12,
-                      }}
+                      errorProps={{ fz: 12 }}
                     />
                   </Flex>
 
-                  <Flex gap={20} mt={24}>
-                    <Select
-                      searchable
-                      placeholder="Select Country"
-                      classNames={{ input: styles.input, label: styles.label }}
-                      flex={1}
-                      label={
-                        <Text fz={14} c="#667086">
-                          Country <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      data={countries.map((c) => c.name)}
-                      disabled={disableCountry}
-                      {...form2.getInputProps("destinationCountry")}
-                    />
-                  </Flex>
+                  <CountryField form2={form2} />
 
-                  <Flex gap={20} mt={24}>
-                    <NumberInput
-                      flex={1}
-                      classNames={{ input: styles.input, label: styles.label }}
-                      description={
-                        <Text fz={12}>
-                          {Number(form2.values.amount) >
-                          Number(account?.accountBalance)
-                            ? `Insufficient Balance`
-                            : ""}
-                        </Text>
-                      }
-                      styles={{
-                        description: {
-                          color: "var(--prune-warning)",
-                        },
-                        input: {
-                          border:
-                            Number(form2.values.amount) >
-                            Number(account?.accountBalance)
-                              ? "1px solid red"
-                              : "1px solid #eaecf0",
-                        },
-                      }}
-                      label={
-                        <Text fz={14} c="#667085">
-                          Amount <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      hideControls
-                      size="lg"
-                      placeholder="Enter amount"
-                      {...form2.getInputProps("amount")}
-                      errorProps={{
-                        fz: 12,
-                      }}
-                    />
-                  </Flex>
+                  <AmountField form2={form2} />
 
-                  <Flex gap={20} mt={24} direction="column">
-                    <Text fz={14} c="#667085" m={0} p={0}>
-                      Upload supporting document (Optional)
-                    </Text>
-                    <DropzoneComponent<typeof sendMoneyRequest>
-                      style={{ flex: 1 }}
-                      otherForm={form2}
-                      formKey="invoice"
-                      uploadedFileUrl={form2.values.invoice}
-                      isUser
-                    />
-                  </Flex>
+                  <DropzoneOptional form2={form2} />
 
-                  <Flex gap={20} mt={24}>
-                    <Textarea
-                      flex={1}
-                      autosize
-                      minRows={3}
-                      maxLength={24}
-                      size="lg"
-                      classNames={{
-                        input: styles.textarea,
-                        label: styles.label,
-                      }}
-                      label={
-                        <Text fz={14} c="#667085">
-                          Narration <span style={{ color: "red" }}>*</span>
-                        </Text>
-                      }
-                      placeholder="Enter narration"
-                      {...form2.getInputProps("narration")}
-                      errorProps={{
-                        fz: 12,
-                      }}
-                    />
-                  </Flex>
+                  <NarrationField form2={form2} />
                 </>
               )}
             </>

@@ -160,20 +160,16 @@ export const sendMoneyIndividualValidate = z
       }),
     }),
 
-    gshTransferType: z
-      .enum(["BankTransfer", "MobileMoney"], {
-        errorMap: () => ({
-          message: "Transfer type must be either BankTransfer or MobileMoney",
-        }),
-      })
-      .optional(),
-    usdTransferType: z
-      .enum(["WithinUSA", "OutsideUSA"], {
-        errorMap: () => ({
-          message: "Transfer type must be either WithinUSA or OutsideUSA",
-        }),
-      })
-      .optional(),
+    gshTransferType: z.enum(["BankTransfer", "MobileMoney"], {
+      errorMap: () => ({
+        message: "Transfer type must be either BankTransfer or MobileMoney",
+      }),
+    }),
+    usdTransferType: z.enum(["WithinUSA", "OutsideUSA"], {
+      errorMap: () => ({
+        message: "Transfer type must be either WithinUSA or OutsideUSA",
+      }),
+    }),
   })
   .superRefine((data, ctx) => {
     // Require transfer type only for applicable currencies
@@ -270,6 +266,13 @@ export const sendMoneyIndividualValidate = z
           path: ["destinationBIC"],
           code: z.ZodIssueCode.custom,
           message: "BIC is required for USD Within USA transfers",
+        });
+      }
+      if (!data.destinationIBAN || data.destinationIBAN.trim() === "") {
+        ctx.addIssue({
+          path: ["destinationIBAN"],
+          code: z.ZodIssueCode.custom,
+          message: "IBAN is required for USD Within USA transfers",
         });
       }
     }
@@ -386,6 +389,11 @@ export const sendMoneyCompanyValidate = z
       ) // Allows empty string or PR-GH format
       .optional(),
 
+    routingNumber: z
+      .string()
+      .regex(/^$|^[0-9]{9}$/, "Invalid routing number format (9 digits)") // Allows empty string
+      .optional(),
+
     phoneNumber: z
       .string()
       .regex(/^$|^[0-9]{10,15}$/, "Invalid phone number format (10-15 digits)") // Allows empty string
@@ -417,14 +425,23 @@ export const sendMoneyCompanyValidate = z
       .string()
       .min(2, "Narration must be at least 2 characters")
       .max(100, "Narration cannot exceed 100 characters"),
-    currency: z.enum(["EUR", "GBP", "GHS"], {
-      errorMap: () => ({ message: "Currency must be either EUR, GBP or GHS" }),
+    currency: z.enum(["EUR", "GBP", "GHS", "USD"], {
+      errorMap: () => ({ message: "Currency must be either EUR, GBP, GHS or USD" }),
     }),
-    gshTransferType: z.enum(["BankTransfer", "MobileMoney"], {
-      errorMap: () => ({
-        message: "Transfer type must be either BankTransfer or MobileMoney",
-      }),
-    }),
+    gshTransferType: z
+      .enum(["BankTransfer", "MobileMoney"], {
+        errorMap: () => ({
+          message: "Transfer type must be either BankTransfer or MobileMoney",
+        }),
+      })
+      .optional(),
+    usdTransferType: z
+      .enum(["WithinUSA", "OutsideUSA"], {
+        errorMap: () => ({
+          message: "Transfer type must be either WithinUSA or OutsideUSA",
+        }),
+      })
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.currency === "EUR") {
@@ -480,6 +497,40 @@ export const sendMoneyCompanyValidate = z
           path: ["phoneNumber"],
           code: z.ZodIssueCode.custom,
           message: "Phone Number is required for GHS MobileMoney transfers",
+        });
+      }
+    }
+
+    if (data.currency === "USD" && data.usdTransferType === "WithinUSA") {
+      if (!data.destinationBIC || data.destinationBIC.trim() === "") {
+        ctx.addIssue({
+          path: ["destinationBIC"],
+          code: z.ZodIssueCode.custom,
+          message: "BIC is required for USD Within USA transfers",
+        });
+      }
+      if (!data.destinationIBAN || data.destinationIBAN.trim() === "") {
+        ctx.addIssue({
+          path: ["destinationIBAN"],
+          code: z.ZodIssueCode.custom,
+          message: "IBAN is required for USD Within USA transfers",
+        });
+      }
+    }
+
+    if (data.currency === "USD" && data.usdTransferType === "OutsideUSA") {
+      if (!data.routingNumber || data.routingNumber.trim() === "") {
+        ctx.addIssue({
+          path: ["routingNumber"],
+          code: z.ZodIssueCode.custom,
+          message: "Routing Number is required for USD OutsideUSA transfers",
+        });
+      }
+      if (!data.accountNumber || data.accountNumber.trim() === "") {
+        ctx.addIssue({
+          path: ["accountNumber"],
+          code: z.ZodIssueCode.custom,
+          message: "Account Number is required for USD OutsideUSA transfers",
         });
       }
     }

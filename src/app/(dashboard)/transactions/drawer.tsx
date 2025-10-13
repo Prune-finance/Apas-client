@@ -46,6 +46,7 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
+  console.log(selectedRequest);
   const pdfRef = useRef<HTMLDivElement>(null);
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.id ?? ""

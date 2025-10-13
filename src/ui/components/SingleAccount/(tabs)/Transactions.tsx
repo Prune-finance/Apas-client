@@ -73,8 +73,7 @@ export const Transactions = ({
 
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
-
-  console.log(downloadMeta);
+    
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
 
   const [search, setSearch] = useQueryState("search", {

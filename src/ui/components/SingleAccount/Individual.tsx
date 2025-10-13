@@ -49,6 +49,7 @@ import TransactionProcessTimeGBP from "./TransactionProcessTimeGBP";
 import NoticeBanner from "../NoticeBanner";
 import SelectTypeOfTransfer from "@/app/(dashboard)/accounts/SelectTypeOfTransfer";
 import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
+import USDSelectTypeOfTransfer from "@/app/(dashboard)/accounts/USDSelectTypeOfTransfer";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -506,6 +507,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                     />
                   </Flex>
                 </>
+              ) : switchCurrency === "USD" ? (
+                <>
+                  <USDSelectTypeOfTransfer />
+                </>
               ) : (
                 <>
                   <Flex gap={20}>
@@ -670,7 +675,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         w="100%"
                         px={20}
                         py={8}
-                        my={switchCurrency === "EUR" ? 0 : 32}                        
+                        my={switchCurrency === "EUR" ? 0 : 32}
                       >
                         <Badge
                           fz={14}

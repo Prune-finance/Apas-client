@@ -63,7 +63,6 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
           ? {
               "Account Number":
                 selectedRequest?.beneficiaryAccountNumber ?? "N/A",
-              "Sort Code": selectedRequest?.beneficiarySortCode ?? "N/A",
             }
           : {
               IBAN: selectedRequest?.recipientIban ?? "",

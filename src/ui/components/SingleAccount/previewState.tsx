@@ -60,6 +60,22 @@ function PreviewState({
               ? requestForm?.phoneNumber
               : requestForm?.accountNumber,
         }
+      : switchCurrency === "USD"
+      ? {
+          [requestForm?.usdTransferType === "WithinUSA"
+            ? "IBAN"
+            : "Account Number"]:
+            requestForm?.usdTransferType === "WithinUSA"
+              ? requestForm?.destinationIBAN
+              : requestForm?.accountNumber,
+
+          [requestForm?.usdTransferType === "WithinUSA"
+            ? "Bic"
+            : "Routing Number"]:
+            requestForm?.usdTransferType === "WithinUSA"
+              ? requestForm?.destinationBIC
+              : requestForm?.routingNumber,
+        }
       : {
           IBAN: requestForm?.destinationIBAN,
           BIC: requestForm?.destinationBIC,

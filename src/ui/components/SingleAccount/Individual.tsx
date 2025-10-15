@@ -272,7 +272,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           `Insufficient funds: The amount entered exceeds your balance`
         );
       // close();
-      console.log(form.values);
       setRequestForm(form.values);
       setSectionState("Individual");
       openDebtor();
@@ -666,7 +665,47 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                     />
                   </Flex>
 
+                  <Flex gap={20} mt={24}>
+                    <TextInput
+                      classNames={{
+                        input: styles.input,
+                        label: styles.label,
+                      }}
+                      flex={1}
+                      size="lg"
+                      label={
+                        <Text fz={14} c="#667085">
+                          Bank Address
+                        </Text>
+                      }
+                      placeholder="Bank Address"
+                      disabled={disableAddress}
+                      {...form.getInputProps("bankAddress")}
+                      errorProps={{ fz: 12 }}
+                    />
+                  </Flex>
+
                   <AmountField form={form} />
+
+                  <Flex gap={20} mt={24}>
+                    <Select
+                      searchable
+                      placeholder="Select Country"
+                      classNames={{
+                        input: styles.input,
+                        label: styles.label,
+                      }}
+                      flex={1}
+                      label={
+                        <Text fz={14} c="#667086">
+                          Country <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
+                      data={countries.map((c) => c?.name)}
+                      disabled={disableCountry}
+                      {...form.getInputProps("destinationCountry")}
+                    />
+                  </Flex>
 
                   <DropzoneOptional form={form} />
 

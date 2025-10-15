@@ -112,7 +112,7 @@ function Account() {
       <SingleDefaultAccountBody
         accountType={account?.AccountRequests?.Currency?.symbol || account?.currencyType}
         account={account}
-        location="gbp-account"
+        location={`${account?.AccountRequests?.Currency?.symbol || account?.currencyType || "ghs"}-business-account`.toLowerCase()}
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

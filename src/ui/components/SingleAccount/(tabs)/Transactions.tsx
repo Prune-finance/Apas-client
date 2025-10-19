@@ -78,6 +78,15 @@ export const Transactions = ({
     shallow: false,
   });
 
+  const getStatementDataChunks = (data: DownloadStatementData[]) => {
+    const chunkSize = 20; // Define your chunk size
+    const chunks: DownloadStatementData[][] = [];
+    for (let i = 0; i < data.length; i += chunkSize) {
+      chunks.push(data.slice(i, i + chunkSize));
+    }
+    return chunks;
+  };
+
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
@@ -310,6 +319,7 @@ export const Transactions = ({
         size={"35%"}
         centered
         withCloseButton={true}
+        style={{backgroundColor: "white"}}
       >
         <Flex
           w="100%"
@@ -356,12 +366,21 @@ export const Transactions = ({
       </Modal>
 
       <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
-        <DownloadStatement
-          currencyType={currencyType || "EUR"}
-          receiptRef={pdfRef}
-          data={downloadData}
-          meta={downloadMeta}
-        />
+        <>
+          {
+            getStatementDataChunks(downloadData).map((dataChunk, index) => {
+              return (
+                <DownloadStatement
+                  key={index}
+                  currencyType={currencyType || "EUR"}
+                  receiptRef={pdfRef}
+                  data={dataChunk} // Render remaining data on other pages
+                  meta={downloadMeta}
+                />
+              );
+            })
+          }
+        </>
       </Box>
     </>
   );

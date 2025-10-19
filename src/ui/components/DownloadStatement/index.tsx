@@ -84,8 +84,11 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
     ? meta.summary.range.split(" - ").map((date) => dayjs(date))
     : [dayjs(), dayjs()];
 
+  const lengthOfData = data?.length || 0;
+  const LinesTofill = lengthOfData < 20 ? 20 - lengthOfData : 0;
+
   return (
-    <Paper withBorder bg="#fff" w="100%" ref={receiptRef}>
+    <Paper withBorder bg="#fff" w="100%" ref={receiptRef} className="pdf-page">
       <Flex
         align="center"
         justify="space-between"
@@ -234,18 +237,18 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
           }}
           data={{
             head: AccountTableHeaders,
-            body: data?.map((item) => [
-              dayjs(item?.createdAt).format("Do MMMM YYYY"),
+            body: data?.concat(Array(LinesTofill).fill(null)).map((item) => [
+              item?.createdAt ? dayjs(item?.createdAt).format("Do MMMM YYYY") : "-",
               item?.description ?? item?.ref ?? "-",
-              item?.type === "CREDIT"
+              item?.type ? (item?.type === "CREDIT"
                 ? formatNumber(item?.amount ?? 0, true, currencyType ?? "EUR")
-                : formatNumber(0, true, currencyType ?? "EUR"),
-              item?.type === "DEBIT"
+                : formatNumber(0, true, currencyType ?? "EUR")) : "-",
+              item?.type ? (item?.type === "DEBIT"
                 ? formatNumber(item?.amount ?? 0, true, currencyType ?? "EUR")
-                : formatNumber(0, true, currencyType ?? "EUR"),
-              item?.balance
+                : formatNumber(0, true, currencyType ?? "EUR")) : "-",
+              item?.balance ? (item?.balance
                 ? formatNumber(item?.balance, true, currencyType ?? "EUR")
-                : formatNumber(0, true, currencyType ?? "EUR"),
+                : formatNumber(0, true, currencyType ?? "EUR")) : "-",
             ]),
           }}
           w="100%"

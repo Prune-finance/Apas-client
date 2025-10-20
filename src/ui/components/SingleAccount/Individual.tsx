@@ -263,6 +263,12 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
         return;
       }
 
+      if (!account?.accountBalance || account?.accountBalance === 0)
+        return form.setFieldError(
+          "amount",
+          `Insufficient funds: The amount entered exceeds your balance`
+        );
+
       if (
         account?.accountBalance &&
         account?.accountBalance < Number(form.values.amount)
@@ -354,7 +360,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
             classNames={{ input: styles.input, label: styles.label }}
             description={
               <Text fz={12}>
-                {Number(form.values.amount) > Number(account?.accountBalance)
+                {Number(form.values.amount) > Number(account?.accountBalance) ||
+                !account?.accountBalance ||
+                account?.accountBalance === 0
                   ? `Insufficient Balance`
                   : ""}
               </Text>
@@ -363,7 +371,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               description: { color: "var(--prune-warning)" },
               input: {
                 border:
-                  Number(form.values.amount) > Number(account?.accountBalance)
+                  Number(form.values.amount) >
+                    Number(account?.accountBalance) ||
+                  !account?.accountBalance ||
+                  account?.accountBalance === 0
                     ? "1px solid red"
                     : "1px solid #eaecf0",
               },

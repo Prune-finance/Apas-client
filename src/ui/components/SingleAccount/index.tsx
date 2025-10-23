@@ -646,6 +646,7 @@ export const SingleAccountBody = ({
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}
+            currencyType={currency}
             // children={children}
             accountID={accountID}
             isUser={isUser}

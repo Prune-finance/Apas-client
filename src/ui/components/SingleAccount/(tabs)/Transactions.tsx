@@ -318,7 +318,7 @@ export const Transactions = ({
           />
 
           <SecondaryBtn
-            text="Download Export"
+            text="Export Transactions"
             icon={IconCircleArrowDown}
             // style={{ cursor: "not-allowed" }}
             fw={600}
@@ -445,18 +445,6 @@ export const Transactions = ({
             numberOfColumns={2}
             clearable
             disabled={loadingStatement}
-          />
-
-          <SelectBox
-            placeholder="Select Document Type"
-            data={["PDF", "CSV"]}
-            value={documentType}
-            onChange={(value) => setDocumentType(value!)}
-            mt={16}
-            size="xs"
-            w="100%"
-            h={44}
-            styles={{ input: { height: "48px" } }}
           />
 
           <PrimaryBtn

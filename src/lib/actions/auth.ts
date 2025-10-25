@@ -1,9 +1,11 @@
 "use client";
 
+import { DownloadStatementData } from "@/ui/components/SingleAccount/(tabs)/Transactions";
 import axios from "axios";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { RefObject } from "react";
+import * as XLSX from "xlsx";
 
 export function parseError(error: unknown) {
   if (axios.isAxiosError(error)) {
@@ -70,6 +72,49 @@ export const handlePdfDownload = async (
     // setProcessing(false);
   }
 };
+
+export const handleCsvDownload = (csvData: DownloadStatementData[], csvName?: string, currency?: string, isStatement?: boolean) => {
+  console.log("CSV Data:", csvData);
+  try {
+    const data = csvData.map((row) => ({
+      createdAt: row.createdAt,
+      amount: row.amount,
+      ...(isStatement ? { balance: row.balance } : {}),
+      narration: row.description || row.narration,
+      reference: row.reference,
+      status: row.status,
+      type: row.type,
+      ...(currency === "GHS" ? { senderWalletId: row.senderWalletId, beneficiaryWalletId: row.beneficiaryWalletId, beneficiaryName: row.beneficiaryName } : {}),
+      ...(currency === "GBP" ? { senderName: row.senderName, beneficiaryAccountNumber: row.beneficiaryAccountNumber, beneficiarySortCode: row.beneficiarySortCode } : {})
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    const csv = XLSX.utils.sheet_to_csv(worksheet);
+
+    const downloadCSV = async (csvData: string) => {
+      const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        csvName || `transaction_statement_${Math.floor(Date.now() / 1000)
+          .toString(36)
+          .substring(2, 15)}.csv`
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    downloadCSV(csv);
+  } catch (error) {
+    throw "Error downloading CSV file";
+  } finally {
+    return;
+  }
+}
 
 export const handlePdfStatement = async (
   pdfRef: RefObject<HTMLDivElement>,

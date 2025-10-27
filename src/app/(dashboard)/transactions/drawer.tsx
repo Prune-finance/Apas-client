@@ -96,10 +96,7 @@ export const TransactionDrawer = ({
           IBAN: selectedRequest?.recipientIban,
           BIC: selectedRequest?.recipientBic,
         }),
-    "Bank Name":
-      selectedRequest?.recipientBankAddress ||
-      selectedRequest?.beneficiaryInstitutionName ||
-      "N/A",
+    "Bank Name": selectedRequest?.beneficiaryInstitutionName || "N/A",
     "Bank Address":
       selectedRequest?.type === "CREDIT"
         ? "Office 7 35-37 Ludgate Hill, London"

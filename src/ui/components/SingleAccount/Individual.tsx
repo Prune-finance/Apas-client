@@ -620,6 +620,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           px={20}
                           py={8}
                           my={switchCurrency === "USD" ? 0 : 32}
+                          mt={20}
                         >
                           <Badge
                             fz={14}

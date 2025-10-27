@@ -1,11 +1,19 @@
 import { useRef, useState, useMemo, useEffect } from "react";
-import { Flex, FloatingIndicator, Image, UnstyledButton } from "@mantine/core";
+import {
+  Flex,
+  FloatingIndicator,
+  Image,
+  Loader,
+  Skeleton,
+  UnstyledButton,
+} from "@mantine/core";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
 import GHSImage from "@/assets/GH.png";
 import USDImage from "@/assets/USD.png";
 import classes from "./styles.module.scss";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import { useCheckCurrencyList } from "@/lib/hooks/accounts";
 
 const data = [
   {
@@ -63,6 +71,8 @@ function CurrencyTab() {
   const controlsRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const [mounted, setMounted] = useState(false);
 
+  const { account, loading } = useCheckCurrencyList();
+
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -81,7 +91,7 @@ function CurrencyTab() {
     }
   };
 
-  const controls = data.map((item, index) => (
+  const controls = data?.map((item, index) => (
     <UnstyledButton
       key={item?.title}
       className={classes.control}
@@ -100,7 +110,13 @@ function CurrencyTab() {
 
   return (
     <div className={classes.root} ref={rootRef}>
-      {controls}
+      {loading ? (
+        <Skeleton h={40} w={100} />
+      ) : (
+        controls?.filter(
+          (item, index) => account?.[data[index]?.title as any] === true
+        )
+      )}
 
       {mounted && controlsRefs.current[active] && rootRef.current && (
         <FloatingIndicator

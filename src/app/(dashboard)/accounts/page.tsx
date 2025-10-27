@@ -495,7 +495,7 @@ function Accounts() {
           }}
         >
           <TabsPanel value={tabs[0].value}>
-            <SimpleGrid cols={{ base: 1, sm: 2, xl: 3 }} mt={32}>
+            <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }} mt={32}>
               <NewAccountCard
                 currency={"EUR"}
                 companyName={account?.accountName ?? "No Default Account"}

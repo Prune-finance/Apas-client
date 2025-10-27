@@ -63,6 +63,7 @@ import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import useAddAccountCurrencyStore from "@/lib/store/add-account";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -152,6 +153,8 @@ function Accounts() {
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+
+  const { addAccountCurrency } = useAddAccountCurrencyStore();
 
   const isInitiator = useHasPermission("INITIATOR");
   const canSendMoney =
@@ -688,7 +691,7 @@ function Accounts() {
           style={{ height: 190, width: "100%", marginBottom: 10 }}
           desc={
             <Text fz={14} c="#667085">
-              You have successfully requested a GBP account.
+              You have successfully requested a {addAccountCurrency} account.
             </Text>
           }
           title="Account Requested Successfully."

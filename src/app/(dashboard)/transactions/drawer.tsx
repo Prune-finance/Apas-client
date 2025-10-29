@@ -46,7 +46,6 @@ export const TransactionDrawer = ({
   close,
   opened,
 }: TransactionDrawerProps) => {
-  console.log(selectedRequest);
   const pdfRef = useRef<HTMLDivElement>(null);
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.id ?? ""
@@ -97,10 +96,7 @@ export const TransactionDrawer = ({
           IBAN: selectedRequest?.recipientIban,
           BIC: selectedRequest?.recipientBic,
         }),
-    "Bank Name":
-      selectedRequest?.recipientBankAddress ??
-      selectedRequest?.beneficiaryInstitutionName ??
-      "N/A",
+    "Bank Name": selectedRequest?.beneficiaryInstitutionName || "N/A",
     "Bank Address":
       selectedRequest?.type === "CREDIT"
         ? "Office 7 35-37 Ludgate Hill, London"
@@ -140,7 +136,7 @@ export const TransactionDrawer = ({
     Bank:
       selectedRequest?.type === "DEBIT"
         ? "Prune Payments LTD"
-        : selectedRequest?.senderInstitutionName ?? "N/A",
+        : selectedRequest?.senderInstitutionName || "N/A",
     "Bank Address":
       selectedRequest?.type === "DEBIT"
         ? "Office 7 35-37 Ludgate Hill, London"
@@ -256,9 +252,16 @@ export const TransactionDrawer = ({
                   {key}:
                 </Text>
 
-                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                  {value}
-                </Text>
+                <Flex align="flex-end" justify="flex-end" w="50%">
+                  <Text
+                    fz={12}
+                    c="var(--prune-text-gray-700)"
+                    ta="right"
+                    fw={600}
+                  >
+                    {value}
+                  </Text>
+                </Flex>
               </Group>
             ))}
           </Stack>
@@ -282,9 +285,16 @@ export const TransactionDrawer = ({
                   {key}:
                 </Text>
 
-                <Text fz={12} c="var(--prune-text-gray-700)" fw={600}>
-                  {value}
-                </Text>
+                <Flex align="flex-end" justify="flex-end" w="50%">
+                  <Text
+                    fz={12}
+                    c="var(--prune-text-gray-700)"
+                    ta="right"
+                    fw={600}
+                  >
+                    {value}
+                  </Text>
+                </Flex>
               </Group>
             ))}
           </Stack>

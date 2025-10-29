@@ -174,8 +174,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBankName: destinationBank,
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
-            recipientBankAddress: "",
-            beneficiaryBankAddress: "",
+            recipientBankAddress: bankAddress,
+            beneficiaryBankAddress: bankAddress,
           };
         } else {
           return {

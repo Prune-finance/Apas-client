@@ -609,7 +609,50 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   <NameFields mt={24} form={form} />
 
                   {switchCurrencyOutsideUS === "WithinUSA" ? (
-                    <BICIBANField form={form} />
+                    <>
+                      <BICIBANField form={form} />
+
+                      {(processing || validated) && showBadge && (
+                        <Group
+                          justify="space-between"
+                          bg="#ECFDF3"
+                          w="100%"
+                          px={20}
+                          py={8}
+                          my={switchCurrency === "USD" ? 0 : 32}
+                          mt={20}
+                        >
+                          <Badge
+                            fz={14}
+                            px={0}
+                            c="#12B76A"
+                            variant="transparent"
+                            fw={600}
+                            color="#12B76A"
+                            tt="capitalize"
+                            rightSection={
+                              validated ? (
+                                <ActionIcon
+                                  variant="light"
+                                  radius="xl"
+                                  color="#12B76A"
+                                  size={23}
+                                >
+                                  <IconCheck />
+                                </ActionIcon>
+                              ) : null
+                            }
+                          >
+                            {validated
+                              ? "Information Validated "
+                              : "Verifying Account Details"}
+                          </Badge>
+                          {processing && (
+                            <Loader type="oval" size={24} color="#12B76A" />
+                          )}
+                        </Group>
+                      )}
+                    </>
                   ) : (
                     <Flex align="center" mt={24} gap={20}>
                       <TextInput

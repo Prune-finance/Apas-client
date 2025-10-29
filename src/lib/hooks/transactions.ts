@@ -952,6 +952,7 @@ export interface TransactionType {
   senderAccountNumber: string;
   senderSortCode: string;
   currencyType: string;
+  currency?: string;
   senderName: string;
   senderBic: string;
   recipientIban: string;

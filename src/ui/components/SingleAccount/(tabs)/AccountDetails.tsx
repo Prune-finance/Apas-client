@@ -15,6 +15,7 @@ import { GiEuropeanFlag } from "react-icons/gi";
 import { PrimaryBtn } from "../../Buttons";
 import { Account } from "@/lib/hooks/accounts";
 import GBImage from "@/assets/GB.png";
+import USImage from "@/assets/USD.png";
 import EUImage from "@/assets/EU-icon.png";
 
 interface Props {
@@ -29,11 +30,17 @@ export default function AccountDetails({ account, loading, currency = "EUR" }: P
     ...(currency === "EUR" && {
       "IBAN/Account Number": account?.accountNumber,
     }),
-    ...(currency === "GBP" && {
+    ...(currency != "EUR" && {
       "Account Number": account?.accountNumber,
+    }),
+    ...(currency != "EUR" && {
+      "Account Iban": account?.accountIban,
     }),
     ...(currency === "EUR" && {
       BIC: "ARPYGB21XXX",
+    }),
+    ...(currency === "USD" && {
+      "SWIFT/BIC": "ARPYGB21",
     }),
     ...(currency === "GBP" && {
       "Sort Code": account?.sortCode,
@@ -51,6 +58,8 @@ export default function AccountDetails({ account, loading, currency = "EUR" }: P
             <>
               {currency === "GBP" ? (
                 <Image src={GBImage.src} alt="GBP" w={20} h={20} />
+              ) : currency === "USD" ? (
+                <Image src={USImage.src} alt="USD" w={20} h={20} />
               ) : (
                 <Image src={EUImage.src} alt="EUR" w={20} h={20} />
               )}

@@ -103,6 +103,16 @@ function Accounts() {
   } = useUserAccounts({ ...queryParams, currency: "GBP" });
 
   const {
+    loading: loadingUsdAccounts,
+    accounts: usdAccounts,
+    revalidate: revalidateUsdAccounts,
+    meta: metaUsdAccounts,
+    statusLoading: statusLoadingUsdAccounts,
+    issuanceRequests: usdIssuanceRequests,
+    revalidateIssuance: revalidateUsdIssuance,
+  } = useUserAccounts({ ...queryParams, currency: "USD" });
+
+  const {
     loading,
     accounts,
     revalidate,
@@ -427,6 +437,67 @@ function Accounts() {
     </TableTr>
   ));
 
+
+  const usdRows = (usdAccounts ?? []).map((element, index) => (
+    <TableTr key={index} style={{ cursor: "pointer" }}>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
+        {/* {`${element.accountName}`}{" "} */}
+        <Text fz={12} inline tt="capitalize">
+          {element.accountName}
+
+          <Text span inherit fz={12} c="#c6a700" fw={600}>
+            {element.staging === "TEST" ? " (TEST)" : ""}
+          </Text>
+        </Text>
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+      >
+        {element.accountIban ?? element.accountNumber}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+      >
+        {formatNumber(element.accountBalance, true, "USD")}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
+        {getUserType(element.type ?? "USER")}
+      </TableTd>
+      {/* <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+      >
+        {element.Company.name}
+      </TableTd> */}
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={`${styles.table__td}`}
+      >
+        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+      >
+        <BadgeComponent status={element.status} active />
+      </TableTd>
+
+      {/* <TableTd className={`${styles.table__td}`}>
+        <MenuComponent id={element.id} status={element.status} />
+      </TableTd> */}
+    </TableTr>
+  ));
+
   const handleRequestAccess = async () => {
     setProcessing(true);
     try {
@@ -649,6 +720,35 @@ function Accounts() {
                       limit={limit}
                       setLimit={setLimit}
                     />
+
+                    
+                  </TabsPanel>
+
+
+                  <TabsPanel value={issuedAccountSubTabs[2].value}>
+                    <TableComponent
+                      head={tableHeaders}
+                      rows={usdRows}
+                      loading={loadingUsdAccounts}
+                    />
+
+                    <EmptyTable
+                      rows={usdRows}
+                      loading={loadingUsdAccounts}
+                      title="There are no accounts"
+                      text="When an account is created, it will appear here"
+                    />
+
+                    <PaginationComponent
+                      total={Math.ceil(
+                        (metaUsdAccounts?.total ?? 0) /
+                          parseInt(limit ?? "10", 10)
+                      )}
+                      active={active}
+                      setActive={setActive}
+                      limit={limit}
+                      setLimit={setLimit}
+                    />
                   </TabsPanel>
                 </TabsComponent>
               </TabsPanel>
@@ -810,4 +910,5 @@ const issuedAccountTabs = [
 const issuedAccountSubTabs = [
   { value: "eur-account", title: "EUR Accounts" },
   { value: "gbp-accounts", title: "GBP Accounts" },
+  { value: "usd-accounts", title: "USD Accounts" },
 ];

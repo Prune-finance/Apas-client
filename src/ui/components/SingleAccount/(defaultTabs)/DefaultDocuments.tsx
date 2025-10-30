@@ -14,6 +14,8 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
     !account?.accountDocuments ||
     (typeof account.accountDocuments === "object" &&
       Object.keys(account.accountDocuments).length === 0);
+
+  console.log(account?.accountDocuments || [])
   return (
     <Box>
       {account?.type === "USER" && !isAccountDocumentsEmpty && (
@@ -48,7 +50,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               {`Director's Documents`}
             </Text>
 
-            {(account.accountDocuments.directors || []).map(
+            {Object.values(account.accountDocuments.directors || {}).map(
               (director, index) => (
                 <Box mb={20} key={index}>
                   <Text fz={12} fw={500} c="dimmed" mb={20}>
@@ -72,7 +74,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               )
             )}
 
-            {(account.accountDocuments.directors || []).length === 0 && (
+            {Object.keys(account.accountDocuments.directors || {})?.length === 0 && (
               <NoContent text="No Director Documents" />
             )}
           </Paper>
@@ -87,7 +89,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
             >
               {`Shareholder's Documents`}
             </Text>
-            {(account.accountDocuments.shareholders || []).map(
+            {Object.values(account.accountDocuments.shareholders || {}).map(
               (director, index) => (
                 <Box mb={20} key={index}>
                   <Text fz={12} fw={500} c="dimmed" mb={20}>
@@ -111,7 +113,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               )
             )}
 
-            {(account.accountDocuments.shareholders || []).length === 0 && (
+            {Object.keys(account.accountDocuments.shareholders || {}).length === 0 && (
               <NoContent text="No Shareholder Documents" />
             )}
           </Paper>

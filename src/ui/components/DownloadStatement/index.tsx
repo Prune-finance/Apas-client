@@ -64,8 +64,9 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
 
     ...(currencyType === "USD"
       ? {
-          IBAN: meta?.accountDetails?.iban ?? "N/A",
-          "Sort Code": meta?.accountDetails?.sortCode ?? "N/A",
+          IBAN: meta?.accountDetails?.accountIban ?? "N/A",
+          "Account Number": meta?.accountDetails?.accountNumber ?? "N/A",
+          "SWIFT/BIC": meta?.accountDetails?.["SWIFT/BIC"] ?? "ARPYGB21",
         }
       : {}),
 

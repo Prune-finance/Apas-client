@@ -163,6 +163,7 @@ export const Transactions = ({
       "ghs-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "eur-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "gbp-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
+      "usd-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
     };
 
     // Use the default URL if location is undefined or not in urlMap
@@ -245,6 +246,7 @@ export const Transactions = ({
       "ghs-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "eur-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "gbp-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
+      "usd-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
     };
 
     const url =
@@ -593,6 +595,9 @@ export interface AccountDetails {
   id: string;
   iban: string;
   country: string;
+  accountIban?: string;
+  accountNumber?: string;
+  "SWIFT/BIC"?: string;
   accountName: string;
   createdAt: string;
   sortCode?: string;

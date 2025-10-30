@@ -958,6 +958,7 @@ export interface CurrencyAccount {
   accountBalance: number;
   accountDocuments: Record<string, any>;
   companyId: string;
+  currency?: "GHS" | "GBP" | "NGN" | "EUR" | "USD" | string;
   staging: "TEST" | "PRODUCTION" | string;
   status: "ACTIVE" | "PENDING" | "REJECTED" | string;
   createdAt: string;

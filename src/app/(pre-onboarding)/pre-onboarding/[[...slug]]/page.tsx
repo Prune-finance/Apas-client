@@ -13,9 +13,8 @@ import {
 import Turnover from "./Turnover";
 
 import {
-  BizBasicInfoSchema,
+  // BizBasicInfoSchema,
   OperationsAccountSchema,
-  questionnaireValues,
   ServicesSchema,
   TurnoverSchema,
   VirtualAccountSchema,
@@ -29,6 +28,10 @@ import { useParams } from "next/navigation";
 import { Onboarding } from "@/lib/interface";
 import { useDisclosure } from "@mantine/hooks";
 import ConsentModal from "./ConsentModal";
+import {
+  BizBasicInfoSchema,
+  questionnaireValues,
+} from "@/lib/schema/pre-onboarding";
 
 export default function Questionnaire() {
   const [active, setActive] = useState(0);

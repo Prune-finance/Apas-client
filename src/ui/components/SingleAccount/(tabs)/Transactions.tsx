@@ -251,7 +251,7 @@ export const Transactions = ({
 
     const url =
       urlMap[location ?? "default"] ||
-      `${baseUrl}/accounts/${accountID}/export?date=${startDate}&endDate=${endDate}`;
+      `${baseUrl}/accounts/${accountID}/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`;
 
     try {
       const { data: res } = await axios.get(url, { headers });

@@ -861,7 +861,7 @@ export function useAdminGetCurrencyTransactions(
     loading,
     queryFn: revalidate,
   } = useAxios<TransactionType[], Meta>({
-    endpoint: `currency-accounts/admin-get-account-transactions-by-id/${id}/${symbol}?queryAccountType=${queryAccountType}`,
+    endpoint: `currency-accounts/admin-get-account-transactions-by-id/${id}/${symbol}`,
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],

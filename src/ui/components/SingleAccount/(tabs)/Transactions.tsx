@@ -69,7 +69,7 @@ export const Transactions = ({
 
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
-    
+
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
 
   const [search, setSearch] = useQueryState("search", {
@@ -415,6 +415,9 @@ export interface AccountDetails {
   accountName: string;
   createdAt: string;
   sortCode?: string;
+  accountNumber?: string;
+  accountIban?: string;
+  bicSwift?: string;
 }
 
 export interface DownloadStatementData {

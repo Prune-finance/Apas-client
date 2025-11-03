@@ -53,7 +53,10 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
           IBAN: meta?.accountDetails?.iban ?? "N/A",
         }
       : {
-          "Account Number": meta?.accountDetails?.iban ?? "N/A",
+          "Account Number":
+            meta?.accountDetails?.iban ??
+            meta?.accountDetails?.accountNumber ??
+            "N/A",
         }),
 
     ...(currencyType === "GBP"
@@ -64,8 +67,8 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
 
     ...(currencyType === "USD"
       ? {
-          IBAN: meta?.accountDetails?.iban ?? "N/A",
-          "Sort Code": meta?.accountDetails?.sortCode ?? "N/A",
+          IBAN: meta?.accountDetails?.accountIban ?? "N/A",
+          "BIC / SWIFT": meta?.accountDetails?.bicSwift ?? "N/A",
         }
       : {}),
 

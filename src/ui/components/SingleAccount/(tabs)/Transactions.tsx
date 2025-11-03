@@ -31,7 +31,11 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import Filter from "../../Filter";
 import { useForm, zodResolver } from "@mantine/form";
 import DownloadStatement from "@/ui/components/DownloadStatement";
-import { handleCsvDownload, handlePdfStatement, parseError } from "@/lib/actions/auth";
+import {
+  handleCsvDownload,
+  handlePdfStatement,
+  parseError,
+} from "@/lib/actions/auth";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { DatePickerInput } from "@mantine/dates";
@@ -59,8 +63,10 @@ export const Transactions = ({
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
     useDisclosure(false);
-  const [openedTransactionsPreview, { open: openTransactionsPreview, close: closeTransactionsPreview }] =
-    useDisclosure(false);
+  const [
+    openedTransactionsPreview,
+    { open: openTransactionsPreview, close: closeTransactionsPreview },
+  ] = useDisclosure(false);
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
     null,
@@ -192,7 +198,11 @@ export const Transactions = ({
         handlePdfStatement(pdfRef);
       } else {
         console.log("downloadData:", downloadData);
-        handleCsvDownload(downloadData, "account_statement.csv", currencyType || "EUR");
+        handleCsvDownload(
+          downloadData,
+          "account_statement.csv",
+          currencyType || "EUR"
+        );
       }
       closePreview();
       handleSuccess(
@@ -267,7 +277,11 @@ export const Transactions = ({
       // Simulate delay for processing
       await new Promise((resolve) => setTimeout(resolve, 5000));
 
-      handleCsvDownload(res.data, "transactions_export.csv", currencyType || "EUR");
+      handleCsvDownload(
+        res.data,
+        "transactions_export.csv",
+        currencyType || "EUR"
+      );
 
       closeTransactionsPreview();
       handleSuccess(
@@ -419,7 +433,7 @@ export const Transactions = ({
         size={"35%"}
         centered
         withCloseButton={true}
-        style={{backgroundColor: "white"}}
+        style={{ backgroundColor: "white" }}
       >
         <Flex
           w="100%"
@@ -471,7 +485,7 @@ export const Transactions = ({
         size={"35%"}
         centered
         withCloseButton={true}
-        style={{backgroundColor: "white"}}
+        style={{ backgroundColor: "white" }}
       >
         <Flex
           w="100%"
@@ -532,19 +546,17 @@ export const Transactions = ({
 
       <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
         <>
-          {
-            getStatementDataChunks(downloadData).map((dataChunk, index) => {
-              return (
-                <DownloadStatement
-                  key={index}
-                  currencyType={currencyType || "EUR"}
-                  receiptRef={pdfRef}
-                  data={dataChunk} // Render remaining data on other pages
-                  meta={downloadMeta}
-                />
-              );
-            })
-          }
+          {getStatementDataChunks(downloadData).map((dataChunk, index) => {
+            return (
+              <DownloadStatement
+                key={index}
+                currencyType={currencyType || "EUR"}
+                receiptRef={pdfRef}
+                data={dataChunk} // Render remaining data on other pages
+                meta={downloadMeta}
+              />
+            );
+          })}
         </>
       </Box>
     </>
@@ -601,8 +613,6 @@ export interface AccountDetails {
   accountName: string;
   createdAt: string;
   sortCode?: string;
-  accountNumber?: string;
-  accountIban?: string;
   bicSwift?: string;
 }
 

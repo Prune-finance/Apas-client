@@ -73,6 +73,7 @@ export default function Account() {
   const { account, loading, revalidate, meta } = useSingleUserAccount(
     params.id, currency
   );
+  console.log("ACCOUNT DATA", account);
   const { handleSuccess, handleError } = useNotification();
   const {
     loading: trxLoading,

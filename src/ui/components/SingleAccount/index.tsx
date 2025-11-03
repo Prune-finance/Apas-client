@@ -648,6 +648,7 @@ export const SingleAccountBody = ({
             loading={loadingTrx}
             payout={payout}
             meta={trxMeta}
+            currencyType={currency}
             // children={children}
             accountID={accountID}
             isUser={isUser}
@@ -712,6 +713,7 @@ export const SingleDefaultAccountBody = ({
     ...(!payout ? [{ value: "Documents" }] : []),
   ];
 
+  console.log(location, accountType);
   return (
     <Box mt={32}>
       <AccountInfo
@@ -754,7 +756,7 @@ export const SingleDefaultAccountBody = ({
             // children={children}
             location={location ?? "default"}
             isUser={isUser}
-            currencyType={account?.AccountRequests?.Currency?.symbol}
+            currencyType={account?.AccountRequests?.Currency?.symbol || accountType}
           >
             {children}
           </Transactions>

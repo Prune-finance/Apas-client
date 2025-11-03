@@ -212,13 +212,52 @@ export default function Accounts({
   ));
 
   const issuedAccountRows = filteredSearch(
-    issuedCurrencyAccounts || [],
+    issuedCurrencyAccounts?.filter(account => account.currency === "GBP") || [],
     ["accountName", "accountNumber", "Company.name"],
     debouncedSearch
   ).map((element, index) => (
     <TableTr
       key={index}
       onClick={() => push(`/admin/businesses/${params.id}/default/${element.id}?accountType=${element.accountType}`)}
+      style={{ cursor: "pointer" }}
+    >
+      <TableTd className={styles.table__td}>
+        {serialNumber(active, index, customParams.limit)}
+      </TableTd>
+      <TableTd className={styles.table__td}>{element.accountName}</TableTd>
+      <TableTd className={styles.table__td}>{element.accountNumber}</TableTd>
+      <TableTd className={styles.table__td}>
+        {getUserType(element.accountType as any)}
+      </TableTd>
+      <TableTd className={`${styles.table__td}`}>
+        {dayjs(element.createdAt).format("Do MMMM, YYYY")}
+      </TableTd>
+      <TableTd className={styles.table__td}>
+        <Badge
+          tt="capitalize"
+          variant="light"
+          color={activeBadgeColor(element.status)}
+          w={82}
+          h={24}
+          fw={400}
+          fz={12}
+        >
+          {element.status.toLowerCase()}
+        </Badge>
+      </TableTd>
+    </TableTr>
+  ));
+
+  const usdIssuedAccounts = issuedCurrencyAccounts?.filter(account => account.currency === "USD");
+
+  const usdIssuedAccountRows = filteredSearch(
+    usdIssuedAccounts || [],
+    ["accountName", "accountNumber", "Company.name"],
+    debouncedSearch
+  ).map((element, index) => (
+    <TableTr
+      key={index}
+      onClick={() => push(`/admin/businesses/${params.id}/default/${element.id}?accountType=${element.accountType}&currency=${element.currency}`)}
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>
@@ -315,9 +354,11 @@ export default function Accounts({
                   key={data?.id}
                   currency={data?.AccountRequests?.Currency?.symbol}
                   companyName={data?.accountName ?? "No Default Account"}
-                  link={`/admin/businesses/${params.id}/default/${data?.id}`}
+                  link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                   sortCode="041917"
                   accountNumber={data?.accountNumber}
+                  walletId={data?.walletId ?? "No Default Account"}
+                  walletOwner={data?.accountName ?? "No Default Account"}
                   balance={data?.accountBalance ?? 0}
                   loading={payoutCurrencyAccountsLoading}
                   business={false}
@@ -333,7 +374,7 @@ export default function Accounts({
                 key={data?.id}
                 currency={data?.AccountRequests?.Currency?.symbol}
                 companyName={data?.accountName ?? "No Default Account"}
-                link={`/admin/businesses/${params.id}/default/${data?.id}`}
+                link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                 sortCode="041917"
                 accountNumber={data?.accountNumber}
                 balance={data?.accountBalance ?? 0}
@@ -386,6 +427,26 @@ export default function Accounts({
               )}
             />
           </TabsPanel>
+
+          <TabsPanel value={issuedAccountSubTabs[2].value}>
+            <TableComponent head={tableHead} rows={usdIssuedAccountRows} loading={loading} />
+            <EmptyTable
+              rows={usdIssuedAccountRows}
+              loading={issuedCurrencyAccountsLoading}
+              text="When an account is created, it will appear here"
+              title="There are no accounts"
+            />
+
+            <PaginationComponent
+              active={active}
+              setActive={setActive}
+              setLimit={setLimit}
+              limit={limit}
+              total={Math.ceil(
+                (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
+              )}
+            />
+          </TabsPanel>
         </TabsComponent>
       </TabsPanel>
     </TabsComponent>
@@ -407,4 +468,5 @@ const tableHead = [
 const issuedAccountSubTabs = [
   { value: "eur-account", title: "EUR Accounts" },
   { value: "gbp-accounts", title: "GBP Accounts" },
+  { value: "usd-accounts", title: "USD Accounts" },
 ];

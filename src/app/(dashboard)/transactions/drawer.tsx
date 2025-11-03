@@ -110,6 +110,7 @@ export const TransactionDrawer = ({
     "Transaction Reference": selectedRequest?.reference ?? "N/A",
   };
 
+  console.log(selectedRequest)
   const senderDetails = {
     "Account Name": loadingSenderAcct ? (
       <Skeleton h={10} w={100} />
@@ -128,6 +129,7 @@ export const TransactionDrawer = ({
       : selectedRequest?.currencyType === "USD"
       ? {
           "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
+          "Account Iban": selectedRequest?.senderIban ?? "N/A"
         }
       : {
           IBAN: selectedRequest?.senderIban,

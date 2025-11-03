@@ -39,6 +39,8 @@ function Account() {
     recipientName,
     recipientIban,
     search,
+    accountType,
+    currency
   } = Object.fromEntries(searchParams.entries());
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -75,7 +77,7 @@ function Account() {
     currencyAccount: account,
     loading,
     revalidate: revalidateAcct,
-  } = useAdminGetCompanyCurrencyAccountByID(params?.account);
+  } = useAdminGetCompanyCurrencyAccountByID(params?.account, currency || undefined);
 
   const [chartFrequency, setChartFrequency] = useState("Monthly");
 
@@ -84,7 +86,7 @@ function Account() {
     loading: loadingTrx,
     meta: trxMeta,
     revalidate: revalidateTrx,
-  } = useAdminGetCurrencyTransactions({ ...param, queryAccountType: account?.accountType }, params.account, account?.AccountRequests?.Currency?.symbol || "GBP", account?.accountType);
+  } = useAdminGetCurrencyTransactions({ ...param, queryAccountType: account?.accountType }, params.account, account?.AccountRequests?.Currency?.symbol || currency || "GBP", account?.accountType || accountType);
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -109,10 +111,10 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
-        accountType={account?.AccountRequests?.Currency?.symbol || account?.currencyType}
+        accountType={account?.AccountRequests?.Currency?.symbol || account?.currencyType || currency}
         account={account}
-        location="gbp-account"
-        transactions={transactions as TransactionType[]}
+        location={`${account?.AccountRequests?.Currency?.symbol || account?.currencyType || currency || "ghs"}-business-account`.toLowerCase()}
+        transactions={(transactions || []) as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}
         setChartFrequency={setChartFrequency}

@@ -53,7 +53,10 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
           IBAN: meta?.accountDetails?.iban ?? "N/A",
         }
       : {
-          "Account Number": meta?.accountDetails?.iban ?? "N/A",
+          "Account Number":
+            meta?.accountDetails?.iban ??
+            meta?.accountDetails?.accountNumber ??
+            "N/A",
         }),
 
     ...(currencyType === "GBP"

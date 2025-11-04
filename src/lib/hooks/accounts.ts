@@ -897,6 +897,7 @@ export interface BaseAccount {
   deletedAt: null;
   accountBalance: number;
   currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
+  currency?: "GHS" | "GBP" | "NGN" | "EUR" | "USD" | string;
   companyId: string;
   companyName?: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";

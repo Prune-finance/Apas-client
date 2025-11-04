@@ -53,8 +53,8 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             currency={"EUR"}
             companyName={account?.accountName ?? "No Default Account"}
             link={`/payouts/${account?.accountNumber}/account`}
-            iban={account?.accountNumber ?? "No Default Account"}
-            bic={"ARPYGB21XXX"}
+            iban={account?.accountNumber ?? account?.accountIban ?? "No Default Account"}
+            bic={"ARPYGB21"}
             balance={account?.accountBalance ?? 0}
             loading={loadingAcct}
             business={false}
@@ -67,12 +67,14 @@ export const PayoutAccount = ({ meta, loading }: Props) => {
             currencyAccount?.map((data) => (
               <NewAccountCard
                 key={data?.id}
-                currency={data?.AccountRequests?.Currency?.symbol}
+                currency={data?.AccountRequests?.Currency?.symbol || data?.currency || data?.currencyType}
                 companyName={data?.accountName ?? "No Default Account"}
                 walletOwner={data?.accountName ?? "No Default Account"}
                 walletId={data?.walletId ?? "No Default Account"}
-                link={`/accounts/default/${data?.id}?accountType=PAYOUT_ACCOUNT&currency=${data?.AccountRequests?.Currency?.symbol}`}
+                link={`/accounts/${data?.id}?accountType=PAYOUT_ACCOUNT&currency=${data?.AccountRequests?.Currency?.symbol || data?.currency || data?.currencyType}`}
                 sortCode="041917"
+                iban={data?.accountIban ?? "No Default Account"}
+                bic={data?.accountBic ?? "No Default Account"}
                 accountNumber={data?.accountNumber}
                 balance={data?.accountBalance ?? 0}
                 loading={loadingAcctGBP}

@@ -308,7 +308,7 @@ export default function Accounts({
             currency={"EUR"}
             companyName={defaultAccount?.accountName ?? "No Default Account"}
             link={`/admin/businesses/${params.id}/default?accountId=${defaultAccount?.id}`}
-            iban={defaultAccount?.accountNumber ?? "No Default Account"}
+            iban={defaultAccount?.accountNumber ?? defaultAccount?.accountIban ?? "No Default Account"}
             bic={"ARPYGB21XXX"}
             balance={defaultAccount?.accountBalance ?? 0}
             loading={loadingDefault}
@@ -356,6 +356,8 @@ export default function Accounts({
                   companyName={data?.accountName ?? "No Default Account"}
                   link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
                   sortCode="041917"
+                  iban={data?.accountIban ?? "No Default Account"}
+                  bic={data?.accountBic ?? "No Default Account"}
                   accountNumber={data?.accountNumber}
                   walletId={data?.walletId ?? "No Default Account"}
                   walletOwner={data?.accountName ?? "No Default Account"}
@@ -378,6 +380,8 @@ export default function Accounts({
                 sortCode="041917"
                 accountNumber={data?.accountNumber}
                 balance={data?.accountBalance ?? 0}
+                iban={data?.accountIban ?? "No Default Account"}
+                bic={"ARPYGB21"}
                 loading={companyCurrencyAccountsLoading}
                 business={false}
                 refresh

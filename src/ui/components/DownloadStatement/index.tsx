@@ -251,17 +251,17 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
           data={{
             head: AccountTableHeaders,
             body: data?.concat(Array(LinesTofill).fill(null)).map((item) => [
-              item?.createdAt ? dayjs(item?.createdAt).format("Do MMMM YYYY") : " ",
+              item?.createdAt ? dayjs(item?.createdAt).format("Do MMMM YYYY") : "-",
               item?.description ?? item?.ref ?? " ",
               item?.type ? (item?.type === "CREDIT"
                 ? formatNumber(item?.amount ?? 0, true, currencyType ?? "EUR")
-                : formatNumber(0, true, currencyType ?? "EUR")) : " ",
+                : formatNumber(0, true, currencyType ?? "EUR")) : "-",
               item?.type ? (item?.type === "DEBIT"
                 ? formatNumber(item?.amount ?? 0, true, currencyType ?? "EUR")
-                : formatNumber(0, true, currencyType ?? "EUR")) : " ",
+                : formatNumber(0, true, currencyType ?? "EUR")) : "-",
               item?.balance ? (item?.balance
                 ? formatNumber(item?.balance, true, currencyType ?? "EUR")
-                : formatNumber(0, true, currencyType ?? "EUR")) : " ",
+                : formatNumber(0, true, currencyType ?? "EUR")) : "-",
             ]),
           }}
           w="100%"

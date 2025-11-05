@@ -624,6 +624,7 @@ export interface DownloadStatementData {
   balance: number;
   description: string;
   ref: string;
+  accessRef?: string;
   companyAccountId: string | null;
   createdAt: string; // ISO date string
   deletedAt: string | null; // ISO date string or null

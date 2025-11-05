@@ -84,6 +84,7 @@ export const handleCsvDownload = (csvData: DownloadStatementData[], csvName?: st
       reference: row.reference,
       status: row.status,
       type: row.type,
+      ...(row.accessRef ? { accessRef: row.accessRef } : {}),
       ...(currency === "GHS" ? { senderWalletId: row.senderWalletId, beneficiaryWalletId: row.beneficiaryWalletId, beneficiaryName: row.beneficiaryName } : {}),
       ...(currency === "GBP" ? { senderName: row.senderName, beneficiaryAccountNumber: row.beneficiaryAccountNumber, beneficiarySortCode: row.beneficiarySortCode } : {})
     }));

@@ -107,8 +107,8 @@ export const PayoutTransactionDrawer = ({
 
   const beneficiaryDetails = {
     "Account Name": data?.recipientName || "N/A",
-    IBAN: data?.recipientIban,
-    BIC: data?.recipientBic,
+    IBAN: data?.recipientIban || data?.beneficiaryAccountNumber || data?.beneficiaryWalletId || "N/A",
+    BIC: data?.recipientBic || data?.beneficiarySortCode || "N/A",
     "Bank Name": data?.recipientBankAddress,
     "Bank Address": data?.recipientBankAddress,
     Country: data?.recipientBankCountry,
@@ -121,8 +121,8 @@ export const PayoutTransactionDrawer = ({
     ) : (
       data?.senderName
     ),
-    IBAN: data?.senderIban,
-    BIC: data?.senderBic,
+    IBAN: data?.senderIban || data?.senderAccountNumber || data?.senderWalletId || "N/A",
+    BIC: data?.senderBic || data?.senderSortCode || "N/A",
     Bank: data?.type === "DEBIT" ? "Prune Payments LTD" : "Prune Payments LTD",
     "Bank Address":
       data?.type === "DEBIT"

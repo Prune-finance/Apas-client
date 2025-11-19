@@ -100,7 +100,7 @@ function Accounts() {
     statusLoading: statusLoadingGbpAccounts,
     issuanceRequests: gbpIssuanceRequests,
     revalidateIssuance: revalidateGbpIssuance,
-  } = useUserAccounts({ ...queryParams, currency: "GBP" });
+  } = useUserAccounts({ ...queryParams, currency: "GBP", accountType: "ISSUED_ACCOUNT" });
 
   const {
     loading: loadingUsdAccounts,
@@ -110,7 +110,7 @@ function Accounts() {
     statusLoading: statusLoadingUsdAccounts,
     issuanceRequests: usdIssuanceRequests,
     revalidateIssuance: revalidateUsdIssuance,
-  } = useUserAccounts({ ...queryParams, currency: "USD" });
+  } = useUserAccounts({ ...queryParams, currency: "USD", accountType: "ISSUED_ACCOUNT" });
 
   const {
     loading,

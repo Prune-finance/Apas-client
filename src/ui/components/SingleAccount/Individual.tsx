@@ -281,6 +281,14 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [transferCurrency]);
 
+    useEffect(() => {
+     if (form.values.destinationCountry == null) {
+        form.setValues({
+          destinationCountry: "",
+        });
+      }
+    }, [form.values.destinationCountry, validated, ref]);
+
     return (
       <>
         <TabsPanel value="To Individual">

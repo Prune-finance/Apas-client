@@ -283,6 +283,14 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       openDebtor();
     };
 
+    useEffect(() => {
+      if (form.values.destinationCountry == null) {
+        form.setValues({
+          destinationCountry: "",
+        });
+      }
+    }, [form.values.destinationCountry, validated, ref]);
+    
     const memorizedData = useMemo(() => {
       if (!banks || !Array.isArray(banks)) return [];
       return banks

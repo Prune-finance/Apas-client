@@ -712,7 +712,8 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                     <NarrationField form2={form2} /> */}
                   </>
                 ) : switchCurrency === "EUR" ? (
-                  <Flex gap={20} w="100%">
+                  <Flex gap={20} w="100%" direction="column">
+                    <FullNameField form2={form2} mt={2} />
                     <TextInput
                       classNames={{ input: styles.input, label: styles.label }}
                       flex={1}
@@ -741,7 +742,8 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                     />
                   </Flex>
                 ) : (
-                  <>
+                  <Flex gap={20} w="100%" direction="column">
+                    <FullNameField form2={form2} mt={0} />
                     <TextInput
                       type="number"
                       classNames={{ input: styles.input, label: styles.label }}
@@ -815,7 +817,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       onWheel={(event) => event.currentTarget.blur()}
                       errorProps={{ fz: 12 }}
                     />
-                  </>
+                  </Flex>
                 )}
               </Flex>
 

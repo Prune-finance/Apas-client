@@ -17,6 +17,7 @@ import { Account } from "@/lib/hooks/accounts";
 import GBImage from "@/assets/GB.png";
 import USImage from "@/assets/USD.png";
 import EUImage from "@/assets/EU-icon.png";
+import GHSImage from "@/assets/cedis-icon.png";
 
 interface Props {
   account: Account | null;
@@ -45,6 +46,9 @@ export default function AccountDetails({ account, loading, currency = "EUR" }: P
     ...(currency === "GBP" && {
       "Sort Code": account?.sortCode,
     }),
+    ...(currency === "GHS" && {
+      "Wallet ID": account?.walletId,
+    }),
     "Bank Name": "Prune Payments LTD",
     "Bank Address": "Office 7 35-37 Ludgate Hill, London",
     "Bank Country": "United Kingdom",
@@ -60,6 +64,8 @@ export default function AccountDetails({ account, loading, currency = "EUR" }: P
                 <Image src={GBImage.src} alt="GBP" w={20} h={20} />
               ) : currency === "USD" ? (
                 <Image src={USImage.src} alt="USD" w={20} h={20} />
+              ) : currency === "GHS" ? (
+                <Image src={GHSImage.src} alt="GHS" w={20} h={20} />
               ) : (
                 <Image src={EUImage.src} alt="EUR" w={20} h={20} />
               )}

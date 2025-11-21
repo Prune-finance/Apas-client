@@ -39,6 +39,12 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     revalidate: GHSRevalidate,
   } = useUserCurrencyGBPAccount("GHS");
 
+  const {
+    account: USDAccount,
+    loading: USDLoading,
+    revalidate: USDRevalidate,
+  } = useUserCurrencyGBPAccount("USD");
+
   const { switchCurrency } = useCurrencySwitchStore();
 
   const matches = useMediaQuery("(max-width: 768px)");
@@ -69,6 +75,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     destinationBank: "",
     destinationAccountNumber: "",
     destinationSortCode: "",
+    routingNumber: "",
     bankAddress: "",
     destinationCountry: "",
     reference: crypto.randomUUID(),
@@ -77,6 +84,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     phoneNumber: "",
     accountNumber: "",
     gshTransferType: "",
+    usdTransferType: "",
     beneficiaryBankCode: "",
   });
 
@@ -87,6 +95,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     destinationBIC: "",
     destinationAccountNumber: "",
     destinationSortCode: "",
+    routingNumber: "",
     destinationBank: "",
     bankAddress: "",
     destinationCountry: "",
@@ -96,6 +105,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     phoneNumber: "",
     accountNumber: "",
     gshTransferType: "",
+    usdTransferType: "",
     beneficiaryBankCode: "",
   });
 
@@ -116,9 +126,11 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         invoice,
         narration,
         gshTransferType,
+        usdTransferType,
         accountNumber,
         beneficiaryBankCode,
         phoneNumber,
+        routingNumber,
       } = requestForm;
 
       // Helper function to get beneficiary details based on currency
@@ -145,6 +157,26 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
           };
+        } else if (currency === "USD") {
+          return {
+            paymentMethodType:
+              usdTransferType === "WithinUSA" ? "SWIFT" : "ACH",
+            // if usdTransferType === "WithinUSA"
+            ...(usdTransferType === "WithinUSA" && {
+              beneficiaryBic: removeWhitespace(destinationBIC),
+              beneficiaryIban: removeWhitespace(destinationIBAN),
+            }),
+            // if usdTransferType === "OutsideUSA"
+            ...(usdTransferType === "OutsideUSA" && {
+              beneficiaryRoutingNumber: removeWhitespace(routingNumber),
+              beneficiaryAccountNumber: removeWhitespace(accountNumber),
+            }),
+            beneficiaryBankName: destinationBank,
+            beneficiaryCountry: destinationCountry,
+            beneficiaryName: fullName,
+            recipientBankAddress: bankAddress,
+            beneficiaryBankAddress: bankAddress,
+          };
         } else {
           return {
             destinationIBAN: removeWhitespace(destinationIBAN),
@@ -161,6 +193,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           ? "/payout/send-gbp"
           : switchCurrency === "GHS"
           ? "/payout/send-ghs"
+          : switchCurrency === "USD"
+          ? "/payout/send-usd"
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, `${firstName} ${lastName}`),
@@ -222,6 +256,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         destinationBIC,
         destinationAccountNumber,
         destinationSortCode,
+        routingNumber,
         destinationBank,
         bankAddress,
         destinationCountry,
@@ -233,6 +268,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         beneficiaryBankCode,
         phoneNumber,
         reference,
+        usdTransferType,
       } = companyRequestForm;
 
       // Reuse the helper function from above
@@ -259,6 +295,26 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
           };
+        } else if (currency === "USD") {
+          return {
+            paymentMethodType:
+              usdTransferType === "WithinUSA" ? "SWIFT" : "ACH",
+            // if usdTransferType === "WithinUSA"
+            ...(usdTransferType === "WithinUSA" && {
+              beneficiaryBic: removeWhitespace(destinationBIC),
+              beneficiaryIban: removeWhitespace(destinationIBAN),
+            }),
+            // if usdTransferType === "OutsideUSA"
+            ...(usdTransferType === "OutsideUSA" && {
+              beneficiaryRoutingNumber: removeWhitespace(routingNumber),
+              beneficiaryAccountNumber: removeWhitespace(accountNumber),
+            }),
+            beneficiaryBankName: destinationBank,
+            beneficiaryCountry: destinationCountry,
+            beneficiaryName: fullName,
+            recipientBankAddress: "",
+            beneficiaryBankAddress: "",
+          };
         } else {
           return {
             destinationIBAN: removeWhitespace(destinationIBAN),
@@ -275,6 +331,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           ? "/payout/send-gbp"
           : switchCurrency === "GHS"
           ? "/payout/send-ghs"
+          : switchCurrency === "USD"
+          ? "/payout/send-usd"
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, companyName),
@@ -336,7 +394,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     revalidate();
     gbpRevalidate();
     GHSRevalidate();
-
+    USDRevalidate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
@@ -354,9 +412,11 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
               ? account
               : switchCurrency === "GBP"
               ? gbpAccount
+              : switchCurrency === "USD"
+              ? USDAccount
               : GHSAccount
           }
-          loading={loading || gbpLoading || GHSLoading}
+          loading={loading || gbpLoading || GHSLoading || USDLoading}
           close={closeMoney}
           openPreview={openPreview}
           setRequestForm={setRequestForm}
@@ -445,6 +505,7 @@ export interface RequestForm {
   destinationBank: string;
   destinationAccountNumber: string;
   destinationSortCode: string;
+  routingNumber: string;
   bankAddress: string;
   destinationCountry: string;
   reference: string; // generated using crypto.randomUUID()
@@ -455,5 +516,6 @@ export interface RequestForm {
   phoneNumber: string;
   accountNumber: string;
   gshTransferType: string;
+  usdTransferType: string;
   beneficiaryBankCode: string;
 }

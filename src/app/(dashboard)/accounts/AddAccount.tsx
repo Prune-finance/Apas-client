@@ -14,6 +14,7 @@ import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { useUserListCurrencyAccount } from "@/lib/hooks/accounts";
+import useAddAccountCurrencyStore from "@/lib/store/add-account";
 
 interface AddAccountProps {
   onClose: () => void;
@@ -38,6 +39,7 @@ function AddAccount({ onClose, openSuccess }: AddAccountProps) {
   const axios = createAxiosInstance("accounts");
   const { handleSuccess, handleError } = useNotification();
   const [loading, setLoading] = useState(false);
+  const { setAddAccountCurrency } = useAddAccountCurrencyStore();
 
   const { listCurrency, loading: currencyLoading } =
     useUserListCurrencyAccount();
@@ -75,7 +77,7 @@ function AddAccount({ onClose, openSuccess }: AddAccountProps) {
         "Account Requested Successfully",
         `You have successfully requested a ${type} account.`
       );
-
+      setAddAccountCurrency(currency as "EUR" | "GBP" | "NGN" | "GHS" | "USD");
       onClose();
       openSuccess();
     } catch (error) {

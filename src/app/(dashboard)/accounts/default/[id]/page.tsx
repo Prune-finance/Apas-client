@@ -109,14 +109,20 @@ function Account() {
         loadingBiz={loadingBiz}
         loading={loading}
         payout={accountType === "PAYOUT_ACCOUNT"}
-        currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN"}
+        currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN" | "USD"}
         open={() => {}}
       />
 
       <SingleDefaultAccountBody
         accountType={account?.AccountRequests?.Currency?.symbol}
         account={account}
-        location={currency === "GBP" ? "gbp-account" : "ghs-account"}
+        location={
+          currency === "GBP"
+            ? "gbp-account"
+            : currency === "USD"
+            ? "usd-account"
+            : "ghs-account"
+        }
         transactions={transactions as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

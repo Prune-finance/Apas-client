@@ -11,19 +11,13 @@ import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
 import { TabsPanel, Flex, Paper, Image } from "@mantine/core";
 import { IconListTree, IconCircleArrowDown } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { useDefaultAccountTransactions } from "@/lib/hooks/transactions";
-import dayjs from "dayjs";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { useSearchParams } from "next/navigation";
-import { useForm, zodResolver } from "@mantine/form";
-import { calculateTotalPages } from "@/lib/utils";
-import { useInfoDetails } from "@/lib/hooks/infoDetails";
-import { useParam } from "@/lib/hooks/param";
+import USDIcon from "@/assets/USD.png";
 import TabsComponent from "@/ui/components/Tabs";
 import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import { EURBusinessAccountTransactions } from "./EURBusiness";
 import { GBPBusinessAccountTransactions } from "./GBPBusiness";
+import { USDBusinessAccountTransactions } from "./USDBusiness";
 
 interface Props {
   panelValue: string;
@@ -63,6 +57,14 @@ export const BusinessAccountTransactions = ({
               setActive={setActive}
             />
           </TabsPanel>
+          <TabsPanel value="usd-accounts">
+            <USDBusinessAccountTransactions
+              panelValue={"usd-accounts"}
+              customStatusOption={customStatusOption}
+              active={active}
+              setActive={setActive}
+            />
+          </TabsPanel>
         </TabsComponent>
       </Paper>
     </TabsPanel>
@@ -79,5 +81,10 @@ const tabs = [
     title: "GBP Transactions",
     value: "gbp-accounts",
     icon: <Image src={GBPIcon.src} alt="icon" h={20} w={20} />,
+  },
+  {
+    title: "USD Transactions",
+    value: "usd-accounts",
+    icon: <Image src={USDIcon.src} alt="icon" h={20} w={20} />,
   },
 ];

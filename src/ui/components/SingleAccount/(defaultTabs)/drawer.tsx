@@ -34,10 +34,10 @@ type Props = {
 export const AccountTransactionDrawer = ({}: Props) => {
   const { data: transaction, close, opened, clearData } = Transaction();
   const beneficiaryDetails = {
-    "Account Name": transaction?.recipientBankCountry,
-    "Account Number/IBAN": transaction?.recipientIban,
+    "Account Name": transaction?.recipientBankCountry || transaction?.beneficiaryName,
+    "Account Number/IBAN": transaction?.recipientIban || transaction?.beneficiaryAccountNumber || transaction?.beneficiaryWalletId,
     "Bank Name": transaction?.recipientBankAddress,
-    BIC: transaction?.recipientBic,
+    BIC: transaction?.recipientBic || transaction?.beneficiarySortCode,
   };
 
   const otherDetails = {

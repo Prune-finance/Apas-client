@@ -63,6 +63,7 @@ import SuccessModal from "@/ui/components/SuccessModal";
 import PendingModalImage from "@/assets/add-account-success.png";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import useAddAccountCurrencyStore from "@/lib/store/add-account";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -99,7 +100,17 @@ function Accounts() {
     statusLoading: statusLoadingGbpAccounts,
     issuanceRequests: gbpIssuanceRequests,
     revalidateIssuance: revalidateGbpIssuance,
-  } = useUserAccounts({ ...queryParams, currency: "GBP" });
+  } = useUserAccounts({ ...queryParams, currency: "GBP", accountType: "ISSUED_ACCOUNT" });
+
+  const {
+    loading: loadingUsdAccounts,
+    accounts: usdAccounts,
+    revalidate: revalidateUsdAccounts,
+    meta: metaUsdAccounts,
+    statusLoading: statusLoadingUsdAccounts,
+    issuanceRequests: usdIssuanceRequests,
+    revalidateIssuance: revalidateUsdIssuance,
+  } = useUserAccounts({ ...queryParams, currency: "USD", accountType: "ISSUED_ACCOUNT" });
 
   const {
     loading,
@@ -152,6 +163,8 @@ function Accounts() {
 
   const [rowId, setRowId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+
+  const { addAccountCurrency } = useAddAccountCurrencyStore();
 
   const isInitiator = useHasPermission("INITIATOR");
   const canSendMoney =
@@ -424,6 +437,67 @@ function Accounts() {
     </TableTr>
   ));
 
+
+  const usdRows = (usdAccounts ?? []).map((element, index) => (
+    <TableTr key={index} style={{ cursor: "pointer" }}>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
+        {/* {`${element.accountName}`}{" "} */}
+        <Text fz={12} inline tt="capitalize">
+          {element.accountName}
+
+          <Text span inherit fz={12} c="#c6a700" fw={600}>
+            {element.staging === "TEST" ? " (TEST)" : ""}
+          </Text>
+        </Text>
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+      >
+        {element.accountIban ?? element.accountNumber}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+      >
+        {formatNumber(element.accountBalance, true, "USD")}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+        tt="capitalize"
+      >
+        {getUserType(element.type ?? "USER")}
+      </TableTd>
+      {/* <TableTd
+        onClick={() => router.push(`/accounts/${element.id}`)}
+        className={styles.table__td}
+      >
+        {element.Company.name}
+      </TableTd> */}
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={`${styles.table__td}`}
+      >
+        {dayjs(element.createdAt).format("ddd DD MMM YYYY")}
+      </TableTd>
+      <TableTd
+        onClick={() => router.push(`/accounts/${element.id}?currency=USD`)}
+        className={styles.table__td}
+      >
+        <BadgeComponent status={element.status} active />
+      </TableTd>
+
+      {/* <TableTd className={`${styles.table__td}`}>
+        <MenuComponent id={element.id} status={element.status} />
+      </TableTd> */}
+    </TableTr>
+  ));
+
   const handleRequestAccess = async () => {
     setProcessing(true);
     try {
@@ -492,7 +566,7 @@ function Accounts() {
           }}
         >
           <TabsPanel value={tabs[0].value}>
-            <SimpleGrid cols={3} mt={32}>
+            <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }} mt={32}>
               <NewAccountCard
                 currency={"EUR"}
                 companyName={account?.accountName ?? "No Default Account"}
@@ -646,6 +720,35 @@ function Accounts() {
                       limit={limit}
                       setLimit={setLimit}
                     />
+
+                    
+                  </TabsPanel>
+
+
+                  <TabsPanel value={issuedAccountSubTabs[2].value}>
+                    <TableComponent
+                      head={tableHeaders}
+                      rows={usdRows}
+                      loading={loadingUsdAccounts}
+                    />
+
+                    <EmptyTable
+                      rows={usdRows}
+                      loading={loadingUsdAccounts}
+                      title="There are no accounts"
+                      text="When an account is created, it will appear here"
+                    />
+
+                    <PaginationComponent
+                      total={Math.ceil(
+                        (metaUsdAccounts?.total ?? 0) /
+                          parseInt(limit ?? "10", 10)
+                      )}
+                      active={active}
+                      setActive={setActive}
+                      limit={limit}
+                      setLimit={setLimit}
+                    />
                   </TabsPanel>
                 </TabsComponent>
               </TabsPanel>
@@ -688,7 +791,7 @@ function Accounts() {
           style={{ height: 190, width: "100%", marginBottom: 10 }}
           desc={
             <Text fz={14} c="#667085">
-              You have successfully requested a GBP account.
+              You have successfully requested a {addAccountCurrency} account.
             </Text>
           }
           title="Account Requested Successfully."
@@ -807,4 +910,5 @@ const issuedAccountTabs = [
 const issuedAccountSubTabs = [
   { value: "eur-account", title: "EUR Accounts" },
   { value: "gbp-accounts", title: "GBP Accounts" },
+  { value: "usd-accounts", title: "USD Accounts" },
 ];

@@ -10,9 +10,15 @@ interface Props {
 }
 
 export const DefaultDocuments = ({ account, isDefault }: Props) => {
+  const isAccountDocumentsEmpty =
+    !account?.accountDocuments ||
+    (typeof account.accountDocuments === "object" &&
+      Object.keys(account.accountDocuments).length === 0);
+
+  console.log(account?.accountDocuments || [])
   return (
     <Box>
-      {account?.type === "USER" && (
+      {account?.type === "USER" && !isAccountDocumentsEmpty && (
         <Paper>
           <SimpleGrid cols={3}>
             <TextInputWithFile
@@ -31,7 +37,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
         </Paper>
       )}
 
-      {account?.type === "CORPORATE" && (
+      {account?.type === "CORPORATE" && !isAccountDocumentsEmpty && (
         <Stack gap={20}>
           <Paper withBorder p={24}>
             <Text
@@ -44,27 +50,31 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
               {`Director's Documents`}
             </Text>
 
-            {(account.accountDocuments.directors || []).map((director, index) => (
-              <Box mb={20} key={index}>
-                <Text fz={12} fw={500} c="dimmed" mb={20}>
-                  Director {index + 1}
-                </Text>
-                <SimpleGrid cols={3}>
-                  <TextInputWithFile
-                    url={director.identityFileUrl}
-                    placeholder={splitCamelCase(director.identityType ?? "")}
-                    label={"Identity Type"}
-                  />
-                  <TextInputWithFile
-                    url={director.proofOfAddressFileUrl}
-                    placeholder={splitCamelCase(director.proofOfAddress ?? "")}
-                    label={"Proof of Address"}
-                  />
-                </SimpleGrid>
-              </Box>
-            ))}
+            {Object.values(account.accountDocuments.directors || {}).map(
+              (director, index) => (
+                <Box mb={20} key={index}>
+                  <Text fz={12} fw={500} c="dimmed" mb={20}>
+                    Director {index + 1}
+                  </Text>
+                  <SimpleGrid cols={3}>
+                    <TextInputWithFile
+                      url={director.identityFileUrl}
+                      placeholder={splitCamelCase(director.identityType ?? "")}
+                      label={"Identity Type"}
+                    />
+                    <TextInputWithFile
+                      url={director.proofOfAddressFileUrl}
+                      placeholder={splitCamelCase(
+                        director.proofOfAddress ?? ""
+                      )}
+                      label={"Proof of Address"}
+                    />
+                  </SimpleGrid>
+                </Box>
+              )
+            )}
 
-            {(account.accountDocuments.directors || []).length === 0 && (
+            {Object.keys(account.accountDocuments.directors || {})?.length === 0 && (
               <NoContent text="No Director Documents" />
             )}
           </Paper>
@@ -79,27 +89,31 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
             >
               {`Shareholder's Documents`}
             </Text>
-            {(account.accountDocuments.shareholders || []).map((director, index) => (
-              <Box mb={20} key={index}>
-                <Text fz={12} fw={500} c="dimmed" mb={20}>
-                  Shareholder {index + 1}
-                </Text>
-                <SimpleGrid cols={3}>
-                  <TextInputWithFile
-                    url={director.identityFileUrl}
-                    placeholder={splitCamelCase(director.identityType ?? "")}
-                    label={"Identity Type"}
-                  />
-                  <TextInputWithFile
-                    url={director.proofOfAddressFileUrl}
-                    placeholder={splitCamelCase(director.proofOfAddress ?? "")}
-                    label={"Proof of Address"}
-                  />
-                </SimpleGrid>
-              </Box>
-            ))}
+            {Object.values(account.accountDocuments.shareholders || {}).map(
+              (director, index) => (
+                <Box mb={20} key={index}>
+                  <Text fz={12} fw={500} c="dimmed" mb={20}>
+                    Shareholder {index + 1}
+                  </Text>
+                  <SimpleGrid cols={3}>
+                    <TextInputWithFile
+                      url={director.identityFileUrl}
+                      placeholder={splitCamelCase(director.identityType ?? "")}
+                      label={"Identity Type"}
+                    />
+                    <TextInputWithFile
+                      url={director.proofOfAddressFileUrl}
+                      placeholder={splitCamelCase(
+                        director.proofOfAddress ?? ""
+                      )}
+                      label={"Proof of Address"}
+                    />
+                  </SimpleGrid>
+                </Box>
+              )
+            )}
 
-            {(account.accountDocuments.shareholders || []).length === 0 && (
+            {Object.keys(account.accountDocuments.shareholders || {}).length === 0 && (
               <NoContent text="No Shareholder Documents" />
             )}
           </Paper>
@@ -108,13 +122,7 @@ export const DefaultDocuments = ({ account, isDefault }: Props) => {
 
       <EmptyTable
         loading={false}
-        rows={
-          !account?.accountDocuments ||
-          (typeof account.accountDocuments === "object" &&
-            Object.keys(account.accountDocuments).length === 0)
-            ? []
-            : [1, 2]
-        }
+        rows={isAccountDocumentsEmpty ? [] : [1, 2]}
         title="There is no data here for now."
         text="When a document is uploaded, it will appear here"
       />

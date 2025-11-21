@@ -700,6 +700,38 @@ export function useUserCurrencyGBPAccount(currency: string) {
 
   return { loading, account, revalidate };
 }
+
+export function useCheckCurrencyList() {
+  const [account, setAccount] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/currency-accounts/requests/get-business-currency-account-status`
+      );
+
+      setAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, account, revalidate };
+}
 export function useUserListOfBanks() {
   const [banks, setBanks] = useState<ListOfBanks[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -858,11 +890,14 @@ export interface BaseAccount {
   accountNumber: string;
   accountType?: string;
   walletId: string;
+  accountBic?: string;
+  accountIban?: string;
   createdAt: Date;
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
   currencyType?: "EUR" | "GBP" | "NGN" | "GHS" | string;
+  currency?: "GHS" | "GBP" | "NGN" | "EUR" | "USD" | string;
   companyId: string;
   companyName?: string;
   status: "ACTIVE" | "INACTIVE" | "FROZEN";
@@ -924,6 +959,7 @@ export interface CurrencyAccount {
   accountBalance: number;
   accountDocuments: Record<string, any>;
   companyId: string;
+  currency?: "GHS" | "GBP" | "NGN" | "EUR" | "USD" | string;
   staging: "TEST" | "PRODUCTION" | string;
   status: "ACTIVE" | "PENDING" | "REJECTED" | string;
   createdAt: string;

@@ -59,6 +59,11 @@ export const useReceipt = ({ selectedRequest, senderAccount }: Props) => {
               "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
               "Bank Name": selectedRequest?.beneficiaryInstitutionName ?? "N/A",
             }
+          : selectedRequest?.currencyType === "USD"
+          ? {
+              "Account Number":
+                selectedRequest?.beneficiaryAccountNumber ?? "N/A",
+            }
           : {
               IBAN: selectedRequest?.recipientIban ?? "",
               "Bank Name": selectedRequest?.beneficiaryInstitutionName ?? "",

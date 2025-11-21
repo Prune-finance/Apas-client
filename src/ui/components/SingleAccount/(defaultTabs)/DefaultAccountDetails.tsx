@@ -75,7 +75,7 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     name: "USD",
     bankIdLabel: "SWIFT/BIC",
     accountIdLabel: "IBAN",    
-    getBankIdValue: (account) => account?.accountBic ?? "",
+    getBankIdValue: () => "ARPYGB21",
     getAccountIdValue: (account) => account?.accountIban ?? "",
     accountNumberLabel: "Account Number",
     getAccountNumberValue: (account) => account?.accountNumber ?? "",

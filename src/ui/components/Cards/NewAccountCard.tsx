@@ -103,7 +103,7 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     accountIdLabel: "IBAN",
     currencySymbol: "$",
     currencyCode: "USD",
-    getBankIdValue: (props) => props.bic,
+    getBankIdValue: (props) => "ARPYGB21",
     getAccountIdValue: (props) => props.iban,
   },
 

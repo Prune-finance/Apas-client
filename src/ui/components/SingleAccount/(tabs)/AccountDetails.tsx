@@ -31,10 +31,10 @@ export default function AccountDetails({ account, loading, currency = "EUR" }: P
     ...(currency === "EUR" && {
       "IBAN/Account Number": account?.accountNumber,
     }),
-    ...(currency != "EUR" && {
+    ...((currency == "GBP" || currency === "USD") && {
       "Account Number": account?.accountNumber,
     }),
-    ...(currency != "EUR" && {
+    ...((currency == "GBP" || currency === "USD") && {
       "Account Iban": account?.accountIban,
     }),
     ...(currency === "EUR" && {

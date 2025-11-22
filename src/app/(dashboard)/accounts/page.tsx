@@ -908,7 +908,7 @@ const issuedAccountTabs = [
 ];
 
 const issuedAccountSubTabs = [
-  { value: "eur-account", title: "EUR Accounts" },
-  { value: "gbp-accounts", title: "GBP Accounts" },
-  { value: "usd-accounts", title: "USD Accounts" },
+  { value: "eur-account", title: "🇪🇺 EUR Accounts" },
+  { value: "gbp-accounts", title: "🇬🇧 GBP Accounts" },
+  { value: "usd-accounts", title: "🇺🇸 USD Accounts" },
 ];

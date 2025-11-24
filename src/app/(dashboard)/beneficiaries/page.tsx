@@ -59,7 +59,7 @@ import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import { validateAccount } from "@/lib/hooks/accounts";
+import { validateAccount, validateAccountGBP } from "@/lib/hooks/accounts";
 
 type Beneficiary = {
   name: string;
@@ -408,6 +408,22 @@ const Beneficiaries = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bic, iban, modalForm.values.currency, modalForm.values.usdTransferType]);
 
+  const [{ accountNumber, sortCode }] = useDebouncedValue(
+    {
+      accountNumber: modalForm.values.accountNumber,
+      sortCode: modalForm.values.sortCode,
+    },
+    2000
+  );
+
+  React.useEffect(() => {
+    const c = modalForm.values.currency;
+    if (c === "GBP" && accountNumber && sortCode) {
+      handleIbanValidationGBP();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [accountNumber, sortCode, modalForm.values.currency]);
+
   const handleIbanValidation = async () => {
     try {
       setValidated(null);
@@ -428,6 +444,29 @@ const Beneficiaries = () => {
     } catch (err) {
       setValidated(false);
       // ignore
+    } finally {
+      setProcessing(false);
+    }
+  };
+
+  const handleIbanValidationGBP = async () => {
+    try {
+      setValidated(null);
+      setProcessing(true);
+      const data = await validateAccountGBP({
+        accountNumber: removeWhitespace(accountNumber || ""),
+        sortCode: removeWhitespace(sortCode || ""),
+      });
+
+      if (data) {
+        modalForm.setValues({
+          bankAddress: data.bankAddress || data.city,
+          bank: data.bankName,
+        });
+        setValidated(Boolean(isValidated));
+      }
+    } catch (err) {
+      setValidated(false);
     } finally {
       setProcessing(false);
     }

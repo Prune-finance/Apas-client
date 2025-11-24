@@ -100,7 +100,11 @@ function Accounts() {
     statusLoading: statusLoadingGbpAccounts,
     issuanceRequests: gbpIssuanceRequests,
     revalidateIssuance: revalidateGbpIssuance,
-  } = useUserAccounts({ ...queryParams, currency: "GBP", accountType: "ISSUED_ACCOUNT" });
+  } = useUserAccounts({
+    ...queryParams,
+    currency: "GBP",
+    accountType: "ISSUED_ACCOUNT",
+  });
 
   const {
     loading: loadingUsdAccounts,
@@ -110,7 +114,11 @@ function Accounts() {
     statusLoading: statusLoadingUsdAccounts,
     issuanceRequests: usdIssuanceRequests,
     revalidateIssuance: revalidateUsdIssuance,
-  } = useUserAccounts({ ...queryParams, currency: "USD", accountType: "ISSUED_ACCOUNT" });
+  } = useUserAccounts({
+    ...queryParams,
+    currency: "USD",
+    accountType: "ISSUED_ACCOUNT",
+  });
 
   const {
     loading,
@@ -133,8 +141,6 @@ function Accounts() {
     loading: currencyLoading,
     revalidate: currencyRevalidate,
   } = useUserCurrencyAccount();
-
-  console.log(currencyAccount);
 
   const { handleSuccess, handleError } = useNotification();
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
@@ -437,7 +443,6 @@ function Accounts() {
     </TableTr>
   ));
 
-
   const usdRows = (usdAccounts ?? []).map((element, index) => (
     <TableTr key={index} style={{ cursor: "pointer" }}>
       <TableTd
@@ -720,10 +725,7 @@ function Accounts() {
                       limit={limit}
                       setLimit={setLimit}
                     />
-
-                    
                   </TabsPanel>
-
 
                   <TabsPanel value={issuedAccountSubTabs[2].value}>
                     <TableComponent

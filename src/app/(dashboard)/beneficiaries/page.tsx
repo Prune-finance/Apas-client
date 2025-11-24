@@ -59,7 +59,11 @@ import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import { validateAccount, validateAccountGBP } from "@/lib/hooks/accounts";
+import {
+  useBeneficiaryAccount,
+  validateAccount,
+  validateAccountGBP,
+} from "@/lib/hooks/accounts";
 
 type Beneficiary = {
   name: string;
@@ -308,6 +312,12 @@ const Beneficiaries = () => {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [validated, setValidated] = useState<boolean | null>(null);
+
+  const {
+    beneficiaryAccount,
+    loading: beneficiaryAccountLoading,
+    revalidate: beneficiaryAccountRevalidate,
+  } = useBeneficiaryAccount();
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,

@@ -528,7 +528,10 @@ export function useUserCurrencyAccountByID(id: string, currency: string) {
   return { loading, currencyAccount, revalidate };
 }
 
-export function useAdminGetCompanyCurrencyAccountByID(id: string, currency?: string) {
+export function useAdminGetCompanyCurrencyAccountByID(
+  id: string,
+  currency?: string
+) {
   const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
     null
   );
@@ -538,7 +541,9 @@ export function useAdminGetCompanyCurrencyAccountByID(id: string, currency?: str
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/currency-accounts/admin-get-account-by-id/${id}${currency ? `?currency=${currency}` : ""}`
+        `/currency-accounts/admin-get-account-by-id/${id}${
+          currency ? `?currency=${currency}` : ""
+        }`
       );
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -593,6 +598,39 @@ export function useUserCurrencyAccount() {
   }, []);
 
   return { loading, currencyAccount, revalidate };
+}
+
+export function useBeneficiaryAccount() {
+  const [beneficiaryAccount, setBeneficiaryAccount] = useState<any[] | null>(
+    null
+  );
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(`/accounts/beneficiaries`);
+
+      setBeneficiaryAccount(data?.data);
+      console.log(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {
+      // Any cleanup code can go here
+    };
+  }, []);
+
+  return { loading, beneficiaryAccount, revalidate };
 }
 
 export function useUserListCurrencyAccount() {

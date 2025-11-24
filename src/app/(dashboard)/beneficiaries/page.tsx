@@ -9,6 +9,9 @@ import {
   TableTr,
   UnstyledButton,
   ThemeIcon,
+  Center,
+  ScrollArea,
+  Modal,
 } from "@mantine/core";
 import React, { Suspense, useMemo, useState } from "react";
 import Image from "next/image";
@@ -34,12 +37,16 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { frontendPagination, calculateTotalPages } from "@/lib/utils";
 import ModalProvider from "@/ui/components/Modal/ModalProvider";
+import { TextInputWithInsideLabel } from "@/ui/components/InputWithLabel";
+import { IconCheck } from "@tabler/icons-react";
 
 import EUIcon from "@/assets/EU-icon.png";
 import GBIcon from "@/assets/GB.png";
 import USIcon from "@/assets/USD.png";
 import NGIcon from "@/assets/Nigeria.png";
 import GHIcon from "@/assets/GH.png";
+import CurrencyTab from "@/ui/components/CurrencyTab";
+import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
 type Beneficiary = {
   name: string;
@@ -104,25 +111,37 @@ const currencyTabs = [
     icon: <Image width={18} height={18} src={GBIcon} alt="gbp" />,
   },
   {
-    value: "USD",
-    icon: <Image width={18} height={18} src={USIcon} alt="usd" />,
-  },
-  {
-    value: "NGN",
-    icon: <Image width={18} height={18} src={NGIcon} alt="ngn" />,
-  },
-  {
-    value: "CAD",
-  },
-  {
     value: "GHS",
     icon: <Image width={18} height={18} src={GHIcon} alt="ghs" />,
   },
+  {
+    value: "USD",
+    icon: <Image width={18} height={18} src={USIcon} alt="usd" />,
+  },
 ];
+
+const inputStyle = {
+  backgroundColor: "#fff",
+  borderColor: "#f2f4f7",
+};
 
 const Beneficiaries = () => {
   const [currency, setCurrency] = useState<string>(currencyTabs[0].value);
   const [opened, { open, close }] = useDisclosure(false);
+  const { switchCurrency } = useCurrencySwitchStore();
+  const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
+  const modalForm = useForm({
+    initialValues: {
+      firstName: "",
+      lastName: "",
+      iban: "",
+      bic: "",
+      bank: "",
+      bankAddress: "",
+      country: "",
+      state: "",
+    },
+  });
 
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
@@ -291,17 +310,136 @@ const Beneficiaries = () => {
           </TabsComponent>
         </Paper>
 
-        <ModalProvider
+        <Modal
           opened={opened}
           onClose={close}
-          close={close}
           title="New Beneficiary"
           size="lg"
+          styles={{
+            title: { fontSize: 24, fontWeight: 500, color: "#1D2939" },
+          }}
         >
-          <Text fz={14} fw={500} c="var(--prune-text-gray-600)">
-            Form coming soon
-          </Text>
-        </ModalProvider>
+          <Center>
+            <CurrencyTab bg="#fff" />
+          </Center>
+
+          <TabsComponent
+            tabs={[{ value: "Individual" }, { value: "Business" }]}
+            defaultValue={beneficiaryType}
+            onChange={(v) => setBeneficiaryType(v || "Individual")}
+            styles={{ list: { marginTop: 24 } }}
+            fz={12}
+          >
+            <TabsPanel value={beneficiaryType}>
+              <Box>
+                {beneficiaryType === "Individual" && (
+                  <Group grow gap={20} mt={12}>
+                    <TextInputWithInsideLabel
+                      label="First Name"
+                      placeholder="First Name"
+                      {...modalForm.getInputProps("firstName")}
+                      styles={{ input: inputStyle }}
+                    />
+                    <TextInputWithInsideLabel
+                      label="Last Name"
+                      placeholder="Last Name"
+                      {...modalForm.getInputProps("lastName")}
+                      styles={{ input: inputStyle }}
+                    />
+                  </Group>
+                )}
+
+                {beneficiaryType === "Business" && (
+                  <Group grow gap={20} mt={12}>
+                    <TextInputWithInsideLabel
+                      label="Company Name"
+                      placeholder="Company Name"
+                      {...modalForm.getInputProps("firstName")}
+                      styles={{ input: inputStyle }}
+                    />
+                    <TextInputWithInsideLabel
+                      label="Contact Email"
+                      placeholder="Email"
+                      {...modalForm.getInputProps("lastName")}
+                      styles={{ input: inputStyle }}
+                    />
+                  </Group>
+                )}
+
+                <Group grow gap={20} mt={20}>
+                  <TextInputWithInsideLabel
+                    label="IBAN"
+                    placeholder="Enter IBAN"
+                    {...modalForm.getInputProps("iban")}
+                    bg="#fff"
+                    styles={{ input: inputStyle }}
+                  />
+                  <TextInputWithInsideLabel
+                    label={switchCurrency === "USD" ? "SWIFT/BIC" : "BIC"}
+                    placeholder={
+                      switchCurrency === "USD" ? "Enter SWIFT/BIC" : "Enter BIC"
+                    }
+                    {...modalForm.getInputProps("bic")}
+                    styles={{ input: inputStyle }}
+                  />
+                </Group>
+
+                {modalForm.values.iban && modalForm.values.bic && (
+                  <Box bg="#EAF7EA" p={16} mt={20} style={{ borderRadius: 8 }}>
+                    <Group justify="space-between">
+                      <Text fz={14} fw={500} c="#1D2939">
+                        Information Validated Successfully
+                      </Text>
+                      <ThemeIcon color="#12B76A" variant="light" radius="xl">
+                        <IconCheck size={16} />
+                      </ThemeIcon>
+                    </Group>
+                  </Box>
+                )}
+
+                <TextInputWithInsideLabel
+                  label="Bank"
+                  placeholder="Bank"
+                  mt={20}
+                  {...modalForm.getInputProps("bank")}
+                  styles={{ input: inputStyle }}
+                />
+
+                <TextInputWithInsideLabel
+                  label="Bank Address"
+                  placeholder="Enter bank address"
+                  mt={20}
+                  {...modalForm.getInputProps("bankAddress")}
+                  styles={{ input: inputStyle }}
+                />
+
+                <Group grow gap={20} mt={20}>
+                  <TextInputWithInsideLabel
+                    label="Country"
+                    placeholder="Country"
+                    {...modalForm.getInputProps("country")}
+                    styles={{ input: inputStyle }}
+                  />
+                  <TextInputWithInsideLabel
+                    label="State"
+                    placeholder="State"
+                    {...modalForm.getInputProps("state")}
+                    styles={{ input: inputStyle }}
+                  />
+                </Group>
+
+                <PrimaryBtn
+                  text="Save as beneficiary"
+                  fw={600}
+                  h={48}
+                  fullWidth
+                  mt={24}
+                  action={close}
+                />
+              </Box>
+            </TabsPanel>
+          </TabsComponent>
+        </Modal>
       </main>
     </Box>
   );

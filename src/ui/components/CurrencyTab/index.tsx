@@ -66,7 +66,7 @@ const data = [
   },
 ];
 
-function CurrencyTab() {
+function CurrencyTab({ bg }: { bg?: string }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const controlsRefs = useRef<Record<number, HTMLButtonElement | null>>({});
   const [mounted, setMounted] = useState(false);
@@ -109,7 +109,11 @@ function CurrencyTab() {
   ));
 
   return (
-    <div className={classes.root} ref={rootRef}>
+    <div
+      className={classes.root}
+      ref={rootRef}
+      style={{ backgroundColor: bg || undefined }}
+    >
       {loading ? (
         <Skeleton h={40} w={100} />
       ) : (

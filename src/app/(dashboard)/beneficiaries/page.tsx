@@ -35,7 +35,7 @@ import Filter from "@/ui/components/Filter";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { frontendPagination, calculateTotalPages } from "@/lib/utils";
+import { frontendPagination, calculateTotalPages, removeWhitespace } from "@/lib/utils";
 import ModalProvider from "@/ui/components/Modal/ModalProvider";
 import {
   TextInputWithInsideLabel,
@@ -210,41 +210,19 @@ const Beneficiaries = () => {
       });
       return;
     }
-
-    const data = {
-      alias: "Acme Vendor", // Optional
-      firstName: "{{$randomFirstName}}",
-      lastName: "{{$randomLastName}}",
-      currency: "GBP",
-      isFavorite: true, // Optional
-      bankName: "Barclays",
-      accountNumber: "12345678",
-      sortCode: "10-20-30",
-      accountIban: "GB82WEST12345698765435",
-      routingNumber: "021000022",
-      swiftBic: "BARCGB21",
-      accountHolderAddress: "1 London Road",
-      //   "walletId": "0240000003", // GHS
-      //   "mobileOperator": "MTN", // GHS
-      //   "countryCode": "GH" // GHS
-    };
-
+    const payload = buildBeneficiaryPayload(modalForm.values);
+    console.log(payload);
     try {
       const { data: res } = await axios.post(
         "/accounts/beneficiaries",
-        modalForm.values
+        payload
       );
       console.log(res);
-      handleSuccess(
-        "Beneficiary successfully",
-        "Beneficiary added successfully"
-      );
+      handleSuccess("Beneficiary successfully", "Beneficiary added successfully");
+      close();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     }
-
-    console.log(modalForm.values);
-    // close();
   };
 
   React.useEffect(() => {
@@ -253,6 +231,67 @@ const Beneficiaries = () => {
       switchCurrency || currencyTabs[0].value
     );
   }, [switchCurrency]);
+
+  const buildBeneficiaryPayload = (v: typeof modalForm.values) => {
+    const base = {
+      alias: `${v.firstName} ${v.lastName}`,
+      firstName: v.firstName,
+      lastName: v.lastName,
+      currency: v.currency,
+      isFavorite: false,
+      accountHolderAddress: v.bankAddress,
+    };
+
+    if (v.currency === "EUR")
+      return {
+        ...base,
+        bankName: v.bank,
+        accountIban: removeWhitespace(v.iban),
+        swiftBic: removeWhitespace(v.bic),
+      };
+
+    if (v.currency === "GBP")
+      return {
+        ...base,
+        bankName: v.bank,
+        accountNumber: removeWhitespace(v.accountNumber),
+        sortCode: removeWhitespace(v.sortCode),
+      };
+
+    if (v.currency === "USD") {
+      if (v.usdTransferType === "WithinUSA")
+        return {
+          ...base,
+          bankName: v.bank,
+          accountIban: removeWhitespace(v.iban),
+          swiftBic: removeWhitespace(v.bic),
+        };
+      return {
+        ...base,
+        bankName: v.bank,
+        routingNumber: removeWhitespace(v.routingNumber),
+        accountNumber: removeWhitespace(v.accountNumber),
+      };
+    }
+
+    if (v.currency === "GHS") {
+      if (v.gshTransferType === "MobileMoney")
+        return {
+          ...base,
+          walletId: v.phoneNumber,
+          mobileOperator: v.bank,
+          countryCode: "GH",
+        };
+      return {
+        ...base,
+        bankName: v.bank,
+        accountNumber: removeWhitespace(v.accountNumber),
+        countryCode: "GH",
+      };
+    }
+
+    return base;
+  };
 
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");

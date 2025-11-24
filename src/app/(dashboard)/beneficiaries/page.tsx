@@ -12,6 +12,7 @@ import {
   Center,
   ScrollArea,
   Modal,
+  Loader,
 } from "@mantine/core";
 import React, { Suspense, useMemo, useState } from "react";
 import Image from "next/image";
@@ -35,7 +36,11 @@ import Filter from "@/ui/components/Filter";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { frontendPagination, calculateTotalPages, removeWhitespace } from "@/lib/utils";
+import {
+  frontendPagination,
+  calculateTotalPages,
+  removeWhitespace,
+} from "@/lib/utils";
 import ModalProvider from "@/ui/components/Modal/ModalProvider";
 import {
   TextInputWithInsideLabel,
@@ -54,6 +59,7 @@ import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import { validateAccount } from "@/lib/hooks/accounts";
 
 type Beneficiary = {
   name: string;
@@ -218,7 +224,10 @@ const Beneficiaries = () => {
         payload
       );
       console.log(res);
-      handleSuccess("Beneficiary successfully", "Beneficiary added successfully");
+      handleSuccess(
+        "Beneficiary successfully",
+        "Beneficiary added successfully"
+      );
       close();
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -292,12 +301,13 @@ const Beneficiaries = () => {
 
     return base;
   };
-
+  const [processing, setProcessing] = useState(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 400);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [validated, setValidated] = useState<boolean | null>(null);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -381,6 +391,47 @@ const Beneficiaries = () => {
       ),
     [searched, active, limit]
   );
+
+  const [{ bic, iban }] = useDebouncedValue(
+    { iban: modalForm.values.iban, bic: modalForm.values.bic },
+    2000
+  );
+
+  React.useEffect(() => {
+    const c = modalForm.values.currency;
+    const isIbanFlow =
+      c === "EUR" ||
+      (c === "USD" && modalForm.values.usdTransferType === "WithinUSA");
+    if (isIbanFlow && iban && bic) {
+      handleIbanValidation();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bic, iban, modalForm.values.currency, modalForm.values.usdTransferType]);
+
+  const handleIbanValidation = async () => {
+    try {
+      setValidated(null);
+      setProcessing(true);
+      const data = await validateAccount({
+        iban: removeWhitespace(iban || ""),
+        bic: removeWhitespace(bic || ""),
+      });
+
+      if (data) {
+        modalForm.setValues({
+          bankAddress: data.address || data.city,
+          bank: data.bankName,
+          country: data.country,
+        });
+        setValidated(Boolean(isValidated));
+      }
+    } catch (err) {
+      setValidated(false);
+      // ignore
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   return (
     <Box>
@@ -637,8 +688,14 @@ const Beneficiaries = () => {
                   </>
                 )}
 
-                {isValidated && (
-                  <Box bg="#EAF7EA" p={16} mt={20} style={{ borderRadius: 8 }}>
+                {!processing && validated && (
+                  <Box
+                    bg="#EAF7EA"
+                    py={12}
+                    px={20}
+                    mt={20}
+                    style={{ borderRadius: 8 }}
+                  >
                     <Group justify="space-between">
                       <Text fz={14} fw={500} c="#1D2939">
                         Information Validated Successfully
@@ -646,6 +703,24 @@ const Beneficiaries = () => {
                       <ThemeIcon color="#12B76A" variant="light" radius="xl">
                         <IconCheck size={16} />
                       </ThemeIcon>
+                    </Group>
+                  </Box>
+                )}
+
+                {processing && (
+                  <Box
+                    bg="#F9F6E6"
+                    py={12}
+                    px={20}
+                    mt={20}
+                    style={{ borderRadius: 8 }}
+                  >
+                    <Group justify="space-between">
+                      <Text fz={14} fw={500} c="#1D2939">
+                        Verifying Account Details
+                      </Text>
+
+                      <Loader color="#D9C136" size={20} />
                     </Group>
                   </Box>
                 )}

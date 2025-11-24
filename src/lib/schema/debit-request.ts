@@ -535,3 +535,89 @@ export const sendMoneyCompanyValidate = z
       }
     }
   });
+
+export const beneficiaryModalValidate = z
+  .object({
+    firstName: z.string().min(2, "First name is required"),
+    lastName: z.string().min(2, "Last name is required"),
+    iban: z
+      .string()
+      .regex(/^$|^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/i, "Invalid IBAN format")
+      .optional(),
+    bic: z
+      .string()
+      .regex(/^$|^[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?$/i, "Invalid BIC format")
+      .optional(),
+    accountNumber: z
+      .string()
+      .regex(/^$|^[0-9]{8,17}$/i, "Invalid account number format (8-17 digits)")
+      .optional(),
+    sortCode: z
+      .string()
+      .regex(
+        /^$|^\d{2}-\d{2}-\d{2}$|^\d{6}$/,
+        "Sort code must be 00-00-00 or 000000"
+      )
+      .optional(),
+    routingNumber: z
+      .string()
+      .regex(/^$|^[0-9]{9}$/i, "Invalid routing number format (9 digits)")
+      .optional(),
+    phoneNumber: z
+      .string()
+      .regex(/^$|^[0-9]{10,15}$/i, "Invalid phone number format (10-15 digits)")
+      .optional(),
+    bank: z.string().min(2, "Bank/Provider is required"),
+    bankAddress: z.string().max(200, "Bank address too long").optional(),
+    country: z.string().min(2, "Country is required"),
+    state: z.string().optional(),
+    currency: z.enum(["EUR", "GBP", "USD", "GHS"]),
+    gshTransferType: z.enum(["BankTransfer", "MobileMoney"]).optional(),
+    usdTransferType: z.enum(["WithinUSA", "OutsideUSA"]).optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.currency === "EUR") {
+      if (!data.iban || data.iban.trim() === "")
+        ctx.addIssue({ path: ["iban"], code: z.ZodIssueCode.custom, message: "IBAN is required for EUR" });
+      if (!data.bic || data.bic.trim() === "")
+        ctx.addIssue({ path: ["bic"], code: z.ZodIssueCode.custom, message: "BIC is required for EUR" });
+    }
+
+    if (data.currency === "GBP") {
+      if (!data.accountNumber || data.accountNumber.trim() === "")
+        ctx.addIssue({ path: ["accountNumber"], code: z.ZodIssueCode.custom, message: "Account Number is required for GBP" });
+      if (!data.sortCode || data.sortCode.trim() === "")
+        ctx.addIssue({ path: ["sortCode"], code: z.ZodIssueCode.custom, message: "Sort Code is required for GBP" });
+    }
+
+    if (data.currency === "USD") {
+      if (!data.usdTransferType)
+        ctx.addIssue({ path: ["usdTransferType"], code: z.ZodIssueCode.custom, message: "Select USD transfer type" });
+
+      if (data.usdTransferType === "WithinUSA") {
+        if (!data.bic || data.bic.trim() === "")
+          ctx.addIssue({ path: ["bic"], code: z.ZodIssueCode.custom, message: "BIC is required for USD WithinUSA" });
+        if (!data.iban || data.iban.trim() === "")
+          ctx.addIssue({ path: ["iban"], code: z.ZodIssueCode.custom, message: "IBAN is required for USD WithinUSA" });
+      }
+      if (data.usdTransferType === "OutsideUSA") {
+        if (!data.routingNumber || data.routingNumber.trim() === "")
+          ctx.addIssue({ path: ["routingNumber"], code: z.ZodIssueCode.custom, message: "Routing Number is required for USD OutsideUSA" });
+        if (!data.accountNumber || data.accountNumber.trim() === "")
+          ctx.addIssue({ path: ["accountNumber"], code: z.ZodIssueCode.custom, message: "Account Number is required for USD OutsideUSA" });
+      }
+    }
+
+    if (data.currency === "GHS") {
+      if (!data.gshTransferType)
+        ctx.addIssue({ path: ["gshTransferType"], code: z.ZodIssueCode.custom, message: "Select GHS transfer type" });
+      if (data.gshTransferType === "BankTransfer") {
+        if (!data.accountNumber || data.accountNumber.trim() === "")
+          ctx.addIssue({ path: ["accountNumber"], code: z.ZodIssueCode.custom, message: "Account Number is required for GHS BankTransfer" });
+      }
+      if (data.gshTransferType === "MobileMoney") {
+        if (!data.phoneNumber || data.phoneNumber.trim() === "")
+          ctx.addIssue({ path: ["phoneNumber"], code: z.ZodIssueCode.custom, message: "Phone Number is required for GHS MobileMoney" });
+      }
+    }
+  });

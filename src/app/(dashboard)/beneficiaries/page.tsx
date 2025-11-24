@@ -37,7 +37,11 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { frontendPagination, calculateTotalPages } from "@/lib/utils";
 import ModalProvider from "@/ui/components/Modal/ModalProvider";
-import { TextInputWithInsideLabel } from "@/ui/components/InputWithLabel";
+import {
+  TextInputWithInsideLabel,
+  SelectInputWithInsideLabel,
+} from "@/ui/components/InputWithLabel";
+import { beneficiaryModalValidate } from "@/lib/schema/debit-request";
 import { IconCheck } from "@tabler/icons-react";
 
 import EUIcon from "@/assets/EU-icon.png";
@@ -140,8 +144,78 @@ const Beneficiaries = () => {
       bankAddress: "",
       country: "",
       state: "",
+      accountNumber: "",
+      sortCode: "",
+      routingNumber: "",
+      phoneNumber: "",
+      currency: switchCurrency ?? currencyTabs[0].value,
+      gshTransferType: "BankTransfer",
+      usdTransferType: "WithinUSA",
     },
+    validate: zodResolver(beneficiaryModalValidate),
   });
+
+  const isValidated = useMemo(() => {
+    const c = modalForm.values.currency;
+    if (c === "EUR")
+      return (
+        !!modalForm.values.iban &&
+        !!modalForm.values.bic &&
+        !modalForm.errors.iban &&
+        !modalForm.errors.bic
+      );
+    if (c === "GBP")
+      return (
+        !!modalForm.values.accountNumber &&
+        !!modalForm.values.sortCode &&
+        !modalForm.errors.accountNumber &&
+        !modalForm.errors.sortCode
+      );
+    if (c === "USD") {
+      if (modalForm.values.usdTransferType === "WithinUSA")
+        return (
+          !!modalForm.values.iban &&
+          !!modalForm.values.bic &&
+          !modalForm.errors.iban &&
+          !modalForm.errors.bic
+        );
+      return (
+        !!modalForm.values.routingNumber &&
+        !!modalForm.values.accountNumber &&
+        !modalForm.errors.routingNumber &&
+        !modalForm.errors.accountNumber
+      );
+    }
+    if (c === "GHS") {
+      if (modalForm.values.gshTransferType === "MobileMoney")
+        return !!modalForm.values.phoneNumber && !modalForm.errors.phoneNumber;
+      return (
+        !!modalForm.values.accountNumber && !modalForm.errors.accountNumber
+      );
+    }
+    return false;
+  }, [modalForm.values, modalForm.errors]);
+
+  const handleSaveBeneficiary = () => {
+    const result = beneficiaryModalValidate.safeParse(modalForm.values);
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      Object.entries(errors).forEach(([field, messages]) => {
+        if (messages?.[0]) modalForm.setFieldError(field, messages[0]);
+      });
+      return;
+    }
+
+    console.log(form.values);
+    // close();
+  };
+
+  React.useEffect(() => {
+    modalForm.setFieldValue(
+      "currency",
+      switchCurrency || currencyTabs[0].value
+    );
+  }, [switchCurrency]);
 
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
@@ -366,25 +440,128 @@ const Beneficiaries = () => {
                   </Group>
                 )}
 
-                <Group grow gap={20} mt={20}>
-                  <TextInputWithInsideLabel
-                    label="IBAN"
-                    placeholder="Enter IBAN"
-                    {...modalForm.getInputProps("iban")}
-                    bg="#fff"
-                    styles={{ input: inputStyle }}
-                  />
-                  <TextInputWithInsideLabel
-                    label={switchCurrency === "USD" ? "SWIFT/BIC" : "BIC"}
-                    placeholder={
-                      switchCurrency === "USD" ? "Enter SWIFT/BIC" : "Enter BIC"
-                    }
-                    {...modalForm.getInputProps("bic")}
-                    styles={{ input: inputStyle }}
-                  />
-                </Group>
+                {modalForm.values.currency === "EUR" && (
+                  <Group grow gap={20} mt={20}>
+                    <TextInputWithInsideLabel
+                      label="IBAN"
+                      placeholder="Enter IBAN"
+                      {...modalForm.getInputProps("iban")}
+                      bg="#fff"
+                      styles={{ input: inputStyle }}
+                    />
+                    <TextInputWithInsideLabel
+                      label="BIC"
+                      placeholder="Enter BIC"
+                      {...modalForm.getInputProps("bic")}
+                      styles={{ input: inputStyle }}
+                    />
+                  </Group>
+                )}
 
-                {modalForm.values.iban && modalForm.values.bic && (
+                {modalForm.values.currency === "GBP" && (
+                  <Group grow gap={20} mt={20}>
+                    <TextInputWithInsideLabel
+                      label="Account Number"
+                      placeholder="Enter account number"
+                      type="number"
+                      {...modalForm.getInputProps("accountNumber")}
+                      styles={{ input: inputStyle }}
+                    />
+                    <TextInputWithInsideLabel
+                      label="Sort Code"
+                      placeholder="Enter sort code"
+                      type="number"
+                      {...modalForm.getInputProps("sortCode")}
+                      styles={{ input: inputStyle }}
+                    />
+                  </Group>
+                )}
+
+                {modalForm.values.currency === "USD" && (
+                  <>
+                    <SelectInputWithInsideLabel
+                      label="Transfer Type"
+                      data={[
+                        { value: "WithinUSA", label: "WithinUSA" },
+                        { value: "OutsideUSA", label: "OutsideUSA" },
+                      ]}
+                      mt={12}
+                      {...modalForm.getInputProps("usdTransferType")}
+                      styles={{ input: inputStyle }}
+                    />
+                    {modalForm.values.usdTransferType === "WithinUSA" ? (
+                      <Group grow gap={20} mt={12}>
+                        <TextInputWithInsideLabel
+                          label="IBAN"
+                          placeholder="Enter IBAN"
+                          {...modalForm.getInputProps("iban")}
+                          styles={{ input: inputStyle }}
+                        />
+                        <TextInputWithInsideLabel
+                          label="SWIFT/BIC"
+                          placeholder="Enter SWIFT/BIC"
+                          {...modalForm.getInputProps("bic")}
+                          styles={{ input: inputStyle }}
+                        />
+                      </Group>
+                    ) : (
+                      <Group grow gap={20} mt={12}>
+                        <TextInputWithInsideLabel
+                          label="Routing Number (ABA)"
+                          placeholder="Enter routing number"
+                          type="number"
+                          {...modalForm.getInputProps("routingNumber")}
+                          styles={{ input: inputStyle }}
+                        />
+                        <TextInputWithInsideLabel
+                          label="Account Number"
+                          placeholder="Enter account number"
+                          type="number"
+                          {...modalForm.getInputProps("accountNumber")}
+                          styles={{ input: inputStyle }}
+                        />
+                      </Group>
+                    )}
+                  </>
+                )}
+
+                {modalForm.values.currency === "GHS" && (
+                  <>
+                    <SelectInputWithInsideLabel
+                      label="Transfer Type"
+                      data={[
+                        { value: "BankTransfer", label: "BankTransfer" },
+                        { value: "MobileMoney", label: "MobileMoney" },
+                      ]}
+                      mt={12}
+                      {...modalForm.getInputProps("gshTransferType")}
+                      styles={{ input: inputStyle }}
+                    />
+                    {modalForm.values.gshTransferType === "MobileMoney" ? (
+                      <Group grow gap={20} mt={12}>
+                        <TextInputWithInsideLabel
+                          label="Phone Number"
+                          placeholder="Enter phone number"
+                          type="number"
+                          {...modalForm.getInputProps("phoneNumber")}
+                          styles={{ input: inputStyle }}
+                        />
+                      </Group>
+                    ) : (
+                      <Group grow gap={20} mt={12}>
+                        <TextInputWithInsideLabel
+                          label="Account Number"
+                          placeholder="Enter account number"
+                          type="number"
+                          {...modalForm.getInputProps("accountNumber")}
+                          styles={{ input: inputStyle }}
+                        />
+                      </Group>
+                    )}
+                  </>
+                )}
+
+                {isValidated && (
                   <Box bg="#EAF7EA" p={16} mt={20} style={{ borderRadius: 8 }}>
                     <Group justify="space-between">
                       <Text fz={14} fw={500} c="#1D2939">
@@ -398,8 +575,18 @@ const Beneficiaries = () => {
                 )}
 
                 <TextInputWithInsideLabel
-                  label="Bank"
-                  placeholder="Bank"
+                  label={
+                    modalForm.values.currency === "GHS" &&
+                    modalForm.values.gshTransferType === "MobileMoney"
+                      ? "Provider"
+                      : "Bank"
+                  }
+                  placeholder={
+                    modalForm.values.currency === "GHS" &&
+                    modalForm.values.gshTransferType === "MobileMoney"
+                      ? "Provider"
+                      : "Bank"
+                  }
                   mt={20}
                   {...modalForm.getInputProps("bank")}
                   styles={{ input: inputStyle }}
@@ -434,7 +621,7 @@ const Beneficiaries = () => {
                   h={48}
                   fullWidth
                   mt={24}
-                  action={close}
+                  action={handleSaveBeneficiary}
                 />
               </Box>
             </TabsPanel>

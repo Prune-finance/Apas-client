@@ -51,6 +51,9 @@ import NGIcon from "@/assets/Nigeria.png";
 import GHIcon from "@/assets/GH.png";
 import CurrencyTab from "@/ui/components/CurrencyTab";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
+import createAxiosInstance from "@/lib/axios";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 type Beneficiary = {
   name: string;
@@ -130,10 +133,12 @@ const inputStyle = {
 };
 
 const Beneficiaries = () => {
+  const axios = createAxiosInstance("accounts");
   const [currency, setCurrency] = useState<string>(currencyTabs[0].value);
   const [opened, { open, close }] = useDisclosure(false);
   const { switchCurrency } = useCurrencySwitchStore();
   const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
+  const { handleError, handleSuccess } = useNotification();
   const modalForm = useForm({
     initialValues: {
       firstName: "",
@@ -196,7 +201,7 @@ const Beneficiaries = () => {
     return false;
   }, [modalForm.values, modalForm.errors]);
 
-  const handleSaveBeneficiary = () => {
+  const handleSaveBeneficiary = async () => {
     const result = beneficiaryModalValidate.safeParse(modalForm.values);
     if (!result.success) {
       const errors = result.error.flatten().fieldErrors;
@@ -206,7 +211,39 @@ const Beneficiaries = () => {
       return;
     }
 
-    console.log(form.values);
+    const data = {
+      alias: "Acme Vendor", // Optional
+      firstName: "{{$randomFirstName}}",
+      lastName: "{{$randomLastName}}",
+      currency: "GBP",
+      isFavorite: true, // Optional
+      bankName: "Barclays",
+      accountNumber: "12345678",
+      sortCode: "10-20-30",
+      accountIban: "GB82WEST12345698765435",
+      routingNumber: "021000022",
+      swiftBic: "BARCGB21",
+      accountHolderAddress: "1 London Road",
+      //   "walletId": "0240000003", // GHS
+      //   "mobileOperator": "MTN", // GHS
+      //   "countryCode": "GH" // GHS
+    };
+
+    try {
+      const { data: res } = await axios.post(
+        "/accounts/beneficiaries",
+        modalForm.values
+      );
+      console.log(res);
+      handleSuccess(
+        "Beneficiary successfully",
+        "Beneficiary added successfully"
+      );
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    }
+
+    console.log(modalForm.values);
     // close();
   };
 

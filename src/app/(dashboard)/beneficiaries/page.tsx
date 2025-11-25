@@ -60,54 +60,14 @@ import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import {
+  BeneficiaryAccountProps,
   useBeneficiaryAccount,
   validateAccount,
   validateAccountGBP,
 } from "@/lib/hooks/accounts";
-
-type Beneficiary = {
-  name: string;
-  email: string;
-  category: string;
-  bank: string;
-  accountNumber: string;
-  currency: "EUR" | "GBP" | "USD" | "NGN" | "CAD" | "GHS";
-};
-
-const sampleBeneficiaries: Beneficiary[] = [
-  {
-    name: "John Smith",
-    email: "john@example.com",
-    category: "Vendors",
-    bank: "Chase Bank",
-    accountNumber: "GB847639735627",
-    currency: "EUR",
-  },
-  {
-    name: "Lukaku Tobi",
-    email: "Lukaku@example.com",
-    category: "Payroll",
-    bank: "Bank of America",
-    accountNumber: "GB847639735627",
-    currency: "EUR",
-  },
-  {
-    name: "Ebenezer Jude",
-    email: "Jude@example.com",
-    category: "Vendors",
-    bank: "Wellsfargo",
-    accountNumber: "GB847639735627",
-    currency: "EUR",
-  },
-  {
-    name: "C80 Limited",
-    email: "C80@example.com",
-    category: "Partner",
-    bank: "Chase Bank",
-    accountNumber: "GB847639735627",
-    currency: "EUR",
-  },
-];
+import { useSearchParams } from "next/navigation";
+import dayjs from "dayjs";
+import countries from "@/assets/countries.json";
 
 const tableHeaders = [
   "Name",
@@ -143,12 +103,19 @@ const inputStyle = {
 };
 
 const Beneficiaries = () => {
+  const searchParams = useSearchParams();
   const axios = createAxiosInstance("accounts");
-  const [currency, setCurrency] = useState<string>(currencyTabs[0].value);
+  const [currency, setCurrency] = useState<string>("EUR");
+  const [loading, setLoading] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const { switchCurrency } = useCurrencySwitchStore();
   const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
   const { handleError, handleSuccess } = useNotification();
+
+  const { status, date, endDate, accountName, type, tab } = Object.fromEntries(
+    searchParams.entries()
+  );
+
   const modalForm = useForm({
     initialValues: {
       firstName: "",
@@ -210,33 +177,6 @@ const Beneficiaries = () => {
     }
     return false;
   }, [modalForm.values, modalForm.errors]);
-
-  const handleSaveBeneficiary = async () => {
-    const result = beneficiaryModalValidate.safeParse(modalForm.values);
-    if (!result.success) {
-      const errors = result.error.flatten().fieldErrors;
-      Object.entries(errors).forEach(([field, messages]) => {
-        if (messages?.[0]) modalForm.setFieldError(field, messages[0]);
-      });
-      return;
-    }
-    const payload = buildBeneficiaryPayload(modalForm.values);
-    console.log(payload);
-    try {
-      const { data: res } = await axios.post(
-        "/accounts/beneficiaries",
-        payload
-      );
-      console.log(res);
-      handleSuccess(
-        "Beneficiary successfully",
-        "Beneficiary added successfully"
-      );
-      close();
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    }
-  };
 
   React.useEffect(() => {
     modalForm.setFieldValue(
@@ -313,94 +253,79 @@ const Beneficiaries = () => {
   const [limit, setLimit] = useState<string | null>("10");
   const [validated, setValidated] = useState<boolean | null>(null);
 
+  const queryParams = {
+    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
+    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
+    accountName: accountName?.trim(),
+    status: status ? status.toUpperCase() : "",
+    type: type ? (type === "Individual" ? "USER" : "CORPORATE") : "",
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
+  };
+
   const {
     beneficiaryAccount,
+    meta,
     loading: beneficiaryAccountLoading,
     revalidate: beneficiaryAccountRevalidate,
-  } = useBeneficiaryAccount();
+  } = useBeneficiaryAccount(
+    {
+      ...queryParams,
+    },
+    currency
+  );
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
 
-  const filteredByCurrency = useMemo(
-    () => sampleBeneficiaries.filter((b) => b.currency === currency),
-    [currency]
-  );
-
-  const searched = useMemo(() => {
-    if (!debouncedSearch) return filteredByCurrency;
-    const lower = debouncedSearch.toLowerCase();
-    return filteredByCurrency.filter(
-      (b) =>
-        b.name.toLowerCase().includes(lower) ||
-        b.email.toLowerCase().includes(lower) ||
-        b.bank.toLowerCase().includes(lower) ||
-        b.accountNumber.toLowerCase().includes(lower) ||
-        b.category.toLowerCase().includes(lower)
-    );
-  }, [filteredByCurrency, debouncedSearch]);
-
-  const rows = useMemo(
-    () =>
-      frontendPagination(searched, active, parseInt(limit ?? "10", 10)).map(
-        (element, index) => (
-          <TableTr key={`${element.email}-${index}`}>
-            <TableTd>
-              <Stack gap={0}>
-                <Text fz={12} fw={500}>
-                  {element.name}
-                </Text>
-                <Text fz={10} fw={400} c="#667085">
-                  {element.email}
-                </Text>
-              </Stack>
-            </TableTd>
-            <TableTd>{element.category}</TableTd>
-            <TableTd>{element.bank}</TableTd>
-            <TableTd>{element.accountNumber}</TableTd>
-            <TableTd>
-              <Group gap={6}>
-                {element.currency === "EUR" && (
-                  <Image width={18} height={18} src={EUIcon} alt="eur" />
-                )}
-                {element.currency === "GBP" && (
-                  <Image width={18} height={18} src={GBIcon} alt="gbp" />
-                )}
-                {element.currency === "USD" && (
-                  <Image width={18} height={18} src={USIcon} alt="usd" />
-                )}
-                {element.currency === "NGN" && (
-                  <Image width={18} height={18} src={NGIcon} alt="ngn" />
-                )}
-                {element.currency === "GHS" && (
-                  <Image width={18} height={18} src={GHIcon} alt="ghs" />
-                )}
-                <Text fz={12} fw={500}>
-                  {element.currency}
-                </Text>
-              </Group>
-            </TableTd>
-            <TableTd>
-              <Group gap={10}>
-                <UnstyledButton>
-                  <ThemeIcon color="#EEF2F6" radius="md">
-                    <IconPencil size={14} color="#475467" />
-                  </ThemeIcon>
-                </UnstyledButton>
-                <UnstyledButton>
-                  <ThemeIcon color="#FEF3F2" radius="md">
-                    <IconTrash size={14} color="#D92D20" />
-                  </ThemeIcon>
-                </UnstyledButton>
-              </Group>
-            </TableTd>
-          </TableTr>
-        )
-      ),
-    [searched, active, limit]
-  );
+  const rows = (beneficiaryAccount ?? []).map((element, index) => (
+    <TableTr key={`${element?.id}-${index}`}>
+      <TableTd>
+        <Stack gap={0}>
+          <Text fz={12} fw={500}>
+            {element?.alias}
+          </Text>
+        </Stack>
+      </TableTd>
+      <TableTd>{element?.type}</TableTd>
+      <TableTd>{element?.bankName}</TableTd>
+      <TableTd>{element?.accountNumber}</TableTd>
+      <TableTd>
+        <Group gap={6}>
+          {element?.Currency?.symbol === "EUR" && (
+            <Image width={18} height={18} src={EUIcon} alt="eur" />
+          )}
+          {element?.Currency?.symbol === "GBP" && (
+            <Image width={18} height={18} src={GBIcon} alt="gbp" />
+          )}
+          {element?.Currency?.symbol === "USD" && (
+            <Image width={18} height={18} src={USIcon} alt="usd" />
+          )}
+          {element?.Currency?.symbol === "NGN" && (
+            <Image width={18} height={18} src={NGIcon} alt="ngn" />
+          )}
+          {element?.Currency?.symbol === "GHS" && (
+            <Image width={18} height={18} src={GHIcon} alt="ghs" />
+          )}
+          <Text fz={12} fw={500}>
+            {element?.Currency?.symbol}
+          </Text>
+        </Group>
+      </TableTd>
+      <TableTd>
+        <Group gap={10}>
+          <UnstyledButton>
+            <ThemeIcon color="#FEF3F2" radius="md">
+              <IconTrash size={14} color="#D92D20" />
+            </ThemeIcon>
+          </UnstyledButton>
+        </Group>
+      </TableTd>
+    </TableTr>
+  ));
 
   const [{ bic, iban }] = useDebouncedValue(
     { iban: modalForm.values.iban, bic: modalForm.values.bic },
@@ -482,6 +407,36 @@ const Beneficiaries = () => {
     }
   };
 
+  const handleSaveBeneficiary = async () => {
+    const result = beneficiaryModalValidate.safeParse(modalForm.values);
+    if (!result.success) {
+      const errors = result.error.flatten().fieldErrors;
+      Object.entries(errors).forEach(([field, messages]) => {
+        if (messages?.[0]) modalForm.setFieldError(field, messages[0]);
+      });
+      return;
+    }
+    const payload = buildBeneficiaryPayload(modalForm.values);
+    try {
+      setLoading(true);
+      const { data: res } = await axios.post(
+        "/accounts/beneficiaries",
+        payload
+      );
+      handleSuccess(
+        "Beneficiary successfully",
+        "Beneficiary added successfully"
+      );
+      beneficiaryAccountRevalidate();
+      close();
+      modalForm.reset();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Box>
       <main className={styles.main}>
@@ -538,19 +493,21 @@ const Beneficiaries = () => {
               <TableComponent
                 head={tableHeaders}
                 rows={rows}
-                loading={false}
+                loading={beneficiaryAccountLoading}
                 mt={24}
               />
 
               <EmptyTable
-                rows={searched}
-                loading={false}
+                rows={rows}
+                loading={beneficiaryAccountLoading}
                 title="There are no beneficiaries"
                 text="When a beneficiary is created, it will appear here."
               />
 
               <PaginationComponent
-                total={calculateTotalPages(limit, searched.length)}
+                total={Math.ceil(
+                  (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
+                )}
                 active={active}
                 setActive={setActive}
                 limit={limit}
@@ -789,6 +746,7 @@ const Beneficiaries = () => {
                   }
                   mt={20}
                   {...modalForm.getInputProps("bank")}
+                  disabled={processing}
                   styles={{ input: inputStyle }}
                 />
 
@@ -797,21 +755,26 @@ const Beneficiaries = () => {
                   placeholder="Enter bank address"
                   mt={20}
                   {...modalForm.getInputProps("bankAddress")}
+                  disabled={processing}
                   styles={{ input: inputStyle }}
                 />
 
                 <Group grow gap={20} mt={20}>
-                  <TextInputWithInsideLabel
+                  <SelectInputWithInsideLabel
+                    searchable
+                    data={countries.map((c) => c?.name)}
                     label="Country"
                     placeholder="Country"
                     {...modalForm.getInputProps("country")}
                     styles={{ input: inputStyle }}
+                    disabled={processing}
                   />
                   <TextInputWithInsideLabel
                     label="State"
                     placeholder="State"
                     {...modalForm.getInputProps("state")}
                     styles={{ input: inputStyle }}
+                    disabled={processing}
                   />
                 </Group>
 
@@ -822,6 +785,7 @@ const Beneficiaries = () => {
                   fullWidth
                   mt={24}
                   action={handleSaveBeneficiary}
+                  loading={loading}
                 />
               </Box>
             </TabsPanel>

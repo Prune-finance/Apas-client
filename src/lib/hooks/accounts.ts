@@ -600,19 +600,42 @@ export function useUserCurrencyAccount() {
   return { loading, currencyAccount, revalidate };
 }
 
-export function useBeneficiaryAccount() {
-  const [beneficiaryAccount, setBeneficiaryAccount] = useState<any[] | null>(
-    null
-  );
+export function useBeneficiaryAccount(
+  customParams: IParams = {},
+  currency: string
+) {
+  const [beneficiaryAccount, setBeneficiaryAccount] = useState<
+    BeneficiaryAccountProps[] | null
+  >(null);
+  const [meta, setMeta] = useState<{ total: number } | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.search && { search: customParams.search }),
+    };
+  }, [customParams]);
+
+  const { limit, date, endDate, status, page, search } = obj;
 
   async function fetchDefaultAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/beneficiaries`);
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `/accounts/beneficiaries?${params}&currency=${currency}`
+      );
 
       setBeneficiaryAccount(data?.data);
-      console.log(data?.data);
+      setMeta(data?.meta ?? null);
     } catch (error) {
       console.log(error);
     } finally {
@@ -625,12 +648,10 @@ export function useBeneficiaryAccount() {
   useEffect(() => {
     fetchDefaultAccount();
 
-    return () => {
-      // Any cleanup code can go here
-    };
-  }, []);
+    return () => {};
+  }, [limit, date, endDate, status, page, search, currency]);
 
-  return { loading, beneficiaryAccount, revalidate };
+  return { loading, beneficiaryAccount, revalidate, meta };
 }
 
 export function useUserListCurrencyAccount() {
@@ -1006,6 +1027,33 @@ export interface CurrencyAccount {
   AccountRequests: {
     Currency: Record<string, any>;
   };
+}
+
+export interface BeneficiaryAccountProps {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  companyId: string;
+  currencyId: string;
+  alias: string;
+  type: "DASHBOARD";
+  status: "PENDING_VERIFICATION";
+  isFavorite: boolean;
+  identifierValue: string;
+  firstName: string;
+  lastName: string;
+  bankName: string;
+  accountNumber: string | null;
+  accountIban: string;
+  sortCode: string | null;
+  routingNumber: string | null;
+  swiftBic: string;
+  accountHolderAddress: string;
+  walletId: string | null;
+  mobileOperator: string | null;
+  countryCode: string | null;
+  Company: { id: string; name: string };
+  Currency: { id: string; symbol: string; name: string };
 }
 
 export interface ListOfBanks {

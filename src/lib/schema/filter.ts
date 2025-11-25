@@ -82,6 +82,7 @@ export interface IParams {
   companyId?: string;
   not?: string;
   currency?: string;
+  currencyType?: string;
   query?: string;
   bank?: string;
   beneficiaryName?: string;

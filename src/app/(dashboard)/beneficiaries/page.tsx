@@ -42,12 +42,13 @@ import {
   removeWhitespace,
 } from "@/lib/utils";
 import ModalProvider from "@/ui/components/Modal/ModalProvider";
+import ModalComponent from "@/ui/components/Modal";
 import {
   TextInputWithInsideLabel,
   SelectInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
 import { beneficiaryModalValidate } from "@/lib/schema/debit-request";
-import { IconCheck } from "@tabler/icons-react";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 import EUIcon from "@/assets/EU-icon.png";
 import GBIcon from "@/assets/GB.png";
@@ -108,9 +109,14 @@ const Beneficiaries = () => {
   const [currency, setCurrency] = useState<string>("EUR");
   const [loading, setLoading] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
+  const [openedDelete, { open: openDelete, close: closeDelete }] =
+    useDisclosure(false);
   const { switchCurrency } = useCurrencySwitchStore();
   const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
   const { handleError, handleSuccess } = useNotification();
+  const [selectedBeneficiary, setSelectedBeneficiary] =
+    useState<BeneficiaryAccountProps | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const { status, date, endDate, accountName, type, tab } = Object.fromEntries(
     searchParams.entries()
@@ -317,7 +323,12 @@ const Beneficiaries = () => {
       </TableTd>
       <TableTd>
         <Group gap={10}>
-          <UnstyledButton>
+          <UnstyledButton
+            onClick={() => {
+              setSelectedBeneficiary(element);
+              openDelete();
+            }}
+          >
             <ThemeIcon color="#FEF3F2" radius="md">
               <IconTrash size={14} color="#D92D20" />
             </ThemeIcon>
@@ -404,6 +415,24 @@ const Beneficiaries = () => {
       setValidated(false);
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleDeleteBeneficiary = async () => {
+    if (!selectedBeneficiary?.id) return;
+    try {
+      setDeleting(true);
+      await axios.delete(
+        `/accounts/beneficiaries/${selectedBeneficiary.id}/delete`
+      );
+      handleSuccess("Delete Beneficiary", "Beneficiary deleted successfully");
+      beneficiaryAccountRevalidate();
+      closeDelete();
+      setSelectedBeneficiary(null);
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -791,6 +820,20 @@ const Beneficiaries = () => {
             </TabsPanel>
           </TabsComponent>
         </Modal>
+        <ModalComponent
+          opened={openedDelete}
+          close={closeDelete}
+          icon={<IconX color="#D92D20" />}
+          color="#FEF3F2"
+          title="Delete Beneficiary"
+          text="This means you are rejecting the request to debit naira this account."
+          customApproveMessage="Yes, Delete"
+          action={handleDeleteBeneficiary}
+          processing={deleting}
+          size={400}
+          btnBg="#D92D20"
+          btnColor="#fff"
+        />
       </main>
     </Box>
   );

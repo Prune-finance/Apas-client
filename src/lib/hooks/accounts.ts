@@ -654,6 +654,39 @@ export function useBeneficiaryAccount(
   return { loading, beneficiaryAccount, revalidate, meta };
 }
 
+export function useSendMoneyBeneficiary(search: string, currency: string) {
+  const [beneficiaryAccount, setBeneficiaryAccount] = useState<
+    BeneficiaryAccountProps[] | null
+  >(null);
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/accounts/beneficiaries?search=${search}&currency=${currency}`
+      );
+
+      setBeneficiaryAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {};
+  }, [search, currency]);
+
+  return { loading, beneficiaryAccount, revalidate };
+}
+
 export function useUserListCurrencyAccount() {
   const [listCurrency, setListCurrency] = useState<
     ListCurrencyAccount[] | null

@@ -6,6 +6,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { RefObject } from "react";
 import * as XLSX from "xlsx";
+import { BeneficiaryAccountProps } from "../hooks/accounts";
 
 export function parseError(error: unknown) {
   if (axios.isAxiosError(error)) {
@@ -136,34 +137,45 @@ export const handleCsvDownload = (
 };
 
 export const handleBeneficiariesCsvDownload = (
-  csvData: DownloadStatementData[],
+  csvData: BeneficiaryAccountProps[],
   csvName?: string,
   currency?: string,
   isStatement?: boolean
 ) => {
-  console.log("CSV Data:", csvData);
   try {
     const data = csvData.map((row) => ({
       createdAt: row.createdAt,
-      amount: row.amount,
-      ...(isStatement ? { balance: row.balance } : {}),
-      narration: row.description || row.narration,
-      reference: row.reference,
-      status: row.status,
+      alias: row.alias,
       type: row.type,
-      ...(row.accessRef ? { accessRef: row.accessRef } : {}),
-      ...(currency === "GHS"
+      bankName: row.bankName,
+      accountHolderAddress: row.accountHolderAddress,
+      companyName: row.Company?.name,
+      currency: row.Currency?.symbol,
+      ...(currency === "EUR"
         ? {
-            senderWalletId: row.senderWalletId,
-            beneficiaryWalletId: row.beneficiaryWalletId,
-            beneficiaryName: row.beneficiaryName,
+            accountIban: row.accountIban,
+            swiftBic: row.swiftBic,
           }
         : {}),
       ...(currency === "GBP"
         ? {
-            senderName: row.senderName,
-            beneficiaryAccountNumber: row.beneficiaryAccountNumber,
-            beneficiarySortCode: row.beneficiarySortCode,
+            accountNumber: row.accountNumber,
+            sortCode: row.sortCode,
+          }
+        : {}),
+      ...(currency === "USD"
+        ? {
+            accountNumber: row.accountNumber,
+            ...(row.routingNumber ? { routingNumber: row.routingNumber } : {}),
+          }
+        : {}),
+      ...(currency === "GHS"
+        ? {
+            walletId: row.walletId,
+            ...(row.mobileOperator
+              ? { mobileOperator: row.mobileOperator }
+              : {}),
+            ...(row.countryCode ? { countryCode: row.countryCode } : {}),
           }
         : {}),
     }));

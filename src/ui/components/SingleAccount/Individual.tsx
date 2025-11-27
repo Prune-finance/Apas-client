@@ -607,7 +607,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         ))}
                       </Group>
                     ) : (
-                      beneficiaryAccount?.map((data) => (
+                      beneficiaryAccount.slice(0, 5)?.map((data) => (
                         <Stack key={data?.id} align="center" gap={6}>
                           <Box
                             pos="relative"
@@ -1215,6 +1215,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               />
             </Flex>
           </Box>
+
           <Modal
             opened={beneficiaryModalOpened}
             onClose={closeBeneficiaryModal}
@@ -1224,6 +1225,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               </Text>
             }
             centered
+            size={500}
           >
             <Group gap={8} mb={12}>
               <Image
@@ -1248,11 +1250,11 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               value={search}
               onChange={(e) => setSearch(e.currentTarget.value)}
             />
-            <ScrollArea h={320} mt={12} scrollbarSize={4}>
+            <ScrollArea h={320} mt={12} scrollbarSize={0}>
               <Stack gap={12}>
                 {(beneficiaryAccount || []).map((b) => (
                   <Group
-                    key={b.id}
+                    key={b?.id}
                     justify="space-between"
                     onClick={() => {
                       handlePopulateForm(b);
@@ -1262,42 +1264,42 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   >
                     <Group gap={12}>
                       <Avatar size={36} variant="light" bg="#F2F4F7">
-                        {getInitials(b.alias)}
+                        {getInitials(b?.alias)}
                       </Avatar>
                       <Stack gap={2}>
                         <Text fz={14} fw={600}>
-                          {`${b.firstName} ${b.lastName}`.trim()}
+                          {`${b?.firstName} ${b?.lastName}`.trim()}
                         </Text>
                         <Text fz={12} c="#667085">
                           {switchCurrency === "EUR" &&
-                            `${b.accountIban} - ${b.bankName}`}
+                            `${b?.accountIban} - ${b?.bankName}`}
                           {switchCurrency === "GBP" &&
-                            `${b.accountNumber ?? ""} - ${b.bankName}`}
+                            `${b?.accountNumber ?? ""} - ${b?.bankName}`}
                           {switchCurrency === "USD" &&
                             (switchCurrencyOutsideUS === "WithinUSA"
-                              ? `${b.accountIban} - ${b.bankName}`
-                              : `${b.routingNumber ?? ""} - ${
-                                  b.accountNumber ?? ""
+                              ? `${b?.accountIban} - ${b?.bankName}`
+                              : `${b?.routingNumber ?? ""} - ${
+                                  b?.accountNumber ?? ""
                                 }`)}
                           {switchCurrency === "GHS" &&
-                            `${b.accountNumber ?? b.identifierValue ?? ""} - ${
-                              b.bankName
-                            }`}
+                            `${
+                              b?.accountNumber ?? b?.identifierValue ?? ""
+                            } - ${b?.bankName}`}
                         </Text>
                       </Stack>
                     </Group>
                     <Text fz={12} c="#667085">
                       {switchCurrency === "EUR" &&
-                        (b.swiftBic ? `BIC: ${b.swiftBic}` : "")}
+                        (b?.swiftBic ? `BIC: ${b?.swiftBic}` : "")}
                       {switchCurrency === "GBP" &&
-                        (b.sortCode ? `Sort Code: ${b.sortCode}` : "")}
+                        (b?.sortCode ? `Sort Code: ${b?.sortCode}` : "")}
                       {switchCurrency === "USD" &&
                         (switchCurrencyOutsideUS === "WithinUSA"
-                          ? b.swiftBic
-                            ? `BIC: ${b.swiftBic}`
+                          ? b?.swiftBic
+                            ? `BIC: ${b?.swiftBic}`
                             : ""
-                          : b.routingNumber
-                          ? `ABA: ${b.routingNumber}`
+                          : b?.routingNumber
+                          ? `ABA: ${b?.routingNumber}`
                           : "")}
                     </Text>
                   </Group>

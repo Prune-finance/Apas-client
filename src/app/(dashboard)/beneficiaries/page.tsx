@@ -279,7 +279,7 @@ const Beneficiaries = () => {
 
     return base;
   };
-  const [processing, setProcessing] = useState(false);
+  const [processing, setProcessing] = useState<boolean | null>(null);
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
@@ -569,7 +569,7 @@ const Beneficiaries = () => {
     modalForm.reset();
     setSelectedBeneficiary(null);
     setValidated(null);
-    setProcessing(false);
+    setProcessing(null);
   };
 
   return (
@@ -925,7 +925,7 @@ const Beneficiaries = () => {
                   }
                   mt={20}
                   {...modalForm.getInputProps("bank")}
-                  disabled={processing}
+                  disabled={processing ?? false}
                   styles={{ input: inputStyle }}
                 />
 
@@ -934,7 +934,7 @@ const Beneficiaries = () => {
                   placeholder="Enter bank address"
                   mt={20}
                   {...modalForm.getInputProps("bankAddress")}
-                  disabled={processing}
+                  disabled={processing ?? false}
                   styles={{ input: inputStyle }}
                 />
 
@@ -946,14 +946,14 @@ const Beneficiaries = () => {
                     placeholder="Country"
                     {...modalForm.getInputProps("country")}
                     styles={{ input: inputStyle }}
-                    disabled={processing}
+                    disabled={processing ?? false}
                   />
                   <TextInputWithInsideLabel
                     label="State"
                     placeholder="State"
                     {...modalForm.getInputProps("state")}
                     styles={{ input: inputStyle }}
-                    disabled={processing}
+                    disabled={processing ?? false}
                   />
                 </Group>
 

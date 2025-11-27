@@ -67,6 +67,7 @@ import SelectTypeOfTransfer from "@/app/(dashboard)/accounts/SelectTypeOfTransfe
 import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
 import USDSelectTypeOfTransfer from "@/app/(dashboard)/accounts/USDSelectTypeOfTransfer";
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
+import { SearchInput } from "../Inputs";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -1244,13 +1245,15 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               />
               <Text fz={14}>{switchCurrency}</Text>
             </Group>
-            <TextInput
-              placeholder="Search beneficiary..."
-              classNames={{ input: styles.input, label: styles.label }}
-              value={search}
-              onChange={(e) => setSearch(e.currentTarget.value)}
+
+            <SearchInput
+              search={search}
+              setSearch={setSearch}
+              w={270}
+              placeholder="Search here......"
             />
-            <ScrollArea h={320} mt={12} scrollbarSize={0}>
+
+            <ScrollArea h={320} mt={22} scrollbarSize={0}>
               <Stack gap={12}>
                 {(beneficiaryAccount || []).map((b) => (
                   <Group
@@ -1262,12 +1265,18 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                     }}
                     style={{ cursor: "pointer" }}
                   >
-                    <Group gap={12}>
-                      <Avatar size={36} variant="light" bg="#F2F4F7">
+                    <Group gap={16}>
+                      <Avatar
+                        size={36}
+                        variant="light"
+                        bg="#fbfee6"
+                        fz={12}
+                        color="#596603"
+                      >
                         {getInitials(b?.alias)}
                       </Avatar>
                       <Stack gap={2}>
-                        <Text fz={14} fw={600}>
+                        <Text fz={12} fw={500} c="#101828">
                           {`${b?.firstName} ${b?.lastName}`.trim()}
                         </Text>
                         <Text fz={12} c="#667085">

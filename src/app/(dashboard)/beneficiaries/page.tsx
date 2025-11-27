@@ -333,7 +333,7 @@ const Beneficiaries = () => {
           : element?.Currency?.symbol === "GBP"
           ? element?.accountNumber
           : element?.Currency?.symbol === "USD"
-          ? element?.accountNumber
+          ? element?.accountNumber || element?.accountIban
           : element?.Currency?.symbol === "NGN"
           ? element?.accountNumber
           : element?.Currency?.symbol === "GHS"

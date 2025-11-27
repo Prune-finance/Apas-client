@@ -133,6 +133,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     const { transferCurrency: switchCurrencyOutsideUS } =
       USDuseTransferCurrencySwitchStore();
     const { transferCurrency } = useTransferCurrencySwitchStore();
+    const [
+      beneficiaryModalOpened,
+      { open: openBeneficiaryModal, close: closeBeneficiaryModal },
+    ] = useDisclosure(false);
 
     const form = useForm({
       initialValues: {
@@ -643,7 +647,12 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                     )}
 
                     {beneficiaryAccount.length > 6 && (
-                      <Stack align="center" gap={6}>
+                      <Stack
+                        align="center"
+                        gap={6}
+                        onClick={openBeneficiaryModal}
+                        style={{ cursor: "pointer" }}
+                      >
                         <ThemeIcon
                           size={48}
                           radius="xl"
@@ -1206,6 +1215,96 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               />
             </Flex>
           </Box>
+          <Modal
+            opened={beneficiaryModalOpened}
+            onClose={closeBeneficiaryModal}
+            title={
+              <Text fz={18} fw={600}>
+                Beneficiary
+              </Text>
+            }
+            centered
+          >
+            <Group gap={8} mb={12}>
+              <Image
+                src={
+                  switchCurrency === "EUR"
+                    ? EUImage.src
+                    : switchCurrency === "GBP"
+                    ? GBImage.src
+                    : switchCurrency === "GHS"
+                    ? GHSImage.src
+                    : USDImage.src
+                }
+                alt={switchCurrency}
+                width={18}
+                height={18}
+              />
+              <Text fz={14}>{switchCurrency}</Text>
+            </Group>
+            <TextInput
+              placeholder="Search beneficiary..."
+              classNames={{ input: styles.input, label: styles.label }}
+              value={search}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+            />
+            <ScrollArea h={320} mt={12} scrollbarSize={4}>
+              <Stack gap={12}>
+                {(beneficiaryAccount || []).map((b) => (
+                  <Group
+                    key={b.id}
+                    justify="space-between"
+                    onClick={() => {
+                      handlePopulateForm(b);
+                      closeBeneficiaryModal();
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <Group gap={12}>
+                      <Avatar size={36} variant="light" bg="#F2F4F7">
+                        {getInitials(b.alias)}
+                      </Avatar>
+                      <Stack gap={2}>
+                        <Text fz={14} fw={600}>
+                          {`${b.firstName} ${b.lastName}`.trim()}
+                        </Text>
+                        <Text fz={12} c="#667085">
+                          {switchCurrency === "EUR" &&
+                            `${b.accountIban} - ${b.bankName}`}
+                          {switchCurrency === "GBP" &&
+                            `${b.accountNumber ?? ""} - ${b.bankName}`}
+                          {switchCurrency === "USD" &&
+                            (switchCurrencyOutsideUS === "WithinUSA"
+                              ? `${b.accountIban} - ${b.bankName}`
+                              : `${b.routingNumber ?? ""} - ${
+                                  b.accountNumber ?? ""
+                                }`)}
+                          {switchCurrency === "GHS" &&
+                            `${b.accountNumber ?? b.identifierValue ?? ""} - ${
+                              b.bankName
+                            }`}
+                        </Text>
+                      </Stack>
+                    </Group>
+                    <Text fz={12} c="#667085">
+                      {switchCurrency === "EUR" &&
+                        (b.swiftBic ? `BIC: ${b.swiftBic}` : "")}
+                      {switchCurrency === "GBP" &&
+                        (b.sortCode ? `Sort Code: ${b.sortCode}` : "")}
+                      {switchCurrency === "USD" &&
+                        (switchCurrencyOutsideUS === "WithinUSA"
+                          ? b.swiftBic
+                            ? `BIC: ${b.swiftBic}`
+                            : ""
+                          : b.routingNumber
+                          ? `ABA: ${b.routingNumber}`
+                          : "")}
+                    </Text>
+                  </Group>
+                ))}
+              </Stack>
+            </ScrollArea>
+          </Modal>
         </TabsPanel>
       </>
     );

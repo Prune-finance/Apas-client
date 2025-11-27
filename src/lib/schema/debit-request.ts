@@ -426,7 +426,9 @@ export const sendMoneyCompanyValidate = z
       .min(2, "Narration must be at least 2 characters")
       .max(100, "Narration cannot exceed 100 characters"),
     currency: z.enum(["EUR", "GBP", "GHS", "USD"], {
-      errorMap: () => ({ message: "Currency must be either EUR, GBP, GHS or USD" }),
+      errorMap: () => ({
+        message: "Currency must be either EUR, GBP, GHS or USD",
+      }),
     }),
     gshTransferType: z
       .enum(["BankTransfer", "MobileMoney"], {
@@ -538,8 +540,11 @@ export const sendMoneyCompanyValidate = z
 
 export const beneficiaryModalValidate = z
   .object({
-    firstName: z.string().min(2, "First name is required"),
-    lastName: z.string().min(2, "Last name is required"),
+    type: z.enum(["INDIVIDUAL", "COMPANY"]),
+    firstName: z.string().optional(),
+    lastName: z.string().optional(),
+    companyName: z.string().optional(),
+    contactEmail: z.string().optional(),
     iban: z
       .string()
       .regex(/^$|^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/i, "Invalid IBAN format")
@@ -576,48 +581,126 @@ export const beneficiaryModalValidate = z
     usdTransferType: z.enum(["WithinUSA", "OutsideUSA"]).optional(),
   })
   .superRefine((data, ctx) => {
+    if (data.type === "INDIVIDUAL") {
+      if (!data.firstName || data.firstName.trim() === "")
+        ctx.addIssue({
+          path: ["firstName"],
+          code: z.ZodIssueCode.custom,
+          message: "First name is required",
+        });
+      if (!data.lastName || data.lastName.trim() === "")
+        ctx.addIssue({
+          path: ["lastName"],
+          code: z.ZodIssueCode.custom,
+          message: "Last name is required",
+        });
+    }
+
+    if (data.type === "COMPANY") {
+      if (!data.companyName || data.companyName.trim() === "")
+        ctx.addIssue({
+          path: ["companyName"],
+          code: z.ZodIssueCode.custom,
+          message: "Company name is required",
+        });
+      if (!data.contactEmail || data.contactEmail.trim() === "")
+        ctx.addIssue({
+          path: ["contactEmail"],
+          code: z.ZodIssueCode.custom,
+          message: "Contact email is required",
+        });
+    }
+
     if (data.currency === "EUR") {
       if (!data.iban || data.iban.trim() === "")
-        ctx.addIssue({ path: ["iban"], code: z.ZodIssueCode.custom, message: "IBAN is required for EUR" });
+        ctx.addIssue({
+          path: ["iban"],
+          code: z.ZodIssueCode.custom,
+          message: "IBAN is required for EUR",
+        });
       if (!data.bic || data.bic.trim() === "")
-        ctx.addIssue({ path: ["bic"], code: z.ZodIssueCode.custom, message: "BIC is required for EUR" });
+        ctx.addIssue({
+          path: ["bic"],
+          code: z.ZodIssueCode.custom,
+          message: "BIC is required for EUR",
+        });
     }
 
     if (data.currency === "GBP") {
       if (!data.accountNumber || data.accountNumber.trim() === "")
-        ctx.addIssue({ path: ["accountNumber"], code: z.ZodIssueCode.custom, message: "Account Number is required for GBP" });
+        ctx.addIssue({
+          path: ["accountNumber"],
+          code: z.ZodIssueCode.custom,
+          message: "Account Number is required for GBP",
+        });
       if (!data.sortCode || data.sortCode.trim() === "")
-        ctx.addIssue({ path: ["sortCode"], code: z.ZodIssueCode.custom, message: "Sort Code is required for GBP" });
+        ctx.addIssue({
+          path: ["sortCode"],
+          code: z.ZodIssueCode.custom,
+          message: "Sort Code is required for GBP",
+        });
     }
 
     if (data.currency === "USD") {
       if (!data.usdTransferType)
-        ctx.addIssue({ path: ["usdTransferType"], code: z.ZodIssueCode.custom, message: "Select USD transfer type" });
+        ctx.addIssue({
+          path: ["usdTransferType"],
+          code: z.ZodIssueCode.custom,
+          message: "Select USD transfer type",
+        });
 
       if (data.usdTransferType === "WithinUSA") {
         if (!data.bic || data.bic.trim() === "")
-          ctx.addIssue({ path: ["bic"], code: z.ZodIssueCode.custom, message: "BIC is required for USD WithinUSA" });
+          ctx.addIssue({
+            path: ["bic"],
+            code: z.ZodIssueCode.custom,
+            message: "BIC is required for USD WithinUSA",
+          });
         if (!data.iban || data.iban.trim() === "")
-          ctx.addIssue({ path: ["iban"], code: z.ZodIssueCode.custom, message: "IBAN is required for USD WithinUSA" });
+          ctx.addIssue({
+            path: ["iban"],
+            code: z.ZodIssueCode.custom,
+            message: "IBAN is required for USD WithinUSA",
+          });
       }
       if (data.usdTransferType === "OutsideUSA") {
         if (!data.routingNumber || data.routingNumber.trim() === "")
-          ctx.addIssue({ path: ["routingNumber"], code: z.ZodIssueCode.custom, message: "Routing Number is required for USD OutsideUSA" });
+          ctx.addIssue({
+            path: ["routingNumber"],
+            code: z.ZodIssueCode.custom,
+            message: "Routing Number is required for USD OutsideUSA",
+          });
         if (!data.accountNumber || data.accountNumber.trim() === "")
-          ctx.addIssue({ path: ["accountNumber"], code: z.ZodIssueCode.custom, message: "Account Number is required for USD OutsideUSA" });
+          ctx.addIssue({
+            path: ["accountNumber"],
+            code: z.ZodIssueCode.custom,
+            message: "Account Number is required for USD OutsideUSA",
+          });
       }
     }
 
     if (data.currency === "GHS") {
       if (!data.gshTransferType)
-        ctx.addIssue({ path: ["gshTransferType"], code: z.ZodIssueCode.custom, message: "Select GHS transfer type" });
+        ctx.addIssue({
+          path: ["gshTransferType"],
+          code: z.ZodIssueCode.custom,
+          message: "Select GHS transfer type",
+        });
       if (data.gshTransferType === "BankTransfer") {
         if (!data.accountNumber || data.accountNumber.trim() === "")
-          ctx.addIssue({ path: ["accountNumber"], code: z.ZodIssueCode.custom, message: "Account Number is required for GHS BankTransfer" });
+          ctx.addIssue({
+            path: ["accountNumber"],
+            code: z.ZodIssueCode.custom,
+            message: "Account Number is required for GHS BankTransfer",
+          });
       }
       if (data.gshTransferType === "MobileMoney") {
         if (!data.phoneNumber || data.phoneNumber.trim() === "")
-          ctx.addIssue({ path: ["phoneNumber"], code: z.ZodIssueCode.custom, message: "Phone Number is required for GHS MobileMoney" });
+          ctx.addIssue({
+            path: ["phoneNumber"],
+            code: z.ZodIssueCode.custom,
+            message: "Phone Number is required for GHS MobileMoney",
+          });
       }
     }
   });

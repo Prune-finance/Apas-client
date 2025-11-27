@@ -117,22 +117,21 @@ const Beneficiaries = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] =
     useDisclosure(false);
-      const [
-        openedTransactionsPreview,
-        { open: openTransactionsPreview, close: closeTransactionsPreview },
-      ] = useDisclosure(false);
-        const [documentType, setDocumentType] = useState<string>("CSV");
-          const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
-            null,
-            null,
-          ]);
+  const [
+    openedTransactionsPreview,
+    { open: openTransactionsPreview, close: closeTransactionsPreview },
+  ] = useDisclosure(false);
+  const [documentType, setDocumentType] = useState<string>("CSV");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
   const { switchCurrency } = useCurrencySwitchStore();
   const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
   const { handleError, handleSuccess, handleInfo } = useNotification();
   const [selectedBeneficiary, setSelectedBeneficiary] =
     useState<BeneficiaryAccountProps | null>(null);
   const [deleting, setDeleting] = useState(false);
-  
 
   const { status, date, endDate, accountName, type, tab } = Object.fromEntries(
     searchParams.entries()
@@ -140,8 +139,11 @@ const Beneficiaries = () => {
 
   const modalForm = useForm({
     initialValues: {
+      type: "INDIVIDUAL",
       firstName: "",
       lastName: "",
+      companyName: "",
+      contactEmail: "",
       iban: "",
       bic: "",
       bank: "",
@@ -207,14 +209,24 @@ const Beneficiaries = () => {
     );
   }, [switchCurrency]);
 
+  React.useEffect(() => {
+    modalForm.setFieldValue(
+      "type",
+      beneficiaryType === "Individual" ? "INDIVIDUAL" : "COMPANY"
+    );
+  }, [beneficiaryType]);
+
   const buildBeneficiaryPayload = (v: typeof modalForm.values) => {
     const base = {
-      alias: `${v.firstName} ${v.lastName}`,
-      firstName: v.firstName,
-      lastName: v.lastName,
+      alias:
+        v.type === "COMPANY" ? v.companyName : `${v.firstName} ${v.lastName}`,
       currency: v.currency,
       isFavorite: false,
       accountHolderAddress: v.bankAddress,
+      type: v.type,
+      ...(v.type === "INDIVIDUAL"
+        ? { firstName: v.firstName, lastName: v.lastName }
+        : { companyName: v.companyName, contactEmail: v.contactEmail }),
     };
 
     if (v.currency === "EUR")
@@ -268,7 +280,7 @@ const Beneficiaries = () => {
     return base;
   };
   const [processing, setProcessing] = useState(false);
-   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
+  const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 400);
@@ -472,6 +484,7 @@ const Beneficiaries = () => {
       Object.entries(errors).forEach(([field, messages]) => {
         if (messages?.[0]) modalForm.setFieldError(field, messages[0]);
       });
+      console.log(errors);
       return;
     }
     const payload = buildBeneficiaryPayload(modalForm.values);
@@ -495,68 +508,69 @@ const Beneficiaries = () => {
     }
   };
 
-
-    const handleExportStatement = async () => {
-   
-  
-      if (!dateRange[0] || !dateRange[1]) {
-        return handleInfo(
-          "Transactions Export",
-          "Please select a valid date range"
-        );
-      }
-  
-      notifications.clean();
-      setLoadingStatement(true);
-  
-      const [startDate, endDate] = dateRange.map((date) =>
-        dayjs(date).format("YYYY-MM-DD")
+  const handleExportStatement = async () => {
+    if (!dateRange[0] || !dateRange[1]) {
+      return handleInfo(
+        "Transactions Export",
+        "Please select a valid date range"
       );
-  
-      const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
-      const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
-    
-  
-      const url =
-       
-        `${baseUrl}/accounts/beneficiaries/export?date=${startDate}&endDate=${endDate}&currency=${currency}`
-  
-      try {
-        const { data: res } = await axios.get(url, { headers });
-  
-        if (!res?.data?.length) {
-          return handleInfo(
-            "Beneficiaries Export",
-            "No beneficiaries found for the selected date range"
-          );
-        }
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-  
-        handleBeneficiariesCsvDownload(
-          res.data,
-          "beneficiaries_export.csv",
-          currency || "EUR"
-        );
-  
-        closeTransactionsPreview();
-        handleSuccess(
+    }
+
+    notifications.clean();
+    setLoadingStatement(true);
+
+    const [startDate, endDate] = dateRange.map((date) =>
+      dayjs(date).format("YYYY-MM-DD")
+    );
+
+    const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
+    const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
+
+    const url = `${baseUrl}/accounts/beneficiaries/export?date=${startDate}&endDate=${endDate}&currency=${currency}`;
+
+    try {
+      const { data: res } = await axios.get(url, { headers });
+
+      if (!res?.data?.length) {
+        return handleInfo(
           "Beneficiaries Export",
-          "Beneficiaries export downloaded successful"
+          "No beneficiaries found for the selected date range"
         );
-        setDateRange([null, null]);
-      } catch (error) {
-        console.error("Error exporting beneficiaries:", error);
-        handleError(
-          "Beneficiaries Export",
-          error instanceof Error
-            ? parseError(error)
-            : "error exporting beneficiaries"
-        );
-      } finally {
-        setLoadingStatement(false);
       }
-    };
-  
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      handleBeneficiariesCsvDownload(
+        res.data,
+        "beneficiaries_export.csv",
+        currency || "EUR"
+      );
+
+      closeTransactionsPreview();
+      handleSuccess(
+        "Beneficiaries Export",
+        "Beneficiaries export downloaded successful"
+      );
+      setDateRange([null, null]);
+    } catch (error) {
+      console.error("Error exporting beneficiaries:", error);
+      handleError(
+        "Beneficiaries Export",
+        error instanceof Error
+          ? parseError(error)
+          : "error exporting beneficiaries"
+      );
+    } finally {
+      setLoadingStatement(false);
+    }
+  };
+
+  const closeModal = () => {
+    close();
+    modalForm.reset();
+    setSelectedBeneficiary(null);
+    setValidated(null);
+    setProcessing(false);
+  };
 
   return (
     <Box>
@@ -684,7 +698,7 @@ const Beneficiaries = () => {
 
         <Modal
           opened={opened}
-          onClose={close}
+          onClose={closeModal}
           title="New Beneficiary"
           size="lg"
           styles={{
@@ -726,13 +740,13 @@ const Beneficiaries = () => {
                     <TextInputWithInsideLabel
                       label="Company Name"
                       placeholder="Company Name"
-                      {...modalForm.getInputProps("firstName")}
+                      {...modalForm.getInputProps("companyName")}
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
                       label="Contact Email"
                       placeholder="Email"
-                      {...modalForm.getInputProps("lastName")}
+                      {...modalForm.getInputProps("contactEmail")}
                       styles={{ input: inputStyle }}
                     />
                   </Group>
@@ -972,70 +986,70 @@ const Beneficiaries = () => {
           btnColor="#fff"
         />
 
-          <Modal
-                opened={openedTransactionsPreview}
-                onClose={closeTransactionsPreview}
-                size={"35%"}
-                centered
-                withCloseButton={true}
-                style={{ backgroundColor: "white" }}
-              >
-                <Flex
-                  w="100%"
-                  align="center"
-                  justify="center"
-                  direction="column"
-                  px={30}
-                >
-                  <Text fz={18} fw={500} c="#000">
-                    Export Transactions
-                  </Text>
-        
-                  <DatePickerInput
-                    placeholder="Select Date Range"
-                    valueFormat="YYYY-MM-DD"
-                    value={dateRange}
-                    onChange={(value: [Date | null, Date | null]) =>
-                      setDateRange(value)
-                    }
-                    size="xs"
-                    w="100%"
-                    h={44}
-                    styles={{ input: { height: "48px" } }}
-                    mt={12}
-                    type="range"
-                    allowSingleDateInRange
-                    leftSection={<IconCalendarMonth size={20} />}
-                    numberOfColumns={2}
-                    clearable
-                    disabled={loading}
-                  />
-        
-                  <SelectBox
-                    placeholder="Select Document Type"
-                    data={["CSV"]}
-                    value={"CSV"}
-                    disabled
-                    onChange={(value) => setDocumentType(value!)}
-                    mt={16}
-                    size="xs"
-                    w="100%"
-                    h={44}
-                    styles={{ input: { height: "48px" } }}
-                  />
-        
-                  <PrimaryBtn
-                    action={handleExportStatement}
-                    loading={loadingStatement}
-                    text="Submit"
-                    mt={22}
-                    ml="auto"
-                    mb={38}
-                    w="100%"
-                    h={44}
-                  />
-                </Flex>
-              </Modal>
+        <Modal
+          opened={openedTransactionsPreview}
+          onClose={closeTransactionsPreview}
+          size={"35%"}
+          centered
+          withCloseButton={true}
+          style={{ backgroundColor: "white" }}
+        >
+          <Flex
+            w="100%"
+            align="center"
+            justify="center"
+            direction="column"
+            px={30}
+          >
+            <Text fz={18} fw={500} c="#000">
+              Export Transactions
+            </Text>
+
+            <DatePickerInput
+              placeholder="Select Date Range"
+              valueFormat="YYYY-MM-DD"
+              value={dateRange}
+              onChange={(value: [Date | null, Date | null]) =>
+                setDateRange(value)
+              }
+              size="xs"
+              w="100%"
+              h={44}
+              styles={{ input: { height: "48px" } }}
+              mt={12}
+              type="range"
+              allowSingleDateInRange
+              leftSection={<IconCalendarMonth size={20} />}
+              numberOfColumns={2}
+              clearable
+              disabled={loading}
+            />
+
+            <SelectBox
+              placeholder="Select Document Type"
+              data={["CSV"]}
+              value={"CSV"}
+              disabled
+              onChange={(value) => setDocumentType(value!)}
+              mt={16}
+              size="xs"
+              w="100%"
+              h={44}
+              styles={{ input: { height: "48px" } }}
+            />
+
+            <PrimaryBtn
+              action={handleExportStatement}
+              loading={loadingStatement}
+              text="Submit"
+              mt={22}
+              ml="auto"
+              mb={38}
+              w="100%"
+              h={44}
+            />
+          </Flex>
+        </Modal>
       </main>
     </Box>
   );

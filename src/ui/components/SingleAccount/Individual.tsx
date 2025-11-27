@@ -9,7 +9,16 @@ import {
   useState,
   useCallback,
 } from "react";
-import { IconCheck } from "@tabler/icons-react";
+import {
+  IconCheck,
+  IconArrowRight,
+  IconCircleFilled,
+} from "@tabler/icons-react";
+
+import GBImage from "@/assets/GB.png";
+import EUImage from "@/assets/EU-icon.png";
+import GHSImage from "@/assets/GH.png";
+import USDImage from "@/assets/USD.png";
 
 import styles from "./sendMoney.module.scss";
 
@@ -28,12 +37,18 @@ import {
   Checkbox,
   Modal,
   Skeleton,
+  Avatar,
+  Stack,
+  ThemeIcon,
+  Image,
 } from "@mantine/core";
 import { TextInput, Select } from "@mantine/core";
 import { useForm, UseFormReturnType, zodResolver } from "@mantine/form";
 import { PrimaryBtn } from "../Buttons";
 import {
+  BeneficiaryAccountProps,
   DefaultAccount,
+  useSendMoneyBeneficiary,
   useUserListOfBanks,
   validateAccount,
   validateAccountGBP,
@@ -42,7 +57,7 @@ import {
 import DropzoneComponent from "../Dropzone";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { sendMoneyIndividualValidate } from "@/lib/schema";
-import { removeWhitespace } from "@/lib/utils";
+import { removeWhitespace, getInitials } from "@/lib/utils";
 import countries from "@/assets/countries.json";
 import TransactionProcessingTimes from "./TransactionProcessingTimes";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
@@ -114,6 +129,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     const [disableAddress, setDisableAddress] = useState(false);
     const [disableCountry, setDisableCountry] = useState(false);
     const { switchCurrency } = useCurrencySwitchStore();
+    const [search, setSearch] = useState("");
     const { transferCurrency: switchCurrencyOutsideUS } =
       USDuseTransferCurrencySwitchStore();
     const { transferCurrency } = useTransferCurrencySwitchStore();
@@ -124,6 +140,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       },
       validate: zodResolver(sendMoneyIndividualValidate),
     });
+
+    const { beneficiaryAccount, loading: beneficiaryAccountLoading } =
+      useSendMoneyBeneficiary(search, switchCurrency);
 
     useEffect(() => {
       form.setFieldValue("currency", switchCurrency);
@@ -290,7 +309,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
         });
       }
     }, [form.values.destinationCountry, validated, ref]);
-    
+
     const memorizedData = useMemo(() => {
       if (!banks || !Array.isArray(banks)) return [];
       return banks
@@ -307,7 +326,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     }, [transferCurrency]);
 
     useEffect(() => {
-     if (form.values.destinationCountry == null) {
+      if (form.values.destinationCountry == null) {
         form.setValues({
           destinationCountry: "",
         });
@@ -321,6 +340,16 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       form.setFieldValue("routingNumber", "");
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [switchCurrencyOutsideUS]);
+
+    useEffect(() => {
+      form.reset();
+      form.setFieldValue("currency", switchCurrency);
+      setValidated(null);
+      setShowBadge(false);
+      setDisableBank(false);
+      setDisableAddress(false);
+      setDisableCountry(false);
+    }, [switchCurrency]);
 
     // Helper UI components to reduce repetition and keep JSX concise
     const NameFields = useCallback(
@@ -506,6 +535,52 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       []
     );
 
+    const handlePopulateForm = (data: BeneficiaryAccountProps) => {
+      form.setFieldValue("firstName", data.firstName || "");
+      form.setFieldValue("lastName", data.lastName || "");
+      form.setFieldValue("destinationBank", data.bankName || "");
+
+      if (switchCurrency === "EUR") {
+        form.setFieldValue("destinationIBAN", data.accountIban || "");
+        form.setFieldValue("destinationBIC", data.swiftBic || "");
+        form.setFieldValue("destinationAccountNumber", "");
+        form.setFieldValue("destinationSortCode", "");
+        form.setFieldValue("routingNumber", "");
+        form.setFieldValue("accountNumber", "");
+      } else if (switchCurrency === "GBP") {
+        form.setFieldValue(
+          "destinationAccountNumber",
+          data.accountNumber || ""
+        );
+        form.setFieldValue("destinationSortCode", data.sortCode || "");
+        form.setFieldValue("destinationIBAN", "");
+        form.setFieldValue("destinationBIC", "");
+        form.setFieldValue("routingNumber", "");
+        form.setFieldValue("accountNumber", "");
+      } else if (switchCurrency === "USD") {
+        if (switchCurrencyOutsideUS === "WithinUSA") {
+          form.setFieldValue("destinationIBAN", data.accountIban || "");
+          form.setFieldValue("destinationBIC", data.swiftBic || "");
+          form.setFieldValue("routingNumber", "");
+          form.setFieldValue("accountNumber", "");
+        } else {
+          form.setFieldValue("routingNumber", data.routingNumber || "");
+          form.setFieldValue("accountNumber", data.accountNumber || "");
+          form.setFieldValue("destinationIBAN", "");
+          form.setFieldValue("destinationBIC", "");
+        }
+        form.setFieldValue("destinationAccountNumber", "");
+        form.setFieldValue("destinationSortCode", "");
+      } else if (switchCurrency === "GHS") {
+        form.setFieldValue("destinationIBAN", "");
+        form.setFieldValue("destinationBIC", "");
+        form.setFieldValue("destinationAccountNumber", "");
+        form.setFieldValue("destinationSortCode", "");
+        form.setFieldValue("routingNumber", "");
+        form.setFieldValue("accountNumber", data.accountNumber || "");
+      }
+    };
+
     return (
       <>
         <TabsPanel value="To Individual">
@@ -514,6 +589,78 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               h={validated ? "calc(100dvh - 500px)" : "100%"}
               scrollbarSize={3}
             >
+              {beneficiaryAccount && beneficiaryAccount?.length > 0 ? (
+                <Box mt={10} mb={32}>
+                  <Text fz={14} fw={500} c="#97AD05">
+                    Beneficiary
+                  </Text>
+
+                  <Group mt={12} gap={24} wrap="nowrap">
+                    {beneficiaryAccountLoading ? (
+                      <Group align="center" gap={6}>
+                        {[1, 2, 3].map((item) => (
+                          <Skeleton h={48} w={48} radius={100} key={item} />
+                        ))}
+                      </Group>
+                    ) : (
+                      beneficiaryAccount?.map((data) => (
+                        <Stack key={data?.id} align="center" gap={6}>
+                          <Box
+                            pos="relative"
+                            onClick={() => handlePopulateForm(data)}
+                            style={{ cursor: "pointer" }}
+                          >
+                            <Avatar size={48} variant="light" bg="#F2F4F7">
+                              {getInitials(data?.alias)}
+                            </Avatar>
+
+                            <Box pos="absolute" bottom={2} right={-4}>
+                              <Image
+                                src={
+                                  switchCurrency === "EUR"
+                                    ? EUImage.src
+                                    : switchCurrency === "GBP"
+                                    ? GBImage.src
+                                    : switchCurrency === "GHS"
+                                    ? GHSImage.src
+                                    : USDImage.src
+                                }
+                                alt="EUR"
+                                width={16}
+                                height={16}
+                              />
+                            </Box>
+                          </Box>
+                          <Text
+                            fz={12}
+                            c="var(--prune-text-gray-700)"
+                            lineClamp={1}
+                          >
+                            {data?.alias}
+                          </Text>
+                        </Stack>
+                      ))
+                    )}
+
+                    {beneficiaryAccount.length > 6 && (
+                      <Stack align="center" gap={6}>
+                        <ThemeIcon
+                          size={48}
+                          radius="xl"
+                          variant="light"
+                          bg="#FBFEE6"
+                        >
+                          <IconArrowRight color="#97AD05" />
+                        </ThemeIcon>
+                        <Text fz={12} c="#97AD05">
+                          See More
+                        </Text>
+                      </Stack>
+                    )}
+                  </Group>
+                </Box>
+              ) : null}
+
               {switchCurrency === "GHS" ? (
                 <>
                   <SelectTypeOfTransfer />

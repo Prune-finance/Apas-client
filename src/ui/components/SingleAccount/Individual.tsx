@@ -131,8 +131,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     const [disableCountry, setDisableCountry] = useState(false);
     const { switchCurrency } = useCurrencySwitchStore();
     const [search, setSearch] = useState("");
-    const { transferCurrency: switchCurrencyOutsideUS } =
-      USDuseTransferCurrencySwitchStore();
+    const {
+      transferCurrency: switchCurrencyOutsideUS,
+      setTransferCurrency: setSwitchCurrencyOutsideUS,
+    } = USDuseTransferCurrencySwitchStore();
     const { transferCurrency } = useTransferCurrencySwitchStore();
     const [
       beneficiaryModalOpened,
@@ -548,40 +550,23 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       if (switchCurrency === "EUR") {
         form.setFieldValue("destinationIBAN", data.accountIban || "");
         form.setFieldValue("destinationBIC", data.swiftBic || "");
-        form.setFieldValue("destinationAccountNumber", "");
-        form.setFieldValue("destinationSortCode", "");
-        form.setFieldValue("routingNumber", "");
-        form.setFieldValue("accountNumber", "");
       } else if (switchCurrency === "GBP") {
         form.setFieldValue(
           "destinationAccountNumber",
           data.accountNumber || ""
         );
         form.setFieldValue("destinationSortCode", data.sortCode || "");
-        form.setFieldValue("destinationIBAN", "");
-        form.setFieldValue("destinationBIC", "");
-        form.setFieldValue("routingNumber", "");
-        form.setFieldValue("accountNumber", "");
       } else if (switchCurrency === "USD") {
-        if (switchCurrencyOutsideUS === "WithinUSA") {
+        if (data?.accountIban && data?.swiftBic) {
+          setSwitchCurrencyOutsideUS("WithinUSA");
           form.setFieldValue("destinationIBAN", data.accountIban || "");
           form.setFieldValue("destinationBIC", data.swiftBic || "");
-          form.setFieldValue("routingNumber", "");
-          form.setFieldValue("accountNumber", "");
         } else {
+          setSwitchCurrencyOutsideUS("OutsideUSA");
           form.setFieldValue("routingNumber", data.routingNumber || "");
           form.setFieldValue("accountNumber", data.accountNumber || "");
-          form.setFieldValue("destinationIBAN", "");
-          form.setFieldValue("destinationBIC", "");
         }
-        form.setFieldValue("destinationAccountNumber", "");
-        form.setFieldValue("destinationSortCode", "");
       } else if (switchCurrency === "GHS") {
-        form.setFieldValue("destinationIBAN", "");
-        form.setFieldValue("destinationBIC", "");
-        form.setFieldValue("destinationAccountNumber", "");
-        form.setFieldValue("destinationSortCode", "");
-        form.setFieldValue("routingNumber", "");
         form.setFieldValue("accountNumber", data.accountNumber || "");
       }
     };

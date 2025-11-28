@@ -68,6 +68,7 @@ import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
 import USDSelectTypeOfTransfer from "@/app/(dashboard)/accounts/USDSelectTypeOfTransfer";
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
 import { SearchInput } from "../Inputs";
+import SaveBeneficiaryToggle from "./SaveBeneficiaryToggle";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -103,6 +104,7 @@ export const sendMoneyIndividualRequest = {
   beneficiaryBankCode: "",
   gshTransferType: "",
   usdTransferType: "",
+  saveBeneficiary: true,
 };
 
 const Individual = forwardRef<HTMLDivElement, IndividualProps>(
@@ -135,7 +137,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       transferCurrency: switchCurrencyOutsideUS,
       setTransferCurrency: setSwitchCurrencyOutsideUS,
     } = USDuseTransferCurrencySwitchStore();
-    const { transferCurrency } = useTransferCurrencySwitchStore();
+    const { transferCurrency, setTransferCurrency } =
+      useTransferCurrencySwitchStore();
     const [
       beneficiaryModalOpened,
       { open: openBeneficiaryModal, close: closeBeneficiaryModal },
@@ -149,7 +152,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     });
 
     const { beneficiaryAccount, loading: beneficiaryAccountLoading } =
-      useSendMoneyBeneficiary(search, switchCurrency);
+      useSendMoneyBeneficiary(search, switchCurrency, "INDIVIDUAL");
 
     useEffect(() => {
       form.setFieldValue("currency", switchCurrency);
@@ -157,14 +160,22 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     }, [switchCurrency]);
 
     useEffect(() => {
-      form.setFieldValue("gshTransferType", transferCurrency);
+      if (form.values.currency === "GHS") {
+        form.setFieldValue("gshTransferType", transferCurrency);
+      } else {
+        form.setFieldValue("gshTransferType", "");
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [transferCurrency]);
+    }, [transferCurrency, form.values.currency]);
 
     useEffect(() => {
-      form.setFieldValue("usdTransferType", switchCurrencyOutsideUS);
+      if (form.values.currency === "USD") {
+        form.setFieldValue("usdTransferType", switchCurrencyOutsideUS);
+      } else {
+        form.setFieldValue("usdTransferType", "");
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [switchCurrencyOutsideUS]);
+    }, [switchCurrencyOutsideUS, form.values.currency]);
 
     const [{ bic, iban }] = useDebouncedValue(
       { iban: form.values.destinationIBAN, bic: form.values.destinationBIC },
@@ -567,7 +578,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           form.setFieldValue("accountNumber", data.accountNumber || "");
         }
       } else if (switchCurrency === "GHS") {
-        form.setFieldValue("accountNumber", data.accountNumber || "");
+        setTransferCurrency("BankTransfer");
+        form.setFieldValue("destinationBank", data.mobileOperator || "");
+        form.setFieldValue("accountNumber", data.walletId || "");
       }
     };
 
@@ -756,6 +769,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
 
                   <AmountField form={form} />
 
+                  <SaveBeneficiaryToggle<typeof sendMoneyIndividualRequest>
+                    form={form}
+                  />
+
                   <DropzoneOptional form={form} />
 
                   <NarrationField form={form} />
@@ -898,6 +915,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   </Flex>
 
                   <AmountField form={form} />
+
+                  <SaveBeneficiaryToggle<typeof sendMoneyIndividualRequest>
+                    form={form}
+                  />
 
                   <Flex gap={20} mt={24}>
                     <Select
@@ -1042,6 +1063,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         />
                       </>
                     )}
+
                     {(processing || validated) && showBadge && (
                       <Group
                         justify="space-between"
@@ -1124,6 +1146,12 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         </Flex>
 
                         <AmountField form={form} />
+
+                        <SaveBeneficiaryToggle<
+                          typeof sendMoneyIndividualRequest
+                        >
+                          form={form}
+                        />
 
                         <Flex gap={20} mt={24}>
                           <Select

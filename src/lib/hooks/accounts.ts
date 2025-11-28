@@ -654,7 +654,11 @@ export function useBeneficiaryAccount(
   return { loading, beneficiaryAccount, revalidate, meta };
 }
 
-export function useSendMoneyBeneficiary(search: string, currency: string) {
+export function useSendMoneyBeneficiary(
+  search: string,
+  currency: string,
+  type: string
+) {
   const [beneficiaryAccount, setBeneficiaryAccount] = useState<
     BeneficiaryAccountProps[] | null
   >(null);
@@ -665,7 +669,7 @@ export function useSendMoneyBeneficiary(search: string, currency: string) {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/accounts/beneficiaries?search=${search}&currency=${currency}`
+        `/accounts/beneficiaries?search=${search}&currency=${currency}&type=${type}`
       );
 
       setBeneficiaryAccount(data?.data);
@@ -682,7 +686,7 @@ export function useSendMoneyBeneficiary(search: string, currency: string) {
     fetchDefaultAccount();
 
     return () => {};
-  }, [search, currency]);
+  }, [search, currency, type]);
 
   return { loading, beneficiaryAccount, revalidate };
 }

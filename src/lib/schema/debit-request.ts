@@ -160,16 +160,26 @@ export const sendMoneyIndividualValidate = z
       }),
     }),
 
-    gshTransferType: z.enum(["BankTransfer", "MobileMoney"], {
-      errorMap: () => ({
-        message: "Transfer type must be either BankTransfer or MobileMoney",
-      }),
-    }),
-    usdTransferType: z.enum(["WithinUSA", "OutsideUSA"], {
-      errorMap: () => ({
-        message: "Transfer type must be either WithinUSA or OutsideUSA",
-      }),
-    }),
+    gshTransferType: z
+      .union([
+        z.enum(["BankTransfer", "MobileMoney"], {
+          errorMap: () => ({
+            message: "Transfer type must be either BankTransfer or MobileMoney",
+          }),
+        }),
+        z.literal(""),
+      ])
+      .optional(),
+    usdTransferType: z
+      .union([
+        z.enum(["WithinUSA", "OutsideUSA"], {
+          errorMap: () => ({
+            message: "Transfer type must be either WithinUSA or OutsideUSA",
+          }),
+        }),
+        z.literal(""),
+      ])
+      .optional(),
   })
   .superRefine((data, ctx) => {
     // Require transfer type only for applicable currencies
@@ -577,8 +587,12 @@ export const beneficiaryModalValidate = z
     country: z.string().min(2, "Country is required"),
     state: z.string().optional(),
     currency: z.enum(["EUR", "GBP", "USD", "GHS"]),
-    gshTransferType: z.enum(["BankTransfer", "MobileMoney"]).optional(),
-    usdTransferType: z.enum(["WithinUSA", "OutsideUSA"]).optional(),
+    gshTransferType: z
+      .union([z.enum(["BankTransfer", "MobileMoney"]), z.literal("")])
+      .optional(),
+    usdTransferType: z
+      .union([z.enum(["WithinUSA", "OutsideUSA"]), z.literal("")])
+      .optional(),
   })
   .superRefine((data, ctx) => {
     if (data.type === "INDIVIDUAL") {

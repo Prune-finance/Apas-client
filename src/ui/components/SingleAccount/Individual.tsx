@@ -149,7 +149,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     });
 
     const { beneficiaryAccount, loading: beneficiaryAccountLoading } =
-      useSendMoneyBeneficiary(search, switchCurrency);
+      useSendMoneyBeneficiary(search, switchCurrency, "INDIVIDUAL");
 
     useEffect(() => {
       form.setFieldValue("currency", switchCurrency);

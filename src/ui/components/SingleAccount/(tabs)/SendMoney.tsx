@@ -276,6 +276,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         phoneNumber,
         reference,
         usdTransferType,
+        saveBeneficiary,
       } = companyRequestForm;
 
       // Reuse the helper function from above
@@ -289,6 +290,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBank: destinationBank,
             beneficiaryCountry: destinationCountry,
             beneficiaryFullName: fullName,
+            saveBeneficiary,
           };
         } else if (currency === "GHS") {
           return {
@@ -301,6 +303,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBankCode: beneficiaryBankCode,
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
+            saveBeneficiary,
           };
         } else if (currency === "USD") {
           return {
@@ -321,6 +324,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryName: fullName,
             recipientBankAddress: "",
             beneficiaryBankAddress: "",
+            saveBeneficiary,
           };
         } else {
           return {
@@ -329,6 +333,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             destinationBank,
             destinationCountry,
             beneficiaryFullName: fullName,
+            saveBeneficiary,
           };
         }
       };

@@ -1160,6 +1160,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                             errorProps={{ fz: 12 }}
                           />
                         </Flex>
+
                         <Flex gap={20} mt={24}>
                           <TextInput
                             classNames={{

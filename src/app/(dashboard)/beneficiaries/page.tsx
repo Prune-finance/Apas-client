@@ -68,6 +68,7 @@ import {
   useBeneficiaryAccount,
   validateAccount,
   validateAccountGBP,
+  useUserListOfBanks,
 } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
@@ -75,15 +76,6 @@ import countries from "@/assets/countries.json";
 import { DatePickerInput } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
 import Cookies from "js-cookie";
-
-const tableHeaders = [
-  "Name",
-  "Category",
-  "Bank",
-  "Account Number / IBAN",
-  "Currency",
-  "Action",
-];
 
 const currencyTabs = [
   {
@@ -117,22 +109,21 @@ const Beneficiaries = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] =
     useDisclosure(false);
-      const [
-        openedTransactionsPreview,
-        { open: openTransactionsPreview, close: closeTransactionsPreview },
-      ] = useDisclosure(false);
-        const [documentType, setDocumentType] = useState<string>("CSV");
-          const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
-            null,
-            null,
-          ]);
+  const [
+    openedTransactionsPreview,
+    { open: openTransactionsPreview, close: closeTransactionsPreview },
+  ] = useDisclosure(false);
+  const [documentType, setDocumentType] = useState<string>("CSV");
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
+  ]);
   const { switchCurrency } = useCurrencySwitchStore();
   const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
   const { handleError, handleSuccess, handleInfo } = useNotification();
   const [selectedBeneficiary, setSelectedBeneficiary] =
     useState<BeneficiaryAccountProps | null>(null);
   const [deleting, setDeleting] = useState(false);
-  
 
   const { status, date, endDate, accountName, type, tab } = Object.fromEntries(
     searchParams.entries()
@@ -140,8 +131,11 @@ const Beneficiaries = () => {
 
   const modalForm = useForm({
     initialValues: {
+      type: "INDIVIDUAL",
       firstName: "",
       lastName: "",
+      companyName: "",
+      contactEmail: "",
       iban: "",
       bic: "",
       bank: "",
@@ -158,6 +152,23 @@ const Beneficiaries = () => {
     },
     validate: zodResolver(beneficiaryModalValidate),
   });
+
+  const { banks, loading: banksLoading } = useUserListOfBanks();
+  const ghsBankProviderOptions = useMemo(() => {
+    if (!banks || !Array.isArray(banks)) return [];
+    return banks
+      .filter((item) => item.payoutType === modalForm.values.gshTransferType)
+      .map((item) => ({
+        value: item.bankName || "",
+        label: item.bankName || "",
+      }));
+  }, [banks, modalForm.values.gshTransferType]);
+
+  React.useEffect(() => {
+    if (modalForm.values.currency === "GHS") {
+      modalForm.setFieldValue("bank", "");
+    }
+  }, [modalForm.values.gshTransferType]);
 
   const isValidated = useMemo(() => {
     const c = modalForm.values.currency;
@@ -207,14 +218,24 @@ const Beneficiaries = () => {
     );
   }, [switchCurrency]);
 
+  React.useEffect(() => {
+    modalForm.setFieldValue(
+      "type",
+      beneficiaryType === "Individual" ? "INDIVIDUAL" : "COMPANY"
+    );
+  }, [beneficiaryType]);
+
   const buildBeneficiaryPayload = (v: typeof modalForm.values) => {
     const base = {
-      alias: `${v.firstName} ${v.lastName}`,
-      firstName: v.firstName,
-      lastName: v.lastName,
+      alias:
+        v.type === "COMPANY" ? v.companyName : `${v.firstName} ${v.lastName}`,
       currency: v.currency,
       isFavorite: false,
       accountHolderAddress: v.bankAddress,
+      type: v.type,
+      ...(v.type === "INDIVIDUAL"
+        ? { firstName: v.firstName, lastName: v.lastName }
+        : { companyName: v.companyName, contactEmail: v.contactEmail }),
     };
 
     if (v.currency === "EUR")
@@ -255,20 +276,20 @@ const Beneficiaries = () => {
           ...base,
           walletId: v.phoneNumber,
           mobileOperator: v.bank,
-          countryCode: "GH",
+          countryCode: v.country,
         };
       return {
         ...base,
-        bankName: v.bank,
-        accountNumber: removeWhitespace(v.accountNumber),
-        countryCode: "GH",
+        mobileOperator: v.bank,
+        walletId: removeWhitespace(v.accountNumber),
+        countryCode: v.country,
       };
     }
 
     return base;
   };
-  const [processing, setProcessing] = useState(false);
-   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
+  const [processing, setProcessing] = useState<boolean | null>(null);
+  const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 400);
@@ -314,18 +335,18 @@ const Beneficiaries = () => {
         </Stack>
       </TableTd>
       <TableTd>{element?.type}</TableTd>
-      <TableTd>{element?.bankName}</TableTd>
+      <TableTd>{element?.bankName || element?.mobileOperator}</TableTd>
       <TableTd>
         {element?.Currency?.symbol === "EUR"
           ? element?.accountIban
           : element?.Currency?.symbol === "GBP"
           ? element?.accountNumber
           : element?.Currency?.symbol === "USD"
-          ? element?.accountNumber
+          ? element?.accountNumber || element?.accountIban
           : element?.Currency?.symbol === "NGN"
           ? element?.accountNumber
           : element?.Currency?.symbol === "GHS"
-          ? element?.walletId
+          ? element?.walletId || element?.mobileOperator
           : ""}
       </TableTd>
       <TableTd>
@@ -472,6 +493,7 @@ const Beneficiaries = () => {
       Object.entries(errors).forEach(([field, messages]) => {
         if (messages?.[0]) modalForm.setFieldError(field, messages[0]);
       });
+      console.log(errors);
       return;
     }
     const payload = buildBeneficiaryPayload(modalForm.values);
@@ -486,7 +508,7 @@ const Beneficiaries = () => {
         "Beneficiary added successfully"
       );
       beneficiaryAccountRevalidate();
-      close();
+      closeModal();
       modalForm.reset();
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -495,68 +517,86 @@ const Beneficiaries = () => {
     }
   };
 
-
-    const handleExportStatement = async () => {
-   
-  
-      if (!dateRange[0] || !dateRange[1]) {
-        return handleInfo(
-          "Transactions Export",
-          "Please select a valid date range"
-        );
-      }
-  
-      notifications.clean();
-      setLoadingStatement(true);
-  
-      const [startDate, endDate] = dateRange.map((date) =>
-        dayjs(date).format("YYYY-MM-DD")
+  const handleExportStatement = async () => {
+    if (!dateRange[0] || !dateRange[1]) {
+      return handleInfo(
+        "Transactions Export",
+        "Please select a valid date range"
       );
-  
-      const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
-      const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
-    
-  
-      const url =
-       
-        `${baseUrl}/accounts/beneficiaries/export?date=${startDate}&endDate=${endDate}&currency=${currency}`
-  
-      try {
-        const { data: res } = await axios.get(url, { headers });
-  
-        if (!res?.data?.length) {
-          return handleInfo(
-            "Beneficiaries Export",
-            "No beneficiaries found for the selected date range"
-          );
-        }
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-  
-        handleBeneficiariesCsvDownload(
-          res.data,
-          "beneficiaries_export.csv",
-          currency || "EUR"
-        );
-  
-        closeTransactionsPreview();
-        handleSuccess(
+    }
+
+    notifications.clean();
+    setLoadingStatement(true);
+
+    const [startDate, endDate] = dateRange.map((date) =>
+      dayjs(date).format("YYYY-MM-DD")
+    );
+
+    const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
+    const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
+
+    const url = `${baseUrl}/accounts/beneficiaries/export?date=${startDate}&endDate=${endDate}&currency=${currency}`;
+
+    try {
+      const { data: res } = await axios.get(url, { headers });
+
+      if (!res?.data?.length) {
+        return handleInfo(
           "Beneficiaries Export",
-          "Beneficiaries export downloaded successful"
+          "No beneficiaries found for the selected date range"
         );
-        setDateRange([null, null]);
-      } catch (error) {
-        console.error("Error exporting beneficiaries:", error);
-        handleError(
-          "Beneficiaries Export",
-          error instanceof Error
-            ? parseError(error)
-            : "error exporting beneficiaries"
-        );
-      } finally {
-        setLoadingStatement(false);
       }
-    };
-  
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+
+      handleBeneficiariesCsvDownload(
+        res.data,
+        "beneficiaries_export.csv",
+        currency || "EUR"
+      );
+
+      closeTransactionsPreview();
+      handleSuccess(
+        "Beneficiaries Export",
+        "Beneficiaries export downloaded successful"
+      );
+      setDateRange([null, null]);
+    } catch (error) {
+      console.error("Error exporting beneficiaries:", error);
+      handleError(
+        "Beneficiaries Export",
+        error instanceof Error
+          ? parseError(error)
+          : "error exporting beneficiaries"
+      );
+    } finally {
+      setLoadingStatement(false);
+    }
+  };
+
+  const closeModal = () => {
+    close();
+    modalForm.reset();
+    setSelectedBeneficiary(null);
+    setValidated(null);
+    setProcessing(null);
+  };
+
+  const tableHeaders = [
+    "Name",
+    "Category",
+    "Bank",
+    currency === "EUR"
+      ? "IBAN"
+      : currency === "GBP"
+      ? "Account Number"
+      : currency === "USD"
+      ? "IBAN / Account Number"
+      : currency === "GHS"
+      ? "Wallet ID / Mobile Operator"
+      : "Account Number / IBAN",
+    "Currency",
+    "Action",
+  ];
 
   return (
     <Box>
@@ -684,7 +724,7 @@ const Beneficiaries = () => {
 
         <Modal
           opened={opened}
-          onClose={close}
+          onClose={closeModal}
           title="New Beneficiary"
           size="lg"
           styles={{
@@ -726,13 +766,13 @@ const Beneficiaries = () => {
                     <TextInputWithInsideLabel
                       label="Company Name"
                       placeholder="Company Name"
-                      {...modalForm.getInputProps("firstName")}
+                      {...modalForm.getInputProps("companyName")}
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
                       label="Contact Email"
                       placeholder="Email"
-                      {...modalForm.getInputProps("lastName")}
+                      {...modalForm.getInputProps("contactEmail")}
                       styles={{ input: inputStyle }}
                     />
                   </Group>
@@ -835,6 +875,24 @@ const Beneficiaries = () => {
                       {...modalForm.getInputProps("gshTransferType")}
                       styles={{ input: inputStyle }}
                     />
+                    <SelectInputWithInsideLabel
+                      searchable
+                      data={ghsBankProviderOptions}
+                      label={
+                        modalForm.values.gshTransferType === "MobileMoney"
+                          ? "Provider"
+                          : "Bank"
+                      }
+                      placeholder={
+                        modalForm.values.gshTransferType === "MobileMoney"
+                          ? "Select Provider"
+                          : "Select Bank"
+                      }
+                      mt={12}
+                      {...modalForm.getInputProps("bank")}
+                      disabled={processing ?? (false || banksLoading)}
+                      styles={{ input: inputStyle }}
+                    />
                     {modalForm.values.gshTransferType === "MobileMoney" ? (
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel
@@ -896,31 +954,23 @@ const Beneficiaries = () => {
                   </Box>
                 )}
 
-                <TextInputWithInsideLabel
-                  label={
-                    modalForm.values.currency === "GHS" &&
-                    modalForm.values.gshTransferType === "MobileMoney"
-                      ? "Provider"
-                      : "Bank"
-                  }
-                  placeholder={
-                    modalForm.values.currency === "GHS" &&
-                    modalForm.values.gshTransferType === "MobileMoney"
-                      ? "Provider"
-                      : "Bank"
-                  }
-                  mt={20}
-                  {...modalForm.getInputProps("bank")}
-                  disabled={processing}
-                  styles={{ input: inputStyle }}
-                />
+                {modalForm.values.currency !== "GHS" && (
+                  <TextInputWithInsideLabel
+                    label="Bank"
+                    placeholder="Bank"
+                    mt={20}
+                    {...modalForm.getInputProps("bank")}
+                    disabled={processing ?? false}
+                    styles={{ input: inputStyle }}
+                  />
+                )}
 
                 <TextInputWithInsideLabel
                   label="Bank Address"
                   placeholder="Enter bank address"
                   mt={20}
                   {...modalForm.getInputProps("bankAddress")}
-                  disabled={processing}
+                  disabled={processing ?? false}
                   styles={{ input: inputStyle }}
                 />
 
@@ -932,14 +982,14 @@ const Beneficiaries = () => {
                     placeholder="Country"
                     {...modalForm.getInputProps("country")}
                     styles={{ input: inputStyle }}
-                    disabled={processing}
+                    disabled={processing ?? false}
                   />
                   <TextInputWithInsideLabel
                     label="State"
                     placeholder="State"
                     {...modalForm.getInputProps("state")}
                     styles={{ input: inputStyle }}
-                    disabled={processing}
+                    disabled={processing ?? false}
                   />
                 </Group>
 
@@ -963,7 +1013,11 @@ const Beneficiaries = () => {
           icon={<IconX color="#D92D20" />}
           color="#FEF3F2"
           title="Delete Beneficiary"
-          text="This means you are rejecting the request to debit naira this account."
+          text={
+            selectedBeneficiary
+              ? `You are deleting beneficiary ${selectedBeneficiary.alias} (${selectedBeneficiary.Currency?.symbol}). This action cannot be undone.`
+              : "You are deleting this beneficiary. This action cannot be undone."
+          }
           customApproveMessage="Yes, Delete"
           action={handleDeleteBeneficiary}
           processing={deleting}
@@ -972,70 +1026,70 @@ const Beneficiaries = () => {
           btnColor="#fff"
         />
 
-          <Modal
-                opened={openedTransactionsPreview}
-                onClose={closeTransactionsPreview}
-                size={"35%"}
-                centered
-                withCloseButton={true}
-                style={{ backgroundColor: "white" }}
-              >
-                <Flex
-                  w="100%"
-                  align="center"
-                  justify="center"
-                  direction="column"
-                  px={30}
-                >
-                  <Text fz={18} fw={500} c="#000">
-                    Export Transactions
-                  </Text>
-        
-                  <DatePickerInput
-                    placeholder="Select Date Range"
-                    valueFormat="YYYY-MM-DD"
-                    value={dateRange}
-                    onChange={(value: [Date | null, Date | null]) =>
-                      setDateRange(value)
-                    }
-                    size="xs"
-                    w="100%"
-                    h={44}
-                    styles={{ input: { height: "48px" } }}
-                    mt={12}
-                    type="range"
-                    allowSingleDateInRange
-                    leftSection={<IconCalendarMonth size={20} />}
-                    numberOfColumns={2}
-                    clearable
-                    disabled={loading}
-                  />
-        
-                  <SelectBox
-                    placeholder="Select Document Type"
-                    data={["CSV"]}
-                    value={"CSV"}
-                    disabled
-                    onChange={(value) => setDocumentType(value!)}
-                    mt={16}
-                    size="xs"
-                    w="100%"
-                    h={44}
-                    styles={{ input: { height: "48px" } }}
-                  />
-        
-                  <PrimaryBtn
-                    action={handleExportStatement}
-                    loading={loadingStatement}
-                    text="Submit"
-                    mt={22}
-                    ml="auto"
-                    mb={38}
-                    w="100%"
-                    h={44}
-                  />
-                </Flex>
-              </Modal>
+        <Modal
+          opened={openedTransactionsPreview}
+          onClose={closeTransactionsPreview}
+          size={"35%"}
+          centered
+          withCloseButton={true}
+          style={{ backgroundColor: "white" }}
+        >
+          <Flex
+            w="100%"
+            align="center"
+            justify="center"
+            direction="column"
+            px={30}
+          >
+            <Text fz={18} fw={500} c="#000">
+              Export Transactions
+            </Text>
+
+            <DatePickerInput
+              placeholder="Select Date Range"
+              valueFormat="YYYY-MM-DD"
+              value={dateRange}
+              onChange={(value: [Date | null, Date | null]) =>
+                setDateRange(value)
+              }
+              size="xs"
+              w="100%"
+              h={44}
+              styles={{ input: { height: "48px" } }}
+              mt={12}
+              type="range"
+              allowSingleDateInRange
+              leftSection={<IconCalendarMonth size={20} />}
+              numberOfColumns={2}
+              clearable
+              disabled={loading}
+            />
+
+            <SelectBox
+              placeholder="Select Document Type"
+              data={["CSV"]}
+              value={"CSV"}
+              disabled
+              onChange={(value) => setDocumentType(value!)}
+              mt={16}
+              size="xs"
+              w="100%"
+              h={44}
+              styles={{ input: { height: "48px" } }}
+            />
+
+            <PrimaryBtn
+              action={handleExportStatement}
+              loading={loadingStatement}
+              text="Submit"
+              mt={22}
+              ml="auto"
+              mb={38}
+              w="100%"
+              h={44}
+            />
+          </Flex>
+        </Modal>
       </main>
     </Box>
   );

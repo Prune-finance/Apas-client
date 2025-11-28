@@ -67,6 +67,7 @@ import SelectTypeOfTransfer from "@/app/(dashboard)/accounts/SelectTypeOfTransfe
 import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
 import USDSelectTypeOfTransfer from "@/app/(dashboard)/accounts/USDSelectTypeOfTransfer";
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
+import { SearchInput } from "../Inputs";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -130,9 +131,15 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     const [disableCountry, setDisableCountry] = useState(false);
     const { switchCurrency } = useCurrencySwitchStore();
     const [search, setSearch] = useState("");
-    const { transferCurrency: switchCurrencyOutsideUS } =
-      USDuseTransferCurrencySwitchStore();
+    const {
+      transferCurrency: switchCurrencyOutsideUS,
+      setTransferCurrency: setSwitchCurrencyOutsideUS,
+    } = USDuseTransferCurrencySwitchStore();
     const { transferCurrency } = useTransferCurrencySwitchStore();
+    const [
+      beneficiaryModalOpened,
+      { open: openBeneficiaryModal, close: closeBeneficiaryModal },
+    ] = useDisclosure(false);
 
     const form = useForm({
       initialValues: {
@@ -543,40 +550,23 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       if (switchCurrency === "EUR") {
         form.setFieldValue("destinationIBAN", data.accountIban || "");
         form.setFieldValue("destinationBIC", data.swiftBic || "");
-        form.setFieldValue("destinationAccountNumber", "");
-        form.setFieldValue("destinationSortCode", "");
-        form.setFieldValue("routingNumber", "");
-        form.setFieldValue("accountNumber", "");
       } else if (switchCurrency === "GBP") {
         form.setFieldValue(
           "destinationAccountNumber",
           data.accountNumber || ""
         );
         form.setFieldValue("destinationSortCode", data.sortCode || "");
-        form.setFieldValue("destinationIBAN", "");
-        form.setFieldValue("destinationBIC", "");
-        form.setFieldValue("routingNumber", "");
-        form.setFieldValue("accountNumber", "");
       } else if (switchCurrency === "USD") {
-        if (switchCurrencyOutsideUS === "WithinUSA") {
+        if (data?.accountIban && data?.swiftBic) {
+          setSwitchCurrencyOutsideUS("WithinUSA");
           form.setFieldValue("destinationIBAN", data.accountIban || "");
           form.setFieldValue("destinationBIC", data.swiftBic || "");
-          form.setFieldValue("routingNumber", "");
-          form.setFieldValue("accountNumber", "");
         } else {
+          setSwitchCurrencyOutsideUS("OutsideUSA");
           form.setFieldValue("routingNumber", data.routingNumber || "");
           form.setFieldValue("accountNumber", data.accountNumber || "");
-          form.setFieldValue("destinationIBAN", "");
-          form.setFieldValue("destinationBIC", "");
         }
-        form.setFieldValue("destinationAccountNumber", "");
-        form.setFieldValue("destinationSortCode", "");
       } else if (switchCurrency === "GHS") {
-        form.setFieldValue("destinationIBAN", "");
-        form.setFieldValue("destinationBIC", "");
-        form.setFieldValue("destinationAccountNumber", "");
-        form.setFieldValue("destinationSortCode", "");
-        form.setFieldValue("routingNumber", "");
         form.setFieldValue("accountNumber", data.accountNumber || "");
       }
     };
@@ -603,7 +593,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         ))}
                       </Group>
                     ) : (
-                      beneficiaryAccount?.map((data) => (
+                      beneficiaryAccount.slice(0, 5)?.map((data) => (
                         <Stack key={data?.id} align="center" gap={6}>
                           <Box
                             pos="relative"
@@ -643,7 +633,12 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                     )}
 
                     {beneficiaryAccount.length > 6 && (
-                      <Stack align="center" gap={6}>
+                      <Stack
+                        align="center"
+                        gap={6}
+                        onClick={openBeneficiaryModal}
+                        style={{ cursor: "pointer" }}
+                      >
                         <ThemeIcon
                           size={48}
                           radius="xl"
@@ -1206,6 +1201,106 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
               />
             </Flex>
           </Box>
+
+          <Modal
+            opened={beneficiaryModalOpened}
+            onClose={closeBeneficiaryModal}
+            title={
+              <Text fz={18} fw={600}>
+                Beneficiary
+              </Text>
+            }
+            centered
+            size={500}
+          >
+            <Group gap={8} mb={12}>
+              <Image
+                src={
+                  switchCurrency === "EUR"
+                    ? EUImage.src
+                    : switchCurrency === "GBP"
+                    ? GBImage.src
+                    : switchCurrency === "GHS"
+                    ? GHSImage.src
+                    : USDImage.src
+                }
+                alt={switchCurrency}
+                width={18}
+                height={18}
+              />
+              <Text fz={14}>{switchCurrency}</Text>
+            </Group>
+
+            <SearchInput
+              search={search}
+              setSearch={setSearch}
+              w={270}
+              placeholder="Search here......"
+            />
+
+            <ScrollArea h={320} mt={22} scrollbarSize={0}>
+              <Stack gap={12}>
+                {(beneficiaryAccount || []).map((b) => (
+                  <Group
+                    key={b?.id}
+                    justify="space-between"
+                    onClick={() => {
+                      handlePopulateForm(b);
+                      closeBeneficiaryModal();
+                    }}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <Group gap={16}>
+                      <Avatar
+                        size={36}
+                        variant="light"
+                        bg="#fbfee6"
+                        fz={12}
+                        color="#596603"
+                      >
+                        {getInitials(b?.alias)}
+                      </Avatar>
+                      <Stack gap={2}>
+                        <Text fz={12} fw={500} c="#101828">
+                          {`${b?.firstName} ${b?.lastName}`.trim()}
+                        </Text>
+                        <Text fz={12} c="#667085">
+                          {switchCurrency === "EUR" &&
+                            `${b?.accountIban} - ${b?.bankName}`}
+                          {switchCurrency === "GBP" &&
+                            `${b?.accountNumber ?? ""} - ${b?.bankName}`}
+                          {switchCurrency === "USD" &&
+                            (switchCurrencyOutsideUS === "WithinUSA"
+                              ? `${b?.accountIban} - ${b?.bankName}`
+                              : `${b?.routingNumber ?? ""} - ${
+                                  b?.accountNumber ?? ""
+                                }`)}
+                          {switchCurrency === "GHS" &&
+                            `${
+                              b?.accountNumber ?? b?.identifierValue ?? ""
+                            } - ${b?.bankName}`}
+                        </Text>
+                      </Stack>
+                    </Group>
+                    <Text fz={12} c="#667085">
+                      {switchCurrency === "EUR" &&
+                        (b?.swiftBic ? `BIC: ${b?.swiftBic}` : "")}
+                      {switchCurrency === "GBP" &&
+                        (b?.sortCode ? `Sort Code: ${b?.sortCode}` : "")}
+                      {switchCurrency === "USD" &&
+                        (switchCurrencyOutsideUS === "WithinUSA"
+                          ? b?.swiftBic
+                            ? `BIC: ${b?.swiftBic}`
+                            : ""
+                          : b?.routingNumber
+                          ? `ABA: ${b?.routingNumber}`
+                          : "")}
+                    </Text>
+                  </Group>
+                ))}
+              </Stack>
+            </ScrollArea>
+          </Modal>
         </TabsPanel>
       </>
     );

@@ -897,7 +897,7 @@ const Beneficiaries = () => {
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel
                           label="Phone Number"
-                          placeholder="Enter phone number"
+                          placeholder="Enter phone number (e.g. 233XXXXXXXXX)"
                           type="number"
                           {...modalForm.getInputProps("phoneNumber")}
                           styles={{ input: inputStyle }}

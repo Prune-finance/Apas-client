@@ -578,9 +578,44 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           form.setFieldValue("accountNumber", data.accountNumber || "");
         }
       } else if (switchCurrency === "GHS") {
-        setTransferCurrency("BankTransfer");
-        form.setFieldValue("destinationBank", data.mobileOperator || "");
-        form.setFieldValue("accountNumber", data.walletId || "");
+        const operator = (data.mobileOperator || "").toLowerCase();
+        const isBank = operator.includes("bank");
+
+        if (isBank) {
+          setTransferCurrency("BankTransfer");
+          const bankName = data.bankName || data.mobileOperator || "";
+          form.setFieldValue("destinationBank", bankName);
+          form.setFieldValue("accountNumber", data.walletId || "");
+
+          if (banks && Array.isArray(banks)) {
+            const selectedBank = banks.find(
+              (bank) =>
+                bank.bankName === bankName && bank.payoutType === "BankTransfer"
+            );
+            if (selectedBank) {
+              form.setFieldValue("beneficiaryBankCode", selectedBank.bankCode);
+            }
+          }
+        } else {
+          setTransferCurrency("MobileMoney");
+          const providerName = data?.mobileOperator || "";
+          form.setFieldValue("destinationBank", providerName);
+          form.setFieldValue("phoneNumber", data.walletId || "");
+
+          if (banks && Array.isArray(banks)) {
+            const selectedProvider = banks.find(
+              (bank) =>
+                bank.bankName === providerName &&
+                bank.payoutType === "MobileMoney"
+            );
+            if (selectedProvider) {
+              form.setFieldValue(
+                "beneficiaryBankCode",
+                selectedProvider.bankCode
+              );
+            }
+          }
+        }
       }
     };
 

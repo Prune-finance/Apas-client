@@ -68,6 +68,7 @@ import {
   useBeneficiaryAccount,
   validateAccount,
   validateAccountGBP,
+  useUserListOfBanks,
 } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
@@ -75,15 +76,6 @@ import countries from "@/assets/countries.json";
 import { DatePickerInput } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
 import Cookies from "js-cookie";
-
-const tableHeaders = [
-  "Name",
-  "Category",
-  "Bank",
-  "Account Number / IBAN",
-  "Currency",
-  "Action",
-];
 
 const currencyTabs = [
   {
@@ -160,6 +152,23 @@ const Beneficiaries = () => {
     },
     validate: zodResolver(beneficiaryModalValidate),
   });
+
+  const { banks, loading: banksLoading } = useUserListOfBanks();
+  const ghsBankProviderOptions = useMemo(() => {
+    if (!banks || !Array.isArray(banks)) return [];
+    return banks
+      .filter((item) => item.payoutType === modalForm.values.gshTransferType)
+      .map((item) => ({
+        value: item.bankName || "",
+        label: item.bankName || "",
+      }));
+  }, [banks, modalForm.values.gshTransferType]);
+
+  React.useEffect(() => {
+    if (modalForm.values.currency === "GHS") {
+      modalForm.setFieldValue("bank", "");
+    }
+  }, [modalForm.values.gshTransferType]);
 
   const isValidated = useMemo(() => {
     const c = modalForm.values.currency;
@@ -267,13 +276,13 @@ const Beneficiaries = () => {
           ...base,
           walletId: v.phoneNumber,
           mobileOperator: v.bank,
-          countryCode: "GH",
+          countryCode: v.country,
         };
       return {
         ...base,
-        bankName: v.bank,
-        accountNumber: removeWhitespace(v.accountNumber),
-        countryCode: "GH",
+        mobileOperator: v.bank,
+        walletId: removeWhitespace(v.accountNumber),
+        countryCode: v.country,
       };
     }
 
@@ -326,7 +335,7 @@ const Beneficiaries = () => {
         </Stack>
       </TableTd>
       <TableTd>{element?.type}</TableTd>
-      <TableTd>{element?.bankName}</TableTd>
+      <TableTd>{element?.bankName || element?.mobileOperator}</TableTd>
       <TableTd>
         {element?.Currency?.symbol === "EUR"
           ? element?.accountIban
@@ -337,7 +346,7 @@ const Beneficiaries = () => {
           : element?.Currency?.symbol === "NGN"
           ? element?.accountNumber
           : element?.Currency?.symbol === "GHS"
-          ? element?.walletId
+          ? element?.walletId || element?.mobileOperator
           : ""}
       </TableTd>
       <TableTd>
@@ -499,7 +508,7 @@ const Beneficiaries = () => {
         "Beneficiary added successfully"
       );
       beneficiaryAccountRevalidate();
-      close();
+      closeModal();
       modalForm.reset();
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -571,6 +580,23 @@ const Beneficiaries = () => {
     setValidated(null);
     setProcessing(null);
   };
+
+  const tableHeaders = [
+    "Name",
+    "Category",
+    "Bank",
+    currency === "EUR"
+      ? "IBAN"
+      : currency === "GBP"
+      ? "Account Number"
+      : currency === "USD"
+      ? "IBAN / Account Number"
+      : currency === "GHS"
+      ? "Wallet ID / Mobile Operator"
+      : "Account Number / IBAN",
+    "Currency",
+    "Action",
+  ];
 
   return (
     <Box>
@@ -849,6 +875,24 @@ const Beneficiaries = () => {
                       {...modalForm.getInputProps("gshTransferType")}
                       styles={{ input: inputStyle }}
                     />
+                    <SelectInputWithInsideLabel
+                      searchable
+                      data={ghsBankProviderOptions}
+                      label={
+                        modalForm.values.gshTransferType === "MobileMoney"
+                          ? "Provider"
+                          : "Bank"
+                      }
+                      placeholder={
+                        modalForm.values.gshTransferType === "MobileMoney"
+                          ? "Select Provider"
+                          : "Select Bank"
+                      }
+                      mt={12}
+                      {...modalForm.getInputProps("bank")}
+                      disabled={processing ?? (false || banksLoading)}
+                      styles={{ input: inputStyle }}
+                    />
                     {modalForm.values.gshTransferType === "MobileMoney" ? (
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel
@@ -910,24 +954,16 @@ const Beneficiaries = () => {
                   </Box>
                 )}
 
-                <TextInputWithInsideLabel
-                  label={
-                    modalForm.values.currency === "GHS" &&
-                    modalForm.values.gshTransferType === "MobileMoney"
-                      ? "Provider"
-                      : "Bank"
-                  }
-                  placeholder={
-                    modalForm.values.currency === "GHS" &&
-                    modalForm.values.gshTransferType === "MobileMoney"
-                      ? "Provider"
-                      : "Bank"
-                  }
-                  mt={20}
-                  {...modalForm.getInputProps("bank")}
-                  disabled={processing ?? false}
-                  styles={{ input: inputStyle }}
-                />
+                {modalForm.values.currency !== "GHS" && (
+                  <TextInputWithInsideLabel
+                    label="Bank"
+                    placeholder="Bank"
+                    mt={20}
+                    {...modalForm.getInputProps("bank")}
+                    disabled={processing ?? false}
+                    styles={{ input: inputStyle }}
+                  />
+                )}
 
                 <TextInputWithInsideLabel
                   label="Bank Address"

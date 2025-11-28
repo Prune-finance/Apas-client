@@ -1013,7 +1013,11 @@ const Beneficiaries = () => {
           icon={<IconX color="#D92D20" />}
           color="#FEF3F2"
           title="Delete Beneficiary"
-          text="This means you are rejecting the request to debit naira this account."
+          text={
+            selectedBeneficiary
+              ? `You are deleting beneficiary ${selectedBeneficiary.alias} (${selectedBeneficiary.Currency?.symbol}). This action cannot be undone.`
+              : "You are deleting this beneficiary. This action cannot be undone."
+          }
           customApproveMessage="Yes, Delete"
           action={handleDeleteBeneficiary}
           processing={deleting}

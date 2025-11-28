@@ -86,6 +86,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     gshTransferType: "",
     usdTransferType: "",
     beneficiaryBankCode: "",
+    saveBeneficiary: false,
   });
 
   const [companyRequestForm, setCompanyRequestForm] = useState({
@@ -107,6 +108,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     gshTransferType: "",
     usdTransferType: "",
     beneficiaryBankCode: "",
+    saveBeneficiary: false,
   });
 
   const sendMoneyRequest = async () => {
@@ -131,6 +133,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         beneficiaryBankCode,
         phoneNumber,
         routingNumber,
+        saveBeneficiary,
       } = requestForm;
 
       // Helper function to get beneficiary details based on currency
@@ -144,6 +147,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBank: destinationBank,
             beneficiaryCountry: destinationCountry,
             beneficiaryFullName: fullName,
+            saveBeneficiary,
           };
         } else if (currency === "GHS") {
           return {
@@ -156,6 +160,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBankName: destinationBank,
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
+            saveBeneficiary,
           };
         } else if (currency === "USD") {
           return {
@@ -176,6 +181,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryName: fullName,
             recipientBankAddress: bankAddress,
             beneficiaryBankAddress: bankAddress,
+            saveBeneficiary,
           };
         } else {
           return {
@@ -184,6 +190,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             destinationBank,
             destinationCountry,
             beneficiaryFullName: fullName,
+            saveBeneficiary,
           };
         }
       };
@@ -518,4 +525,5 @@ export interface RequestForm {
   gshTransferType: string;
   usdTransferType: string;
   beneficiaryBankCode: string;
+  saveBeneficiary: boolean;
 }

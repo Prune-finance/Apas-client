@@ -68,6 +68,7 @@ import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
 import USDSelectTypeOfTransfer from "@/app/(dashboard)/accounts/USDSelectTypeOfTransfer";
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
 import { SearchInput } from "../Inputs";
+import SaveBeneficiaryToggle from "./SaveBeneficiaryToggle";
 interface IndividualProps {
   account: DefaultAccount | null;
   close: () => void;
@@ -103,6 +104,7 @@ export const sendMoneyIndividualRequest = {
   beneficiaryBankCode: "",
   gshTransferType: "",
   usdTransferType: "",
+  saveBeneficiary: true,
 };
 
 const Individual = forwardRef<HTMLDivElement, IndividualProps>(
@@ -767,6 +769,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
 
                   <AmountField form={form} />
 
+                  <SaveBeneficiaryToggle<typeof sendMoneyIndividualRequest>
+                    form={form}
+                  />
+
                   <DropzoneOptional form={form} />
 
                   <NarrationField form={form} />
@@ -909,6 +915,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   </Flex>
 
                   <AmountField form={form} />
+
+                  <SaveBeneficiaryToggle<typeof sendMoneyIndividualRequest>
+                    form={form}
+                  />
 
                   <Flex gap={20} mt={24}>
                     <Select
@@ -1053,6 +1063,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         />
                       </>
                     )}
+
                     {(processing || validated) && showBadge && (
                       <Group
                         justify="space-between"
@@ -1135,6 +1146,12 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                         </Flex>
 
                         <AmountField form={form} />
+
+                        <SaveBeneficiaryToggle<
+                          typeof sendMoneyIndividualRequest
+                        >
+                          form={form}
+                        />
 
                         <Flex gap={20} mt={24}>
                           <Select

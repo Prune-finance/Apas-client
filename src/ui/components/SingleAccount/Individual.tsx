@@ -135,7 +135,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       transferCurrency: switchCurrencyOutsideUS,
       setTransferCurrency: setSwitchCurrencyOutsideUS,
     } = USDuseTransferCurrencySwitchStore();
-    const { transferCurrency } = useTransferCurrencySwitchStore();
+    const { transferCurrency, setTransferCurrency } =
+      useTransferCurrencySwitchStore();
     const [
       beneficiaryModalOpened,
       { open: openBeneficiaryModal, close: closeBeneficiaryModal },
@@ -157,14 +158,22 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     }, [switchCurrency]);
 
     useEffect(() => {
-      form.setFieldValue("gshTransferType", transferCurrency);
+      if (form.values.currency === "GHS") {
+        form.setFieldValue("gshTransferType", transferCurrency);
+      } else {
+        form.setFieldValue("gshTransferType", "");
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [transferCurrency]);
+    }, [transferCurrency, form.values.currency]);
 
     useEffect(() => {
-      form.setFieldValue("usdTransferType", switchCurrencyOutsideUS);
+      if (form.values.currency === "USD") {
+        form.setFieldValue("usdTransferType", switchCurrencyOutsideUS);
+      } else {
+        form.setFieldValue("usdTransferType", "");
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [switchCurrencyOutsideUS]);
+    }, [switchCurrencyOutsideUS, form.values.currency]);
 
     const [{ bic, iban }] = useDebouncedValue(
       { iban: form.values.destinationIBAN, bic: form.values.destinationBIC },
@@ -567,7 +576,9 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           form.setFieldValue("accountNumber", data.accountNumber || "");
         }
       } else if (switchCurrency === "GHS") {
-        form.setFieldValue("accountNumber", data.accountNumber || "");
+        setTransferCurrency("BankTransfer");
+        form.setFieldValue("destinationBank", data.mobileOperator || "");
+        form.setFieldValue("accountNumber", data.walletId || "");
       }
     };
 

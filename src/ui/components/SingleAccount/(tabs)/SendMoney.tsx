@@ -147,7 +147,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBank: destinationBank,
             beneficiaryCountry: destinationCountry,
             beneficiaryFullName: fullName,
-            saveBeneficiary,
           };
         } else if (currency === "GHS") {
           return {
@@ -160,7 +159,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBankName: destinationBank,
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
-            saveBeneficiary,
           };
         } else if (currency === "USD") {
           return {
@@ -181,7 +179,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryName: fullName,
             recipientBankAddress: bankAddress,
             beneficiaryBankAddress: bankAddress,
-            saveBeneficiary,
           };
         } else {
           return {
@@ -190,7 +187,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             destinationBank,
             destinationCountry,
             beneficiaryFullName: fullName,
-            saveBeneficiary,
           };
         }
       };
@@ -205,7 +201,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, `${firstName} ${lastName}`),
-
+          isBenficiary: saveBeneficiary,
           bankAddress,
           amount,
           reference: crypto.randomUUID(),
@@ -290,7 +286,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBank: destinationBank,
             beneficiaryCountry: destinationCountry,
             beneficiaryFullName: fullName,
-            saveBeneficiary,
           };
         } else if (currency === "GHS") {
           return {
@@ -303,7 +298,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryBankCode: beneficiaryBankCode,
             beneficiaryCountry: destinationCountry,
             beneficiaryName: fullName,
-            saveBeneficiary,
           };
         } else if (currency === "USD") {
           return {
@@ -324,7 +318,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             beneficiaryName: fullName,
             recipientBankAddress: "",
             beneficiaryBankAddress: "",
-            saveBeneficiary,
           };
         } else {
           return {
@@ -333,7 +326,6 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             destinationBank,
             destinationCountry,
             beneficiaryFullName: fullName,
-            saveBeneficiary,
           };
         }
       };
@@ -348,7 +340,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, companyName),
-
+          isBenficiary: saveBeneficiary,
           bankAddress,
           amount,
           reference: crypto.randomUUID(),

@@ -812,10 +812,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
 
                   <AmountField form={form} />
 
-                  <SaveBeneficiaryToggle<typeof sendMoneyIndividualRequest>
-                    form={form}
-                  />
-
                   <DropzoneOptional form={form} />
 
                   <NarrationField form={form} />
@@ -958,10 +954,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   </Flex>
 
                   <AmountField form={form} />
-
-                  <SaveBeneficiaryToggle<typeof sendMoneyIndividualRequest>
-                    form={form}
-                  />
 
                   <Flex gap={20} mt={24}>
                     <Select
@@ -1191,12 +1183,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
 
                         <AmountField form={form} />
 
-                        <SaveBeneficiaryToggle<
-                          typeof sendMoneyIndividualRequest
-                        >
-                          form={form}
-                        />
-
                         <Flex gap={20} mt={24}>
                           <Select
                             searchable
@@ -1225,6 +1211,10 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                   </Flex>
                 </>
               )}
+
+              <SaveBeneficiaryToggle<typeof sendMoneyIndividualRequest>
+                form={form}
+              />
 
               <Flex
                 align="center"

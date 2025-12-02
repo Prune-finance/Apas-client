@@ -5,7 +5,11 @@ import EarthIcon from "@/assets/earth.png";
 import ActiveMobileMoney from "@/assets/active-mm.png";
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
 
-const USDSelectTypeOfTransfer = () => {
+const USDSelectTypeOfTransfer = ({
+  setSwitchStatus,
+}: {
+  setSwitchStatus: (status: boolean) => void;
+}) => {
   const { transferCurrency, setTransferCurrency } =
     USDuseTransferCurrencySwitchStore();
 
@@ -13,6 +17,7 @@ const USDSelectTypeOfTransfer = () => {
     currency: "WithinUSA" | "OutsideUSA"
   ) => {
     setTransferCurrency(currency);
+    setSwitchStatus(true);
   };
 
   const style = {

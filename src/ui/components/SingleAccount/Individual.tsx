@@ -126,7 +126,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     ref
   ) {
     const { banks, loading } = useUserListOfBanks();
-
+    const [switchStatus, setSwitchStatus] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [disableBank, setDisableBank] = useState(false);
     const [disableAddress, setDisableAddress] = useState(false);
@@ -326,6 +326,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           destinationCountry: "",
         });
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [form.values.destinationCountry, validated, ref]);
 
     const memorizedData = useMemo(() => {
@@ -349,13 +350,17 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
           destinationCountry: "",
         });
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [form.values.destinationCountry, validated, ref]);
 
     useEffect(() => {
-      form.setFieldValue("destinationBIC", "");
-      form.setFieldValue("destinationIBAN", "");
-      form.setFieldValue("accountNumber", "");
-      form.setFieldValue("routingNumber", "");
+      if (switchStatus) {
+        form.setFieldValue("destinationBIC", "");
+        form.setFieldValue("destinationIBAN", "");
+        form.setFieldValue("accountNumber", "");
+        form.setFieldValue("routingNumber", "");
+        setSwitchStatus(false);
+      }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [switchCurrencyOutsideUS]);
 
@@ -367,6 +372,8 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       setDisableBank(false);
       setDisableAddress(false);
       setDisableCountry(false);
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [switchCurrency]);
 
     // Helper UI components to reduce repetition and keep JSX concise
@@ -554,6 +561,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     );
 
     const handlePopulateForm = (data: BeneficiaryAccountProps) => {
+      setSwitchStatus(false);
       form.setFieldValue("firstName", data.firstName || "");
       form.setFieldValue("lastName", data.lastName || "");
       form.setFieldValue("destinationBank", data.bankName || "");
@@ -814,7 +822,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                 </>
               ) : switchCurrency === "USD" ? (
                 <>
-                  <USDSelectTypeOfTransfer />
+                  <USDSelectTypeOfTransfer setSwitchStatus={setSwitchStatus} />
 
                   <NameFields mt={24} form={form} />
 

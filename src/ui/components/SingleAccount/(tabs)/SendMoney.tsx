@@ -201,7 +201,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, `${firstName} ${lastName}`),
-          isBenficiary: saveBeneficiary,
+          isBeneficiary: saveBeneficiary,
+          beneficiaryType: "INDIVIDUAL",
           bankAddress,
           amount,
           reference: crypto.randomUUID(),
@@ -340,7 +341,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, companyName),
-          isBenficiary: saveBeneficiary,
+          isBeneficiary: saveBeneficiary,
+          beneficiaryType: "COMPANY",
           bankAddress,
           amount,
           reference: crypto.randomUUID(),

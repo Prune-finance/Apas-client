@@ -121,7 +121,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
   ref
 ) {
   const { banks, loading } = useUserListOfBanks();
-
+  const [switchStatus, setSwitchStatus] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [disableBank, setDisableBank] = useState(false);
   const [disableAddress, setDisableAddress] = useState(false);
@@ -228,10 +228,13 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
   }, [switchCurrencyOutsideUS]);
 
   useEffect(() => {
-    form2.setFieldValue("destinationBIC", "");
-    form2.setFieldValue("destinationIBAN", "");
-    form2.setFieldValue("accountNumber", "");
-    form2.setFieldValue("routingNumber", "");
+    if (switchStatus) {
+      form2.setFieldValue("destinationBIC", "");
+      form2.setFieldValue("destinationIBAN", "");
+      form2.setFieldValue("accountNumber", "");
+      form2.setFieldValue("routingNumber", "");
+      setSwitchStatus(false);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [switchCurrencyOutsideUS]);
 
@@ -774,15 +777,15 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                   }}
                 />
               </Flex>
-
-              <SaveBeneficiaryToggle<typeof sendMoneyRequest> form={form2} />
             </>
           ) : (
             <>
               <Flex direction="column">
                 {switchCurrency === "USD" ? (
                   <>
-                    <USDSelectTypeOfTransfer />
+                    <USDSelectTypeOfTransfer
+                      setSwitchStatus={setSwitchStatus}
+                    />
 
                     <FullNameField form2={form2} mt={0} />
 
@@ -872,10 +875,6 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                     <CountryField form2={form2} />
 
                     <AmountField form2={form2} />
-
-                    <SaveBeneficiaryToggle<typeof sendMoneyRequest>
-                      form={form2}
-                    />
 
                     <DropzoneOptional form2={form2} />
 
@@ -1057,10 +1056,6 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
                   <AmountField form2={form2} />
 
-                  <SaveBeneficiaryToggle<typeof sendMoneyRequest>
-                    form={form2}
-                  />
-
                   <DropzoneOptional form2={form2} />
 
                   <NarrationField form2={form2} />
@@ -1068,6 +1063,8 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
               )}
             </>
           )}
+
+          <SaveBeneficiaryToggle<typeof sendMoneyRequest> form={form2} />
 
           <Flex
             align="center"

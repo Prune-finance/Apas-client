@@ -174,6 +174,7 @@ const Beneficiaries = () => {
     if (modalForm.values.currency === "GHS") {
       modalForm.setFieldValue("bank", "");
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modalForm.values.gshTransferType]);
 
   const isValidated = useMemo(() => {
@@ -220,13 +221,20 @@ const Beneficiaries = () => {
   React.useEffect(() => {
     modalForm.setFieldValue("currency", currency);
     setSwitchCurrency(currency);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currency]);
+
+  React.useEffect(() => {
+    modalForm.setFieldValue("currency", switchCurrency);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [switchCurrency]);
 
   React.useEffect(() => {
     modalForm.setFieldValue(
       "type",
       beneficiaryType === "Individual" ? "INDIVIDUAL" : "COMPANY"
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [beneficiaryType]);
 
   const buildBeneficiaryPayload = (v: typeof modalForm.values) => {

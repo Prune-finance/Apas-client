@@ -69,6 +69,7 @@ import {
   validateAccount,
   validateAccountGBP,
   useUserListOfBanks,
+  useCheckCurrencyList,
 } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
@@ -104,7 +105,9 @@ const inputStyle = {
 const Beneficiaries = () => {
   const searchParams = useSearchParams();
   const axios = createAxiosInstance("accounts");
-  const [currency, setCurrency] = useState<string>("EUR");
+  const [currency, setCurrency] = useState<"EUR" | "GBP" | "GHS" | "USD">(
+    "EUR"
+  );
   const [loading, setLoading] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] =
@@ -118,12 +121,14 @@ const Beneficiaries = () => {
     null,
     null,
   ]);
-  const { switchCurrency } = useCurrencySwitchStore();
+  const { switchCurrency, setSwitchCurrency } = useCurrencySwitchStore();
   const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
   const { handleError, handleSuccess, handleInfo } = useNotification();
   const [selectedBeneficiary, setSelectedBeneficiary] =
     useState<BeneficiaryAccountProps | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const { account: accountCurrencyList, loading: accountCurrencyListLoading } =
+    useCheckCurrencyList();
 
   const { status, date, endDate, accountName, type, tab } = Object.fromEntries(
     searchParams.entries()
@@ -212,11 +217,9 @@ const Beneficiaries = () => {
   }, [modalForm.values, modalForm.errors]);
 
   React.useEffect(() => {
-    modalForm.setFieldValue(
-      "currency",
-      switchCurrency || currencyTabs[0].value
-    );
-  }, [switchCurrency]);
+    modalForm.setFieldValue("currency", currency);
+    setSwitchCurrency(currency);
+  }, [currency]);
 
   React.useEffect(() => {
     modalForm.setFieldValue(
@@ -625,7 +628,9 @@ const Beneficiaries = () => {
             tabs={currencyTabs}
             styles={{ list: { marginTop: 24 } }}
             defaultValue={currency}
-            onChange={(v) => setCurrency(v || "EUR")}
+            onChange={(v) =>
+              setCurrency((v as "EUR" | "GBP" | "GHS" | "USD") || "EUR")
+            }
           >
             <TabsPanel value={currency}>
               <Group

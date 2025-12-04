@@ -736,7 +736,7 @@ const Beneficiaries = () => {
           </Center>
 
           <TabsComponent
-            tabs={[{ value: "Individual" }, { value: "Business" }]}
+            tabs={[{ value: "Individual" }, { value: "Company" }]}
             defaultValue={beneficiaryType}
             onChange={(v) => setBeneficiaryType(v || "Individual")}
             styles={{ list: { marginTop: 24 } }}
@@ -761,7 +761,7 @@ const Beneficiaries = () => {
                   </Group>
                 )}
 
-                {beneficiaryType === "Business" && (
+                {beneficiaryType === "Company" && (
                   <Group grow gap={20} mt={12}>
                     <TextInputWithInsideLabel
                       label="Company Name"
@@ -801,15 +801,31 @@ const Beneficiaries = () => {
                     <TextInputWithInsideLabel
                       label="Account Number"
                       placeholder="Enter account number"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={8}
                       {...modalForm.getInputProps("accountNumber")}
+                      onChange={(e) => {
+                        const digits = e.currentTarget.value
+                          .replace(/\D/g, "")
+                          .slice(0, 8);
+                        modalForm.setFieldValue("accountNumber", digits);
+                      }}
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
                       label="Sort Code"
                       placeholder="Enter sort code"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
                       {...modalForm.getInputProps("sortCode")}
+                      onChange={(e) => {
+                        const digits = e.currentTarget.value
+                          .replace(/\D/g, "")
+                          .slice(0, 6);
+                        modalForm.setFieldValue("sortCode", digits);
+                      }}
                       styles={{ input: inputStyle }}
                     />
                   </Group>

@@ -14,6 +14,7 @@ import {
   Modal,
   Loader,
   Flex,
+  Skeleton,
 } from "@mantine/core";
 import React, { Suspense, useMemo, useState } from "react";
 import Image from "next/image";
@@ -625,13 +626,26 @@ const Beneficiaries = () => {
           </div>
 
           <TabsComponent
-            tabs={currencyTabs}
+            tabs={currencyTabs.filter(
+              (item, index) =>
+                accountCurrencyList?.[currencyTabs[index]?.value as any] ===
+                true
+            )}
+            loading={accountCurrencyListLoading}
             styles={{ list: { marginTop: 24 } }}
             defaultValue={currency}
             onChange={(v) =>
               setCurrency((v as "EUR" | "GBP" | "GHS" | "USD") || "EUR")
             }
           >
+            {accountCurrencyListLoading && (
+              <Flex align="center" gap={10}>
+                <Skeleton w={50} h={40} mt={10} />
+                <Skeleton w={50} h={40} mt={10} />
+                <Skeleton w={50} h={40} mt={10} />
+                <Skeleton w={50} h={40} mt={10} />
+              </Flex>
+            )}
             <TabsPanel value={currency}>
               <Group
                 justify="space-between"

@@ -34,7 +34,7 @@ export default function TabsComponent({
   return (
     <Tabs
       pos="relative"
-      defaultValue={tabs[0].value}
+      defaultValue={tabs[0]?.value}
       variant="pills"
       classNames={{
         root: styles.tabs,
@@ -47,13 +47,13 @@ export default function TabsComponent({
         {tabs.map((tab, idx) => (
           <>
             <TabsTab
-              key={tab.value}
-              value={tab.value}
-              {...(tab.icon && { leftSection: tab.icon })}
-              {...(props.tt && { tt: props.tt })}
-              {...(props.fz && { fz: props.fz })}
+              key={tab?.value}
+              value={tab?.value}
+              {...(tab?.icon && { leftSection: tab?.icon })}
+              {...(props?.tt && { tt: props?.tt })}
+              {...(props?.fz && { fz: props?.fz })}
             >
-              {tab.title || tab.value}
+              {tab?.title || tab?.value}
             </TabsTab>
           </>
         ))}

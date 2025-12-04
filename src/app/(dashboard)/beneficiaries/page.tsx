@@ -14,6 +14,7 @@ import {
   Modal,
   Loader,
   Flex,
+  Skeleton,
 } from "@mantine/core";
 import React, { Suspense, useMemo, useState } from "react";
 import Image from "next/image";
@@ -69,6 +70,7 @@ import {
   validateAccount,
   validateAccountGBP,
   useUserListOfBanks,
+  useCheckCurrencyList,
 } from "@/lib/hooks/accounts";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
@@ -104,7 +106,9 @@ const inputStyle = {
 const Beneficiaries = () => {
   const searchParams = useSearchParams();
   const axios = createAxiosInstance("accounts");
-  const [currency, setCurrency] = useState<string>("EUR");
+  const [currency, setCurrency] = useState<"EUR" | "GBP" | "GHS" | "USD">(
+    "EUR"
+  );
   const [loading, setLoading] = useState(false);
   const [opened, { open, close }] = useDisclosure(false);
   const [openedDelete, { open: openDelete, close: closeDelete }] =
@@ -118,12 +122,14 @@ const Beneficiaries = () => {
     null,
     null,
   ]);
-  const { switchCurrency } = useCurrencySwitchStore();
+  const { switchCurrency, setSwitchCurrency } = useCurrencySwitchStore();
   const [beneficiaryType, setBeneficiaryType] = useState<string>("Individual");
   const { handleError, handleSuccess, handleInfo } = useNotification();
   const [selectedBeneficiary, setSelectedBeneficiary] =
     useState<BeneficiaryAccountProps | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const { account: accountCurrencyList, loading: accountCurrencyListLoading } =
+    useCheckCurrencyList();
 
   const { status, date, endDate, accountName, type, tab } = Object.fromEntries(
     searchParams.entries()
@@ -212,11 +218,9 @@ const Beneficiaries = () => {
   }, [modalForm.values, modalForm.errors]);
 
   React.useEffect(() => {
-    modalForm.setFieldValue(
-      "currency",
-      switchCurrency || currencyTabs[0].value
-    );
-  }, [switchCurrency]);
+    modalForm.setFieldValue("currency", currency);
+    setSwitchCurrency(currency);
+  }, [currency]);
 
   React.useEffect(() => {
     modalForm.setFieldValue(
@@ -622,11 +626,26 @@ const Beneficiaries = () => {
           </div>
 
           <TabsComponent
-            tabs={currencyTabs}
+            tabs={currencyTabs.filter(
+              (item, index) =>
+                accountCurrencyList?.[currencyTabs[index]?.value as any] ===
+                true
+            )}
+            loading={accountCurrencyListLoading}
             styles={{ list: { marginTop: 24 } }}
             defaultValue={currency}
-            onChange={(v) => setCurrency(v || "EUR")}
+            onChange={(v) =>
+              setCurrency((v as "EUR" | "GBP" | "GHS" | "USD") || "EUR")
+            }
           >
+            {accountCurrencyListLoading && (
+              <Flex align="center" gap={10}>
+                <Skeleton w={50} h={40} mt={10} />
+                <Skeleton w={50} h={40} mt={10} />
+                <Skeleton w={50} h={40} mt={10} />
+                <Skeleton w={50} h={40} mt={10} />
+              </Flex>
+            )}
             <TabsPanel value={currency}>
               <Group
                 justify="space-between"
@@ -651,6 +670,7 @@ const Beneficiaries = () => {
                     text="Export Beneficiary"
                     fw={600}
                     icon={IconCircleArrowDown}
+                    action={openTransactionsPreview}
                   />
                 </Group>
               </Group>
@@ -736,7 +756,7 @@ const Beneficiaries = () => {
           </Center>
 
           <TabsComponent
-            tabs={[{ value: "Individual" }, { value: "Business" }]}
+            tabs={[{ value: "Individual" }, { value: "Company" }]}
             defaultValue={beneficiaryType}
             onChange={(v) => setBeneficiaryType(v || "Individual")}
             styles={{ list: { marginTop: 24 } }}
@@ -761,7 +781,7 @@ const Beneficiaries = () => {
                   </Group>
                 )}
 
-                {beneficiaryType === "Business" && (
+                {beneficiaryType === "Company" && (
                   <Group grow gap={20} mt={12}>
                     <TextInputWithInsideLabel
                       label="Company Name"
@@ -801,15 +821,31 @@ const Beneficiaries = () => {
                     <TextInputWithInsideLabel
                       label="Account Number"
                       placeholder="Enter account number"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={8}
                       {...modalForm.getInputProps("accountNumber")}
+                      onChange={(e) => {
+                        const digits = e.currentTarget.value
+                          .replace(/\D/g, "")
+                          .slice(0, 8);
+                        modalForm.setFieldValue("accountNumber", digits);
+                      }}
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
                       label="Sort Code"
                       placeholder="Enter sort code"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
                       {...modalForm.getInputProps("sortCode")}
+                      onChange={(e) => {
+                        const digits = e.currentTarget.value
+                          .replace(/\D/g, "")
+                          .slice(0, 6);
+                        modalForm.setFieldValue("sortCode", digits);
+                      }}
                       styles={{ input: inputStyle }}
                     />
                   </Group>

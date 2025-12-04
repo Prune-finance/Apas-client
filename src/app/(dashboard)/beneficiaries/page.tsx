@@ -651,6 +651,7 @@ const Beneficiaries = () => {
                     text="Export Beneficiary"
                     fw={600}
                     icon={IconCircleArrowDown}
+                    action={openTransactionsPreview}
                   />
                 </Group>
               </Group>

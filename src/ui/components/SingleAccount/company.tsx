@@ -238,6 +238,16 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [switchCurrencyOutsideUS]);
 
+  useEffect(() => {
+    if (switchStatus) {
+      form2.setFieldValue("destinationBank", "");
+      form2.setFieldValue("accountNumber", "");
+      form2.setFieldValue("phoneNumber", "");
+      setSwitchStatus(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [transferCurrency]);
+
   const [{ bic, iban }] = useDebouncedValue(
     { iban: form2.values.destinationIBAN, bic: form2.values.destinationBIC },
     2000
@@ -633,7 +643,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
           ) : null}
           {switchCurrency === "GHS" ? (
             <>
-              <SelectTypeOfTransfer />
+              <SelectTypeOfTransfer setSwitchStatus={setSwitchStatus} />
 
               {loading ? (
                 <Skeleton h={50} w={"100%"} />

@@ -6,7 +6,11 @@ import ActiveBankTransfer from "@/assets/active-bt.png";
 import ActiveMobileMoney from "@/assets/active-mm.png";
 import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
 
-const SelectTypeOfTransfer = () => {
+const SelectTypeOfTransfer = ({
+  setSwitchStatus,
+}: {
+  setSwitchStatus: (status: boolean) => void;
+}) => {
   const { transferCurrency, setTransferCurrency } =
     useTransferCurrencySwitchStore();
 
@@ -14,6 +18,7 @@ const SelectTypeOfTransfer = () => {
     currency: "BankTransfer" | "MobileMoney"
   ) => {
     setTransferCurrency(currency);
+    setSwitchStatus(true);
   };
 
   const style = {

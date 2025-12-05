@@ -340,11 +340,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     }, [banks, transferCurrency]);
 
     useEffect(() => {
-      form.setFieldValue("destinationBank", null!);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [transferCurrency]);
-
-    useEffect(() => {
       if (form.values.destinationCountry == null) {
         form.setValues({
           destinationCountry: "",
@@ -363,6 +358,16 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [switchCurrencyOutsideUS]);
+
+    useEffect(() => {
+      if (switchStatus) {
+        form.setFieldValue("destinationBank", "");
+        form.setFieldValue("accountNumber", "");
+        form.setFieldValue("phoneNumber", "");
+        setSwitchStatus(false);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [transferCurrency]);
 
     useEffect(() => {
       form.reset();
@@ -714,7 +719,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
 
               {switchCurrency === "GHS" ? (
                 <>
-                  <SelectTypeOfTransfer />
+                  <SelectTypeOfTransfer setSwitchStatus={setSwitchStatus} />
 
                   {loading ? (
                     <Skeleton h={50} w={"100%"} />

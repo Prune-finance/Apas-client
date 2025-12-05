@@ -434,6 +434,8 @@ const Beneficiaries = () => {
 
   const handleIbanValidation = async () => {
     try {
+      modalForm.setFieldValue("bank", "");
+      modalForm.setFieldValue("bankAddress", "");
       setValidated(null);
       setProcessing(true);
       const data = await validateAccount({
@@ -441,13 +443,18 @@ const Beneficiaries = () => {
         bic: removeWhitespace(bic || ""),
       });
 
-      if (data) {
+      if (
+        data &&
+        (data.bankName || data.address || data.city || data.country)
+      ) {
         modalForm.setValues({
           bankAddress: data.address || data.city,
           bank: data.bankName,
           country: data.country,
         });
         setValidated(Boolean(isValidated));
+      } else {
+        setValidated(false);
       }
     } catch (err) {
       setValidated(false);
@@ -459,6 +466,9 @@ const Beneficiaries = () => {
 
   const handleIbanValidationGBP = async () => {
     try {
+      modalForm.setFieldValue("bank", "");
+      modalForm.setFieldValue("bankAddress", "");
+
       setValidated(null);
       setProcessing(true);
       const data = await validateAccountGBP({
@@ -466,12 +476,14 @@ const Beneficiaries = () => {
         sortCode: removeWhitespace(sortCode || ""),
       });
 
-      if (data) {
+      if (data && (data.bankName || data.bankAddress || data.city)) {
         modalForm.setValues({
           bankAddress: data.bankAddress || data.city,
           bank: data.bankName,
         });
         setValidated(Boolean(isValidated));
+      } else {
+        setValidated(false);
       }
     } catch (err) {
       setValidated(false);

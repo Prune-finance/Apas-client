@@ -554,7 +554,10 @@ export const beneficiaryModalValidate = z
     firstName: z.string().optional(),
     lastName: z.string().optional(),
     companyName: z.string().optional(),
-    contactEmail: z.string().optional(),
+    contactEmail: z
+      .string()
+      .regex(/^$|^[^\s@]+@[^\s@]+\.[^\s@]+$/i, "Invalid email format")
+      .optional(),
     iban: z
       .string()
       .regex(/^$|^[A-Z]{2}\d{2}[A-Z0-9]{11,30}$/i, "Invalid IBAN format")
@@ -617,12 +620,7 @@ export const beneficiaryModalValidate = z
           code: z.ZodIssueCode.custom,
           message: "Company name is required",
         });
-      if (!data.contactEmail || data.contactEmail.trim() === "")
-        ctx.addIssue({
-          path: ["contactEmail"],
-          code: z.ZodIssueCode.custom,
-          message: "Contact email is required",
-        });
+      // Contact email is optional for company beneficiaries; validate only if provided
     }
 
     if (data.currency === "EUR") {

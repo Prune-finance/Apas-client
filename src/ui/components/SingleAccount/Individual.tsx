@@ -340,11 +340,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     }, [banks, transferCurrency]);
 
     useEffect(() => {
-      form.setFieldValue("destinationBank", null!);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [transferCurrency]);
-
-    useEffect(() => {
       if (form.values.destinationCountry == null) {
         form.setValues({
           destinationCountry: "",
@@ -363,6 +358,21 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [switchCurrencyOutsideUS]);
+
+    useEffect(() => {
+      if (switchStatus) {
+        if (switchCurrency === "GHS") {
+          form.setFieldValue("destinationBank", null as any);
+        } else {
+          form.setFieldValue("destinationBank", "");
+        }
+        form.setFieldValue("beneficiaryBankCode", "");
+        form.setFieldValue("accountNumber", "");
+        form.setFieldValue("phoneNumber", "");
+        setSwitchStatus(false);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [transferCurrency]);
 
     useEffect(() => {
       form.reset();
@@ -587,29 +597,49 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
         }
       } else if (switchCurrency === "GHS") {
         const operator = (data.mobileOperator || "").toLowerCase();
-        const isBank = operator.includes("bank");
+        const isBank =
+          operator.includes("bank") ||
+          (!!data.bankName && !data.mobileOperator);
 
         if (isBank) {
           setTransferCurrency("BankTransfer");
           const bankName = data.bankName || data.mobileOperator || "";
+          const acct = data.accountNumber || data.identifierValue || "";
+          if (!bankName || !acct) {
+            form.setFieldValue("destinationBank", null as any);
+            form.setFieldValue("accountNumber", "");
+            form.setFieldValue("beneficiaryBankCode", "");
+            form.setFieldValue("phoneNumber", "");
+            return;
+          }
           form.setFieldValue("destinationBank", bankName);
-          form.setFieldValue("accountNumber", data.walletId || "");
-
+          form.setFieldValue("accountNumber", acct);
+          let code = "";
           if (banks && Array.isArray(banks)) {
             const selectedBank = banks.find(
               (bank) =>
                 bank.bankName === bankName && bank.payoutType === "BankTransfer"
             );
             if (selectedBank) {
-              form.setFieldValue("beneficiaryBankCode", selectedBank.bankCode);
+              code = selectedBank.bankCode;
             }
           }
+          form.setFieldValue("beneficiaryBankCode", code);
+          form.setFieldValue("phoneNumber", "");
         } else {
           setTransferCurrency("MobileMoney");
           const providerName = data?.mobileOperator || "";
+          const wallet = data.walletId || "";
+          if (!providerName || !wallet) {
+            form.setFieldValue("destinationBank", null as any);
+            form.setFieldValue("phoneNumber", "");
+            form.setFieldValue("beneficiaryBankCode", "");
+            form.setFieldValue("accountNumber", "");
+            return;
+          }
           form.setFieldValue("destinationBank", providerName);
-          form.setFieldValue("phoneNumber", data.walletId || "");
-
+          form.setFieldValue("phoneNumber", wallet);
+          let code = "";
           if (banks && Array.isArray(banks)) {
             const selectedProvider = banks.find(
               (bank) =>
@@ -617,12 +647,11 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                 bank.payoutType === "MobileMoney"
             );
             if (selectedProvider) {
-              form.setFieldValue(
-                "beneficiaryBankCode",
-                selectedProvider.bankCode
-              );
+              code = selectedProvider.bankCode;
             }
           }
+          form.setFieldValue("beneficiaryBankCode", code);
+          form.setFieldValue("accountNumber", "");
         }
       }
     };
@@ -714,7 +743,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
 
               {switchCurrency === "GHS" ? (
                 <>
-                  <SelectTypeOfTransfer />
+                  <SelectTypeOfTransfer setSwitchStatus={setSwitchStatus} />
 
                   {loading ? (
                     <Skeleton h={50} w={"100%"} />
@@ -742,21 +771,30 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                             : "Select Provider"
                         }
                         {...form.getInputProps("destinationBank")}
+                        value={form.values.destinationBank || null}
                         onChange={(value) => {
-                          form.setFieldValue("destinationBank", value!);
-                          if (value && banks && Array.isArray(banks)) {
+                          if (!value) {
+                            form.setFieldValue("destinationBank", null as any);
+                            form.setFieldValue("beneficiaryBankCode", "");
+                            form.setFieldValue("accountNumber", "");
+                            form.setFieldValue("phoneNumber", "");
+                            return;
+                          }
+                          form.setFieldValue("destinationBank", value);
+                          let code = "";
+                          if (banks && Array.isArray(banks)) {
                             const selectedBank = banks.find(
                               (bank) =>
                                 bank.bankName === value &&
                                 transferCurrency === bank.payoutType
                             );
                             if (selectedBank) {
-                              form.setFieldValue(
-                                "beneficiaryBankCode",
-                                selectedBank.bankCode
-                              );
+                              code = selectedBank.bankCode;
                             }
                           }
+                          form.setFieldValue("beneficiaryBankCode", code);
+                          form.setFieldValue("accountNumber", "");
+                          form.setFieldValue("phoneNumber", "");
                         }}
                         errorProps={{ fz: 12 }}
                       />

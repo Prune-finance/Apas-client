@@ -505,7 +505,7 @@ const Beneficiaries = () => {
       Object.entries(errors).forEach(([field, messages]) => {
         if (messages?.[0]) modalForm.setFieldError(field, messages[0]);
       });
-      console.log(errors);
+
       return;
     }
     const payload = buildBeneficiaryPayload(modalForm.values);
@@ -775,13 +775,21 @@ const Beneficiaries = () => {
                 {beneficiaryType === "Individual" && (
                   <Group grow gap={20} mt={12}>
                     <TextInputWithInsideLabel
-                      label="First Name"
+                      label={
+                        <Text fz={12}>
+                          First Name <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       placeholder="First Name"
                       {...modalForm.getInputProps("firstName")}
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
-                      label="Last Name"
+                      label={
+                        <Text fz={12}>
+                          Last Name <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       placeholder="Last Name"
                       {...modalForm.getInputProps("lastName")}
                       styles={{ input: inputStyle }}
@@ -792,13 +800,17 @@ const Beneficiaries = () => {
                 {beneficiaryType === "Company" && (
                   <Group grow gap={20} mt={12}>
                     <TextInputWithInsideLabel
-                      label="Company Name"
+                      label={
+                        <Text fz={12}>
+                          Company Name <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       placeholder="Company Name"
                       {...modalForm.getInputProps("companyName")}
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
-                      label="Contact Email"
+                      label={<Text fz={12}>Contact Email (Optional)</Text>}
                       placeholder="Email"
                       {...modalForm.getInputProps("contactEmail")}
                       styles={{ input: inputStyle }}
@@ -809,14 +821,22 @@ const Beneficiaries = () => {
                 {modalForm.values.currency === "EUR" && (
                   <Group grow gap={20} mt={20}>
                     <TextInputWithInsideLabel
-                      label="IBAN"
+                      label={
+                        <Text fz={12}>
+                          IBAN <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       placeholder="Enter IBAN"
                       {...modalForm.getInputProps("iban")}
                       bg="#fff"
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
-                      label="BIC"
+                      label={
+                        <Text fz={12}>
+                          BIC <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       placeholder="Enter BIC"
                       {...modalForm.getInputProps("bic")}
                       styles={{ input: inputStyle }}
@@ -827,7 +847,11 @@ const Beneficiaries = () => {
                 {modalForm.values.currency === "GBP" && (
                   <Group grow gap={20} mt={20}>
                     <TextInputWithInsideLabel
-                      label="Account Number"
+                      label={
+                        <Text fz={12}>
+                          Account Number <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       placeholder="Enter account number"
                       type="text"
                       inputMode="numeric"
@@ -842,7 +866,11 @@ const Beneficiaries = () => {
                       styles={{ input: inputStyle }}
                     />
                     <TextInputWithInsideLabel
-                      label="Sort Code"
+                      label={
+                        <Text fz={12}>
+                          Sort Code <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       placeholder="Enter sort code"
                       type="text"
                       inputMode="numeric"
@@ -862,7 +890,11 @@ const Beneficiaries = () => {
                 {modalForm.values.currency === "USD" && (
                   <>
                     <SelectInputWithInsideLabel
-                      label="Transfer Type"
+                      label={
+                        <Text fz={12}>
+                          Transfer Type <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       data={[
                         { value: "WithinUSA", label: "WithinUSA" },
                         { value: "OutsideUSA", label: "OutsideUSA" },
@@ -874,13 +906,21 @@ const Beneficiaries = () => {
                     {modalForm.values.usdTransferType === "WithinUSA" ? (
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel
-                          label="IBAN"
+                          label={
+                            <Text fz={12}>
+                              IBAN <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
                           placeholder="Enter IBAN"
                           {...modalForm.getInputProps("iban")}
                           styles={{ input: inputStyle }}
                         />
                         <TextInputWithInsideLabel
-                          label="SWIFT/BIC"
+                          label={
+                            <Text fz={12}>
+                              SWIFT/BIC <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
                           placeholder="Enter SWIFT/BIC"
                           {...modalForm.getInputProps("bic")}
                           styles={{ input: inputStyle }}
@@ -889,14 +929,24 @@ const Beneficiaries = () => {
                     ) : (
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel
-                          label="Routing Number (ABA)"
+                          label={
+                            <Text fz={12}>
+                              Routing Number (ABA){" "}
+                              <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
                           placeholder="Enter routing number"
                           type="number"
                           {...modalForm.getInputProps("routingNumber")}
                           styles={{ input: inputStyle }}
                         />
                         <TextInputWithInsideLabel
-                          label="Account Number"
+                          label={
+                            <Text fz={12}>
+                              Account Number{" "}
+                              <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
                           placeholder="Enter account number"
                           type="number"
                           {...modalForm.getInputProps("accountNumber")}
@@ -910,7 +960,11 @@ const Beneficiaries = () => {
                 {modalForm.values.currency === "GHS" && (
                   <>
                     <SelectInputWithInsideLabel
-                      label="Transfer Type"
+                      label={
+                        <Text fz={12}>
+                          Transfer Type <span style={{ color: "red" }}>*</span>
+                        </Text>
+                      }
                       data={[
                         { value: "BankTransfer", label: "BankTransfer" },
                         { value: "MobileMoney", label: "MobileMoney" },
@@ -923,9 +977,15 @@ const Beneficiaries = () => {
                       searchable
                       data={ghsBankProviderOptions}
                       label={
-                        modalForm.values.gshTransferType === "MobileMoney"
-                          ? "Provider"
-                          : "Bank"
+                        modalForm.values.gshTransferType === "MobileMoney" ? (
+                          <Text fz={12}>
+                            Provider <span style={{ color: "red" }}>*</span>
+                          </Text>
+                        ) : (
+                          <Text fz={12}>
+                            Bank <span style={{ color: "red" }}>*</span>
+                          </Text>
+                        )
                       }
                       placeholder={
                         modalForm.values.gshTransferType === "MobileMoney"
@@ -940,7 +1000,12 @@ const Beneficiaries = () => {
                     {modalForm.values.gshTransferType === "MobileMoney" ? (
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel
-                          label="Phone Number"
+                          label={
+                            <Text fz={12}>
+                              Phone Number{" "}
+                              <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
                           placeholder="Enter phone number (e.g. 233XXXXXXXXX)"
                           type="number"
                           {...modalForm.getInputProps("phoneNumber")}
@@ -950,7 +1015,12 @@ const Beneficiaries = () => {
                     ) : (
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel
-                          label="Account Number"
+                          label={
+                            <Text fz={12}>
+                              Account Number{" "}
+                              <span style={{ color: "red" }}>*</span>
+                            </Text>
+                          }
                           placeholder="Enter account number"
                           type="number"
                           {...modalForm.getInputProps("accountNumber")}
@@ -1000,7 +1070,11 @@ const Beneficiaries = () => {
 
                 {modalForm.values.currency !== "GHS" && (
                   <TextInputWithInsideLabel
-                    label="Bank"
+                    label={
+                      <Text fz={12}>
+                        Bank <span style={{ color: "red" }}>*</span>
+                      </Text>
+                    }
                     placeholder="Bank"
                     mt={20}
                     {...modalForm.getInputProps("bank")}
@@ -1010,7 +1084,11 @@ const Beneficiaries = () => {
                 )}
 
                 <TextInputWithInsideLabel
-                  label="Bank Address"
+                  label={
+                    <Text fz={12}>
+                      Bank Address <span style={{ color: "red" }}>*</span>
+                    </Text>
+                  }
                   placeholder="Enter bank address"
                   mt={20}
                   {...modalForm.getInputProps("bankAddress")}
@@ -1022,14 +1100,22 @@ const Beneficiaries = () => {
                   <SelectInputWithInsideLabel
                     searchable
                     data={countries.map((c) => c?.name)}
-                    label="Country"
+                    label={
+                      <Text fz={12}>
+                        Country <span style={{ color: "red" }}>*</span>
+                      </Text>
+                    }
                     placeholder="Country"
                     {...modalForm.getInputProps("country")}
                     styles={{ input: inputStyle }}
                     disabled={processing ?? false}
                   />
                   <TextInputWithInsideLabel
-                    label="State"
+                    label={
+                      <Text fz={12}>
+                        State <span style={{ color: "red" }}>*</span>
+                      </Text>
+                    }
                     placeholder="State"
                     {...modalForm.getInputProps("state")}
                     styles={{ input: inputStyle }}

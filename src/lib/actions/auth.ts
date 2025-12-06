@@ -165,7 +165,7 @@ export const handleBeneficiariesCsvDownload = (
         : {}),
       ...(currency === "USD"
         ? {
-            accountNumber: row.accountNumber,
+            accountNumber: row.accountNumber || row.accountIban,
             ...(row.routingNumber ? { routingNumber: row.routingNumber } : {}),
           }
         : {}),

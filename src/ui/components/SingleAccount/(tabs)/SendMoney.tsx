@@ -86,6 +86,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     gshTransferType: "",
     usdTransferType: "",
     beneficiaryBankCode: "",
+    saveBeneficiary: false,
   });
 
   const [companyRequestForm, setCompanyRequestForm] = useState({
@@ -107,6 +108,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
     gshTransferType: "",
     usdTransferType: "",
     beneficiaryBankCode: "",
+    saveBeneficiary: false,
   });
 
   const sendMoneyRequest = async () => {
@@ -131,6 +133,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         beneficiaryBankCode,
         phoneNumber,
         routingNumber,
+        saveBeneficiary,
       } = requestForm;
 
       // Helper function to get beneficiary details based on currency
@@ -198,7 +201,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, `${firstName} ${lastName}`),
-
+          isBeneficiary: saveBeneficiary,
+          beneficiaryType: "INDIVIDUAL",
           bankAddress,
           amount,
           reference: crypto.randomUUID(),
@@ -269,6 +273,7 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
         phoneNumber,
         reference,
         usdTransferType,
+        saveBeneficiary,
       } = companyRequestForm;
 
       // Reuse the helper function from above
@@ -336,7 +341,8 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
           : "/payout/send-money",
         {
           ...getBeneficiaryDetails(switchCurrency, companyName),
-
+          isBeneficiary: saveBeneficiary,
+          beneficiaryType: "COMPANY",
           bankAddress,
           amount,
           reference: crypto.randomUUID(),
@@ -518,4 +524,5 @@ export interface RequestForm {
   gshTransferType: string;
   usdTransferType: string;
   beneficiaryBankCode: string;
+  saveBeneficiary: boolean;
 }

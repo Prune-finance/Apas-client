@@ -29,6 +29,8 @@ export default function ModalComponent({
   setReason,
   addReason,
   size,
+  btnBg,
+  btnColor,
 }: ModalProps) {
   return (
     <Modal
@@ -91,6 +93,8 @@ export default function ModalComponent({
             action={action}
             loading={processing}
             fullWidth
+            bg={btnBg ? btnBg : undefined}
+            c={btnColor ? btnColor : undefined}
           />
         </Flex>
       </Flex>
@@ -118,4 +122,6 @@ interface ModalProps {
   setReason?: Dispatch<SetStateAction<string>>;
   addReason?: boolean;
   size?: "xs" | "sm" | "md" | "lg" | "xl" | "full" | number;
+  btnBg?: string;
+  btnColor?: string;
 }

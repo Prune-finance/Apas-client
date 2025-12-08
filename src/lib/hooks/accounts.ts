@@ -528,7 +528,10 @@ export function useUserCurrencyAccountByID(id: string, currency: string) {
   return { loading, currencyAccount, revalidate };
 }
 
-export function useAdminGetCompanyCurrencyAccountByID(id: string, currency?: string) {
+export function useAdminGetCompanyCurrencyAccountByID(
+  id: string,
+  currency?: string
+) {
   const [currencyAccount, setCurrencyAccount] = useState<DefaultAccount | null>(
     null
   );
@@ -538,7 +541,9 @@ export function useAdminGetCompanyCurrencyAccountByID(id: string, currency?: str
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `/currency-accounts/admin-get-account-by-id/${id}${currency ? `?currency=${currency}` : ""}`
+        `/currency-accounts/admin-get-account-by-id/${id}${
+          currency ? `?currency=${currency}` : ""
+        }`
       );
       setCurrencyAccount(data?.data);
     } catch (error) {
@@ -593,6 +598,97 @@ export function useUserCurrencyAccount() {
   }, []);
 
   return { loading, currencyAccount, revalidate };
+}
+
+export function useBeneficiaryAccount(
+  customParams: IParams = {},
+  currency: string
+) {
+  const [beneficiaryAccount, setBeneficiaryAccount] = useState<
+    BeneficiaryAccountProps[] | null
+  >(null);
+  const [meta, setMeta] = useState<{ total: number } | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const obj = useMemo(() => {
+    return {
+      ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.date && { date: customParams.date }),
+      ...(customParams.endDate && { endDate: customParams.endDate }),
+      ...(customParams.status && { status: customParams.status }),
+      ...(customParams.page && { page: customParams.page }),
+      ...(customParams.search && { search: customParams.search }),
+    };
+  }, [customParams]);
+
+  const { limit, date, endDate, status, page, search } = obj;
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams(
+        obj as Record<string, string>
+      ).toString();
+
+      const { data } = await axios.get(
+        `/accounts/beneficiaries?${params}&currency=${currency}`
+      );
+
+      setBeneficiaryAccount(data?.data);
+      setMeta(data?.meta ?? null);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {};
+  }, [limit, date, endDate, status, page, search, currency]);
+
+  return { loading, beneficiaryAccount, revalidate, meta };
+}
+
+export function useSendMoneyBeneficiary(
+  search: string,
+  currency: string,
+  type: string
+) {
+  const [beneficiaryAccount, setBeneficiaryAccount] = useState<
+    BeneficiaryAccountProps[] | null
+  >(null);
+
+  const [loading, setLoading] = useState(true);
+
+  async function fetchDefaultAccount() {
+    setLoading(true);
+    try {
+      const { data } = await axios.get(
+        `/accounts/beneficiaries?search=${search}&currency=${currency}&type=${type}`
+      );
+
+      setBeneficiaryAccount(data?.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const revalidate = () => fetchDefaultAccount();
+
+  useEffect(() => {
+    fetchDefaultAccount();
+
+    return () => {};
+  }, [search, currency, type]);
+
+  return { loading, beneficiaryAccount, revalidate };
 }
 
 export function useUserListCurrencyAccount() {
@@ -968,6 +1064,33 @@ export interface CurrencyAccount {
   AccountRequests: {
     Currency: Record<string, any>;
   };
+}
+
+export interface BeneficiaryAccountProps {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  companyId: string;
+  currencyId: string;
+  alias: string;
+  type: "DASHBOARD";
+  status: "PENDING_VERIFICATION";
+  isFavorite: boolean;
+  identifierValue: string;
+  firstName: string;
+  lastName: string;
+  bankName: string;
+  accountNumber: string | null;
+  accountIban: string;
+  sortCode: string | null;
+  routingNumber: string | null;
+  swiftBic: string;
+  accountHolderAddress: string;
+  walletId: string | null;
+  mobileOperator: string | null;
+  countryCode: string | null;
+  Company: { id: string; name: string };
+  Currency: { id: string; symbol: string; name: string };
 }
 
 export interface ListOfBanks {

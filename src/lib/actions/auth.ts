@@ -6,6 +6,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { RefObject } from "react";
 import * as XLSX from "xlsx";
+import { BeneficiaryAccountProps } from "../hooks/accounts";
 
 export function parseError(error: unknown) {
   if (axios.isAxiosError(error)) {
@@ -73,7 +74,12 @@ export const handlePdfDownload = async (
   }
 };
 
-export const handleCsvDownload = (csvData: DownloadStatementData[], csvName?: string, currency?: string, isStatement?: boolean) => {
+export const handleCsvDownload = (
+  csvData: DownloadStatementData[],
+  csvName?: string,
+  currency?: string,
+  isStatement?: boolean
+) => {
   console.log("CSV Data:", csvData);
   try {
     const data = csvData.map((row) => ({
@@ -85,8 +91,20 @@ export const handleCsvDownload = (csvData: DownloadStatementData[], csvName?: st
       status: row.status,
       type: row.type,
       ...(row.accessRef ? { accessRef: row.accessRef } : {}),
-      ...(currency === "GHS" ? { senderWalletId: row.senderWalletId, beneficiaryWalletId: row.beneficiaryWalletId, beneficiaryName: row.beneficiaryName } : {}),
-      ...(currency === "GBP" ? { senderName: row.senderName, beneficiaryAccountNumber: row.beneficiaryAccountNumber, beneficiarySortCode: row.beneficiarySortCode } : {})
+      ...(currency === "GHS"
+        ? {
+            senderWalletId: row.senderWalletId,
+            beneficiaryWalletId: row.beneficiaryWalletId,
+            beneficiaryName: row.beneficiaryName,
+          }
+        : {}),
+      ...(currency === "GBP"
+        ? {
+            senderName: row.senderName,
+            beneficiaryAccountNumber: row.beneficiaryAccountNumber,
+            beneficiarySortCode: row.beneficiarySortCode,
+          }
+        : {}),
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(data);
@@ -100,9 +118,10 @@ export const handleCsvDownload = (csvData: DownloadStatementData[], csvName?: st
       link.setAttribute("href", url);
       link.setAttribute(
         "download",
-        csvName || `transaction_statement_${Math.floor(Date.now() / 1000)
-          .toString(36)
-          .substring(2, 15)}.csv`
+        csvName ||
+          `transaction_statement_${Math.floor(Date.now() / 1000)
+            .toString(36)
+            .substring(2, 15)}.csv`
       );
       document.body.appendChild(link);
       link.click();
@@ -115,14 +134,89 @@ export const handleCsvDownload = (csvData: DownloadStatementData[], csvName?: st
   } finally {
     return;
   }
-}
+};
+
+export const handleBeneficiariesCsvDownload = (
+  csvData: BeneficiaryAccountProps[],
+  csvName?: string,
+  currency?: string,
+  isStatement?: boolean
+) => {
+  try {
+    const data = csvData.map((row) => ({
+      createdAt: row.createdAt,
+      alias: row.alias,
+      type: row.type,
+      bankName: row.bankName,
+      accountHolderAddress: row.accountHolderAddress,
+      companyName: row.Company?.name,
+      currency: row.Currency?.symbol,
+      ...(currency === "EUR"
+        ? {
+            accountIban: row.accountIban,
+            swiftBic: row.swiftBic,
+          }
+        : {}),
+      ...(currency === "GBP"
+        ? {
+            accountNumber: row.accountNumber,
+            sortCode: row.sortCode,
+          }
+        : {}),
+      ...(currency === "USD"
+        ? {
+            accountNumber: row.accountNumber || row.accountIban,
+            ...(row.routingNumber ? { routingNumber: row.routingNumber } : {}),
+          }
+        : {}),
+      ...(currency === "GHS"
+        ? {
+            walletId: row.walletId,
+            ...(row.mobileOperator
+              ? { mobileOperator: row.mobileOperator }
+              : {}),
+            ...(row.countryCode ? { countryCode: row.countryCode } : {}),
+          }
+        : {}),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    const csv = XLSX.utils.sheet_to_csv(worksheet);
+
+    const downloadCSV = async (csvData: string) => {
+      const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute(
+        "download",
+        csvName ||
+          `beneficiaries_${Math.floor(Date.now() / 1000)
+            .toString(36)
+            .substring(2, 15)}.csv`
+      );
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    downloadCSV(csv);
+  } catch (error) {
+    throw "Error downloading CSV file";
+  } finally {
+    return;
+  }
+};
 
 export const handlePdfStatement = async (
   pdfRef: RefObject<HTMLDivElement>,
   pdfName?: string
 ) => {
   const input = pdfRef.current;
-  const pdfPages = document.querySelectorAll(".pdf-page") as NodeListOf<HTMLDivElement>;
+  const pdfPages = document.querySelectorAll(
+    ".pdf-page"
+  ) as NodeListOf<HTMLDivElement>;
   if (!input) return;
   input.style.backgroundColor = "#ffffff";
   try {
@@ -133,10 +227,10 @@ export const handlePdfStatement = async (
     const getCanvasData = (element: HTMLElement) => {
       return new Promise((resolve, reject) => {
         html2canvas(element, { scale: 2, logging: true })
-          .then(function(canvas) {
+          .then(function (canvas) {
             resolve(canvas.toDataURL("image/jpeg"));
           })
-          .catch(function(error) {
+          .catch(function (error) {
             reject(
               "Error while creating canvas for element with ID: " + element.id
             );
@@ -155,7 +249,9 @@ export const handlePdfStatement = async (
 
       let promises: Promise<unknown>[] = [];
       const pagesToProcess = pdfPages?.length > 0 ? pdfPages : [input];
-      pagesToProcess.forEach(page => {promises.push(getCanvasData(page))});
+      pagesToProcess.forEach((page) => {
+        promises.push(getCanvasData(page));
+      });
 
       Promise.all(promises).then((images) => {
         images.forEach((imgData, index) => {

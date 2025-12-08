@@ -27,6 +27,7 @@ import {
   IconDatabase,
   IconMoneybag,
   IconSearch,
+  IconUsersPlus,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -106,6 +107,11 @@ export const UserMainLinks = [
     text: "Accounts",
     link: "/accounts",
     icon: <IconUsers size={16} />,
+  },
+  {
+    text: "Beneficiaries",
+    link: "/beneficiaries",
+    icon: <IconUsersPlus size={16} />,
   },
   {
     text: "Debit Requests",

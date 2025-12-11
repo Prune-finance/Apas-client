@@ -105,7 +105,6 @@ const inputStyle = {
 
 const Beneficiaries = () => {
   const searchParams = useSearchParams();
-  const axios = createAxiosInstance("accounts");
   const [currency, setCurrency] = useState<"EUR" | "GBP" | "GHS" | "USD">(
     "EUR"
   );
@@ -495,6 +494,7 @@ const Beneficiaries = () => {
   const handleDeleteBeneficiary = async () => {
     if (!selectedBeneficiary?.id) return;
     try {
+      const axios = createAxiosInstance("accounts");
       setDeleting(true);
       await axios.delete(
         `/accounts/beneficiaries/${selectedBeneficiary.id}/delete`
@@ -523,6 +523,7 @@ const Beneficiaries = () => {
     const payload = buildBeneficiaryPayload(modalForm.values);
     try {
       setLoading(true);
+      const axios = createAxiosInstance("accounts");
       const { data: res } = await axios.post(
         "/accounts/beneficiaries",
         payload
@@ -562,6 +563,7 @@ const Beneficiaries = () => {
     const url = `${baseUrl}/accounts/beneficiaries/export?date=${startDate}&endDate=${endDate}&currency=${currency}`;
 
     try {
+      const axios = createAxiosInstance("accounts");
       const { data: res } = await axios.get(url, { headers });
 
       if (!res?.data?.length) {

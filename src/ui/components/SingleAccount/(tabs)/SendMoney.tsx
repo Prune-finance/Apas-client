@@ -167,12 +167,22 @@ export const SendMoney = ({ opened, closeMoney, openSendMoney }: Props) => {
             // if usdTransferType === "WithinUSA"
             ...(usdTransferType === "WithinUSA" && {
               beneficiaryBic: removeWhitespace(destinationBIC),
-              beneficiaryIban: removeWhitespace(destinationIBAN),
+              ...(destinationIBAN && {
+                 beneficiaryIban: removeWhitespace(destinationIBAN),
+              }),
+              ...(accountNumber && {
+                 beneficiaryAccountNumber: removeWhitespace(accountNumber),
+              }),
             }),
             // if usdTransferType === "OutsideUSA"
             ...(usdTransferType === "OutsideUSA" && {
               beneficiaryRoutingNumber: removeWhitespace(routingNumber),
-              beneficiaryAccountNumber: removeWhitespace(accountNumber),
+              ...(destinationIBAN && {
+                 beneficiaryIban: removeWhitespace(destinationIBAN),
+              }),
+              ...(accountNumber && {
+                 beneficiaryAccountNumber: removeWhitespace(accountNumber),
+              }),
             }),
             beneficiaryBankName: destinationBank,
             beneficiaryCountry: destinationCountry,

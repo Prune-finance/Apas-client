@@ -278,20 +278,17 @@ export const sendMoneyIndividualValidate = z
           message: "BIC is required for USD Within USA transfers",
         });
       }
-      if (!data.destinationIBAN || data.destinationIBAN.trim() === "") {
-        ctx.addIssue({
-          path: ["destinationIBAN"],
-          code: z.ZodIssueCode.custom,
-          message: "IBAN is required for USD Within USA transfers",
-        });
-      }
     }
+
     if (data.currency === "USD" && data.usdTransferType === "WithinUSA") {
-      if (!data.destinationIBAN || data.destinationIBAN.trim() === "") {
+      if (
+        (!data.destinationIBAN || data.destinationIBAN.trim() === "") &&
+        (!data.accountNumber || data.accountNumber.trim() === "")
+      ) {
         ctx.addIssue({
-          path: ["destinationIBAN"],
+          path: ["destinationIBAN", "accountNumber"],
           code: z.ZodIssueCode.custom,
-          message: "IBAN is required for USD Within USA transfers",
+          message: "IBAN or Account Number is required for USD Within USA transfers",
         });
       }
     }
@@ -306,11 +303,14 @@ export const sendMoneyIndividualValidate = z
       }
     }
     if (data.currency === "USD" && data.usdTransferType === "OutsideUSA") {
-      if (!data.accountNumber || data.accountNumber.trim() === "") {
+      if (
+        (!data.destinationIBAN || data.destinationIBAN.trim() === "") &&
+        (!data.accountNumber || data.accountNumber.trim() === "")
+      ) {
         ctx.addIssue({
-          path: ["accountNumber"],
+          path: ["destinationIBAN", "accountNumber"],
           code: z.ZodIssueCode.custom,
-          message: "Account Number is required for USD OutsideUSA transfers",
+          message: "IBAN or Account Number is required for USD Within USA transfers",
         });
       }
     }
@@ -521,11 +521,14 @@ export const sendMoneyCompanyValidate = z
           message: "BIC is required for USD Within USA transfers",
         });
       }
-      if (!data.destinationIBAN || data.destinationIBAN.trim() === "") {
+      if (
+        (!data.destinationIBAN || data.destinationIBAN.trim() === "") &&
+        (!data.accountNumber || data.accountNumber.trim() === "")
+      ) {
         ctx.addIssue({
-          path: ["destinationIBAN"],
+          path: ["destinationIBAN", "accountNumber"],
           code: z.ZodIssueCode.custom,
-          message: "IBAN is required for USD Within USA transfers",
+          message: "IBAN or Account Number is required for USD Within USA transfers",
         });
       }
     }

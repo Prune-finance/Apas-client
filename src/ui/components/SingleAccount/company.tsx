@@ -402,6 +402,15 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transferCurrency]);
 
+  useEffect(() => {
+    if (form2.values.currency === "USD" ) {
+      if (form2.values.accountNumber || iban) {
+        form2.setFieldError("destinationIBAN", undefined);
+        form2.setFieldError("accountNumber", undefined);
+      }
+    }
+  }, [form2.values.accountNumber, iban]);
+
   const CountryField = useCallback(
     ({ form2 }: { form2: UseFormReturnType<typeof sendMoneyRequest> }) => (
       <Flex gap={20} mt={24}>
@@ -800,84 +809,122 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                     <FullNameField form2={form2} mt={0} />
 
                     {switchCurrencyOutsideUS === "WithinUSA" ? (
-                      <Flex gap={20} mt={24} w="100%">
-                        <TextInput
-                          classNames={{
-                            input: styles.input,
-                            label: styles.label,
-                          }}
-                          flex={1}
-                          size="lg"
-                          label={
-                            <Text fz={14} c="#667085">
-                              IBAN <span style={{ color: "red" }}>*</span>
-                            </Text>
-                          }
-                          placeholder="Enter IBAN"
-                          {...form2.getInputProps("destinationIBAN")}
-                          errorProps={{ fz: 12 }}
-                        />
-                        <TextInput
-                          classNames={{
-                            input: styles.input,
-                            label: styles.label,
-                          }}
-                          flex={1}
-                          size="lg"
-                          label={
-                            <Text fz={14} c="#667085">
-                              BIC <span style={{ color: "red" }}>*</span>
-                            </Text>
-                          }
-                          placeholder="Enter BIC"
-                          {...form2.getInputProps("destinationBIC")}
-                          errorProps={{ fz: 12 }}
-                        />
-                      </Flex>
+                      <>
+                        <Flex gap={20} mt={24} w="100%">
+                          <TextInput
+                            classNames={{
+                              input: styles.input,
+                              label: styles.label,
+                            }}
+                            flex={1}
+                            size="lg"
+                            label={
+                              <Text fz={14} c="#667085">
+                                BIC <span style={{ color: "red" }}>*</span>
+                              </Text>
+                            }
+                            placeholder="Enter BIC"
+                            {...form2.getInputProps("destinationBIC")}
+                            errorProps={{ fz: 12 }}
+                          />
+                        </Flex>
+                        <Flex gap={20} mt={24} w="100%">
+                          <TextInput
+                            classNames={{
+                              input: styles.input,
+                              label: styles.label,
+                            }}
+                            flex={1}
+                            size="lg"
+                            label={
+                              <Text fz={14} c="#667085">
+                                IBAN
+                              </Text>
+                            }
+                            placeholder="Enter IBAN"
+                            {...form2.getInputProps("destinationIBAN")}
+                            errorProps={{ fz: 12 }}
+                          />
+                          <TextInput
+                            classNames={{
+                              input: styles.input,
+                              label: styles.label,
+                            }}
+                            flex={1}
+                            size="lg"
+                            label={
+                              <Text fz={14} c="#667085">
+                                Account Number
+                              </Text>
+                            }
+                            placeholder="Enter Account Number"
+                            {...form2.getInputProps("accountNumber")}
+                            errorProps={{ fz: 12 }}
+                          />
+                        </Flex>
+                      </>
                     ) : (
-                      <Flex align="center" mt={24} gap={20} w="100%">
-                        <TextInput
-                          classNames={{
-                            input: styles.input,
-                            label: styles.label,
-                          }}
-                          flex={1}
-                          size="lg"
-                          type="number"
-                          minLength={10}
-                          maxLength={16}
-                          label={
-                            <Text fz={14} c="#667085">
-                              Routing Number (ABA){" "}
-                              <span style={{ color: "red" }}>*</span>
-                            </Text>
-                          }
-                          placeholder="Enter routing number"
-                          {...form2.getInputProps("routingNumber")}
-                          errorProps={{ fz: 12 }}
-                        />
-
-                        <TextInput
-                          classNames={{
-                            input: styles.input,
-                            label: styles.label,
-                          }}
-                          flex={1}
-                          size="lg"
-                          type="number"
-                          minLength={10}
-                          maxLength={16}
-                          label={
-                            <Text fz={14} c="#667085">
-                              Account Number{" "}
-                              <span style={{ color: "red" }}>*</span>
-                            </Text>
-                          }
-                          placeholder="Enter account number"
-                          {...form2.getInputProps("accountNumber")}
-                          errorProps={{ fz: 12 }}
-                        />
-                      </Flex>
+                      <>
+                        <Flex align="center" mt={24} gap={20} w="100%">
+                          <TextInput
+                            classNames={{
+                              input: styles.input,
+                              label: styles.label,
+                            }}
+                            flex={1}
+                            size="lg"
+                            type="number"
+                            minLength={10}
+                            maxLength={16}
+                            label={
+                              <Text fz={14} c="#667085">
+                                Routing Number (ABA){" "}
+                                <span style={{ color: "red" }}>*</span>
+                              </Text>
+                            }
+                            placeholder="Enter routing number"
+                            {...form2.getInputProps("routingNumber")}
+                            errorProps={{ fz: 12 }}
+                          />
+                        </Flex>
+                        <Flex align="center" mt={24} gap={20} w="100%">
+                          <TextInput
+                            classNames={{
+                              input: styles.input,
+                              label: styles.label,
+                            }}
+                            flex={1}
+                            size="lg"
+                            type="number"
+                            minLength={10}
+                            maxLength={16}
+                            label={
+                              <Text fz={14} c="#667085">
+                                Account Number{" "}
+                              </Text>
+                            }
+                            placeholder="Enter account number"
+                            {...form2.getInputProps("accountNumber")}
+                            errorProps={{ fz: 12 }}
+                          />
+                          <TextInput
+                            classNames={{
+                              input: styles.input,
+                              label: styles.label,
+                            }}
+                            flex={1}
+                            size="lg"
+                            label={
+                              <Text fz={14} c="#667085">
+                                IBAN
+                              </Text>
+                            }
+                            placeholder="Enter IBAN"
+                            {...form2.getInputProps("destinationIBAN")}
+                            errorProps={{ fz: 12 }}
+                          />
+                        </Flex>
+                      </>
                     )}
 
                     <BankField form2={form2} />

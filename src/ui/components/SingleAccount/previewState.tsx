@@ -62,19 +62,15 @@ function PreviewState({
         }
       : switchCurrency === "USD"
       ? {
-          [requestForm?.usdTransferType === "WithinUSA"
-            ? "IBAN"
-            : "Account Number"]:
-            requestForm?.usdTransferType === "WithinUSA"
-              ? requestForm?.destinationIBAN
-              : requestForm?.accountNumber,
-
-          [requestForm?.usdTransferType === "WithinUSA"
-            ? "Bic"
-            : "Routing Number"]:
-            requestForm?.usdTransferType === "WithinUSA"
-              ? requestForm?.destinationBIC
-              : requestForm?.routingNumber,
+          ...(requestForm?.destinationIBAN && {
+              IBAN: requestForm?.destinationIBAN
+          }),
+          ...(requestForm?.destinationBIC && {
+              BIC: requestForm?.destinationBIC
+          }),
+          ...(requestForm?.accountNumber && {
+              "Account Number": requestForm?.accountNumber
+          })
         }
       : {
           IBAN: requestForm?.destinationIBAN,

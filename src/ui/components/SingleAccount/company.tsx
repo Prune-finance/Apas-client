@@ -959,7 +959,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       size="lg"
                       label={
                         <Text fz={14} c="#667085">
-                          BIC <span style={{ color: "red" }}>*</span>
+                          BIC / SWIFT <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
                       placeholder="Enter BIC"

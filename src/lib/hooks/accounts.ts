@@ -1072,6 +1072,7 @@ export interface BeneficiaryAccountProps {
   updatedAt: string;
   companyId: string;
   currencyId: string;
+  companyName: string;
   alias: string;
   type: "DASHBOARD";
   status: "PENDING_VERIFICATION";

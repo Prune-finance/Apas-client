@@ -271,12 +271,14 @@ const Beneficiaries = () => {
           ...base,
           bankName: v.bank,
           accountIban: removeWhitespace(v.iban),
+          accountNumber: removeWhitespace(v.accountNumber),
           swiftBic: removeWhitespace(v.bic),
         };
       return {
         ...base,
         bankName: v.bank,
         routingNumber: removeWhitespace(v.routingNumber),
+        accountIban: removeWhitespace(v.iban),
         accountNumber: removeWhitespace(v.accountNumber),
       };
     }
@@ -918,28 +920,44 @@ const Beneficiaries = () => {
                       styles={{ input: inputStyle }}
                     />
                     {modalForm.values.usdTransferType === "WithinUSA" ? (
-                      <Group grow gap={20} mt={12}>
-                        <TextInputWithInsideLabel
-                          label={
-                            <Text fz={12}>
-                              IBAN <span style={{ color: "red" }}>*</span>
-                            </Text>
-                          }
-                          placeholder="Enter IBAN"
-                          {...modalForm.getInputProps("iban")}
-                          styles={{ input: inputStyle }}
-                        />
-                        <TextInputWithInsideLabel
-                          label={
-                            <Text fz={12}>
-                              SWIFT/BIC <span style={{ color: "red" }}>*</span>
-                            </Text>
-                          }
-                          placeholder="Enter SWIFT/BIC"
-                          {...modalForm.getInputProps("bic")}
-                          styles={{ input: inputStyle }}
-                        />
-                      </Group>
+                      <>
+                        <Group grow gap={20} mt={12}>
+                          <TextInputWithInsideLabel
+                            label={
+                              <Text fz={12}>
+                                SWIFT/BIC <span style={{ color: "red" }}>*</span>
+                              </Text>
+                            }
+                            placeholder="Enter SWIFT/BIC"
+                            {...modalForm.getInputProps("bic")}
+                            styles={{ input: inputStyle }}
+                          />
+                          
+                        </Group>
+                        <Group grow gap={20} mt={12}>
+                          <TextInputWithInsideLabel
+                            label={
+                              <Text fz={12}>
+                                IBAN <span style={{ color: "red" }}>*</span>
+                              </Text>
+                            }
+                            placeholder="Enter IBAN"
+                            {...modalForm.getInputProps("iban")}
+                            styles={{ input: inputStyle }}
+                          />
+                    
+                          <TextInputWithInsideLabel
+                            label={
+                              <Text fz={12}>
+                                Account Number <span style={{ color: "red" }}>*</span>
+                              </Text>
+                            }
+                            placeholder="Enter Account Number"
+                            {...modalForm.getInputProps("accountNumber")}
+                            styles={{ input: inputStyle }}
+                          />
+                        </Group>
+                      </>
                     ) : (
                       <Group grow gap={20} mt={12}>
                         <TextInputWithInsideLabel

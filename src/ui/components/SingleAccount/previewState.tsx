@@ -116,7 +116,20 @@ function PreviewState({
               ? companyRequestForm?.phoneNumber
               : companyRequestForm?.accountNumber,
         }
-      : {
+      : switchCurrency === "USD"
+      ? {
+          ...(companyRequestForm?.destinationIBAN && {
+              IBAN: companyRequestForm?.destinationIBAN
+          }),
+          ...(companyRequestForm?.destinationBIC && {
+              BIC: companyRequestForm?.destinationBIC
+          }),
+          ...(companyRequestForm?.accountNumber && {
+              "Account Number": companyRequestForm?.accountNumber
+          })
+        }
+      :
+      {
           IBAN: companyRequestForm?.destinationIBAN,
           BIC: companyRequestForm?.destinationBIC,
         }),

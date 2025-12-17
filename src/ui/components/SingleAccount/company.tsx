@@ -151,7 +151,8 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     useSendMoneyBeneficiary(search, switchCurrency, "COMPANY");
 
   const handlePopulateForm = (data: BeneficiaryAccountProps) => {
-    form2.setFieldValue("companyName", data.Company?.name || data.alias || "");
+    console.log("Populating form with data:", data, data?.companyName|| data.alias || data.Company?.name  || "");
+    form2.setFieldValue("companyName", data?.companyName|| data.alias || data.Company?.name  || "");
     form2.setFieldValue("destinationBank", data.bankName || "");
 
     if (switchCurrency === "EUR") {
@@ -161,9 +162,10 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
       form2.setFieldValue("destinationAccountNumber", data.accountNumber || "");
       form2.setFieldValue("destinationSortCode", data.sortCode || "");
     } else if (switchCurrency === "USD") {
-      if (data?.accountIban && data?.swiftBic) {
+      if ((data?.accountIban || data?.accountNumber) && data?.swiftBic) {
         setSwitchCurrencyOutsideUS("WithinUSA");
         form2.setFieldValue("destinationIBAN", data.accountIban || "");
+        form2.setFieldValue("accountNumber", data.accountNumber || "");
         form2.setFieldValue("destinationBIC", data.swiftBic || "");
       } else {
         setSwitchCurrencyOutsideUS("OutsideUSA");

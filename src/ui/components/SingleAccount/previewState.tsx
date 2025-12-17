@@ -282,7 +282,7 @@ function PreviewState({
             </Stack>
           ) : (
             <Stack gap={24}>
-              {Object.entries(companyRequestFormDetails).map(([key, value]) => (
+              {Object.entries(companyRequestFormDetails).map(([key, value]: [string, any]) => (
                 <Group justify="space-between" key={key}>
                   <Text fz={12} c="var(--prune-text-gray-500)" tt="capitalize">
                     {key}:

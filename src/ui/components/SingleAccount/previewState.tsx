@@ -219,7 +219,7 @@ function PreviewState({
               <Text fz={14} fw={600}>
                 Beneficiary Details
               </Text>
-              {Object.entries(beneficiaryDetails).map(([key, value]) => (
+              {Object.entries(beneficiaryDetails).map(([key, value]: [string, any]) => (
                 <Group justify="space-between" key={key}>
                   <Text fz={12} c="var(--prune-text-gray-500)" tt="capitalize">
                     {key}:

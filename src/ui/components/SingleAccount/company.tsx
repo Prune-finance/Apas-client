@@ -152,6 +152,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
   const handlePopulateForm = (data: BeneficiaryAccountProps) => {
     console.log("Populating form with data:", data, data?.companyName|| data.alias || data.Company?.name  || "");
+    form2.reset();
     form2.setFieldValue("companyName", data?.companyName|| data.alias || data.Company?.name  || "");
     form2.setFieldValue("destinationBank", data.bankName || "");
 

@@ -653,7 +653,13 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     );
 
     const handlePopulateForm = (data: BeneficiaryAccountProps) => {
-      setSwitchStatus(false);
+      setProcessing(false);
+      setValidated(null);
+      setDisableAddress(false);
+      setDisableBank(false);
+      setDisableCountry(false);
+      setShowBadge(false);
+      form.reset();
       form.setFieldValue("firstName", data.firstName || "");
       form.setFieldValue("lastName", data.lastName || "");
       form.setFieldValue("destinationBank", data.bankName || "");

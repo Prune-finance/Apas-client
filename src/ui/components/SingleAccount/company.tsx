@@ -152,12 +152,12 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
 
   const handlePopulateForm = (data: BeneficiaryAccountProps) => {
     console.log("Populating form with datas:", data, data?.companyName|| data.alias || data.Company?.name  || "");
-    setProcessing(true);
+    setProcessing(false);
     setValidated(null);
     setDisableAddress(false);
     setDisableBank(false);
     setDisableCountry(false);
-    setShowBadge(true);
+    setShowBadge(false);
     form2.reset();
     form2.setFieldValue("companyName", data?.companyName|| data.alias || data.Company?.name  || "");
     form2.setFieldValue("destinationBank", data.bankName || "");
@@ -936,15 +936,21 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                       </>
                     )}
 
-                    <BankField form2={form2} />
+                    {
+                      (!validated && !processing) && (
+                        <>
+                          <BankField form2={form2} />
 
-                    <CountryField form2={form2} />
+                          <CountryField form2={form2} />
 
-                    <AmountField form2={form2} />
+                          <AmountField form2={form2} />
 
-                    <DropzoneOptional form2={form2} />
+                          <DropzoneOptional form2={form2} />
 
-                    <NarrationField form2={form2} />
+                          <NarrationField form2={form2} />
+                        </>
+                      )
+                    }
                   </>
                 ) : switchCurrency === "EUR" ? (
                   <Flex gap={20} w="100%" direction="column">

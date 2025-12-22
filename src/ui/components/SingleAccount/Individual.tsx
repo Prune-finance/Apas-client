@@ -150,6 +150,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       },
       validate: zodResolver(sendMoneyIndividualValidate),
     });
+    console.log(form.values);
 
     const { beneficiaryAccount, loading: beneficiaryAccountLoading } =
       useSendMoneyBeneficiary(search, switchCurrency, "INDIVIDUAL");
@@ -658,7 +659,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
       setDisableBank(false);
       setDisableCountry(false);
       setShowBadge(false);
-      form.reset();
       form.setFieldValue("firstName", data.firstName || "");
       form.setFieldValue("lastName", data.lastName || "");
       form.setFieldValue("destinationBank", data.bankName || "");

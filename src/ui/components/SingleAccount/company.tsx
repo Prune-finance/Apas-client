@@ -158,7 +158,6 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
     setDisableBank(false);
     setDisableCountry(false);
     setShowBadge(false);
-    form2.reset();
     form2.setFieldValue("companyName", data?.companyName|| data.alias || data.Company?.name  || "");
     form2.setFieldValue("destinationBank", data.bankName || "");
 

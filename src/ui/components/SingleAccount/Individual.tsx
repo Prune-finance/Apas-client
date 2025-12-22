@@ -385,7 +385,6 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
     }, [transferCurrency]);
 
     useEffect(() => {
-      form.reset();
       form.setFieldValue("currency", switchCurrency);
       setValidated(null);
       setShowBadge(false);

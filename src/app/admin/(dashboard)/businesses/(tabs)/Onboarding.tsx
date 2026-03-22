@@ -144,8 +144,8 @@ export default function OnboardingBusinesses() {
       <EmptyTable
         loading={loading}
         rows={data || []}
-        title="There are no businesses."
-        text="When a business is created, it will appear here"
+        title="There are no businesses currently onboarding."
+        text="When a business starts the onboarding process, it will appear here"
       />
 
       <PaginationComponent

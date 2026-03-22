@@ -4,6 +4,8 @@ import { Box, TabsPanel, Title } from "@mantine/core";
 import { Suspense } from "react";
 import OnboardedBusinesses from "./(tabs)/Onboarded";
 import OnboardingBusinesses from "./(tabs)/Onboarding";
+import ApiActiveBusinesses from "./(tabs)/ApiActive";
+import AccountActiveBusinesses from "./(tabs)/AccountActive";
 
 function Businesses() {
   return (
@@ -11,7 +13,7 @@ function Businesses() {
       <Title order={2}>Businesses</Title>
 
       <TabsComponent tabs={tabs} mt={32}>
-        {[OnboardedBusinesses, OnboardingBusinesses].map((Component, index) => (
+        {[OnboardedBusinesses, OnboardingBusinesses, ApiActiveBusinesses, AccountActiveBusinesses].map((Component, index) => (
           <TabsPanel value={tabs[index].value} key={index}>
             <Component />
           </TabsPanel>
@@ -30,6 +32,8 @@ export default function BusinessesSuspense() {
 }
 
 const tabs: Tab[] = [
-  { title: "Onboarded Business", value: "onboarded" },
+  { title: "Onboarded Businesses", value: "onboarded" },
   { title: "Onboarding Businesses", value: "onboarding" },
+  { title: "API Active Businesses", value: "api" },
+  { title: "Account Active Businesses", value: "account" },
 ];

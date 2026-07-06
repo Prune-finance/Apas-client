@@ -90,6 +90,7 @@ export const handleCsvDownload = (
       reference: row.reference,
       status: row.status,
       type: row.type,
+      controlRef: row.accessId || row.accessRef,
       ...(row.accessRef ? { accessRef: row.accessRef } : {}),
       ...(currency === "GHS"
         ? {

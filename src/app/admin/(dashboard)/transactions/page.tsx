@@ -95,10 +95,10 @@ function TransactionForAccount() {
 }
 
 const tabs = [
+  { value: "all-transactions", title: "All Transactions" },
   { value: "business-accounts", title: "Business Accounts" },
   { value: "issued-accounts", title: "Issued Accounts" },
-  { value: "payout-accounts", title: "Payout Accounts" },
-  { value: "all-transactions", title: "All Transactions" },
+  { value: "payout-accounts", title: "Payout Accounts" }
 ];
 
 const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];

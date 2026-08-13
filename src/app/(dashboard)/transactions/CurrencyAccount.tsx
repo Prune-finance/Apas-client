@@ -12,6 +12,7 @@ import { OwnAccountTableHeaders } from "@/lib/static";
 import { calculateTotalPages } from "@/lib/utils";
 import { Box, Group, LoadingOverlay } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
+import { Dispatch, SetStateAction } from "react";
 import { IconListTree } from "@tabler/icons-react";
 
 interface Props {
@@ -20,7 +21,7 @@ interface Props {
   meta: Meta | null | undefined;
   currency: string;
   search: string;
-  setSearch: (v: string) => void;
+  setSearch: Dispatch<SetStateAction<string>>;
   opened: boolean;
   toggle: () => void;
   form: UseFormReturnType<FilterType>;

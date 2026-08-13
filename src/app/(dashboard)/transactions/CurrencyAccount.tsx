@@ -26,9 +26,9 @@ interface Props {
   toggle: () => void;
   form: UseFormReturnType<FilterType>;
   active: number;
-  setActive: (v: number) => void;
+  setActive: Dispatch<SetStateAction<number>>;
   limit: string | null;
-  setLimit: (v: string | null) => void;
+  setLimit: Dispatch<SetStateAction<string | null>>;
 }
 
 export const CurrencyAccount = ({

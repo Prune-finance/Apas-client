@@ -11,6 +11,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import { BusinessAccountTransactions } from "./(tabs)/business";
 import { IssuedAccountTransactions } from "./(tabs)/issued";
 import { PayoutAccountTransactions } from "./(tabs)/payout";
+import { AllAccountTransactions } from "./(tabs)/all";
 
 function TransactionForAccount() {
   const searchParams = useSearchParams();
@@ -72,6 +73,13 @@ function TransactionForAccount() {
             active={active}
             setActive={setActive}
           />
+
+          <AllAccountTransactions
+            panelValue={tabs[3].value}
+            customStatusOption={customStatusOption}
+            active={active}
+            setActive={setActive}
+          />
         </TabsComponent>
 
         {data && (
@@ -90,6 +98,7 @@ const tabs = [
   { value: "business-accounts", title: "Business Accounts" },
   { value: "issued-accounts", title: "Issued Accounts" },
   { value: "payout-accounts", title: "Payout Accounts" },
+  { value: "all-transactions", title: "All Transactions" },
 ];
 
 const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];

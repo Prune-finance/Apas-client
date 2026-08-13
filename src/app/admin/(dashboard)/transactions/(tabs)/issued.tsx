@@ -1,3 +1,5 @@
+"use client";
+
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { IssuedAccountTableHeaders } from "@/lib/static";
 import { SecondaryBtn } from "@/ui/components/Buttons";
@@ -8,17 +10,28 @@ import { SearchInput, TextBox, SelectBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
-import { TabsPanel, Flex } from "@mantine/core";
+import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
 import { IconListTree, IconCircleArrowDown } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { useTransactions } from "@/lib/hooks/transactions";
+import { useIssuedAccountTransactions } from "@/lib/hooks/transactions";
+import { useInfoDetails } from "@/lib/hooks/infoDetails";
+import { useParam } from "@/lib/hooks/param";
 import dayjs from "dayjs";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { calculateTotalPages } from "@/lib/utils";
-import { useInfoDetails } from "@/lib/hooks/infoDetails";
-import { useParam } from "@/lib/hooks/param";
+import EUIcon from "@/assets/EU-icon.png";
+import GBPIcon from "@/assets/GB.png";
+import USDIcon from "@/assets/USD.png";
+
+type Currency = "EUR" | "GBP" | "USD";
+
+const currencyTabs = [
+  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
+  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
+  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+];
 
 interface Props {
   panelValue: string;
@@ -26,26 +39,22 @@ interface Props {
   active: number;
   setActive: Dispatch<SetStateAction<number>>;
 }
+
 export const IssuedAccountTransactions = ({
   panelValue,
   customStatusOption,
   active,
   setActive,
 }: Props) => {
+  const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const [opened, { toggle }] = useDisclosure(false);
   const searchParams = useSearchParams();
 
-  const {
-    status,
-    type,
-    senderName,
-    date,
-    endDate,
-    recipientName,
-    recipientIban,
-  } = Object.fromEntries(searchParams.entries());
+  const { status, type, senderName, date, endDate, recipientName, recipientIban } =
+    Object.fromEntries(searchParams.entries());
 
   const { param } = useParam({
     status,
@@ -60,90 +69,108 @@ export const IssuedAccountTransactions = ({
     search: debouncedSearch,
   });
 
-  const { transactions, loading, meta } = useTransactions(undefined, param);
-  const { infoDetails } = useInfoDetails(meta);
-
-  const [opened, { toggle }] = useDisclosure(false);
+  const { transactions, loading, meta } = useIssuedAccountTransactions({
+    ...param,
+    currencyCode: activeCurrency,
+  });
+  const { infoDetails } = useInfoDetails(meta, activeCurrency);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
 
+  const handleCurrencyChange = (currency: Currency) => {
+    setActiveCurrency(currency);
+    setActive(1);
+  };
+
   return (
     <TabsPanel value={panelValue}>
-      <InfoCards title="Overview" details={infoDetails} loading={loading}>
-        {/* <Select
-            data={["Last Week", "Last Month"]}
-            variant="filled"
-            placeholder="Last Week"
-            defaultValue={"Last Week"}
-            w={150}
-            // h={22}
-            color="var(--prune-text-gray-500)"
-            styles={{
-              input: {
-                outline: "none",
+      <div style={{ display: "flex", gap: 8, marginTop: 32, marginBottom: 24 }}>
+        {currencyTabs.map((t) => {
+          const isActive = activeCurrency === t.currency;
+          return (
+            <button
+              key={t.currency}
+              onClick={() => handleCurrencyChange(t.currency)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "8px 16px",
+                borderRadius: 100,
                 border: "none",
-              },
-            }}
-          /> */}
-      </InfoCards>
-      <Flex justify="space-between" align="center" mt={38}>
-        <SearchInput search={search} setSearch={setSearch} />
+                cursor: "pointer",
+                fontSize: 14,
+                fontWeight: isActive ? 600 : 500,
+                backgroundColor: isActive ? "#c1dd06" : "#fbfee6",
+                color: isActive ? "#344054" : "#596603",
+                transition: "background-color 0.15s ease, color 0.15s ease",
+              }}
+            >
+              <Image src={t.icon} alt="icon" h={20} w={20} />
+              {t.title}
+            </button>
+          );
+        })}
+      </div>
 
-        <Flex gap={12}>
-          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-          <SecondaryBtn
-            text="Download Statement"
-            // action={toggle}
-            icon={IconCircleArrowDown}
-          />
+      <Box pos="relative">
+        <LoadingOverlay
+          visible={loading}
+          zIndex={10}
+          overlayProps={{ radius: "sm", blur: 1 }}
+          loaderProps={{ size: "md" }}
+        />
+
+        <InfoCards title="Overview" details={infoDetails} loading={loading} />
+
+        <Flex justify="space-between" align="center" mt={38}>
+          <SearchInput search={search} setSearch={setSearch} />
+          <Flex gap={12}>
+            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+            <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+          </Flex>
         </Flex>
-      </Flex>
 
-      <Filter<FilterType>
-        opened={opened}
-        toggle={toggle}
-        form={form}
-        customStatusOption={customStatusOption}
-      >
-        <TextBox
-          placeholder="Sender Name"
-          {...form.getInputProps("senderName")}
+        <Filter<FilterType>
+          opened={opened}
+          toggle={toggle}
+          form={form}
+          customStatusOption={customStatusOption}
+        >
+          <TextBox placeholder="Sender Name" {...form.getInputProps("senderName")} />
+          <TextBox placeholder="Beneficiary Name" {...form.getInputProps("recipientName")} />
+          <TextBox placeholder="Beneficiary IBAN" {...form.getInputProps("recipientIban")} />
+          <SelectBox
+            placeholder="Type"
+            {...form.getInputProps("type")}
+            data={["DEBIT", "CREDIT"]}
+          />
+        </Filter>
+
+        <TableComponent
+          head={IssuedAccountTableHeaders}
+          rows={<IssuedTransactionTableRows data={transactions} />}
+          loading={loading}
         />
-        <TextBox
-          placeholder="Beneficiary Name"
-          {...form.getInputProps("recipientName")}
+
+        <EmptyTable
+          rows={transactions}
+          loading={loading}
+          text="Transactions will be shown here"
+          title="There are no transactions"
         />
-        <TextBox
-          placeholder="Beneficiary IBAN"
-          {...form.getInputProps("recipientIban")}
+
+        <PaginationComponent
+          active={active}
+          setActive={setActive}
+          setLimit={setLimit}
+          limit={limit}
+          total={calculateTotalPages(limit, meta?.total || 0)}
         />
-        <SelectBox
-          placeholder="Type"
-          {...form.getInputProps("type")}
-          data={["DEBIT", "CREDIT"]}
-        />
-      </Filter>
-      <TableComponent
-        head={IssuedAccountTableHeaders}
-        rows={<IssuedTransactionTableRows data={transactions} />}
-        loading={loading}
-      />
-      <EmptyTable
-        rows={transactions}
-        loading={loading}
-        text="Transactions will be shown here"
-        title="There are no transactions"
-      />
-      <PaginationComponent
-        active={active}
-        setActive={setActive}
-        setLimit={setLimit}
-        limit={limit}
-        total={calculateTotalPages(limit, meta?.total || 0)}
-      />
+      </Box>
     </TabsPanel>
   );
 };

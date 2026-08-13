@@ -1,6 +1,6 @@
 "use client";
 
-import { useIssuedAccountTransactions } from "@/lib/hooks/transactions";
+import { useAllAccountTransactions } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -9,8 +9,8 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
-import { IssuedAccountTableHeaders } from "@/lib/static";
+import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
+import { OwnAccountTableHeaders } from "@/lib/static";
 import { calculateTotalPages } from "@/lib/utils";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { Group, Image } from "@mantine/core";
@@ -35,7 +35,7 @@ const currencyTabs = [
   { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
 ];
 
-export const IssuedAccountsTab = () => {
+export const AllTransactionsTab = () => {
   const searchParams = useSearchParams();
   const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
   const [active, setActive] = useState(1);
@@ -66,7 +66,7 @@ export const IssuedAccountsTab = () => {
     currencyCode: activeCurrency,
   };
 
-  const { transactions, loading, meta } = useIssuedAccountTransactions(queryParams);
+  const { transactions, loading, meta } = useAllAccountTransactions(queryParams);
   usePaginationReset({ queryParams, setActive });
 
   const handleCurrencyChange = (currency: Currency) => {
@@ -138,9 +138,9 @@ export const IssuedAccountsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={<IssuedTransactionTableRows data={transactions} isUser />}
+        rows={<BusinessTransactionTableRows data={transactions} business isUser />}
         loading={loading}
-        head={IssuedAccountTableHeaders}
+        head={OwnAccountTableHeaders}
       />
 
       <EmptyTable

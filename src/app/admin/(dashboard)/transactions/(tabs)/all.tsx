@@ -1,8 +1,9 @@
 "use client";
 
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { BusinessAccountTableHeaders } from "@/lib/static";
+import { OwnAccountTableHeaders } from "@/lib/static";
 import { SecondaryBtn } from "@/ui/components/Buttons";
+import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
 import Filter from "@/ui/components/Filter";
 import { SearchInput, TextBox, SelectBox } from "@/ui/components/Inputs";
@@ -12,7 +13,7 @@ import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
 import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
 import { IconListTree, IconCircleArrowDown } from "@tabler/icons-react";
 import { Dispatch, SetStateAction, useState } from "react";
-import { useOwnerAccountTransactions } from "@/lib/hooks/transactions";
+import { useAllAccountTransactions } from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
 import dayjs from "dayjs";
@@ -20,7 +21,6 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { calculateTotalPages } from "@/lib/utils";
-import InfoCards from "@/ui/components/Cards/InfoCards";
 import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import USDIcon from "@/assets/USD.png";
@@ -40,7 +40,7 @@ interface Props {
   setActive: Dispatch<SetStateAction<number>>;
 }
 
-export const BusinessAccountTransactions = ({
+export const AllAccountTransactions = ({
   panelValue,
   customStatusOption,
   active,
@@ -69,7 +69,7 @@ export const BusinessAccountTransactions = ({
     search: debouncedSearch,
   });
 
-  const { transactions, loading, meta } = useOwnerAccountTransactions({
+  const { transactions, loading, meta } = useAllAccountTransactions({
     ...param,
     currencyCode: activeCurrency,
   });
@@ -151,7 +151,7 @@ export const BusinessAccountTransactions = ({
         </Filter>
 
         <TableComponent
-          head={BusinessAccountTableHeaders}
+          head={OwnAccountTableHeaders}
           rows={<BusinessTransactionTableRows data={transactions} />}
           loading={loading}
         />

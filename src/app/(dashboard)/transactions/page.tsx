@@ -10,6 +10,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import { AccountsTab } from "./(tabs)/Accounts";
 import { IssuedAccountsTab } from "./(tabs)/IssuedAccounts";
 import { PayoutsTab } from "./(tabs)/Payouts";
+import { AllTransactionsTab } from "./(tabs)/AllTransactions";
 import Transaction from "@/lib/store/transaction";
 import { TransactionDrawer } from "./drawer";
 import { useSearchParams } from "next/navigation";
@@ -42,6 +43,9 @@ function AccountTrx() {
           mt={32}
           keepMounted={false}
         >
+          <TabsPanel value="all-transactions">
+            <AllTransactionsTab />
+          </TabsPanel>
           <TabsPanel value="own-account">
             <AccountsTab />
           </TabsPanel>
@@ -68,6 +72,7 @@ export default function AccountTrxSuspense() {
 }
 
 const tabs = [
+  { title: "All Transactions", value: "all-transactions" },
   { title: "Own Account", value: "own-account" },
   { title: "Issued Accounts", value: "issued-accounts" },
   { title: "Payouts", value: "payouts" },

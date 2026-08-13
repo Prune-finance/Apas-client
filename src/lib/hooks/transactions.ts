@@ -849,6 +849,70 @@ export function useUserCurrencyTransactions(
   return { loading: boolean, transactions: data || [], meta, revalidate };
 }
 
+export function useUserAccountTransactionsByCurrency(
+  customParams: ITrx = {},
+  currency: "EUR" | "GBP" | "USD"
+) {
+  const endpoint =
+    currency === "EUR"
+      ? "/accounts/company/transactions"
+      : `currency-accounts/transactions/get-company-currency-account-transactions/${currency}`;
+
+  const {
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<TransactionType[], Meta>({
+    endpoint,
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams), currency],
+  });
+
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useOwnerAccountTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/accounts/businesses/transactions",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useIssuedAccountTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/accounts/transactions",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function usePayoutCurrencyTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/transactions",
+    baseURL: "payouts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useAllAccountTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/accounts/transactions/all",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
 export function useAdminGetCurrencyTransactions(
   customParams: ITrx = {},
   id: string,

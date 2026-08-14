@@ -12,7 +12,7 @@ import { TableComponent } from "@/ui/components/Table";
 import { PayoutTransactionTableRows } from "@/ui/components/TableRows";
 import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
 import { IconListTree, IconCircleArrowDown } from "@tabler/icons-react";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { usePayoutCurrencyTransactions } from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
@@ -38,16 +38,13 @@ const currencyTabs = [
 interface Props {
   panelValue: string;
   customStatusOption: string[];
-  active: number;
-  setActive: Dispatch<SetStateAction<number>>;
 }
 
 export const PayoutAccountTransactions = ({
   panelValue,
   customStatusOption,
-  active,
-  setActive,
 }: Props) => {
+  const [active, setActive] = useState(1);
   const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
@@ -154,7 +151,7 @@ export const PayoutAccountTransactions = ({
 
         <TableComponent
           head={PayoutTableHeaders}
-          rows={<PayoutTransactionTableRows data={transactions} />}
+          rows={<PayoutTransactionTableRows data={transactions} currency={activeCurrency} />}
           loading={loading}
         />
 

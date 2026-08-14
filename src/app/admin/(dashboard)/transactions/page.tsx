@@ -3,7 +3,7 @@
 import { Paper, Stack, Text, Title } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import Transaction from "@/lib/store/transaction";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 import TabsComponent from "@/ui/components/Tabs";
@@ -15,8 +15,6 @@ import { AllAccountTransactions } from "./(tabs)/all";
 
 function TransactionForAccount() {
   const searchParams = useSearchParams();
-  const [active, setActive] = useState(1);
-
   const { tab } = Object.fromEntries(searchParams.entries());
 
   const { data, close, opened: openedDrawer } = Transaction();
@@ -48,7 +46,6 @@ function TransactionForAccount() {
             tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
               ?.value ?? tabs[0].value
           }
-          onChange={() => setActive(1)}
           mt={28}
           styles={{ list: { marginBottom: 28 } }}
           keepMounted={false}
@@ -56,29 +53,21 @@ function TransactionForAccount() {
           <BusinessAccountTransactions
             panelValue={tabs[0].value}
             customStatusOption={customStatusOption}
-            active={active}
-            setActive={setActive}
           />
 
           <IssuedAccountTransactions
             panelValue={tabs[1].value}
             customStatusOption={customStatusOption}
-            active={active}
-            setActive={setActive}
           />
 
           <PayoutAccountTransactions
             panelValue={tabs[2].value}
             customStatusOption={customStatusOption}
-            active={active}
-            setActive={setActive}
           />
 
           <AllAccountTransactions
             panelValue={tabs[3].value}
             customStatusOption={customStatusOption}
-            active={active}
-            setActive={setActive}
           />
         </TabsComponent>
 

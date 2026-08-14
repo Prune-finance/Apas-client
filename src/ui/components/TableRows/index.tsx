@@ -14,13 +14,14 @@ import { BusinessData } from "@/lib/hooks/businesses";
 
 export const BusinessTransactionTableRows = ({
   data,
-
   business,
   isUser,
+  currency,
 }: {
   data: TransactionType[];
   business?: boolean;
   isUser?: boolean;
+  currency?: string;
 }) => {
   const { open, setData } = Transaction();
   return data.map((element) => (
@@ -68,7 +69,7 @@ export const BusinessTransactionTableRows = ({
       </TableTd>
 
       <TableTd>
-        {formatNumber(element.amount, true, element?.currencyType ?? "EUR")}
+        {formatNumber(element.amount, true, currency ?? element?.currencyType ?? "EUR")}
       </TableTd>
 
       <TableTd w="15%">{element.centrolinkRef ?? element?.accessId}</TableTd>
@@ -95,11 +96,12 @@ export const IssuedTransactionTableRows = ({
   data,
   noLink,
   isUser,
+  currency,
 }: {
   data: TransactionType[];
-
   noLink?: boolean;
   isUser?: boolean;
+  currency?: string;
 }) => {
   const { open, setData } = Transaction();
   return data.map((element) => (
@@ -150,7 +152,7 @@ export const IssuedTransactionTableRows = ({
       </TableTd>
 
       <TableTd>
-        {formatNumber(element?.amount, true, element?.currencyType ?? "EUR")}
+        {formatNumber(element?.amount, true, currency ?? element?.currencyType ?? "EUR")}
       </TableTd>
 
       <TableTd w="15%">{element?.reference}</TableTd>
@@ -176,9 +178,11 @@ export const IssuedTransactionTableRows = ({
 export const PayoutTransactionTableRows = ({
   data,
   isUser,
+  currency,
 }: {
   data: TransactionType[];
   isUser?: boolean;
+  currency?: string;
 }) => {
   const { open, setData } = Transaction();
   return data.map((element) => (
@@ -223,7 +227,7 @@ export const PayoutTransactionTableRows = ({
         <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
 
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>{formatNumber(element.amount, true, currency ?? element?.currencyType ?? "EUR")}</TableTd>
 
       <TableTd w="15%">{element.reference}</TableTd>
 

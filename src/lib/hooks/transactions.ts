@@ -95,7 +95,7 @@ export function useSingleTransactions(
     const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `${id}/transactions` : "transactions";
+      // const path = id ? `${id}/transactions` : "transactions";
 
       const { data } = await axios.get(`/admin/transactions/${id}/data`, {
         params,
@@ -221,7 +221,7 @@ export function useBusinessTransactions(
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `` : "transactions";
+      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/${id}/transactions`,
@@ -311,7 +311,7 @@ export function useBusinessAccountTransactions(
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `` : "transactions";
+      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/company-account/${id}/transactions`,
@@ -401,7 +401,7 @@ export function usePayoutAccountTransactions(
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `` : "transactions";
+      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/payout-account/${id}/transactions`,
@@ -917,7 +917,7 @@ export function useAdminGetCurrencyTransactions(
   customParams: ITrx = {},
   id: string,
   symbol: string,
-  queryAccountType?: string
+  // queryAccountType?: string
 ) {
   const {
     data,
@@ -1115,4 +1115,48 @@ export interface TransactionType {
   companyAccountId: string | null;
   payoutAccountId: string | null;
   staging: "TEST" | "LIVE";
+}
+
+interface ExportResult {
+  url: string;
+  key: string;
+  filename: string;
+  expiresInSeconds: number;
+}
+
+async function openExportUrl(promise: Promise<{ data: { data: ExportResult } }>) {
+  const { data } = await promise;
+  window.open(data.data.url, "_blank");
+}
+
+export function exportOwnerAccountTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("admin/accounts/businesses/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportIssuedAccountTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("admin/accounts/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportPayoutTransactions(params: IParams) {
+  return openExportUrl(
+    payoutAxiosInstance.get("admin/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportAllAccountTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("admin/accounts/transactions/all/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
 }

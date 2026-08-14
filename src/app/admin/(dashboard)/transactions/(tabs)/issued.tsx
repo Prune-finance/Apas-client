@@ -11,9 +11,9 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
-import { IconListTree, IconCircleArrowDown } from "@tabler/icons-react";
+import { IconListTree, IconCircleArrowDown, IconFileExport } from "@tabler/icons-react";
 import { useState } from "react";
-import { useIssuedAccountTransactions } from "@/lib/hooks/transactions";
+import { useIssuedAccountTransactions, exportIssuedAccountTransactions } from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
 import dayjs from "dayjs";
@@ -79,9 +79,20 @@ export const IssuedAccountTransactions = ({
     validate: zodResolver(FilterSchema),
   });
 
+  const [exporting, setExporting] = useState(false);
+
   const handleCurrencyChange = (currency: Currency) => {
     setActiveCurrency(currency);
     setActive(1);
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportIssuedAccountTransactions({ ...param, currencyCode: activeCurrency });
+    } finally {
+      setExporting(false);
+    }
   };
 
   return (
@@ -130,6 +141,7 @@ export const IssuedAccountTransactions = ({
           <Flex gap={12}>
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
             <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+            <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
           </Flex>
         </Flex>
 

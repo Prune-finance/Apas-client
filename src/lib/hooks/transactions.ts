@@ -1126,7 +1126,12 @@ interface ExportResult {
 
 async function openExportUrl(promise: Promise<{ data: { data: ExportResult } }>) {
   const { data } = await promise;
-  window.open(data.data.url, "_blank");
+  const a = document.createElement("a");
+  a.href = data.data.url;
+  a.download = data.data.filename || "export";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 export function exportOwnerAccountTransactions(params: IParams) {

@@ -24,15 +24,17 @@ import { useSearchParams } from "next/navigation";
 import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import USDIcon from "@/assets/USD.png";
+import GHSIcon from "@/assets/GH.png";
 
 dayjs.extend(advancedFormat);
 
-type Currency = "EUR" | "GBP" | "USD";
+type Currency = "EUR" | "GBP" | "USD" | "GHS";
 
 const currencyTabs = [
   { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
   { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
   { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+  { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
 ];
 
 export const AllTransactionsTab = () => {

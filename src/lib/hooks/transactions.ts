@@ -917,7 +917,7 @@ export function useAdminGetCurrencyTransactions(
   customParams: ITrx = {},
   id: string,
   symbol: string,
-  // queryAccountType?: string
+  _queryAccountType?: string
 ) {
   const {
     data,

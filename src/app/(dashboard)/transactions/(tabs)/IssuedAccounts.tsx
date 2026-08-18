@@ -34,7 +34,7 @@ const currencyTabs = [
   { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
   { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
   { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
-  { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
+  // { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
 ];
 
 export const IssuedAccountsTab = () => {

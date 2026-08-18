@@ -895,7 +895,7 @@ export function useIssuedAccountTransactions(customParams: ITrx = {}) {
 
 export function usePayoutCurrencyTransactions(customParams: ITrx = {}) {
   const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
-    endpoint: "admin/transactions",
+    endpoint: "admin/accounts/businesses/transactions",
     baseURL: "payouts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -1152,7 +1152,7 @@ export function exportIssuedAccountTransactions(params: IParams) {
 
 export function exportPayoutTransactions(params: IParams) {
   return openExportUrl(
-    payoutAxiosInstance.get("admin/transactions/export", {
+    payoutAxiosInstance.get("admin/accounts/businesses/transactions/export", {
       params: sanitizedQueryParams(params),
     })
   );

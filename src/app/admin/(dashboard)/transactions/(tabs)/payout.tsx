@@ -11,9 +11,16 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { PayoutTransactionTableRows } from "@/ui/components/TableRows";
 import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
-import { IconListTree, IconCircleArrowDown, IconFileExport } from "@tabler/icons-react";
+import {
+  IconListTree,
+  IconCircleArrowDown,
+  IconFileExport,
+} from "@tabler/icons-react";
 import { useState } from "react";
-import { usePayoutCurrencyTransactions, exportPayoutTransactions } from "@/lib/hooks/transactions";
+import {
+  usePayoutCurrencyTransactions,
+  exportPayoutTransactions,
+} from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
 import dayjs from "dayjs";
@@ -52,8 +59,15 @@ export const PayoutAccountTransactions = ({
   const [opened, { toggle }] = useDisclosure(false);
   const searchParams = useSearchParams();
 
-  const { status, type, senderName, date, endDate, recipientName, recipientIban } =
-    Object.fromEntries(searchParams.entries());
+  const {
+    status,
+    type,
+    senderName,
+    date,
+    endDate,
+    recipientName,
+    recipientIban,
+  } = Object.fromEntries(searchParams.entries());
 
   const { param } = useParam({
     status,
@@ -89,7 +103,10 @@ export const PayoutAccountTransactions = ({
   const handleExport = async () => {
     setExporting(true);
     try {
-      await exportPayoutTransactions({ ...param, currencyCode: activeCurrency });
+      await exportPayoutTransactions({
+        ...param,
+        currencyCode: activeCurrency,
+      });
     } finally {
       setExporting(false);
     }
@@ -140,8 +157,16 @@ export const PayoutAccountTransactions = ({
           <SearchInput search={search} setSearch={setSearch} />
           <Flex gap={12}>
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-            <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
-            <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
+            <SecondaryBtn
+              text="Download Statement"
+              icon={IconCircleArrowDown}
+            />
+            <SecondaryBtn
+              text="Export"
+              action={handleExport}
+              icon={IconFileExport}
+              loading={exporting}
+            />
           </Flex>
         </Flex>
 
@@ -151,9 +176,18 @@ export const PayoutAccountTransactions = ({
           form={form}
           customStatusOption={customStatusOption}
         >
-          <TextBox placeholder="Sender Name" {...form.getInputProps("senderName")} />
-          <TextBox placeholder="Beneficiary Name" {...form.getInputProps("recipientName")} />
-          <TextBox placeholder="Beneficiary IBAN" {...form.getInputProps("recipientIban")} />
+          <TextBox
+            placeholder="Sender Name"
+            {...form.getInputProps("senderName")}
+          />
+          <TextBox
+            placeholder="Beneficiary Name"
+            {...form.getInputProps("recipientName")}
+          />
+          <TextBox
+            placeholder="Beneficiary IBAN"
+            {...form.getInputProps("recipientIban")}
+          />
           <SelectBox
             placeholder="Type"
             {...form.getInputProps("type")}
@@ -163,7 +197,12 @@ export const PayoutAccountTransactions = ({
 
         <TableComponent
           head={PayoutTableHeaders}
-          rows={<PayoutTransactionTableRows data={transactions} currency={activeCurrency} />}
+          rows={
+            <PayoutTransactionTableRows
+              data={transactions}
+              currency={activeCurrency}
+            />
+          }
           loading={loading}
         />
 

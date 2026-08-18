@@ -3,7 +3,7 @@
 import { Paper, Stack, Text, Title } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import Transaction from "@/lib/store/transaction";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 import TabsComponent from "@/ui/components/Tabs";
@@ -16,6 +16,7 @@ import { AllAccountTransactions } from "./(tabs)/all";
 function TransactionForAccount() {
   const searchParams = useSearchParams();
   const { tab } = Object.fromEntries(searchParams.entries());
+  const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
 
   const { data, close, opened: openedDrawer } = Transaction();
 
@@ -26,6 +27,13 @@ function TransactionForAccount() {
     "CANCELLED",
     "FAILED",
   ];
+
+  const handleTabChange = (value: string | null) => {
+    if (!value) return;
+    setTabCounts((prev) => ({ ...prev, [value]: (prev[value] ?? 0) + 1 }));
+  };
+
+  const tabKey = (value: string) => `${value}-${tabCounts[value] ?? 0}`;
 
   return (
     <main>
@@ -46,29 +54,35 @@ function TransactionForAccount() {
             tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
               ?.value ?? tabs[0].value
           }
+          onChange={handleTabChange}
           mt={28}
           styles={{ list: { marginBottom: 28 } }}
           keepMounted={false}
         >
-          <BusinessAccountTransactions
+          <AllAccountTransactions
+            key={tabKey(tabs[0].value)}
             panelValue={tabs[0].value}
             customStatusOption={customStatusOption}
           />
-
-          <IssuedAccountTransactions
+          <BusinessAccountTransactions
+            key={tabKey(tabs[1].value)}
             panelValue={tabs[1].value}
             customStatusOption={customStatusOption}
           />
 
-          <PayoutAccountTransactions
+          <IssuedAccountTransactions
+            key={tabKey(tabs[2].value)}
             panelValue={tabs[2].value}
             customStatusOption={customStatusOption}
           />
 
-          <AllAccountTransactions
+          <PayoutAccountTransactions
+            key={tabKey(tabs[3].value)}
             panelValue={tabs[3].value}
             customStatusOption={customStatusOption}
           />
+
+          
         </TabsComponent>
 
         {data && (

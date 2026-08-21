@@ -43,13 +43,15 @@ export const BusinessTransactionTableRows = ({
             pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
           }}
         >
-          <Link
-            href={`${!isUser ? "/admin" : ""}/transactions/${
-              element.senderIban
-            }`}
-          >
-            {element?.senderName || "N/A"}
-          </Link>
+          {isDummyIBAN(element.senderIban) ? (
+            element?.senderName || "N/A"
+          ) : (
+            <Link
+              href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
+            >
+              {element?.senderName || "N/A"}
+            </Link>
+          )}
         </TableTd>
       )}
 
@@ -213,11 +215,15 @@ export const PayoutTransactionTableRows = ({
           pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
         }}
       >
-        <Link
-          href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
-        >
-          {element?.senderName || "N/A"}
-        </Link>
+        {isDummyIBAN(element.senderIban) ? (
+          element?.senderName || "N/A"
+        ) : (
+          <Link
+            href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
+          >
+            {element?.senderName || "N/A"}
+          </Link>
+        )}
       </TableTd>
 
       <TableTd w="15%">{element?.centrolinkRef ?? element?.accessId}</TableTd>

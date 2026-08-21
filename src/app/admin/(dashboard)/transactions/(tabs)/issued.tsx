@@ -11,7 +11,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
-import { IconListTree, IconCircleArrowDown, IconFileExport } from "@tabler/icons-react";
+import { IconListTree, IconCircleArrowDown, IconFileExport, IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
 import { useIssuedAccountTransactions, exportIssuedAccountTransactions } from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
@@ -65,7 +65,7 @@ export const IssuedAccountTransactions = ({
     search: debouncedSearch,
   });
 
-  const { transactions, loading, meta } = useIssuedAccountTransactions({
+  const { transactions, loading, meta, revalidate } = useIssuedAccountTransactions({
     ...param,
     currencyCode: activeCurrency,
   });
@@ -136,6 +136,7 @@ export const IssuedAccountTransactions = ({
         <Flex justify="space-between" align="center" mt={38}>
           <SearchInput search={search} setSearch={setSearch} />
           <Flex gap={12}>
+            <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
             <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
             <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />

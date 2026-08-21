@@ -15,6 +15,7 @@ import {
   IconListTree,
   IconCircleArrowDown,
   IconFileExport,
+  IconRefresh,
 } from "@tabler/icons-react";
 import { useState } from "react";
 import {
@@ -82,7 +83,7 @@ export const PayoutAccountTransactions = ({
     search: debouncedSearch,
   });
 
-  const { transactions, loading, meta } = usePayoutCurrencyTransactions({
+  const { transactions, loading, meta, revalidate } = usePayoutCurrencyTransactions({
     ...param,
     currencyCode: activeCurrency,
   });
@@ -156,6 +157,7 @@ export const PayoutAccountTransactions = ({
         <Flex justify="space-between" align="center" mt={38}>
           <SearchInput search={search} setSearch={setSearch} />
           <Flex gap={12}>
+            <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
             <SecondaryBtn
               text="Download Statement"

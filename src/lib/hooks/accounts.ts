@@ -223,18 +223,20 @@ export function usePayoutAccount(customParams: IParams = {}) {
 export function useAccountStatistics({
   frequency,
   accountType,
+  currencyCode,
 }: {
   frequency: string;
-  accountType: "Accounts" | "Payout" | "Company";
+  accountType: "COMPANY_ACCOUNT" | "ISSUED_ACCOUNT" | "PAYOUT_ACCOUNT";
+  currencyCode?: string;
 }) {
-  const { loading, meta, queryFn } = useAxios<unknown, AccountStatsMeta>({
+  const { loading, data, meta, queryFn } = useAxios<StatInterval[], AccountStatsMeta>({
     baseURL: "accounts",
     endpoint: "/admin/accounts/statistics",
-    params: { frequency, accountType },
-    dependencies: [frequency, accountType],
+    params: { frequency, accountType, ...(currencyCode && { currencyCode }) },
+    dependencies: [frequency, accountType, currencyCode],
   });
 
-  return { loading, meta, revalidate: queryFn };
+  return { loading, data: data || [], meta, revalidate: queryFn };
 }
 
 export function useUserAccounts(customParams: IParams = {}) {
@@ -1137,11 +1139,17 @@ export interface ListCurrencyAccount {
   status: "APPROVED" | "PENDING" | "REJECTED" | "ISSUED" | string;
 }
 
+export interface StatInterval {
+  interval: string;
+  total: number;
+}
+
 export interface AccountStatsMeta {
-  activeAccountCount: number;
-  inactiveAccountCount: number;
-  totalInflow: number;
-  totalOutflow: number;
-  totalNumberOfAccounts: number;
-  totalAccountBalance: number;
+  currencyCode?: string;
+  activeAccountCount?: number;
+  inactiveAccountCount?: number;
+  totalInflow?: number;
+  totalOutflow?: number;
+  totalNumberOfAccounts?: number;
+  totalAccountBalance?: number;
 }

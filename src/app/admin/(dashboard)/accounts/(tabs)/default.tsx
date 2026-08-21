@@ -137,9 +137,10 @@ export default function BusinessAccounts() {
     dependencies,
   });
 
-  const { loading: loadingStats, meta: statsMeta } = useAccountStatistics({
+  const { loading: loadingStats, meta: statsMeta, data: statData } = useAccountStatistics({
     frequency: frequency?.toLowerCase() ?? "monthly",
-    accountType: "Company",
+    accountType: "COMPANY_ACCOUNT",
+    currencyCode: activeCurrency,
   });
 
   // TODO: Handle the resetting of activePage state when the filter is toggled
@@ -350,6 +351,8 @@ export default function BusinessAccounts() {
         setFrequency={setFrequency}
         accountType="Business"
         meta={statsMeta}
+        statData={statData}
+        currency={activeCurrency}
         form={form}
         open={openFilter}
         close={closeFilter}
@@ -414,6 +417,7 @@ export default function BusinessAccounts() {
             freezeOpen={freezeOpen}
             open={open}
             setRowId={setRowId}
+            currency={activeCurrency}
           />
         }
         loading={loading}
@@ -503,16 +507,17 @@ type RowProps = {
   freezeOpen: () => void;
   unfreezeOpen: () => void;
   open: () => void;
+  currency: string;
 };
 
 const RowComponent = ({
   accounts,
-
   setRowId,
   activateOpen,
   freezeOpen,
   unfreezeOpen,
   open,
+  currency,
 }: RowProps) => {
   const { push } = useRouter();
 
@@ -539,7 +544,7 @@ const RowComponent = ({
         </Link>
       </TableTd>
       <TableTd>{element.accountNumber}</TableTd>
-      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
+      <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>
       <TableTd>{element.Company?.issuedAccountCount}</TableTd>

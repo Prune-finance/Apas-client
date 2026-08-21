@@ -7,12 +7,14 @@ interface FlowCardProps {
   total: number;
   percentage: number;
   gain?: boolean;
+  currency?: string;
 }
 export default function FlowCard({
   title,
   total,
   percentage,
   gain,
+  currency = "EUR",
 }: FlowCardProps) {
   return (
     <AccountCustomCard>
@@ -23,7 +25,7 @@ export default function FlowCard({
 
         <Group justify="space-between">
           <Text fz={24} fw={600} c="var(--prune-text-gray-700)">
-            {formatNumber(total, true, "EUR")}
+            {formatNumber(total, true, currency)}
           </Text>
 
           <ThisMonth percentage={percentage} gain={gain} />

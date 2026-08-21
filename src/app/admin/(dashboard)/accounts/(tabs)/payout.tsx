@@ -131,9 +131,10 @@ export default function PayoutAccounts() {
     dependencies,
   });
 
-  const { loading: loadingStats, meta: statsMeta } = useAccountStatistics({
+  const { loading: loadingStats, meta: statsMeta, data: statData } = useAccountStatistics({
     frequency: frequency?.toLowerCase() ?? "monthly",
-    accountType: "Payout",
+    accountType: "PAYOUT_ACCOUNT",
+    currencyCode: activeCurrency,
   });
 
   // TODO: Handle the resetting of activePage state when the filter is toggled
@@ -343,6 +344,8 @@ export default function PayoutAccounts() {
         setFrequency={setFrequency}
         accountType="Payout"
         meta={statsMeta}
+        statData={statData}
+        currency={activeCurrency}
         form={form}
         open={openFilter}
         close={closeFilter}
@@ -406,6 +409,7 @@ export default function PayoutAccounts() {
             freezeOpen={freezeOpen}
             open={open}
             setRowId={setRowId}
+            currency={activeCurrency}
           />
         }
         loading={loading}
@@ -493,6 +497,7 @@ type RowProps = {
   freezeOpen: () => void;
   unfreezeOpen: () => void;
   open: () => void;
+  currency: string;
 };
 
 const RowComponent = ({
@@ -502,6 +507,7 @@ const RowComponent = ({
   freezeOpen,
   unfreezeOpen,
   open,
+  currency,
 }: RowProps) => {
   const { push } = useRouter();
 
@@ -522,7 +528,7 @@ const RowComponent = ({
         </Link>
       </TableTd>
       <TableTd>{element.accountNumber}</TableTd>
-      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
+      <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd>
         <BadgeComponent status={element.status} active />

@@ -33,27 +33,26 @@ export const BusinessTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      {!business && (
-        <TableTd
-          td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          style={{
-            pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
-          }}
-        >
-          {isDummyIBAN(element.senderIban) ? (
-            element?.senderName || "N/A"
-          ) : (
+      {!business &&
+        (element.senderIban ? (
+          <TableTd
+            td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+            style={{
+              pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+            }}
+          >
             <Link
               href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
             >
               {element?.senderName || "N/A"}
             </Link>
-          )}
-        </TableTd>
-      )}
+          </TableTd>
+        ) : (
+          <TableTd>{element?.senderName || "N/A"}</TableTd>
+        ))}
 
       <TableTd>
         <Stack gap={0}>
@@ -205,27 +204,25 @@ export const PayoutTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       {/* <TableTd>{element.senderName || "N/A"}</TableTd> */}
-
-      <TableTd
-        td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        style={{
-          pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
-        }}
-      >
-        {isDummyIBAN(element.senderIban) ? (
-          element?.senderName || "N/A"
-        ) : (
+      {element.senderIban ? (
+        <TableTd
+          td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+          style={{
+            pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
+          }}
+        >
           <Link
             href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
           >
             {element?.senderName || "N/A"}
           </Link>
-        )}
-      </TableTd>
-
+        </TableTd>
+      ) : (
+        <TableTd>{element?.senderName || "N/A"}</TableTd>
+      )}
       <TableTd w="15%">{element?.centrolinkRef ?? element?.accessId}</TableTd>
       <TableTd>
         <Stack gap={0}>

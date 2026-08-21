@@ -69,7 +69,11 @@ export const BusinessTransactionTableRows = ({
       </TableTd>
 
       <TableTd>
-        {formatNumber(element.amount, true, currency ?? element?.currencyType ?? "EUR")}
+        {formatNumber(
+          element.amount,
+          true,
+          currency ?? element?.currencyType ?? "EUR",
+        )}
       </TableTd>
 
       <TableTd w="15%">{element.centrolinkRef ?? element?.accessId}</TableTd>
@@ -152,7 +156,11 @@ export const IssuedTransactionTableRows = ({
       </TableTd>
 
       <TableTd>
-        {formatNumber(element?.amount, true, currency ?? element?.currencyType ?? "EUR")}
+        {formatNumber(
+          element?.amount,
+          true,
+          currency ?? element?.currencyType ?? "EUR",
+        )}
       </TableTd>
 
       <TableTd w="15%">{element?.reference}</TableTd>
@@ -212,14 +220,14 @@ export const PayoutTransactionTableRows = ({
         </Link>
       </TableTd>
 
-      <TableTd w="15%">{element.centrolinkRef}</TableTd>
+      <TableTd w="15%">{element?.centrolinkRef ?? element?.accessId}</TableTd>
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {element.recipientName}
+            {element?.recipientName ?? element?.beneficiaryName}
           </Text>
           <Text fz={10} fw={400}>
-            {element.recipientIban}
+            {element?.recipientIban ?? element?.beneficiaryAccountNumber}
           </Text>
         </Stack>
       </TableTd>
@@ -227,7 +235,13 @@ export const PayoutTransactionTableRows = ({
         <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
 
-      <TableTd>{formatNumber(element.amount, true, currency ?? element?.currencyType ?? "EUR")}</TableTd>
+      <TableTd>
+        {formatNumber(
+          element.amount,
+          true,
+          currency ?? element?.currencyType ?? "EUR",
+        )}
+      </TableTd>
 
       <TableTd w="15%">{element.reference}</TableTd>
 

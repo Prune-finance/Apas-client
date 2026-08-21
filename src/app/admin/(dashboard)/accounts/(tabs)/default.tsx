@@ -31,6 +31,7 @@ import {
   IconCheck,
   IconArrowUpRight,
   IconDotsVertical,
+  IconFileExport,
 } from "@tabler/icons-react";
 
 // import ModalComponent from "@/ui/components/Modal";
@@ -68,6 +69,21 @@ import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { Image } from "@mantine/core";
+import EUIcon from "@/assets/EU-icon.png";
+import GBPIcon from "@/assets/GB.png";
+import USDIcon from "@/assets/USD.png";
+import GHSIcon from "@/assets/GH.png";
+import { exportBusinessAccounts } from "@/lib/hooks/accounts";
+
+type Currency = "EUR" | "GBP" | "USD" | "GHS";
+
+const currencyTabs = [
+  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
+  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
+  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+  { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
+];
 
 export default function BusinessAccounts() {
   const searchParams = useSearchParams();
@@ -78,6 +94,7 @@ export default function BusinessAccounts() {
 
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
+  const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
   const [frequency, setFrequency] = useState<string | null>("Monthly");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -92,6 +109,7 @@ export default function BusinessAccounts() {
     page: activePage,
     limit: parseInt(limit ?? "10", 10),
     search: debouncedSearch,
+    currencyCode: activeCurrency,
   };
 
   const dependencies = [
@@ -104,6 +122,7 @@ export default function BusinessAccounts() {
     accountNumber,
     type,
     debouncedSearch,
+    activeCurrency,
   ];
 
   const {
@@ -214,6 +233,22 @@ export default function BusinessAccounts() {
     validate: zodResolver(FilterSchema),
   });
 
+  const handleCurrencyChange = (currency: Currency) => {
+    setActiveCurrency(currency);
+    setActivePage(1);
+  };
+
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportBusinessAccounts(params);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const fetchAccounts = async (limit: number) => {
     try {
       const { data } = await axios.get(
@@ -280,6 +315,35 @@ export default function BusinessAccounts() {
 
   return (
     <div className={styles.table__container}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+        {currencyTabs.map((t) => {
+          const isActive = activeCurrency === t.currency;
+          return (
+            <button
+              key={t.currency}
+              onClick={() => handleCurrencyChange(t.currency)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "8px 16px",
+                borderRadius: 100,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 14,
+                fontWeight: isActive ? 600 : 500,
+                backgroundColor: isActive ? "#c1dd06" : "#fbfee6",
+                color: isActive ? "#344054" : "#596603",
+                transition: "background-color 0.15s ease, color 0.15s ease",
+              }}
+            >
+              <Image src={t.icon} alt="icon" h={20} w={20} />
+              {t.title}
+            </button>
+          );
+        })}
+      </div>
+
       <AccountInfoCards
         loading={loadingStats}
         frequency={frequency}
@@ -304,9 +368,15 @@ export default function BusinessAccounts() {
           <SecondaryBtn
             text="Export CSV"
             icon={IconArrowUpRight}
-            // style={{ cursor: "not-allowed" }}
             action={handleExportCsv}
             loading={processingCSV}
+            fw={600}
+          />
+          <SecondaryBtn
+            text="Export"
+            icon={IconFileExport}
+            action={handleExport}
+            loading={exporting}
             fw={600}
           />
           <SecondaryBtn

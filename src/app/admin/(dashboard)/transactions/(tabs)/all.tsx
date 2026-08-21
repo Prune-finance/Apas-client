@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { OwnAccountTableHeaders } from "@/lib/static";
+import { AllTransactionTableHeaders } from "@/lib/static";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -162,7 +162,7 @@ export const AllAccountTransactions = ({
         </Filter>
 
         <TableComponent
-          head={OwnAccountTableHeaders}
+          head={AllTransactionTableHeaders}
           rows={<BusinessTransactionTableRows data={transactions} currency={activeCurrency} />}
           loading={loading}
         />

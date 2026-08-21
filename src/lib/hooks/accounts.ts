@@ -919,6 +919,35 @@ export function useUserDefaultPayoutAccountGBP() {
   return { loading, account, revalidate };
 }
 
+interface AccountExportResult {
+  url: string;
+  key: string;
+  filename: string;
+  expiresInSeconds: number;
+}
+
+async function openAccountExportUrl(promise: Promise<{ data: { data: AccountExportResult } }>) {
+  const { data } = await promise;
+  const a = document.createElement("a");
+  a.href = data.data.url;
+  a.download = data.data.filename || "export";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+export function exportBusinessAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/default/export", { params: sanitizedQueryParams(params) }));
+}
+
+export function exportIssuedAdminAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/export", { params: sanitizedQueryParams(params) }));
+}
+
+export function exportPayoutAdminAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/payout/export", { params: sanitizedQueryParams(params) }));
+}
+
 export interface AccountMeta {
   active: number;
   inactive: number;

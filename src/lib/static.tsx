@@ -304,6 +304,16 @@ export const OwnAccountTableHeaders = [
   "Status",
 ];
 
+export const AllTransactionTableHeaders = [
+  "Sender Name",
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Prune Ref",
+  "Date & Time",
+  "Status",
+];
+
 export const IssuedAccountTableHeaders = [
   "Sender Name",
   "Beneficiary",

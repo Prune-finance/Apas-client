@@ -63,7 +63,7 @@ export const AccountsTab = () => {
     currencyCode: activeTab.currency,
   };
 
-  const { transactions, loading, meta } = useOwnerAccountTransactions(queryParams);
+  const { transactions, loading, meta, revalidate } = useOwnerAccountTransactions(queryParams);
 
   usePaginationReset({ queryParams, setActive });
 
@@ -121,6 +121,7 @@ export const AccountsTab = () => {
             setActive={setActive}
             limit={limit}
             setLimit={setLimit}
+            revalidate={revalidate}
           />
         </div>
       </Paper>

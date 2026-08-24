@@ -13,7 +13,7 @@ import { calculateTotalPages } from "@/lib/utils";
 import { Box, Group, LoadingOverlay } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
 import { Dispatch, SetStateAction } from "react";
-import { IconListTree } from "@tabler/icons-react";
+import { IconListTree, IconRefresh } from "@tabler/icons-react";
 
 interface Props {
   transactions: TransactionType[];
@@ -29,6 +29,7 @@ interface Props {
   setActive: Dispatch<SetStateAction<number>>;
   limit: string | null;
   setLimit: Dispatch<SetStateAction<string | null>>;
+  revalidate?: () => void;
 }
 
 export const CurrencyAccount = ({
@@ -45,6 +46,7 @@ export const CurrencyAccount = ({
   setActive,
   limit,
   setLimit,
+  revalidate,
 }: Props) => {
   const infoDetails = [
     {
@@ -84,7 +86,10 @@ export const CurrencyAccount = ({
 
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
+        <Group>
+          <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} fw={600} />
+          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
+        </Group>
       </Group>
 
       <Filter<FilterType>

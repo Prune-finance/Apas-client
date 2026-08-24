@@ -875,7 +875,7 @@ export function useUserAccountTransactionsByCurrency(
 
 export function useOwnerAccountTransactions(customParams: ITrx = {}) {
   const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
-    endpoint: "admin/accounts/businesses/transactions",
+    endpoint: "accounts/company/transactions",
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -885,7 +885,7 @@ export function useOwnerAccountTransactions(customParams: ITrx = {}) {
 
 export function useIssuedAccountTransactions(customParams: ITrx = {}) {
   const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
-    endpoint: "admin/accounts/transactions",
+    endpoint: "accounts/transactions",
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -895,7 +895,7 @@ export function useIssuedAccountTransactions(customParams: ITrx = {}) {
 
 export function usePayoutCurrencyTransactions(customParams: ITrx = {}) {
   const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
-    endpoint: "admin/transactions",
+    endpoint: "payout/transactions",
     baseURL: "payouts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -905,7 +905,7 @@ export function usePayoutCurrencyTransactions(customParams: ITrx = {}) {
 
 export function useAllAccountTransactions(customParams: ITrx = {}) {
   const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
-    endpoint: "admin/accounts/transactions/all",
+    endpoint: "accounts/company/transactions/all",
     baseURL: "accounts",
     params: sanitizedQueryParams(customParams),
     dependencies: [sanitizeURL(customParams)],
@@ -1136,7 +1136,7 @@ async function openExportUrl(promise: Promise<{ data: { data: ExportResult } }>)
 
 export function exportOwnerAccountTransactions(params: IParams) {
   return openExportUrl(
-    axios.get("admin/accounts/businesses/transactions/export", {
+    axios.get("accounts/company/transactions/export", {
       params: sanitizedQueryParams(params),
     })
   );
@@ -1144,7 +1144,7 @@ export function exportOwnerAccountTransactions(params: IParams) {
 
 export function exportIssuedAccountTransactions(params: IParams) {
   return openExportUrl(
-    axios.get("admin/accounts/transactions/export", {
+    axios.get("accounts/transactions/export", {
       params: sanitizedQueryParams(params),
     })
   );
@@ -1152,7 +1152,7 @@ export function exportIssuedAccountTransactions(params: IParams) {
 
 export function exportPayoutTransactions(params: IParams) {
   return openExportUrl(
-    payoutAxiosInstance.get("admin/transactions/export", {
+    payoutAxiosInstance.get("payout/transactions/export", {
       params: sanitizedQueryParams(params),
     })
   );
@@ -1160,7 +1160,7 @@ export function exportPayoutTransactions(params: IParams) {
 
 export function exportAllAccountTransactions(params: IParams) {
   return openExportUrl(
-    axios.get("admin/accounts/transactions/all/export", {
+    axios.get("accounts/company/transactions/all/export", {
       params: sanitizedQueryParams(params),
     })
   );

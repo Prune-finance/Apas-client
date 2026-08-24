@@ -16,7 +16,7 @@ import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { Group, Image } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
-import { IconListTree } from "@tabler/icons-react";
+import { IconListTree, IconRefresh } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useState } from "react";
@@ -65,7 +65,7 @@ export const IssuedAccountsTab = () => {
     currencyCode: activeCurrency,
   };
 
-  const { transactions, loading, meta } = useIssuedAccountTransactions(queryParams);
+  const { transactions, loading, meta, revalidate } = useIssuedAccountTransactions(queryParams);
   usePaginationReset({ queryParams, setActive });
 
   const handleCurrencyChange = (currency: Currency) => {
@@ -115,7 +115,10 @@ export const IssuedAccountsTab = () => {
 
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
+        <Group>
+          <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} fw={600} />
+          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
+        </Group>
       </Group>
 
       <Filter<FilterType>

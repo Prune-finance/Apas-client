@@ -10,13 +10,13 @@ import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
-import { OwnAccountTableHeaders } from "@/lib/static";
+import { AllTransactionTableHeaders } from "@/lib/static";
 import { calculateTotalPages } from "@/lib/utils";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { Group, Image } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
-import { IconListTree } from "@tabler/icons-react";
+import { IconListTree, IconRefresh } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useState } from "react";
@@ -68,7 +68,7 @@ export const AllTransactionsTab = () => {
     currencyCode: activeCurrency,
   };
 
-  const { transactions, loading, meta } = useAllAccountTransactions(queryParams);
+  const { transactions, loading, meta, revalidate } = useAllAccountTransactions(queryParams);
   usePaginationReset({ queryParams, setActive });
 
   const handleCurrencyChange = (currency: Currency) => {
@@ -118,7 +118,10 @@ export const AllTransactionsTab = () => {
 
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
+        <Group>
+          <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} fw={600} />
+          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
+        </Group>
       </Group>
 
       <Filter<FilterType>
@@ -140,9 +143,9 @@ export const AllTransactionsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={<BusinessTransactionTableRows data={transactions} business isUser />}
+        rows={<BusinessTransactionTableRows data={transactions} isUser />}
         loading={loading}
-        head={OwnAccountTableHeaders}
+        head={AllTransactionTableHeaders}
       />
 
       <EmptyTable

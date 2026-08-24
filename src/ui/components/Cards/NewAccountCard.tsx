@@ -171,6 +171,7 @@ function NewAccountCard({
   };
 
   return (
+    <Link href={link || "#"} style={{ display: "block", height: "100%", textDecoration: "none" }}>
     <BackgroundImage
       key={key}
       src={config.background}
@@ -179,6 +180,7 @@ function NewAccountCard({
         borderRadius: 6,
         overflow: "hidden",
         border: "1px solid #EAECF0",
+        cursor: link ? "pointer" : "default",
       }}
       w="100%"
     >
@@ -210,7 +212,7 @@ function NewAccountCard({
                 justify="end"
                 c="var(--prune-text-gray-900)"
               >
-                {link && (
+                {/* {link && (
                   <Link href={link}>
                     <Box bg="#596603" px={8} p={2} style={{ borderRadius: 12 }}>
                       <Text fz={10} fw={500} c="#fff">
@@ -218,7 +220,7 @@ function NewAccountCard({
                       </Text>
                     </Box>
                   </Link>
-                )}
+                )} */}
               </Group>
             </Group>
           ) : (
@@ -240,7 +242,7 @@ function NewAccountCard({
                     color="#596603"
                     size="xs"
                     p={2}
-                    onClick={() => handleReload()}
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleReload(); }}
                     style={{
                       cursor: processing ? "not-allowed" : "pointer",
                       pointerEvents: processing ? "none" : "auto",
@@ -398,6 +400,7 @@ function NewAccountCard({
         </Flex>
       </Stack>
     </BackgroundImage>
+    </Link>
   );
 }
 

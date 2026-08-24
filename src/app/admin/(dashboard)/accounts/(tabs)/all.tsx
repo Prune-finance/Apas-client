@@ -344,7 +344,6 @@ const tableHeaders = [
   "Account Balance",
   "Date Created",
   "Account Type",
-  "Total No. of Issued Acc",
   "Status",
   "Action",
 ];
@@ -391,7 +390,7 @@ const RowComponent = ({
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>
-      <TableTd>{element.Company?.issuedAccountCount}</TableTd>
+      {/* <TableTd>{element.Company?.issuedAccountCount}</TableTd> */}
       <TableTd>
         <BadgeComponent status={element.status} active />
       </TableTd>

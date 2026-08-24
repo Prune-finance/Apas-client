@@ -342,12 +342,17 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
 
     const memorizedData = useMemo(() => {
       if (!banks || !Array.isArray(banks)) return [];
+      const seen = new Set<string>();
       return banks
         .filter((item) => transferCurrency === item?.payoutType)
-        .map((item) => ({
-          label: item?.bankName || "",
-          value: item?.bankName || "",
-        }));
+        .reduce<{ label: string; value: string }[]>((acc, item) => {
+          const name = item?.bankName || "";
+          if (name && !seen.has(name)) {
+            seen.add(name);
+            acc.push({ label: name, value: name });
+          }
+          return acc;
+        }, []);
     }, [banks, transferCurrency]);
 
     useEffect(() => {
@@ -1114,7 +1119,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           Country <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
-                      data={countries.map((c) => c?.name)}
+                      data={[...new Set(countries.map((c) => c?.name).filter(Boolean))]}
                       disabled={disableCountry}
                       {...form.getInputProps("destinationCountry")}
                     />
@@ -1342,7 +1347,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                                 Country <span style={{ color: "red" }}>*</span>
                               </Text>
                             }
-                            data={countries.map((c) => c?.name)}
+                            data={[...new Set(countries.map((c) => c?.name).filter(Boolean))]}
                             disabled={disableCountry}
                             {...form.getInputProps("destinationCountry")}
                           />

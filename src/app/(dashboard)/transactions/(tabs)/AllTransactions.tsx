@@ -1,6 +1,6 @@
 "use client";
 
-import { useAllAccountTransactions } from "@/lib/hooks/transactions";
+import { useUserAllTransactions } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -68,7 +68,7 @@ export const AllTransactionsTab = () => {
     currencyCode: activeCurrency,
   };
 
-  const { transactions, loading, meta, revalidate } = useAllAccountTransactions(queryParams);
+  const { transactions, loading, meta, revalidate } = useUserAllTransactions(queryParams);
   usePaginationReset({ queryParams, setActive });
 
   const handleCurrencyChange = (currency: Currency) => {

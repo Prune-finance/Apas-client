@@ -8,7 +8,7 @@ import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { useOwnerAccountTransactions } from "@/lib/hooks/transactions";
+import { useUserBusinessTransactions } from "@/lib/hooks/transactions";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { CurrencyAccount } from "../CurrencyAccount";
 import EUIcon from "@/assets/EU-icon.png";
@@ -63,7 +63,7 @@ export const AccountsTab = () => {
     currencyCode: activeTab.currency,
   };
 
-  const { transactions, loading, meta, revalidate } = useOwnerAccountTransactions(queryParams);
+  const { transactions, loading, meta, revalidate } = useUserBusinessTransactions(queryParams);
 
   usePaginationReset({ queryParams, setActive });
 

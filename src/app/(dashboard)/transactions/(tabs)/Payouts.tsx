@@ -1,6 +1,6 @@
 "use client";
 
-import { usePayoutCurrencyTransactions } from "@/lib/hooks/transactions";
+import { useUserPayoutTransactions } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -68,7 +68,7 @@ export const PayoutsTab = () => {
     currencyCode: activeCurrency,
   };
 
-  const { transactions, loading, meta, revalidate } = usePayoutCurrencyTransactions(queryParams);
+  const { transactions, loading, meta, revalidate } = useUserPayoutTransactions(queryParams);
   usePaginationReset({ queryParams, setActive });
 
   const handleCurrencyChange = (currency: Currency) => {

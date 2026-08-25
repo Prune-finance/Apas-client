@@ -123,7 +123,7 @@ export const SecondaryBtn = ({
   const Icon = icon;
   return link ? (
     <Button
-      color="var(--prune-text-gray-200)"
+      color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
       variant="outline"
       fz={12}
@@ -140,7 +140,7 @@ export const SecondaryBtn = ({
     </Button>
   ) : (
     <Button
-      color="var(--prune-text-gray-200)"
+      color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
       variant="outline"
       fz={12}

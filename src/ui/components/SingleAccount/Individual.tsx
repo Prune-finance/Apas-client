@@ -1119,7 +1119,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                           Country <span style={{ color: "red" }}>*</span>
                         </Text>
                       }
-                      data={[...new Set(countries.map((c) => c?.name).filter(Boolean))]}
+                      data={Array.from(new Set(countries.map((c) => c?.name).filter(Boolean) as string[]))}
                       disabled={disableCountry}
                       {...form.getInputProps("destinationCountry")}
                     />
@@ -1347,7 +1347,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                                 Country <span style={{ color: "red" }}>*</span>
                               </Text>
                             }
-                            data={[...new Set(countries.map((c) => c?.name).filter(Boolean))]}
+                            data={Array.from(new Set(countries.map((c) => c?.name).filter(Boolean) as string[]))}
                             disabled={disableCountry}
                             {...form.getInputProps("destinationCountry")}
                           />

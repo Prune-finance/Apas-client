@@ -8,7 +8,7 @@ import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { useUserBusinessTransactions } from "@/lib/hooks/transactions";
+import { useUserBusinessTransactions, exportUserBusinessTransactions } from "@/lib/hooks/transactions";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { CurrencyAccount } from "../CurrencyAccount";
 import EUIcon from "@/assets/EU-icon.png";
@@ -64,8 +64,17 @@ export const AccountsTab = () => {
   };
 
   const { transactions, loading, meta, revalidate } = useUserBusinessTransactions(queryParams);
-
   usePaginationReset({ queryParams, setActive });
+
+  const [exporting, setExporting] = useState(false);
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportUserBusinessTransactions({ ...queryParams, currencyCode: activeTab.currency });
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParam.toString());
@@ -122,6 +131,8 @@ export const AccountsTab = () => {
             limit={limit}
             setLimit={setLimit}
             revalidate={revalidate}
+            onExport={handleExport}
+            exporting={exporting}
           />
         </div>
       </Paper>

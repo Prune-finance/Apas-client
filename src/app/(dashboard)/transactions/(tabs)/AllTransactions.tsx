@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserAllTransactions } from "@/lib/hooks/transactions";
+import { useUserAllTransactions, exportUserAllTransactions } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -16,7 +16,7 @@ import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { Group, Image } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
-import { IconListTree, IconRefresh } from "@tabler/icons-react";
+import { IconListTree, IconRefresh, IconFileExport } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useState } from "react";
@@ -71,6 +71,16 @@ export const AllTransactionsTab = () => {
   const { transactions, loading, meta, revalidate } = useUserAllTransactions(queryParams);
   usePaginationReset({ queryParams, setActive });
 
+  const [exporting, setExporting] = useState(false);
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportUserAllTransactions({ ...queryParams, currencyCode: activeCurrency });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const handleCurrencyChange = (currency: Currency) => {
     setActiveCurrency(currency);
     setActive(1);
@@ -120,6 +130,7 @@ export const AllTransactionsTab = () => {
         <SearchInput search={search} setSearch={setSearch} />
         <Group>
           <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} fw={600} />
+          <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} fw={600} />
           <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
         </Group>
       </Group>

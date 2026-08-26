@@ -10,6 +10,7 @@ import {
   Box,
   Flex,
   Group,
+  Image,
   Modal,
   Paper,
   SimpleGrid,
@@ -64,6 +65,9 @@ import PendingModalImage from "@/assets/add-account-success.png";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import useAddAccountCurrencyStore from "@/lib/store/add-account";
+import EUIcon from "@/assets/EU-icon.png";
+import GBPIcon from "@/assets/GB.png";
+import USDIcon from "@/assets/USD.png";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -171,6 +175,8 @@ function Accounts() {
   const [processing, setProcessing] = useState(false);
 
   const { addAccountCurrency } = useAddAccountCurrencyStore();
+
+  const [activeIssuedCurrency, setActiveIssuedCurrency] = useState<"EUR" | "GBP" | "USD">("EUR");
 
   const isInitiator = useHasPermission("INITIATOR");
   const canSendMoney =
@@ -636,16 +642,38 @@ function Accounts() {
               style={{ position: "relative" }}
             >
               <TabsPanel value={issuedAccountTabs[0].value}>
-                <TabsComponent
-                  tabs={issuedAccountSubTabs}
-                  mt={30}
-                  tt="capitalize"
-                  fz={12}
-                  style={{ position: "relative" }}
-                >
+                <>
+                  <div style={{ display: "flex", gap: 8, marginTop: 30, marginBottom: 4 }}>
+                    {issuedCurrencyPills.map((t) => {
+                      const isActive = activeIssuedCurrency === t.currency;
+                      return (
+                        <button
+                          key={t.currency}
+                          onClick={() => setActiveIssuedCurrency(t.currency)}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            padding: "8px 16px",
+                            borderRadius: 100,
+                            border: "none",
+                            cursor: "pointer",
+                            fontSize: 14,
+                            fontWeight: isActive ? 600 : 500,
+                            backgroundColor: isActive ? "#c1dd06" : "#fbfee6",
+                            color: isActive ? "#344054" : "#596603",
+                            transition: "background-color 0.15s ease, color 0.15s ease",
+                          }}
+                        >
+                          <Image src={t.icon} alt={t.currency} h={20} w={20} />
+                          {t.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+
                   <Group justify="space-between" mt={30}>
                     <SearchInput search={search} setSearch={setSearch} />
-
                     <SecondaryBtn
                       text="Filter"
                       action={toggle}
@@ -663,12 +691,10 @@ function Accounts() {
                       placeholder="Account Name"
                       {...form.getInputProps("accountName")}
                     />
-
                     <TextBox
                       placeholder="Account Number"
                       {...form.getInputProps("accountNumber")}
                     />
-
                     <SelectBox
                       placeholder="Type"
                       {...form.getInputProps("type")}
@@ -677,82 +703,30 @@ function Accounts() {
                     />
                   </Filter>
 
-                  <TabsPanel value={issuedAccountSubTabs[0].value}>
-                    <TableComponent
-                      head={tableHeaders}
-                      rows={rows}
-                      loading={loading}
-                    />
+                  {activeIssuedCurrency === "EUR" && (
+                    <>
+                      <TableComponent head={tableHeaders} rows={rows} loading={loading} />
+                      <EmptyTable rows={rows} loading={loading} title="There are no accounts" text="When an account is created, it will appear here" />
+                      <PaginationComponent total={Math.ceil((meta?.total ?? 0) / parseInt(limit ?? "10", 10))} active={active} setActive={setActive} limit={limit} setLimit={setLimit} />
+                    </>
+                  )}
 
-                    <EmptyTable
-                      rows={rows}
-                      loading={loading}
-                      title="There are no accounts"
-                      text="When an account is created, it will appear here"
-                    />
+                  {activeIssuedCurrency === "GBP" && (
+                    <>
+                      <TableComponent head={tableHeaders} rows={gbpRows} loading={loadingGbpAccounts} />
+                      <EmptyTable rows={gbpRows} loading={loadingGbpAccounts} title="There are no accounts" text="When an account is created, it will appear here" />
+                      <PaginationComponent total={Math.ceil((metaGbpAccounts?.total ?? 0) / parseInt(limit ?? "10", 10))} active={active} setActive={setActive} limit={limit} setLimit={setLimit} />
+                    </>
+                  )}
 
-                    <PaginationComponent
-                      total={Math.ceil(
-                        (meta?.total ?? 0) / parseInt(limit ?? "10", 10)
-                      )}
-                      active={active}
-                      setActive={setActive}
-                      limit={limit}
-                      setLimit={setLimit}
-                    />
-                  </TabsPanel>
-                  <TabsPanel value={issuedAccountSubTabs[1].value}>
-                    <TableComponent
-                      head={tableHeaders}
-                      rows={gbpRows}
-                      loading={loadingGbpAccounts}
-                    />
-
-                    <EmptyTable
-                      rows={gbpRows}
-                      loading={loadingGbpAccounts}
-                      title="There are no accounts"
-                      text="When an account is created, it will appear here"
-                    />
-
-                    <PaginationComponent
-                      total={Math.ceil(
-                        (metaGbpAccounts?.total ?? 0) /
-                          parseInt(limit ?? "10", 10)
-                      )}
-                      active={active}
-                      setActive={setActive}
-                      limit={limit}
-                      setLimit={setLimit}
-                    />
-                  </TabsPanel>
-
-                  <TabsPanel value={issuedAccountSubTabs[2].value}>
-                    <TableComponent
-                      head={tableHeaders}
-                      rows={usdRows}
-                      loading={loadingUsdAccounts}
-                    />
-
-                    <EmptyTable
-                      rows={usdRows}
-                      loading={loadingUsdAccounts}
-                      title="There are no accounts"
-                      text="When an account is created, it will appear here"
-                    />
-
-                    <PaginationComponent
-                      total={Math.ceil(
-                        (metaUsdAccounts?.total ?? 0) /
-                          parseInt(limit ?? "10", 10)
-                      )}
-                      active={active}
-                      setActive={setActive}
-                      limit={limit}
-                      setLimit={setLimit}
-                    />
-                  </TabsPanel>
-                </TabsComponent>
+                  {activeIssuedCurrency === "USD" && (
+                    <>
+                      <TableComponent head={tableHeaders} rows={usdRows} loading={loadingUsdAccounts} />
+                      <EmptyTable rows={usdRows} loading={loadingUsdAccounts} title="There are no accounts" text="When an account is created, it will appear here" />
+                      <PaginationComponent total={Math.ceil((metaUsdAccounts?.total ?? 0) / parseInt(limit ?? "10", 10))} active={active} setActive={setActive} limit={limit} setLimit={setLimit} />
+                    </>
+                  )}
+                </>
               </TabsPanel>
 
               <TabsPanel value={issuedAccountTabs[1].value}>
@@ -909,8 +883,8 @@ const issuedAccountTabs = [
   { value: "Pending Accounts", icon: <IconUsers size={14} /> },
 ];
 
-const issuedAccountSubTabs = [
-  { value: "eur-account", title: "🇪🇺 EUR Accounts" },
-  { value: "gbp-accounts", title: "🇬🇧 GBP Accounts" },
-  { value: "usd-accounts", title: "🇺🇸 USD Accounts" },
+const issuedCurrencyPills = [
+  { currency: "EUR" as const, title: "EUR", icon: EUIcon.src },
+  { currency: "GBP" as const, title: "GBP", icon: GBPIcon.src },
+  { currency: "USD" as const, title: "USD", icon: USDIcon.src },
 ];

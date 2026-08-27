@@ -134,6 +134,10 @@ export function useSingleCompanyTransactions(
   const [loading, setLoading] = useState(true);
 
   async function fetchTrx() {
+    if (!trxId) {
+      setLoading(false);
+      return;
+    }
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
@@ -991,6 +995,7 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
   }, [customParams]);
 
   async function fetchTrx() {
+    if (!iban) return;
     setLoading(true);
     const params = new URLSearchParams(obj as Record<string, string>);
 
@@ -1014,11 +1019,9 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
   useEffect(() => {
     fetchTrx();
 
-    return () => {
-      // Any cleanup code can go here
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [iban]);
 
   return { loading, transactions, meta, revalidate };
 }
@@ -1041,6 +1044,7 @@ export function useUserTransactionsByIBAN(
   }, [customParams]);
 
   async function fetchTrx() {
+    if (!iban) return;
     setLoading(true);
     const params = new URLSearchParams(obj as Record<string, string>);
 
@@ -1064,11 +1068,9 @@ export function useUserTransactionsByIBAN(
   useEffect(() => {
     fetchTrx();
 
-    return () => {
-      // Any cleanup code can go here
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [iban]);
 
   return { loading, transactions, meta, revalidate };
 }

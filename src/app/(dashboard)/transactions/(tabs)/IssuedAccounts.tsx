@@ -159,7 +159,7 @@ export const IssuedAccountsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={<IssuedTransactionTableRows data={transactions} isUser />}
+        rows={<IssuedTransactionTableRows data={transactions} isUser currency={activeCurrency} />}
         loading={loading}
         head={IssuedAccountTableHeaders}
       />

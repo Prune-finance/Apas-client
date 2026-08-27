@@ -406,6 +406,7 @@ export function useSingleAccountByIBAN(iban: string, currencyCode?: string) {
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
+    if (!iban) return;
     setLoading(true);
 
     try {
@@ -428,9 +429,7 @@ export function useSingleAccountByIBAN(iban: string, currencyCode?: string) {
   useEffect(() => {
     fetchAccount();
 
-    return () => {
-      // Any cleanup code can go here
-    };
+    return () => {};
   }, [iban, currencyCode]);
 
   return { loading, account, revalidate };
@@ -441,6 +440,7 @@ export function useSingleUserAccountByIBAN(iban: string, currencyCode?: string) 
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
+    if (!iban) return;
     setLoading(true);
     try {
       const { data } = await axios.get(`/accounts/number/${iban}`, {
@@ -462,9 +462,7 @@ export function useSingleUserAccountByIBAN(iban: string, currencyCode?: string) 
   useEffect(() => {
     fetchAccount();
 
-    return () => {
-      // Any cleanup code can go here
-    };
+    return () => {};
   }, [iban, currencyCode]);
 
   return { loading, account, revalidate };

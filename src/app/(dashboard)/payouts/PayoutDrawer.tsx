@@ -2,7 +2,6 @@
 
 import {
   TransactionType,
-  useSingleCompanyTransactions,
   useSingleTransactions,
 } from "@/lib/hooks/transactions";
 import { formatNumber } from "@/lib/utils";
@@ -84,11 +83,6 @@ export const PayoutTransactionDrawer = ({
     data?.id ?? ""
   );
 
-  const {
-    transaction: defaultTransaction,
-    loading: loadingDefaultTransaction,
-  } = useSingleCompanyTransactions(data?.id ?? "");
-
   const { account: senderAccount, loading: loadingSenderAcct } =
     useSingleUserAccountByIBAN(data?.senderIban ?? "");
 
@@ -98,8 +92,7 @@ export const PayoutTransactionDrawer = ({
   });
 
   const businessDetails = {
-    "Business Name":
-      transaction?.company?.name ?? defaultTransaction?.company?.name ?? "N/A",
+    "Business Name": transaction?.company?.name ?? "N/A",
     "Account Type": "Payout Account",
     IBAN: data?.recipientIban,
     BIC: "ARPYGB21XXX",

@@ -401,7 +401,7 @@ export function useSingleUserAccount(id: string, currency: string = "EUR") {
   return { loading, account, meta, revalidate };
 }
 
-export function useSingleAccountByIBAN(iban: string) {
+export function useSingleAccountByIBAN(iban: string, currencyCode?: string) {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -409,7 +409,9 @@ export function useSingleAccountByIBAN(iban: string) {
     setLoading(true);
 
     try {
-      const { data } = await axios.get(`/admin/accounts/number/${iban}`);
+      const { data } = await axios.get(`/admin/accounts/number/${iban}`, {
+        params: currencyCode ? { currencyCode } : undefined,
+      });
 
       setAccount(data.data);
     } catch (error) {
@@ -429,19 +431,21 @@ export function useSingleAccountByIBAN(iban: string) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [iban]);
+  }, [iban, currencyCode]);
 
   return { loading, account, revalidate };
 }
 
-export function useSingleUserAccountByIBAN(iban: string) {
+export function useSingleUserAccountByIBAN(iban: string, currencyCode?: string) {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/number/${iban}`);
+      const { data } = await axios.get(`/accounts/number/${iban}`, {
+        params: currencyCode ? { currencyCode } : undefined,
+      });
 
       setAccount(data.data);
     } catch (error) {
@@ -461,7 +465,7 @@ export function useSingleUserAccountByIBAN(iban: string) {
     return () => {
       // Any cleanup code can go here
     };
-  }, [iban]);
+  }, [iban, currencyCode]);
 
   return { loading, account, revalidate };
 }

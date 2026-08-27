@@ -986,6 +986,7 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
     };
   }, [customParams]);
 
@@ -1035,6 +1036,7 @@ export function useUserTransactionsByIBAN(
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
     };
   }, [customParams]);
 

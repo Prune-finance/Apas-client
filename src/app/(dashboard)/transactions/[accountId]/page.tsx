@@ -34,7 +34,7 @@ dayjs.extend(advancedFormat);
 import { useState } from "react";
 import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
@@ -42,14 +42,16 @@ import { AmountGroup } from "@/ui/components/AmountGroup";
 
 export default function AccountTransactions() {
   const { accountId } = useParams<{ accountId: string }>();
+  const searchParams = useSearchParams();
+  const currencyCode = searchParams.get("currencyCode") ?? "EUR";
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { transactions, loading, meta } = useUserTransactionsByIBAN(accountId);
+  const { transactions, loading, meta } = useUserTransactionsByIBAN(accountId, { currencyCode });
 
   const { account, loading: loadingAcct } =
-    useSingleUserAccountByIBAN(accountId);
+    useSingleUserAccountByIBAN(accountId, currencyCode);
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
@@ -69,21 +71,21 @@ export default function AccountTransactions() {
       title: "Total Balance",
       value: account?.accountBalance || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loadingAcct,
     },
     {
       title: "Money In",
       value: 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {
       title: "Money Out",
       value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {

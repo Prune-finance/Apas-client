@@ -296,6 +296,7 @@ export const countries = [
 ];
 
 export const OwnAccountTableHeaders = [
+  "Sender Name",
   "Beneficiary",
   "Type",
   "Amount",

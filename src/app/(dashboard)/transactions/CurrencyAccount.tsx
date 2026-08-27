@@ -121,7 +121,7 @@ export const CurrencyAccount = ({
       </Filter>
 
       <TableComponent
-        rows={<BusinessTransactionTableRows data={transactions} business isUser />}
+        rows={<BusinessTransactionTableRows data={transactions} isUser currency={currency} />}
         loading={loading}
         head={OwnAccountTableHeaders}
       />

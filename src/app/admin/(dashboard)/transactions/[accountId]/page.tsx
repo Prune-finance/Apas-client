@@ -26,7 +26,7 @@ dayjs.extend(advancedFormat);
 import { useState } from "react";
 import styles from "../styles.module.scss";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useSingleAccountByIBAN } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
@@ -37,13 +37,15 @@ import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 
 export default function AccountTransactions() {
   const { accountId } = useParams<{ accountId: string }>();
+  const searchParams = useSearchParams();
+  const currencyCode = searchParams.get("currencyCode") ?? "EUR";
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { transactions, loading, meta } = useTransactionsByIBAN(accountId);
+  const { transactions, loading, meta } = useTransactionsByIBAN(accountId, { currencyCode });
 
-  const { account, loading: loadingAcct } = useSingleAccountByIBAN(accountId);
+  const { account, loading: loadingAcct } = useSingleAccountByIBAN(accountId, currencyCode);
 
   const { business } = useSingleBusiness(account?.companyId ?? "");
 
@@ -65,7 +67,7 @@ export default function AccountTransactions() {
       title: "Total Balance",
       value: account?.accountBalance || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loadingAcct,
     },
     {
@@ -75,7 +77,7 @@ export default function AccountTransactions() {
           .filter((trx) => trx.type === "CREDIT")
           .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {
@@ -85,7 +87,7 @@ export default function AccountTransactions() {
           .filter((trx) => trx.type === "DEBIT")
           .reduce((prv, curr) => prv + curr.amount, 0) || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {

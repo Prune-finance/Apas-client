@@ -19,7 +19,7 @@ export default function ErrorFallback({
   return (
     <Container fluid>
       <Flex align="center" justify="flex-start" mt={25} mx={30}>
-        <Image width={111} height={30} src={PruneIcon.src} alt="prune icon" unoptimized />
+        <Image width={111} height={30} src={PruneIcon.src} alt="prune icon" />
       </Flex>
 
       <Flex

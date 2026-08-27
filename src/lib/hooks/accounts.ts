@@ -602,6 +602,19 @@ export function useUserCurrencyAccount() {
   return { loading, currencyAccount, revalidate };
 }
 
+export function useAvailableCurrencies() {
+  const { currencyAccount, loading } = useUserCurrencyAccount();
+
+  const currencies = useMemo(() => {
+    const extra = (currencyAccount ?? [])
+      .map((a) => a.currency ?? a.AccountRequests?.Currency?.symbol)
+      .filter((c): c is string => Boolean(c));
+    return ["EUR", ...Array.from(new Set(extra))];
+  }, [currencyAccount]);
+
+  return { currencies, loading };
+}
+
 export function useBeneficiaryAccount(
   customParams: IParams = {},
   currency: string

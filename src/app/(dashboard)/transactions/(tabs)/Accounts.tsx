@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { useUserBusinessTransactions, exportUserBusinessTransactions } from "@/lib/hooks/transactions";
+import { useAvailableCurrencies } from "@/lib/hooks/accounts";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { CurrencyAccount } from "../CurrencyAccount";
 import EUIcon from "@/assets/EU-icon.png";
@@ -18,18 +19,17 @@ import GHSIcon from "@/assets/GH.png";
 
 dayjs.extend(advancedFormat);
 
-type Currency = "EUR" | "GBP" | "USD" | "GHS";
-
-const currencyTabs = [
-  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
-  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
-  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
-  { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
-];
+const currencyIconMap: Record<string, string> = {
+  EUR: EUIcon.src,
+  GBP: GBPIcon.src,
+  USD: USDIcon.src,
+  GHS: GHSIcon.src,
+};
 
 export const AccountsTab = () => {
   const searchParams = useSearchParams();
-  const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
+  const { currencies } = useAvailableCurrencies();
+  const [activeCurrency, setActiveCurrency] = useState("EUR");
 
   const [opened, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
@@ -71,10 +71,16 @@ export const AccountsTab = () => {
     }
   };
 
-  const handleCurrencyChange = (currency: Currency) => {
+  const handleCurrencyChange = (currency: string) => {
     setActiveCurrency(currency);
     setActive(1);
   };
+
+  const currencyTabs = currencies.map((c) => ({
+    currency: c,
+    title: c,
+    icon: currencyIconMap[c] ?? EUIcon.src,
+  }));
 
   return (
     <main>

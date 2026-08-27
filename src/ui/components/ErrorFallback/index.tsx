@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { FallbackProps } from "react-error-boundary";
 import { useMediaQuery } from "@mantine/hooks";
-import PruneIcon from "@/assets/logo.png";
+import PruneIcon from "@/assets/logo-with-text.svg";
 
 export default function ErrorFallback({
   error,
@@ -19,7 +19,7 @@ export default function ErrorFallback({
   return (
     <Container fluid>
       <Flex align="center" justify="flex-start" mt={25} mx={30}>
-        <Image width={100} height={29} src={PruneIcon} alt="prune icon" />
+        <Image width={111} height={30} src={PruneIcon.src} alt="prune icon" unoptimized />
       </Flex>
 
       <Flex

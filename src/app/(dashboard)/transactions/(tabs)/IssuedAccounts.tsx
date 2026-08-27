@@ -1,6 +1,7 @@
 "use client";
 
 import { useUserIssuedAccountTransactions, exportUserIssuedAccountTransactions } from "@/lib/hooks/transactions";
+import { useAvailableCurrencies } from "@/lib/hooks/accounts";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -24,19 +25,20 @@ import { useSearchParams } from "next/navigation";
 import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import USDIcon from "@/assets/USD.png";
+import GHSIcon from "@/assets/GH.png";
 dayjs.extend(advancedFormat);
 
-type Currency = "EUR" | "GBP" | "USD";
-
-const currencyTabs = [
-  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
-  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
-  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
-];
+const currencyIconMap: Record<string, string> = {
+  EUR: EUIcon.src,
+  GBP: GBPIcon.src,
+  USD: USDIcon.src,
+  GHS: GHSIcon.src,
+};
 
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
-  const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
+  const { currencies } = useAvailableCurrencies();
+  const [activeCurrency, setActiveCurrency] = useState("EUR");
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
@@ -78,10 +80,16 @@ export const IssuedAccountsTab = () => {
     }
   };
 
-  const handleCurrencyChange = (currency: Currency) => {
+  const handleCurrencyChange = (currency: string) => {
     setActiveCurrency(currency);
     setActive(1);
   };
+
+  const currencyTabs = currencies.map((c) => ({
+    currency: c,
+    title: c,
+    icon: currencyIconMap[c] ?? EUIcon.src,
+  }));
 
   const infoDetails = [
     { title: "Total Balance", value: meta?.totalAmount || 0, formatted: true, currency: activeCurrency },

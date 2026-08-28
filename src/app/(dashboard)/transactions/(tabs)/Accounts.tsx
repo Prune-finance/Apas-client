@@ -46,8 +46,8 @@ export const AccountsTab = () => {
   });
 
   const queryParams = {
-    date: date ? dayjs(date).format("YYYY-MM-DD") : undefined,
-    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : undefined,
+    date: date || undefined,
+    endDate: endDate || undefined,
     status: status?.toUpperCase(),
     recipientIban,
     recipientName,

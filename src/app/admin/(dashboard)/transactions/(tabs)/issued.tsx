@@ -16,7 +16,6 @@ import { useState } from "react";
 import { useIssuedAccountTransactions, exportIssuedAccountTransactions } from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
-import dayjs from "dayjs";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { calculateTotalPages } from "@/lib/utils";
@@ -48,10 +47,17 @@ export const IssuedAccountTransactions = ({
   const [opened, { toggle }] = useDisclosure(false);
   const [appliedFilters, setAppliedFilters] = useState<FilterType>(FilterValues);
 
+  const toLocalDateStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
   const { param } = useParam({
     status: appliedFilters.status ?? undefined,
-    date: appliedFilters.createdAt?.[0] ? dayjs(appliedFilters.createdAt[0]).format("YYYY-MM-DD") : undefined,
-    endDate: appliedFilters.createdAt?.[1] ? dayjs(appliedFilters.createdAt[1]).format("YYYY-MM-DD") : undefined,
+    date: appliedFilters.createdAt?.[0] ? toLocalDateStr(appliedFilters.createdAt[0]) : undefined,
+    endDate: appliedFilters.createdAt?.[1] ? toLocalDateStr(appliedFilters.createdAt[1]) : undefined,
     type: appliedFilters.type ?? undefined,
     senderName: appliedFilters.senderName ?? undefined,
     recipientName: appliedFilters.recipientName ?? undefined,

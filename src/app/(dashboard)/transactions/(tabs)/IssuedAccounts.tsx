@@ -85,11 +85,13 @@ export const IssuedAccountsTab = () => {
     setActive(1);
   };
 
-  const currencyTabs = currencies.map((c) => ({
-    currency: c,
-    title: c,
-    icon: currencyIconMap[c] ?? EUIcon.src,
-  }));
+  const currencyTabs = currencies
+    .filter((c) => c !== "GHS")
+    .map((c) => ({
+      currency: c,
+      title: c,
+      icon: currencyIconMap[c] ?? EUIcon.src,
+    }));
 
   const infoDetails = [
     { title: "Total Balance", value: meta?.totalAmount || 0, formatted: true, currency: activeCurrency },

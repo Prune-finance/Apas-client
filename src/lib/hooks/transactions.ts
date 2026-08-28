@@ -988,11 +988,13 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
+      ...(customParams.search && { search: customParams.search }),
     };
-  }, [customParams]);
+  }, [customParams.limit, customParams.page, customParams.date, customParams.status, customParams.currencyCode, customParams.search]);
 
   async function fetchTrx() {
     if (!iban) return;
@@ -1021,7 +1023,7 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
 
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [iban]);
+  }, [iban, obj]);
 
   return { loading, transactions, meta, revalidate };
 }
@@ -1030,18 +1032,20 @@ export function useUserTransactionsByIBAN(
   iban: string,
   customParams: ITrx = {}
 ) {
-  const [transactions, setTransactions] = useState<TrxData[]>([]);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
+      ...(customParams.search && { search: customParams.search }),
     };
-  }, [customParams]);
+  }, [customParams.limit, customParams.page, customParams.date, customParams.status, customParams.currencyCode, customParams.search]);
 
   async function fetchTrx() {
     if (!iban) return;
@@ -1070,7 +1074,7 @@ export function useUserTransactionsByIBAN(
 
     return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [iban]);
+  }, [iban, obj]);
 
   return { loading, transactions, meta, revalidate };
 }

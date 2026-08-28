@@ -19,6 +19,8 @@ type Props<T> = {
   frozenStatus?: boolean;
   customStatusOption?: string[];
   noDate?: boolean;
+  onApply?: (values: T) => void;
+  onClear?: () => void;
 };
 
 export default function Filter<T>({
@@ -31,6 +33,8 @@ export default function Filter<T>({
   frozenStatus,
   customStatusOption,
   noDate,
+  onApply,
+  onClear,
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
@@ -39,6 +43,11 @@ export default function Filter<T>({
   const handleApply = async () => {
     setProcessing(true);
     try {
+      if (onApply) {
+        onApply(form.values as T);
+        return;
+      }
+
       const filteredValues = Object.fromEntries(
         Object.entries(form.values as Record<string, unknown>)
           .filter(([key, value]) => value)
@@ -87,12 +96,12 @@ export default function Filter<T>({
       // Get current URL and its search params
       const currentUrl = new URL(window.location.href);
       const currentSearchParams = new URLSearchParams(currentUrl.search);
-      
+
       // Add new filter values to the existing search params
       Object.entries(filteredValues).forEach(([key, value]) => {
         currentSearchParams.set(key, value);
       });
-      
+
       // Create new URL with the combined parameters
       const newUrl = `${pathname}?${currentSearchParams.toString()}`;
 
@@ -174,10 +183,14 @@ export default function Filter<T>({
             color="var(--prune-text-gray-700)"
             onClick={() => {
               form.reset();
+              if (onClear) {
+                onClear();
+                return;
+              }
               // Get current URL to check for currency parameter
               const currentUrl = new URL(window.location.href);
               const currencyParam = currentUrl.searchParams.get('currency');
-              
+
               // If currency parameter exists, preserve it when clearing
               if (currencyParam) {
                 window.history.pushState({}, "", `${pathname}?currency=${currencyParam}`);

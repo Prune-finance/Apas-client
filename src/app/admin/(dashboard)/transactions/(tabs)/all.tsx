@@ -18,7 +18,6 @@ import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
 import dayjs from "dayjs";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { calculateTotalPages } from "@/lib/utils";
 import EUIcon from "@/assets/EU-icon.png";
@@ -50,19 +49,16 @@ export const AllAccountTransactions = ({
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const [opened, { toggle }] = useDisclosure(false);
-  const searchParams = useSearchParams();
-
-  const { status, type, senderName, date, endDate, recipientName, recipientIban } =
-    Object.fromEntries(searchParams.entries());
+  const [appliedFilters, setAppliedFilters] = useState<FilterType>(FilterValues);
 
   const { param } = useParam({
-    status,
-    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
-    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
-    type,
-    senderName,
-    recipientName,
-    recipientIban,
+    status: appliedFilters.status ?? undefined,
+    date: appliedFilters.createdAt?.[0] ? dayjs(appliedFilters.createdAt[0]).format("YYYY-MM-DD") : undefined,
+    endDate: appliedFilters.createdAt?.[1] ? dayjs(appliedFilters.createdAt[1]).format("YYYY-MM-DD") : undefined,
+    type: appliedFilters.type ?? undefined,
+    senderName: appliedFilters.senderName ?? undefined,
+    recipientName: appliedFilters.recipientName ?? undefined,
+    recipientIban: appliedFilters.recipientIban ?? undefined,
     page: active,
     limit: parseInt(limit ?? "10", 10),
     search: debouncedSearch,
@@ -151,6 +147,8 @@ export const AllAccountTransactions = ({
           toggle={toggle}
           form={form}
           customStatusOption={customStatusOption}
+          onApply={(values) => { setAppliedFilters(values); setActive(1); }}
+          onClear={() => { setAppliedFilters(FilterValues); setActive(1); }}
         >
           <TextBox placeholder="Sender Name" {...form.getInputProps("senderName")} />
           <TextBox placeholder="Beneficiary Name" {...form.getInputProps("recipientName")} />

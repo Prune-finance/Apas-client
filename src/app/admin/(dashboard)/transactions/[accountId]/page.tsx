@@ -122,7 +122,7 @@ export default function AccountTransactions() {
             // variant="light"
           >
             {account
-              ? `${account?.firstName.charAt(0)}${account?.lastName.charAt(0)}`
+              ? `${account?.firstName?.charAt(0) ?? account?.accountName?.charAt(0) ?? ""}${account?.lastName?.charAt(0) ?? ""}`
               : null}
           </Avatar>
         ) : (

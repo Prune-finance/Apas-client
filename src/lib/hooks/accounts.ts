@@ -232,7 +232,7 @@ export function useAccountStatistics({
   const { loading, data, meta, queryFn } = useAxios<StatInterval[], AccountStatsMeta>({
     baseURL: "accounts",
     endpoint: "/admin/accounts/statistics",
-    params: { frequency, accountType, ...(currencyCode && { currencyCode }) },
+    params: { frequency, accountType, ...(currencyCode && { currency: currencyCode }) },
     dependencies: [frequency, accountType, currencyCode],
   });
 

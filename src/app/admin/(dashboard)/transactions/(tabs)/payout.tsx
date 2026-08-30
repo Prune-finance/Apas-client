@@ -54,8 +54,7 @@ export const PayoutAccountTransactions = ({
   const searchParams = useSearchParams();
   const router = useRouter();
   const [active, setActive] = useState(1);
-  const urlCurrency = searchParams.get("currency");
-  const [activeCurrency, setActiveCurrency] = useState<Currency>((urlCurrency as Currency) || "EUR");
+  const activeCurrency = (searchParams.get("currency") as Currency) || "EUR";
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -96,7 +95,6 @@ export const PayoutAccountTransactions = ({
   const [exporting, setExporting] = useState(false);
 
   const handleCurrencyChange = (currency: Currency) => {
-    setActiveCurrency(currency);
     setActive(1);
     const params = new URLSearchParams(searchParams.toString());
     params.set("currency", currency);

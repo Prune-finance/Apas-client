@@ -86,8 +86,7 @@ export default function PayoutAccounts() {
   const router = useRouter();
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
-  const urlCurrency = searchParams.get("currency");
-  const [activeCurrency, setActiveCurrency] = useState<Currency>((urlCurrency as Currency) || "EUR");
+  const activeCurrency = (searchParams.get("currency") as Currency) || "EUR";
   const [frequency, setFrequency] = useState<string | null>("Monthly");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -228,7 +227,6 @@ export default function PayoutAccounts() {
   });
 
   const handleCurrencyChange = (currency: Currency) => {
-    setActiveCurrency(currency);
     setActivePage(1);
     const params = new URLSearchParams(searchParams.toString());
     params.set("currency", currency);

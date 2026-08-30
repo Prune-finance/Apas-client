@@ -28,7 +28,7 @@ function Accounts() {
 
         <TabsComponent
           tabs={tabs}
-          defaultValue={
+          value={
             tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
               ?.value ?? tabs[0].value
           }

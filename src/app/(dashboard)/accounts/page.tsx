@@ -176,10 +176,7 @@ function Accounts() {
 
   const { addAccountCurrency } = useAddAccountCurrencyStore();
 
-  const urlCurrency = searchParams.get("currency");
-  const [activeIssuedCurrency, setActiveIssuedCurrency] = useState<"EUR" | "GBP" | "USD">(
-    (urlCurrency as "EUR" | "GBP" | "USD") || "EUR"
-  );
+  const activeIssuedCurrency = (searchParams.get("currency") as "EUR" | "GBP" | "USD") || "EUR";
 
   const isInitiator = useHasPermission("INITIATOR");
   const canSendMoney =
@@ -572,7 +569,7 @@ function Accounts() {
         <TabsComponent
           tabs={tabs}
           mt={32}
-          defaultValue={
+          value={
             tabs.find((_tab) => _tab.value === tab)?.value ?? tabs[0].value
           }
           onChange={(value) => {
@@ -653,7 +650,6 @@ function Accounts() {
                         <button
                           key={t.currency}
                           onClick={() => {
-                            setActiveIssuedCurrency(t.currency);
                             const params = new URLSearchParams(searchParams.toString());
                             params.set("currency", t.currency);
                             router.push(`?${params.toString()}`);

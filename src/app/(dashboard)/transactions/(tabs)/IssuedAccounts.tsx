@@ -39,8 +39,7 @@ export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
   const { currencies } = useAvailableCurrencies();
   const router = useRouter();
-  const urlCurrency = searchParams.get("currency");
-  const [activeCurrency, setActiveCurrency] = useState(urlCurrency || "EUR");
+  const activeCurrency = searchParams.get("currency") || "EUR";
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
@@ -83,7 +82,6 @@ export const IssuedAccountsTab = () => {
   };
 
   const handleCurrencyChange = (currency: string) => {
-    setActiveCurrency(currency);
     setActive(1);
     const params = new URLSearchParams(searchParams.toString());
     params.set("currency", currency);

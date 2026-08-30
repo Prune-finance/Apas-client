@@ -66,7 +66,7 @@ export default function AccountInfoCards({
       <Grid>
         <GridCol span={{ base: 12, md: 7 }}>
           <FlowChart
-            balance={meta?.totalAccountBalance || 0}
+            balance={meta?.totalAmount || 0}
             frequency={frequency}
             setFrequency={setFrequency}
             accountType={accountType}
@@ -83,17 +83,17 @@ export default function AccountInfoCards({
             title={`Total Number of ${accountType} Account`}
             frequency={frequency}
             setFrequency={setFrequency}
-            total={meta?.totalNumberOfAccounts || 0}
+            total={meta?.totalAccounts || 0}
             accountType={accountType}
             chartData={[
               {
                 name: "Active Account",
-                value: meta?.activeAccountCount || 0,
+                value: meta?.activeAccounts || 0,
                 color: "var(--prune-primary-600)",
               },
               {
                 name: "Inactive Account",
-                value: meta?.inactiveAccountCount || 0,
+                value: meta?.inactiveAccounts || 0,
                 color: "var(--prune-text-gray-200)",
               },
             ]}
@@ -125,7 +125,7 @@ export default function AccountInfoCards({
             <GridCol span={6}>
               <StatusCard
                 title="Active Account"
-                total={meta?.activeAccountCount || 0}
+                total={meta?.activeAccounts || 0}
                 percentage={0}
                 gain
                 viewAction={
@@ -138,7 +138,7 @@ export default function AccountInfoCards({
             <GridCol span={6}>
               <StatusCard
                 title="Inactive Account"
-                total={meta?.inactiveAccountCount || 0}
+                total={meta?.inactiveAccounts || 0}
                 percentage={0}
                 viewAction={
                   opened && _status === "Inactive"

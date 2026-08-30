@@ -1161,10 +1161,10 @@ export interface StatInterval {
 
 export interface AccountStatsMeta {
   currencyCode?: string;
-  activeAccountCount?: number;
-  inactiveAccountCount?: number;
+  activeAccounts?: number;
+  inactiveAccounts?: number;
   totalInflow?: number;
   totalOutflow?: number;
-  totalNumberOfAccounts?: number;
-  totalAccountBalance?: number;
+  totalAccounts?: number;
+  totalAmount?: number;
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Image, Paper } from "@mantine/core";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
@@ -29,7 +29,9 @@ const currencyIconMap: Record<string, string> = {
 export const AccountsTab = () => {
   const searchParams = useSearchParams();
   const { currencies } = useAvailableCurrencies();
-  const [activeCurrency, setActiveCurrency] = useState("EUR");
+  const router = useRouter();
+  const urlCurrency = searchParams.get("currency");
+  const [activeCurrency, setActiveCurrency] = useState(urlCurrency || "EUR");
 
   const [opened, { toggle }] = useDisclosure(false);
   const [search, setSearch] = useState("");
@@ -74,6 +76,9 @@ export const AccountsTab = () => {
   const handleCurrencyChange = (currency: string) => {
     setActiveCurrency(currency);
     setActive(1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("currency", currency);
+    router.push(`?${params.toString()}`);
   };
 
   const currencyTabs = currencies.map((c) => ({

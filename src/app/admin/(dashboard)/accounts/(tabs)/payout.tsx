@@ -29,7 +29,6 @@ import {
   IconTrash,
   IconListTree,
   IconCheck,
-  IconArrowUpRight,
   IconDotsVertical,
   IconFileExport,
 } from "@tabler/icons-react";
@@ -40,9 +39,8 @@ import {
   AccountMeta,
   useAccountStatistics,
 } from "@/lib/hooks/accounts";
-import { camelCaseToTitleCase, formatNumber, getUserType } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 
-import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
@@ -57,7 +55,6 @@ import { validateRequest } from "@/lib/schema";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
-import * as XLSX from "xlsx";
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
@@ -86,9 +83,11 @@ export default function PayoutAccounts() {
   const { status, date, endDate, accountName, accountNumber, type } =
     Object.fromEntries(searchParams.entries());
 
+  const router = useRouter();
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
-  const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
+  const urlCurrency = searchParams.get("currency");
+  const [activeCurrency, setActiveCurrency] = useState<Currency>((urlCurrency as Currency) || "EUR");
   const [frequency, setFrequency] = useState<string | null>("Monthly");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -148,10 +147,10 @@ export default function PayoutAccounts() {
     useDisclosure(false);
   const [filterOpened, { toggle, open: openFilter, close: closeFilter }] =
     useDisclosure(false);
-  const { handleError, handleSuccess } = useNotification();
+  const { handleSuccess } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
-  const [processingCSV, setProcessingCSV] = useState(false);
+  // const [processingCSV, setProcessingCSV] = useState(false);
 
   const requestForm = useForm({
     initialValues: {
@@ -231,6 +230,9 @@ export default function PayoutAccounts() {
   const handleCurrencyChange = (currency: Currency) => {
     setActiveCurrency(currency);
     setActivePage(1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("currency", currency);
+    router.push(`?${params.toString()}`);
   };
 
   const [exporting, setExporting] = useState(false);
@@ -257,7 +259,7 @@ export default function PayoutAccounts() {
     }
   };
 
-  const handleExportCsv = async () => {
+  /* const handleExportCsv = async () => {
     setProcessingCSV(true);
     // fetch data
     try {
@@ -305,7 +307,7 @@ export default function PayoutAccounts() {
     } finally {
       setProcessingCSV(false);
     }
-  };
+  }; */
 
   return (
     <div className={styles.table__container}>
@@ -360,13 +362,13 @@ export default function PayoutAccounts() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <Group gap={12}>
-          <SecondaryBtn
+          {/* <SecondaryBtn
             text="Export CSV"
             icon={IconArrowUpRight}
             action={handleExportCsv}
             loading={processingCSV}
             fw={600}
-          />
+          /> */}
           <SecondaryBtn
             text="Export"
             icon={IconFileExport}

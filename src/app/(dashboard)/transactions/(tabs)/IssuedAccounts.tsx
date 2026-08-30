@@ -21,7 +21,7 @@ import { IconListTree, IconRefresh, IconFileExport } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import USDIcon from "@/assets/USD.png";
@@ -38,7 +38,9 @@ const currencyIconMap: Record<string, string> = {
 export const IssuedAccountsTab = () => {
   const searchParams = useSearchParams();
   const { currencies } = useAvailableCurrencies();
-  const [activeCurrency, setActiveCurrency] = useState("EUR");
+  const router = useRouter();
+  const urlCurrency = searchParams.get("currency");
+  const [activeCurrency, setActiveCurrency] = useState(urlCurrency || "EUR");
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
@@ -83,6 +85,9 @@ export const IssuedAccountsTab = () => {
   const handleCurrencyChange = (currency: string) => {
     setActiveCurrency(currency);
     setActive(1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("currency", currency);
+    router.push(`?${params.toString()}`);
   };
 
   const currencyTabs = currencies

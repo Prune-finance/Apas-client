@@ -176,7 +176,10 @@ function Accounts() {
 
   const { addAccountCurrency } = useAddAccountCurrencyStore();
 
-  const [activeIssuedCurrency, setActiveIssuedCurrency] = useState<"EUR" | "GBP" | "USD">("EUR");
+  const urlCurrency = searchParams.get("currency");
+  const [activeIssuedCurrency, setActiveIssuedCurrency] = useState<"EUR" | "GBP" | "USD">(
+    (urlCurrency as "EUR" | "GBP" | "USD") || "EUR"
+  );
 
   const isInitiator = useHasPermission("INITIATOR");
   const canSendMoney =
@@ -573,7 +576,7 @@ function Accounts() {
             tabs.find((_tab) => _tab.value === tab)?.value ?? tabs[0].value
           }
           onChange={(value) => {
-            window.history.pushState({}, "", "?tab=" + value);
+            if (value) router.push("?tab=" + value);
           }}
         >
           <TabsPanel value={tabs[0].value}>
@@ -649,7 +652,12 @@ function Accounts() {
                       return (
                         <button
                           key={t.currency}
-                          onClick={() => setActiveIssuedCurrency(t.currency)}
+                          onClick={() => {
+                            setActiveIssuedCurrency(t.currency);
+                            const params = new URLSearchParams(searchParams.toString());
+                            params.set("currency", t.currency);
+                            router.push(`?${params.toString()}`);
+                          }}
                           style={{
                             display: "flex",
                             alignItems: "center",

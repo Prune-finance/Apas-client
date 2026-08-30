@@ -5,7 +5,7 @@ import React from "react";
 import { Suspense } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import TabsComponent from "@/ui/components/Tabs";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import IssuedAccounts from "./(tabs)/issued";
 import BusinessAccounts from "./(tabs)/default";
 import PayoutAccounts from "./(tabs)/payout";
@@ -13,6 +13,7 @@ import AllAccounts from "./(tabs)/all";
 
 function Accounts() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   const tab = searchParams.get("tab");
 
@@ -31,6 +32,7 @@ function Accounts() {
             tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
               ?.value ?? tabs[0].value
           }
+          onChange={(value) => { if (value) router.push(`?tab=${value}`); }}
           tt="uppercase"
           mt={28}
           keepMounted={false}

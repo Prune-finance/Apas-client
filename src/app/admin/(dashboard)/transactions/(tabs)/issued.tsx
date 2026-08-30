@@ -17,6 +17,7 @@ import { useIssuedAccountTransactions, exportIssuedAccountTransactions } from "@
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { calculateTotalPages } from "@/lib/utils";
 import EUIcon from "@/assets/EU-icon.png";
@@ -39,8 +40,11 @@ export const IssuedAccountTransactions = ({
   panelValue,
   customStatusOption,
 }: Props) => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [active, setActive] = useState(1);
-  const [activeCurrency, setActiveCurrency] = useState<Currency>("EUR");
+  const urlCurrency = searchParams.get("currency");
+  const [activeCurrency, setActiveCurrency] = useState<Currency>((urlCurrency as Currency) || "EUR");
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -83,6 +87,9 @@ export const IssuedAccountTransactions = ({
   const handleCurrencyChange = (currency: Currency) => {
     setActiveCurrency(currency);
     setActive(1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("currency", currency);
+    router.push(`?${params.toString()}`);
   };
 
   const handleExport = async () => {

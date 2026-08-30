@@ -1,7 +1,7 @@
 "use client";
 
 import { Paper, Stack, Text, Title } from "@mantine/core";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Transaction from "@/lib/store/transaction";
 import { Suspense, useState } from "react";
 
@@ -15,6 +15,7 @@ import { AllAccountTransactions } from "./(tabs)/all";
 
 function TransactionForAccount() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const { tab } = Object.fromEntries(searchParams.entries());
   const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
 
@@ -31,6 +32,7 @@ function TransactionForAccount() {
   const handleTabChange = (value: string | null) => {
     if (!value) return;
     setTabCounts((prev) => ({ ...prev, [value]: (prev[value] ?? 0) + 1 }));
+    router.push(`?tab=${value}`);
   };
 
   const tabKey = (value: string) => `${value}-${tabCounts[value] ?? 0}`;

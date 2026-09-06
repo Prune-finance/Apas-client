@@ -138,7 +138,7 @@ export const Transactions = ({
     if (!dateRange[0] || !dateRange[1]) {
       return handleInfo(
         "Account Statement",
-        "Please select a valid date range"
+        "Please select a valid date range",
       );
     }
 
@@ -146,7 +146,7 @@ export const Transactions = ({
     setLoadingStatement(true);
 
     const [startDate, endDate] = dateRange.map((date) =>
-      dayjs(date).format("YYYY-MM-DD")
+      dayjs(date).format("YYYY-MM-DD"),
     );
     const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
 
@@ -180,7 +180,7 @@ export const Transactions = ({
       if (!res?.data?.length) {
         return handleInfo(
           "Account Statement",
-          "No transactions found for the selected date range"
+          "No transactions found for the selected date range",
         );
       }
 
@@ -198,13 +198,13 @@ export const Transactions = ({
         handleCsvDownload(
           downloadData,
           "account_statement.csv",
-          currencyType || "EUR"
+          currencyType || "EUR",
         );
       }
       closePreview();
       handleSuccess(
         "Account Statement",
-        "Account statement downloaded successful"
+        "Account statement downloaded successful",
       );
       setDateRange([null, null]);
     } catch (error) {
@@ -213,7 +213,7 @@ export const Transactions = ({
         "Account Statement",
         error instanceof Error
           ? parseError(error)
-          : "error downloading account statement"
+          : "error downloading account statement",
       );
     } finally {
       setLoadingStatement(false);
@@ -226,7 +226,7 @@ export const Transactions = ({
     if (!dateRange[0] || !dateRange[1]) {
       return handleInfo(
         "Transactions Export",
-        "Please select a valid date range"
+        "Please select a valid date range",
       );
     }
 
@@ -234,7 +234,7 @@ export const Transactions = ({
     setLoadingStatement(true);
 
     const [startDate, endDate] = dateRange.map((date) =>
-      dayjs(date).format("YYYY-MM-DD")
+      dayjs(date).format("YYYY-MM-DD"),
     );
 
     const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
@@ -266,7 +266,7 @@ export const Transactions = ({
       if (!res?.data?.length) {
         return handleInfo(
           "Transactions Export",
-          "No transactions found for the selected date range"
+          "No transactions found for the selected date range",
         );
       }
 
@@ -277,13 +277,13 @@ export const Transactions = ({
       handleCsvDownload(
         res.data,
         "transactions_export.csv",
-        currencyType || "EUR"
+        currencyType || "EUR",
       );
 
       closeTransactionsPreview();
       handleSuccess(
         "Transactions Export",
-        "Transactions export downloaded successful"
+        "Transactions export downloaded successful",
       );
       setDateRange([null, null]);
     } catch (error) {
@@ -292,7 +292,7 @@ export const Transactions = ({
         "Transactions Export",
         error instanceof Error
           ? parseError(error)
-          : "error exporting transactions"
+          : "error exporting transactions",
       );
     } finally {
       setLoadingStatement(false);
@@ -371,8 +371,8 @@ export const Transactions = ({
             currencyType === "GBP"
               ? "Account Number"
               : currencyType === "GHS"
-              ? "Wallet ID"
-              : "Beneficiary IBAN"
+                ? "Wallet ID"
+                : "Beneficiary IBAN"
           }
           {...form.getInputProps("recipientIban")}
         />
@@ -647,6 +647,7 @@ export interface DownloadStatementData {
   description: string;
   ref: string;
   accessRef?: string;
+  accessId?: string;
   companyAccountId: string | null;
   createdAt: string; // ISO date string
   deletedAt: string | null; // ISO date string or null

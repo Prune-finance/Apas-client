@@ -24,8 +24,8 @@ import {
   UserOtherLinks,
 } from "@/lib/static";
 
-import PruneLogo from "@/assets/logo.png";
-import PruneTintLogo from "@/assets/logo-tint.png";
+import PruneLogo from "@/assets/logo-with-text.svg";
+// import PruneTintLogo from "@/assets/logo-tint.png";
 import styles from "./styles.module.scss";
 import { useDisclosure, useIdle } from "@mantine/hooks";
 import ModalComponent from "../Modal";
@@ -163,7 +163,7 @@ export default function Navbar() {
   return (
     <nav className={styles.nav}>
       <div className={styles.logo__container}>
-        <Image src={PruneLogo} width={95} height={30} alt="prune logo" />
+        <Image src={PruneLogo.src} width={119} height={32} alt="prune logo" unoptimized />
       </div>
 
       <div className={styles.menu__container}>
@@ -385,7 +385,7 @@ export function UserNavbar() {
   return (
     <nav className={`${styles.user__nav}`}>
       <div className={styles.logo__container}>
-        <Image src={PruneTintLogo} width={105} height={30} alt="prune logo" />
+        <Image src={PruneLogo.src} width={119} height={32} alt="prune logo" unoptimized />
       </div>
 
       <div className={styles.menu__container}>

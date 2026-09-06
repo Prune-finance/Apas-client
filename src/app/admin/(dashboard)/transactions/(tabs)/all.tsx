@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { PayoutTableHeaders } from "@/lib/static";
+import { AllTransactionTableHeaders } from "@/lib/static";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -9,19 +9,11 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, TextBox, SelectBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { PayoutTransactionTableRows } from "@/ui/components/TableRows";
+import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
 import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
-import {
-  IconListTree,
-  IconCircleArrowDown,
-  IconFileExport,
-  IconRefresh,
-} from "@tabler/icons-react";
+import { IconListTree, IconCircleArrowDown, IconFileExport, IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
-import {
-  usePayoutCurrencyTransactions,
-  exportPayoutTransactions,
-} from "@/lib/hooks/transactions";
+import { useAllAccountTransactions, exportAllAccountTransactions } from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -47,7 +39,7 @@ interface Props {
   customStatusOption: string[];
 }
 
-export const PayoutAccountTransactions = ({
+export const AllAccountTransactions = ({
   panelValue,
   customStatusOption,
 }: Props) => {
@@ -81,7 +73,7 @@ export const PayoutAccountTransactions = ({
     search: debouncedSearch,
   });
 
-  const { transactions, loading, meta, revalidate } = usePayoutCurrencyTransactions({
+  const { transactions, loading, meta, revalidate } = useAllAccountTransactions({
     ...param,
     currencyCode: activeCurrency,
   });
@@ -104,10 +96,7 @@ export const PayoutAccountTransactions = ({
   const handleExport = async () => {
     setExporting(true);
     try {
-      await exportPayoutTransactions({
-        ...param,
-        currencyCode: activeCurrency,
-      });
+      await exportAllAccountTransactions({ ...param, currencyCode: activeCurrency });
     } finally {
       setExporting(false);
     }
@@ -159,16 +148,8 @@ export const PayoutAccountTransactions = ({
           <Flex gap={12}>
             <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-            <SecondaryBtn
-              text="Download Statement"
-              icon={IconCircleArrowDown}
-            />
-            <SecondaryBtn
-              text="Export"
-              action={handleExport}
-              icon={IconFileExport}
-              loading={exporting}
-            />
+            <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+            <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
           </Flex>
         </Flex>
 
@@ -180,18 +161,9 @@ export const PayoutAccountTransactions = ({
           onApply={(values) => { setAppliedFilters(values); setActive(1); }}
           onClear={() => { setAppliedFilters(FilterValues); setActive(1); }}
         >
-          <TextBox
-            placeholder="Sender Name"
-            {...form.getInputProps("senderName")}
-          />
-          <TextBox
-            placeholder="Beneficiary Name"
-            {...form.getInputProps("recipientName")}
-          />
-          <TextBox
-            placeholder="Beneficiary IBAN"
-            {...form.getInputProps("recipientIban")}
-          />
+          <TextBox placeholder="Sender Name" {...form.getInputProps("senderName")} />
+          <TextBox placeholder="Beneficiary Name" {...form.getInputProps("recipientName")} />
+          <TextBox placeholder="Beneficiary IBAN" {...form.getInputProps("recipientIban")} />
           <SelectBox
             placeholder="Type"
             {...form.getInputProps("type")}
@@ -200,13 +172,8 @@ export const PayoutAccountTransactions = ({
         </Filter>
 
         <TableComponent
-          head={PayoutTableHeaders}
-          rows={
-            <PayoutTransactionTableRows
-              data={transactions}
-              currency={activeCurrency}
-            />
-          }
+          head={AllTransactionTableHeaders}
+          rows={<BusinessTransactionTableRows data={transactions} currency={activeCurrency} />}
           loading={loading}
         />
 

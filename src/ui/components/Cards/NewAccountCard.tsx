@@ -8,12 +8,14 @@ import {
   Group,
   Image,
   Loader,
+  LoadingOverlay,
   Skeleton,
   Stack,
   Text,
   ThemeIcon,
 } from "@mantine/core";
 import { MouseEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import createAxiosInstance from "@/lib/axios";
@@ -30,7 +32,6 @@ import EUImage from "@/assets/EU-icon.png";
 import CediIcon from "@/assets/cedis-icon.png";
 import USDImage from "@/assets/USD.png";
 import { SeeAll } from ".";
-import Link from "next/link";
 
 interface Props extends CardProps {
   currency: string;
@@ -143,8 +144,16 @@ function NewAccountCard({
   const config = currencyConfigs[currency] || currencyConfigs.EUR;
 
   const [processing, setProcessing] = useState(false);
+  const [navigating, setNavigating] = useState(false);
   const { handleError, handleSuccess } = useNotification();
   const axios = createAxiosInstance("accounts");
+  const router = useRouter();
+
+  const handleCardClick = () => {
+    if (!link) return;
+    setNavigating(true);
+    router.push(link);
+  };
 
   const handlePropagation = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
@@ -171,6 +180,8 @@ function NewAccountCard({
   };
 
   return (
+    <Box pos="relative" style={{ height: "100%", cursor: link ? "pointer" : "default" }} onClick={handleCardClick}>
+      <LoadingOverlay visible={navigating} zIndex={10} overlayProps={{ blur: 1 }} loaderProps={{ size: "sm", color: "#596603" }} />
     <BackgroundImage
       key={key}
       src={config.background}
@@ -179,6 +190,7 @@ function NewAccountCard({
         borderRadius: 6,
         overflow: "hidden",
         border: "1px solid #EAECF0",
+        cursor: link ? "pointer" : "default",
       }}
       w="100%"
     >
@@ -210,7 +222,7 @@ function NewAccountCard({
                 justify="end"
                 c="var(--prune-text-gray-900)"
               >
-                {link && (
+                {/* {link && (
                   <Link href={link}>
                     <Box bg="#596603" px={8} p={2} style={{ borderRadius: 12 }}>
                       <Text fz={10} fw={500} c="#fff">
@@ -218,7 +230,7 @@ function NewAccountCard({
                       </Text>
                     </Box>
                   </Link>
-                )}
+                )} */}
               </Group>
             </Group>
           ) : (
@@ -240,7 +252,7 @@ function NewAccountCard({
                     color="#596603"
                     size="xs"
                     p={2}
-                    onClick={() => handleReload()}
+                    onClick={(e) => { e.stopPropagation(); e.preventDefault(); handleReload(); }}
                     style={{
                       cursor: processing ? "not-allowed" : "pointer",
                       pointerEvents: processing ? "none" : "auto",
@@ -398,6 +410,7 @@ function NewAccountCard({
         </Flex>
       </Stack>
     </BackgroundImage>
+    </Box>
   );
 }
 

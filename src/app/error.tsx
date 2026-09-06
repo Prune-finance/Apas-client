@@ -2,7 +2,7 @@
 
 import { Box, Button, Container, Flex, Image, Text } from "@mantine/core";
 import { useEffect } from "react";
-import PruneIcon from "@/assets/logo.png";
+import PruneIcon from "@/assets/logo-with-text.svg";
 
 export default function Error({
   error,
@@ -19,7 +19,7 @@ export default function Error({
   return (
     <Container fluid>
       <Flex align="center" justify="flex-start" mt={25} mx={30}>
-        <Image width={100} height={29} src={PruneIcon.src} alt="prune icon" />
+        <Image width={111} height={30} src={PruneIcon.src} alt="prune icon" />
       </Flex>
 
       <Flex

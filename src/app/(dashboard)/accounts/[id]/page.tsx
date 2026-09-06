@@ -54,6 +54,7 @@ export default function Account() {
     type,
     senderName,
     endDate,
+    search,
     recipientName,
     recipientIban,
   } = Object.fromEntries(searchParams.entries());
@@ -66,6 +67,7 @@ export default function Account() {
     ...(senderName && { senderName: senderName }),
     ...(recipientName && { recipientName: recipientName }),
     ...(recipientIban && { recipientIban: recipientIban }),
+    ...(search && { search: search }),
     page: active,
     limit: parseInt(limit ?? "10", 10),
   };
@@ -176,9 +178,7 @@ export default function Account() {
               size="lg"
               color="var(--prune-primary-700)"
               variant="filled"
-            >{`${account?.firstName.charAt(0)}${account?.lastName.charAt(
-              0
-            )}`}</Avatar>
+            >{`${account?.firstName?.charAt(0) ?? account?.accountName?.charAt(0) ?? ""}${account?.lastName?.charAt(0) ?? ""}`}</Avatar>
           ) : (
             <Skeleton circle h={50} w={50} />
           )}

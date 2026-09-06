@@ -14,8 +14,9 @@ interface FlowChartProps {
   balance: number;
   frequency: string | null;
   setFrequency: Dispatch<SetStateAction<string | null>>;
-  chartData: ChartData[]; // Add chartData prop
+  chartData: ChartData[];
   accountType: "Issued" | "Payout" | "Business";
+  currency?: string;
 }
 export default function FlowChart({
   balance,
@@ -23,6 +24,7 @@ export default function FlowChart({
   setFrequency,
   chartData,
   accountType,
+  currency = "EUR",
 }: FlowChartProps) {
   return (
     <AccountCustomCard>
@@ -38,7 +40,7 @@ export default function FlowChart({
         <Group justify="space-between">
           <Stack gap={8}>
             <Text fz={24} c="var(--prune-text-gray-700)" fw={600}>
-              {formatNumber(balance, true, "EUR")}
+              {formatNumber(balance, true, currency)}
             </Text>
 
             <ThisMonth percentage={2.3} gain />
@@ -67,7 +69,7 @@ export default function FlowChart({
           ]}
           tickLine="none"
           tooltipProps={{
-            formatter: (value) => [`${formatNumber(value, true, "EUR")}`],
+            formatter: (value) => [`${formatNumber(value, true, currency)}`],
             payload: [{ name: "05-01", value: 12, unit: "kg" }],
           }}
           // valueFormatter={(value) => formatNumber(value, true, "EUR")}

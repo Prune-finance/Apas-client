@@ -5,6 +5,7 @@ import {
   useTransactionsByIBAN,
 } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { calculateTotalPages } from "@/lib/utils";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -26,7 +27,7 @@ dayjs.extend(advancedFormat);
 import { useState } from "react";
 import styles from "../styles.module.scss";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useSingleAccountByIBAN } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
@@ -37,21 +38,28 @@ import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
 
 export default function AccountTransactions() {
   const { accountId } = useParams<{ accountId: string }>();
+  const searchParams = useSearchParams();
+  const currencyCode = searchParams.get("currencyCode") ?? "EUR";
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
 
-  const { transactions, loading, meta } = useTransactionsByIBAN(accountId);
+  const { transactions, loading, meta } = useTransactionsByIBAN(accountId, {
+    currencyCode,
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
+  });
 
-  const { account, loading: loadingAcct } = useSingleAccountByIBAN(accountId);
+  const { account, loading: loadingAcct } = useSingleAccountByIBAN(accountId, currencyCode);
 
   const { business } = useSingleBusiness(account?.companyId ?? "");
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 500);
   const [selectedRequest, setSelectedRequest] =
     useState<TransactionType | null>(null);
 
@@ -65,32 +73,26 @@ export default function AccountTransactions() {
       title: "Total Balance",
       value: account?.accountBalance || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loadingAcct,
     },
     {
       title: "Money In",
-      value:
-        transactions
-          .filter((trx) => trx.type === "CREDIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.in || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {
       title: "Money Out",
-      value:
-        transactions
-          .filter((trx) => trx.type === "DEBIT")
-          .reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.out || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: meta?.total || 0,
       loading: loading,
     },
   ];
@@ -120,7 +122,7 @@ export default function AccountTransactions() {
             // variant="light"
           >
             {account
-              ? `${account?.firstName.charAt(0)}${account?.lastName.charAt(0)}`
+              ? `${account?.firstName?.charAt(0) ?? account?.accountName?.charAt(0) ?? ""}${account?.lastName?.charAt(0) ?? ""}`
               : null}
           </Avatar>
         ) : (
@@ -183,7 +185,7 @@ export default function AccountTransactions() {
         text="When a transaction is recorded, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total || 0)}
         active={active}
         setActive={setActive}
         limit={limit}

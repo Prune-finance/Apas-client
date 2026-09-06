@@ -1,6 +1,6 @@
 "use client";
 
-import { useUserIssuedAccountTransactions, exportUserIssuedAccountTransactions } from "@/lib/hooks/transactions";
+import { useUserAllTransactions, exportUserAllTransactions } from "@/lib/hooks/transactions";
 import { useAvailableCurrencies } from "@/lib/hooks/accounts";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SecondaryBtn } from "@/ui/components/Buttons";
@@ -10,8 +10,8 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
-import { IssuedAccountTableHeaders } from "@/lib/static";
+import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
+import { AllTransactionTableHeaders } from "@/lib/static";
 import { calculateTotalPages } from "@/lib/utils";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { Group, Image } from "@mantine/core";
@@ -26,6 +26,7 @@ import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import USDIcon from "@/assets/USD.png";
 import GHSIcon from "@/assets/GH.png";
+
 dayjs.extend(advancedFormat);
 
 const currencyIconMap: Record<string, string> = {
@@ -35,7 +36,7 @@ const currencyIconMap: Record<string, string> = {
   GHS: GHSIcon.src,
 };
 
-export const IssuedAccountsTab = () => {
+export const AllTransactionsTab = () => {
   const searchParams = useSearchParams();
   const { currencies } = useAvailableCurrencies();
   const router = useRouter();
@@ -68,14 +69,14 @@ export const IssuedAccountsTab = () => {
     currencyCode: activeCurrency,
   };
 
-  const { transactions, loading, meta, revalidate } = useUserIssuedAccountTransactions(queryParams);
+  const { transactions, loading, meta, revalidate } = useUserAllTransactions(queryParams);
   usePaginationReset({ queryParams, setActive });
 
   const [exporting, setExporting] = useState(false);
   const handleExport = async () => {
     setExporting(true);
     try {
-      await exportUserIssuedAccountTransactions({ ...queryParams, currencyCode: activeCurrency });
+      await exportUserAllTransactions({ ...queryParams, currencyCode: activeCurrency });
     } finally {
       setExporting(false);
     }
@@ -88,13 +89,11 @@ export const IssuedAccountsTab = () => {
     router.push(`?${params.toString()}`);
   };
 
-  const currencyTabs = currencies
-    .filter((c) => c !== "GHS")
-    .map((c) => ({
-      currency: c,
-      title: c,
-      icon: currencyIconMap[c] ?? EUIcon.src,
-    }));
+  const currencyTabs = currencies.map((c) => ({
+    currency: c,
+    title: c,
+    icon: currencyIconMap[c] ?? EUIcon.src,
+  }));
 
   const infoDetails = [
     { title: "Total Balance", value: meta?.totalAmount || 0, formatted: true, currency: activeCurrency },
@@ -164,9 +163,9 @@ export const IssuedAccountsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={<IssuedTransactionTableRows data={transactions} isUser currency={activeCurrency} />}
+        rows={<BusinessTransactionTableRows data={transactions} isUser currency={activeCurrency} />}
         loading={loading}
-        head={IssuedAccountTableHeaders}
+        head={AllTransactionTableHeaders}
       />
 
       <EmptyTable

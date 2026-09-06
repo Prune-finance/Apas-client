@@ -29,8 +29,8 @@ import {
   IconTrash,
   IconListTree,
   IconCheck,
-  IconArrowUpRight,
   IconDotsVertical,
+  IconFileExport,
 } from "@tabler/icons-react";
 
 // import ModalComponent from "@/ui/components/Modal";
@@ -39,9 +39,8 @@ import {
   AccountMeta,
   useAccountStatistics,
 } from "@/lib/hooks/accounts";
-import { camelCaseToTitleCase, formatNumber, getUserType } from "@/lib/utils";
+import { formatNumber } from "@/lib/utils";
 
-import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
@@ -56,12 +55,26 @@ import { validateRequest } from "@/lib/schema";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
-import * as XLSX from "xlsx";
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
+import { Image } from "@mantine/core";
+import EUIcon from "@/assets/EU-icon.png";
+import GBPIcon from "@/assets/GB.png";
+import USDIcon from "@/assets/USD.png";
+import GHSIcon from "@/assets/GH.png";
+import { exportPayoutAdminAccounts } from "@/lib/hooks/accounts";
+
+type Currency = "EUR" | "GBP" | "USD" | "GHS";
+
+const currencyTabs = [
+  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
+  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
+  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+  { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
+];
 
 export default function PayoutAccounts() {
   const searchParams = useSearchParams();
@@ -70,8 +83,10 @@ export default function PayoutAccounts() {
   const { status, date, endDate, accountName, accountNumber, type } =
     Object.fromEntries(searchParams.entries());
 
+  const router = useRouter();
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
+  const activeCurrency = (searchParams.get("currency") as Currency) || "EUR";
   const [frequency, setFrequency] = useState<string | null>("Monthly");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
@@ -86,6 +101,7 @@ export default function PayoutAccounts() {
     page: activePage,
     limit: parseInt(limit ?? "10", 10),
     search: debouncedSearch,
+    currencyCode: activeCurrency,
   };
 
   const dependencies = [
@@ -98,6 +114,7 @@ export default function PayoutAccounts() {
     accountNumber,
     type,
     debouncedSearch,
+    activeCurrency,
   ];
 
   const {
@@ -112,9 +129,10 @@ export default function PayoutAccounts() {
     dependencies,
   });
 
-  const { loading: loadingStats, meta: statsMeta } = useAccountStatistics({
+  const { loading: loadingStats, meta: statsMeta, data: statData } = useAccountStatistics({
     frequency: frequency?.toLowerCase() ?? "monthly",
-    accountType: "Payout",
+    accountType: "PAYOUT_ACCOUNT",
+    currencyCode: activeCurrency,
   });
 
   // TODO: Handle the resetting of activePage state when the filter is toggled
@@ -128,10 +146,10 @@ export default function PayoutAccounts() {
     useDisclosure(false);
   const [filterOpened, { toggle, open: openFilter, close: closeFilter }] =
     useDisclosure(false);
-  const { handleError, handleSuccess } = useNotification();
+  const { handleSuccess } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
-  const [processingCSV, setProcessingCSV] = useState(false);
+  // const [processingCSV, setProcessingCSV] = useState(false);
 
   const requestForm = useForm({
     initialValues: {
@@ -208,6 +226,24 @@ export default function PayoutAccounts() {
     validate: zodResolver(FilterSchema),
   });
 
+  const handleCurrencyChange = (currency: Currency) => {
+    setActivePage(1);
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("currency", currency);
+    router.push(`?${params.toString()}`);
+  };
+
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportPayoutAdminAccounts(params);
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const fetchAccounts = async (limit: number) => {
     try {
       const { data } = await axios.get(
@@ -221,7 +257,7 @@ export default function PayoutAccounts() {
     }
   };
 
-  const handleExportCsv = async () => {
+  /* const handleExportCsv = async () => {
     setProcessingCSV(true);
     // fetch data
     try {
@@ -269,16 +305,47 @@ export default function PayoutAccounts() {
     } finally {
       setProcessingCSV(false);
     }
-  };
+  }; */
 
   return (
     <div className={styles.table__container}>
+      <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+        {currencyTabs.map((t) => {
+          const isActive = activeCurrency === t.currency;
+          return (
+            <button
+              key={t.currency}
+              onClick={() => handleCurrencyChange(t.currency)}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: "8px 16px",
+                borderRadius: 100,
+                border: "none",
+                cursor: "pointer",
+                fontSize: 14,
+                fontWeight: isActive ? 600 : 500,
+                backgroundColor: isActive ? "#c1dd06" : "#fbfee6",
+                color: isActive ? "#344054" : "#596603",
+                transition: "background-color 0.15s ease, color 0.15s ease",
+              }}
+            >
+              <Image src={t.icon} alt="icon" h={20} w={20} />
+              {t.title}
+            </button>
+          );
+        })}
+      </div>
+
       <AccountInfoCards
         loading={loadingStats}
         frequency={frequency}
         setFrequency={setFrequency}
         accountType="Payout"
         meta={statsMeta}
+        statData={statData}
+        currency={activeCurrency}
         form={form}
         open={openFilter}
         close={closeFilter}
@@ -293,12 +360,18 @@ export default function PayoutAccounts() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <Group gap={12}>
-          <SecondaryBtn
+          {/* <SecondaryBtn
             text="Export CSV"
             icon={IconArrowUpRight}
-            // style={{ cursor: "not-allowed" }}
             action={handleExportCsv}
             loading={processingCSV}
+            fw={600}
+          /> */}
+          <SecondaryBtn
+            text="Export"
+            icon={IconFileExport}
+            action={handleExport}
+            loading={exporting}
             fw={600}
           />
           <SecondaryBtn
@@ -336,6 +409,7 @@ export default function PayoutAccounts() {
             freezeOpen={freezeOpen}
             open={open}
             setRowId={setRowId}
+            currency={activeCurrency}
           />
         }
         loading={loading}
@@ -423,6 +497,7 @@ type RowProps = {
   freezeOpen: () => void;
   unfreezeOpen: () => void;
   open: () => void;
+  currency: string;
 };
 
 const RowComponent = ({
@@ -432,6 +507,7 @@ const RowComponent = ({
   freezeOpen,
   unfreezeOpen,
   open,
+  currency,
 }: RowProps) => {
   const { push } = useRouter();
 
@@ -452,7 +528,7 @@ const RowComponent = ({
         </Link>
       </TableTd>
       <TableTd>{element.accountNumber}</TableTd>
-      <TableTd>{formatNumber(element.accountBalance, true, "EUR")}</TableTd>
+      <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd>
         <BadgeComponent status={element.status} active />

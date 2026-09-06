@@ -1,7 +1,7 @@
 "use client";
 
 import { Paper, Stack, Text, Title } from "@mantine/core";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Transaction from "@/lib/store/transaction";
 import { Suspense, useState } from "react";
 
@@ -11,12 +11,13 @@ import TabsComponent from "@/ui/components/Tabs";
 import { BusinessAccountTransactions } from "./(tabs)/business";
 import { IssuedAccountTransactions } from "./(tabs)/issued";
 import { PayoutAccountTransactions } from "./(tabs)/payout";
+import { AllAccountTransactions } from "./(tabs)/all";
 
 function TransactionForAccount() {
   const searchParams = useSearchParams();
-  const [active, setActive] = useState(1);
-
+  const router = useRouter();
   const { tab } = Object.fromEntries(searchParams.entries());
+  const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
 
   const { data, close, opened: openedDrawer } = Transaction();
 
@@ -27,6 +28,14 @@ function TransactionForAccount() {
     "CANCELLED",
     "FAILED",
   ];
+
+  const handleTabChange = (value: string | null) => {
+    if (!value) return;
+    setTabCounts((prev) => ({ ...prev, [value]: (prev[value] ?? 0) + 1 }));
+    router.push(`?tab=${value}`);
+  };
+
+  const tabKey = (value: string) => `${value}-${tabCounts[value] ?? 0}`;
 
   return (
     <main>
@@ -43,35 +52,39 @@ function TransactionForAccount() {
 
         <TabsComponent
           tabs={tabs}
-          defaultValue={
+          value={
             tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
               ?.value ?? tabs[0].value
           }
-          onChange={() => setActive(1)}
+          onChange={handleTabChange}
           mt={28}
           styles={{ list: { marginBottom: 28 } }}
           keepMounted={false}
         >
-          <BusinessAccountTransactions
+          <AllAccountTransactions
+            key={tabKey(tabs[0].value)}
             panelValue={tabs[0].value}
             customStatusOption={customStatusOption}
-            active={active}
-            setActive={setActive}
+          />
+          <BusinessAccountTransactions
+            key={tabKey(tabs[1].value)}
+            panelValue={tabs[1].value}
+            customStatusOption={customStatusOption}
           />
 
           <IssuedAccountTransactions
-            panelValue={tabs[1].value}
+            key={tabKey(tabs[2].value)}
+            panelValue={tabs[2].value}
             customStatusOption={customStatusOption}
-            active={active}
-            setActive={setActive}
           />
 
           <PayoutAccountTransactions
-            panelValue={tabs[2].value}
+            key={tabKey(tabs[3].value)}
+            panelValue={tabs[3].value}
             customStatusOption={customStatusOption}
-            active={active}
-            setActive={setActive}
           />
+
+          
         </TabsComponent>
 
         {data && (
@@ -87,9 +100,10 @@ function TransactionForAccount() {
 }
 
 const tabs = [
+  { value: "all-transactions", title: "All Transactions" },
   { value: "business-accounts", title: "Business Accounts" },
   { value: "issued-accounts", title: "Issued Accounts" },
-  { value: "payout-accounts", title: "Payout Accounts" },
+  { value: "payout-accounts", title: "Payout Accounts" }
 ];
 
 const searchProps = ["senderIban", "recipientIban", "recipientBankAddress"];

@@ -2,6 +2,19 @@ import { TransactionType } from "@/lib/hooks/transactions";
 import { filteredSearch } from "@/lib/search";
 import Transaction from "@/lib/store/transaction";
 import { formatNumber, frontendPagination, isDummyIBAN } from "@/lib/utils";
+
+function getSenderIdentifier(element: TransactionType, currency?: string): string | undefined {
+  const curr = currency ?? element.currencyType ?? "EUR";
+  if (curr === "GHS") return element.senderWalletId || undefined;
+  if (curr === "GBP" || curr === "USD") return element.senderAccountNumber || undefined;
+  return element.senderIban || undefined;
+}
+
+function isSenderClickable(identifier: string | undefined, currency?: string): boolean {
+  if (!identifier) return false;
+  const curr = currency ?? "EUR";
+  return curr !== "EUR" || !isDummyIBAN(identifier);
+}
 import { Stack, TableTd, TableTr, Text } from "@mantine/core";
 import Link from "next/link";
 import { AmountGroup } from "../AmountGroup";
@@ -14,16 +27,22 @@ import { BusinessData } from "@/lib/hooks/businesses";
 
 export const BusinessTransactionTableRows = ({
   data,
-
   business,
   isUser,
+  currency,
 }: {
   data: TransactionType[];
   business?: boolean;
   isUser?: boolean;
+  currency?: string;
 }) => {
   const { open, setData } = Transaction();
-  return data.map((element) => (
+  return data.map((element) => {
+    const currCode = currency ?? element.currencyType ?? "EUR";
+    const identifier = getSenderIdentifier(element, currency);
+    const clickable = isSenderClickable(identifier, currCode);
+
+    return (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -33,23 +52,15 @@ export const BusinessTransactionTableRows = ({
       style={{ cursor: "pointer" }}
     >
       {!business && (
-        <TableTd
-          td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          style={{
-            pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
-          }}
-        >
-          <Link
-            href={`${!isUser ? "/admin" : ""}/transactions/${
-              element.senderIban
-            }`}
-          >
-            {element?.senderName || "N/A"}
-          </Link>
-        </TableTd>
+        clickable ? (
+          <TableTd td="underline" onClick={(e) => e.stopPropagation()}>
+            <Link href={`${!isUser ? "/admin" : ""}/transactions/${identifier}?currencyCode=${currCode}`}>
+              {element?.senderName || "N/A"}
+            </Link>
+          </TableTd>
+        ) : (
+          <TableTd>{element?.senderName || "N/A"}</TableTd>
+        )
       )}
 
       <TableTd>
@@ -68,7 +79,11 @@ export const BusinessTransactionTableRows = ({
       </TableTd>
 
       <TableTd>
-        {formatNumber(element.amount, true, element?.currencyType ?? "EUR")}
+        {formatNumber(
+          element.amount,
+          true,
+          currency ?? element?.currencyType ?? "EUR",
+        )}
       </TableTd>
 
       <TableTd w="15%">{element.centrolinkRef ?? element?.accessId}</TableTd>
@@ -88,21 +103,28 @@ export const BusinessTransactionTableRows = ({
         <BadgeComponent status={element.status} />
       </TableTd>
     </TableTr>
-  ));
+    );
+  });
 };
 
 export const IssuedTransactionTableRows = ({
   data,
   noLink,
   isUser,
+  currency,
 }: {
   data: TransactionType[];
-
   noLink?: boolean;
   isUser?: boolean;
+  currency?: string;
 }) => {
   const { open, setData } = Transaction();
-  return data.map((element) => (
+  return data.map((element) => {
+    const currCode = currency ?? element.currencyType ?? "EUR";
+    const identifier = getSenderIdentifier(element, currency);
+    const clickable = !noLink && isSenderClickable(identifier, currCode);
+
+    return (
     <TableTr
       key={element?.id}
       onClick={() => {
@@ -111,26 +133,17 @@ export const IssuedTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      <TableTd
-        // td={noLink || isDummyIBAN(element.senderIban) ? "none" : "underline"}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        style={{
-          pointerEvents:
-            noLink || isDummyIBAN(element.senderIban) ? "none" : "auto",
-        }}
-      >
-        {/* <Link
-          href={`${!isUser ? "/admin" : ""}/transactions/${
-            element?.currencyType === "GBP"
-              ? element?.beneficiaryAccountNumber
-              : element.senderIban
-          }`}
-        > */}
-        {element?.senderName || "N/A"}
-        {/* </Link> */}
-      </TableTd>
+      {clickable ? (
+        <TableTd td="underline" onClick={(e) => e.stopPropagation()}>
+          <Link href={`${!isUser ? "/admin" : ""}/transactions/${identifier}?currencyCode=${currCode}`}>
+            {element?.senderName || "N/A"}
+          </Link>
+        </TableTd>
+      ) : (
+        <TableTd onClick={(e) => e.stopPropagation()}>
+          {element?.senderName || "N/A"}
+        </TableTd>
+      )}
 
       <TableTd>
         <Stack gap={0}>
@@ -150,7 +163,11 @@ export const IssuedTransactionTableRows = ({
       </TableTd>
 
       <TableTd>
-        {formatNumber(element?.amount, true, element?.currencyType ?? "EUR")}
+        {formatNumber(
+          element?.amount,
+          true,
+          currency ?? element?.currencyType ?? "EUR",
+        )}
       </TableTd>
 
       <TableTd w="15%">{element?.reference}</TableTd>
@@ -170,18 +187,26 @@ export const IssuedTransactionTableRows = ({
         <BadgeComponent w={"auto"} status={element?.status} />
       </TableTd>
     </TableTr>
-  ));
+    );
+  });
 };
 
 export const PayoutTransactionTableRows = ({
   data,
   isUser,
+  currency,
 }: {
   data: TransactionType[];
   isUser?: boolean;
+  currency?: string;
 }) => {
   const { open, setData } = Transaction();
-  return data.map((element) => (
+  return data.map((element) => {
+    const currCode = currency ?? element.currencyType ?? "EUR";
+    const identifier = getSenderIdentifier(element, currency);
+    const clickable = isSenderClickable(identifier, currCode);
+
+    return (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -190,32 +215,23 @@ export const PayoutTransactionTableRows = ({
       }}
       style={{ cursor: "pointer" }}
     >
-      {/* <TableTd>{element.senderName || "N/A"}</TableTd> */}
-
-      <TableTd
-        td={isDummyIBAN(element.senderIban) ? "none" : "underline"}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        style={{
-          pointerEvents: isDummyIBAN(element.senderIban) ? "none" : "auto",
-        }}
-      >
-        <Link
-          href={`${!isUser ? "/admin" : ""}/transactions/${element.senderIban}`}
-        >
-          {element?.senderName || "N/A"}
-        </Link>
-      </TableTd>
-
-      <TableTd w="15%">{element.centrolinkRef}</TableTd>
+      {clickable ? (
+        <TableTd td="underline" onClick={(e) => e.stopPropagation()}>
+          <Link href={`${!isUser ? "/admin" : ""}/transactions/${identifier}?currencyCode=${currCode}`}>
+            {element?.senderName || "N/A"}
+          </Link>
+        </TableTd>
+      ) : (
+        <TableTd>{element?.senderName || "N/A"}</TableTd>
+      )}
+      <TableTd w="15%">{element?.centrolinkRef ?? element?.accessId}</TableTd>
       <TableTd>
         <Stack gap={0}>
           <Text fz={12} fw={400}>
-            {element.recipientName}
+            {element?.recipientName ?? element?.beneficiaryName}
           </Text>
           <Text fz={10} fw={400}>
-            {element.recipientIban}
+            {element?.recipientIban ?? element?.beneficiaryAccountNumber}
           </Text>
         </Stack>
       </TableTd>
@@ -223,7 +239,13 @@ export const PayoutTransactionTableRows = ({
         <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
 
-      <TableTd>{formatNumber(element.amount, true, "EUR")}</TableTd>
+      <TableTd>
+        {formatNumber(
+          element.amount,
+          true,
+          currency ?? element?.currencyType ?? "EUR",
+        )}
+      </TableTd>
 
       <TableTd w="15%">{element.reference}</TableTd>
 
@@ -241,7 +263,8 @@ export const PayoutTransactionTableRows = ({
         <BadgeComponent w={"100%"} status={element.status} />
       </TableTd>
     </TableTr>
-  ));
+    );
+  });
 };
 
 export const InquiryTableRows = ({

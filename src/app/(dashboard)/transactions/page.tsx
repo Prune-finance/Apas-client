@@ -10,13 +10,15 @@ import TabsComponent from "@/ui/components/Tabs";
 import { AccountsTab } from "./(tabs)/Accounts";
 import { IssuedAccountsTab } from "./(tabs)/IssuedAccounts";
 import { PayoutsTab } from "./(tabs)/Payouts";
+import { AllTransactionsTab } from "./(tabs)/AllTransactions";
 import Transaction from "@/lib/store/transaction";
 import { TransactionDrawer } from "./drawer";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function AccountTrx() {
   const { opened, close, data } = Transaction();
   const searchParam = useSearchParams();
+  const router = useRouter();
   const tab = searchParam.get("tab");
 
   return (
@@ -35,13 +37,17 @@ function AccountTrx() {
 
         <TabsComponent
           tabs={tabs}
-          defaultValue={
+          value={
             tabs.find((t) => t.value.toLowerCase() === tab?.toLowerCase())
               ?.value ?? tabs[0].value
           }
+          onChange={(value) => { if (value) router.push(`?tab=${value}`); }}
           mt={32}
           keepMounted={false}
         >
+          <TabsPanel value="all-transactions">
+            <AllTransactionsTab />
+          </TabsPanel>
           <TabsPanel value="own-account">
             <AccountsTab />
           </TabsPanel>
@@ -68,6 +74,7 @@ export default function AccountTrxSuspense() {
 }
 
 const tabs = [
+  { title: "All Transactions", value: "all-transactions" },
   { title: "Own Account", value: "own-account" },
   { title: "Issued Accounts", value: "issued-accounts" },
   { title: "Payouts", value: "payouts" },

@@ -23,7 +23,7 @@ export default function BasicInfo() {
         <TextInputWithInsideLabel
           label="Email"
           w="100%"
-          rightSection={<IconMail />}
+          leftSection={<IconMail />}
           {...form.getInputProps("businessEmail")}
           key={form.key("businessEmail")}
           withAsterisk
@@ -31,7 +31,7 @@ export default function BasicInfo() {
         <TextInputWithInsideLabel
           label="Legal Business Name"
           w="100%"
-          rightSection={<IconBriefcase />}
+          leftSection={<IconBriefcase />}
           {...form.getInputProps("businessName")}
           key={form.key("businessName")}
           withAsterisk
@@ -42,7 +42,7 @@ export default function BasicInfo() {
         <TextInputWithInsideLabel
           label="Trading Name"
           w="100%"
-          rightSection={<IconBriefcase />}
+          leftSection={<IconBriefcase />}
           {...form.getInputProps("businessTradingName")}
           key={form.key("businessTradingName")}
           withAsterisk
@@ -75,7 +75,7 @@ export default function BasicInfo() {
         <TextInputWithInsideLabel
           label="Business Address"
           w="100%"
-          rightSection={<IconMapPin />}
+          leftSection={<IconMapPin />}
           {...form.getInputProps("businessAddress")}
           key={form.key("businessAddress")}
           withAsterisk

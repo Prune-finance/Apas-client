@@ -383,7 +383,13 @@ export default function IssuedAccounts() {
       </Filter>
 
       <TableComponent
-        head={tableHeaders}
+        head={tableHeaders.map((h) =>
+          h === "Account Number"
+            ? activeCurrency === "USD"
+              ? "Account IBAN"
+              : "Account Number"
+            : h
+        )}
         rows={
           <RowComponent
             accounts={accounts || []}
@@ -510,7 +516,11 @@ const RowComponent = ({
           {element.accountName}
         </Link>
       </TableTd>
-      <TableTd>{element.accountNumber}</TableTd>
+      <TableTd>
+        {currency === "USD"
+          ? element.accountIban ?? element.accountNumber
+          : element.accountNumber}
+      </TableTd>
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>

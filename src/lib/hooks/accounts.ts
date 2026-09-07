@@ -981,6 +981,7 @@ export interface AccountData {
   accountName: string;
   accountIban?: string;
   accountNumber: string;
+  walletId?: string;
   accountDocuments: AccountDocuments;
   createdAt: Date;
   updatedAt: Date;

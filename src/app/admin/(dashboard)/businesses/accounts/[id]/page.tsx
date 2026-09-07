@@ -188,6 +188,8 @@ export default function Account() {
           admin
           trxMeta={meta}
           revalidate={revalidateAcct}
+          page={active}
+          limit={limit}
         >
           <PaginationComponent
             active={active}

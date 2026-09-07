@@ -42,6 +42,7 @@ import { DatePickerInput } from "@mantine/dates";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import { useQueryState } from "nuqs";
+import { exportSingleUserAccountTransactions } from "@/lib/hooks/transactions";
 export const Transactions = ({
   transactions,
   loading,
@@ -52,6 +53,8 @@ export const Transactions = ({
   location,
   isUser,
   currencyType,
+  page,
+  limit,
 }: Props) => {
   const pdfRef = useRef<HTMLDivElement>(null);
 
@@ -63,24 +66,21 @@ export const Transactions = ({
   const [openedFilter, { toggle }] = useDisclosure(false);
   const [openedPreview, { open: openPreview, close: closePreview }] =
     useDisclosure(false);
-  const [
-    openedTransactionsPreview,
-    { open: openTransactionsPreview, close: closeTransactionsPreview },
-  ] = useDisclosure(false);
+  const [exporting, setExporting] = useState(false);
+
   const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
     null,
     null,
   ]);
-  const [documentType, setDocumentType] = useState<string>("PDF");
+  const documentType = "PDF";
   const { handleSuccess, handleError, handleInfo } = useNotification();
 
   const [downloadData, setDownloadData] = useState<DownloadStatementData[]>([]);
-  const [exportData, setExportData] = useState<DownloadStatementData[]>([]);
-
   const [downloadMeta, setDownloadMeta] =
     useState<downloadStatementMeta | null>(null);
 
   const [loadingStatement, setLoadingStatement] = useState<boolean>(false);
+  const [appliedFilterCount, setAppliedFilterCount] = useState(0);
 
   const [search, setSearch] = useQueryState("search", {
     defaultValue: "",
@@ -102,6 +102,44 @@ export const Transactions = ({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
   });
+
+  const { status, createdAt, senderName, recipientName, recipientIban, type: txType } = form.values;
+
+  const handleExportTransactions = async () => {
+    if (!accountID) return;
+    const [date, endDate] = (createdAt ?? [null, null]).map((d) =>
+      d ? dayjs(d).format("YYYY-MM-DD") : undefined
+    );
+    setExporting(true);
+    try {
+      await exportSingleUserAccountTransactions(accountID, {
+        ...(page && { page }),
+        ...(limit && { limit: parseInt(limit, 10) }),
+        ...(status && { status }),
+        ...(date && { date }),
+        ...(endDate && { endDate }),
+        ...(senderName && { senderName }),
+        ...(recipientName && { recipientName }),
+        ...(recipientIban && { recipientIban }),
+        ...(txType && { type: txType }),
+        currency: currencyType,
+      });
+    } catch (error) {
+      handleError("Transactions Export", parseError(error));
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const countActiveFilters = (values: FilterType) =>
+    [
+      values.status,
+      values.createdAt?.[0],
+      values.senderName,
+      values.recipientName,
+      values.recipientIban,
+      values.type,
+    ].filter(Boolean).length;
 
   const overviewDetails = [
     {
@@ -220,84 +258,6 @@ export const Transactions = ({
     }
   };
 
-  const handleExportStatement = async () => {
-    console.log(location);
-
-    if (!dateRange[0] || !dateRange[1]) {
-      return handleInfo(
-        "Transactions Export",
-        "Please select a valid date range",
-      );
-    }
-
-    notifications.clean();
-    setLoadingStatement(true);
-
-    const [startDate, endDate] = dateRange.map((date) =>
-      dayjs(date).format("YYYY-MM-DD"),
-    );
-
-    const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
-    const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
-
-    // Define the possible URLs based on location
-    const urlMap: { [key: string]: string } = {
-      payout: `${baseUrl}/payouts/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}`,
-      "admin-account": `${baseUrl}/admin/accounts/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}`,
-      "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}`,
-      "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}`,
-      "own-account": `${baseUrl}/accounts/${accountID}/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "issued-account": `${baseUrl}/accounts/${accountID}/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "gbp-account": `${baseUrl}/accounts/${accountID}/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "ghs-account": `${baseUrl}/accounts/${accountID}/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "ghs-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "eur-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "gbp-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "usd-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-    };
-
-    const url =
-      urlMap[location ?? "default"] ||
-      `${baseUrl}/accounts/${accountID}/export?date=${startDate}&endDate=${endDate}&currency=${currencyType}`;
-
-    try {
-      const { data: res } = await axios.get(url, { headers });
-
-      if (!res?.data?.length) {
-        return handleInfo(
-          "Transactions Export",
-          "No transactions found for the selected date range",
-        );
-      }
-
-      setExportData(res.data);
-      // Simulate delay for processing
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-
-      handleCsvDownload(
-        res.data,
-        "transactions_export.csv",
-        currencyType || "EUR",
-      );
-
-      closeTransactionsPreview();
-      handleSuccess(
-        "Transactions Export",
-        "Transactions export downloaded successful",
-      );
-      setDateRange([null, null]);
-    } catch (error) {
-      console.error("Error exporting transactions:", error);
-      handleError(
-        "Transactions Export",
-        error instanceof Error
-          ? parseError(error)
-          : "error exporting transactions",
-      );
-    } finally {
-      setLoadingStatement(false);
-    }
-  };
 
   const closeAccountStatement = () => {
     closePreview();
@@ -322,6 +282,7 @@ export const Transactions = ({
             text="Filter"
             icon={IconListTree}
             fw={600}
+            indicator={appliedFilterCount}
           />
 
           <SecondaryBtn
@@ -336,10 +297,9 @@ export const Transactions = ({
           <SecondaryBtn
             text="Export Transactions"
             icon={IconCircleArrowDown}
-            // style={{ cursor: "not-allowed" }}
             fw={600}
-            // action={() => handlePdfStatement(pdfRef)}
-            action={openTransactionsPreview}
+            action={handleExportTransactions}
+            loading={exporting}
           />
         </Group>
       </Group>
@@ -348,6 +308,8 @@ export const Transactions = ({
         opened={openedFilter}
         toggle={toggle}
         form={form}
+        onAfterApply={(values) => setAppliedFilterCount(countActiveFilters(values))}
+        onClear={() => setAppliedFilterCount(0)}
         customStatusOption={[
           "PENDING",
           currencyType === "GHS" || currencyType === "USD"
@@ -476,70 +438,6 @@ export const Transactions = ({
         </Flex>
       </Modal>
 
-      <Modal
-        opened={openedTransactionsPreview}
-        onClose={closeTransactionsPreview}
-        size={"35%"}
-        centered
-        withCloseButton={true}
-        style={{ backgroundColor: "white" }}
-      >
-        <Flex
-          w="100%"
-          align="center"
-          justify="center"
-          direction="column"
-          px={30}
-        >
-          <Text fz={18} fw={500} c="#000">
-            Export Transactions
-          </Text>
-
-          <DatePickerInput
-            placeholder="Select Date Range"
-            valueFormat="YYYY-MM-DD"
-            value={dateRange}
-            onChange={(value: [Date | null, Date | null]) =>
-              setDateRange(value)
-            }
-            size="xs"
-            w="100%"
-            h={44}
-            styles={{ input: { height: "48px" } }}
-            mt={12}
-            type="range"
-            allowSingleDateInRange
-            leftSection={<IconCalendarMonth size={20} />}
-            numberOfColumns={2}
-            clearable
-            disabled={loading}
-          />
-
-          <SelectBox
-            placeholder="Select Document Type"
-            data={["CSV"]}
-            value={"CSV"}
-            disabled
-            onChange={(value) => setDocumentType(value!)}
-            mt={16}
-            size="xs"
-            w="100%"
-            h={44}
-            styles={{ input: { height: "48px" } }}
-          />
-
-          <PrimaryBtn
-            action={handleExportStatement}
-            loading={loadingStatement}
-            text="Submit"
-            mt={22}
-            ml="auto"
-            mb={38}
-            w="100%"
-            h={44}
-          />
-        </Flex>
-      </Modal>
 
       <Box pos="absolute" left={-9999} bottom={700} w="60vw" m={0} p={0}>
         <>
@@ -586,6 +484,8 @@ interface Props {
   location?: string;
   isUser?: boolean;
   currencyType?: string;
+  page?: number;
+  limit?: string | null;
 }
 
 export interface BalanceDetail {

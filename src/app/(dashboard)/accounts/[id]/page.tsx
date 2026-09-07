@@ -278,6 +278,8 @@ export default function Account() {
         isUser
         revalidate={revalidate}
         business={business}
+        page={active}
+        limit={limit}
       >
         <PaginationComponent
           active={active}

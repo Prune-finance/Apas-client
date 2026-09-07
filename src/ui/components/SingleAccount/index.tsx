@@ -591,6 +591,8 @@ interface SingleAccountProps {
   isUser?: boolean;
   revalidate: () => Promise<void>;
   currency?: string;
+  page?: number;
+  limit?: string | null;
 }
 
 export const SingleAccountBody = ({
@@ -610,6 +612,8 @@ export const SingleAccountBody = ({
   location,
   isUser,
   revalidate,
+  page,
+  limit,
 }: SingleAccountProps) => {
   const tabs = [
     { value: "Account Details" },
@@ -649,9 +653,10 @@ export const SingleAccountBody = ({
             payout={payout}
             meta={trxMeta}
             currencyType={currency}
-            // children={children}
             accountID={accountID}
             isUser={isUser}
+            page={page}
+            limit={limit}
           >
             {children}
           </Transactions>
@@ -695,6 +700,8 @@ export const SingleDefaultAccountBody = ({
   revalidateTrx,
   isUser,
   accountType,
+  page,
+  limit,
 }: SingleDefaultAccountProps) => {
   /**
    * @description - Tabs for the default account
@@ -757,6 +764,8 @@ export const SingleDefaultAccountBody = ({
             location={location ?? "default"}
             isUser={isUser}
             currencyType={account?.AccountRequests?.Currency?.symbol || accountType}
+            page={page}
+            limit={limit}
           >
             {children}
           </Transactions>

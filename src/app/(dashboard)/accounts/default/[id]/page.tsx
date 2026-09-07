@@ -132,6 +132,8 @@ function Account() {
         revalidateTrx={revalidateTrx}
         business={business}
         isUser
+        page={active}
+        limit={limit}
       >
         <PaginationComponent
           active={active}

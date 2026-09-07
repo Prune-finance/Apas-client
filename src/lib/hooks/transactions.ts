@@ -1237,3 +1237,11 @@ export function exportUserAllTransactions(params: IParams) {
     })
   );
 }
+
+export function exportSingleUserAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`accounts/${accountID}/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}

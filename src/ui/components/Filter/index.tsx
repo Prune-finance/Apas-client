@@ -20,6 +20,7 @@ type Props<T> = {
   customStatusOption?: string[];
   noDate?: boolean;
   onApply?: (values: T) => void;
+  onAfterApply?: (values: T) => void;
   onClear?: () => void;
 };
 
@@ -34,6 +35,7 @@ export default function Filter<T>({
   customStatusOption,
   noDate,
   onApply,
+  onAfterApply,
   onClear,
 }: Props<T>) {
   const { push, replace } = useRouter();
@@ -107,6 +109,7 @@ export default function Filter<T>({
 
       // push(`${newUrl}`);
       window.history.pushState({}, "", newUrl);
+      onAfterApply?.(form.values as T);
     } finally {
       setProcessing(false);
     }

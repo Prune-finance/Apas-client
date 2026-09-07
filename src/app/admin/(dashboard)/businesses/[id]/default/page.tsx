@@ -133,6 +133,8 @@ export default function BusinessDefaultAccount() {
           isDefault
           trxMeta={meta}
           revalidate={revalidateAcct}
+          page={active}
+          limit={limit}
         >
           <PaginationComponent
             active={active}

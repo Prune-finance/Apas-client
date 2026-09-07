@@ -1,11 +1,12 @@
 "use client";
 
-import { Box, Paper, Text, TextInput } from "@mantine/core";
+import { Box, Text, Title } from "@mantine/core";
 import Image from "next/image";
 import PruneIcon from "@/assets/icon.png";
-import styles from "./style.module.scss";
-import { inter } from "@/ui/fonts";
+import signInBg from "@/assets/auth-bg/sign-in.png";
+import authStyles from "@/ui/styles/auth.module.scss";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import { TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
 import { useState } from "react";
@@ -22,6 +23,7 @@ export default function UserForgotPassword() {
   const schema = z.object({
     email: z.string().email("Invalid Email").min(1, "Email is required"),
   });
+
   const form = useForm({
     initialValues: { email: "" },
     validate: zodResolver(schema),
@@ -36,7 +38,7 @@ export default function UserForgotPassword() {
       );
       handleSuccess(
         "Email Sent",
-        `A password reset link has been sent to your email. `
+        "A password reset link has been sent to your email."
       );
       push("/auth/reset-password");
     } catch (error) {
@@ -47,56 +49,103 @@ export default function UserForgotPassword() {
   };
 
   return (
-    <div className={styles.container}>
-      <Paper w={476} className={styles.paper}>
-        <Image width={29} height={29} src={PruneIcon} alt="prune icon" />
-        <Text c="var(--prune-text-gray-900)" fz={24} fw={600} mt={27} mb={0}>
-          Forgot Password
-        </Text>
-        <Text
-          fz={14}
-          fw={400}
-          m={0}
-          p={0}
-          c="var(--prune-text-gray-600)"
-          style={{ fontFamily: inter.style.fontFamily }}
-        >
-          Do not worry, we would help you reset it.
-        </Text>
-
-        <Box
-          component="form"
-          onSubmit={form.onSubmit(() => handleResetLink())}
-          w="100%"
-        >
-          <TextInput
-            mt={42}
-            placeholder="Enter Email"
-            {...form.getInputProps("email")}
-            classNames={{ input: styles.input }}
+    <main className={authStyles.login}>
+      {/* Left sidebar — identical to login */}
+      <div className={authStyles.login__frame}>
+        <div className={authStyles.bg__image}>
+          <Image
+            src={signInBg}
+            alt="sign in background"
+            fill
+            style={{ objectFit: "cover", objectPosition: "center top" }}
+            priority
           />
+          <div className={authStyles.bg__overlay} />
+        </div>
 
-          <PrimaryBtn
-            text="Send Reset Link"
-            fullWidth
-            mt={39}
-            fw={600}
-            type="submit"
-            loading={processing}
-          />
+        <div className={authStyles.frame__logo}>
+          <Image width={33} height={33} src={PruneIcon} alt="Prune icon" />
+          <Text fz={20} fw={600} c="white" lh={1}>
+            Prune Payments
+          </Text>
+        </div>
+
+        <div className={authStyles.testimonial}>
+          <Title order={2} className={authStyles.testimonial__quote}>
+            Just what I needed to settle my distributors.
+          </Title>
+          <div className={authStyles.testimonial__author}>
+            <Text fz={16} fw={700} c="white">
+              Karen Yue
+            </Text>
+            <Text fz={14} fw={400} c="white">
+              Director of Digital Marketing Technology
+            </Text>
+          </div>
+        </div>
+      </div>
+
+      {/* Right panel — forgot password form */}
+      <div className={authStyles.login__paper}>
+        <Box w={{ base: "90vw", sm: 394 }}>
+          {/* <Image width={29} height={29} src={PruneIcon} alt="prune icon" /> */}
+
+          <Title order={2} className={authStyles.paper__header}>
+            Forgot Password
+          </Title>
+
+          <Text className={authStyles.paper__text}>
+            Do not worry, we would help you reset it.
+          </Text>
+
+          <Box
+            component="form"
+            mt={32}
+            onSubmit={form.onSubmit(() => handleResetLink())}
+          >
+            <TextInput
+              styles={{
+                input: {
+                  height: "48px",
+                  border: "1px solid var(--prune-text-gray-100)",
+                  borderRadius: "8px",
+                  paddingLeft: "15px",
+                  paddingRight: "15px",
+                  fontSize: "14px",
+                  color: "var(--prune-text-gray-700)",
+                },
+              }}
+              placeholder="Enter Email"
+              {...form.getInputProps("email")}
+            />
+
+            <PrimaryBtn
+              text="Send Reset Link"
+              fullWidth
+              mt={24}
+              h={48}
+              radius={4}
+              fz={16}
+              fw={500}
+              type="submit"
+              loading={processing}
+            />
+
+            <PrimaryBtn
+              text="Go back to Login"
+              link="/auth/login"
+              mt={16}
+              variant="transparent"
+              fz={14}
+              fw={600}
+              fullWidth
+              p={0}
+              c="var(--prune-primary-800)"
+              style={{ textAlign: "center" }}
+            />
+          </Box>
         </Box>
-
-        <PrimaryBtn
-          text="Go back to Login"
-          link="/auth/login"
-          mt={10}
-          td="underline"
-          variant="transparent"
-          c="var(--prune-primary-700)"
-          fz={14}
-          fw={600}
-        />
-      </Paper>
-    </div>
+      </div>
+    </main>
   );
 }

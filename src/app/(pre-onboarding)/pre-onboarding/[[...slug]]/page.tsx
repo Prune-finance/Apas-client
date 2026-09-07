@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Container, Progress, Text } from "@mantine/core";
+import { Box, Progress, Text } from "@mantine/core";
 
 import Services from "./Services";
 import { QuestionnaireNav } from "./QuestionnaireNav";
@@ -90,13 +90,13 @@ export default function Questionnaire() {
   return (
     <QuestionnaireFormProvider form={form}>
       <Box pos="sticky" top={0} style={{ zIndex: 100 }} bg="#FCFCFD">
-        <Container size={1200} pt={30} pb={20}>
+        <Box px={{ base: 24, sm: 48, lg: 120 }} pt={32} pb={15}>
           <Text
             ta="left"
-            mb={30}
+            mb={15}
             c="var(--prune-text-gray-700)"
             fz={24}
-            fw={500}
+            fw={600}
           >
             Prune Onboarding: Company Profile
           </Text>
@@ -105,11 +105,11 @@ export default function Questionnaire() {
             // value={calculateProgress}
             color="var(--prune-primary-600)"
           />
-        </Container>
+        </Box>
       </Box>
 
-      <Container size={1200} mt={40}>
-        <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
+      <Box px={{ base: 24, sm: 48, lg: 120 }} mt={40}>
+        <Text c="var(--prune-text-gray-700)" fw={600} fz={20} mb={32}>
           Tell Us About Your Business.
         </Text>
         {active === 0 && <BasicInfo />}
@@ -135,7 +135,7 @@ export default function Questionnaire() {
               : "Next"
           }
         />
-      </Container>
+      </Box>
 
       <ConsentModal opened={opened} close={close} />
     </QuestionnaireFormProvider>

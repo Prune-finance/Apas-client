@@ -4,108 +4,58 @@
   min-height: 100%;
 
   .login__frame {
-    // flex-grow: 1;
     width: 507px;
+    flex-shrink: 0;
     display: flex;
-    padding-bottom: 50px;
     flex-direction: column;
-    background-color: var(--prune-black);
+    justify-content: space-between;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
 
-    .cards {
-      flex-grow: 1;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-
-      .card {
-        background-color: #fff;
-        width: 440px;
-        height: 363px;
-        border-radius: 10px;
-        position: absolute;
-        z-index: 1;
-        padding: 25px 30px;
-        display: flex;
-        flex-direction: column;
-      }
-
-      .card__one {
-        margin-right: -70px;
-      }
-
-      .card__two {
-        margin-right: -30px;
-        transform: rotate(-3deg);
-      }
-
-      .card__three {
-        margin-right: 10px;
-        transform: rotate(-10deg);
-      }
-
-      .images__container {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .card__info {
-        margin-top: 15px;
-        display: flex;
-        flex-direction: column;
-        flex-grow: 1;
-        justify-content: center;
-        gap: 10px;
-
-        .info {
-          .info__text {
-            color: var(--prune-text-gray);
-          }
-        }
-      }
+    .bg__image {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
     }
 
-    .text__notifications {
+    .bg__overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.6) 7.8%,
+        rgba(0, 0, 0, 0) 33.6%
+      );
+      z-index: 1;
+    }
+
+    .frame__logo {
       display: flex;
-      padding-left: 70px;
-      justify-content: space-between;
       align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+    }
 
-      .text {
-        .text__title,
-        .text__sub {
-          max-width: 340px;
-          color: var(--prune-text-white);
-          line-height: 44px;
-        }
+    .testimonial {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+      z-index: 2;
 
-        .text__sub {
-          margin-top: 30px;
-          line-height: 24px;
-        }
+      .testimonial__quote {
+        font-size: 24px;
+        font-weight: 700;
+        color: white;
+        line-height: 1.2;
       }
 
-      .notifications {
-        .notifications__card {
-          height: 96px;
-          width: 440px;
-          padding: 20px 10px;
-          background-color: #fff;
-          border-radius: 10px;
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          margin-right: -130px;
-          box-shadow: 20px 15px 0px 2px rgba(255, 255, 255, 1),
-            40px 35px 0px 2px rgba(255, 255, 255, 0.75),
-            60px 55px 0px 2px rgba(255, 255, 255, 0.5);
-
-          .card__text {
-            .text__sub {
-              color: #344054;
-            }
-          }
-        }
+      .testimonial__author {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
       }
     }
   }
@@ -125,14 +75,15 @@
 
     .paper__header {
       font-size: 32px;
-      margin-top: 30px;
-      color: var(--prune-text-gray-800);
+      margin-top: 24px;
+      color: var(--prune-text-gray-700);
+      line-height: 1.2;
     }
 
     .paper__text {
       font-size: 14px;
       margin-top: 10px;
-      color: var(--prune-text-gray-500);
+      color: var(--prune-text-gray-600);
     }
 
     .text__input__container {

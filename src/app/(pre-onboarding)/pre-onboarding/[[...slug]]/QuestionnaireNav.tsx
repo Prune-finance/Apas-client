@@ -32,13 +32,14 @@ export function QuestionnaireNav({
         }}
         disabled={disabled}
       />
-      <SecondaryBtn
-        text={previousText}
-        fullWidth
-        fw={600}
-        action={onPrevious}
-        disabled={disabledPrev}
-      />
+      {!disabledPrev && (
+        <SecondaryBtn
+          text={previousText}
+          fullWidth
+          fw={600}
+          action={onPrevious}
+        />
+      )}
     </Stack>
   );
 }

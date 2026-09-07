@@ -527,7 +527,13 @@ const RowComponent = ({
           {element.accountName}
         </Link>
       </TableTd>
-      <TableTd>{element.accountNumber}</TableTd>
+      <TableTd>
+        {currency === "USD"
+          ? element.accountIban ?? element.accountNumber
+          : currency === "GHS"
+          ? element.walletId ?? element.accountNumber
+          : element.accountNumber}
+      </TableTd>
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd>

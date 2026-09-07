@@ -4,8 +4,7 @@ import Image from "next/image";
 
 import styles from "@/ui/styles/auth.module.scss";
 import PruneIcon from "@/assets/icon.png";
-import { inter, pjs } from "@/ui/fonts";
-import { CardOne, CardThree, CardTwo } from "./cards";
+import signInBg from "@/assets/auth-bg/sign-in.png";
 import LoginForm from "./form";
 import { checkToken } from "@/lib/actions/checkToken";
 import { redirect } from "next/navigation";
@@ -18,57 +17,41 @@ async function Login() {
   return (
     <main className={styles.login}>
       <div className={styles.login__frame}>
-        <div className={styles.cards}>
-          <CardThree />
-          <CardTwo />
-          <CardOne />
+        <div className={styles.bg__image}>
+          <Image
+            src={signInBg}
+            alt="sign in background"
+            fill
+            style={{ objectFit: "cover", objectPosition: "center top" }}
+            priority
+          />
+          <div className={styles.bg__overlay} />
         </div>
 
-        <div className={styles.text__notifications}>
-          <div className={styles.text}>
-            <Title
-              order={3}
-              fz={33}
-              fw={500}
-              className={`${styles.text__title} ${inter.className}`}
-            >
-              Prune makes your API generation easy, fast and reliable
-            </Title>
-            <Text fz={14} className={`${styles.text__sub} ${pjs.className}`}>
-              {`The API's robust features and seamless integration capabilities
-              have transformed the way we handle transactions, manage user
-              accounts, and process payments..`}
+        <div className={styles.frame__logo}>
+          <Image width={33} height={33} src={PruneIcon} alt="Prune icon" />
+          <Text fz={20} fw={600} c="white" lh={1}>
+            Prune Payments
+          </Text>
+        </div>
+
+        <div className={styles.testimonial}>
+          <Title order={2} className={styles.testimonial__quote}>
+            Just what I needed to settle my distributors.
+          </Title>
+          <div className={styles.testimonial__author}>
+            <Text fz={16} fw={700} c="white">
+              Karen Yue
+            </Text>
+            <Text fz={14} fw={400} c="white">
+              Director of Digital Marketing Technology
             </Text>
           </div>
-          {/* <div className={styles.notifications}>
-            <div className={styles.notifications__card}>
-              <Image width={66} height={66} src={PruneIcon} alt="prune icon" />
-              <div className={styles.card__text}>
-                <Text className={`${inter.className}`} fz={17.11} fw={600}>
-                  Account Created
-                </Text>
-                <Text fz={15.18} fw={400} className={styles.text__sub}>
-                  Your GBP account has been <br /> created successfully.
-                </Text>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
 
       <div className={styles.login__paper}>
-        <Group
-          gap={2}
-          style={{
-            // border: "1px solid red",
-            alignSelf: "flex-end",
-            justifySelf: "flex-start",
-          }}
-          justify="flex-end"
-          pos="absolute"
-          top={36}
-          right={43}
-        >
+        <Group gap={2} justify="flex-end" pos="absolute" top={36} right={43}>
           <Text fz={14} className={styles.rdr__text}>
             Having Issues?{" "}
           </Text>
@@ -83,10 +66,8 @@ async function Login() {
           />
         </Group>
         <Box w={{ base: "90vw", sm: 394 }}>
-          <Image width={29} height={29} src={PruneIcon} alt="prune icon" />
-
           <Title order={2} className={styles.paper__header}>
-            LOG IN
+            Login
           </Title>
 
           <Text className={styles.paper__text}>

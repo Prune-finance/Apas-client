@@ -47,6 +47,28 @@
 // }
 
 @font-face {
+  font-family: "EksellDisplay";
+  src: url("/fonts/eksell/ekselldisplaytrial-small.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EksellDisplay";
+  src: url("/fonts/eksell/ekselldisplaytrial-medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EksellDisplay";
+  src: url("/fonts/eksell/ekselldisplaytrial-large.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Switzer";
   src: url("/fonts/Switzer-Thin.woff2") format("woff2");
   font-weight: 100;
@@ -202,7 +224,8 @@ body {
 body {
   color: var(--prune-text-gray-700);
   background: #f6f6f6;
-  font-family: var(--font-switzer);
+  font-family: var(--font-ibm-plex-sans);
+  font-size: 12px;
 }
 
 a {
@@ -315,15 +338,153 @@ a {
 .mantine-RichTextEditor-content,
 .m_6c018570,
 .mantine-PillsInput-wrapper {
-  font-family: var(--font-switzer);
+  font-family: var(--font-ibm-plex-sans);
 
   &:focus {
-    border: 1px solid var(--prune-primary-700) !important;
+    border-color: var(--prune-primary-600) !important;
+    box-shadow: 0 0 0 3px rgba(193, 221, 6, 0.2) !important;
   }
 
   &::placeholder {
-    font-size: 12px !important;
-    font-family: var(--font-switzer);
-    // font-family: "Switzer" !important;
+    color: var(--prune-text-gray-400) !important;
+    font-size: 14px !important;
+    font-family: var(--font-ibm-plex-sans);
+  }
+}
+
+// Suppress browser autofill blue tint
+.mantine-TextInput-input,
+.mantine-PasswordInput-innerInput {
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 9999px white inset !important;
+    -webkit-text-fill-color: var(--prune-text-gray-700) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+// Input visual elements — border, radius, disabled state
+.mantine-TextInput-input,
+.mantine-PasswordInput-input,
+.mantine-DateInput-input,
+.mantine-DatePickerInput-input,
+.mantine-YearPickerInput-input,
+.mantine-MultiSelect-input,
+.mantine-Textarea-input,
+.mantine-NumberInput-input,
+.mantine-PillsInput-wrapper,
+.mantine-Select-input {
+  border-radius: 8px !important;
+  border: 1px solid var(--prune-text-gray-100) !important;
+
+  &:disabled,
+  &[data-disabled] {
+    background: #f5f5f5 !important;
+    opacity: 1 !important;
+  }
+}
+
+// Focus ring on wrapper-level elements (PasswordInput, MultiSelect, PillsInput)
+.mantine-PasswordInput-input,
+.mantine-MultiSelect-input,
+.mantine-PillsInput-wrapper {
+  &:focus-within {
+    border-color: var(--prune-primary-600) !important;
+    box-shadow: 0 0 0 3px rgba(193, 221, 6, 0.2) !important;
+  }
+}
+
+// Input labels (base: 12px)
+.mantine-TextInput-label,
+.mantine-PasswordInput-label,
+.mantine-Select-label,
+.mantine-DateInput-label,
+.mantine-DatePickerInput-label,
+.mantine-YearPickerInput-label,
+.mantine-MultiSelect-label,
+.mantine-Textarea-label,
+.mantine-NumberInput-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #475467;
+}
+
+// lg screens (≥ 64em / 1024px)
+@media (min-width: 64em) {
+  // Input/textarea/select text
+  .mantine-TextInput-input,
+  .mantine-PasswordInput-innerInput,
+  .mantine-Select-input,
+  .mantine-MultiSelect-input,
+  .mantine-Textarea-input,
+  .mantine-NumberInput-input,
+  .mantine-DateInput-input,
+  .mantine-DatePickerInput-input,
+  .mantine-YearPickerInput-input {
+    font-size: 14px !important;
+
+    &::placeholder {
+      font-size: 14px !important;
+    }
+  }
+
+  // Labels
+  .mantine-TextInput-label,
+  .mantine-PasswordInput-label,
+  .mantine-Select-label,
+  .mantine-DateInput-label,
+  .mantine-DatePickerInput-label,
+  .mantine-YearPickerInput-label,
+  .mantine-MultiSelect-label,
+  .mantine-Textarea-label,
+  .mantine-NumberInput-label {
+    font-size: 14px !important;
+  }
+
+  // Checkbox / radio labels
+  .mantine-Checkbox-label,
+  .mantine-Radio-label {
+    font-size: 14px !important;
+  }
+}
+
+// 2xl screens (≥ 96em / 1536px)
+@media (min-width: 96em) {
+  // Input/textarea/select text
+  .mantine-TextInput-input,
+  .mantine-PasswordInput-innerInput,
+  .mantine-Select-input,
+  .mantine-MultiSelect-input,
+  .mantine-Textarea-input,
+  .mantine-NumberInput-input,
+  .mantine-DateInput-input,
+  .mantine-DatePickerInput-input,
+  .mantine-YearPickerInput-input {
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px !important;
+    }
+  }
+
+  // Labels
+  .mantine-TextInput-label,
+  .mantine-PasswordInput-label,
+  .mantine-Select-label,
+  .mantine-DateInput-label,
+  .mantine-DatePickerInput-label,
+  .mantine-YearPickerInput-label,
+  .mantine-MultiSelect-label,
+  .mantine-Textarea-label,
+  .mantine-NumberInput-label {
+    font-size: 16px !important;
+  }
+
+  // Checkbox / radio labels
+  .mantine-Checkbox-label,
+  .mantine-Radio-label {
+    font-size: 16px !important;
   }
 }

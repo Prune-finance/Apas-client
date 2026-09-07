@@ -1,5 +1,21 @@
+.primary__btn {
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  line-height: 18px;
+
+  @media (min-width: 88em) {
+    font-size: 16px !important;
+  }
+}
+
 .secondary__btn {
+  border-radius: 8px !important;
   transition: all 0.3s;
+
+  @media (min-width: 88em) {
+    font-size: 16px !important;
+  }
 
   &:hover {
     border: 1px solid var(--prune-primary-700);

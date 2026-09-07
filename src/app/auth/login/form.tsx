@@ -6,29 +6,44 @@ import useNotification from "@/lib/hooks/notification";
 import { LoginType, loginValues, validateLogin } from "@/lib/schema/auth";
 import User from "@/lib/store/user";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { LoginInput } from "@/ui/components/Inputs";
-import {
-  Box,
-  Checkbox,
-  Group,
-  PasswordInput,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Box, Checkbox, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
 import { Suspense, useState } from "react";
-
-import styles from "@/ui/styles/auth.module.scss";
-import classes from "@/ui/styles/containedInput.module.scss";
 import { useSearchParams } from "next/navigation";
+
+const fieldStyles = {
+  input: {
+    height: "48px",
+    border: "1px solid var(--prune-text-gray-100)",
+    borderRadius: "8px",
+    paddingLeft: "15px",
+    paddingRight: "15px",
+    fontSize: "14px",
+    color: "var(--prune-text-gray-700)",
+  },
+};
+
+const passwordStyles = {
+  input: {
+    height: "48px",
+    border: "1px solid var(--prune-text-gray-100)",
+    borderRadius: "8px",
+  },
+  innerInput: {
+    paddingLeft: "15px",
+    paddingRight: "15px",
+    fontSize: "14px",
+    color: "var(--prune-text-gray-700)",
+    height: "100%",
+  },
+};
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
   const [processing, setProcessing] = useState(false);
   const { setUser } = User();
-
   const { handleSuccess, handleError } = useNotification();
 
   const form = useForm<LoginType>({
@@ -40,15 +55,10 @@ function LoginForm() {
     setProcessing(true);
     try {
       const { errors, hasErrors } = form.validate();
-      if (hasErrors) {
-        return;
-      }
+      if (hasErrors) return;
 
-      const authUrl = "/api/auth/login";
-      const { data } = await axios.post(authUrl, form.values);
-
+      const { data } = await axios.post("/api/auth/login", form.values);
       setUser({ ...data.data });
-
       Cookies.set("auth", data.meta.token, { expires: 0.25 });
       handleSuccess("Authentication Successful", "Welcome back");
       window.location.replace(redirect ? redirect : "/");
@@ -60,86 +70,58 @@ function LoginForm() {
   };
 
   return (
-    <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
-      <TextInput
-        mt="md"
-        classNames={classes}
-        label="Email"
-        size="xs"
-        flex={1}
-        placeholder="Enter Email"
-        {...form.getInputProps("email")}
-      />
+    <Box component="form" mt={32} onSubmit={form.onSubmit(() => handleLogin())}>
+      {/* Email + Password — 16px gap */}
+      <Stack gap={16}>
+        <TextInput
+          styles={fieldStyles}
+          placeholder="Email"
+          {...form.getInputProps("email")}
+        />
 
-      <PasswordInput
-        mt="md"
-        classNames={classes}
-        styles={{
-          input: {
-            border: "1px solid var(--prune-text-gray-300)",
-            "&:focus": { border: "none", outline: "none" },
-            "&:active": { border: "none", outline: "none" },
-          },
+        <PasswordInput
+          styles={passwordStyles}
+          placeholder="Password"
+          {...form.getInputProps("password")}
+        />
+      </Stack>
 
-          innerInput: {
-            border: "none",
-            outline: "none",
-            paddingTop: "18px",
-            height: "100%",
-          },
-        }}
-        label="Password"
-        flex={1}
-        placeholder="Enter Password"
-        size="xs"
-        {...form.getInputProps("password")}
-        color="#C1DD06"
-      />
+      {/* Remember me + Log In — 16px gap, 24px below fields */}
+      <Stack gap={16} mt={24}>
+        <Checkbox
+          label="Remember me"
+          size="sm"
+          color="var(--prune-primary-600)"
+          styles={{
+            label: { fontSize: "14px", color: "var(--prune-text-gray-700)" },
+            input: { borderRadius: "4px" },
+          }}
+        />
 
-      {/* <LoginInput form={form} label="email" />
-      <LoginInput form={form} label="password" /> */}
-
-      <div className={styles.login__actions}>
-        <Checkbox label="Remember me" size="xs" color="#C1DD06" />
-      </div>
-
-      <PrimaryBtn
-        // action={handleLogin}
-        loading={processing}
-        fullWidth
-        text="Log In"
-        type="submit"
-        fz={14}
-        fw={600}
-        mt={32}
-      />
+        <PrimaryBtn
+          loading={processing}
+          fullWidth
+          text="Log In"
+          type="submit"
+          h={48}
+          radius={4}
+          fz={16}
+          fw={500}
+        />
+      </Stack>
 
       <PrimaryBtn
         text="Forgot Password?"
         variant="transparent"
         fz={14}
         fw={600}
-        mt={32}
-        w="15ch"
+        mt={16}
         p={0}
         c="var(--prune-primary-800)"
         link="/auth/forgot-password"
+        fullWidth
+        style={{ textAlign: "center" }}
       />
-
-      {/* <Group gap={2}>
-        <Text fz={14} className={styles.rdr__text}>
-          New user?{" "}
-        </Text>
-        <PrimaryBtn
-          text="Learn how to sign up"
-          variant="transparent"
-          fz={14}
-          fw={600}
-          p={0}
-          c="var(--prune-primary-800)"
-          link="https://prune-payments.gitbook.io/prune-api-services/"
-        />
-      </Group> */}
     </Box>
   );
 }

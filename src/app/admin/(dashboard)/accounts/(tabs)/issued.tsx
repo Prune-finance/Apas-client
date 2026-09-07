@@ -526,6 +526,8 @@ const RowComponent = ({
       <TableTd>
         {currency === "USD"
           ? element.accountIban ?? element.accountNumber
+          : currency === "GHS"
+          ? element.walletId ?? element.accountNumber
           : element.accountNumber}
       </TableTd>
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>

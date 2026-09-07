@@ -77,12 +77,14 @@ export const PrimaryBtn = ({
     <Button
       color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
-      fz={12}
-      fw={500}
+      fz={14}
+      fw={600}
+      radius={10}
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       href={link}
       onClick={action}
+      className={styles.primary__btn}
       {...props}
     >
       {text}
@@ -91,13 +93,15 @@ export const PrimaryBtn = ({
     <Button
       color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
-      fz={12}
-      fw={500}
+      fz={14}
+      fw={600}
+      radius={10}
       leftSection={Icon && <Icon size={14} />}
       onClick={(e) => {
         e.stopPropagation();
         action && action();
       }}
+      className={styles.primary__btn}
       {...props}
     >
       {text}
@@ -129,7 +133,8 @@ export const SecondaryBtn = ({
       c="var(--prune-text-gray-800)"
       variant="outline"
       fz={12}
-      fw={500}
+      fw={600}
+      radius={8}
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       onClick={action}
@@ -146,7 +151,8 @@ export const SecondaryBtn = ({
       c="var(--prune-text-gray-800)"
       variant="outline"
       fz={12}
-      fw={500}
+      fw={600}
+      radius={8}
       leftSection={Icon && <Icon size={14} />}
       onClick={(e) => {
         e.stopPropagation();

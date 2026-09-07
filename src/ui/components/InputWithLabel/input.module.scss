@@ -7,14 +7,43 @@
   padding-top: 25px;
   background-color: #fcfcfd;
   border: 1px solid #f2f4f7;
+  font-size: 12px;
+
+  &::placeholder {
+    font-size: 12px;
+  }
+
+  @media (min-width: 64em) {
+    font-size: 14px;
+
+    &::placeholder {
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 96em) {
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px !important;
+    }
+  }
 }
 
 .label {
   font-weight: 400;
   position: absolute;
   pointer-events: none;
-  font-size: var(--mantine-font-size-xs);
+  font-size: 12px;
   padding-left: var(--mantine-spacing-sm);
   padding-top: calc(var(--mantine-spacing-sm) / 2);
   z-index: 1;
+
+  @media (min-width: 64em) {
+    font-size: 14px;
+  }
+
+  @media (min-width: 96em) {
+    font-size: 16px !important;
+  }
 }

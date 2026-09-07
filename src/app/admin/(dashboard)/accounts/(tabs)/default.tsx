@@ -95,11 +95,15 @@ export default function BusinessAccounts() {
   const [frequency, setFrequency] = useState<string | null>("Monthly");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const [cardStatus, setCardStatus] = useState<string | null>(null);
+
+  const effectiveStatus = cardStatus ?? (status || null);
+  const activeFilterCount = [effectiveStatus, date, endDate, accountName, accountNumber, type].filter(Boolean).length;
 
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
+    ...(effectiveStatus && { status: effectiveStatus.toUpperCase() }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     ...(accountName && { accountName }),
     ...(accountNumber && { accountNumber }),
@@ -112,6 +116,7 @@ export default function BusinessAccounts() {
   const dependencies = [
     limit,
     activePage,
+    cardStatus,
     status,
     date,
     endDate,
@@ -356,6 +361,7 @@ export default function BusinessAccounts() {
         open={openFilter}
         close={closeFilter}
         opened={filterOpened}
+        onStatusFilter={setCardStatus}
       />
 
       <Group
@@ -386,11 +392,12 @@ export default function BusinessAccounts() {
             icon={IconListTree}
             action={toggle}
             fw={600}
+            indicator={activeFilterCount}
           />
         </Group>
       </Group>
 
-      <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form}>
+      <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form} onClear={() => setCardStatus(null)}>
         <TextBox
           placeholder="Account Name"
           {...form.getInputProps("accountName")}

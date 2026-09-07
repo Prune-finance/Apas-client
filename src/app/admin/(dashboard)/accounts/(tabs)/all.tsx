@@ -72,6 +72,8 @@ export default function AllAccounts() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
+  const activeFilterCount = [status, date, endDate, accountName, accountNumber, type].filter(Boolean).length;
+
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
@@ -239,6 +241,7 @@ export default function AllAccounts() {
             icon={IconListTree}
             action={toggle}
             fw={600}
+            indicator={activeFilterCount}
           />
         </Group>
       </Group>

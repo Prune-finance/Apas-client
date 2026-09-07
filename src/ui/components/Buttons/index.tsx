@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, ButtonProps, Group, UnstyledButton } from "@mantine/core";
+import { Button, ButtonProps, Group, Indicator, UnstyledButton } from "@mantine/core";
 import {
   Icon,
   IconArrowLeft,
@@ -110,6 +110,7 @@ interface PrimaryBtnProps extends Props {
   action?: () => void;
   showIcon?: boolean;
   type?: "button" | "reset" | "submit";
+  indicator?: number;
 }
 export const SecondaryBtn = ({
   link,
@@ -118,10 +119,11 @@ export const SecondaryBtn = ({
   action,
   showIcon,
   type = "button",
+  indicator,
   ...props
 }: PrimaryBtnProps) => {
   const Icon = icon;
-  return link ? (
+  const btn = link ? (
     <Button
       color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
@@ -157,4 +159,9 @@ export const SecondaryBtn = ({
       {text}
     </Button>
   );
+  return indicator && indicator > 0 ? (
+    <Indicator label={indicator} size={16} color="var(--prune-primary-600)" c="var(--prune-text-gray-800)" inline>
+      {btn}
+    </Indicator>
+  ) : btn;
 };

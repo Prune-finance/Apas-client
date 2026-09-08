@@ -1,6 +1,6 @@
 import { Box, Container, Flex, Text } from "@mantine/core";
 import React from "react";
-import PruneIcon from "@/assets/logo-with-text.svg";
+import PruneIcon from "@/assets/logo.svg";
 import Image from "next/image";
 
 function NotFoundPage() {

@@ -2,7 +2,7 @@
 
 import { Box, Button, Container, Flex, Image, Text } from "@mantine/core";
 import { useEffect } from "react";
-import PruneIcon from "@/assets/logo-with-text.svg";
+import PruneIcon from "@/assets/logo.svg";
 
 export default function Error({
   error,

@@ -3,7 +3,7 @@ import Photo2 from "@/assets/questionnaire/questionnaire2.png";
 import Photo3 from "@/assets/questionnaire/questionnaire3.png";
 import Photo4 from "@/assets/questionnaire/questionnaire4.png";
 import Photo5 from "@/assets/questionnaire/questionnaire5.png";
-import Icon from "@/assets/logo-with-text.svg";
+import Icon from "@/assets/LogoWhite.png";
 import { BackgroundImage, Box, Group, Image, Stack, Text } from "@mantine/core";
 import { useParams } from "next/navigation";
 import { useMemo } from "react";
@@ -39,7 +39,7 @@ export default function Navbar() {
     >
       <Stack justify="space-between" c="#fff" h="100%">
         <Group gap={8} wrap="nowrap">
-          <Image src={Icon} width={119} height={32} alt="prune logo" unoptimized />
+          <Image src={Icon} width={119} height={32} alt="prune logo" />
         </Group>
 
         <Stack gap={4}>

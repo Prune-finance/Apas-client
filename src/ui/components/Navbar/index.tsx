@@ -24,7 +24,7 @@ import {
   UserOtherLinks,
 } from "@/lib/static";
 
-import PruneLogo from "@/assets/logo-with-text.svg";
+import PruneLogo from "@/assets/logo.svg";
 // import PruneTintLogo from "@/assets/logo-tint.png";
 import styles from "./styles.module.scss";
 import { useDisclosure, useIdle } from "@mantine/hooks";

@@ -124,8 +124,7 @@ export default function Questionnaire() {
             if (active === 4) return open();
             setActive((prev) => Math.min(prev + 1, 4));
           }}
-          disabledPrev={active === 0}
-          // disabled={active === 4}
+          hidePrev={active === 0}
           onPrevious={() => {
             setActive((prev) => Math.max(prev - 1, 0));
           }}

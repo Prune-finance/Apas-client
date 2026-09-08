@@ -8,7 +8,7 @@ interface QuestionnaireNavProps {
   nextText?: string;
   previousText?: string;
   disabled?: boolean;
-  disabledPrev?: boolean;
+  hidePrev?: boolean;
 }
 
 export function QuestionnaireNav({
@@ -17,7 +17,7 @@ export function QuestionnaireNav({
   nextText = "Next",
   previousText = "Previous step",
   disabled = false,
-  disabledPrev = false,
+  hidePrev = false,
 }: QuestionnaireNavProps) {
   const form = useQuestionnaireFormContext();
   return (
@@ -32,13 +32,14 @@ export function QuestionnaireNav({
         }}
         disabled={disabled}
       />
-      <SecondaryBtn
-        text={previousText}
-        fullWidth
-        fw={600}
-        action={onPrevious}
-        disabled={disabledPrev}
-      />
+      {!hidePrev && (
+        <SecondaryBtn
+          text={previousText}
+          fullWidth
+          fw={600}
+          action={onPrevious}
+        />
+      )}
     </Stack>
   );
 }

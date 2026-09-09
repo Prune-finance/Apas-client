@@ -20,7 +20,7 @@ export default function QuestionnaireLayout({
       <AppShell.Navbar withBorder={false}>
         <Navbar />
       </AppShell.Navbar>
-      <AppShell.Main pb="lg" px={40}>
+      <AppShell.Main pb="lg">
         {children}
       </AppShell.Main>
     </AppShell>

@@ -12,11 +12,17 @@ import {
   TextInputProps,
   Select,
   SelectProps,
+  NumberInput,
+  NumberInputProps,
+  Textarea,
+  TextareaProps,
+  rem,
 } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
 import styles from "@/ui/styles/auth.module.scss";
 import { IconSearch } from "@tabler/icons-react";
 import { Dispatch, SetStateAction } from "react";
+import insideLabelClasses from "@/ui/components/InputWithLabel/input.module.scss";
 
 type InputProps = {
   form: UseFormReturnType<LoginType>;
@@ -186,4 +192,81 @@ interface SelectBoxProps extends SelectProps {}
 
 export const SelectBox = ({ ...props }: SelectBoxProps) => {
   return <Select size="xs" w={120} h={36} {...props} />;
+};
+
+const insideLabelLeftSectionWidth = rem(52);
+
+const insideLabelTextInputStyles: TextInputProps["styles"] = {
+  input: {
+    paddingLeft: insideLabelLeftSectionWidth,
+  },
+  label: {
+    paddingLeft: insideLabelLeftSectionWidth,
+  },
+};
+
+const insideLabelNumberInputStyles: NumberInputProps["styles"] = {
+  input: {
+    paddingLeft: insideLabelLeftSectionWidth,
+  },
+  label: {
+    paddingLeft: insideLabelLeftSectionWidth,
+  },
+};
+
+interface TextInputWithInsideLabelProps extends TextInputProps {}
+
+export const TextInputWithInsideLabel = ({
+  leftSection,
+  leftSectionWidth,
+  styles,
+  ...props
+}: TextInputWithInsideLabelProps) => {
+  const hasLeftSection = Boolean(leftSection);
+
+  return (
+    <TextInput
+      {...props}
+      leftSection={leftSection}
+      leftSectionWidth={
+        leftSectionWidth ?? (hasLeftSection ? insideLabelLeftSectionWidth : undefined)
+      }
+      classNames={insideLabelClasses}
+      styles={hasLeftSection ? insideLabelTextInputStyles : styles}
+    />
+  );
+};
+
+interface NumberInputWithInsideLabelProps extends NumberInputProps {}
+
+export const NumberInputWithInsideLabel = ({
+  leftSection,
+  leftSectionWidth,
+  styles,
+  ...props
+}: NumberInputWithInsideLabelProps) => {
+  const hasLeftSection = Boolean(leftSection);
+
+  return (
+    <NumberInput
+      {...props}
+      leftSection={leftSection}
+      leftSectionWidth={
+        leftSectionWidth ?? (hasLeftSection ? insideLabelLeftSectionWidth : undefined)
+      }
+      placeholder="Enter number"
+      classNames={insideLabelClasses}
+      styles={hasLeftSection ? insideLabelNumberInputStyles : styles}
+      thousandSeparator=","
+      min={0}
+    />
+  );
+};
+
+interface TextareaWithInsideLabelProps extends TextareaProps {}
+
+export const TextareaWithInsideLabel = ({
+  ...props
+}: TextareaWithInsideLabelProps) => {
+  return <Textarea {...props} classNames={insideLabelClasses} />;
 };

@@ -762,7 +762,7 @@ export const SingleDefaultAccountBody = ({
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
-            accountID={account?.accountId}
+            accountID={account?.id}
             transactions={transactions}
             loading={loadingTrx}
             payout={payout}

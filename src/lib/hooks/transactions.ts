@@ -1255,3 +1255,11 @@ export function exportSingleUserAccountTransactions(accountID: string, params: I
     })
   );
 }
+
+export function exportAdminSingleAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`admin/accounts/${accountID}/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}

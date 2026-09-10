@@ -145,6 +145,7 @@ export default function BusinessDefaultAccount() {
           open={open}
           business={business}
           loadingBiz={loadingBiz}
+          currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN" | "USD" | undefined}
           admin
         />
 

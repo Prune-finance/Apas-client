@@ -681,6 +681,7 @@ interface SingleDefaultAccountProps
   location?: string;
   accountType?: string;
   revalidateTrx?: () => void;
+  onTabChange?: (tab: string | null) => void;
 }
 
 export const SingleDefaultAccountBody = ({
@@ -703,6 +704,7 @@ export const SingleDefaultAccountBody = ({
   currency,
   page,
   limit,
+  onTabChange,
 }: SingleDefaultAccountProps) => {
   /**
    * @description - Tabs for the default account
@@ -713,6 +715,10 @@ export const SingleDefaultAccountBody = ({
    */
 
   const [tab, setTab] = useState<string | null>("Account Details");
+  const handleTabChange = (value: string | null) => {
+    setTab(value);
+    onTabChange?.(value);
+  };
 
   const tabs: Array<{ value: string }> = [
     { value: "Account Details" },
@@ -743,7 +749,7 @@ export const SingleDefaultAccountBody = ({
         showRefreshBtn
         refreshButtonIndex={tab}
         value={tab}
-        onChange={setTab}
+        onChange={handleTabChange}
         loading={loadingTrx}
         revalidate={revalidateTrx}
       >
@@ -756,7 +762,7 @@ export const SingleDefaultAccountBody = ({
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
           <Transactions
-            accountID={account?.id}
+            accountID={account?.accountId}
             transactions={transactions}
             loading={loadingTrx}
             payout={payout}

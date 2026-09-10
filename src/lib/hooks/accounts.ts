@@ -979,7 +979,7 @@ export interface AccountData {
   id: string;
   firstName: string;
   lastName: string;
-  accountId: number;
+  accountId: string;
   accountName: string;
   accountIban?: string;
   accountNumber: string;
@@ -1030,7 +1030,7 @@ export interface BaseAccount {
   id: string;
   firstName: string;
   lastName: string;
-  accountId: number;
+  accountId: string;
   accountName: string;
   accountNumber: string;
   accountType?: string;

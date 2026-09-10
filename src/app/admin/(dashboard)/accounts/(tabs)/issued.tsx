@@ -509,17 +509,17 @@ const RowComponent = ({
 }: RowProps) => {
   const { push } = useRouter();
 
-  const handleRowClick = (id: string) => {
-    push(`/admin/accounts/${id}`);
+  const handleRowClick = (businessId: string) => {
+    push(`/admin/accounts/${businessId}/default?accountType=issued&currency=${currency}`);
   };
   return accounts.map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id)}
+      onClick={() => handleRowClick(element.Company.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
-        <Link href={`/admin/accounts/${element.id}`}>
+        <Link href={`/admin/accounts/${element.Company.id}/default?accountType=issued&currency=${currency}`}>
           {element.accountName}
         </Link>
       </TableTd>

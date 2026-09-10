@@ -751,7 +751,7 @@ export const SingleDefaultAccountBody = ({
           <DefaultAccountDetails
             account={account}
             loading={loading}
-            accountType={accountType}
+            accountType={currency ?? accountType}
           />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>

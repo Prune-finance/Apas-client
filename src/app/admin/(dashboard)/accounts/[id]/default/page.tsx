@@ -121,7 +121,7 @@ export default function BusinessDefaultAccount() {
   const loading = isPayout ? loadingPayout : loadingDefault;
   const revalidateAcct = isPayout ? revalidatePayout : revalidateDefault;
 
-  const accountIdForTrx = account?.accountId ?? acctId;
+  const accountIdForTrx = account?.id ?? acctId;
 
   const {
     loading: loadingDefaultTrx,

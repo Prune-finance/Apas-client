@@ -42,7 +42,7 @@ import { DatePickerInput } from "@mantine/dates";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import { useQueryState } from "nuqs";
-import { exportSingleUserAccountTransactions } from "@/lib/hooks/transactions";
+import { exportSingleUserAccountTransactions, exportAdminSingleAccountTransactions } from "@/lib/hooks/transactions";
 export const Transactions = ({
   transactions,
   loading,
@@ -105,25 +105,32 @@ export const Transactions = ({
 
   const { status, createdAt, senderName, recipientName, recipientIban, type: txType } = form.values;
 
+  const isAdminLocation = location?.startsWith("admin");
+
   const handleExportTransactions = async () => {
     if (!accountID) return;
     const [date, endDate] = (createdAt ?? [null, null]).map((d) =>
       d ? dayjs(d).format("YYYY-MM-DD") : undefined
     );
     setExporting(true);
+    const exportParams = {
+      ...(page && { page }),
+      ...(limit && { limit: parseInt(limit, 10) }),
+      ...(status && { status }),
+      ...(date && { date }),
+      ...(endDate && { endDate }),
+      ...(senderName && { senderName }),
+      ...(recipientName && { recipientName }),
+      ...(recipientIban && { recipientIban }),
+      ...(txType && { type: txType }),
+      currency: currencyType,
+    };
     try {
-      await exportSingleUserAccountTransactions(accountID, {
-        ...(page && { page }),
-        ...(limit && { limit: parseInt(limit, 10) }),
-        ...(status && { status }),
-        ...(date && { date }),
-        ...(endDate && { endDate }),
-        ...(senderName && { senderName }),
-        ...(recipientName && { recipientName }),
-        ...(recipientIban && { recipientIban }),
-        ...(txType && { type: txType }),
-        currency: currencyType,
-      });
+      if (isAdminLocation) {
+        await exportAdminSingleAccountTransactions(accountID, exportParams);
+      } else {
+        await exportSingleUserAccountTransactions(accountID, exportParams);
+      }
     } catch (error) {
       handleError("Transactions Export", parseError(error));
     } finally {
@@ -423,6 +430,7 @@ export const Transactions = ({
             numberOfColumns={2}
             clearable
             disabled={loadingStatement}
+            maxDate={new Date()}
           />
 
           <PrimaryBtn

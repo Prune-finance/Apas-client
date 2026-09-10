@@ -20,6 +20,7 @@ interface Props extends TabsProps {
   loading?: boolean;
   revalidate?: () => void;
   refreshButtonIndex?: string | null;
+  pill?: boolean;
 }
 
 export default function TabsComponent({
@@ -29,6 +30,7 @@ export default function TabsComponent({
   refreshButtonIndex,
   loading,
   revalidate,
+  pill,
   ...props
 }: Props) {
   return (
@@ -36,11 +38,15 @@ export default function TabsComponent({
       pos="relative"
       defaultValue={tabs[0]?.value}
       variant="pills"
-      classNames={{
-        root: styles.tabs,
-        list: styles.tabs__list,
-        tab: styles.tab,
-      }}
+      classNames={
+        pill
+          ? {}
+          : {
+              root: styles.tabs,
+              list: styles.tabs__list,
+              tab: styles.tab,
+            }
+      }
       {...props}
     >
       <TabsList>

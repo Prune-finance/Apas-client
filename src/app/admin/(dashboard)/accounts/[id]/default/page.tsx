@@ -5,6 +5,7 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
   TransactionType,
   useBusinessAccountTransactions,
+  usePayoutAccountTransactions,
 } from "@/lib/hooks/transactions";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -43,6 +44,7 @@ export default function BusinessDefaultAccount() {
     currency,
   } = Object.fromEntries(searchParams.entries());
   const [acctId, setAcctId] = useState(accountId);
+  const [transactionsEnabled, setTransactionsEnabled] = useState(false);
   const isPayout = accountType === "payout";
 
   const customParams = useMemo(() => {
@@ -55,6 +57,7 @@ export default function BusinessDefaultAccount() {
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
       ...(search && { search: search }),
+      ...(currency && { currencyCode: currency }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -69,6 +72,7 @@ export default function BusinessDefaultAccount() {
     active,
     limit,
     search,
+    currency,
   ]);
 
   const {
@@ -117,12 +121,34 @@ export default function BusinessDefaultAccount() {
   const loading = isPayout ? loadingPayout : loadingDefault;
   const revalidateAcct = isPayout ? revalidatePayout : revalidateDefault;
 
+  const accountIdForTrx = account?.accountId ?? acctId;
+
   const {
-    loading: loadingTrx,
-    transactions,
-    revalidate: revalidateTrx,
-    meta,
-  } = useBusinessAccountTransactions(accountId ?? account?.id, customParams);
+    loading: loadingDefaultTrx,
+    transactions: defaultTransactions,
+    revalidate: revalidateDefaultTrx,
+    meta: defaultMeta,
+  } = useBusinessAccountTransactions(
+    !isPayout ? accountIdForTrx : "",
+    customParams,
+    !isPayout && transactionsEnabled
+  );
+
+  const {
+    loading: loadingPayoutTrx,
+    transactions: payoutTransactions,
+    revalidate: revalidatePayoutTrx,
+    meta: payoutMeta,
+  } = usePayoutAccountTransactions(
+    isPayout ? accountIdForTrx : "",
+    customParams,
+    isPayout && transactionsEnabled
+  );
+
+  const loadingTrx = isPayout ? loadingPayoutTrx : loadingDefaultTrx;
+  const transactions = isPayout ? payoutTransactions : defaultTransactions;
+  const revalidateTrx = isPayout ? revalidatePayoutTrx : revalidateDefaultTrx;
+  const meta = isPayout ? payoutMeta : defaultMeta;
 
   return (
     <main>
@@ -166,6 +192,9 @@ export default function BusinessDefaultAccount() {
           revalidate={revalidateAcct}
           page={active}
           limit={limit}
+          onTabChange={(tab) => {
+            if (tab === "Transactions") setTransactionsEnabled(true);
+          }}
         >
           <PaginationComponent
             active={active}

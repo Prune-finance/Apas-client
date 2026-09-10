@@ -270,11 +270,12 @@ export function useBusinessTransactions(
 
 export function useBusinessAccountTransactions(
   id: string = "",
-  customParams: IParams = {}
+  customParams: IParams = {},
+  enabled: boolean = true
 ) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const obj = useMemo(() => {
     return {
@@ -284,9 +285,9 @@ export function useBusinessAccountTransactions(
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.search && { search: customParams.search }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -309,13 +310,14 @@ export function useBusinessAccountTransactions(
     senderName,
     not,
     search,
+    currencyCode,
   } = obj;
 
   async function fetchTrx() {
+    if (!enabled || !id) return;
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/company-account/${id}/transactions`,
@@ -334,6 +336,7 @@ export function useBusinessAccountTransactions(
   const revalidate = () => fetchTrx();
 
   useEffect(() => {
+    if (!enabled || !id) return;
     fetchTrx();
 
     return () => {
@@ -341,12 +344,14 @@ export function useBusinessAccountTransactions(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    enabled,
     limit,
     page,
     date,
     endDate,
     status,
     type,
+    currencyCode,
     recipientIban,
     recipientName,
     senderName,
@@ -360,11 +365,12 @@ export function useBusinessAccountTransactions(
 
 export function usePayoutAccountTransactions(
   id: string = "",
-  customParams: IParams = {}
+  customParams: IParams = {},
+  enabled: boolean = true
 ) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const obj = useMemo(() => {
     return {
@@ -374,9 +380,9 @@ export function usePayoutAccountTransactions(
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.search && { search: customParams.search }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -399,13 +405,14 @@ export function usePayoutAccountTransactions(
     senderName,
     not,
     search,
+    currencyCode,
   } = obj;
 
   async function fetchTrx() {
+    if (!enabled || !id) return;
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/payout-account/${id}/transactions`,
@@ -424,6 +431,7 @@ export function usePayoutAccountTransactions(
   const revalidate = () => fetchTrx();
 
   useEffect(() => {
+    if (!enabled || !id) return;
     fetchTrx();
 
     return () => {
@@ -431,12 +439,14 @@ export function usePayoutAccountTransactions(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    enabled,
     limit,
     page,
     date,
     endDate,
     status,
     type,
+    currencyCode,
     recipientIban,
     recipientName,
     senderName,

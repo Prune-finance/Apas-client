@@ -167,10 +167,10 @@ export const PayoutAccountTransactions = ({
           <Flex gap={12}>
             <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} indicator={activeFilterCount} />
-            <SecondaryBtn
+            {/* <SecondaryBtn
               text="Download Statement"
               icon={IconCircleArrowDown}
-            />
+            /> */}
             <SecondaryBtn
               text="Export"
               action={handleExport}

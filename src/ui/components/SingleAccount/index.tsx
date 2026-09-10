@@ -700,6 +700,7 @@ export const SingleDefaultAccountBody = ({
   revalidateTrx,
   isUser,
   accountType,
+  currency,
   page,
   limit,
 }: SingleDefaultAccountProps) => {
@@ -733,7 +734,7 @@ export const SingleDefaultAccountBody = ({
         revalidate={revalidate}
         main={location === "own-account" || location === "admin-default"}
         business={business}
-        currencyType={accountType}
+        currencyType={currency ?? accountType}
       />
 
       <TabsComponent
@@ -763,7 +764,7 @@ export const SingleDefaultAccountBody = ({
             // children={children}
             location={location ?? "default"}
             isUser={isUser}
-            currencyType={account?.AccountRequests?.Currency?.symbol || accountType}
+            currencyType={account?.AccountRequests?.Currency?.symbol || currency || accountType}
             page={page}
             limit={limit}
           >

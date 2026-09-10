@@ -541,18 +541,18 @@ const RowComponent = ({
   //   debouncedSearch
   // );
 
-  const handleRowClick = (id: string, businessId: string) => {
-    push(`/admin/accounts/${businessId}/default?accountId=${id}`);
+  const handleRowClick = (businessId: string) => {
+    push(`/admin/accounts/${businessId}/default?accountType=business&currency=${currency}`);
   };
   return accounts.map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id, element.Company.id)}
+      onClick={() => handleRowClick(element.Company.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
         <Link
-          href={`/admin/accounts/${element.Company.id}/default?accountId=${element.id}`}
+          href={`/admin/accounts/${element.Company.id}/default?accountType=business&currency=${currency}`}
         >
           {element.accountName}
         </Link>

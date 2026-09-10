@@ -104,14 +104,15 @@ export function useSingleAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function useBusinessDefaultAccount(id: string) {
+export function useBusinessDefaultAccount(id: string, currencyCode?: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/admin/company/${id}/default-account`);
+      const query = currencyCode ? `?currencyCode=${currencyCode}` : "";
+      const { data } = await axios.get(`/admin/company/${id}/default-account${query}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -136,14 +137,15 @@ export function useBusinessDefaultAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function useBusinessPayoutAccount(id: string) {
+export function useBusinessPayoutAccount(id: string, currencyCode?: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/admin/company/${id}/payout-account`);
+      const query = currencyCode ? `?currencyCode=${currencyCode}` : "";
+      const { data } = await axios.get(`/admin/company/${id}/payout-account${query}`);
 
       setAccount(data.data);
     } catch (error) {

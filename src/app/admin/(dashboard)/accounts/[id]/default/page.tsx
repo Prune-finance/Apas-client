@@ -18,6 +18,7 @@ import { useDisclosure } from "@mantine/hooks";
 import dayjs from "dayjs";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
+import { useBusinessPayoutAccount } from "@/lib/hooks/accounts";
 
 export default function BusinessDefaultAccount() {
   const params = useParams<{ id: string }>();
@@ -38,8 +39,11 @@ export default function BusinessDefaultAccount() {
     recipientIban,
     accountId,
     search,
+    accountType,
+    currency,
   } = Object.fromEntries(searchParams.entries());
   const [acctId, setAcctId] = useState(accountId);
+  const isPayout = accountType === "payout";
 
   const customParams = useMemo(() => {
     return {
@@ -98,10 +102,20 @@ export default function BusinessDefaultAccount() {
   // });
 
   const {
-    account,
-    loading,
-    revalidate: revalidateAcct,
-  } = useBusinessDefaultAccount(params.id);
+    account: defaultAccount,
+    loading: loadingDefault,
+    revalidate: revalidateDefault,
+  } = useBusinessDefaultAccount(params.id, !isPayout ? currency : undefined);
+
+  const {
+    account: payoutAccount,
+    loading: loadingPayout,
+    revalidate: revalidatePayout,
+  } = useBusinessPayoutAccount(params.id, isPayout ? currency : undefined);
+
+  const account = isPayout ? payoutAccount : defaultAccount;
+  const loading = isPayout ? loadingPayout : loadingDefault;
+  const revalidateAcct = isPayout ? revalidatePayout : revalidateDefault;
 
   const {
     loading: loadingTrx,
@@ -137,7 +151,8 @@ export default function BusinessDefaultAccount() {
         <SingleDefaultAccountBody
           account={account}
           accountID={params?.id}
-          location="admin-default"
+          location={isPayout ? "admin-payout" : "admin-default"}
+          currency={currency}
           transactions={transactions as TransactionType[]}
           revalidateTrx={revalidateTrx}
           loading={loading}

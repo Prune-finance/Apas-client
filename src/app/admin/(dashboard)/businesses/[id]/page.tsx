@@ -77,6 +77,9 @@ export default function SingleBusiness() {
   // const [trusted, setTrusted] = useState(business ? business.kycTrusted : false);
 
   const [activeTab, setActiveTab] = useState<string | null>(tab);
+  const [visitedTabs, setVisitedTabs] = useState<Set<string>>(
+    new Set([tab || "business"])
+  );
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
@@ -403,6 +406,7 @@ export default function SingleBusiness() {
           <Tabs
             onChange={(e) => {
               setActiveTab(e);
+              if (e) setVisitedTabs((prev) => new Set([...prev, e]));
               window.history.pushState({}, "", `?tab=${e}`);
             }}
             defaultValue={
@@ -429,7 +433,7 @@ export default function SingleBusiness() {
             </TabsList>
 
             <TabsPanel value="business">
-              {business && (
+              {visitedTabs.has("business") && business && (
                 <Business
                   business={business}
                   revalidate={revalidate}
@@ -441,33 +445,39 @@ export default function SingleBusiness() {
             </TabsPanel>
 
             <TabsPanel value="documents">
-              {business && (
+              {visitedTabs.has("documents") && business && (
                 <Documents business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
             <TabsPanel value="directors">
-              {business && (
+              {visitedTabs.has("directors") && business && (
                 <Directors business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
             <TabsPanel value="shareholders">
-              {business && (
+              {visitedTabs.has("shareholders") && business && (
                 <Shareholders business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
             <TabsPanel value="accounts">
-              <Accounts business={business} />
+              {visitedTabs.has("accounts") && (
+                <Accounts business={business} />
+              )}
             </TabsPanel>
 
             <TabsPanel value="keys">
-              <Keys business={business} loading={loading} />
+              {visitedTabs.has("keys") && (
+                <Keys business={business} loading={loading} />
+              )}
             </TabsPanel>
 
             <TabsPanel value="requests">
-              <Requests business={business} />
+              {visitedTabs.has("requests") && (
+                <Requests business={business} />
+              )}
             </TabsPanel>
           </Tabs>
         </div>

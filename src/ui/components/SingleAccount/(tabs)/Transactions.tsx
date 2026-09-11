@@ -43,7 +43,7 @@ import { DatePickerInput } from "@mantine/dates";
 import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import { useQueryState } from "nuqs";
-import { exportSingleUserAccountTransactions, exportAdminSingleAccountTransactions } from "@/lib/hooks/transactions";
+import { exportSingleUserAccountTransactions, exportAdminSingleAccountTransactions, exportAdminPayoutAccountTransactions } from "@/lib/hooks/transactions";
 export const Transactions = ({
   transactions,
   loading,
@@ -127,7 +127,9 @@ export const Transactions = ({
       ...(currencyType && { currencyCode: currencyType }),
     };
     try {
-      if (isAdminLocation) {
+      if (isAdminLocation && payout) {
+        await exportAdminPayoutAccountTransactions(accountID, exportParams);
+      } else if (isAdminLocation) {
         await exportAdminSingleAccountTransactions(accountID, exportParams);
       } else {
         await exportSingleUserAccountTransactions(accountID, exportParams);

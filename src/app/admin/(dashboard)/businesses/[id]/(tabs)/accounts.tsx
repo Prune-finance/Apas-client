@@ -31,7 +31,6 @@ import { TableComponent } from "@/ui/components/Table";
 import { useBusinessTransactions } from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
 import TabsComponent from "@/ui/components/Tabs";
-import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import EmptyTable from "@/ui/components/EmptyTable";
 import createAxiosInstance from "@/lib/axios";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
@@ -324,31 +323,32 @@ export default function Accounts({
         
 
           {payoutAccount && (
-            <AccountCard
+            <NewAccountCard
               currency="EUR"
-              bic="ARPYGB21XXX"
+              companyName={payoutAccount?.accountName ?? "No Payout Account"}
+              bic={payoutAccount?.accountBic ?? "ARPYGB21XXX"}
+              iban={payoutAccount?.accountIban ?? payoutAccount?.accountNumber ?? "No Payout Account"}
+              accountNumber={payoutAccount?.accountNumber}
+              sortCode={payoutAccount?.sortCode ?? ""}
               balance={payoutAccount?.accountBalance ?? 0}
-              iban={payoutAccount?.accountNumber ?? ""}
               loading={loadingPayout}
-              badgeText="Payout Account"
-              link={`/admin/businesses/${params.id}/payout?accountId=${payoutAccount.id}`}
-              business
-              // disable
+              link={`/admin/businesses/${params.id}/payout?accountId=${payoutAccount.id}&accountType=PAYOUT_ACCOUNT`}
+              business={false}
             >
-              {/* <Switch
-                readOnly
-                label="Disabled"
-                onChange={() => {}}
-                checked={
-                  !services.find(
-                    (service) => service.serviceIdentifier === "PAYOUT_SERVICE"
-                  )?.active
-                }
-                styles={{ label: { fontSize: "10px" } }}
-                size="xs"
-                labelPosition="left"
-              /> */}
-            </AccountCard>
+              <Badge
+                variant="light"
+                color="#596603"
+                bg="#fbfee6"
+                c="#596603"
+                fw={500}
+                fz={11}
+                radius="xl"
+                px={10}
+                py={4}
+              >
+                Payout Account
+              </Badge>
+            </NewAccountCard>
           )}
 
            {payoutCurrencyAccounts &&
@@ -358,7 +358,7 @@ export default function Accounts({
                   key={data?.id}
                   currency={data?.AccountRequests?.Currency?.symbol}
                   companyName={data?.accountName ?? "No Default Account"}
-                  link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
+                  link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}&accountType=PAYOUT_ACCOUNT`}
                   sortCode="041917"
                   iban={data?.accountIban ?? "No Default Account"}
                   bic={data?.accountBic ?? "No Default Account"}
@@ -370,7 +370,21 @@ export default function Accounts({
                   business={false}
                   refresh
                   revalidate={payoutCurrencyAccountsRevalidate}
-                />
+                >
+                  <Badge
+                    variant="light"
+                    color="#596603"
+                    bg="#fbfee6"
+                    c="#596603"
+                    fw={500}
+                    fz={11}
+                    radius="xl"
+                    px={10}
+                    py={4}
+                  >
+                    Payout Account
+                  </Badge>
+                </NewAccountCard>
             ))}
 
             {companyCurrencyAccounts &&

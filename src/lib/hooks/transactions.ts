@@ -1258,3 +1258,11 @@ export function exportAdminSingleAccountTransactions(accountID: string, params: 
     })
   );
 }
+
+export function exportAdminPayoutAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`admin/accounts/business/payout-account/${accountID}/transactions/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}

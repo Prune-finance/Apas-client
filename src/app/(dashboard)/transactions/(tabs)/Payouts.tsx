@@ -165,7 +165,7 @@ export const PayoutsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={<PayoutTransactionTableRows data={transactions} isUser currency={activeCurrency} />}
+        rows={<PayoutTransactionTableRows data={transactions} isUser currency={activeCurrency} noLink />}
         loading={loading}
         head={PayoutTableHeaders}
       />

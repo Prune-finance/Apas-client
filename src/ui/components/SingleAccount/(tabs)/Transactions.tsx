@@ -205,13 +205,13 @@ export const Transactions = ({
       "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
-      "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "gbp-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${accountID}?date=${startDate}&endDate=${endDate}`,
-      "ghs-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${currencyType}/${accountID}?date=${startDate}&endDate=${endDate}`,
+      "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
+      "gbp-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
+      "ghs-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "ghs-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "eur-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
       "gbp-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
-      "usd-account": `${baseUrl}/currency-accounts/transactions/get-company-currency-account-transaction-statement/${currencyType}/${accountID}?date=${startDate}&endDate=${endDate}`,
+      "usd-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "usd-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
     };
 

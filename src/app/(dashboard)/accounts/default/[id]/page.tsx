@@ -114,7 +114,8 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
-        accountType={account?.AccountRequests?.Currency?.symbol}
+        accountType={account?.AccountRequests?.Currency?.symbol || currency}
+        currency={account?.AccountRequests?.Currency?.symbol || currency}
         account={account}
         location={
           currency === "GBP"

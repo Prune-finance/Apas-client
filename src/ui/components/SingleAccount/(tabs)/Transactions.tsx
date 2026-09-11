@@ -218,8 +218,15 @@ export const Transactions = ({
       "usd-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,
     };
 
+    // Payout admin accounts use a dedicated statement endpoint
+    const payoutAdminUrl =
+      payout && isAdminLocation
+        ? `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`
+        : null;
+
     // Use the default URL if location is undefined or not in urlMap
     const url =
+      payoutAdminUrl ||
       urlMap[location ?? "default"] ||
       `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}`;
 

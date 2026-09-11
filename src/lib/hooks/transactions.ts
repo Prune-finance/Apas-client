@@ -1253,7 +1253,7 @@ export function exportSingleUserAccountTransactions(accountID: string, params: I
 
 export function exportAdminSingleAccountTransactions(accountID: string, params: IParams) {
   return openExportUrl(
-    axios.get(`accounts/business/company-account/${accountID}/transactions/export`, {
+    axios.get(`admin/accounts/business/company-account/${accountID}/transactions/export`, {
       params: sanitizedQueryParams(params),
     })
   );

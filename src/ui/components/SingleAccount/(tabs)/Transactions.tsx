@@ -124,7 +124,7 @@ export const Transactions = ({
       ...(recipientName && { recipientName }),
       ...(recipientIban && { recipientIban }),
       ...(txType && { type: txType }),
-      currency: currencyType,
+      ...(currencyType && { currencyCode: currencyType }),
     };
     try {
       if (isAdminLocation) {

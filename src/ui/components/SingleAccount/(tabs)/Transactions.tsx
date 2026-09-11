@@ -200,7 +200,7 @@ export const Transactions = ({
 
     // Define the possible URLs based on location
     const urlMap: { [key: string]: string } = {
-      payout: `${baseUrl}/payouts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      payout: `${baseUrl}/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "admin-account": `${baseUrl}/admin/accounts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,

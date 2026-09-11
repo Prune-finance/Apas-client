@@ -93,6 +93,7 @@ export default function SingleUserPayoutAccount() {
 
       <SingleDefaultAccountBody
         account={account}
+        accountID={account?.id}
         location="payout"
         transactions={transactions as TransactionType[]}
         revalidateTrx={revalidateTrx}

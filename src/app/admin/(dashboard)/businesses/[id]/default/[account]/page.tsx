@@ -2,15 +2,10 @@
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "../styles.module.scss";
-import {
-  useAdminGetCompanyCurrencyAccountByID,
-
-} from "@/lib/hooks/accounts";
+import { useAdminGetCompanyCurrencyAccountByID } from "@/lib/hooks/accounts";
 import {
   TransactionType,
-  useAdminGetCurrencyTransactions,
-  useUserCurrencyTransactions,
-  useUserDefaultTransactions,
+  useBusinessAccountTransactions,
 } from "@/lib/hooks/transactions";
 import {
   DefaultAccountHead,
@@ -29,6 +24,7 @@ function Account() {
   const searchParams = useSearchParams();
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
+  const [transactionsEnabled, setTransactionsEnabled] = useState(false);
 
   const {
     status,
@@ -40,21 +36,34 @@ function Account() {
     recipientIban,
     search,
     accountType,
-    currency
+    currency,
   } = Object.fromEntries(searchParams.entries());
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const param = useMemo(() => {
+  const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
+
+  const {
+    currencyAccount: account,
+    loading,
+    revalidate: revalidateAcct,
+  } = useAdminGetCompanyCurrencyAccountByID(params?.account, currency || undefined);
+
+  const [chartFrequency, setChartFrequency] = useState("Monthly");
+
+  const currencyCode = account?.AccountRequests?.Currency?.symbol || currency;
+
+  const customParams = useMemo(() => {
     return {
       ...(status && { status: status.toUpperCase() }),
       ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
       ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-      ...(type && { type: type }),
-      ...(senderName && { senderName: senderName }),
-      ...(recipientName && { beneficiaryName: recipientName }),
-      ...(recipientIban && { beneficiaryAccountNumber: recipientIban }),
+      ...(type && { type }),
+      ...(senderName && { senderName }),
+      ...(recipientName && { recipientName }),
+      ...(recipientIban && { recipientIban }),
       ...(debouncedSearch && { search: debouncedSearch }),
+      ...(currencyCode && { currencyCode }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -69,24 +78,22 @@ function Account() {
     active,
     limit,
     debouncedSearch,
+    currencyCode,
   ]);
- 
-  const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
-
-  const {
-    currencyAccount: account,
-    loading,
-    revalidate: revalidateAcct,
-  } = useAdminGetCompanyCurrencyAccountByID(params?.account, currency || undefined);
-
-  const [chartFrequency, setChartFrequency] = useState("Monthly");
 
   const {
     transactions,
     loading: loadingTrx,
     meta: trxMeta,
     revalidate: revalidateTrx,
-  } = useAdminGetCurrencyTransactions({ ...param, queryAccountType: account?.accountType }, params.account, account?.AccountRequests?.Currency?.symbol || currency || "GBP", account?.accountType || accountType);
+  } = useBusinessAccountTransactions(
+    account?.id ?? params.account,
+    customParams,
+    transactionsEnabled
+  );
+
+  const location = `${currencyCode || accountType || "ghs"}-business-account`.toLowerCase();
+
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -111,9 +118,9 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
-        accountType={account?.AccountRequests?.Currency?.symbol || account?.currencyType || currency}
+        accountType={currencyCode || accountType}
         account={account}
-        location={`${account?.AccountRequests?.Currency?.symbol || account?.currencyType || currency || "ghs"}-business-account`.toLowerCase()}
+        location={location}
         transactions={(transactions || []) as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}
@@ -125,6 +132,9 @@ function Account() {
         isUser
         page={active}
         limit={limit}
+        onTabChange={(tab) => {
+          if (tab === "Transactions") setTransactionsEnabled(true);
+        }}
       >
         <PaginationComponent
           active={active}

@@ -222,14 +222,20 @@ export const Transactions = ({
     try {
       const { data: res } = await axios.get(url, { headers });
 
+      // Admin statement endpoints return a signed URL directly
+      if (res?.data?.url) {
+        window.open(res.data.url, "_blank");
+        handleSuccess("Account Statement", res.message ?? "Account statement generated successfully");
+        setDateRange([null, null]);
+        return;
+      }
+
       if (!res?.data?.length) {
         return handleInfo(
           "Account Statement",
           "No transactions found for the selected date range",
         );
       }
-
-      console.log(res?.data, res?.meta);
 
       setDownloadData(res.data);
       setDownloadMeta(res.meta);
@@ -239,7 +245,6 @@ export const Transactions = ({
       if (documentType === "PDF") {
         handlePdfStatement(pdfRef);
       } else {
-        console.log("downloadData:", downloadData);
         handleCsvDownload(
           downloadData,
           "account_statement.csv",
@@ -249,7 +254,7 @@ export const Transactions = ({
       closePreview();
       handleSuccess(
         "Account Statement",
-        "Account statement downloaded successful",
+        res.message ?? "Account statement downloaded successfully",
       );
       setDateRange([null, null]);
     } catch (error) {

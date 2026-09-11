@@ -106,7 +106,7 @@ export const Transactions = ({
 
   const { status, createdAt, senderName, recipientName, recipientIban, type: txType } = form.values;
 
-  const isAdminLocation = location?.startsWith("admin");
+  const isAdminLocation = location?.startsWith("admin") || location?.endsWith("business-account");
 
   const handleExportTransactions = async () => {
     if (!accountID) return;

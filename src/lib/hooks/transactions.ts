@@ -3,7 +3,7 @@ import createAxiosInstance from "@/lib/axios";
 import { BusinessData } from "./businesses";
 import { IParams } from "@/lib/schema";
 import useAxios from "./useAxios";
-import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL, downloadFileFromUrl } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 const payoutAxiosInstance = createAxiosInstance("payouts");
@@ -1175,12 +1175,7 @@ interface ExportResult {
 
 async function openExportUrl(promise: Promise<{ data: { data: ExportResult } }>) {
   const { data } = await promise;
-  const a = document.createElement("a");
-  a.href = data.data.url;
-  a.download = data.data.filename || "export";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  await downloadFileFromUrl(data.data.url, data.data.filename || "export");
 }
 
 export function exportOwnerAccountTransactions(params: IParams) {

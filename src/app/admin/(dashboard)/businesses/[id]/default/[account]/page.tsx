@@ -13,14 +13,14 @@ import {
 } from "@/ui/components/SingleAccount";
 import { Space } from "@mantine/core";
 import { Suspense, useMemo, useState } from "react";
-import { useUserBusiness } from "@/lib/hooks/businesses";
+import { useSingleBusiness } from "@/lib/hooks/businesses";
 import { useParams, useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { useDebouncedValue } from "@mantine/hooks";
 
 function Account() {
-  const params = useParams<{ account: string }>();
+  const params = useParams<{ id: string; account: string }>();
   const searchParams = useSearchParams();
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
@@ -41,7 +41,7 @@ function Account() {
 
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const { business, meta, revalidate, loading: loadingBiz } = useUserBusiness();
+  const { business, loading: loadingBiz } = useSingleBusiness(params.id);
 
   const {
     currencyAccount: account,
@@ -98,11 +98,15 @@ function Account() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Accounts", href: "/accounts" },
-          { title: "Own Accounts", href: "/accounts" },
+          { title: "Businesses", href: "/admin/businesses" },
+          {
+            title: business?.name || "",
+            href: `/admin/businesses/${params.id}`,
+            loading: loadingBiz,
+          },
           {
             title: account?.accountName || "",
-            href: `/accounts/default`,
+            href: `/admin/businesses/${params.id}/default/${params.account}`,
             loading: loading,
           },
         ]}
@@ -119,6 +123,7 @@ function Account() {
 
       <SingleDefaultAccountBody
         accountType={currencyCode || accountType}
+        currency={currencyCode}
         account={account}
         location={location}
         transactions={(transactions || []) as TransactionType[]}

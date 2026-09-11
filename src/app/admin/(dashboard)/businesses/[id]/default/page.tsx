@@ -84,12 +84,21 @@ export default function BusinessDefaultAccount() {
     revalidate: revalidateAcct,
   } = useBusinessDefaultAccount(params.id);
 
+  const accountCurrency =
+    account?.AccountRequests?.Currency?.symbol ||
+    (account as any)?.currency ||
+    "EUR";
+
   const {
     loading: loadingTrx,
     transactions,
     revalidate: revalidateTrx,
     meta,
-  } = useBusinessAccountTransactions(accountId ?? account?.id, customParams);
+  } = useBusinessAccountTransactions(
+    accountId ?? account?.id,
+    { ...customParams, currencyCode: accountCurrency },
+    true
+  );
 
   return (
     <main>
@@ -123,6 +132,7 @@ export default function BusinessDefaultAccount() {
           account={account}
           accountID={params?.id}
           location="admin-default"
+          currency={accountCurrency}
           revalidateTrx={revalidateTrx}
           transactions={transactions as TransactionType[]}
           loading={loading}

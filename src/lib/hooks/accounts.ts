@@ -5,7 +5,7 @@ import { IParams } from "@/lib/schema";
 
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "./useAxios";
-import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL, downloadFileFromUrl } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 
@@ -947,12 +947,7 @@ interface AccountExportResult {
 
 async function openAccountExportUrl(promise: Promise<{ data: { data: AccountExportResult } }>) {
   const { data } = await promise;
-  const a = document.createElement("a");
-  a.href = data.data.url;
-  a.download = data.data.filename || "export";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  await downloadFileFromUrl(data.data.url, data.data.filename || "export");
 }
 
 export function exportBusinessAccounts(params: IParams) {

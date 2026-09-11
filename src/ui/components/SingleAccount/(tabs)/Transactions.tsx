@@ -36,6 +36,7 @@ import {
   handlePdfStatement,
   parseError,
 } from "@/lib/actions/auth";
+import { downloadFileFromUrl } from "@/lib/utils";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { DatePickerInput } from "@mantine/dates";
@@ -224,7 +225,7 @@ export const Transactions = ({
 
       // Admin statement endpoints return a signed URL directly
       if (res?.data?.url) {
-        window.open(res.data.url, "_blank");
+        await downloadFileFromUrl(res.data.url, res.data.filename || "statement.pdf");
         handleSuccess("Account Statement", res.message ?? "Account statement generated successfully");
         setDateRange([null, null]);
         return;

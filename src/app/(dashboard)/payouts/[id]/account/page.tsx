@@ -39,6 +39,7 @@ export default function SingleUserPayoutAccount() {
     recipientName,
     recipientIban,
     search,
+    currency,
   } = Object.fromEntries(searchParams.entries());
 
   const param = {
@@ -55,6 +56,12 @@ export default function SingleUserPayoutAccount() {
   };
 
   const { loading, account, revalidate } = useUserDefaultPayoutAccount();
+
+  const currencyCode =
+    account?.AccountRequests?.Currency?.symbol ||
+    (account as any)?.currency ||
+    currency ||
+    "EUR";
 
   const { business, loading: loadingBiz } = useUserBusiness();
 
@@ -94,6 +101,7 @@ export default function SingleUserPayoutAccount() {
       <SingleDefaultAccountBody
         account={account}
         accountID={account?.id}
+        currency={currencyCode}
         location="payout"
         transactions={transactions as TransactionType[]}
         revalidateTrx={revalidateTrx}

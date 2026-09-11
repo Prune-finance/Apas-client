@@ -6,6 +6,7 @@ import { useAdminGetCompanyCurrencyAccountByID } from "@/lib/hooks/accounts";
 import {
   TransactionType,
   useBusinessAccountTransactions,
+  usePayoutAccountTransactions,
 } from "@/lib/hooks/transactions";
 import {
   DefaultAccountHead,
@@ -53,6 +54,9 @@ function Account() {
 
   const currencyCode = account?.AccountRequests?.Currency?.symbol || currency;
 
+  const isPayout =
+    account?.accountType === "PAYOUT_ACCOUNT" || accountType === "PAYOUT_ACCOUNT";
+
   const customParams = useMemo(() => {
     return {
       ...(status && { status: status.toUpperCase() }),
@@ -81,16 +85,34 @@ function Account() {
     currencyCode,
   ]);
 
+  const accountIdForTrx = account?.id ?? params.account;
+
   const {
-    transactions,
-    loading: loadingTrx,
-    meta: trxMeta,
-    revalidate: revalidateTrx,
+    transactions: companyTrx,
+    loading: loadingCompanyTrx,
+    meta: companyTrxMeta,
+    revalidate: revalidateCompanyTrx,
   } = useBusinessAccountTransactions(
-    account?.id ?? params.account,
+    !isPayout ? accountIdForTrx : "",
     customParams,
-    transactionsEnabled
+    !isPayout && transactionsEnabled
   );
+
+  const {
+    transactions: payoutTrx,
+    loading: loadingPayoutTrx,
+    meta: payoutTrxMeta,
+    revalidate: revalidatePayoutTrx,
+  } = usePayoutAccountTransactions(
+    isPayout ? accountIdForTrx : "",
+    customParams,
+    isPayout && transactionsEnabled
+  );
+
+  const transactions = isPayout ? payoutTrx : companyTrx;
+  const loadingTrx = isPayout ? loadingPayoutTrx : loadingCompanyTrx;
+  const trxMeta = isPayout ? payoutTrxMeta : companyTrxMeta;
+  const revalidateTrx = isPayout ? revalidatePayoutTrx : revalidateCompanyTrx;
 
   const location = `${currencyCode || accountType || "ghs"}-business-account`.toLowerCase();
 
@@ -118,6 +140,7 @@ function Account() {
         business={business}
         loadingBiz={loadingBiz}
         loading={loading}
+        payout={isPayout}
         open={() => {}}
       />
 
@@ -126,6 +149,7 @@ function Account() {
         currency={currencyCode}
         account={account}
         location={location}
+        payout={isPayout}
         transactions={(transactions || []) as TransactionType[]}
         loading={loading}
         loadingTrx={loadingTrx}

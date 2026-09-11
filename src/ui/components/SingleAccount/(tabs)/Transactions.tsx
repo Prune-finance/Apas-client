@@ -206,6 +206,7 @@ export const Transactions = ({
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "issued-account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
+      "payout-issued": `${baseUrl}/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "gbp-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "ghs-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "ghs-business-account": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currency=${currencyType}`,

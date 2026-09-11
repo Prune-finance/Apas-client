@@ -123,7 +123,7 @@ export const CurrencyAccount = ({
       </Filter>
 
       <TableComponent
-        rows={<BusinessTransactionTableRows data={transactions} isUser currency={currency} />}
+        rows={<BusinessTransactionTableRows data={transactions} isUser currency={currency} noLink />}
         loading={loading}
         head={OwnAccountTableHeaders}
       />

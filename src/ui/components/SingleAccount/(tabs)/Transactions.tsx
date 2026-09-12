@@ -374,15 +374,13 @@ export const Transactions = ({
           payout ? (
             <PayoutTransactionTableRows
               data={transactions}
-              // searchProps={searchProps}
-              // search={debouncedSearch}
+              noLink
             />
           ) : (
             <IssuedTransactionTableRows
               data={transactions}
-              // searchProps={searchProps}
-              // search={debouncedSearch}
               isUser={isUser}
+              noLink
             />
           )
         }

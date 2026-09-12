@@ -10,8 +10,9 @@ function getSenderIdentifier(element: TransactionType, currency?: string): strin
   return element.senderIban || undefined;
 }
 
-function isSenderClickable(identifier: string | undefined, currency?: string): boolean {
+function isSenderClickable(identifier: string | undefined, currency?: string, type?: string): boolean {
   if (!identifier) return false;
+  if (type?.toUpperCase() === "CREDIT") return false;
   const curr = currency ?? "EUR";
   return curr !== "EUR" || !isDummyIBAN(identifier);
 }
@@ -30,17 +31,19 @@ export const BusinessTransactionTableRows = ({
   business,
   isUser,
   currency,
+  noLink,
 }: {
   data: TransactionType[];
   business?: boolean;
   isUser?: boolean;
   currency?: string;
+  noLink?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return data.map((element) => {
     const currCode = currency ?? element.currencyType ?? "EUR";
     const identifier = getSenderIdentifier(element, currency);
-    const clickable = isSenderClickable(identifier, currCode);
+    const clickable = !noLink && isSenderClickable(identifier, currCode, element.type);
 
     return (
     <TableTr
@@ -122,7 +125,7 @@ export const IssuedTransactionTableRows = ({
   return data.map((element) => {
     const currCode = currency ?? element.currencyType ?? "EUR";
     const identifier = getSenderIdentifier(element, currency);
-    const clickable = !noLink && isSenderClickable(identifier, currCode);
+    const clickable = !noLink && isSenderClickable(identifier, currCode, element.type);
 
     return (
     <TableTr
@@ -195,16 +198,18 @@ export const PayoutTransactionTableRows = ({
   data,
   isUser,
   currency,
+  noLink,
 }: {
   data: TransactionType[];
   isUser?: boolean;
   currency?: string;
+  noLink?: boolean;
 }) => {
   const { open, setData } = Transaction();
   return data.map((element) => {
     const currCode = currency ?? element.currencyType ?? "EUR";
     const identifier = getSenderIdentifier(element, currency);
-    const clickable = isSenderClickable(identifier, currCode);
+    const clickable = !noLink && isSenderClickable(identifier, currCode, element.type);
 
     return (
     <TableTr

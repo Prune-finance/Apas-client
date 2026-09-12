@@ -7,7 +7,6 @@ import StatusCard from "./StatusCard";
 import { AccountStatsMeta, StatInterval } from "@/lib/hooks/accounts";
 import { UseFormReturnType } from "@mantine/form";
 import { FilterType } from "@/lib/schema";
-import { usePathname } from "next/navigation";
 import dayjs from "dayjs";
 
 interface Props {
@@ -22,6 +21,7 @@ interface Props {
   opened: boolean;
   open: () => void;
   close: () => void;
+  onStatusFilter?: (status: string | null) => void;
 }
 export default function AccountInfoCards({
   frequency,
@@ -35,20 +35,18 @@ export default function AccountInfoCards({
   opened,
   open,
   close,
+  onStatusFilter,
 }: Props) {
-  const pathname = usePathname();
   const [_status, setStatus] = useState<string | null>(null);
+
   const handleOpen = (status: "Active" | "Inactive") => {
     setStatus(status);
     open();
-
     form.setFieldValue("status", status);
-
-    window.history.pushState(
-      {},
-      "",
-      `${pathname}?status=${status.toUpperCase()}`
-    );
+    onStatusFilter?.(status.toUpperCase());
+    const params = new URLSearchParams(window.location.search);
+    params.set("status", status.toUpperCase());
+    window.history.pushState(null, "", `${window.location.pathname}?${params.toString()}`);
   };
 
   const handleClose = (status: "Active" | "Inactive") => {
@@ -56,8 +54,11 @@ export default function AccountInfoCards({
     setStatus(null);
     close();
     form.setFieldValue("status", null);
-
-    window.history.pushState({}, "", pathname);
+    onStatusFilter?.(null);
+    const params = new URLSearchParams(window.location.search);
+    params.delete("status");
+    const query = params.toString();
+    window.history.pushState(null, "", query ? `${window.location.pathname}?${query}` : window.location.pathname);
   };
 
   return (

@@ -1,4 +1,7 @@
-import { Badge, TableTd, TableTr, TabsPanel, SimpleGrid } from "@mantine/core";
+import { Badge, TableTd, TableTr, TabsPanel, SimpleGrid, Image } from "@mantine/core";
+import EUIcon from "@/assets/EU-icon.png";
+import GBPIcon from "@/assets/GB.png";
+import USDIcon from "@/assets/USD.png";
 import localFont from "next/font/local";
 import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect } from "react";
@@ -28,7 +31,6 @@ import { TableComponent } from "@/ui/components/Table";
 import { useBusinessTransactions } from "@/lib/hooks/transactions";
 import PaginationComponent from "@/ui/components/Pagination";
 import TabsComponent from "@/ui/components/Tabs";
-import { AccountCard } from "@/ui/components/Cards/AccountCard";
 import EmptyTable from "@/ui/components/EmptyTable";
 import createAxiosInstance from "@/lib/axios";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
@@ -42,6 +44,7 @@ export default function Accounts({
   business: BusinessData | null;
 }) {
   const [accounts, setAccounts] = useState<AccountData[]>([]);
+  const [activeSubTab, setActiveSubTab] = useState<"EUR" | "GBP" | "USD">("EUR");
   // const [defaultAccount, setDefaultAccount] = useState<AccountData | null>(
   //   null
   // );
@@ -320,31 +323,32 @@ export default function Accounts({
         
 
           {payoutAccount && (
-            <AccountCard
+            <NewAccountCard
               currency="EUR"
-              bic="ARPYGB21XXX"
+              companyName={payoutAccount?.accountName ?? "No Payout Account"}
+              bic={payoutAccount?.accountBic ?? "ARPYGB21XXX"}
+              iban={payoutAccount?.accountIban ?? payoutAccount?.accountNumber ?? "No Payout Account"}
+              accountNumber={payoutAccount?.accountNumber}
+              sortCode={payoutAccount?.sortCode ?? ""}
               balance={payoutAccount?.accountBalance ?? 0}
-              iban={payoutAccount?.accountNumber ?? ""}
               loading={loadingPayout}
-              badgeText="Payout Account"
-              link={`/admin/businesses/${params.id}/payout?accountId=${payoutAccount.id}`}
-              business
-              // disable
+              link={`/admin/businesses/${params.id}/payout?accountId=${payoutAccount.id}&accountType=PAYOUT_ACCOUNT`}
+              business={false}
             >
-              {/* <Switch
-                readOnly
-                label="Disabled"
-                onChange={() => {}}
-                checked={
-                  !services.find(
-                    (service) => service.serviceIdentifier === "PAYOUT_SERVICE"
-                  )?.active
-                }
-                styles={{ label: { fontSize: "10px" } }}
-                size="xs"
-                labelPosition="left"
-              /> */}
-            </AccountCard>
+              <Badge
+                variant="light"
+                color="#596603"
+                bg="#fbfee6"
+                c="#596603"
+                fw={500}
+                fz={11}
+                radius="xl"
+                px={10}
+                py={4}
+              >
+                Payout Account
+              </Badge>
+            </NewAccountCard>
           )}
 
            {payoutCurrencyAccounts &&
@@ -354,7 +358,7 @@ export default function Accounts({
                   key={data?.id}
                   currency={data?.AccountRequests?.Currency?.symbol}
                   companyName={data?.accountName ?? "No Default Account"}
-                  link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}`}
+                  link={`/admin/businesses/${params.id}/default/${data?.id}?currency=${data?.AccountRequests?.Currency?.symbol}&accountType=PAYOUT_ACCOUNT`}
                   sortCode="041917"
                   iban={data?.accountIban ?? "No Default Account"}
                   bic={data?.accountBic ?? "No Default Account"}
@@ -366,7 +370,21 @@ export default function Accounts({
                   business={false}
                   refresh
                   revalidate={payoutCurrencyAccountsRevalidate}
-                />
+                >
+                  <Badge
+                    variant="light"
+                    color="#596603"
+                    bg="#fbfee6"
+                    c="#596603"
+                    fw={500}
+                    fz={11}
+                    radius="xl"
+                    px={10}
+                    py={4}
+                  >
+                    Payout Account
+                  </Badge>
+                </NewAccountCard>
             ))}
 
             {companyCurrencyAccounts &&
@@ -392,66 +410,91 @@ export default function Accounts({
       </TabsPanel>
 
       <TabsPanel value={tabs[1].value}>
-        <TabsComponent tabs={issuedAccountSubTabs} mt={24}>
-          <TabsPanel value={issuedAccountSubTabs[0].value}>
-              <TableComponent head={tableHead} rows={rows} loading={loading} />
-              <EmptyTable
-                rows={rows}
-                loading={loading}
-                text="When an account is created, it will appear here"
-                title="There are no accounts"
-              />
+        <div style={{ display: "flex", gap: 8, marginTop: 24, marginBottom: 24 }}>
+          {issuedAccountSubTabs.map((t) => {
+            const isActive = activeSubTab === t.currency;
+            return (
+              <button
+                key={t.currency}
+                onClick={() => setActiveSubTab(t.currency)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 16px",
+                  borderRadius: 100,
+                  border: "none",
+                  cursor: "pointer",
+                  fontSize: 14,
+                  fontWeight: isActive ? 600 : 500,
+                  backgroundColor: isActive ? "#c1dd06" : "#fbfee6",
+                  color: isActive ? "#344054" : "#596603",
+                  transition: "background-color 0.15s ease, color 0.15s ease",
+                }}
+              >
+                <Image src={t.icon} alt={t.currency} h={20} w={20} />
+                {t.title}
+              </button>
+            );
+          })}
+        </div>
 
-              <PaginationComponent
-                active={active}
-                setActive={setActive}
-                setLimit={setLimit}
-                limit={limit}
-                total={Math.ceil(
-                  (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
-                )}
-              />
-          </TabsPanel>
-          <TabsPanel value={issuedAccountSubTabs[1].value}>
-            <TableComponent head={tableHead} rows={issuedAccountRows} loading={loading} />
+        {activeSubTab === "EUR" && (
+          <>
+            <TableComponent head={tableHead} rows={rows} loading={loading} />
+            <EmptyTable
+              rows={rows}
+              loading={loading}
+              text="When an account is created, it will appear here"
+              title="There are no accounts"
+            />
+            <PaginationComponent
+              active={active}
+              setActive={setActive}
+              setLimit={setLimit}
+              limit={limit}
+              total={Math.ceil((meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10))}
+            />
+          </>
+        )}
+
+        {activeSubTab === "GBP" && (
+          <>
+            <TableComponent head={tableHead} rows={issuedAccountRows} loading={issuedCurrencyAccountsLoading} />
             <EmptyTable
               rows={issuedAccountRows}
               loading={issuedCurrencyAccountsLoading}
               text="When an account is created, it will appear here"
               title="There are no accounts"
             />
-
             <PaginationComponent
               active={active}
               setActive={setActive}
               setLimit={setLimit}
               limit={limit}
-              total={Math.ceil(
-                (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
-              )}
+              total={Math.ceil((meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10))}
             />
-          </TabsPanel>
+          </>
+        )}
 
-          <TabsPanel value={issuedAccountSubTabs[2].value}>
-            <TableComponent head={tableHead} rows={usdIssuedAccountRows} loading={loading} />
+        {activeSubTab === "USD" && (
+          <>
+            <TableComponent head={tableHead} rows={usdIssuedAccountRows} loading={issuedCurrencyAccountsLoading} />
             <EmptyTable
               rows={usdIssuedAccountRows}
               loading={issuedCurrencyAccountsLoading}
               text="When an account is created, it will appear here"
               title="There are no accounts"
             />
-
             <PaginationComponent
               active={active}
               setActive={setActive}
               setLimit={setLimit}
               limit={limit}
-              total={Math.ceil(
-                (meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10)
-              )}
+              total={Math.ceil((meta?.total ?? 0) / (parseInt(limit ?? "10", 10) || 10))}
             />
-          </TabsPanel>
-        </TabsComponent>
+          </>
+        )}
       </TabsPanel>
     </TabsComponent>
   );
@@ -470,7 +513,7 @@ const tableHead = [
 ];
 
 const issuedAccountSubTabs = [
-  { value: "eur-account", title: "🇪🇺 EUR Accounts" },
-  { value: "gbp-accounts", title: "🇬🇧 GBP Accounts" },
-  { value: "usd-accounts", title: "🇺🇸 USD Accounts" },
+  { value: "eur-account", title: "EUR Accounts", currency: "EUR" as const, icon: EUIcon.src },
+  { value: "gbp-accounts", title: "GBP Accounts", currency: "GBP" as const, icon: GBPIcon.src },
+  { value: "usd-accounts", title: "USD Accounts", currency: "USD" as const, icon: USDIcon.src },
 ];

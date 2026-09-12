@@ -3,7 +3,7 @@ import createAxiosInstance from "@/lib/axios";
 import { BusinessData } from "./businesses";
 import { IParams } from "@/lib/schema";
 import useAxios from "./useAxios";
-import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL, downloadFileFromUrl } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 const payoutAxiosInstance = createAxiosInstance("payouts");
@@ -270,11 +270,12 @@ export function useBusinessTransactions(
 
 export function useBusinessAccountTransactions(
   id: string = "",
-  customParams: IParams = {}
+  customParams: IParams = {},
+  enabled: boolean = true
 ) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const obj = useMemo(() => {
     return {
@@ -284,9 +285,9 @@ export function useBusinessAccountTransactions(
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.search && { search: customParams.search }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -309,13 +310,14 @@ export function useBusinessAccountTransactions(
     senderName,
     not,
     search,
+    currencyCode,
   } = obj;
 
   async function fetchTrx() {
+    if (!enabled || !id) return;
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/company-account/${id}/transactions`,
@@ -334,6 +336,7 @@ export function useBusinessAccountTransactions(
   const revalidate = () => fetchTrx();
 
   useEffect(() => {
+    if (!enabled || !id) return;
     fetchTrx();
 
     return () => {
@@ -341,12 +344,14 @@ export function useBusinessAccountTransactions(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    enabled,
     limit,
     page,
     date,
     endDate,
     status,
     type,
+    currencyCode,
     recipientIban,
     recipientName,
     senderName,
@@ -360,11 +365,12 @@ export function useBusinessAccountTransactions(
 
 export function usePayoutAccountTransactions(
   id: string = "",
-  customParams: IParams = {}
+  customParams: IParams = {},
+  enabled: boolean = true
 ) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const obj = useMemo(() => {
     return {
@@ -374,9 +380,9 @@ export function usePayoutAccountTransactions(
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.search && { search: customParams.search }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -399,13 +405,14 @@ export function usePayoutAccountTransactions(
     senderName,
     not,
     search,
+    currencyCode,
   } = obj;
 
   async function fetchTrx() {
+    if (!enabled || !id) return;
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/payout-account/${id}/transactions`,
@@ -424,6 +431,7 @@ export function usePayoutAccountTransactions(
   const revalidate = () => fetchTrx();
 
   useEffect(() => {
+    if (!enabled || !id) return;
     fetchTrx();
 
     return () => {
@@ -431,12 +439,14 @@ export function usePayoutAccountTransactions(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    enabled,
     limit,
     page,
     date,
     endDate,
     status,
     type,
+    currencyCode,
     recipientIban,
     recipientName,
     senderName,
@@ -1165,12 +1175,7 @@ interface ExportResult {
 
 async function openExportUrl(promise: Promise<{ data: { data: ExportResult } }>) {
   const { data } = await promise;
-  const a = document.createElement("a");
-  a.href = data.data.url;
-  a.download = data.data.filename || "export";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  await downloadFileFromUrl(data.data.url, data.data.filename || "export");
 }
 
 export function exportOwnerAccountTransactions(params: IParams) {
@@ -1233,6 +1238,30 @@ export function exportUserPayoutTransactions(params: IParams) {
 export function exportUserAllTransactions(params: IParams) {
   return openExportUrl(
     axios.get("accounts/company/transactions/all/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportSingleUserAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`accounts/${accountID}/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportAdminSingleAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`admin/accounts/business/company-account/${accountID}/transactions/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportAdminPayoutAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`admin/accounts/business/payout-account/${accountID}/transactions/export`, {
       params: sanitizedQueryParams(params),
     })
   );

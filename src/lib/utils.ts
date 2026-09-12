@@ -238,3 +238,17 @@ export const sanitizeURL = (obj: IParams): string => {
 
   return new URLSearchParams(sanitizedObj as Record<string, string>).toString();
 };
+
+export async function downloadFileFromUrl(url: string, filename: string = "download") {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(blobUrl);
+}
+

@@ -114,7 +114,8 @@ function Account() {
       />
 
       <SingleDefaultAccountBody
-        accountType={account?.AccountRequests?.Currency?.symbol}
+        accountType={account?.AccountRequests?.Currency?.symbol || currency}
+        currency={account?.AccountRequests?.Currency?.symbol || currency}
         account={account}
         location={
           currency === "GBP"
@@ -132,6 +133,8 @@ function Account() {
         revalidateTrx={revalidateTrx}
         business={business}
         isUser
+        page={active}
+        limit={limit}
       >
         <PaginationComponent
           active={active}

@@ -143,6 +143,8 @@ export default function BusinessPayoutAccount() {
           payout
           trxMeta={meta}
           revalidate={revalidate}
+          page={active}
+          limit={limit}
         >
           <PaginationComponent
             active={active}

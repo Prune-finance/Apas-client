@@ -95,11 +95,15 @@ export default function BusinessAccounts() {
   const [frequency, setFrequency] = useState<string | null>("Monthly");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const [cardStatus, setCardStatus] = useState<string | null>(null);
+
+  const effectiveStatus = cardStatus ?? (status || null);
+  const activeFilterCount = [effectiveStatus, date, endDate, accountName, accountNumber, type].filter(Boolean).length;
 
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(status && { status: status.toUpperCase() }),
+    ...(effectiveStatus && { status: effectiveStatus.toUpperCase() }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     ...(accountName && { accountName }),
     ...(accountNumber && { accountNumber }),
@@ -112,6 +116,7 @@ export default function BusinessAccounts() {
   const dependencies = [
     limit,
     activePage,
+    cardStatus,
     status,
     date,
     endDate,
@@ -356,6 +361,7 @@ export default function BusinessAccounts() {
         open={openFilter}
         close={closeFilter}
         opened={filterOpened}
+        onStatusFilter={setCardStatus}
       />
 
       <Group
@@ -386,11 +392,12 @@ export default function BusinessAccounts() {
             icon={IconListTree}
             action={toggle}
             fw={600}
+            indicator={activeFilterCount}
           />
         </Group>
       </Group>
 
-      <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form}>
+      <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form} onClear={() => setCardStatus(null)}>
         <TextBox
           placeholder="Account Name"
           {...form.getInputProps("accountName")}
@@ -407,7 +414,15 @@ export default function BusinessAccounts() {
       </Filter>
 
       <TableComponent
-        head={tableHeaders}
+        head={tableHeaders.map((h) =>
+          h === "Account Number"
+            ? activeCurrency === "USD"
+              ? "Account IBAN"
+              : activeCurrency === "GHS"
+              ? "Wallet ID"
+              : "Account Number"
+            : h
+        )}
         rows={
           <RowComponent
             accounts={accounts || []}
@@ -526,23 +541,29 @@ const RowComponent = ({
   //   debouncedSearch
   // );
 
-  const handleRowClick = (id: string, businessId: string) => {
-    push(`/admin/accounts/${businessId}/default?accountId=${id}`);
+  const handleRowClick = (businessId: string) => {
+    push(`/admin/accounts/${businessId}/default?accountType=business&currency=${currency}`);
   };
   return accounts.map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id, element.Company.id)}
+      onClick={() => handleRowClick(element.Company.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
         <Link
-          href={`/admin/accounts/${element.Company.id}/default?accountId=${element.id}`}
+          href={`/admin/accounts/${element.Company.id}/default?accountType=business&currency=${currency}`}
         >
           {element.accountName}
         </Link>
       </TableTd>
-      <TableTd>{element.accountNumber}</TableTd>
+      <TableTd>
+        {currency === "USD"
+          ? element.accountIban ?? element.accountNumber
+          : currency === "GHS"
+          ? element.walletId ?? element.accountNumber
+          : element.accountNumber}
+      </TableTd>
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>

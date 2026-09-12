@@ -5,7 +5,7 @@ import { IParams } from "@/lib/schema";
 
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "./useAxios";
-import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL, downloadFileFromUrl } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 
@@ -104,14 +104,15 @@ export function useSingleAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function useBusinessDefaultAccount(id: string) {
+export function useBusinessDefaultAccount(id: string, currencyCode?: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/admin/company/${id}/default-account`);
+      const query = currencyCode ? `?currencyCode=${currencyCode}` : "";
+      const { data } = await axios.get(`/admin/company/${id}/default-account${query}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -136,14 +137,15 @@ export function useBusinessDefaultAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function useBusinessPayoutAccount(id: string) {
+export function useBusinessPayoutAccount(id: string, currencyCode?: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/admin/company/${id}/payout-account`);
+      const query = currencyCode ? `?currencyCode=${currencyCode}` : "";
+      const { data } = await axios.get(`/admin/company/${id}/payout-account${query}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -945,12 +947,7 @@ interface AccountExportResult {
 
 async function openAccountExportUrl(promise: Promise<{ data: { data: AccountExportResult } }>) {
   const { data } = await promise;
-  const a = document.createElement("a");
-  a.href = data.data.url;
-  a.download = data.data.filename || "export";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+  await downloadFileFromUrl(data.data.url, data.data.filename || "export");
 }
 
 export function exportBusinessAccounts(params: IParams) {
@@ -981,6 +978,7 @@ export interface AccountData {
   accountName: string;
   accountIban?: string;
   accountNumber: string;
+  walletId?: string;
   accountDocuments: AccountDocuments;
   createdAt: Date;
   updatedAt: Date;

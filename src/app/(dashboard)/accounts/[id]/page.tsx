@@ -44,6 +44,7 @@ export default function Account() {
   const params = useParams<{ id: string }>();
   const searchParams = useSearchParams()
   const currency = searchParams.get('currency') || "EUR";
+  const accountType = searchParams.get('accountType') || "";
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const axios = createAxiosInstance("accounts");
@@ -274,10 +275,12 @@ export default function Account() {
         loadingTrx={trxLoading}
         setChartFrequency={setChartFrequency}
         trxMeta={txrMeta}
-        location="issued-account"
+        location={accountType === "PAYOUT_ACCOUNT" ? "payout-issued" : "issued-account"}
         isUser
         revalidate={revalidate}
         business={business}
+        page={active}
+        limit={limit}
       >
         <PaginationComponent
           active={active}

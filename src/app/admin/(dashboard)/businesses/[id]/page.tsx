@@ -406,7 +406,7 @@ export default function SingleBusiness() {
           <Tabs
             onChange={(e) => {
               setActiveTab(e);
-              if (e) setVisitedTabs((prev) => new Set([...prev, e]));
+              if (e) setVisitedTabs((prev) => new Set(Array.from(prev).concat(e)));
               window.history.pushState({}, "", `?tab=${e}`);
             }}
             defaultValue={

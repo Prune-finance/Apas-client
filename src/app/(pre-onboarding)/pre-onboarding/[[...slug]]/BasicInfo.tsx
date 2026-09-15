@@ -21,19 +21,19 @@ export default function BasicInfo() {
     <Box style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <Flex direction={{ base: "column", md: "row" }} align="center" gap={24}>
         <TextInputWithInsideLabel
-          label="Email"
-          w="100%"
-          leftSection={<IconMail />}
-          {...form.getInputProps("businessEmail")}
-          key={form.key("businessEmail")}
-          withAsterisk
-        />
-        <TextInputWithInsideLabel
           label="Legal Business Name"
           w="100%"
           leftSection={<IconBriefcase />}
           {...form.getInputProps("businessName")}
           key={form.key("businessName")}
+          withAsterisk
+        />
+        <TextInputWithInsideLabel
+          label="Company Email"
+          w="100%"
+          leftSection={<IconMail />}
+          {...form.getInputProps("businessEmail")}
+          key={form.key("businessEmail")}
           withAsterisk
         />
       </Flex>

@@ -29,8 +29,10 @@ import { useParams } from "next/navigation";
 import { Onboarding } from "@/lib/interface";
 import { useDisclosure } from "@mantine/hooks";
 import ConsentModal from "./ConsentModal";
+import ContactEntry from "./ContactEntry";
 
 export default function Questionnaire() {
+  const [entryDone, setEntryDone] = useState(false);
   const [active, setActive] = useState(0);
   const [opened, { open, close }] = useDisclosure(false);
   const params = useParams();
@@ -86,6 +88,20 @@ export default function Questionnaire() {
       });
     },
   });
+
+  if (!entryDone) {
+    return (
+      <Box px={{ base: 24, sm: 48, lg: 120 }} py={48}>
+        <ContactEntry
+          onComplete={() => setEntryDone(true)}
+          onReturning={(step) => {
+            setEntryDone(true);
+            setActive(step);
+          }}
+        />
+      </Box>
+    );
+  }
 
   return (
     <QuestionnaireFormProvider form={form}>

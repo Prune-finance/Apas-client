@@ -5,6 +5,7 @@ import { useSingleBusiness } from "@/lib/hooks/businesses";
 import {
   TransactionType,
   useBusinessAccountTransactions,
+  usePayoutAccountTransactions,
 } from "@/lib/hooks/transactions";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -18,6 +19,7 @@ import { useDisclosure } from "@mantine/hooks";
 import dayjs from "dayjs";
 import { useParams, useSearchParams } from "next/navigation";
 import React, { useMemo, useState } from "react";
+import { useBusinessPayoutAccount } from "@/lib/hooks/accounts";
 
 export default function BusinessDefaultAccount() {
   const params = useParams<{ id: string }>();
@@ -38,8 +40,12 @@ export default function BusinessDefaultAccount() {
     recipientIban,
     accountId,
     search,
+    accountType,
+    currency,
   } = Object.fromEntries(searchParams.entries());
   const [acctId, setAcctId] = useState(accountId);
+  const [transactionsEnabled, setTransactionsEnabled] = useState(false);
+  const isPayout = accountType === "payout";
 
   const customParams = useMemo(() => {
     return {
@@ -51,6 +57,7 @@ export default function BusinessDefaultAccount() {
       ...(recipientName && { recipientName: recipientName }),
       ...(recipientIban && { recipientIban: recipientIban }),
       ...(search && { search: search }),
+      ...(currency && { currencyCode: currency }),
       page: active,
       limit: parseInt(limit ?? "10", 10),
     };
@@ -65,6 +72,7 @@ export default function BusinessDefaultAccount() {
     active,
     limit,
     search,
+    currency,
   ]);
 
   const {
@@ -98,17 +106,49 @@ export default function BusinessDefaultAccount() {
   // });
 
   const {
-    account,
-    loading,
-    revalidate: revalidateAcct,
-  } = useBusinessDefaultAccount(params.id);
+    account: defaultAccount,
+    loading: loadingDefault,
+    revalidate: revalidateDefault,
+  } = useBusinessDefaultAccount(params.id, !isPayout ? currency : undefined);
 
   const {
-    loading: loadingTrx,
-    transactions,
-    revalidate: revalidateTrx,
-    meta,
-  } = useBusinessAccountTransactions(accountId ?? account?.id, customParams);
+    account: payoutAccount,
+    loading: loadingPayout,
+    revalidate: revalidatePayout,
+  } = useBusinessPayoutAccount(params.id, isPayout ? currency : undefined);
+
+  const account = isPayout ? payoutAccount : defaultAccount;
+  const loading = isPayout ? loadingPayout : loadingDefault;
+  const revalidateAcct = isPayout ? revalidatePayout : revalidateDefault;
+
+  const accountIdForTrx = account?.id ?? acctId;
+
+  const {
+    loading: loadingDefaultTrx,
+    transactions: defaultTransactions,
+    revalidate: revalidateDefaultTrx,
+    meta: defaultMeta,
+  } = useBusinessAccountTransactions(
+    !isPayout ? accountIdForTrx : "",
+    customParams,
+    !isPayout && transactionsEnabled
+  );
+
+  const {
+    loading: loadingPayoutTrx,
+    transactions: payoutTransactions,
+    revalidate: revalidatePayoutTrx,
+    meta: payoutMeta,
+  } = usePayoutAccountTransactions(
+    isPayout ? accountIdForTrx : "",
+    customParams,
+    isPayout && transactionsEnabled
+  );
+
+  const loadingTrx = isPayout ? loadingPayoutTrx : loadingDefaultTrx;
+  const transactions = isPayout ? payoutTransactions : defaultTransactions;
+  const revalidateTrx = isPayout ? revalidatePayoutTrx : revalidateDefaultTrx;
+  const meta = isPayout ? payoutMeta : defaultMeta;
 
   return (
     <main>
@@ -131,13 +171,15 @@ export default function BusinessDefaultAccount() {
           open={open}
           business={business}
           loadingBiz={loadingBiz}
+          currencyType={currency as "GBP" | "GHS" | "EUR" | "NGN" | "USD" | undefined}
           admin
         />
 
         <SingleDefaultAccountBody
           account={account}
           accountID={params?.id}
-          location="admin-default"
+          location={isPayout ? "admin-payout" : "admin-default"}
+          currency={currency}
           transactions={transactions as TransactionType[]}
           revalidateTrx={revalidateTrx}
           loading={loading}
@@ -148,6 +190,11 @@ export default function BusinessDefaultAccount() {
           isDefault
           trxMeta={meta}
           revalidate={revalidateAcct}
+          page={active}
+          limit={limit}
+          onTabChange={(tab) => {
+            if (tab === "Transactions") setTransactionsEnabled(true);
+          }}
         >
           <PaginationComponent
             active={active}

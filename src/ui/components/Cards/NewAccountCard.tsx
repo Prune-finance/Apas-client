@@ -408,6 +408,8 @@ function NewAccountCard({
             </Flex>
           </Group>
         </Flex>
+
+        {children}
       </Stack>
     </BackgroundImage>
     </Box>

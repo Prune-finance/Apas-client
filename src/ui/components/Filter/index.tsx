@@ -20,6 +20,7 @@ type Props<T> = {
   customStatusOption?: string[];
   noDate?: boolean;
   onApply?: (values: T) => void;
+  onAfterApply?: (values: T) => void;
   onClear?: () => void;
 };
 
@@ -34,6 +35,7 @@ export default function Filter<T>({
   customStatusOption,
   noDate,
   onApply,
+  onAfterApply,
   onClear,
 }: Props<T>) {
   const { push, replace } = useRouter();
@@ -107,6 +109,7 @@ export default function Filter<T>({
 
       // push(`${newUrl}`);
       window.history.pushState({}, "", newUrl);
+      onAfterApply?.(form.values as T);
     } finally {
       setProcessing(false);
     }
@@ -183,20 +186,15 @@ export default function Filter<T>({
             color="var(--prune-text-gray-700)"
             onClick={() => {
               form.reset();
-              if (onClear) {
-                onClear();
-                return;
-              }
-              // Get current URL to check for currency parameter
               const currentUrl = new URL(window.location.href);
-              const currencyParam = currentUrl.searchParams.get('currency');
-
-              // If currency parameter exists, preserve it when clearing
-              if (currencyParam) {
-                window.history.pushState({}, "", `${pathname}?currency=${currencyParam}`);
-              } else {
-                window.history.pushState({}, "", pathname);
-              }
+              const kept = new URLSearchParams();
+              const tabParam = currentUrl.searchParams.get("tab");
+              const currencyParam = currentUrl.searchParams.get("currency");
+              if (tabParam) kept.set("tab", tabParam);
+              if (currencyParam) kept.set("currency", currencyParam);
+              const query = kept.toString();
+              window.history.pushState({}, "", query ? `${pathname}?${query}` : pathname);
+              onClear?.();
             }}
             // w={62}
             // h={36}

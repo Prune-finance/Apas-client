@@ -72,6 +72,8 @@ export default function AllAccounts() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
+  const activeFilterCount = [status, date, endDate, accountName, accountNumber, type].filter(Boolean).length;
+
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
@@ -239,6 +241,7 @@ export default function AllAccounts() {
             icon={IconListTree}
             action={toggle}
             fw={600}
+            indicator={activeFilterCount}
           />
         </Group>
       </Group>
@@ -260,7 +263,15 @@ export default function AllAccounts() {
       </Filter>
 
       <TableComponent
-        head={tableHeaders}
+        head={tableHeaders.map((h) =>
+          h === "Account Number"
+            ? activeCurrency === "USD"
+              ? "Account IBAN"
+              : activeCurrency === "GHS"
+              ? "Wallet ID"
+              : "Account Number"
+            : h
+        )}
         rows={
           <RowComponent
             accounts={accounts || []}
@@ -372,24 +383,30 @@ const RowComponent = ({
 }: RowProps) => {
   const { push } = useRouter();
 
-  const handleRowClick = (id: string, businessId: string) => {
-    push(`/admin/accounts/${businessId}/default?accountId=${id}`);
+  const handleRowClick = (businessId: string) => {
+    push(`/admin/accounts/${businessId}/default?accountType=all&currency=${currency}`);
   };
 
   return accounts.map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => handleRowClick(element.id, element.Company.id)}
+      onClick={() => handleRowClick(element.Company.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
         <Link
-          href={`/admin/accounts/${element.Company.id}/default?accountId=${element.id}`}
+          href={`/admin/accounts/${element.Company.id}/default?accountType=all&currency=${currency}`}
         >
           {element.accountName}
         </Link>
       </TableTd>
-      <TableTd>{element.accountNumber}</TableTd>
+      <TableTd>
+        {currency === "USD"
+          ? element.accountIban ?? element.accountNumber
+          : currency === "GHS"
+          ? element.walletId ?? element.accountNumber
+          : element.accountNumber}
+      </TableTd>
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
       <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>

@@ -41,6 +41,8 @@ export const AccountsTab = () => {
   const { status, date, endDate, type, recipientName, recipientIban } =
     Object.fromEntries(searchParams.entries());
 
+  const activeFilterCount = [status, date, endDate, type, recipientName, recipientIban].filter(Boolean).length;
+
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
@@ -135,6 +137,7 @@ export const AccountsTab = () => {
             revalidate={revalidate}
             onExport={handleExport}
             exporting={exporting}
+            filterCount={activeFilterCount}
           />
         </div>
       </Paper>

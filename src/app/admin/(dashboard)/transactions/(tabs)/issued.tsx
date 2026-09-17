@@ -49,6 +49,14 @@ export const IssuedAccountTransactions = ({
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const [opened, { toggle }] = useDisclosure(false);
   const [appliedFilters, setAppliedFilters] = useState<FilterType>(FilterValues);
+  const activeFilterCount = [
+    appliedFilters.status,
+    appliedFilters.createdAt?.[0],
+    appliedFilters.type,
+    appliedFilters.senderName,
+    appliedFilters.recipientName,
+    appliedFilters.recipientIban,
+  ].filter(Boolean).length;
 
   const toLocalDateStr = (d: Date) => {
     const y = d.getFullYear();
@@ -144,8 +152,8 @@ export const IssuedAccountTransactions = ({
           <SearchInput search={search} setSearch={setSearch} />
           <Flex gap={12}>
             <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
-            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
-            <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} indicator={activeFilterCount} />
+            {/* <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} /> */}
             <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
           </Flex>
         </Flex>

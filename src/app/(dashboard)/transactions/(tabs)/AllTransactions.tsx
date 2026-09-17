@@ -50,6 +50,8 @@ export const AllTransactionsTab = () => {
   const { status, date, endDate, type, recipientName, recipientIban, senderName } =
     Object.fromEntries(searchParams.entries());
 
+  const activeFilterCount = [status, date, endDate, type, senderName, recipientName, recipientIban].filter(Boolean).length;
+
   const form = useForm<FilterType>({
     initialValues: FilterValues,
     validate: zodResolver(FilterSchema),
@@ -140,7 +142,7 @@ export const AllTransactionsTab = () => {
         <Group>
           <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} fw={600} />
           <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} fw={600} />
-          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} />
+          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} indicator={activeFilterCount} />
         </Group>
       </Group>
 
@@ -163,7 +165,7 @@ export const AllTransactionsTab = () => {
       </Filter>
 
       <TableComponent
-        rows={<BusinessTransactionTableRows data={transactions} isUser currency={activeCurrency} />}
+        rows={<BusinessTransactionTableRows data={transactions} isUser currency={activeCurrency} noLink />}
         loading={loading}
         head={AllTransactionTableHeaders}
       />

@@ -3,7 +3,7 @@ import createAxiosInstance from "@/lib/axios";
 import { BusinessData } from "./businesses";
 import { IParams } from "@/lib/schema";
 import useAxios from "./useAxios";
-import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL, downloadFileFromUrl } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 const payoutAxiosInstance = createAxiosInstance("payouts");
@@ -95,7 +95,7 @@ export function useSingleTransactions(
     const params = new URLSearchParams(queryParams as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `${id}/transactions` : "transactions";
+      // const path = id ? `${id}/transactions` : "transactions";
 
       const { data } = await axios.get(`/admin/transactions/${id}/data`, {
         params,
@@ -134,6 +134,10 @@ export function useSingleCompanyTransactions(
   const [loading, setLoading] = useState(true);
 
   async function fetchTrx() {
+    if (!trxId) {
+      setLoading(false);
+      return;
+    }
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
@@ -221,7 +225,7 @@ export function useBusinessTransactions(
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `` : "transactions";
+      // const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/${id}/transactions`,
@@ -266,11 +270,12 @@ export function useBusinessTransactions(
 
 export function useBusinessAccountTransactions(
   id: string = "",
-  customParams: IParams = {}
+  customParams: IParams = {},
+  enabled: boolean = true
 ) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const obj = useMemo(() => {
     return {
@@ -280,9 +285,9 @@ export function useBusinessAccountTransactions(
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.search && { search: customParams.search }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -305,13 +310,14 @@ export function useBusinessAccountTransactions(
     senderName,
     not,
     search,
+    currencyCode,
   } = obj;
 
   async function fetchTrx() {
+    if (!enabled || !id) return;
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/company-account/${id}/transactions`,
@@ -330,6 +336,7 @@ export function useBusinessAccountTransactions(
   const revalidate = () => fetchTrx();
 
   useEffect(() => {
+    if (!enabled || !id) return;
     fetchTrx();
 
     return () => {
@@ -337,12 +344,14 @@ export function useBusinessAccountTransactions(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    enabled,
     limit,
     page,
     date,
     endDate,
     status,
     type,
+    currencyCode,
     recipientIban,
     recipientName,
     senderName,
@@ -356,11 +365,12 @@ export function useBusinessAccountTransactions(
 
 export function usePayoutAccountTransactions(
   id: string = "",
-  customParams: IParams = {}
+  customParams: IParams = {},
+  enabled: boolean = true
 ) {
   const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const obj = useMemo(() => {
     return {
@@ -370,9 +380,9 @@ export function usePayoutAccountTransactions(
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.status && { status: customParams.status }),
-      ...(customParams.endDate && { endDate: customParams.endDate }),
       ...(customParams.type && { type: customParams.type }),
       ...(customParams.search && { search: customParams.search }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
       ...(customParams.recipientIban && {
         recipientIban: customParams.recipientIban,
       }),
@@ -395,13 +405,14 @@ export function usePayoutAccountTransactions(
     senderName,
     not,
     search,
+    currencyCode,
   } = obj;
 
   async function fetchTrx() {
+    if (!enabled || !id) return;
     const params = new URLSearchParams(obj as Record<string, string>);
     try {
       setLoading(true);
-      const path = id ? `` : "transactions";
 
       const { data } = await axios.get(
         `/admin/accounts/business/payout-account/${id}/transactions`,
@@ -420,6 +431,7 @@ export function usePayoutAccountTransactions(
   const revalidate = () => fetchTrx();
 
   useEffect(() => {
+    if (!enabled || !id) return;
     fetchTrx();
 
     return () => {
@@ -427,12 +439,14 @@ export function usePayoutAccountTransactions(
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
+    enabled,
     limit,
     page,
     date,
     endDate,
     status,
     type,
+    currencyCode,
     recipientIban,
     recipientName,
     senderName,
@@ -849,11 +863,106 @@ export function useUserCurrencyTransactions(
   return { loading: boolean, transactions: data || [], meta, revalidate };
 }
 
+export function useUserAccountTransactionsByCurrency(
+  customParams: ITrx = {},
+  currency: "EUR" | "GBP" | "USD"
+) {
+  const endpoint =
+    currency === "EUR"
+      ? "/accounts/company/transactions"
+      : `currency-accounts/transactions/get-company-currency-account-transactions/${currency}`;
+
+  const {
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<TransactionType[], Meta>({
+    endpoint,
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams), currency],
+  });
+
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useOwnerAccountTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/accounts/businesses/transactions",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useIssuedAccountTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/accounts/transactions",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function usePayoutCurrencyTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/transactions",
+    baseURL: "payouts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useAllAccountTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "admin/accounts/transactions/all",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+// Customer-side transaction hooks
+export function useUserBusinessTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "accounts/company/transactions",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useUserIssuedAccountTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "accounts/transactions",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
+export function useUserAllTransactions(customParams: ITrx = {}) {
+  const { data, meta, loading, queryFn: revalidate } = useAxios<TransactionType[], Meta>({
+    endpoint: "accounts/company/transactions/all",
+    baseURL: "accounts",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+  return { loading, transactions: data || [], meta, revalidate };
+}
+
 export function useAdminGetCurrencyTransactions(
   customParams: ITrx = {},
   id: string,
   symbol: string,
-  queryAccountType?: string
+  _queryAccountType?: string
 ) {
   const {
     data,
@@ -889,12 +998,16 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
+      ...(customParams.search && { search: customParams.search }),
     };
-  }, [customParams]);
+  }, [customParams.limit, customParams.page, customParams.date, customParams.status, customParams.currencyCode, customParams.search]);
 
   async function fetchTrx() {
+    if (!iban) return;
     setLoading(true);
     const params = new URLSearchParams(obj as Record<string, string>);
 
@@ -918,11 +1031,9 @@ export function useTransactionsByIBAN(iban: string, customParams: ITrx = {}) {
   useEffect(() => {
     fetchTrx();
 
-    return () => {
-      // Any cleanup code can go here
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [iban, obj]);
 
   return { loading, transactions, meta, revalidate };
 }
@@ -931,19 +1042,23 @@ export function useUserTransactionsByIBAN(
   iban: string,
   customParams: ITrx = {}
 ) {
-  const [transactions, setTransactions] = useState<TrxData[]>([]);
+  const [transactions, setTransactions] = useState<TransactionType[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
 
   const obj = useMemo(() => {
     return {
       ...(customParams.limit && { limit: customParams.limit }),
+      ...(customParams.page && { page: customParams.page }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
+      ...(customParams.currencyCode && { currencyCode: customParams.currencyCode }),
+      ...(customParams.search && { search: customParams.search }),
     };
-  }, [customParams]);
+  }, [customParams.limit, customParams.page, customParams.date, customParams.status, customParams.currencyCode, customParams.search]);
 
   async function fetchTrx() {
+    if (!iban) return;
     setLoading(true);
     const params = new URLSearchParams(obj as Record<string, string>);
 
@@ -967,11 +1082,9 @@ export function useUserTransactionsByIBAN(
   useEffect(() => {
     fetchTrx();
 
-    return () => {
-      // Any cleanup code can go here
-    };
+    return () => {};
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [iban, obj]);
 
   return { loading, transactions, meta, revalidate };
 }
@@ -1051,4 +1164,105 @@ export interface TransactionType {
   companyAccountId: string | null;
   payoutAccountId: string | null;
   staging: "TEST" | "LIVE";
+}
+
+interface ExportResult {
+  url: string;
+  key: string;
+  filename: string;
+  expiresInSeconds: number;
+}
+
+async function openExportUrl(promise: Promise<{ data: { data: ExportResult } }>) {
+  const { data } = await promise;
+  await downloadFileFromUrl(data.data.url, data.data.filename || "export");
+}
+
+export function exportOwnerAccountTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("admin/accounts/businesses/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportIssuedAccountTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("admin/accounts/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportPayoutTransactions(params: IParams) {
+  return openExportUrl(
+    payoutAxiosInstance.get("admin/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportAllAccountTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("admin/accounts/transactions/all/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+// Customer-side export functions
+export function exportUserBusinessTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("accounts/company/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportUserIssuedAccountTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("accounts/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportUserPayoutTransactions(params: IParams) {
+  return openExportUrl(
+    payoutAxiosInstance.get("payout/transactions/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportUserAllTransactions(params: IParams) {
+  return openExportUrl(
+    axios.get("accounts/company/transactions/all/export", {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportSingleUserAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`accounts/${accountID}/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportAdminSingleAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`admin/accounts/business/company-account/${accountID}/transactions/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}
+
+export function exportAdminPayoutAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`admin/accounts/business/payout-account/${accountID}/transactions/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
 }

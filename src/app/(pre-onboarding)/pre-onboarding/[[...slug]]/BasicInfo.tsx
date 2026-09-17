@@ -21,6 +21,14 @@ export default function BasicInfo() {
     <Box style={{ display: "flex", flexDirection: "column", gap: 20 }}>
       <Flex direction={{ base: "column", md: "row" }} align="center" gap={20}>
         <TextInputWithInsideLabel
+          label="Email"
+          w="100%"
+          rightSection={<IconMail />}
+          {...form.getInputProps("businessEmail")}
+          key={form.key("businessEmail")}
+          withAsterisk
+        />
+        <TextInputWithInsideLabel
           label="Legal Business Name"
           w="100%"
           rightSection={<IconBriefcase />}
@@ -28,6 +36,9 @@ export default function BasicInfo() {
           key={form.key("businessName")}
           withAsterisk
         />
+      </Flex>
+
+      <Flex direction={{ base: "column", md: "row" }} align="center" gap={20}>
         <TextInputWithInsideLabel
           label="Trading Name"
           w="100%"
@@ -36,9 +47,6 @@ export default function BasicInfo() {
           key={form.key("businessTradingName")}
           withAsterisk
         />
-      </Flex>
-
-      <Flex direction={{ base: "column", md: "row" }} align="center" gap={20}>
         <SelectInputWithInsideLabel
           label="Country"
           w="100%"
@@ -49,14 +57,6 @@ export default function BasicInfo() {
           searchable
           {...form.getInputProps("businessCountry")}
           key={form.key("businessCountry")}
-          withAsterisk
-        />
-        <TextInputWithInsideLabel
-          label="Business Address"
-          w="100%"
-          rightSection={<IconMapPin />}
-          {...form.getInputProps("businessAddress")}
-          key={form.key("businessAddress")}
           withAsterisk
         />
       </Flex>
@@ -73,14 +73,13 @@ export default function BasicInfo() {
 
       <Flex direction={{ base: "column", md: "row" }} align="center" gap={20}>
         <TextInputWithInsideLabel
-          label="Email"
+          label="Business Address"
           w="100%"
-          rightSection={<IconMail />}
-          {...form.getInputProps("businessEmail")}
-          key={form.key("businessEmail")}
+          rightSection={<IconMapPin />}
+          {...form.getInputProps("businessAddress")}
+          key={form.key("businessAddress")}
           withAsterisk
         />
-
         <Box w="100%">
           <PhoneNumberInput<QuestionnaireType>
             form={form}

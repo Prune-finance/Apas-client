@@ -5,7 +5,7 @@ import { IParams } from "@/lib/schema";
 
 import createAxiosInstance from "@/lib/axios";
 import useAxios from "./useAxios";
-import { sanitizedQueryParams, sanitizeURL } from "../utils";
+import { sanitizedQueryParams, sanitizeURL, downloadFileFromUrl } from "../utils";
 
 const axios = createAxiosInstance("accounts");
 
@@ -104,14 +104,15 @@ export function useSingleAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function useBusinessDefaultAccount(id: string) {
+export function useBusinessDefaultAccount(id: string, currencyCode?: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/admin/company/${id}/default-account`);
+      const query = currencyCode ? `?currencyCode=${currencyCode}` : "";
+      const { data } = await axios.get(`/admin/company/${id}/default-account${query}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -136,14 +137,15 @@ export function useBusinessDefaultAccount(id: string) {
   return { loading, account, revalidate };
 }
 
-export function useBusinessPayoutAccount(id: string) {
+export function useBusinessPayoutAccount(id: string, currencyCode?: string) {
   const [account, setAccount] = useState<DefaultAccount | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
     setLoading(true);
     try {
-      const { data } = await axios.get(`/admin/company/${id}/payout-account`);
+      const query = currencyCode ? `?currencyCode=${currencyCode}` : "";
+      const { data } = await axios.get(`/admin/company/${id}/payout-account${query}`);
 
       setAccount(data.data);
     } catch (error) {
@@ -223,18 +225,20 @@ export function usePayoutAccount(customParams: IParams = {}) {
 export function useAccountStatistics({
   frequency,
   accountType,
+  currencyCode,
 }: {
   frequency: string;
-  accountType: "Accounts" | "Payout" | "Company";
+  accountType: "COMPANY_ACCOUNT" | "ISSUED_ACCOUNT" | "PAYOUT_ACCOUNT";
+  currencyCode?: string;
 }) {
-  const { loading, meta, queryFn } = useAxios<unknown, AccountStatsMeta>({
+  const { loading, data, meta, queryFn } = useAxios<StatInterval[], AccountStatsMeta>({
     baseURL: "accounts",
     endpoint: "/admin/accounts/statistics",
-    params: { frequency, accountType },
-    dependencies: [frequency, accountType],
+    params: { frequency, accountType, ...(currencyCode && { currency: currencyCode }) },
+    dependencies: [frequency, accountType, currencyCode],
   });
 
-  return { loading, meta, revalidate: queryFn };
+  return { loading, data: data || [], meta, revalidate: queryFn };
 }
 
 export function useUserAccounts(customParams: IParams = {}) {
@@ -399,15 +403,18 @@ export function useSingleUserAccount(id: string, currency: string = "EUR") {
   return { loading, account, meta, revalidate };
 }
 
-export function useSingleAccountByIBAN(iban: string) {
+export function useSingleAccountByIBAN(iban: string, currencyCode?: string) {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
+    if (!iban) return;
     setLoading(true);
 
     try {
-      const { data } = await axios.get(`/admin/accounts/number/${iban}`);
+      const { data } = await axios.get(`/admin/accounts/number/${iban}`, {
+        params: currencyCode ? { currencyCode } : undefined,
+      });
 
       setAccount(data.data);
     } catch (error) {
@@ -424,22 +431,23 @@ export function useSingleAccountByIBAN(iban: string) {
   useEffect(() => {
     fetchAccount();
 
-    return () => {
-      // Any cleanup code can go here
-    };
-  }, [iban]);
+    return () => {};
+  }, [iban, currencyCode]);
 
   return { loading, account, revalidate };
 }
 
-export function useSingleUserAccountByIBAN(iban: string) {
+export function useSingleUserAccountByIBAN(iban: string, currencyCode?: string) {
   const [account, setAccount] = useState<Account | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
+    if (!iban) return;
     setLoading(true);
     try {
-      const { data } = await axios.get(`/accounts/number/${iban}`);
+      const { data } = await axios.get(`/accounts/number/${iban}`, {
+        params: currencyCode ? { currencyCode } : undefined,
+      });
 
       setAccount(data.data);
     } catch (error) {
@@ -456,10 +464,8 @@ export function useSingleUserAccountByIBAN(iban: string) {
   useEffect(() => {
     fetchAccount();
 
-    return () => {
-      // Any cleanup code can go here
-    };
-  }, [iban]);
+    return () => {};
+  }, [iban, currencyCode]);
 
   return { loading, account, revalidate };
 }
@@ -598,6 +604,19 @@ export function useUserCurrencyAccount() {
   }, []);
 
   return { loading, currencyAccount, revalidate };
+}
+
+export function useAvailableCurrencies() {
+  const { currencyAccount, loading } = useUserCurrencyAccount();
+
+  const currencies = useMemo(() => {
+    const extra = (currencyAccount ?? [])
+      .map((a) => a.currency ?? a.AccountRequests?.Currency?.symbol)
+      .filter((c): c is string => Boolean(c));
+    return ["EUR", ...Array.from(new Set(extra))];
+  }, [currencyAccount]);
+
+  return { currencies, loading };
 }
 
 export function useBeneficiaryAccount(
@@ -919,6 +938,30 @@ export function useUserDefaultPayoutAccountGBP() {
   return { loading, account, revalidate };
 }
 
+interface AccountExportResult {
+  url: string;
+  key: string;
+  filename: string;
+  expiresInSeconds: number;
+}
+
+async function openAccountExportUrl(promise: Promise<{ data: { data: AccountExportResult } }>) {
+  const { data } = await promise;
+  await downloadFileFromUrl(data.data.url, data.data.filename || "export");
+}
+
+export function exportBusinessAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/default/export", { params: sanitizedQueryParams(params) }));
+}
+
+export function exportIssuedAdminAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/export", { params: sanitizedQueryParams(params) }));
+}
+
+export function exportPayoutAdminAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/payout/export", { params: sanitizedQueryParams(params) }));
+}
+
 export interface AccountMeta {
   active: number;
   inactive: number;
@@ -935,6 +978,7 @@ export interface AccountData {
   accountName: string;
   accountIban?: string;
   accountNumber: string;
+  walletId?: string;
   accountDocuments: AccountDocuments;
   createdAt: Date;
   updatedAt: Date;
@@ -1108,11 +1152,17 @@ export interface ListCurrencyAccount {
   status: "APPROVED" | "PENDING" | "REJECTED" | "ISSUED" | string;
 }
 
+export interface StatInterval {
+  interval: string;
+  total: number;
+}
+
 export interface AccountStatsMeta {
-  activeAccountCount: number;
-  inactiveAccountCount: number;
-  totalInflow: number;
-  totalOutflow: number;
-  totalNumberOfAccounts: number;
-  totalAccountBalance: number;
+  currencyCode?: string;
+  activeAccounts?: number;
+  inactiveAccounts?: number;
+  totalInflow?: number;
+  totalOutflow?: number;
+  totalAccounts?: number;
+  totalAmount?: number;
 }

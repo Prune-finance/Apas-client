@@ -1,7 +1,7 @@
 "use client";
 
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { IssuedAccountTableHeaders } from "@/lib/static";
+import { AllTransactionTableHeaders } from "@/lib/static";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -9,11 +9,11 @@ import Filter from "@/ui/components/Filter";
 import { SearchInput, TextBox, SelectBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
-import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
+import { BusinessTransactionTableRows } from "@/ui/components/TableRows";
 import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
 import { IconListTree, IconCircleArrowDown, IconFileExport, IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
-import { useIssuedAccountTransactions, exportIssuedAccountTransactions } from "@/lib/hooks/transactions";
+import { useAllAccountTransactions, exportAllAccountTransactions } from "@/lib/hooks/transactions";
 import { useInfoDetails } from "@/lib/hooks/infoDetails";
 import { useParam } from "@/lib/hooks/param";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -23,12 +23,15 @@ import { calculateTotalPages } from "@/lib/utils";
 import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import USDIcon from "@/assets/USD.png";
-type Currency = "EUR" | "GBP" | "USD";
+import GHSIcon from "@/assets/GH.png";
+
+type Currency = "EUR" | "GBP" | "USD" | "GHS";
 
 const currencyTabs = [
   { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
   { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
   { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+  { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
 ];
 
 interface Props {
@@ -36,7 +39,7 @@ interface Props {
   customStatusOption: string[];
 }
 
-export const IssuedAccountTransactions = ({
+export const AllAccountTransactions = ({
   panelValue,
   customStatusOption,
 }: Props) => {
@@ -78,7 +81,7 @@ export const IssuedAccountTransactions = ({
     search: debouncedSearch,
   });
 
-  const { transactions, loading, meta, revalidate } = useIssuedAccountTransactions({
+  const { transactions, loading, meta, revalidate } = useAllAccountTransactions({
     ...param,
     currencyCode: activeCurrency,
   });
@@ -101,7 +104,7 @@ export const IssuedAccountTransactions = ({
   const handleExport = async () => {
     setExporting(true);
     try {
-      await exportIssuedAccountTransactions({ ...param, currencyCode: activeCurrency });
+      await exportAllAccountTransactions({ ...param, currencyCode: activeCurrency });
     } finally {
       setExporting(false);
     }
@@ -177,8 +180,8 @@ export const IssuedAccountTransactions = ({
         </Filter>
 
         <TableComponent
-          head={IssuedAccountTableHeaders}
-          rows={<IssuedTransactionTableRows data={transactions} currency={activeCurrency} />}
+          head={AllTransactionTableHeaders}
+          rows={<BusinessTransactionTableRows data={transactions} currency={activeCurrency} />}
           loading={loading}
         />
 

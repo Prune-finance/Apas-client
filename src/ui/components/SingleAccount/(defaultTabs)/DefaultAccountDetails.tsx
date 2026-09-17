@@ -16,8 +16,8 @@ import { PrimaryBtn } from "../../Buttons";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
 import GBImage from "@/assets/GB.png";
 import EUImage from "@/assets/EU-icon.png";
-import NGNImage from "@/assets/cedis-icon.png";
-import GHSImage from "@/assets/cedis-icon.png";
+import NGNImage from "@/assets/Nigeria.png";
+import GHSImage from "@/assets/GH.png";
 import USDImage from "@/assets/USD.png";
 
 interface CurrencyConfig {

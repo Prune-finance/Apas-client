@@ -591,6 +591,8 @@ interface SingleAccountProps {
   isUser?: boolean;
   revalidate: () => Promise<void>;
   currency?: string;
+  page?: number;
+  limit?: string | null;
 }
 
 export const SingleAccountBody = ({
@@ -610,6 +612,8 @@ export const SingleAccountBody = ({
   location,
   isUser,
   revalidate,
+  page,
+  limit,
 }: SingleAccountProps) => {
   const tabs = [
     { value: "Account Details" },
@@ -649,9 +653,10 @@ export const SingleAccountBody = ({
             payout={payout}
             meta={trxMeta}
             currencyType={currency}
-            // children={children}
             accountID={accountID}
             isUser={isUser}
+            page={page}
+            limit={limit}
           >
             {children}
           </Transactions>
@@ -676,6 +681,7 @@ interface SingleDefaultAccountProps
   location?: string;
   accountType?: string;
   revalidateTrx?: () => void;
+  onTabChange?: (tab: string | null) => void;
 }
 
 export const SingleDefaultAccountBody = ({
@@ -695,6 +701,10 @@ export const SingleDefaultAccountBody = ({
   revalidateTrx,
   isUser,
   accountType,
+  currency,
+  page,
+  limit,
+  onTabChange,
 }: SingleDefaultAccountProps) => {
   /**
    * @description - Tabs for the default account
@@ -705,6 +715,10 @@ export const SingleDefaultAccountBody = ({
    */
 
   const [tab, setTab] = useState<string | null>("Account Details");
+  const handleTabChange = (value: string | null) => {
+    setTab(value);
+    onTabChange?.(value);
+  };
 
   const tabs: Array<{ value: string }> = [
     { value: "Account Details" },
@@ -726,7 +740,7 @@ export const SingleDefaultAccountBody = ({
         revalidate={revalidate}
         main={location === "own-account" || location === "admin-default"}
         business={business}
-        currencyType={accountType}
+        currencyType={currency ?? accountType}
       />
 
       <TabsComponent
@@ -735,7 +749,7 @@ export const SingleDefaultAccountBody = ({
         showRefreshBtn
         refreshButtonIndex={tab}
         value={tab}
-        onChange={setTab}
+        onChange={handleTabChange}
         loading={loadingTrx}
         revalidate={revalidateTrx}
       >
@@ -743,7 +757,7 @@ export const SingleDefaultAccountBody = ({
           <DefaultAccountDetails
             account={account}
             loading={loading}
-            accountType={accountType}
+            accountType={currency ?? accountType}
           />
         </TabsPanel>
         <TabsPanel value={tabs[1].value}>
@@ -756,7 +770,9 @@ export const SingleDefaultAccountBody = ({
             // children={children}
             location={location ?? "default"}
             isUser={isUser}
-            currencyType={account?.AccountRequests?.Currency?.symbol || accountType}
+            currencyType={account?.AccountRequests?.Currency?.symbol || currency || accountType}
+            page={page}
+            limit={limit}
           >
             {children}
           </Transactions>

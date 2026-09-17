@@ -1,25 +1,18 @@
 "use client";
 import dayjs from "dayjs";
 
-import React, {
-  Dispatch,
-  SetStateAction,
-  Suspense,
-  useMemo,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 
-// Mantine Imports
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
-  Badge,
   Group,
+  Image,
   Menu,
   MenuDropdown,
   MenuItem,
   MenuTarget,
 } from "@mantine/core";
-import { UnstyledButton, rem, Text } from "@mantine/core";
+import { UnstyledButton, rem } from "@mantine/core";
 import { TableTr, TableTd } from "@mantine/core";
 
 import styles from "@/ui/styles/accounts.module.scss";
@@ -30,23 +23,17 @@ import {
   IconListTree,
   IconCheck,
   IconDotsVertical,
-  IconFileExport,
 } from "@tabler/icons-react";
 
-// import ModalComponent from "@/ui/components/Modal";
-import {
-  AccountData,
-  AccountMeta,
-  useAccountStatistics,
-} from "@/lib/hooks/accounts";
-import { formatNumber } from "@/lib/utils";
+import { AccountData, AccountMeta } from "@/lib/hooks/accounts";
+import { formatNumber, getUserType } from "@/lib/utils";
 
+import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import Filter from "@/ui/components/Filter";
 import { useForm, zodResolver } from "@mantine/form";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -55,17 +42,13 @@ import { validateRequest } from "@/lib/schema";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
-import createAxiosInstance from "@/lib/axios";
 import useAxios from "@/lib/hooks/useAxios";
-import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { Image } from "@mantine/core";
 import EUIcon from "@/assets/EU-icon.png";
 import GBPIcon from "@/assets/GB.png";
 import USDIcon from "@/assets/USD.png";
 import GHSIcon from "@/assets/GH.png";
-import { exportPayoutAdminAccounts } from "@/lib/hooks/accounts";
 
 type Currency = "EUR" | "GBP" | "USD" | "GHS";
 
@@ -76,9 +59,8 @@ const currencyTabs = [
   { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
 ];
 
-export default function PayoutAccounts() {
+export default function AllAccounts() {
   const searchParams = useSearchParams();
-  const axios = createAxiosInstance("accounts");
 
   const { status, date, endDate, accountName, accountNumber, type } =
     Object.fromEntries(searchParams.entries());
@@ -87,18 +69,15 @@ export default function PayoutAccounts() {
   const [limit, setLimit] = useState<string | null>("10");
   const [activePage, setActivePage] = useState(1);
   const activeCurrency = (searchParams.get("currency") as Currency) || "EUR";
-  const [frequency, setFrequency] = useState<string | null>("Monthly");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
-  const [cardStatus, setCardStatus] = useState<string | null>(null);
 
-  const effectiveStatus = cardStatus ?? (status || null);
-  const activeFilterCount = [effectiveStatus, date, endDate, accountName, accountNumber, type].filter(Boolean).length;
+  const activeFilterCount = [status, date, endDate, accountName, accountNumber, type].filter(Boolean).length;
 
   const params = {
     ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
-    ...(effectiveStatus && { status: effectiveStatus.toUpperCase() }),
+    ...(status && { status: status.toUpperCase() }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
     ...(accountName && { accountName }),
     ...(accountNumber && { accountNumber }),
@@ -111,7 +90,6 @@ export default function PayoutAccounts() {
   const dependencies = [
     limit,
     activePage,
-    cardStatus,
     status,
     date,
     endDate,
@@ -128,19 +106,11 @@ export default function PayoutAccounts() {
     meta,
     queryFn: revalidate,
   } = useAxios<AccountData[], AccountMeta>({
-    endpoint: "/admin/accounts/payout",
+    endpoint: "/admin/accounts/all",
     baseURL: "accounts",
     params,
     dependencies,
   });
-
-  const { loading: loadingStats, meta: statsMeta, data: statData } = useAccountStatistics({
-    frequency: frequency?.toLowerCase() ?? "monthly",
-    accountType: "PAYOUT_ACCOUNT",
-    currencyCode: activeCurrency,
-  });
-
-  // TODO: Handle the resetting of activePage state when the filter is toggled
 
   const [freezeOpened, { open: freezeOpen, close: freezeClose }] =
     useDisclosure(false);
@@ -149,12 +119,10 @@ export default function PayoutAccounts() {
   const [opened, { open, close }] = useDisclosure(false);
   const [activateOpened, { open: activateOpen, close: activateClose }] =
     useDisclosure(false);
-  const [filterOpened, { toggle, open: openFilter, close: closeFilter }] =
-    useDisclosure(false);
-  const { handleSuccess } = useNotification();
+  const [filterOpened, { toggle }] = useDisclosure(false);
+  const { handleError, handleSuccess } = useNotification();
 
   const [rowId, setRowId] = useState<string | null>(null);
-  // const [processingCSV, setProcessingCSV] = useState(false);
 
   const requestForm = useForm({
     initialValues: {
@@ -178,11 +146,10 @@ export default function PayoutAccounts() {
     endpoint: `/admin/accounts/${rowId}/freeze`,
     method: "PATCH",
     body,
-    onSuccess(data, meta) {
+    onSuccess() {
       revalidate();
       handleSuccess("Action Completed", "Account frozen");
       freezeClose();
-
       requestForm.reset();
     },
   });
@@ -191,11 +158,10 @@ export default function PayoutAccounts() {
     endpoint: `/admin/accounts/${rowId}/deactivate`,
     method: "PATCH",
     body,
-    onSuccess(data, meta) {
+    onSuccess() {
       revalidate();
       handleSuccess("Action Completed", "Account Deactivated");
       close();
-
       requestForm.reset();
     },
   });
@@ -204,11 +170,10 @@ export default function PayoutAccounts() {
     endpoint: `/admin/accounts/${rowId}/activate`,
     method: "PATCH",
     body,
-    onSuccess(data, meta) {
+    onSuccess() {
       revalidate();
       handleSuccess("Action Completed", "Account Activated");
       activateClose();
-
       requestForm.reset();
     },
   });
@@ -217,11 +182,10 @@ export default function PayoutAccounts() {
     endpoint: `/admin/accounts/${rowId}/unfreeze`,
     method: "PATCH",
     body,
-    onSuccess(data, meta) {
+    onSuccess() {
       revalidate();
       handleSuccess("Action Completed", "Account unfrozen");
       unfreezeClose();
-
       requestForm.reset();
     },
   });
@@ -237,80 +201,6 @@ export default function PayoutAccounts() {
     params.set("currency", currency);
     router.push(`?${params.toString()}`);
   };
-
-  const [exporting, setExporting] = useState(false);
-
-  const handleExport = async () => {
-    setExporting(true);
-    try {
-      await exportPayoutAdminAccounts(params);
-    } finally {
-      setExporting(false);
-    }
-  };
-
-  const fetchAccounts = async (limit: number) => {
-    try {
-      const { data } = await axios.get(
-        `/admin/accounts/default?limit=${limit}`
-      );
-
-      return data.data;
-    } catch (error) {
-      console.log(error);
-      throw error;
-    }
-  };
-
-  /* const handleExportCsv = async () => {
-    setProcessingCSV(true);
-    // fetch data
-    try {
-      const response = await fetchAccounts(meta?.total ?? 0);
-
-      [
-        "Business Account Name",
-        "Account Number",
-        "Account Balance",
-        "Date Created",
-        "Status",
-        "Action",
-      ];
-
-      const data = response.map((account: AccountData) => ({
-        "Account Name": account.accountName,
-        "Account Number": account.accountNumber,
-        Type: getUserType(account.type),
-        Business: account.Company.name,
-        "Date Created": dayjs(account.createdAt).format("ddd DD MMM YYYY"),
-        Status: camelCaseToTitleCase(account.status),
-      }));
-
-      //convert data to worksheet
-      const worksheet = XLSX.utils.json_to_sheet(data);
-
-      //convert worksheet to CSV
-      const csv = XLSX.utils.sheet_to_csv(worksheet);
-
-      //download CSV
-      const downloadCSV = (csvData: string) => {
-        const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-        const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", "Payout Accounts.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      };
-
-      downloadCSV(csv);
-    } catch (err) {
-      handleError("An error occurred", parseError(err));
-    } finally {
-      setProcessingCSV(false);
-    }
-  }; */
 
   return (
     <div className={styles.table__container}>
@@ -343,43 +233,9 @@ export default function PayoutAccounts() {
         })}
       </div>
 
-      <AccountInfoCards
-        loading={loadingStats}
-        frequency={frequency}
-        setFrequency={setFrequency}
-        accountType="Payout"
-        meta={statsMeta}
-        statData={statData}
-        currency={activeCurrency}
-        form={form}
-        open={openFilter}
-        close={closeFilter}
-        opened={filterOpened}
-        onStatusFilter={setCardStatus}
-      />
-      <Group
-        justify="space-between"
-        align="center"
-        mt={24}
-        // className={styles.container__search__filter}
-      >
+      <Group justify="space-between" align="center" mt={24}>
         <SearchInput search={search} setSearch={setSearch} />
-
         <Group gap={12}>
-          {/* <SecondaryBtn
-            text="Export CSV"
-            icon={IconArrowUpRight}
-            action={handleExportCsv}
-            loading={processingCSV}
-            fw={600}
-          /> */}
-          <SecondaryBtn
-            text="Export"
-            icon={IconFileExport}
-            action={handleExport}
-            loading={exporting}
-            fw={600}
-          />
           <SecondaryBtn
             text="Filter"
             icon={IconListTree}
@@ -390,7 +246,7 @@ export default function PayoutAccounts() {
         </Group>
       </Group>
 
-      <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form} onClear={() => setCardStatus(null)}>
+      <Filter<FilterType> opened={filterOpened} toggle={toggle} form={form}>
         <TextBox
           placeholder="Account Name"
           {...form.getInputProps("accountName")}
@@ -497,10 +353,11 @@ export default function PayoutAccounts() {
 }
 
 const tableHeaders = [
-  "Business Account Name",
+  "Account Name",
   "Account Number",
   "Account Balance",
   "Date Created",
+  "Account Type",
   "Status",
   "Action",
 ];
@@ -527,8 +384,9 @@ const RowComponent = ({
   const { push } = useRouter();
 
   const handleRowClick = (businessId: string) => {
-    push(`/admin/accounts/${businessId}/default?accountType=payout&currency=${currency}`);
+    push(`/admin/accounts/${businessId}/default?accountType=all&currency=${currency}`);
   };
+
   return accounts.map((element, index) => (
     <TableTr
       key={index}
@@ -537,7 +395,7 @@ const RowComponent = ({
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
         <Link
-          href={`/admin/accounts/${element.Company.id}/default?accountType=payout&currency=${currency}`}
+          href={`/admin/accounts/${element.Company.id}/default?accountType=all&currency=${currency}`}
         >
           {element.accountName}
         </Link>
@@ -551,10 +409,11 @@ const RowComponent = ({
       </TableTd>
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("ddd DD MMM YYYY")}</TableTd>
+      <TableTd tt="capitalize">{getUserType(element.type)}</TableTd>
+      {/* <TableTd>{element.Company?.issuedAccountCount}</TableTd> */}
       <TableTd>
         <BadgeComponent status={element.status} active />
       </TableTd>
-
       <TableTd onClick={(e) => e.stopPropagation()}>
         <MenuComponent
           id={element.id}
@@ -598,18 +457,6 @@ const MenuComponent = ({
       </MenuTarget>
 
       <MenuDropdown>
-        {/* <Link href={`/admin/accounts/${id}`}>
-          <MenuItem
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            View
-          </MenuItem>
-        </Link> */}
-
         <MenuItem
           onClick={() => {
             setRowId(id);

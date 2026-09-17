@@ -142,8 +142,8 @@ export default function Header() {
       </div>
 
       <Switch
-        color="green"
-        c={stage === "LIVE" ? "green" : "dimmed"}
+        color="var(--prune-primary-600)"
+        c={stage === "LIVE" ? "var(--prune-primary-600)" : "dimmed"}
         fz={14}
         fw={500}
         labelPosition="left"
@@ -376,8 +376,8 @@ export function UserHeader() {
         </div>
 
         <Switch
-          color="green"
-          c={stage === "LIVE" ? "green" : "dimmed"}
+          color="var(--prune-primary-600)"
+          c={stage === "LIVE" ? "var(--prune-primary-600)" : "dimmed"}
           fz={14}
           fw={500}
           labelPosition="left"

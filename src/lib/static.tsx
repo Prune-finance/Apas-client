@@ -296,6 +296,17 @@ export const countries = [
 ];
 
 export const OwnAccountTableHeaders = [
+  "Sender Name",
+  "Beneficiary",
+  "Type",
+  "Amount",
+  "Prune Ref",
+  "Date & Time",
+  "Status",
+];
+
+export const AllTransactionTableHeaders = [
+  "Sender Name",
   "Beneficiary",
   "Type",
   "Amount",

@@ -5,8 +5,7 @@ import {
   useUserTransactionsByIBAN,
 } from "@/lib/hooks/transactions";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
-import { filteredSearch } from "@/lib/search";
-import { frontendPagination, formatNumber, getInitials } from "@/lib/utils";
+import { formatNumber, getInitials, calculateTotalPages } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import InfoCards from "@/ui/components/Cards/InfoCards";
@@ -34,7 +33,7 @@ dayjs.extend(advancedFormat);
 import { useState } from "react";
 import styles from "../styles.module.scss";
 import { TransactionDrawer } from "../drawer";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { IssuedAccountTableHeaders } from "@/lib/static";
@@ -42,20 +41,28 @@ import { AmountGroup } from "@/ui/components/AmountGroup";
 
 export default function AccountTransactions() {
   const { accountId } = useParams<{ accountId: string }>();
+  const searchParams = useSearchParams();
+  const currencyCode = searchParams.get("currencyCode") ?? "EUR";
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
 
-  const { transactions, loading, meta } = useUserTransactionsByIBAN(accountId);
+  const [search, setSearch] = useState("");
+  const [debouncedSearch] = useDebouncedValue(search, 500);
+
+  const { transactions, loading, meta } = useUserTransactionsByIBAN(accountId, {
+    currencyCode,
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
+    search: debouncedSearch,
+  });
 
   const { account, loading: loadingAcct } =
-    useSingleUserAccountByIBAN(accountId);
+    useSingleUserAccountByIBAN(accountId, currencyCode);
 
   const [opened, { toggle }] = useDisclosure(false);
   const [openedDrawer, { open: openDrawer, close: closeDrawer }] =
     useDisclosure(false);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch] = useDebouncedValue(search, 500);
   const [selectedRequest, setSelectedRequest] =
     useState<TransactionType | null>(null);
 
@@ -69,37 +76,31 @@ export default function AccountTransactions() {
       title: "Total Balance",
       value: account?.accountBalance || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loadingAcct,
     },
     {
       title: "Money In",
-      value: 0,
+      value: meta?.in || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {
       title: "Money Out",
-      value: transactions.reduce((prv, curr) => prv + curr.amount, 0) || 0,
+      value: meta?.out || 0,
       formatted: true,
-      currency: "EUR",
+      currency: currencyCode,
       loading: loading,
     },
     {
       title: "Total Transactions",
-      value: transactions.length,
+      value: meta?.total || 0,
       loading: loading,
     },
   ];
 
-  const searchProps = ["recipientIban", "recipientBankAddress", "reference"];
-
-  const rows = frontendPagination(
-    filteredSearch(transactions, searchProps, debouncedSearch),
-    active,
-    parseInt(limit ?? "10", 10)
-  ).map((element) => (
+  const rows = transactions.map((element) => (
     <TableTr
       key={element.id}
       onClick={() => {
@@ -117,7 +118,7 @@ export default function AccountTransactions() {
         <AmountGroup type={element.type} fz={12} fw={400} />
       </TableTd>
       <TableTd className={styles.table__td}>
-        {formatNumber(element.amount, true, "EUR")}
+        {formatNumber(element.amount, true, currencyCode)}
       </TableTd>
       <TableTd className={styles.table__td}>{element.reference}</TableTd>
 
@@ -203,7 +204,7 @@ export default function AccountTransactions() {
         text="When a transaction is recorded, it will appear here"
       />
       <PaginationComponent
-        total={Math.ceil(transactions.length / parseInt(limit ?? "10", 10))}
+        total={calculateTotalPages(limit, meta?.total || 0)}
         active={active}
         setActive={setActive}
         limit={limit}

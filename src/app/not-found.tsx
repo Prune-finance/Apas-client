@@ -1,13 +1,13 @@
 import { Box, Container, Flex, Text } from "@mantine/core";
 import React from "react";
-import PruneIcon from "@/assets/logo.png";
+import PruneIcon from "@/assets/logo-with-text.svg";
 import Image from "next/image";
 
 function NotFoundPage() {
   return (
     <Container fluid>
       <Flex align="center" justify="flex-start" mt={25} mx={30}>
-        <Image width={100} height={29} src={PruneIcon} alt="prune icon" />
+        <Image width={111} height={30} src={PruneIcon.src} alt="prune icon" unoptimized />
       </Flex>
 
       <Flex

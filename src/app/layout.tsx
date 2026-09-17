@@ -30,6 +30,22 @@ const theme = createTheme({
   headings: {
     fontFamily: switzer.style.fontFamily,
   },
+  primaryColor: "prune",
+  primaryShade: 5,
+  colors: {
+    prune: [
+      "#fbfee6", // 0 - primary-50
+      "#ebf98d", // 1 - primary-200
+      "#e2f759", // 2 - primary-300
+      "#ddf539", // 3 - primary-400
+      "#d4f307", // 4 - primary-500
+      "#c1dd06", // 5 - primary-600 (main)
+      "#97ad05", // 6 - primary-700
+      "#758604", // 7 - primary-800
+      "#596603", // 8 - primary-900
+      "#3d4502", // 9
+    ],
+  },
 });
 
 export default function RootLayout({

@@ -74,6 +74,7 @@ export const PrimaryBtn = ({
   icon,
   action,
   showIcon,
+  onClick,
   ...props
 }: PrimaryBtnProps) => {
   const Icon = icon;
@@ -86,7 +87,10 @@ export const PrimaryBtn = ({
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       href={link}
-      onClick={action}
+      onClick={(e) => {
+        onClick?.(e);
+        if (!e.defaultPrevented) action?.();
+      }}
       {...props}
       radius={BUTTON_RADIUS}
       className={[styles.primary__btn, props.className].filter(Boolean).join(" ")}
@@ -102,7 +106,8 @@ export const PrimaryBtn = ({
       leftSection={Icon && <Icon size={14} />}
       onClick={(e) => {
         e.stopPropagation();
-        action && action();
+        onClick?.(e);
+        if (!e.defaultPrevented) action?.();
       }}
       {...props}
       radius={BUTTON_RADIUS}

@@ -34,11 +34,15 @@ import {
 import useAxios from "@/lib/hooks/useAxios";
 import { Onboarding } from "@/lib/interface";
 import createAxiosInstance from "@/lib/axios";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
 
 const DRAFT_KEY = "questionnaire_draft";
 const questAxios = createAxiosInstance("questionnaire");
 
 export default function Questionnaire() {
+  const { handleSuccess, handleError } = useNotification();
+
   const [entryDone, setEntryDone] = useState(false);
   const [active, setActive] = useState(0);
   const [saving, setSaving] = useState(false);
@@ -65,21 +69,19 @@ export default function Questionnaire() {
       if (active === 2)
         return zodResolver(z.object({ services: ServicesSchema }))(values);
       if (active === 3)
-        return zodResolver(
-          z.object({ operationsAccounts: OperationsAccountSchema })
-        )(values);
-      if (active === 4)
         return zodResolver(z.object({ virtualAccounts: VirtualAccountSchema }))(
           values
         );
+      if (active === 4)
+        return zodResolver(
+          z.object({ operationsAccounts: OperationsAccountSchema })
+        )(values);
       return {};
     },
   });
 
   const hasVirtualAccount = Boolean(
-    form.values.services.find(
-      (service) => service.name === "Virtual Account Services"
-    )
+    form.values.services.find((service) => service.name === "VIRTUAL_ACCOUNTS")
   );
 
   // Resume flow: fetch existing questionnaire when URL has reference + token
@@ -116,7 +118,12 @@ export default function Questionnaire() {
           geoFootprint: a.geographicFootprint ?? "",
           businessDescription: a.businessDescription ?? "",
           annualTurnover: a.annualTurnover ?? "",
-          services: a.services?.length ? a.services : questionnaireValues.services,
+          services: a.services?.length
+            ? a.services.map((service: { service?: string; name?: string; currencies: string[] }) => ({
+                name: service.service ?? service.name ?? "",
+                currencies: service.currencies,
+              }))
+            : questionnaireValues.services,
           virtualAccounts: a.virtualAccounts ?? questionnaireValues.virtualAccounts,
           operationsAccounts: a.operationsBalance
             ? { estimated_balance: String(a.operationsBalance) }
@@ -128,7 +135,11 @@ export default function Questionnaire() {
 
         // Section 1 = ContactEntry (done), section 2 = BasicInfo (active 0), etc.
         const nextSection = progress?.nextSection ?? 2;
-        setActive(Math.max(0, Math.min(4, nextSection - 2)));
+        const nextActive = Math.max(0, Math.min(4, nextSection - 2));
+        const needsVirtualAccount = partial.services?.some(
+          (service) => service.name === "VIRTUAL_ACCOUNTS"
+        );
+        setActive(nextActive === 3 && !needsVirtualAccount ? 4 : nextActive);
         setEntryDone(true);
       } catch {
         // If fetch fails, show ContactEntry so user can re-enter
@@ -195,6 +206,34 @@ export default function Questionnaire() {
         regulatoryLicence: v.regulatoryDetails ?? "",
       };
     }
+    if (step === 1) {
+      return { annualTurnover: form.values.annualTurnover };
+    }
+    if (step === 2) {
+      return {
+        services: form.values.services.map((s) => ({
+          service: s.name,
+          currencies: s.currencies,
+        })),
+      };
+    }
+    if (step === 3) {
+      const va = form.values.virtualAccounts;
+      return {
+        dayOneAccounts: Number(va.day_one_requirement),
+        fullCapacityAccounts: Number(va.total_number_of_virtual_accounts),
+        singleAccountMaxDaily: String(va.max_value_per_transaction?.daily ?? ""),
+        singleAccountMaxMonthly: String(va.max_value_per_transaction?.monthly ?? ""),
+        singleAccountMaxAnnually: String(va.max_value_per_transaction?.annually ?? ""),
+        allAccountsMaxDaily: String(va.max_value_all_virtual_accounts?.daily ?? ""),
+        allAccountsMaxMonthly: String(va.max_value_all_virtual_accounts?.monthly ?? ""),
+        allAccountsMaxAnnually: String(va.max_value_all_virtual_accounts?.annually ?? ""),
+        highestTransactionCount: Number(va.total_highest_transaction_count?.daily ?? 0),
+      };
+    }
+    if (step === 4) {
+      return { operationsBalance: form.values.operationsAccounts.estimated_balance };
+    }
     return {};
   };
 
@@ -210,7 +249,11 @@ export default function Questionnaire() {
 
     const reference = getReference();
     const token = getResumeToken();
-    if (!reference || !token) return;
+
+    if (!reference || !token) {
+      handleError("Unable to save", "Session reference not found. Please refresh and try again.");
+      return;
+    }
 
     setSavingDraft(true);
     try {
@@ -219,17 +262,17 @@ export default function Questionnaire() {
         buildSectionPayload(active),
         { headers: { "X-Resume-Token": token } }
       );
-    } catch {
-      // fail silently — save progress should never block the user
+      handleSuccess("Progress saved", "Your progress has been saved successfully.");
+    } catch (err) {
+      handleError("Save failed", parseError(err));
     } finally {
       setSavingDraft(false);
     }
   };
 
   const goNext = () => {
-    if (active === 3 && !hasVirtualAccount) return open();
     if (active === 4) return open();
-    setActive((prev) => Math.min(prev + 1, 4));
+    setActive(active === 2 && !hasVirtualAccount ? 4 : Math.min(active + 1, 4));
   };
 
   // Save with validation — POST /sections/{n}/complete
@@ -243,8 +286,9 @@ export default function Questionnaire() {
       const token = getResumeToken();
 
       if (reference && token) {
+        const completeSection = active + 2;
         await questAxios.post(
-          `/business/questionnaire/${reference}/sections/${active + 2}/complete`,
+          `/business/questionnaire/${reference}/sections/${completeSection}/complete`,
           buildSectionPayload(active),
           { headers: { "X-Resume-Token": token } }
         );
@@ -307,36 +351,36 @@ export default function Questionnaire() {
         </Box>
       </Box>
 
-      {/* onBlur bubbles up from every field — auto-saves draft on each field exit */}
       <Box
         px={{ base: 24, sm: 48, lg: 120 }}
         mt={40}
-        onBlur={() => { saveDraft(); }}
       >
         <Flex align="center" justify="space-between" mb={32}>
           <Title order={4} c="var(--prune-text-gray-700)">
             Tell Us About Your Business.
           </Title>
-          <Tooltip label="Save progress" withArrow position="left">
-            <PrimaryBtn
-              text="Save progress"
-              icon={IconDeviceFloppy}
-              showIcon
-              h={36}
-              fz={13}
-              fw={500}
-              loading={savingDraft}
-              disabled={saving}
-              action={() => { saveDraft(); }}
-            />
-          </Tooltip>
+          {active !== 1 && active !== 4 && (
+            <Tooltip label="Save progress" withArrow position="left">
+              <PrimaryBtn
+                text="Save progress"
+                icon={IconDeviceFloppy}
+                showIcon
+                h={36}
+                fz={13}
+                fw={500}
+                loading={savingDraft}
+                disabled={saving}
+                action={() => { saveDraft(); }}
+              />
+            </Tooltip>
+          )}
         </Flex>
 
         {active === 0 && <BasicInfo />}
         {active === 1 && <Turnover />}
         {active === 2 && <Services />}
-        {active === 3 && <OperationsAccount />}
-        {active === 4 && <VirtualAccount />}
+        {active === 3 && <VirtualAccount />}
+        {active === 4 && <OperationsAccount />}
 
         <QuestionnaireNav
           onNext={handleNext}
@@ -344,13 +388,9 @@ export default function Questionnaire() {
           disabled={savingDraft}
           onPrevious={() => {
             if (active === 0) return setEntryDone(false);
-            setActive((prev) => Math.max(prev - 1, 0));
+            setActive(active === 4 && !hasVirtualAccount ? 2 : Math.max(active - 1, 0));
           }}
-          nextText={
-            (active === 3 && !hasVirtualAccount) || active === 4
-              ? "Submit"
-              : "Save & Continue"
-          }
+          nextText={active === 4 ? "Submit" : "Save & Continue"}
         />
       </Box>
 

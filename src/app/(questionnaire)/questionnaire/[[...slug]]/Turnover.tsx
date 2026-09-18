@@ -1,17 +1,30 @@
-import { Box, Text, RadioGroup, Stack } from "@mantine/core";
-import React from "react";
+import { Box, RadioGroup, Stack } from "@mantine/core";
+import { useEffect, useState } from "react";
 import CustomRadio from "./CustomRadio";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import { formatNumber } from "@/lib/utils";
+import createAxiosInstance from "@/lib/axios";
+
+const questAxios = createAxiosInstance("questionnaire");
+
+interface RefOption { value: string; label: string }
 
 export default function Turnover() {
   const form = useQuestionnaireFormContext();
+  const [monetaryBands, setMonetaryBands] = useState<RefOption[]>([]);
+
+  useEffect(() => {
+    questAxios
+      .get("/business/questionnaire/reference-data", {
+        params: { include: "monetaryBands" },
+      })
+      .then(({ data: res }) => {
+        setMonetaryBands(res.data?.monetaryBands ?? []);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <Box>
-      {/* <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
-        Tell Us More About Your Business.
-      </Text> */}
       <RadioGroup
         name="turnover"
         label="What is this entity's annual turnover?"
@@ -26,31 +39,11 @@ export default function Turnover() {
         }}
       >
         <Stack gap={20} mt="xs" style={{ cursor: "pointer" }}>
-          {Object.entries(turnoverOptions).map(([value, label], idx) => (
-            <CustomRadio key={idx} value={value} label={label} />
+          {monetaryBands.map((option) => (
+            <CustomRadio key={option.value} value={option.value} label={option.label} />
           ))}
         </Stack>
       </RadioGroup>
     </Box>
   );
 }
-
-const turnoverOptions = {
-  "less-than-10000": `Less than ${formatNumber(10000, true, "GBP")}`,
-  "less-than-50000": `${formatNumber(10000, true, "GBP")} - ${formatNumber(
-    50000,
-    true,
-    "GBP"
-  )}`,
-  "less-than-100000": `${formatNumber(50000, true, "GBP")} - ${formatNumber(
-    100000,
-    true,
-    "GBP"
-  )}`,
-  "less-than-500000": `${formatNumber(100000, true, "GBP")} - ${formatNumber(
-    500000,
-    true,
-    "GBP"
-  )}`,
-  "above-500000": `More than ${formatNumber(500000, true, "GBP")}`,
-} as const;

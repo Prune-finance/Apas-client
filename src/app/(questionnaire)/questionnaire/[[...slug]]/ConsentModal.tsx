@@ -1,15 +1,14 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Box, Flex, Modal, Text } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import { z } from "zod";
-import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import { Flex, Modal, Stack, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import ConfirmationModal from "./ConfirmationModal";
-import {
-  PhoneNumberInput,
-  TextInputWithInsideLabel,
-} from "@/ui/components/InputWithLabel";
-import useAxios from "@/lib/hooks/useAxios";
+import createAxiosInstance from "@/lib/axios";
+import useNotification from "@/lib/hooks/notification";
+import { parseError } from "@/lib/actions/auth";
+
+const questAxios = createAxiosInstance("questionnaire");
 
 interface ConsentModalProps {
   opened: boolean;
@@ -17,64 +16,52 @@ interface ConsentModalProps {
 }
 
 export default function ConsentModal({ opened, close }: ConsentModalProps) {
-  const [openedConfirm, { open, close: closeConfirm }] = useDisclosure(false);
+  const { handleError } = useNotification();
+  const [openedConfirm, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
+  const [submitting, setSubmitting] = useState(false);
 
-  const questionnaireForm = useQuestionnaireFormContext();
-  const { countryCode, isRegulated, ...restOfQuestionnaire } =
-    questionnaireForm.values;
+  const params = useParams();
+  const searchParams = useSearchParams();
 
-  const schema = z.object({
-    contactPersonName: z.string().min(1, "Name is required"),
-    contactPersonDesignation: z.string().min(1, "Designation is required"),
-    contactPersonPhoneNumber: z.string().min(1, "Contact number is required"),
-    contactPersonEmail: z
-      .string()
-      .email("Invalid email address")
-      .min(1, "Email is required"),
-    contactCountryCode: z.string().min(1, "Country code is required"),
-  });
+  const getReference = () =>
+    (params?.slug?.[0] as string | undefined) ??
+    (typeof window !== "undefined" ? sessionStorage.getItem("quest_reference") : null);
 
-  type FormValues = z.infer<typeof schema>;
+  const getResumeToken = () =>
+    searchParams?.get("token") ??
+    (typeof window !== "undefined" ? sessionStorage.getItem("quest_token") : null);
 
-  const form = useForm<FormValues>({
-    initialValues: {
-      contactPersonName: "",
-      contactPersonDesignation: "",
-      contactPersonPhoneNumber: "+234",
-      contactPersonEmail: "",
-      contactCountryCode: "+234",
-    },
-    validate: zodResolver(schema),
-  });
+  const handleConsent = async () => {
+    const reference = getReference();
+    const token = getResumeToken();
 
-  const { contactCountryCode, ...rest } = form.values;
+    if (!reference || !token) {
+      handleError("Unable to submit", "Session reference not found. Please refresh and try again.");
+      return;
+    }
 
-  const { loading, queryFn } = useAxios({
-    baseURL: "auth",
-    endpoint: "/onboarding/questionnaire/create",
-    method: "POST",
-    body: {
-      ...restOfQuestionnaire,
-      isRegulated: isRegulated === "yes",
-      ...rest,
-    },
-    onSuccess: () => {
+    setSubmitting(true);
+    try {
+      await questAxios.post(
+        `/business/questionnaire/${reference}/submit`,
+        {},
+        { headers: { "X-Resume-Token": token } }
+      );
       close();
-      form.reset();
-      questionnaireForm.reset();
-      open();
-    },
-  });
+      openConfirm();
+    } catch (err) {
+      handleError("Submission failed", parseError(err));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <>
       <Modal
         opened={opened}
-        onClose={() => {
-          form.reset();
-          close();
-        }}
-        title="Company Profile"
+        onClose={close}
+        title="Questionnaire Consent"
         styles={{
           title: {
             fontSize: "14px",
@@ -85,57 +72,36 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
         padding={24}
         centered
       >
-        <Text fz={24} fw={700} c="var(--prune-text-gray-700)">
-          Contact Person
-        </Text>
+        <Stack gap={24}>
+          <Text fz={24} fw={700} c="var(--prune-text-gray-700)">
+            Declaration & Consent
+          </Text>
 
-        <Text my={16} c="var(--prune-text-gray-700)" fw={500} fz={16}>
-          Who is filling this form?
-        </Text>
-
-        <Box
-          display="flex"
-          style={{
-            flexDirection: "column",
-            gap: 24,
-          }}
-          component="form"
-          onSubmit={form.onSubmit((values) => queryFn())}
-        >
-          <TextInputWithInsideLabel
-            label="Name"
-            w="100%"
-            {...form.getInputProps("contactPersonName")}
-          />
-
-          <TextInputWithInsideLabel
-            label="Designation"
-            w="100%"
-            {...form.getInputProps("contactPersonDesignation")}
-          />
-
-          <PhoneNumberInput<FormValues>
-            form={form}
-            phoneNumberKey="contactPersonPhoneNumber"
-            countryCodeKey="contactCountryCode"
-          />
-
-          <TextInputWithInsideLabel
-            label="Email"
-            w="100%"
-            {...form.getInputProps("contactPersonEmail")}
-          />
+          <Stack gap={12}>
+            <Text fz={14} c="var(--prune-text-gray-600)" lh={1.6}>
+              By clicking <strong>I Consent</strong>, you confirm that the information provided in
+              this questionnaire is accurate and complete to the best of your knowledge.
+            </Text>
+            <Text fz={14} c="var(--prune-text-gray-600)" lh={1.6}>
+              You consent to Prune Payments collecting, processing, and sharing the information
+              submitted in this form for the purpose of reviewing your business application and
+              conducting any required due diligence in accordance with applicable regulations.
+            </Text>
+            <Text fz={14} c="var(--prune-text-gray-600)" lh={1.6}>
+              Your information will be handled in accordance with our Privacy Policy and will only
+              be used for purposes related to your onboarding and account management.
+            </Text>
+          </Stack>
 
           <Flex justify="end">
             <PrimaryBtn
               text="I Consent"
               fw={600}
-              disabled={!form.isDirty()}
-              type="submit"
-              loading={loading}
+              action={handleConsent}
+              loading={submitting}
             />
           </Flex>
-        </Box>
+        </Stack>
       </Modal>
 
       <ConfirmationModal opened={openedConfirm} close={closeConfirm} />

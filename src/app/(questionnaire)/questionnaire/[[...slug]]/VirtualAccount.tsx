@@ -1,12 +1,10 @@
-import { Box, Group, NumberInput, Stack, Text } from "@mantine/core";
+import { Box, Group, Stack, Text } from "@mantine/core";
 import { NumberInputWithInsideLabel } from "./TextInputWithInsideLabel";
 import { IconCurrencyPound } from "@tabler/icons-react";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 export default function VirtualAccount() {
   const form = useQuestionnaireFormContext();
-
-  console.log(form.errors);
 
   return (
     <Box>
@@ -23,13 +21,11 @@ export default function VirtualAccount() {
 
         <NumberInputWithInsideLabel
           label="What is the projected total number of virtual accounts needed at full capacity?"
-          {...form.getInputProps(
-            "virtualAccounts.total_number_of_virtual_accounts"
-          )}
+          {...form.getInputProps("virtualAccounts.total_number_of_virtual_accounts")}
           key={form.key("virtualAccounts.total_number_of_virtual_accounts")}
         />
 
-        {transactionLimits.map((section, idx) => (
+        {currencyLimits.map((section, idx) => (
           <Stack key={idx} gap={16}>
             <Text c="var(--prune-text-gray-500)" fw={500} fz={16}>
               {section.title}
@@ -46,30 +42,23 @@ export default function VirtualAccount() {
                   >
                     {field}
                   </Text>
-
-                  <NumberInput
+                  <NumberInputWithInsideLabel
                     leftSection={<IconCurrencyPound />}
-                    placeholder="Amount"
+                    label="Amount"
                     w="100%"
                     className="Switzer"
-                    min={0}
-                    thousandSeparator=","
                     {...form.getInputProps(
                       `virtualAccounts.${
                         idx === 0
                           ? "max_value_per_transaction"
-                          : idx === 1
-                          ? "max_value_all_virtual_accounts"
-                          : "total_highest_transaction_count"
+                          : "max_value_all_virtual_accounts"
                       }.${field}`
                     )}
                     key={form.key(
                       `virtualAccounts.${
                         idx === 0
                           ? "max_value_per_transaction"
-                          : idx === 1
-                          ? "max_value_all_virtual_accounts"
-                          : "total_highest_transaction_count"
+                          : "max_value_all_virtual_accounts"
                       }.${field}`
                     )}
                   />
@@ -78,6 +67,17 @@ export default function VirtualAccount() {
             </Stack>
           </Stack>
         ))}
+
+        <Stack gap={16}>
+          <Text c="var(--prune-text-gray-500)" fw={500} fz={16}>
+            What is the total highest transaction count that all issued virtual accounts will process?
+          </Text>
+          <NumberInputWithInsideLabel
+            label="Count"
+            {...form.getInputProps("virtualAccounts.total_highest_transaction_count.daily")}
+            key={form.key("virtualAccounts.total_highest_transaction_count.daily")}
+          />
+        </Stack>
       </Stack>
     </Box>
   );
@@ -90,7 +90,7 @@ interface LimitSection {
   fields: Period[];
 }
 
-export const transactionLimits: LimitSection[] = [
+export const currencyLimits: LimitSection[] = [
   {
     title: (
       <Text>
@@ -113,11 +113,6 @@ export const transactionLimits: LimitSection[] = [
         virtual account
       </Text>
     ),
-    fields: ["daily", "monthly", "annually"],
-  },
-  {
-    title:
-      "What is the total highest transaction count that all issued virtual accounts will process?",
     fields: ["daily", "monthly", "annually"],
   },
 ];

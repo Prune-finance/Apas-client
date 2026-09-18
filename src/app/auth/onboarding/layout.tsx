@@ -1,6 +1,6 @@
 "use client";
 
-import Navbar from "@/app/(pre-onboarding)/Navbar";
+import Navbar from "@/app/(questionnaire)/Navbar";
 import { AppShell, Box, Center, Container } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 

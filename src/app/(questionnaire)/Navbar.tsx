@@ -39,7 +39,7 @@ export default function Navbar() {
     >
       <Stack justify="space-between" c="#fff" h="100%">
         <Group gap={8} wrap="nowrap">
-          <Image src={Icon} width={119} height={32} alt="prune logo" />
+          <Image src={Icon.src} h={36} alt="prune logo" fit="contain" />
         </Group>
 
         <Stack gap={4}>

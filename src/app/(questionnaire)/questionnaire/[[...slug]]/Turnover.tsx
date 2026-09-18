@@ -9,9 +9,9 @@ export default function Turnover() {
 
   return (
     <Box>
-      <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
+      {/* <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
         Tell Us More About Your Business.
-      </Text>
+      </Text> */}
       <RadioGroup
         name="turnover"
         label="What is this entity's annual turnover?"

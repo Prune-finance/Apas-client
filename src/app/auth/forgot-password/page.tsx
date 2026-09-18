@@ -2,7 +2,7 @@
 
 import { Box, Text, Title } from "@mantine/core";
 import Image from "next/image";
-import PruneIcon from "@/assets/icon.png";
+import LogoWhite from "@/assets/LogoWhite.png";
 import signInBg from "@/assets/auth-bg/sign-in.png";
 import authStyles from "@/ui/styles/auth.module.scss";
 import { PrimaryBtn } from "@/ui/components/Buttons";
@@ -64,10 +64,7 @@ export default function UserForgotPassword() {
         </div>
 
         <div className={authStyles.frame__logo}>
-          <Image width={33} height={33} src={PruneIcon} alt="Prune icon" />
-          <Text fz={20} fw={600} c="white" lh={1}>
-            Prune Payments
-          </Text>
+          <Image height={36} src={LogoWhite} alt="Prune logo" style={{ width: "auto" }} />
         </div>
 
         <div className={authStyles.testimonial}>

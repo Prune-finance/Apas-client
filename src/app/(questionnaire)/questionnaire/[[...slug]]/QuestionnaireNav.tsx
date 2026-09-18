@@ -1,6 +1,5 @@
-import { Stack } from "@mantine/core";
+import { Flex } from "@mantine/core";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 
 interface QuestionnaireNavProps {
   onNext?: () => void;
@@ -9,6 +8,7 @@ interface QuestionnaireNavProps {
   previousText?: string;
   disabled?: boolean;
   hidePrev?: boolean;
+  loading?: boolean;
 }
 
 export function QuestionnaireNav({
@@ -18,19 +18,17 @@ export function QuestionnaireNav({
   previousText = "Previous step",
   disabled = false,
   hidePrev = false,
+  loading = false,
 }: QuestionnaireNavProps) {
-  const form = useQuestionnaireFormContext();
   return (
-    <Stack gap={12} mt={32}>
+    <Flex direction="column" gap={12} mt={32}>
       <PrimaryBtn
         text={nextText}
         fullWidth
         fw={600}
-        action={() => {
-          if (form.validate().hasErrors) return;
-          onNext && onNext();
-        }}
+        action={onNext}
         disabled={disabled}
+        loading={loading}
       />
       {!hidePrev && (
         <SecondaryBtn
@@ -40,6 +38,6 @@ export function QuestionnaireNav({
           action={onPrevious}
         />
       )}
-    </Stack>
+    </Flex>
   );
 }

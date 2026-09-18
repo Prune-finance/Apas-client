@@ -18,7 +18,7 @@ export default function ConfirmationModal({
     <Modal
       opened={opened}
       onClose={() => {
-        push("/pre-onboarding");
+        push("/questionnaire");
         close();
       }}
       withCloseButton={false}
@@ -38,7 +38,7 @@ export default function ConfirmationModal({
             text="Okay"
             action={() => {
               close();
-              push("/pre-onboarding");
+              push("/questionnaire");
             }}
             fw={600}
           />

@@ -1,14 +1,12 @@
 import form from "@/app/auth/login/form";
 import { QuestionnaireType } from "@/lib/schema";
 import { businessIndustries } from "@/lib/static";
-import {
-  SelectInputWithInsideLabel,
-  PhoneNumberInput,
-} from "@/ui/components/InputWithLabel";
+import { PhoneNumberInput } from "./TextInputWithInsideLabel";
 import { Box, Checkbox, Flex, Stack, Text } from "@mantine/core";
 import { IconBriefcase, IconMapPin, IconMail } from "@tabler/icons-react";
 import React from "react";
 import {
+  SelectInputWithInsideLabel,
   TextInputWithInsideLabel,
   TextareaWithInsideLabel,
 } from "./TextInputWithInsideLabel";

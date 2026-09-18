@@ -71,8 +71,6 @@ export default async function Register({ params }: Props) {
         </Group>
 
         <Box w={{ base: "90vw", sm: 394 }}>
-          <Image width={29} height={29} src={PruneIcon} alt="prune icon" />
-
           <Title order={2} className={styles.paper__header}>
             Create Account
           </Title>

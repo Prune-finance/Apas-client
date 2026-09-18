@@ -25,6 +25,33 @@ const positiveIntegerSchema = (fieldName: string) =>
       .int(`${fieldName} must be an integer`),
   ]);
 
+const validatePeriodOrder = (
+  values: { daily: string | number; monthly: string | number; annually: string | number },
+  ctx: z.RefinementCtx
+) => {
+  const numericValue = (value: string | number) =>
+    typeof value === "string" && value.trim() === "" ? NaN : Number(value);
+  const daily = numericValue(values.daily);
+  const monthly = numericValue(values.monthly);
+  const annually = numericValue(values.annually);
+
+  if (Number.isFinite(daily) && Number.isFinite(monthly) && monthly < daily) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["monthly"],
+      message: "Monthly value must be greater than or equal to the daily value",
+    });
+  }
+
+  if (Number.isFinite(monthly) && Number.isFinite(annually) && annually < monthly) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["annually"],
+      message: "Yearly value must be greater than or equal to the monthly value",
+    });
+  }
+};
+
 export const VirtualAccountSchema = z.object({
   day_one_requirement: positiveIntegerSchema(
     "Initial virtual account requirement"
@@ -42,7 +69,7 @@ export const VirtualAccountSchema = z.object({
     annually: positiveIntegerSchema(
       "Annual maximum transaction value for single virtual account"
     ),
-  }),
+  }).superRefine(validatePeriodOrder),
   max_value_all_virtual_accounts: z.object({
     daily: positiveIntegerSchema(
       "Daily maximum transaction value for all virtual accounts"
@@ -53,12 +80,12 @@ export const VirtualAccountSchema = z.object({
     annually: positiveIntegerSchema(
       "Annual maximum transaction value for all virtual accounts"
     ),
-  }),
+  }).superRefine(validatePeriodOrder),
   total_highest_transaction_count: z.object({
     daily: positiveIntegerSchema("Daily maximum transaction count"),
     monthly: positiveIntegerSchema("Monthly maximum transaction count"),
     annually: positiveIntegerSchema("Annual maximum transaction count"),
-  }),
+  }).superRefine(validatePeriodOrder),
 });
 
 // Operations Account
@@ -83,6 +110,7 @@ export const BizBasicInfoSchema = z.object({
     .regex(/^\+?[0-9]*$/, "Phone number must be a valid number"),
   countryCode: z.string().min(1, "Country code is required"),
   isRegulated: z.enum(["yes", "no"]),
+  regulatoryDetails: z.string().optional(),
   geoFootprint: z
     .string({
       invalid_type_error:
@@ -126,12 +154,13 @@ export const questionnaireValues: QuestionnaireType = {
   businessName: "",
   businessTradingName: "",
   businessEmail: "",
-  businessPhoneNumber: "+234",
+  businessPhoneNumber: "",
   businessCountry: "",
   businessAddress: "",
   countryCode: "+234",
   businessIndustry: "",
   isRegulated: "no",
+  regulatoryDetails: "",
   geoFootprint: "",
   businessDescription: "",
   annualTurnover: "",

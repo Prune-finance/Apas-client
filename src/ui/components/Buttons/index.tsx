@@ -67,7 +67,7 @@ interface PrimaryBtnProps extends Props {
   icon?: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
   action?: () => void;
   showIcon?: boolean;
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
 }
 export const PrimaryBtn = ({
   link,

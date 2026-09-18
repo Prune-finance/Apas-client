@@ -127,7 +127,7 @@ export const questionnaireValues: QuestionnaireType = {
   businessName: "",
   businessTradingName: "",
   businessEmail: "",
-  businessPhoneNumber: "+234",
+  businessPhoneNumber: "",
   businessCountry: "",
   businessAddress: "",
   countryCode: "+234",

@@ -110,7 +110,7 @@ export default function Questionnaire() {
           businessIndustry: a.businessIndustry ?? "",
           businessCountry: a.countryCode ?? "",
           countryCode: a.phoneCountryCode ?? "+234",
-          businessPhoneNumber: a.phoneNumber ?? "+234",
+          businessPhoneNumber: a.phoneNumber ?? "",
           isRegulated: a.isRegulated ? "yes" : "no",
           regulatoryDetails: a.regulatoryLicence ?? "",
           geoFootprint: a.geographicFootprint ?? "",

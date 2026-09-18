@@ -1,20 +1,38 @@
-import form from "@/app/auth/login/form";
 import { QuestionnaireType } from "@/lib/schema";
-import { businessIndustries } from "@/lib/static";
 import { PhoneNumberInput } from "./TextInputWithInsideLabel";
 import { Box, Checkbox, Flex, Stack, Text } from "@mantine/core";
 import { IconBriefcase, IconMapPin, IconMail } from "@tabler/icons-react";
-import React from "react";
+import { useEffect, useState } from "react";
 import {
   SelectInputWithInsideLabel,
   TextInputWithInsideLabel,
   TextareaWithInsideLabel,
 } from "./TextInputWithInsideLabel";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import countries from "@/assets/countries.json";
+import createAxiosInstance from "@/lib/axios";
+
+const questAxios = createAxiosInstance("questionnaire");
+
+interface RefOption { value: string; label: string }
 
 export default function BasicInfo() {
   const form = useQuestionnaireFormContext();
+
+  const [countryOptions, setCountryOptions] = useState<RefOption[]>([]);
+  const [industryOptions, setIndustryOptions] = useState<RefOption[]>([]);
+
+  useEffect(() => {
+    questAxios
+      .get("/business/questionnaire/reference-data", {
+        params: { include: "countries,industries" },
+      })
+      .then(({ data: res }) => {
+        setCountryOptions(res.data?.countries ?? []);
+        setIndustryOptions(res.data?.industries ?? []);
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <Box style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <Flex direction={{ base: "column", md: "row" }} align="center" gap={24}>
@@ -48,10 +66,7 @@ export default function BasicInfo() {
         <SelectInputWithInsideLabel
           label="Country"
           w="100%"
-          data={countries.map((country) => ({
-            value: country.code,
-            label: country.name,
-          }))}
+          data={countryOptions}
           searchable
           {...form.getInputProps("businessCountry")}
           key={form.key("businessCountry")}
@@ -63,7 +78,7 @@ export default function BasicInfo() {
         label="Business Industry"
         w="100%"
         searchable
-        data={businessIndustries}
+        data={industryOptions}
         {...form.getInputProps("businessIndustry")}
         key={form.key("businessIndustry")}
         withAsterisk

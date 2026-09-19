@@ -319,13 +319,25 @@ export function useBusinessAccountTransactions(
     try {
       setLoading(true);
 
-      const { data } = await axios.get(
-        `/admin/accounts/business/company-account/${id}/transactions`,
-        { params }
-      );
+      if ((type === "ISSUED_ACCOUNT" || type === "PAYOUT_ACCOUNT") && currencyCode != 'EUR') {
+        // Add any specific logic for ISSUED_ACCOUNT type here
+        const { data } = await axios.get(
+          `/currency-account-transactions/${id}/${currencyCode}`,
+          { params }
+        );
 
-      setTransactions(data.data);
-      setMeta(data.meta);
+        setTransactions(data.data);
+        setMeta(data.meta);
+      } else {
+
+        const { data } = await axios.get(
+          `/admin/accounts/business/company-account/${id}/transactions`,
+          { params }
+        );
+
+        setTransactions(data.data);
+        setMeta(data.meta);
+      }
     } catch (error) {
       console.log(error);
     } finally {

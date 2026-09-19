@@ -295,6 +295,7 @@ export function useBusinessAccountTransactions(
         recipientName: customParams.recipientName,
       }),
       ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.accountType && { accountType: customParams.accountType }),
     };
   }, [customParams]);
 
@@ -305,6 +306,7 @@ export function useBusinessAccountTransactions(
     endDate,
     status,
     type,
+    accountType,
     recipientIban,
     recipientName,
     senderName,
@@ -319,7 +321,7 @@ export function useBusinessAccountTransactions(
     try {
       setLoading(true);
 
-      if ((type === "ISSUED_ACCOUNT" || type === "PAYOUT_ACCOUNT") && currencyCode != 'EUR') {
+      if ((accountType === "ISSUED_ACCOUNT" || accountType === "PAYOUT_ACCOUNT") && currencyCode != 'EUR') {
         // Add any specific logic for ISSUED_ACCOUNT type here
         const { data } = await axios.get(
           `/currency-account-transactions/${id}/${currencyCode}`,

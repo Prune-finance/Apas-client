@@ -63,7 +63,7 @@ function Account() {
       ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
       ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
       ...(type && { type }),
-      ...(accountType && { type: accountType }),
+      ...(accountType && { accountType: accountType }),
       ...(senderName && { senderName }),
       ...(recipientName && { recipientName }),
       ...(recipientIban && { recipientIban }),

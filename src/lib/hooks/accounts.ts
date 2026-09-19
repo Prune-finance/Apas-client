@@ -984,6 +984,7 @@ export interface AccountData {
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
+  accountIdentifier: string;
   Company: {
     name: string;
     id: string;

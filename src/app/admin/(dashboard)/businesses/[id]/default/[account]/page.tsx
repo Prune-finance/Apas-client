@@ -86,7 +86,7 @@ function Account() {
   ]);
 
   const accountIdForTrx = account?.id ?? params.account;
-
+  console.log(accountIdForTrx);
   const {
     transactions: companyTrx,
     loading: loadingCompanyTrx,
@@ -97,6 +97,7 @@ function Account() {
     customParams,
     !isPayout && transactionsEnabled
   );
+  console.log(customParams, companyTrxMeta,  !isPayout, transactionsEnabled, customParams);
 
   const {
     transactions: payoutTrx,

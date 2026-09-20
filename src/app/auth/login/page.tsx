@@ -71,6 +71,21 @@ async function Login() {
             Enter your details below to have access to your account
           </Text>
           <LoginForm />
+
+          <Group gap={4} mt={16} justify="center">
+            <Text fz={14} c="var(--prune-text-gray-600)">
+              Don&apos;t have an account?
+            </Text>
+            <PrimaryBtn
+              variant="transparent"
+              text="Answer the questionnaire"
+              link="/questionnaire"
+              c="var(--prune-primary-700)"
+              fz={14}
+              px={0}
+              fw={600}
+            />
+          </Group>
         </Box>
       </div>
     </main>

@@ -1,5 +1,5 @@
 import { Box, Group, Stack, Text } from "@mantine/core";
-import { NumberInputWithInsideLabel } from "./TextInputWithInsideLabel";
+import { NumberInputWithInsideLabel } from "@/ui/components/InputWithLabel/QuestInputs";
 import { IconCurrencyPound } from "@tabler/icons-react";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 

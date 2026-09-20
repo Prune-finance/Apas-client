@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { Icon, IconProps } from "@tabler/icons-react";
-import CheckboxCard from "./CheckboxCard";
+import CheckboxCard from "@/ui/components/CheckboxCard";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import createAxiosInstance from "@/lib/axios";
 

@@ -22,7 +22,7 @@ import {
 import {
   TextInputWithInsideLabel,
   PhoneNumberInput,
-} from "./TextInputWithInsideLabel";
+} from "@/ui/components/InputWithLabel/QuestInputs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
@@ -37,9 +37,19 @@ const EmailSchema = z.object({
 
 const ContactSchema = z.object({
   email: z.string().email(),
-  contactName: z.string().min(1, "Name is required"),
-  contactDesignation: z.string().min(1, "Designation is required"),
-  contactPhoneNumber: z.string().min(1, "Phone number is required"),
+  contactName: z
+    .string()
+    .min(1, "Name is required")
+    .max(100, "Name cannot exceed 100 characters"),
+  contactDesignation: z
+    .string()
+    .min(1, "Designation is required")
+    .max(100, "Designation cannot exceed 100 characters"),
+  contactPhoneNumber: z
+    .string()
+    .min(1, "Phone number is required")
+    .max(15, "Phone number cannot exceed 15 digits")
+    .regex(/^\+?[0-9]*$/, "Phone number must contain digits only"),
   contactCountryCode: z.string().min(1, "Country code is required"),
 });
 

@@ -1,6 +1,6 @@
 import { Box, RadioGroup, Stack, Text } from "@mantine/core";
 import { useEffect, useState } from "react";
-import CustomRadio from "./CustomRadio";
+import CustomRadio from "@/ui/components/CustomRadio";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import createAxiosInstance from "@/lib/axios";
 

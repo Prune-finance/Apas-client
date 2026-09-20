@@ -6,7 +6,7 @@ import {
   Text,
   ThemeIcon,
 } from "@mantine/core";
-import classes from "./services.module.css";
+import classes from "./CheckboxCard.module.css";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { Icon, IconProps } from "@tabler/icons-react";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";

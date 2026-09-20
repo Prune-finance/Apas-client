@@ -378,3 +378,12 @@ export const QuestPhoneInput = <T,>({
     </Box>
   );
 };
+
+// Alias exports for questionnaire components
+export {
+  QuestInput as TextInputWithInsideLabel,
+  QuestSelect as SelectInputWithInsideLabel,
+  QuestNumberInput as NumberInputWithInsideLabel,
+  QuestTextarea as TextareaWithInsideLabel,
+  QuestPhoneInput as PhoneNumberInput,
+};

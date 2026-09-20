@@ -1,5 +1,5 @@
 import { QuestionnaireType } from "@/lib/schema";
-import { PhoneNumberInput } from "./TextInputWithInsideLabel";
+import { PhoneNumberInput } from "@/ui/components/InputWithLabel/QuestInputs";
 import { Box, Checkbox, Flex, Stack, Text } from "@mantine/core";
 import { IconBriefcase, IconMapPin, IconMail } from "@tabler/icons-react";
 import { useEffect, useState } from "react";

@@ -7,7 +7,7 @@ import {
   SelectInputWithInsideLabel,
   TextInputWithInsideLabel,
   TextareaWithInsideLabel,
-} from "./TextInputWithInsideLabel";
+} from "@/ui/components/InputWithLabel/QuestInputs";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import createAxiosInstance from "@/lib/axios";
 

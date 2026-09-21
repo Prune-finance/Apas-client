@@ -24,19 +24,19 @@ export default function BasicInfo() {
 
   useEffect(() => {
     const selectedValue = form.values.businessCountry;
-    if (!selectedValue) return;
+    if (!selectedValue || countryOptions.length === 0) return;
 
     const selectedOption = countryOptions.find((opt) => opt.value === selectedValue);
-    const name = selectedOption?.label ?? selectedValue;
+    if (!selectedOption) return;
 
     const match = countriesWithCode.find((c) =>
-      c.label.toLowerCase().includes(name.toLowerCase())
+      c.label.toLowerCase().includes(selectedOption.label.toLowerCase())
     );
     if (match) {
       form.setFieldValue("countryCode", match.value);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.values.businessCountry]);
+  }, [form.values.businessCountry, countryOptions]);
 
   useEffect(() => {
     questAxios

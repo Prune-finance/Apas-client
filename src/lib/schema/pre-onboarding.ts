@@ -119,14 +119,14 @@ export const BizBasicInfoSchema = z.object({
     .min(1, "Legal business name is required")
     .min(2, "Legal business name must be at least 2 characters")
     .max(100, "Legal business name cannot exceed 100 characters")
-    .refine((v) => v.trim().length > 0, "Legal business name cannot be only spaces")
+    .refine((v) => v.trim().length > 0, "Legal business name cannot be empty")
     .refine((v) => !/[<>{}[\]\\^`~]/.test(v), "Legal business name contains unsupported characters"),
   businessTradingName: z
     .string()
     .min(1, "Trading name is required")
     .min(2, "Trading name must be at least 2 characters")
     .max(50, "Trading name cannot exceed 50 characters")
-    .refine((v) => v.trim().length > 0, "Trading name cannot be only spaces")
+    .refine((v) => v.trim().length > 0, "Trading name cannot be empty")
     .refine((v) => !/[<>{}[\]\\^`~]/.test(v), "Trading name contains unsupported characters"),
   businessCountry: z.string().min(1, "Country is required"),
   businessAddress: z
@@ -134,7 +134,7 @@ export const BizBasicInfoSchema = z.object({
     .min(1, "Business address is required")
     .min(5, "Business address must be at least 5 characters")
     .max(255, "Business address cannot exceed 255 characters")
-    .refine((v) => v.trim().length > 0, "Business address cannot be only spaces"),
+    .refine((v) => v.trim().length > 0, "Business address cannot be empty"),
   businessIndustry: z.string().min(1, "Business industry is required"),
   businessEmail: z
     .string()
@@ -159,13 +159,13 @@ export const BizBasicInfoSchema = z.object({
     .min(1, "Geo footprint is required")
     .min(10, "Geographic footprint must be at least 10 characters")
     .max(5000, "Geographic footprint cannot exceed 5000 characters")
-    .refine((v) => v.trim().length > 0, "Geo footprint cannot be only spaces"),
+    .refine((v) => v.trim().length > 0, "Geo footprint cannot be empty"),
   businessDescription: z
     .string()
     .min(1, "Business description is required")
     .min(10, "Business description must be at least 10 characters")
     .max(500, "Business description cannot exceed 500 characters")
-    .refine((v) => v.trim().length > 0, "Business description cannot be only spaces"),
+    .refine((v) => v.trim().length > 0, "Business description cannot be empty"),
 });
 
 export const ContactPerson = z.object({
@@ -174,13 +174,13 @@ export const ContactPerson = z.object({
     .min(1, "Contact name is required")
     .min(2, "Name must be at least 2 characters")
     .max(50, "Name cannot exceed 50 characters")
-    .refine((v) => v.trim().length > 0, "Name cannot be only spaces"),
+    .refine((v) => v.trim().length > 0, "Name cannot be empty"),
   contactDesignation: z
     .string()
     .min(1, "Contact designation is required")
     .min(2, "Designation must be at least 2 characters")
     .max(50, "Designation cannot exceed 50 characters")
-    .refine((v) => v.trim().length > 0, "Designation cannot be only spaces"),
+    .refine((v) => v.trim().length > 0, "Designation cannot be empty"),
   contactEmail: z
     .string()
     .min(1, "Contact email address is required")

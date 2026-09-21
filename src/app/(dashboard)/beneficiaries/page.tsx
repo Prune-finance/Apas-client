@@ -17,7 +17,6 @@ import {
   Skeleton,
 } from "@mantine/core";
 import React, { Suspense, useMemo, useState } from "react";
-import Image from "next/image";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 
@@ -54,11 +53,7 @@ import {
 import { beneficiaryModalValidate } from "@/lib/schema/debit-request";
 import { IconCheck, IconX } from "@tabler/icons-react";
 
-import EUIcon from "@/assets/EU-icon.png";
-import GBIcon from "@/assets/GB.png";
-import USIcon from "@/assets/USD.png";
-import NGIcon from "@/assets/Nigeria.png";
-import GHIcon from "@/assets/GH.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import CurrencyTab from "@/ui/components/CurrencyTab";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import createAxiosInstance from "@/lib/axios";
@@ -80,22 +75,10 @@ import { notifications } from "@mantine/notifications";
 import Cookies from "js-cookie";
 
 const currencyTabs = [
-  {
-    value: "EUR",
-    icon: <Image width={18} height={18} src={EUIcon} alt="eur" />,
-  },
-  {
-    value: "GBP",
-    icon: <Image width={18} height={18} src={GBIcon} alt="gbp" />,
-  },
-  {
-    value: "GHS",
-    icon: <Image width={18} height={18} src={GHIcon} alt="ghs" />,
-  },
-  {
-    value: "USD",
-    icon: <Image width={18} height={18} src={USIcon} alt="usd" />,
-  },
+  { value: "EUR", icon: <CountryFlag code="EUR" size={18} /> },
+  { value: "GBP", icon: <CountryFlag code="GBP" size={18} /> },
+  { value: "GHS", icon: <CountryFlag code="GHS" size={18} /> },
+  { value: "USD", icon: <CountryFlag code="USD" size={18} /> },
 ];
 
 const inputStyle = {
@@ -364,21 +347,7 @@ const Beneficiaries = () => {
       </TableTd>
       <TableTd>
         <Group gap={6}>
-          {element?.Currency?.symbol === "EUR" && (
-            <Image width={18} height={18} src={EUIcon} alt="eur" />
-          )}
-          {element?.Currency?.symbol === "GBP" && (
-            <Image width={18} height={18} src={GBIcon} alt="gbp" />
-          )}
-          {element?.Currency?.symbol === "USD" && (
-            <Image width={18} height={18} src={USIcon} alt="usd" />
-          )}
-          {element?.Currency?.symbol === "NGN" && (
-            <Image width={18} height={18} src={NGIcon} alt="ngn" />
-          )}
-          {element?.Currency?.symbol === "GHS" && (
-            <Image width={18} height={18} src={GHIcon} alt="ghs" />
-          )}
+          <CountryFlag code={element?.Currency?.symbol ?? ""} size={18} />
           <Text fz={12} fw={500}>
             {element?.Currency?.symbol}
           </Text>

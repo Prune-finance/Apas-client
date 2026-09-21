@@ -14,7 +14,7 @@ import { PayoutTransactionTableRows } from "@/ui/components/TableRows";
 import { PayoutTableHeaders } from "@/lib/static";
 import { calculateTotalPages } from "@/lib/utils";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
-import { Group, Image } from "@mantine/core";
+import { Group } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure, useDebouncedValue } from "@mantine/hooks";
 import { IconListTree, IconRefresh, IconFileExport } from "@tabler/icons-react";
@@ -22,19 +22,9 @@ import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
-import GHSIcon from "@/assets/GH.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 dayjs.extend(advancedFormat);
-
-const currencyIconMap: Record<string, string> = {
-  EUR: EUIcon.src,
-  GBP: GBPIcon.src,
-  USD: USDIcon.src,
-  GHS: GHSIcon.src,
-};
 
 export const PayoutsTab = () => {
   const searchParams = useSearchParams();
@@ -94,7 +84,6 @@ export const PayoutsTab = () => {
   const currencyTabs = currencies.map((c) => ({
     currency: c,
     title: c,
-    icon: currencyIconMap[c] ?? EUIcon.src,
   }));
 
   const infoDetails = [
@@ -128,7 +117,7 @@ export const PayoutsTab = () => {
                 transition: "background-color 0.15s ease, color 0.15s ease",
               }}
             >
-              <Image src={t.icon} alt="icon" h={20} w={20} />
+              <CountryFlag code={t.currency} size={20} />
               {t.title}
             </button>
           );

@@ -10,7 +10,7 @@ import { SearchInput, TextBox, SelectBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { TableComponent } from "@/ui/components/Table";
 import { IssuedTransactionTableRows } from "@/ui/components/TableRows";
-import { Box, Flex, Image, LoadingOverlay, TabsPanel } from "@mantine/core";
+import { Box, Flex, LoadingOverlay, TabsPanel } from "@mantine/core";
 import { IconListTree, IconCircleArrowDown, IconFileExport, IconRefresh } from "@tabler/icons-react";
 import { useState } from "react";
 import { useIssuedAccountTransactions, exportIssuedAccountTransactions } from "@/lib/hooks/transactions";
@@ -20,15 +20,13 @@ import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { calculateTotalPages } from "@/lib/utils";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 type Currency = "EUR" | "GBP" | "USD";
 
 const currencyTabs = [
-  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
-  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
-  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+  { title: "EUR", currency: "EUR" as Currency },
+  { title: "GBP", currency: "GBP" as Currency },
+  { title: "USD", currency: "USD" as Currency },
 ];
 
 interface Props {
@@ -131,7 +129,7 @@ export const IssuedAccountTransactions = ({
                 transition: "background-color 0.15s ease, color 0.15s ease",
               }}
             >
-              <Image src={t.icon} alt="icon" h={20} w={20} />
+              <CountryFlag code={t.currency} size={20} />
               {t.title}
             </button>
           );

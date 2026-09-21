@@ -10,7 +10,6 @@ import {
   Box,
   Flex,
   Group,
-  Image,
   Modal,
   Paper,
   SimpleGrid,
@@ -65,9 +64,7 @@ import PendingModalImage from "@/assets/add-account-success.png";
 import NewAccountCard from "@/ui/components/Cards/NewAccountCard";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import useAddAccountCurrencyStore from "@/lib/store/add-account";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 function Accounts() {
   const searchParams = useSearchParams();
@@ -669,7 +666,7 @@ function Accounts() {
                             transition: "background-color 0.15s ease, color 0.15s ease",
                           }}
                         >
-                          <Image src={t.icon} alt={t.currency} h={20} w={20} />
+                          <CountryFlag code={t.currency} size={20} />
                           {t.title}
                         </button>
                       );
@@ -888,7 +885,7 @@ const issuedAccountTabs = [
 ];
 
 const issuedCurrencyPills = [
-  { currency: "EUR" as const, title: "EUR", icon: EUIcon.src },
-  { currency: "GBP" as const, title: "GBP", icon: GBPIcon.src },
-  { currency: "USD" as const, title: "USD", icon: USDIcon.src },
+  { currency: "EUR" as const, title: "EUR" },
+  { currency: "GBP" as const, title: "GBP" },
+  { currency: "USD" as const, title: "USD" },
 ];

@@ -64,7 +64,21 @@ export default function Questionnaire() {
     initialValues: questionnaireValues,
     mode: "controlled",
     validate: (values) => {
-      if (active === 0) return zodResolver(BizBasicInfoSchema)(values);
+      if (active === 0)
+        return zodResolver(
+          BizBasicInfoSchema.superRefine((data, ctx) => {
+            if (
+              data.isRegulated === "yes" &&
+              !data.regulatoryDetails?.trim()
+            ) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: "Please provide details of the regulatory license",
+                path: ["regulatoryDetails"],
+              });
+            }
+          })
+        )(values);
       if (active === 1) return zodResolver(TurnoverSchema)(values);
       if (active === 2)
         return zodResolver(z.object({ services: ServicesSchema }))(values);
@@ -385,7 +399,7 @@ export default function Questionnaire() {
         <QuestionnaireNav
           onNext={handleNext}
           loading={saving}
-          disabled={savingDraft}
+          disabled={savingDraft || (active === 2 && form.values.services.length === 0)}
           onPrevious={() => {
             if (active === 0) return setEntryDone(false);
             setActive(active === 4 && !hasVirtualAccount ? 2 : Math.max(active - 1, 0));

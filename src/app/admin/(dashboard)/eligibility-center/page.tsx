@@ -8,7 +8,9 @@ import {
   Flex,
   Grid,
   GridCol,
+  Group,
   Skeleton,
+  Stack,
   TableTd,
   TableTr,
   Text,
@@ -27,8 +29,15 @@ import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedValue } from "@mantine/hooks";
-import { calculateTotalPages } from "@/lib/utils";
+import { calculateTotalPages, STAGE } from "@/lib/utils";
 import PaginationComponent from "@/ui/components/Pagination";
+import CountryFlag from "@/ui/components/CountryFlag";
+
+const statusToStage: Record<string, STAGE> = {
+  IN_PROGRESS: "In Progress",
+  ONBOARDING_INVITED: "Onboarding Invited",
+  SUBMITTED: "Submitted",
+};
 
 function EligibilityCenter() {
   const searchParams = useSearchParams();
@@ -39,7 +48,7 @@ function EligibilityCenter() {
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
   const { countryCode, service, dateFrom, dateTo } = Object.fromEntries(
-    searchParams.entries()
+    searchParams.entries(),
   );
 
   const queryParams = {
@@ -109,9 +118,9 @@ function EligibilityCenter() {
           <Flex gap={12}>
             <PrimaryBtn
               text="Add New Profile"
+              link="/admin/eligibility-center/new"
               fw={600}
               fz={12}
-              link="/admin/eligibility-center/new"
             />
           </Flex>
         </div>
@@ -141,13 +150,7 @@ function EligibilityCenter() {
   );
 }
 
-const tableHeaders = [
-  "Business Name",
-  "Date",
-  "Country",
-  "Services",
-  "Stage",
-];
+const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage"];
 
 export default function EligibilityCenterSus() {
   return (
@@ -162,13 +165,12 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
 
   return data?.map((row) => {
     const services = row.answers?.services ?? [];
-    const serviceLabel =
-      services.length === 0
-        ? "—"
-        : services
-            .filter((s) => s?.name)
-            .map((s) => s.name.replace(/_/g, " "))
-            .join(", ") || "—";
+    const tier =
+      services.length > 0 && services.every((s) => s?.name === "REMITTANCE")
+        ? "Tier 1"
+        : "Tier 2";
+    const stage = statusToStage[row.status] ?? "PROFILE";
+    const countryCode = row.answers?.countryCode ?? "";
 
     return (
       <TableTr
@@ -176,12 +178,32 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
         onClick={() => push(`/admin/eligibility-center/${row.reference}`)}
         style={{ cursor: "pointer" }}
       >
-        <TableTd>{row.answers?.legalBusinessName ?? "—"}</TableTd>
-        <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
-        <TableTd>{row.answers?.countryCode ?? "—"}</TableTd>
-        <TableTd>{serviceLabel}</TableTd>
         <TableTd>
-          <BadgeComponent stage status={row.status} w={150} />
+          <Stack gap={2}>
+            <Text fw={500} fz={14} c="var(--prune-text-gray-700)">
+              {row.answers?.legalBusinessName ?? "—"}
+            </Text>
+            {row.contactEmail && (
+              <Text fz={12} c="var(--prune-text-gray-500)">
+                {row.contactEmail ?? "—"}
+              </Text>
+            )}
+          </Stack>
+        </TableTd>
+        <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
+        <TableTd>
+          <Group gap={8} wrap="nowrap">
+            <CountryFlag code={countryCode} size={20} />
+            <Text fz={14} c="var(--prune-text-gray-700)">
+              {countryCode || "—"}
+            </Text>
+          </Group>
+        </TableTd>
+        <TableTd>
+          <BadgeComponent tier status={tier} variant="filled" />
+        </TableTd>
+        <TableTd>
+          <BadgeComponent stage status={stage} w={140} />
         </TableTd>
       </TableTr>
     );

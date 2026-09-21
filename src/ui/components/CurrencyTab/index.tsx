@@ -2,68 +2,20 @@ import { useRef, useState, useMemo, useEffect } from "react";
 import {
   Flex,
   FloatingIndicator,
-  Image,
   Loader,
   Skeleton,
   UnstyledButton,
 } from "@mantine/core";
-import GBImage from "@/assets/GB.png";
-import EUImage from "@/assets/EU-icon.png";
-import GHSImage from "@/assets/GH.png";
-import USDImage from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import classes from "./styles.module.scss";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 import { useCheckCurrencyList } from "@/lib/hooks/accounts";
 
 const data = [
-  {
-    title: "EUR",
-    icon: (
-      <Image
-        src={EUImage.src}
-        alt="EUR"
-        width={18}
-        height={18}
-        style={{ zIndex: 1 }}
-      />
-    ),
-  },
-  {
-    title: "GBP",
-    icon: (
-      <Image
-        src={GBImage.src}
-        alt="GBP"
-        width={18}
-        height={18}
-        style={{ zIndex: 1 }}
-      />
-    ),
-  },
-  {
-    title: "GHS",
-    icon: (
-      <Image
-        src={GHSImage.src}
-        alt="GHS"
-        width={18}
-        height={18}
-        style={{ zIndex: 1 }}
-      />
-    ),
-  },
-  {
-    title: "USD",
-    icon: (
-      <Image
-        src={USDImage.src}
-        alt="USD"
-        width={18}
-        height={18}
-        style={{ zIndex: 1 }}
-      />
-    ),
-  },
+  { title: "EUR", icon: <CountryFlag code="EUR" size={18} style={{ zIndex: 1 }} /> },
+  { title: "GBP", icon: <CountryFlag code="GBP" size={18} style={{ zIndex: 1 }} /> },
+  { title: "GHS", icon: <CountryFlag code="GHS" size={18} style={{ zIndex: 1 }} /> },
+  { title: "USD", icon: <CountryFlag code="USD" size={18} style={{ zIndex: 1 }} /> },
 ];
 
 function CurrencyTab({ bg }: { bg?: string }) {

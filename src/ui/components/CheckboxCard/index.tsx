@@ -10,7 +10,6 @@ import classes from "./CheckboxCard.module.css";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { Icon, IconProps } from "@tabler/icons-react";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import useNotification from "@/lib/hooks/notification";
 
 interface CurrencyOption { value: string; label: string }
 
@@ -31,7 +30,6 @@ export default function CheckboxCard({
   icon,
   idx,
 }: ServiceCategory) {
-  const { handleInfo } = useNotification();
   const Icon = icon;
   const form = useQuestionnaireFormContext();
   const services = form.getValues().services;
@@ -45,10 +43,7 @@ export default function CheckboxCard({
       checked={isChecked}
       onChange={(e) => {
         if (e) {
-          form.insertListItem("services", {
-            name: serviceValue,
-            currencies: accounts.slice(0, 1).map((a) => a.value),
-          });
+          form.insertListItem("services", { name: serviceValue, currencies: [] });
           return;
         }
         const removeIdx = services.findIndex((s) => s.name === serviceValue);
@@ -85,24 +80,17 @@ export default function CheckboxCard({
                   (s) => s.name === serviceValue
                 );
 
-                const service = services.find((s) => s.name === serviceValue);
-
-                if (removeIdx === -1)
-                  return handleInfo(
-                    "Service Required",
-                    "Please select a service before choosing a currency."
-                  );
-
-                const currentService = services[removeIdx];
-                if (!currentService || !Array.isArray(currentService.currencies))
-                  return;
-
-                const acctIndex = currentService.currencies.findIndex(
-                  (c) => c === account.value
-                );
-
                 if (!e.target.checked) {
+                  // Unchecking a currency
+                  if (removeIdx === -1) return;
+                  const currentService = services[removeIdx];
+                  if (!currentService || !Array.isArray(currentService.currencies))
+                    return;
+                  const acctIndex = currentService.currencies.findIndex(
+                    (c) => c === account.value
+                  );
                   if (currentService.currencies.length <= 1) {
+                    // Last currency removed → remove the whole service
                     form.removeListItem("services", removeIdx);
                     return;
                   }
@@ -110,12 +98,13 @@ export default function CheckboxCard({
                   return;
                 }
 
-                if (!service) {
-                  form.insertListItem(
-                    "services",
-                    { name: serviceValue, currencies: [account.value] },
-                    idx
-                  );
+                // Checking a currency
+                if (removeIdx === -1) {
+                  // Parent not yet selected → auto-select it with this currency
+                  form.insertListItem("services", {
+                    name: serviceValue,
+                    currencies: [account.value],
+                  });
                   return;
                 }
 

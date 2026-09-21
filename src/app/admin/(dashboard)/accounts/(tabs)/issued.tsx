@@ -46,18 +46,15 @@ import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Link from "next/link";
-import { Image } from "@mantine/core";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import { exportIssuedAdminAccounts } from "@/lib/hooks/accounts";
 
 type Currency = "EUR" | "GBP" | "USD";
 
 const currencyTabs = [
-  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
-  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
-  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+  { title: "EUR", currency: "EUR" as Currency },
+  { title: "GBP", currency: "GBP" as Currency },
+  { title: "USD", currency: "USD" as Currency },
 ];
 
 export default function IssuedAccounts() {
@@ -319,7 +316,7 @@ export default function IssuedAccounts() {
                 transition: "background-color 0.15s ease, color 0.15s ease",
               }}
             >
-              <Image src={t.icon} alt="icon" h={20} w={20} />
+              <CountryFlag code={t.currency} size={20} />
               {t.title}
             </button>
           );

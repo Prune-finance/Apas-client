@@ -105,6 +105,7 @@ export const QuestSelect = ({
   const [focused, setFocused] = useState(false);
   const floating = focused || Boolean(value);
   const hasIcon = Boolean(leftSection);
+  const leftPad = leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : rem(12));
 
   return (
     <Select
@@ -115,7 +116,14 @@ export const QuestSelect = ({
       leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
       classNames={classes}
       styles={{
-        ...(hasIcon ? withIconLabelStyle : noIconLabelStyle),
+        label: {
+          paddingLeft: leftPad,
+          opacity: floating ? 1 : 0,
+          top: floating ? rem(10) : "50%",
+          transform: floating ? "translateY(0)" : "translateY(-50%)",
+          fontSize: floating ? 11 : 14,
+          color: floating ? "#667085" : "#98a2b3",
+        },
         input: { paddingTop: floating ? 20 : 0 },
       }}
       onFocus={(e) => {
@@ -210,6 +218,34 @@ export const QuestTextarea = ({
   );
 };
 
+// ─── Flag helpers ─────────────────────────────────────────────────────────
+
+function flagEmojiToISO(emoji: string): string {
+  // Regional indicator symbols are surrogate pairs; each occupies 2 UTF-16 code units
+  const a = emoji.codePointAt(0);
+  const b = emoji.codePointAt(2);
+  if (a === undefined || b === undefined) return "";
+  const ai = a - 0x1f1e6;
+  const bi = b - 0x1f1e6;
+  if (ai < 0 || ai > 25 || bi < 0 || bi > 25) return "";
+  return String.fromCharCode(65 + ai, 65 + bi).toLowerCase();
+}
+
+function FlagImage({ emoji, size = 18 }: { emoji: string; size?: number }) {
+  const iso = flagEmojiToISO(emoji);
+  if (!iso) return <span style={{ fontSize: size, lineHeight: 1 }}>{emoji}</span>;
+  return (
+    <img
+      src={`https://flagcdn.com/w20/${iso}.png`}
+      srcSet={`https://flagcdn.com/w40/${iso}.png 2x`}
+      width={size}
+      height={Math.round(size * 0.75)}
+      alt={iso.toUpperCase()}
+      style={{ display: "inline-block", objectFit: "cover", borderRadius: 2, flexShrink: 0 }}
+    />
+  );
+}
+
 // ─── QuestPhoneInput ───────────────────────────────────────────────────────
 
 interface QuestPhoneInputProps<T> {
@@ -247,11 +283,19 @@ export const QuestPhoneInput = <T,>({
     .filter((item) =>
       item.label.toLowerCase().includes(search.toLowerCase().trim())
     )
-    .map((item) => (
-      <Combobox.Option value={item.value} key={item.value}>
-        <Text fz={13}>{item.label}</Text>
-      </Combobox.Option>
-    ));
+    .map((item) => {
+      const parts = item.label.split(" ");
+      const emoji = parts[0];
+      const name = parts.slice(1).join(" ");
+      return (
+        <Combobox.Option value={item.value} key={item.value}>
+          <Flex align="center" gap={8}>
+            <FlagImage emoji={emoji} size={18} />
+            <Text fz={13}>{name}</Text>
+          </Flex>
+        </Combobox.Option>
+      );
+    });
 
   return (
     <Box style={{ position: "relative" }}>
@@ -289,7 +333,7 @@ export const QuestPhoneInput = <T,>({
                 flexShrink: 0,
               }}
             >
-              <span style={{ fontSize: rem(18), lineHeight: 1 }}>{flagEmoji}</span>
+              <FlagImage emoji={flagEmoji} size={18} />
               <Text fz={14} c="#98a2b3" fw={500} lh={1}>
                 {dialCode}
               </Text>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Flex, Image, Stack, Text } from "@mantine/core";
-import USAIcon from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import EarthIcon from "@/assets/earth.png";
 import ActiveMobileMoney from "@/assets/active-mm.png";
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
@@ -40,7 +40,7 @@ const USDSelectTypeOfTransfer = ({
         bg={transferCurrency === "WithinUSA" ? "#F2F5DE" : "transparent"}
         onClick={() => handleTransferCurrencyChange("WithinUSA")}
       >
-        <Image src={USAIcon.src} alt="Within US" w={32} h={32} />
+        <CountryFlag code="USD" size={32} />
         <Stack gap={0}>
           <Text fz={14} c="#1D2939">
             Within the US

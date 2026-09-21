@@ -1,10 +1,12 @@
 .card {
+  background: #ffffff;
   border: 1px solid #f2f4f7;
-  border-radius: 4px;
-  transition: background-color 0.3s, border-color 0.3s;
+  border-radius: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+  cursor: default;
 
   &:hover {
-    border: 1px solid #c6a700;
     background: #f9f6e6;
+    border-color: #c6a700;
   }
 }

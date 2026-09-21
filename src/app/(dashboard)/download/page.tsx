@@ -15,7 +15,7 @@ import {
 import React, { useState } from "react";
 import PruneIcon from "@/assets/icon.png";
 import Image from "next/image";
-import EUIcon from "@/assets/eu.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import { TableComponent } from "@/ui/components/DownloadStatementTable";
 
 const accountDetails = {
@@ -96,7 +96,7 @@ function DownloadStatement() {
             radius={12}
           >
             <Flex align="center" justify="flex-start" gap={4} mb={24}>
-              <Image width={36} height={35} src={EUIcon} alt="eu-icon" />
+              <CountryFlag code="EUR" size={35} />
               <Text fz={16} fw={600} c="#1D2939">
                 EUR Account
               </Text>

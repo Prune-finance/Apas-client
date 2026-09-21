@@ -3,7 +3,6 @@ import {
   Checkbox,
   Flex,
   Group,
-  Image,
   SimpleGrid,
   Stack,
   Text,
@@ -22,10 +21,7 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { PanelWrapper } from "./utils";
 import { IconPencilMinus } from "@tabler/icons-react";
 import { serviceCategories } from "@/lib/static";
-import GBP from "@/assets/GB.png";
-import USD from "@/assets/us.png";
-import EUR from "@/assets/EU-icon.png";
-import NGN from "@/assets/Nigeria.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 import Skeleton from "../Skeleton";
 import { UseFormReturnType } from "@mantine/form";
@@ -380,14 +376,7 @@ const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
                       : 0.5,
                   }}
                 >
-                  <Image
-                    src={
-                      CurrencyIcon[currency as keyof typeof CurrencyIcon].src
-                    }
-                    w={16}
-                    h={16}
-                    alt={currency}
-                  />
+                  <CountryFlag code={currency} size={16} />
                   <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
                     {currency}
                   </Text>
@@ -401,9 +390,3 @@ const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
   );
 };
 
-const CurrencyIcon = {
-  GBP,
-  USD,
-  EUR,
-  NGN,
-};

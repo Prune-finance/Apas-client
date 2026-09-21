@@ -16,7 +16,7 @@ import {
 } from "@mantine/core";
 import React, { RefObject, useState } from "react";
 import PruneIcon from "@/assets/icon.png";
-import EUIcon from "@/assets/eu.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import { TableComponent } from "@/ui/components/DownloadStatementTable";
 import {
   DownloadStatementData,
@@ -25,9 +25,6 @@ import {
 import { formatNumber } from "@/lib/utils";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import GBP from "@/assets/GB.png";
-import GHS from "@/assets/GH.png";
-import USD from "@/assets/USD.png";
 
 dayjs.extend(advancedFormat);
 
@@ -159,21 +156,7 @@ function DownloadStatement({ receiptRef, data, meta, currencyType }: Props) {
           >
             <Flex align="center" justify="flex-start" gap={4} mb={24}>
               <Box h={35} w={36}>
-                <Image
-                  width={30}
-                  height={30}
-                  src={
-                    currencyType === "EUR"
-                      ? EUIcon.src
-                      : currencyType === "GHS"
-                      ? GHS.src
-                      : currencyType === "USD"
-                      ? USD.src
-                      : GBP.src
-                  }
-                  alt="eu-icon"
-                  fit="contain"
-                />
+                <CountryFlag code={currencyType ?? "EUR"} size={30} />
               </Box>
               <Text fz={16} fw={600} c="#1D2939">
                 {currencyType === "EUR"

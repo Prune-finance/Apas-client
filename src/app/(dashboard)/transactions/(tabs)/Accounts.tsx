@@ -1,6 +1,6 @@
 "use client";
 
-import { Image, Paper } from "@mantine/core";
+import { Paper } from "@mantine/core";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useForm, zodResolver } from "@mantine/form";
@@ -12,19 +12,9 @@ import { useUserBusinessTransactions, exportUserBusinessTransactions } from "@/l
 import { useAvailableCurrencies } from "@/lib/hooks/accounts";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { CurrencyAccount } from "../CurrencyAccount";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
-import GHSIcon from "@/assets/GH.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 dayjs.extend(advancedFormat);
-
-const currencyIconMap: Record<string, string> = {
-  EUR: EUIcon.src,
-  GBP: GBPIcon.src,
-  USD: USDIcon.src,
-  GHS: GHSIcon.src,
-};
 
 export const AccountsTab = () => {
   const searchParams = useSearchParams();
@@ -84,7 +74,6 @@ export const AccountsTab = () => {
   const currencyTabs = currencies.map((c) => ({
     currency: c,
     title: c,
-    icon: currencyIconMap[c] ?? EUIcon.src,
   }));
 
   return (
@@ -113,7 +102,7 @@ export const AccountsTab = () => {
                     transition: "background-color 0.15s ease, color 0.15s ease",
                   }}
                 >
-                  <Image src={t.icon} alt="icon" h={20} w={20} />
+                  <CountryFlag code={t.currency} size={20} />
                   {t.title}
                 </button>
               );

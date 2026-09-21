@@ -10,6 +10,7 @@ import {
 } from "@/ui/components/InputWithLabel/QuestInputs";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import createAxiosInstance from "@/lib/axios";
+import { countriesWithCode } from "@/lib/countries-codes-flags";
 
 const questAxios = createAxiosInstance("questionnaire");
 
@@ -20,6 +21,22 @@ export default function BasicInfo() {
 
   const [countryOptions, setCountryOptions] = useState<RefOption[]>([]);
   const [industryOptions, setIndustryOptions] = useState<RefOption[]>([]);
+
+  useEffect(() => {
+    const selectedValue = form.values.businessCountry;
+    if (!selectedValue) return;
+
+    const selectedOption = countryOptions.find((opt) => opt.value === selectedValue);
+    const name = selectedOption?.label ?? selectedValue;
+
+    const match = countriesWithCode.find((c) =>
+      c.label.toLowerCase().includes(name.toLowerCase())
+    );
+    if (match) {
+      form.setFieldValue("countryCode", match.value);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form.values.businessCountry]);
 
   useEffect(() => {
     questAxios
@@ -156,6 +173,7 @@ export default function BasicInfo() {
           maxRows={4}
           {...form.getInputProps("regulatoryDetails")}
           key={form.key("regulatoryDetails")}
+          withAsterisk
         />
       )}
     </Box>

@@ -182,15 +182,24 @@ export default function Questionnaire() {
         savedRef.current = { ...questionnaireValues, ...partial };
 
         // Section 1 = ContactEntry (done), section 2 = BasicInfo (active 0), etc.
-        const nextSection = progress?.nextSection ?? 2;
-        const nextActive = Math.max(0, Math.min(4, nextSection - 2));
-        const needsVirtualAccount = partial.services?.some(
-          (service) => service.name === "VIRTUAL_ACCOUNTS"
-        );
-        const resolvedStep = nextActive === 3 && !needsVirtualAccount ? 4 : nextActive;
+        const isComplete = progress?.isComplete === true || progress?.nextSection === null;
+        let resolvedStep: number;
+
+        if (isComplete) {
+          resolvedStep = 4;
+        } else {
+          const nextSection = progress?.nextSection ?? 2;
+          const nextActive = Math.max(0, Math.min(4, nextSection - 2));
+          const needsVirtualAccount = partial.services?.some(
+            (service) => service.name === "VIRTUAL_ACCOUNTS"
+          );
+          resolvedStep = nextActive === 3 && !needsVirtualAccount ? 4 : nextActive;
+        }
+
         setActive(resolvedStep);
         setEntryDone(true);
         pushStepToURL(resolvedStep);
+        if (isComplete) open();
       } catch {
         // If fetch fails, show ContactEntry so user can re-enter
       } finally {

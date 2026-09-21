@@ -22,14 +22,15 @@ export default function ConfirmationModal({
         close();
       }}
       withCloseButton={false}
-      padding={24}
+      size="xl"
+      padding={32}
       centered
     >
       <Stack gap={24}>
         <Text fz={24} fw={700} c="var(--prune-text-gray-700)">
           We have received your request
         </Text>
-        <Text fz={16} fw={400} c="var(--prune-text-gray-700)">
+        <Text fz={{ base: 14, lg: 16 }} fw={400} c="var(--prune-text-gray-700)">
           You will get a feedback from us about the state of your request.
         </Text>
 

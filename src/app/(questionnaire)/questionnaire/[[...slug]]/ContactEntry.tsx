@@ -297,7 +297,7 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
             </Stack>
 
             <TextInputWithInsideLabel
-              label="Name"
+              label="Full Name"
               w="100%"
               leftSection={<IconUser size={16} />}
               {...form.getInputProps("contactName")}

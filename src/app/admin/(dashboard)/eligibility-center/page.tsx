@@ -38,18 +38,23 @@ function EligibilityCenter() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const { status, date, endDate } = Object.fromEntries(searchParams.entries());
+  const { countryCode, service, dateFrom, dateTo } = Object.fromEntries(
+    searchParams.entries()
+  );
 
   const queryParams = {
-    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
-    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
-    status: status ? status.toUpperCase() : "",
-    limit: parseInt(limit ?? "10", 10),
-    page: active,
     search: debouncedSearch,
+    countryCode: countryCode ?? "",
+    service: service ?? "",
+    dateFrom: dateFrom ? dayjs(dateFrom).format("YYYY-MM-DD") : "",
+    dateTo: dateTo ? dayjs(dateTo).format("YYYY-MM-DD") : "",
+    sortBy: "date",
+    sortOrder: "desc",
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
   };
 
-  const { data, meta, loading, revalidate } = useQuestionnairesAdmin(queryParams);
+  const { data, meta, loading } = useQuestionnairesAdmin(queryParams);
   const { stats, loading: statsLoading } = useQuestionnairesStats();
 
   const isLoading = loading || statsLoading;
@@ -160,7 +165,10 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
     const serviceLabel =
       services.length === 0
         ? "—"
-        : services.map((s) => s.name.replace(/_/g, " ")).join(", ");
+        : services
+            .filter((s) => s?.name)
+            .map((s) => s.name.replace(/_/g, " "))
+            .join(", ") || "—";
 
     return (
       <TableTr

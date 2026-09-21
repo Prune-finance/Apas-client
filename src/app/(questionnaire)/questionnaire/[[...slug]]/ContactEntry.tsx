@@ -32,7 +32,12 @@ const questAxios = createAxiosInstance("questionnaire");
 const RESEND_COOLDOWN = 120; // seconds
 
 const EmailSchema = z.object({
-  email: z.string().email("Enter a valid email address").min(1, "Email is required"),
+  email: z
+    .string()
+    .min(1, "Email is required")
+    .max(50, "Email cannot exceed 50 characters")
+    .email("Enter a valid email address")
+    .refine((v) => !v.includes(" "), "Email cannot contain spaces"),
 });
 
 const ContactSchema = z.object({
@@ -40,16 +45,21 @@ const ContactSchema = z.object({
   contactName: z
     .string()
     .min(1, "Name is required")
-    .max(100, "Name cannot exceed 100 characters"),
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name cannot exceed 50 characters")
+    .refine((v) => v.trim().length > 0, "Name cannot be only spaces"),
   contactDesignation: z
     .string()
     .min(1, "Designation is required")
-    .max(100, "Designation cannot exceed 100 characters"),
+    .min(2, "Designation must be at least 2 characters")
+    .max(50, "Designation cannot exceed 50 characters")
+    .refine((v) => v.trim().length > 0, "Designation cannot be only spaces"),
   contactPhoneNumber: z
     .string()
     .min(1, "Phone number is required")
+    .min(7, "Phone number is too short")
     .max(15, "Phone number cannot exceed 15 digits")
-    .regex(/^\+?[0-9]*$/, "Phone number must contain digits only"),
+    .regex(/^[0-9]+$/, "Phone number must contain digits only"),
   contactCountryCode: z.string().min(1, "Country code is required"),
 });
 

@@ -114,19 +114,40 @@ export const OperationsAccountSchema = z.object({
 
 // Business Basic Info
 export const BizBasicInfoSchema = z.object({
-  businessName: z.string().min(1, "Legal business name is required"),
-  businessTradingName: z.string().min(1, "Trading name is required"),
+  businessName: z
+    .string()
+    .min(1, "Legal business name is required")
+    .min(2, "Legal business name must be at least 2 characters")
+    .max(100, "Legal business name cannot exceed 100 characters")
+    .refine((v) => v.trim().length > 0, "Legal business name cannot be only spaces")
+    .refine((v) => !/[<>{}[\]\\^`~]/.test(v), "Legal business name contains unsupported characters"),
+  businessTradingName: z
+    .string()
+    .min(1, "Trading name is required")
+    .min(2, "Trading name must be at least 2 characters")
+    .max(50, "Trading name cannot exceed 50 characters")
+    .refine((v) => v.trim().length > 0, "Trading name cannot be only spaces")
+    .refine((v) => !/[<>{}[\]\\^`~]/.test(v), "Trading name contains unsupported characters"),
   businessCountry: z.string().min(1, "Country is required"),
-  businessAddress: z.string().min(1, "Business address is required"),
+  businessAddress: z
+    .string()
+    .min(1, "Business address is required")
+    .min(5, "Business address must be at least 5 characters")
+    .max(255, "Business address cannot exceed 255 characters")
+    .refine((v) => v.trim().length > 0, "Business address cannot be only spaces"),
   businessIndustry: z.string().min(1, "Business industry is required"),
   businessEmail: z
     .string()
+    .min(1, "Email address is required")
+    .max(50, "Email address cannot exceed 50 characters")
     .email("Invalid email address")
-    .min(1, "Email address is required"),
+    .refine((v) => !v.includes(" "), "Email address cannot contain spaces"),
   businessPhoneNumber: z
     .string()
     .min(1, "Phone number is required")
-    .regex(/^\+?[0-9]*$/, "Phone number must be a valid number"),
+    .min(7, "Phone number is too short")
+    .max(15, "Phone number cannot exceed 15 digits")
+    .regex(/^[0-9]+$/, "Phone number must contain digits only"),
   countryCode: z.string().min(1, "Country code is required"),
   isRegulated: z.enum(["yes", "no"]),
   regulatoryDetails: z.string().optional(),
@@ -136,10 +157,14 @@ export const BizBasicInfoSchema = z.object({
         "Description of your geographic footprint is required",
     })
     .min(1, "Geo footprint is required")
+    .min(10, "Geographic footprint must be at least 10 characters")
+    .max(5000, "Geographic footprint cannot exceed 5000 characters")
     .refine((v) => v.trim().length > 0, "Geo footprint cannot be only spaces"),
   businessDescription: z
     .string()
     .min(1, "Business description is required")
+    .min(10, "Business description must be at least 10 characters")
+    .max(500, "Business description cannot exceed 500 characters")
     .refine((v) => v.trim().length > 0, "Business description cannot be only spaces"),
 });
 
@@ -147,20 +172,27 @@ export const ContactPerson = z.object({
   contactName: z
     .string()
     .min(1, "Contact name is required")
-    .max(100, "Name cannot exceed 100 characters"),
+    .min(2, "Name must be at least 2 characters")
+    .max(50, "Name cannot exceed 50 characters")
+    .refine((v) => v.trim().length > 0, "Name cannot be only spaces"),
   contactDesignation: z
     .string()
     .min(1, "Contact designation is required")
-    .max(100, "Designation cannot exceed 100 characters"),
+    .min(2, "Designation must be at least 2 characters")
+    .max(50, "Designation cannot exceed 50 characters")
+    .refine((v) => v.trim().length > 0, "Designation cannot be only spaces"),
   contactEmail: z
     .string()
+    .min(1, "Contact email address is required")
+    .max(50, "Email address cannot exceed 50 characters")
     .email("Invalid email address")
-    .min(1, "Contact email address is required"),
+    .refine((v) => !v.includes(" "), "Email address cannot contain spaces"),
   contactPhoneNumber: z
     .string()
     .min(1, "Contact phone number is required")
+    .min(7, "Phone number is too short")
     .max(15, "Phone number cannot exceed 15 digits")
-    .regex(/^\+?[0-9]*$/, "Contact phone number must be a valid number"),
+    .regex(/^[0-9]+$/, "Contact phone number must contain digits only"),
   contactCountryCode: z.string().min(1, "Contact country code is required"),
 });
 

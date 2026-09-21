@@ -1,6 +1,5 @@
 import {
   Checkbox,
-  Group,
   SimpleGrid,
   Stack,
   Text,
@@ -35,6 +34,11 @@ export default function CheckboxCard({
   const services = form.getValues().services;
 
   const isChecked = services.some((s) => s.name === serviceValue);
+  const serviceIdx = services.findIndex((s) => s.name === serviceValue);
+  const currencyError =
+    serviceIdx >= 0
+      ? (form.errors[`services.${serviceIdx}.currencies`] as string | undefined)
+      : undefined;
 
   return (
     <Checkbox.Card
@@ -115,6 +119,12 @@ export default function CheckboxCard({
             />
           ))}
         </SimpleGrid>
+
+        {currencyError && (
+          <Text fz={11} c="red.6" mt={-4}>
+            {currencyError}
+          </Text>
+        )}
       </Stack>
     </Checkbox.Card>
   );

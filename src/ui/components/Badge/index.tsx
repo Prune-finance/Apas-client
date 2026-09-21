@@ -56,7 +56,7 @@ export const BadgeComponent = ({
     >
       {stage ? (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
-          <StageDot color={color} style={{marginRight: '4px'}} />
+          <StageDot color={color} />
           {status?.toLowerCase()}
         </span>
       ) : (

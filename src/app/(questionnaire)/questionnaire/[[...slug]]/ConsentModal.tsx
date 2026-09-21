@@ -62,6 +62,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
         opened={opened}
         onClose={close}
         title="Questionnaire Consent"
+        size="xl"
         styles={{
           title: {
             fontSize: "14px",
@@ -69,7 +70,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
             color: "var(--prune-primary-800)",
           },
         }}
-        padding={24}
+        padding={32}
         centered
       >
         <Stack gap={24}>
@@ -78,16 +79,16 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
           </Text>
 
           <Stack gap={12}>
-            <Text fz={14} c="var(--prune-text-gray-600)" lh={1.6}>
+            <Text fz={{ base: 14, lg: 16 }} c="var(--prune-text-gray-600)" lh={1.6}>
               By clicking <strong>I Consent</strong>, you confirm that the information provided in
               this questionnaire is accurate and complete to the best of your knowledge.
             </Text>
-            <Text fz={14} c="var(--prune-text-gray-600)" lh={1.6}>
+            <Text fz={{ base: 14, lg: 16 }} c="var(--prune-text-gray-600)" lh={1.6}>
               You consent to Prune Payments collecting, processing, and sharing the information
               submitted in this form for the purpose of reviewing your business application and
               conducting any required due diligence in accordance with applicable regulations.
             </Text>
-            <Text fz={14} c="var(--prune-text-gray-600)" lh={1.6}>
+            <Text fz={{ base: 14, lg: 16 }} c="var(--prune-text-gray-600)" lh={1.6}>
               Your information will be handled in accordance with our Privacy Policy and will only
               be used for purposes related to your onboarding and account management.
             </Text>

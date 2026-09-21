@@ -390,9 +390,10 @@ export const QuestPhoneInput = <T,>({
             type="tel"
             aria-label={label}
             value={phoneValue}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              form.setValues({ [phoneNumberKey]: e.currentTarget.value } as Partial<T>)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const digits = e.currentTarget.value.replace(/\D/g, "");
+              form.setValues({ [phoneNumberKey]: digits } as Partial<T>);
+            }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             placeholder={floating ? "" : label}

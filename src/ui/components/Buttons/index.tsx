@@ -14,6 +14,8 @@ import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { FaCircleChevronLeft } from "react-icons/fa6";
 import styles from "./button.module.scss";
 
+const BUTTON_RADIUS = 9999;
+
 interface Props extends ButtonProps {
   link?: string;
   text?: string;
@@ -37,6 +39,7 @@ export const BackBtn = ({ link, text = "Back", ...props }: Props) => {
         <FaCircleChevronLeft size={20} fill="var(--prune-text-gray-700)" />
       }
       {...props}
+      radius={BUTTON_RADIUS}
     >
       {text}
     </Button>
@@ -53,6 +56,7 @@ export const BackBtn = ({ link, text = "Back", ...props }: Props) => {
         <FaCircleChevronLeft size={20} fill="var(--prune-text-gray-700)" />
       }
       {...props}
+      radius={BUTTON_RADIUS}
     >
       {text}
     </Button>
@@ -63,6 +67,7 @@ interface PrimaryBtnProps extends Props {
   icon?: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
   action?: () => void;
   showIcon?: boolean;
+  onClick?: React.MouseEventHandler<HTMLButtonElement | HTMLAnchorElement>;
 }
 export const PrimaryBtn = ({
   link,
@@ -70,6 +75,7 @@ export const PrimaryBtn = ({
   icon,
   action,
   showIcon,
+  onClick,
   ...props
 }: PrimaryBtnProps) => {
   const Icon = icon;
@@ -77,13 +83,18 @@ export const PrimaryBtn = ({
     <Button
       color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
-      fz={12}
-      fw={500}
+      fz={14}
+      fw={600}
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       href={link}
-      onClick={action}
+      onClick={(e) => {
+        onClick?.(e);
+        if (!e.defaultPrevented) action?.();
+      }}
       {...props}
+      radius={BUTTON_RADIUS}
+      className={[styles.primary__btn, props.className].filter(Boolean).join(" ")}
     >
       {text}
     </Button>
@@ -91,14 +102,17 @@ export const PrimaryBtn = ({
     <Button
       color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
-      fz={12}
-      fw={500}
+      fz={14}
+      fw={600}
       leftSection={Icon && <Icon size={14} />}
       onClick={(e) => {
         e.stopPropagation();
-        action && action();
+        onClick?.(e);
+        if (!e.defaultPrevented) action?.();
       }}
       {...props}
+      radius={BUTTON_RADIUS}
+      className={[styles.primary__btn, props.className].filter(Boolean).join(" ")}
     >
       {text}
     </Button>
@@ -129,14 +143,15 @@ export const SecondaryBtn = ({
       c="var(--prune-text-gray-800)"
       variant="outline"
       fz={12}
-      fw={500}
+      fw={600}
       leftSection={Icon && <Icon size={14} />}
       component={Link}
       onClick={action}
       href={link}
       type={type}
-      className={styles.secondary__btn}
       {...props}
+      radius={BUTTON_RADIUS}
+      className={[styles.secondary__btn, props.className].filter(Boolean).join(" ")}
     >
       {text}
     </Button>
@@ -146,15 +161,16 @@ export const SecondaryBtn = ({
       c="var(--prune-text-gray-800)"
       variant="outline"
       fz={12}
-      fw={500}
+      fw={600}
       leftSection={Icon && <Icon size={14} />}
       onClick={(e) => {
         e.stopPropagation();
         action && action();
       }}
-      className={styles.secondary__btn}
       type={type}
       {...props}
+      radius={BUTTON_RADIUS}
+      className={[styles.secondary__btn, props.className].filter(Boolean).join(" ")}
     >
       {text}
     </Button>

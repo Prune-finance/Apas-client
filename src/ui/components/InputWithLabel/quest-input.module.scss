@@ -1,0 +1,129 @@
+// Floating label inputs for questionnaire forms.
+// Default: only placeholder text visible (label hidden).
+// Floating (focused or has value): label slides up to top, placeholder hides.
+
+.root {
+  position: relative;
+}
+
+.input {
+  height: 56px;
+  padding-top: 0;
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  font-size: 14px !important;
+  color: var(--prune-text-gray-700);
+  transition: border-color 0.2s ease, padding-top 0.22s ease;
+
+  @media (min-width: 64em) {
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px !important;
+    }
+  }
+
+  &:focus {
+    border-color: var(--prune-primary-600);
+  }
+
+  // When floating: push value text down to make room for label at top
+  [data-floating] & {
+    padding-top: 20px;
+  }
+
+  // Hide the placeholder text when label is showing
+  [data-floating] &::placeholder {
+    color: transparent;
+  }
+}
+
+.label {
+  position: absolute;
+  pointer-events: none;
+  z-index: 1;
+  font-weight: 400;
+  font-size: 14px;
+  color: #98a2b3;
+
+  // Default: vertically centered (sits at same visual level as placeholder)
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0; // invisible — placeholder shows instead
+
+  transition:
+    top 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    font-size 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    color 0.22s ease,
+    opacity 0.15s ease;
+
+  @media (min-width: 64em) {
+    font-size: 16px;
+  }
+
+  // Floating: label moves up inside the field — stays small regardless of screen size
+  [data-floating] & {
+    top: 10px;
+    transform: translateY(0);
+    font-size: 11px !important;
+    color: #667085;
+    opacity: 1;
+  }
+}
+
+// Textarea variant — taller, label anchors to top
+.textarea {
+  padding-top: 14px;
+  min-height: 120px;
+  background: #ffffff;
+  border: 1px solid #e4e7ec;
+  border-radius: 8px;
+  font-size: 14px !important;
+  color: var(--prune-text-gray-700);
+  transition: border-color 0.2s ease, padding-top 0.22s ease;
+  resize: vertical;
+
+  @media (min-width: 64em) {
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px !important;
+    }
+  }
+
+  &:focus {
+    border-color: var(--prune-primary-600);
+  }
+
+  [data-floating] & {
+    padding-top: 26px;
+  }
+
+  [data-floating] &::placeholder {
+    color: transparent;
+  }
+}
+
+.error {
+  font-size: 12px;
+}
+
+// Plain <input> inside the unified phone field container
+.phone_input {
+  font-size: 14px !important;
+
+  &::placeholder {
+    color: #98a2b3;
+    font-size: 14px !important;
+  }
+
+  @media (min-width: 64em) {
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px !important;
+    }
+  }
+}

@@ -25,41 +25,87 @@ const positiveIntegerSchema = (fieldName: string) =>
       .int(`${fieldName} must be an integer`),
   ]);
 
-export const VirtualAccountSchema = z.object({
-  day_one_requirement: positiveIntegerSchema(
-    "Initial virtual account requirement"
-  ),
-  total_number_of_virtual_accounts: positiveIntegerSchema(
-    "Projected virtual accounts at full capacity"
-  ),
-  max_value_per_transaction: z.object({
-    daily: positiveIntegerSchema(
-      "Daily maximum transaction value for single virtual account"
+const validatePeriodOrder = (
+  values: { daily: string | number; monthly: string | number; annually: string | number },
+  ctx: z.RefinementCtx
+) => {
+  const numericValue = (value: string | number) =>
+    typeof value === "string" && value.trim() === "" ? NaN : Number(value);
+  const daily = numericValue(values.daily);
+  const monthly = numericValue(values.monthly);
+  const annually = numericValue(values.annually);
+
+  if (Number.isFinite(daily) && Number.isFinite(monthly) && monthly < daily) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["monthly"],
+      message: "Monthly value must be greater than or equal to the daily value",
+    });
+  }
+
+  if (Number.isFinite(monthly) && Number.isFinite(annually) && annually < monthly) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["annually"],
+      message: "Yearly value must be greater than or equal to the monthly value",
+    });
+  }
+};
+
+export const VirtualAccountSchema = z
+  .object({
+    day_one_requirement: positiveIntegerSchema(
+      "Initial virtual account requirement"
     ),
-    monthly: positiveIntegerSchema(
-      "Monthly maximum transaction value for single virtual account"
+    total_number_of_virtual_accounts: positiveIntegerSchema(
+      "Projected virtual accounts at full capacity"
     ),
-    annually: positiveIntegerSchema(
-      "Annual maximum transaction value for single virtual account"
-    ),
-  }),
-  max_value_all_virtual_accounts: z.object({
-    daily: positiveIntegerSchema(
-      "Daily maximum transaction value for all virtual accounts"
-    ),
-    monthly: positiveIntegerSchema(
-      "Monthly maximum transaction value for all virtual accounts"
-    ),
-    annually: positiveIntegerSchema(
-      "Annual maximum transaction value for all virtual accounts"
-    ),
-  }),
-  total_highest_transaction_count: z.object({
-    daily: positiveIntegerSchema("Daily maximum transaction count"),
-    monthly: positiveIntegerSchema("Monthly maximum transaction count"),
-    annually: positiveIntegerSchema("Annual maximum transaction count"),
-  }),
-});
+    max_value_per_transaction: z
+      .object({
+        daily: positiveIntegerSchema(
+          "Daily maximum transaction value for single virtual account"
+        ),
+        monthly: positiveIntegerSchema(
+          "Monthly maximum transaction value for single virtual account"
+        ),
+        annually: positiveIntegerSchema(
+          "Annual maximum transaction value for single virtual account"
+        ),
+      })
+      .superRefine(validatePeriodOrder),
+    max_value_all_virtual_accounts: z
+      .object({
+        daily: positiveIntegerSchema(
+          "Daily maximum transaction value for all virtual accounts"
+        ),
+        monthly: positiveIntegerSchema(
+          "Monthly maximum transaction value for all virtual accounts"
+        ),
+        annually: positiveIntegerSchema(
+          "Annual maximum transaction value for all virtual accounts"
+        ),
+      })
+      .superRefine(validatePeriodOrder),
+    total_highest_transaction_count: z.object({
+      daily: positiveIntegerSchema("Total highest transaction count"),
+    }),
+  })
+  .superRefine((values, ctx) => {
+    const dayOne = Number(values.day_one_requirement);
+    const total = Number(values.total_number_of_virtual_accounts);
+    if (
+      Number.isFinite(dayOne) &&
+      Number.isFinite(total) &&
+      total < dayOne
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["total_number_of_virtual_accounts"],
+        message:
+          "Projected total must be greater than or equal to the day one requirement",
+      });
+    }
+  });
 
 // Operations Account
 export const OperationsAccountSchema = z.object({
@@ -83,25 +129,37 @@ export const BizBasicInfoSchema = z.object({
     .regex(/^\+?[0-9]*$/, "Phone number must be a valid number"),
   countryCode: z.string().min(1, "Country code is required"),
   isRegulated: z.enum(["yes", "no"]),
+  regulatoryDetails: z.string().optional(),
   geoFootprint: z
     .string({
       invalid_type_error:
         "Description of your geographic footprint is required",
     })
-    .min(1, "Geo footprint is required"),
-  businessDescription: z.string().min(1, "Business description is required"),
+    .min(1, "Geo footprint is required")
+    .refine((v) => v.trim().length > 0, "Geo footprint cannot be only spaces"),
+  businessDescription: z
+    .string()
+    .min(1, "Business description is required")
+    .refine((v) => v.trim().length > 0, "Business description cannot be only spaces"),
 });
 
 export const ContactPerson = z.object({
-  contactName: z.string().min(1, "Contact name is required"),
-  contactDesignation: z.string().min(1, "Contact designation is required"),
+  contactName: z
+    .string()
+    .min(1, "Contact name is required")
+    .max(100, "Name cannot exceed 100 characters"),
+  contactDesignation: z
+    .string()
+    .min(1, "Contact designation is required")
+    .max(100, "Designation cannot exceed 100 characters"),
   contactEmail: z
     .string()
     .email("Invalid email address")
     .min(1, "Contact email address is required"),
   contactPhoneNumber: z
     .string()
-    .min(10, "Contact phone number is required")
+    .min(1, "Contact phone number is required")
+    .max(15, "Phone number cannot exceed 15 digits")
     .regex(/^\+?[0-9]*$/, "Contact phone number must be a valid number"),
   contactCountryCode: z.string().min(1, "Contact country code is required"),
 });
@@ -126,12 +184,13 @@ export const questionnaireValues: QuestionnaireType = {
   businessName: "",
   businessTradingName: "",
   businessEmail: "",
-  businessPhoneNumber: "+234",
+  businessPhoneNumber: "",
   businessCountry: "",
   businessAddress: "",
   countryCode: "+234",
   businessIndustry: "",
   isRegulated: "no",
+  regulatoryDetails: "",
   geoFootprint: "",
   businessDescription: "",
   annualTurnover: "",
@@ -151,8 +210,6 @@ export const questionnaireValues: QuestionnaireType = {
     },
     total_highest_transaction_count: {
       daily: "",
-      monthly: "",
-      annually: "",
     },
   },
   operationsAccounts: {

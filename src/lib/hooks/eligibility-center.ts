@@ -20,6 +20,32 @@ export function useOnboardingBusiness(customParams: IParams = {}) {
   return { loading, data, meta, revalidate };
 }
 
+export function useQuestionnairesAdmin(customParams: IParams = {}) {
+  const {
+    data,
+    meta,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<QuestionnaireAdminItem[], QuestionnaireMeta>({
+    baseURL: "questionnaire",
+    endpoint: "/business/questionnaire/admin",
+    params: sanitizedQueryParams(customParams),
+    dependencies: [sanitizeURL(customParams)],
+  });
+
+  return { loading, data, meta, revalidate };
+}
+
+export function useQuestionnairesStats() {
+  const { data, loading } = useAxios<QuestionnaireStats>({
+    baseURL: "questionnaire",
+    endpoint: "/business/questionnaire/admin/stats",
+    dependencies: [],
+  });
+
+  return { loading, stats: data };
+}
+
 export function useSingleOnboardingBusiness(id: string) {
   const {
     data,
@@ -109,5 +135,40 @@ export interface Meta {
   approved: number;
   currentPage: number;
   totalPages: number;
+  onboarded: number;
+}
+
+export interface QuestionnaireAdminItem {
+  reference: string;
+  contactEmail: string;
+  status: string;
+  progress: {
+    isComplete: boolean;
+    sections: { section: number; isComplete: boolean }[];
+  };
+  answers: {
+    legalBusinessName?: string;
+    countryCode?: string;
+    services?: { name: string; currencies: string[] }[];
+    [key: string]: unknown;
+  };
+  createdAt: string;
+  submittedAt: string | null;
+  decision: unknown;
+  onboarding: unknown;
+}
+
+export interface QuestionnaireMeta {
+  total: number;
+  currentPage: number;
+  totalPages: number;
+}
+
+export interface QuestionnaireStats {
+  totalLeads: number;
+  inProgress: number;
+  pending: number;
+  approved: number;
+  rejected: number;
   onboarded: number;
 }

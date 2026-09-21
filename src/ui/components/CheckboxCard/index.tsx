@@ -6,20 +6,25 @@ import {
   Text,
   ThemeIcon,
 } from "@mantine/core";
-import classes from "./services.module.css";
+import classes from "./CheckboxCard.module.css";
 import { ForwardRefExoticComponent, RefAttributes } from "react";
 import { Icon, IconProps } from "@tabler/icons-react";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import useNotification from "@/lib/hooks/notification";
 
+interface CurrencyOption { value: string; label: string }
+
 interface ServiceCategory {
   idx: number;
+  value: string;
   title: string;
   description: string;
-  accounts: string[];
+  accounts: CurrencyOption[];
   icon: ForwardRefExoticComponent<IconProps & RefAttributes<Icon>>;
 }
+
 export default function CheckboxCard({
+  value: serviceValue,
   title,
   description,
   accounts,
@@ -31,29 +36,27 @@ export default function CheckboxCard({
   const form = useQuestionnaireFormContext();
   const services = form.getValues().services;
 
+  const isChecked = services.some((s) => s.name === serviceValue);
+
   return (
     <Checkbox.Card
       className={classes.root}
       radius="md"
-      checked={services.some((service) => service.name === title)}
+      checked={isChecked}
       onChange={(e) => {
         if (e) {
-          form.insertListItem(`services`, {
-            name: title,
-            currencies: [accounts.at(0)],
+          form.insertListItem("services", {
+            name: serviceValue,
+            currencies: accounts.slice(0, 1).map((a) => a.value),
           });
           return;
         }
-
-        const removeIdx = services.findIndex(
-          (service) => service.name === title
-        );
+        const removeIdx = services.findIndex((s) => s.name === serviceValue);
         form.removeListItem("services", removeIdx);
       }}
       key={form.key(`services.${idx}`)}
     >
       <Stack align="flex-start">
-        {/* <Checkbox.Indicator /> */}
         <ThemeIcon
           color="var(--prune-text-gray-500)"
           radius={4}
@@ -65,42 +68,37 @@ export default function CheckboxCard({
         <Text className={classes.description}>{description}</Text>
 
         <SimpleGrid cols={2}>
-          {accounts.map((item, index) => (
+          {accounts.map((account, index) => (
             <Checkbox
               key={form.key(`services.${idx}.currencies.${index}`)}
-              label={`${item} Account`}
-              // value={item}
+              label={account.label}
               onClick={(e) => e.stopPropagation()}
               checked={Boolean(
                 form
                   .getValues()
-                  .services.find((service) => service.name === title)
-                  ?.currencies?.includes(item)
+                  .services.find((s) => s.name === serviceValue)
+                  ?.currencies?.includes(account.value)
               )}
               onChange={(e) => {
                 const { services } = form.getValues();
-                const removeIdx = services?.findIndex(
-                  (service) => service.name === title
+                const removeIdx = services.findIndex(
+                  (s) => s.name === serviceValue
                 );
 
-                const service = services.find((s) => s.name === title);
+                const service = services.find((s) => s.name === serviceValue);
 
                 if (removeIdx === -1)
                   return handleInfo(
                     "Service Required",
                     "Please select a service before choosing a currency."
-                  ); // Prevent undefined access
+                  );
 
-                // Only proceed if services[removeIdx] exists and has currencies
                 const currentService = services[removeIdx];
-                if (
-                  !currentService ||
-                  !Array.isArray(currentService.currencies)
-                )
+                if (!currentService || !Array.isArray(currentService.currencies))
                   return;
 
                 const acctIndex = currentService.currencies.findIndex(
-                  (acct) => acct === item
+                  (c) => c === account.value
                 );
 
                 if (!e.target.checked) {
@@ -108,24 +106,20 @@ export default function CheckboxCard({
                     form.removeListItem("services", removeIdx);
                     return;
                   }
-                  form.removeListItem(
-                    `services.${removeIdx}.currencies`,
-                    acctIndex
-                  );
+                  form.removeListItem(`services.${removeIdx}.currencies`, acctIndex);
                   return;
                 }
 
                 if (!service) {
                   form.insertListItem(
-                    `services`,
-                    { name: title, currencies: [item] },
+                    "services",
+                    { name: serviceValue, currencies: [account.value] },
                     idx
                   );
-
                   return;
                 }
 
-                form.insertListItem(`services.${removeIdx}.currencies`, item);
+                form.insertListItem(`services.${removeIdx}.currencies`, account.value);
               }}
               fz={12}
               color="var(--prune-primary-600)"

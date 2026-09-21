@@ -19,52 +19,51 @@ import { PrimaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
 import { switzer } from "@/ui/fonts";
 import {
-  OnboardingBusinessData,
-  useOnboardingBusiness,
+  QuestionnaireAdminItem,
+  useQuestionnairesAdmin,
+  useQuestionnairesStats,
 } from "@/lib/hooks/eligibility-center";
 import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { useDebouncedValue } from "@mantine/hooks";
 import { calculateTotalPages } from "@/lib/utils";
 import PaginationComponent from "@/ui/components/Pagination";
 
 function EligibilityCenter() {
-  // const [search, setSearch] = useState("");
-  // const [debouncedSearch] = useDebouncedValue(search, 1000);
-
   const searchParams = useSearchParams();
-  const [opened, { toggle }] = useDisclosure(false);
 
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const { status, date, endDate, name, contactEmail } = Object.fromEntries(
+  const { countryCode, service, dateFrom, dateTo } = Object.fromEntries(
     searchParams.entries()
   );
 
   const queryParams = {
-    date: date ? dayjs(date).format("YYYY-MM-DD") : "",
-    endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
-    status: status ? status.toUpperCase() : "",
-    business: name,
-    email: contactEmail,
-    limit: parseInt(limit ?? "10", 10),
-    page: active,
     search: debouncedSearch,
+    countryCode: countryCode ?? "",
+    service: service ?? "",
+    dateFrom: dateFrom ? dayjs(dateFrom).format("YYYY-MM-DD") : "",
+    dateTo: dateTo ? dayjs(dateTo).format("YYYY-MM-DD") : "",
+    sortBy: "date",
+    sortOrder: "desc",
+    page: active,
+    limit: parseInt(limit ?? "10", 10),
   };
 
-  const { data, meta, loading, revalidate } = useOnboardingBusiness({
-    search: debouncedSearch,
-  });
+  const { data, meta, loading } = useQuestionnairesAdmin(queryParams);
+  const { stats, loading: statsLoading } = useQuestionnairesStats();
+
+  const isLoading = loading || statsLoading;
 
   const InfoCards = [
-    { title: "Total leads", num: meta?.total },
-    { title: "Total approved", num: meta?.approved },
-    { title: "Total onboarded", num: meta?.onboarded },
-    { title: "Pending", num: meta?.pending },
+    { title: "Total leads", num: stats?.totalLeads },
+    { title: "Total approved", num: stats?.approved },
+    { title: "Total onboarded", num: stats?.onboarded },
+    { title: "Pending", num: stats?.pending },
   ];
 
   return (
@@ -89,11 +88,11 @@ function EligibilityCenter() {
                   <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
                     {d?.title}
                   </Text>
-                  {loading ? (
+                  {isLoading ? (
                     <Skeleton w={50} h={24} />
                   ) : (
                     <Text fz={24} fw={500} c="var(--prune-text-gray-700)">
-                      {d?.num}
+                      {d?.num ?? 0}
                     </Text>
                   )}
                 </Flex>
@@ -148,7 +147,6 @@ const tableHeaders = [
   "Country",
   "Services",
   "Stage",
-  // "Actions",
 ];
 
 export default function EligibilityCenterSus() {
@@ -159,37 +157,33 @@ export default function EligibilityCenterSus() {
   );
 }
 
-const Rows = ({ data }: { data: OnboardingBusinessData[] | null }) => {
+const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
   const { push } = useRouter();
 
-  return data?.map((row) => (
-    <TableTr
-      key={row.id}
-      onClick={() => push(`/admin/eligibility-center/${row.id}`)}
-      style={{ cursor: "pointer" }}
-    >
-      <TableTd>{row.businessName}</TableTd>
-      <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
-      <TableTd>{row.businessCountry}</TableTd>
-      <TableTd>
-        <BadgeComponent
-          tier
-          status={
-            row.services?.every((s) => s.name === "Remittance")
-              ? "Tier 1"
-              : "Tier 2"
-          }
-          variant="filled"
-        />
-      </TableTd>
-      <TableTd>
-        <BadgeComponent
-          stage
-          status={row?.processStatus || "QUESTIONNAIRE"}
-          c={row?.status === "ACTIVATION" ? "var(--prune-text-gray-800)" : ""}
-          w={150}
-        />
-      </TableTd>
-    </TableTr>
-  ));
+  return data?.map((row) => {
+    const services = row.answers?.services ?? [];
+    const serviceLabel =
+      services.length === 0
+        ? "—"
+        : services
+            .filter((s) => s?.name)
+            .map((s) => s.name.replace(/_/g, " "))
+            .join(", ") || "—";
+
+    return (
+      <TableTr
+        key={row.reference}
+        onClick={() => push(`/admin/eligibility-center/${row.reference}`)}
+        style={{ cursor: "pointer" }}
+      >
+        <TableTd>{row.answers?.legalBusinessName ?? "—"}</TableTd>
+        <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
+        <TableTd>{row.answers?.countryCode ?? "—"}</TableTd>
+        <TableTd>{serviceLabel}</TableTd>
+        <TableTd>
+          <BadgeComponent stage status={row.status} w={150} />
+        </TableTd>
+      </TableTr>
+    );
+  });
 };

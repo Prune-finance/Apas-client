@@ -1,10 +1,27 @@
 import { Box, RadioGroup, Stack, Text } from "@mantine/core";
-import CustomRadio from "./CustomRadio";
+import { useEffect, useState } from "react";
+import CustomRadio from "@/ui/components/CustomRadio";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import { operationsAccountEstimatedBalance } from "@/lib/static";
+import createAxiosInstance from "@/lib/axios";
+
+const questAxios = createAxiosInstance("questionnaire");
+
+interface RefOption { value: string; label: string }
 
 export default function OperationsAccount() {
   const form = useQuestionnaireFormContext();
+  const [monetaryBands, setMonetaryBands] = useState<RefOption[]>([]);
+
+  useEffect(() => {
+    questAxios
+      .get("/business/questionnaire/reference-data", {
+        params: { include: "monetaryBands" },
+      })
+      .then(({ data: res }) => {
+        setMonetaryBands(res.data?.monetaryBands ?? []);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <Box>
@@ -26,11 +43,9 @@ export default function OperationsAccount() {
         errorProps={{ mt: 10 }}
       >
         <Stack gap={20} mt="xs" style={{ cursor: "pointer" }}>
-          {Object.entries(operationsAccountEstimatedBalance).map(
-            ([value, label], idx) => (
-              <CustomRadio key={idx} value={value} label={label} />
-            )
-          )}
+          {monetaryBands.map((option) => (
+            <CustomRadio key={option.value} value={option.value} label={option.label} />
+          ))}
         </Stack>
       </RadioGroup>
     </Box>

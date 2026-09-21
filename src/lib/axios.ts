@@ -4,6 +4,7 @@ import Cookies from "js-cookie";
 export const BASEURL = {
   auth: process.env.NEXT_PUBLIC_SERVER_URL,
   accounts: process.env.NEXT_PUBLIC_ACCOUNTS_URL,
+  questionnaire: process.env.NEXT_PUBLIC_QUESTIONNAIRE_URL,
   payouts: process.env.NEXT_PUBLIC_PAYOUT_URL,
 };
 

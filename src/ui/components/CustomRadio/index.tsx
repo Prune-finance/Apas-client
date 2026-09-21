@@ -1,5 +1,5 @@
 import { Group, Radio, RadioProps, Text } from "@mantine/core";
-import classes from "./services.module.css";
+import classes from "./CustomRadio.module.css";
 
 interface Props extends RadioProps {}
 

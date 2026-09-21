@@ -6,7 +6,7 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { useEffect, useRef, useState } from "react";
 import { zodResolver } from "@mantine/form";
 import { z } from "zod";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDisclosure } from "@mantine/hooks";
 
 import Services from "./Services";
@@ -50,6 +50,8 @@ export default function Questionnaire() {
   const [opened, { open, close }] = useDisclosure(false);
   const params = useParams();
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const questionnaireId = params?.slug?.[0] as string | undefined;
   const resumeToken = searchParams?.get("token");
@@ -59,6 +61,38 @@ export default function Questionnaire() {
 
   // Baseline snapshot — set when data loads; compared on each "Save & Continue"
   const savedRef = useRef<QuestionnaireType | null>(null);
+
+  // Refs for stale-closure-safe reads inside URL-sync effect
+  const activeRef = useRef(active);
+  const entryDoneRef = useRef(entryDone);
+  const resumeLoadingRef = useRef(resumeLoading);
+  useEffect(() => { activeRef.current = active; }, [active]);
+  useEffect(() => { entryDoneRef.current = entryDone; }, [entryDone]);
+  useEffect(() => { resumeLoadingRef.current = resumeLoading; }, [resumeLoading]);
+
+  // Push current step into the URL so each step gets a browser history entry
+  const pushStepToURL = (step: number) => {
+    const params = new URLSearchParams(searchParams?.toString() ?? "");
+    params.set("step", String(step));
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  // Sync URL → state when the browser back/forward button is used
+  useEffect(() => {
+    if (resumeLoadingRef.current) return;
+    const stepParam = searchParams?.get("step");
+    if (!entryDoneRef.current) return;
+    if (stepParam === null) {
+      // Browser backed past the first step — return to ContactEntry
+      setEntryDone(false);
+      return;
+    }
+    const step = parseInt(stepParam, 10);
+    if (!isNaN(step) && step >= 0 && step <= 4 && step !== activeRef.current) {
+      setActive(step);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const form = useQuestionnaireForm({
     initialValues: questionnaireValues,
@@ -153,8 +187,10 @@ export default function Questionnaire() {
         const needsVirtualAccount = partial.services?.some(
           (service) => service.name === "VIRTUAL_ACCOUNTS"
         );
-        setActive(nextActive === 3 && !needsVirtualAccount ? 4 : nextActive);
+        const resolvedStep = nextActive === 3 && !needsVirtualAccount ? 4 : nextActive;
+        setActive(resolvedStep);
         setEntryDone(true);
+        pushStepToURL(resolvedStep);
       } catch {
         // If fetch fails, show ContactEntry so user can re-enter
       } finally {
@@ -286,7 +322,9 @@ export default function Questionnaire() {
 
   const goNext = () => {
     if (active === 4) return open();
-    setActive(active === 2 && !hasVirtualAccount ? 4 : Math.min(active + 1, 4));
+    const nextStep = active === 2 && !hasVirtualAccount ? 4 : Math.min(active + 1, 4);
+    setActive(nextStep);
+    pushStepToURL(nextStep);
   };
 
   // Save with validation — POST /sections/{n}/complete
@@ -335,10 +373,14 @@ export default function Questionnaire() {
     return (
       <Box px={{ base: 24, sm: 48, lg: 120 }} py={48}>
         <ContactEntry
-          onComplete={() => setEntryDone(true)}
+          onComplete={() => {
+            setEntryDone(true);
+            pushStepToURL(0);
+          }}
           onReturning={(step) => {
             setEntryDone(true);
             setActive(step);
+            pushStepToURL(step);
           }}
         />
       </Box>
@@ -400,10 +442,7 @@ export default function Questionnaire() {
           onNext={handleNext}
           loading={saving}
           disabled={savingDraft || (active === 2 && form.values.services.length === 0)}
-          onPrevious={() => {
-            if (active === 0) return setEntryDone(false);
-            setActive(active === 4 && !hasVirtualAccount ? 2 : Math.max(active - 1, 0));
-          }}
+          onPrevious={() => router.back()}
           nextText={active === 4 ? "Submit" : "Save & Continue"}
         />
       </Box>

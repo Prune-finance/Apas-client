@@ -17,6 +17,7 @@ export const ServicesSchema = z
   .min(1, "Select at least one service");
 
 const MAX_SAFE = Number.MAX_SAFE_INTEGER;
+const MAX_ACCOUNTS = 1_000_000_000;
 
 const positiveIntegerSchema = (fieldName: string, max = MAX_SAFE) =>
   z.union([
@@ -67,10 +68,12 @@ const validatePeriodOrder = (
 export const VirtualAccountSchema = z
   .object({
     day_one_requirement: positiveIntegerSchema(
-      "Initial virtual account requirement"
+      "Initial virtual account requirement",
+      MAX_ACCOUNTS
     ),
     total_number_of_virtual_accounts: positiveIntegerSchema(
-      "Projected virtual accounts at full capacity"
+      "Projected virtual accounts at full capacity",
+      MAX_ACCOUNTS
     ),
     max_value_per_transaction: z
       .object({
@@ -99,7 +102,7 @@ export const VirtualAccountSchema = z
       })
       .superRefine(validatePeriodOrder),
     total_highest_transaction_count: z.object({
-      daily: positiveIntegerSchema("Total highest transaction count"),
+      daily: positiveIntegerSchema("Total highest transaction count", MAX_ACCOUNTS),
     }),
   })
   .superRefine((values, ctx) => {

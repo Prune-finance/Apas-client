@@ -28,7 +28,7 @@ export default function VirtualAccount() {
           allowDecimal={false}
           allowNegative={false}
           min={1}
-          max={Number.MAX_SAFE_INTEGER}
+          max={1_000_000_000}
           onKeyDown={digitsOnly}
           {...form.getInputProps("virtualAccounts.day_one_requirement")}
           key={form.key("virtualAccounts.day_one_requirement")}
@@ -39,7 +39,7 @@ export default function VirtualAccount() {
           allowDecimal={false}
           allowNegative={false}
           min={1}
-          max={Number.MAX_SAFE_INTEGER}
+          max={1_000_000_000}
           onKeyDown={digitsOnly}
           {...form.getInputProps("virtualAccounts.total_number_of_virtual_accounts")}
           key={form.key("virtualAccounts.total_number_of_virtual_accounts")}

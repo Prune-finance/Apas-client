@@ -32,7 +32,12 @@ export default function ConfirmationModal({
         <img
           src={requestReceived.src}
           alt="Request received"
-          style={{ width: 200, height: 160, objectFit: "contain" }}
+          style={{
+            width: 200,
+            height: 160,
+            objectFit: "contain",
+            marginTop: 16,
+          }}
         />
 
         <Stack gap={12} w="100%">

@@ -345,6 +345,11 @@ export default function Questionnaire() {
 
   // Save with validation — POST /sections/{n}/complete
   const handleNext = async () => {
+    if (
+      active === 0 &&
+      form.values.businessCountry &&
+      !SUPPORTED_ISO_CODES.has(form.values.businessCountry.toUpperCase())
+    ) return;
     if (form.validate().hasErrors) return;
     if (!isDirty()) { goNext(); return; }
 

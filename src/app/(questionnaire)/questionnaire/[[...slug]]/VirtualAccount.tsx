@@ -2,6 +2,16 @@ import { Box, Group, Stack, Text } from "@mantine/core";
 import { NumberInputWithInsideLabel } from "@/ui/components/InputWithLabel/QuestInputs";
 import { IconCurrencyPound } from "@tabler/icons-react";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
+import type React from "react";
+
+const digitsOnly = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  if (
+    !/^\d$/.test(e.key) &&
+    !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab", "Home", "End"].includes(e.key)
+  ) {
+    e.preventDefault();
+  }
+};
 
 export default function VirtualAccount() {
   const form = useQuestionnaireFormContext();
@@ -18,6 +28,7 @@ export default function VirtualAccount() {
           allowDecimal={false}
           allowNegative={false}
           min={1}
+          onKeyDown={digitsOnly}
           {...form.getInputProps("virtualAccounts.day_one_requirement")}
           key={form.key("virtualAccounts.day_one_requirement")}
         />
@@ -27,6 +38,7 @@ export default function VirtualAccount() {
           allowDecimal={false}
           allowNegative={false}
           min={1}
+          onKeyDown={digitsOnly}
           {...form.getInputProps("virtualAccounts.total_number_of_virtual_accounts")}
           key={form.key("virtualAccounts.total_number_of_virtual_accounts")}
         />
@@ -83,6 +95,7 @@ export default function VirtualAccount() {
             allowDecimal={false}
             allowNegative={false}
             min={1}
+            onKeyDown={digitsOnly}
             {...form.getInputProps("virtualAccounts.total_highest_transaction_count.daily")}
             key={form.key("virtualAccounts.total_highest_transaction_count.daily")}
           />

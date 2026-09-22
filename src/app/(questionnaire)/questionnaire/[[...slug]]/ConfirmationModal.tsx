@@ -1,7 +1,6 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Flex, Modal, Stack, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 
 import React from "react";
 interface ConfirmationModalProps {
@@ -28,12 +27,11 @@ export default function ConfirmationModal({
       centered
     >
       <Stack gap={24} align="center">
-        <Image
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src="/request-recieved.gif"
           alt="Request received"
-          width={200}
-          height={160}
-          unoptimized
+          style={{ width: 200, height: 160, objectFit: "contain" }}
         />
 
         <Stack gap={12} w="100%">

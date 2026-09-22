@@ -2,53 +2,92 @@ import { QuestionnaireType } from "@/lib/schema";
 import { PhoneNumberInput } from "@/ui/components/InputWithLabel/QuestInputs";
 import { Box, Checkbox, Flex, Stack, Text } from "@mantine/core";
 import { IconBriefcase, IconMapPin, IconMail } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import {
   SelectInputWithInsideLabel,
   TextInputWithInsideLabel,
   TextareaWithInsideLabel,
 } from "@/ui/components/InputWithLabel/QuestInputs";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
-import createAxiosInstance from "@/lib/axios";
 import { countriesWithCode } from "@/lib/countries-codes-flags";
 
-const questAxios = createAxiosInstance("questionnaire");
+// Derive country options from the existing dial-code list (flag emoji encodes ISO-2 code)
+const COUNTRY_OPTIONS = countriesWithCode
+  .map((c) => {
+    const parts = c.label.split(" ");
+    const emoji = parts[0];
+    const name = parts.slice(1).join(" ");
+    const a = emoji.codePointAt(0);
+    const b = emoji.codePointAt(2);
+    if (a === undefined || b === undefined) return null;
+    const iso = String.fromCharCode(65 + (a - 0x1f1e6), 65 + (b - 0x1f1e6));
+    if (iso.length !== 2) return null;
+    return { value: iso, label: name };
+  })
+  .filter((c): c is { value: string; label: string } => c !== null)
+  .sort((a, b) => a.label.localeCompare(b.label));
 
-interface RefOption { value: string; label: string }
+const INDUSTRY_OPTIONS = [
+  "Financial Services / FinTech",
+  "Banking",
+  "Insurance",
+  "Technology / Software",
+  "E-commerce / Retail",
+  "Logistics & Transportation",
+  "Healthcare",
+  "Pharmaceuticals",
+  "Education / EdTech",
+  "Real Estate",
+  "Construction",
+  "Manufacturing",
+  "Agriculture / Agribusiness",
+  "Food & Beverage",
+  "Hospitality / Hotels",
+  "Travel & Tourism",
+  "Telecommunications",
+  "Media & Entertainment",
+  "Marketing & Advertising",
+  "Professional Services / Consulting",
+  "Legal Services",
+  "Accounting",
+  "Energy / Oil & Gas",
+  "Renewable Energy",
+  "Automotive",
+  "Aviation",
+  "Import & Export / Trading",
+  "Consumer Goods",
+  "Fashion & Apparel",
+  "Beauty & Cosmetics",
+  "Sports & Fitness",
+  "Security Services",
+  "Government / Public Sector",
+  "Nonprofit / NGO",
+  "Mining",
+  "Telecommunications & IT Services",
+  "Cybersecurity",
+  "Artificial Intelligence",
+  "Cryptocurrency / Blockchain",
+  "Business Process Outsourcing (BPO)",
+].map((item) => ({ value: item, label: item }));
 
 export default function BasicInfo() {
   const form = useQuestionnaireFormContext();
 
-  const [countryOptions, setCountryOptions] = useState<RefOption[]>([]);
-  const [industryOptions, setIndustryOptions] = useState<RefOption[]>([]);
-
+  // When the selected country changes, sync the phone dial code
   useEffect(() => {
-    const selectedValue = form.values.businessCountry;
-    if (!selectedValue || countryOptions.length === 0) return;
+    const iso = form.values.businessCountry; // e.g. "NG"
+    if (!iso || iso.length !== 2) return;
 
-    const selectedOption = countryOptions.find((opt) => opt.value === selectedValue);
-    if (!selectedOption) return;
-
-    const match = countriesWithCode.find((c) =>
-      c.label.toLowerCase().includes(selectedOption.label.toLowerCase())
+    // Re-build the flag emoji from the ISO code to find the exact dial code entry
+    const upper = iso.toUpperCase();
+    const flagEmoji = String.fromCodePoint(
+      0x1f1e6 + upper.charCodeAt(0) - 65,
+      0x1f1e6 + upper.charCodeAt(1) - 65
     );
-    if (match) {
-      form.setFieldValue("countryCode", match.value);
-    }
+    const match = countriesWithCode.find((c) => c.label.startsWith(flagEmoji));
+    if (match) form.setFieldValue("countryCode", match.value);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form.values.businessCountry, countryOptions]);
-
-  useEffect(() => {
-    questAxios
-      .get("/business/questionnaire/reference-data", {
-        params: { include: "countries,industries" },
-      })
-      .then(({ data: res }) => {
-        setCountryOptions(res.data?.countries ?? []);
-        setIndustryOptions(res.data?.industries ?? []);
-      })
-      .catch(() => {});
-  }, []);
+  }, [form.values.businessCountry]);
 
   return (
     <Box style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -83,7 +122,7 @@ export default function BasicInfo() {
         <SelectInputWithInsideLabel
           label="Country"
           w="100%"
-          data={countryOptions}
+          data={COUNTRY_OPTIONS}
           searchable
           {...form.getInputProps("businessCountry")}
           key={form.key("businessCountry")}
@@ -95,7 +134,7 @@ export default function BasicInfo() {
         label="Business Industry"
         w="100%"
         searchable
-        data={industryOptions}
+        data={INDUSTRY_OPTIONS}
         {...form.getInputProps("businessIndustry")}
         key={form.key("businessIndustry")}
         withAsterisk

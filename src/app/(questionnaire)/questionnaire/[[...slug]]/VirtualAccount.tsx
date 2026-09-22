@@ -15,12 +15,18 @@ export default function VirtualAccount() {
       <Stack gap={16}>
         <NumberInputWithInsideLabel
           label="How many virtual accounts do you need as a day one requirement?"
+          allowDecimal={false}
+          allowNegative={false}
+          min={1}
           {...form.getInputProps("virtualAccounts.day_one_requirement")}
           key={form.key("virtualAccounts.day_one_requirement")}
         />
 
         <NumberInputWithInsideLabel
           label="What is the projected total number of virtual accounts needed at full capacity?"
+          allowDecimal={false}
+          allowNegative={false}
+          min={1}
           {...form.getInputProps("virtualAccounts.total_number_of_virtual_accounts")}
           key={form.key("virtualAccounts.total_number_of_virtual_accounts")}
         />
@@ -74,6 +80,9 @@ export default function VirtualAccount() {
           </Text>
           <NumberInputWithInsideLabel
             label="Count"
+            allowDecimal={false}
+            allowNegative={false}
+            min={1}
             {...form.getInputProps("virtualAccounts.total_highest_transaction_count.daily")}
             key={form.key("virtualAccounts.total_highest_transaction_count.daily")}
           />

@@ -47,14 +47,13 @@ function EligibilityCenter() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const { countryCode, service, dateFrom, dateTo } = Object.fromEntries(
+  const { countryCode, dateFrom, dateTo } = Object.fromEntries(
     searchParams.entries(),
   );
 
   const queryParams = {
     search: debouncedSearch,
     countryCode: countryCode ?? "",
-    service: service ?? "",
     dateFrom: dateFrom ? dayjs(dateFrom).format("YYYY-MM-DD") : "",
     dateTo: dateTo ? dayjs(dateTo).format("YYYY-MM-DD") : "",
     sortBy: "date",
@@ -150,7 +149,7 @@ function EligibilityCenter() {
   );
 }
 
-const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage"];
+const tableHeaders = ["Business Name", "Date", "Country", "Stage"];
 
 export default function EligibilityCenterSus() {
   return (
@@ -164,11 +163,6 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
   const { push } = useRouter();
 
   return data?.map((row) => {
-    const services = row.answers?.services ?? [];
-    const tier =
-      services.length > 0 && services.every((s) => s?.name === "REMITTANCE")
-        ? "Tier 1"
-        : "Tier 2";
     const stage = statusToStage[row.status] ?? "PROFILE";
     const countryCode = row.answers?.countryCode ?? "";
 
@@ -198,9 +192,6 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
               {countryCode || "—"}
             </Text>
           </Group>
-        </TableTd>
-        <TableTd>
-          <BadgeComponent tier status={tier} variant="filled" />
         </TableTd>
         <TableTd>
           <BadgeComponent stage status={stage} w={140} />

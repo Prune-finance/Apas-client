@@ -7,7 +7,15 @@ import type React from "react";
 const digitsOnly = (e: React.KeyboardEvent<HTMLInputElement>) => {
   if (
     !/^\d$/.test(e.key) &&
-    !["Backspace", "Delete", "ArrowLeft", "ArrowRight", "Tab", "Home", "End"].includes(e.key)
+    ![
+      "Backspace",
+      "Delete",
+      "ArrowLeft",
+      "ArrowRight",
+      "Tab",
+      "Home",
+      "End",
+    ].includes(e.key)
   ) {
     e.preventDefault();
   }
@@ -18,10 +26,6 @@ export default function VirtualAccount() {
 
   return (
     <Box>
-      <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
-        Virtual Accounts Service
-      </Text>
-
       <Stack gap={16}>
         <NumberInputWithInsideLabel
           label="How many virtual accounts do you need as a day one requirement?"
@@ -41,12 +45,14 @@ export default function VirtualAccount() {
           min={1}
           max={1_000_000_000}
           onKeyDown={digitsOnly}
-          {...form.getInputProps("virtualAccounts.total_number_of_virtual_accounts")}
+          {...form.getInputProps(
+            "virtualAccounts.total_number_of_virtual_accounts",
+          )}
           key={form.key("virtualAccounts.total_number_of_virtual_accounts")}
         />
 
         {currencyLimits.map((section, idx) => (
-          <Stack key={idx} gap={16}>
+          <Stack key={idx} gap={16} mt={16}>
             <Text c="var(--prune-text-gray-500)" fw={500} fz={16}>
               {section.title}
             </Text>
@@ -75,14 +81,14 @@ export default function VirtualAccount() {
                         idx === 0
                           ? "max_value_per_transaction"
                           : "max_value_all_virtual_accounts"
-                      }.${field}`
+                      }.${field}`,
                     )}
                     key={form.key(
                       `virtualAccounts.${
                         idx === 0
                           ? "max_value_per_transaction"
                           : "max_value_all_virtual_accounts"
-                      }.${field}`
+                      }.${field}`,
                     )}
                   />
                 </Group>
@@ -91,9 +97,10 @@ export default function VirtualAccount() {
           </Stack>
         ))}
 
-        <Stack gap={16}>
+        <Stack gap={16} mt={16}>
           <Text c="var(--prune-text-gray-500)" fw={500} fz={16}>
-            What is the total highest transaction count that all issued virtual accounts will process?
+            What is the total highest transaction count that all issued virtual
+            accounts will process?
           </Text>
           <NumberInputWithInsideLabel
             label="Count"
@@ -102,8 +109,12 @@ export default function VirtualAccount() {
             min={1}
             max={1_000_000_000}
             onKeyDown={digitsOnly}
-            {...form.getInputProps("virtualAccounts.total_highest_transaction_count.daily")}
-            key={form.key("virtualAccounts.total_highest_transaction_count.daily")}
+            {...form.getInputProps(
+              "virtualAccounts.total_highest_transaction_count.daily",
+            )}
+            key={form.key(
+              "virtualAccounts.total_highest_transaction_count.daily",
+            )}
           />
         </Stack>
       </Stack>

@@ -38,6 +38,12 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 
 const DRAFT_KEY = "questionnaire_draft";
+
+const STEP_TITLES: Record<number, string> = {
+  0: "Tell Us About Your Business.",
+  2: "What service(s) is this Entity interested in?",
+  3: "Virtual Accounts Service",
+};
 const questAxios = createAxiosInstance("questionnaire");
 
 export default function Questionnaire() {
@@ -340,8 +346,19 @@ export default function Questionnaire() {
         { headers: { "X-Resume-Token": token } }
       );
       handleSuccess("Progress saved", "Your progress has been saved successfully.");
-    } catch (err) {
-      handleError("Save failed", parseError(err));
+    } catch (err: unknown) {
+      let msg = parseError(err);
+      if (
+        typeof err === "object" &&
+        err !== null &&
+        "response" in err
+      ) {
+        const res = (err as { response?: { data?: { issues?: { field: string; message: string }[] } } }).response?.data;
+        if (res?.issues?.length) {
+          msg = res.issues.map((i) => i.message).join(", ");
+        }
+      }
+      handleError("Save failed", msg);
     } finally {
       setSavingDraft(false);
     }
@@ -451,23 +468,27 @@ export default function Questionnaire() {
         mt={40}
       >
         <Flex align="center" justify="space-between" mb={32}>
-          <Title order={4} c="var(--prune-text-gray-700)">
-            Tell Us About Your Business.
-          </Title>
+          {STEP_TITLES[active] && (
+            <Text fz={24} fw={700} c="var(--prune-text-gray-700)" style={{ fontFamily: "'EksellDisplay', serif" }}>
+              {STEP_TITLES[active]}
+            </Text>
+          )}
           {active !== 1 && active !== 4 && (
-            <Tooltip label="Save progress" withArrow position="left">
-              <PrimaryBtn
-                text="Save progress"
-                icon={IconDeviceFloppy}
-                showIcon
-                h={36}
-                fz={13}
-                fw={500}
-                loading={savingDraft}
-                disabled={saving}
-                action={() => { saveDraft(); }}
-              />
-            </Tooltip>
+            <Box ml="auto">
+              <Tooltip label="Save progress" withArrow position="left">
+                <PrimaryBtn
+                  text="Save progress"
+                  icon={IconDeviceFloppy}
+                  showIcon
+                  h={36}
+                  fz={13}
+                  fw={500}
+                  loading={savingDraft}
+                  disabled={saving}
+                  action={() => { saveDraft(); }}
+                />
+              </Tooltip>
+            </Box>
           )}
         </Flex>
 

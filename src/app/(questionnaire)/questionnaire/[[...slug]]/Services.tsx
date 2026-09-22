@@ -77,10 +77,6 @@ export default function Services() {
 
   return (
     <Box>
-      <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
-        What service(s) is this Entity interested in?
-      </Text>
-
       <SimpleGrid cols={{ base: 1, md: 2 }} pt="md">
         {serviceItems.map((item, idx) => (
           <CheckboxCard

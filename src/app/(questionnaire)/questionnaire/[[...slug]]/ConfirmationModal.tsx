@@ -37,10 +37,20 @@ export default function ConfirmationModal({
         />
 
         <Stack gap={12} w="100%">
-          <Text fz={{ base: 20, lg: 24 }} fw={700} c="var(--prune-text-gray-700)" ta="center">
+          <Text
+            fz={{ base: 20, lg: 24 }}
+            fw={700}
+            c="var(--prune-text-gray-700)"
+            ta="center"
+          >
             We have received your request
           </Text>
-          <Text fz={{ base: 14, lg: 16 }} fw={400} c="var(--prune-text-gray-700)" ta="center">
+          <Text
+            fz={{ base: 14, lg: 16 }}
+            fw={400}
+            c="var(--prune-text-gray-700)"
+            ta="center"
+          >
             You will get a feedback from us about the state of your request.
           </Text>
         </Stack>

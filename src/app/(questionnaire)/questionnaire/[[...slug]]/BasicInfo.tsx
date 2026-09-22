@@ -104,7 +104,7 @@ export default function BasicInfo() {
 
   return (
     <Box style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-      <Flex direction={{ base: "column", md: "row" }} align="center" gap={24}>
+      <Flex direction={{ base: "column", md: "row" }} align="flex-start" gap={24}>
         <TextInputWithInsideLabel
           label="Legal Business Name"
           w="100%"
@@ -123,7 +123,7 @@ export default function BasicInfo() {
         />
       </Flex>
 
-      <Flex direction={{ base: "column", md: "row" }} align="center" gap={20}>
+      <Flex direction={{ base: "column", md: "row" }} align="flex-start" gap={20}>
         <TextInputWithInsideLabel
           label="Trading Name"
           w="100%"
@@ -158,7 +158,7 @@ export default function BasicInfo() {
         withAsterisk
       />
 
-      <Flex direction={{ base: "column", md: "row" }} align="center" gap={24}>
+      <Flex direction={{ base: "column", md: "row" }} align="flex-start" gap={24}>
         <TextInputWithInsideLabel
           label="Business Address"
           w="100%"

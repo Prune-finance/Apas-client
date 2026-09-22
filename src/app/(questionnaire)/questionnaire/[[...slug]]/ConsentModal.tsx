@@ -61,7 +61,6 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
       <Modal
         opened={opened}
         onClose={close}
-        title="Questionnaire Consent"
         size="xl"
         styles={{
           title: {

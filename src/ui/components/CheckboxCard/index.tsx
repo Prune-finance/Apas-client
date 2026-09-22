@@ -63,8 +63,10 @@ export default function CheckboxCard({
         >
           <Icon size={16} />
         </ThemeIcon>
-        <Text className={classes.label}>{title}</Text>
-        <Text className={classes.description}>{description}</Text>
+        <Stack gap={12} my={12}>
+          <Text className={classes.label}>{title}</Text>
+          <Text className={classes.description}>{description}</Text>
+        </Stack>
 
         <SimpleGrid cols={2}>
           {accounts.map((account, index) => (

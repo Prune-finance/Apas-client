@@ -11,6 +11,9 @@
 
 .secondary__btn {
   border-radius: 9999px !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 18px;
   transition: all 0.3s;
 
   @media (min-width: 88em) {

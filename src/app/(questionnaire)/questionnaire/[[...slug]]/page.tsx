@@ -139,6 +139,10 @@ export default function Questionnaire() {
     form.values.services.find((service) => service.name === "VIRTUAL_ACCOUNTS")
   );
 
+  const hasOperationsAccount = Boolean(
+    form.values.services.find((service) => service.name === "OPERATIONS_ACCOUNT")
+  );
+
   // Resume flow: fetch existing questionnaire when URL has reference + token
   useEffect(() => {
     if (!isResume) return;
@@ -367,7 +371,16 @@ export default function Questionnaire() {
 
   const goNext = () => {
     if (active === 4) return open();
-    const nextStep = active === 2 && !hasVirtualAccount ? 4 : Math.min(active + 1, 4);
+    if (active === 3 && !hasOperationsAccount) return open();
+
+    if (active === 2 && !hasVirtualAccount) {
+      if (!hasOperationsAccount) return open();
+      setActive(4);
+      pushStepToURL(4);
+      return;
+    }
+
+    const nextStep = Math.min(active + 1, 4);
     setActive(nextStep);
     pushStepToURL(nextStep);
   };
@@ -394,18 +407,29 @@ export default function Questionnaire() {
       const reference = getReference();
       const token = getResumeToken();
 
+      savedRef.current = { ...form.values };
+      persistToStorage();
+
       if (reference && token) {
         const completeSection = active + 2;
-        await questAxios.post(
+        const { data: apiRes } = await questAxios.post(
           `/business/questionnaire/${reference}/sections/${completeSection}/complete`,
           buildSectionPayload(active),
           { headers: { "X-Resume-Token": token } }
         );
+        const progress = apiRes?.data?.progress;
+        if (progress?.isComplete === true || progress?.nextSection === null) {
+          open();
+        } else if (progress?.nextSection != null) {
+          const nextActive = (progress.nextSection as number) - 2;
+          setActive(nextActive);
+          pushStepToURL(nextActive);
+        } else {
+          goNext();
+        }
+      } else {
+        goNext();
       }
-
-      savedRef.current = { ...form.values };
-      persistToStorage();
-      goNext();
     } catch {
       // errors surface via notifications
     } finally {

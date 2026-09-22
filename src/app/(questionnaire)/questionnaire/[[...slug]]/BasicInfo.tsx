@@ -11,7 +11,7 @@ import {
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { countriesWithCode } from "@/lib/countries-codes-flags";
 
-const SUPPORTED_ISO_CODES = new Set(["NG", "GB", "FR", "DE", "IT", "ES", "BJ", "ML", "TG", "CI", "US"]);
+export const SUPPORTED_ISO_CODES = new Set(["NG", "GB", "FR", "DE", "IT", "ES", "BJ", "ML", "TG", "CI", "US"]);
 
 // Derive country options from the existing dial-code list (flag emoji encodes ISO-2 code)
 const COUNTRY_OPTIONS = (() => {

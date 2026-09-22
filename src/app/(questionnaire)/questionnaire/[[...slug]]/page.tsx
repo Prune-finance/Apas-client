@@ -13,7 +13,7 @@ import Services from "./Services";
 import { QuestionnaireNav } from "./QuestionnaireNav";
 import OperationsAccount from "./OperationsAccount";
 import VirtualAccount from "./VirtualAccount";
-import BasicInfo from "./BasicInfo";
+import BasicInfo, { SUPPORTED_ISO_CODES } from "./BasicInfo";
 import ConsentModal from "./ConsentModal";
 import ContactEntry from "./ContactEntry";
 
@@ -457,7 +457,13 @@ export default function Questionnaire() {
         <QuestionnaireNav
           onNext={handleNext}
           loading={saving}
-          disabled={savingDraft || (active === 2 && form.values.services.length === 0)}
+          disabled={
+            savingDraft ||
+            (active === 2 && form.values.services.length === 0) ||
+            (active === 0 &&
+              Boolean(form.values.businessCountry) &&
+              !SUPPORTED_ISO_CODES.has(form.values.businessCountry.toUpperCase()))
+          }
           onPrevious={goPrev}
           nextText={active === 4 ? "Submit" : "Save & Continue"}
         />

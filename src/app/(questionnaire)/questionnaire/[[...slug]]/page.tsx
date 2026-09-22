@@ -172,7 +172,25 @@ export default function Questionnaire() {
                 currencies: service.currencies,
               }))
             : questionnaireValues.services,
-          virtualAccounts: a.virtualAccounts ?? questionnaireValues.virtualAccounts,
+          virtualAccounts: a.virtualAccounts
+            ? {
+                day_one_requirement: a.virtualAccounts.dayOneAccounts ?? "",
+                total_number_of_virtual_accounts: a.virtualAccounts.fullCapacityAccounts ?? "",
+                max_value_per_transaction: {
+                  daily: a.virtualAccounts.singleAccountMaxDaily ?? "",
+                  monthly: a.virtualAccounts.singleAccountMaxMonthly ?? "",
+                  annually: a.virtualAccounts.singleAccountMaxAnnually ?? "",
+                },
+                max_value_all_virtual_accounts: {
+                  daily: a.virtualAccounts.allAccountsMaxDaily ?? "",
+                  monthly: a.virtualAccounts.allAccountsMaxMonthly ?? "",
+                  annually: a.virtualAccounts.allAccountsMaxAnnually ?? "",
+                },
+                total_highest_transaction_count: {
+                  daily: a.virtualAccounts.highestTransactionCount ?? "",
+                },
+              }
+            : questionnaireValues.virtualAccounts,
           operationsAccounts: a.operationsBalance
             ? { estimated_balance: String(a.operationsBalance) }
             : questionnaireValues.operationsAccounts,

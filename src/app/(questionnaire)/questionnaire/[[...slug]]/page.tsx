@@ -43,6 +43,7 @@ const STEP_TITLES: Record<number, string> = {
   0: "Tell Us About Your Business.",
   2: "What service(s) is this Entity interested in?",
   3: "Virtual Accounts Service",
+  4: "Operations Account",
 };
 const questAxios = createAxiosInstance("questionnaire");
 

@@ -1,4 +1,4 @@
-import { Box, RadioGroup, Stack, Text } from "@mantine/core";
+import { Box, RadioGroup, Stack } from "@mantine/core";
 import { useEffect, useState } from "react";
 import CustomRadio from "@/ui/components/CustomRadio";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
@@ -25,10 +25,6 @@ export default function OperationsAccount() {
 
   return (
     <Box>
-      <Text c="var(--prune-text-gray-700)" fw={700} fz={24} mb={32}>
-        Operations Account
-      </Text>
-
       <RadioGroup
         name="operations-account-balance"
         label="Please indicate the estimated balance(s) you will hold in the operating account(s)"

@@ -100,7 +100,7 @@ export default function VirtualAccount() {
             allowDecimal={false}
             allowNegative={false}
             min={1}
-            max={Number.MAX_SAFE_INTEGER}
+            max={1_000_000_000}
             onKeyDown={digitsOnly}
             {...form.getInputProps("virtualAccounts.total_highest_transaction_count.daily")}
             key={form.key("virtualAccounts.total_highest_transaction_count.daily")}

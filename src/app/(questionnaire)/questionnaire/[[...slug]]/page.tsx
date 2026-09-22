@@ -336,6 +336,13 @@ export default function Questionnaire() {
     pushStepToURL(nextStep);
   };
 
+  const goPrev = () => {
+    if (active === 0) return;
+    const prevStep = active === 4 && !hasVirtualAccount ? 2 : Math.max(active - 1, 0);
+    setActive(prevStep);
+    pushStepToURL(prevStep);
+  };
+
   // Save with validation — POST /sections/{n}/complete
   const handleNext = async () => {
     if (form.validate().hasErrors) return;
@@ -451,7 +458,7 @@ export default function Questionnaire() {
           onNext={handleNext}
           loading={saving}
           disabled={savingDraft || (active === 2 && form.values.services.length === 0)}
-          onPrevious={() => router.back()}
+          onPrevious={goPrev}
           nextText={active === 4 ? "Submit" : "Save & Continue"}
         />
       </Box>

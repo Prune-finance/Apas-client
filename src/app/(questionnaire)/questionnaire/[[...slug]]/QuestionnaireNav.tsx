@@ -36,7 +36,7 @@ export function QuestionnaireNav({
           fullWidth
           fw={600}
           action={onPrevious}
-          disabled={disabled || loading}
+          disabled={loading}
         />
       )}
     </Flex>

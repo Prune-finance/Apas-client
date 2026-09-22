@@ -11,21 +11,30 @@ import {
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { countriesWithCode } from "@/lib/countries-codes-flags";
 
+const SUPPORTED_ISO_CODES = new Set(["NG", "GB", "FR", "DE", "IT", "ES", "BJ", "ML", "TG", "CI", "US"]);
+
 // Derive country options from the existing dial-code list (flag emoji encodes ISO-2 code)
-const COUNTRY_OPTIONS = countriesWithCode
-  .map((c) => {
-    const parts = c.label.split(" ");
-    const emoji = parts[0];
-    const name = parts.slice(1).join(" ");
-    const a = emoji.codePointAt(0);
-    const b = emoji.codePointAt(2);
-    if (a === undefined || b === undefined) return null;
-    const iso = String.fromCharCode(65 + (a - 0x1f1e6), 65 + (b - 0x1f1e6));
-    if (iso.length !== 2) return null;
-    return { value: iso, label: name };
-  })
-  .filter((c): c is { value: string; label: string } => c !== null)
-  .sort((a, b) => a.label.localeCompare(b.label));
+const COUNTRY_OPTIONS = (() => {
+  const seen = new Set<string>();
+  return countriesWithCode
+    .map((c) => {
+      const parts = c.label.split(" ");
+      const emoji = parts[0];
+      const name = parts.slice(1).join(" ");
+      const a = emoji.codePointAt(0);
+      const b = emoji.codePointAt(2);
+      if (a === undefined || b === undefined) return null;
+      const iso = String.fromCharCode(65 + (a - 0x1f1e6), 65 + (b - 0x1f1e6));
+      if (iso.length !== 2) return null;
+      return { value: iso, label: name };
+    })
+    .filter((c): c is { value: string; label: string } => {
+      if (c === null || seen.has(c.value)) return false;
+      seen.add(c.value);
+      return true;
+    })
+    .sort((a, b) => a.label.localeCompare(b.label));
+})();
 
 const INDUSTRY_OPTIONS = [
   "Financial Services / FinTech",
@@ -72,6 +81,10 @@ const INDUSTRY_OPTIONS = [
 
 export default function BasicInfo() {
   const form = useQuestionnaireFormContext();
+
+  const countryValue = form.values.businessCountry;
+  const countryNotSupported =
+    Boolean(countryValue) && !SUPPORTED_ISO_CODES.has(countryValue.toUpperCase());
 
   // When the selected country changes, sync the phone dial code
   useEffect(() => {
@@ -127,6 +140,11 @@ export default function BasicInfo() {
           {...form.getInputProps("businessCountry")}
           key={form.key("businessCountry")}
           withAsterisk
+          error={
+            countryNotSupported
+              ? "We currently only support: Nigeria, United Kingdom, France, Germany, Italy, Spain, Benin, Mali, Togo, Côte d'Ivoire, United States of America."
+              : form.errors.businessCountry
+          }
         />
       </Flex>
 

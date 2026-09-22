@@ -15,12 +15,13 @@ import {
   TextareaProps,
   TextInput,
   TextInputProps,
+  Tooltip,
   UnstyledButton,
   useCombobox,
 } from "@mantine/core";
 import { useState } from "react";
 import { UseFormReturnType } from "@mantine/form";
-import { IconChevronDown } from "@tabler/icons-react";
+import { IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
 import classes from "./quest-input.module.scss";
 import { countriesWithCode } from "@/lib/countries-codes-flags";
 
@@ -91,7 +92,9 @@ export const QuestInput = ({
 
 // ─── QuestSelect ───────────────────────────────────────────────────────────
 
-interface QuestSelectProps extends SelectProps {}
+interface QuestSelectProps extends SelectProps {
+  tooltip?: string;
+}
 
 export const QuestSelect = ({
   label,
@@ -100,6 +103,7 @@ export const QuestSelect = ({
   onBlur,
   leftSection,
   leftSectionWidth,
+  tooltip,
   ...props
 }: QuestSelectProps) => {
   const [focused, setFocused] = useState(false);
@@ -107,9 +111,18 @@ export const QuestSelect = ({
   const hasIcon = Boolean(leftSection);
   const leftPad = leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : rem(12));
 
+  const labelNode = tooltip ? (
+    <Flex align="center" gap={4} component="span">
+      <span>{label}</span>
+      <Tooltip label={tooltip} multiline maw={260} withArrow position="top">
+        <IconInfoCircle size={14} style={{ color: "#667085", cursor: "pointer", flexShrink: 0 }} />
+      </Tooltip>
+    </Flex>
+  ) : label;
+
   return (
     <Select
-      label={label}
+      label={labelNode}
       placeholder={typeof label === "string" ? label : undefined}
       value={value}
       leftSection={leftSection}

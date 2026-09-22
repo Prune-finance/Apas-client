@@ -142,7 +142,7 @@ export const SecondaryBtn = ({
       color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
       variant="outline"
-      fz={12}
+      fz={14}
       fw={600}
       leftSection={Icon && <Icon size={14} />}
       component={Link}
@@ -160,7 +160,7 @@ export const SecondaryBtn = ({
       color="var(--prune-primary-600)"
       c="var(--prune-text-gray-800)"
       variant="outline"
-      fz={12}
+      fz={14}
       fw={600}
       leftSection={Icon && <Icon size={14} />}
       onClick={(e) => {

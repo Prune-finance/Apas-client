@@ -1,4 +1,5 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import requestReceived from "@/assets/request-recieved.gif";
 import { Flex, Modal, Stack, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 
@@ -22,14 +23,14 @@ export default function ConfirmationModal({
         close();
       }}
       withCloseButton={false}
-      size="xl"
+      size="lg"
       padding={32}
       centered
     >
       <Stack gap={24} align="center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/request-recieved.gif"
+          src={requestReceived.src}
           alt="Request received"
           style={{ width: 200, height: 160, objectFit: "contain" }}
         />

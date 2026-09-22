@@ -16,13 +16,25 @@ export const ServicesSchema = z
   )
   .min(1, "Select at least one service");
 
-const positiveIntegerSchema = (fieldName: string) =>
+const MAX_SAFE = Number.MAX_SAFE_INTEGER;
+
+const positiveIntegerSchema = (fieldName: string, max = MAX_SAFE) =>
   z.union([
     z.string().min(1, `${fieldName} is required`),
     z
       .number({ invalid_type_error: `${fieldName} must be a number` })
       .positive(`${fieldName} must be a positive number`)
-      .int(`${fieldName} must be an integer`),
+      .int(`${fieldName} must be an integer`)
+      .max(max, `${fieldName} must be ${max.toLocaleString()} or less`),
+  ]);
+
+const positiveNumberSchema = (fieldName: string, max = MAX_SAFE) =>
+  z.union([
+    z.string().min(1, `${fieldName} is required`),
+    z
+      .number({ invalid_type_error: `${fieldName} must be a number` })
+      .positive(`${fieldName} must be a positive number`)
+      .max(max, `${fieldName} must be ${max.toLocaleString()} or less`),
   ]);
 
 const validatePeriodOrder = (
@@ -62,26 +74,26 @@ export const VirtualAccountSchema = z
     ),
     max_value_per_transaction: z
       .object({
-        daily: positiveIntegerSchema(
+        daily: positiveNumberSchema(
           "Daily maximum transaction value for single virtual account"
         ),
-        monthly: positiveIntegerSchema(
+        monthly: positiveNumberSchema(
           "Monthly maximum transaction value for single virtual account"
         ),
-        annually: positiveIntegerSchema(
+        annually: positiveNumberSchema(
           "Annual maximum transaction value for single virtual account"
         ),
       })
       .superRefine(validatePeriodOrder),
     max_value_all_virtual_accounts: z
       .object({
-        daily: positiveIntegerSchema(
+        daily: positiveNumberSchema(
           "Daily maximum transaction value for all virtual accounts"
         ),
-        monthly: positiveIntegerSchema(
+        monthly: positiveNumberSchema(
           "Monthly maximum transaction value for all virtual accounts"
         ),
-        annually: positiveIntegerSchema(
+        annually: positiveNumberSchema(
           "Annual maximum transaction value for all virtual accounts"
         ),
       })

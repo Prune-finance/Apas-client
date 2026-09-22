@@ -28,6 +28,7 @@ export default function VirtualAccount() {
           allowDecimal={false}
           allowNegative={false}
           min={1}
+          max={Number.MAX_SAFE_INTEGER}
           onKeyDown={digitsOnly}
           {...form.getInputProps("virtualAccounts.day_one_requirement")}
           key={form.key("virtualAccounts.day_one_requirement")}
@@ -38,6 +39,7 @@ export default function VirtualAccount() {
           allowDecimal={false}
           allowNegative={false}
           min={1}
+          max={Number.MAX_SAFE_INTEGER}
           onKeyDown={digitsOnly}
           {...form.getInputProps("virtualAccounts.total_number_of_virtual_accounts")}
           key={form.key("virtualAccounts.total_number_of_virtual_accounts")}
@@ -65,6 +67,9 @@ export default function VirtualAccount() {
                     label="Amount"
                     w="100%"
                     className="Switzer"
+                    allowNegative={false}
+                    min={1}
+                    max={Number.MAX_SAFE_INTEGER}
                     {...form.getInputProps(
                       `virtualAccounts.${
                         idx === 0
@@ -95,6 +100,7 @@ export default function VirtualAccount() {
             allowDecimal={false}
             allowNegative={false}
             min={1}
+            max={Number.MAX_SAFE_INTEGER}
             onKeyDown={digitsOnly}
             {...form.getInputProps("virtualAccounts.total_highest_transaction_count.daily")}
             key={form.key("virtualAccounts.total_highest_transaction_count.daily")}

@@ -9,7 +9,7 @@ import InfoCards from "../../Cards/InfoCards";
 import EmptyTable from "../../EmptyTable";
 import { SearchInput, SelectBox, TextBox } from "../../Inputs";
 import { TableComponent } from "../../Table";
-import { TransactionType } from "@/lib/hooks/transactions";
+import { exportAdminIssuedAccountTransactions, TransactionType } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -107,6 +107,7 @@ export const Transactions = ({
   const { status, createdAt, senderName, recipientName, recipientIban, type: txType } = form.values;
 
   const isAdminLocation = location?.startsWith("admin") || location?.endsWith("business-account");
+  const isIssuedAccount = location?.includes("admin/businesses/accounts");
 
   const handleExportTransactions = async () => {
     if (!accountID) return;
@@ -127,7 +128,9 @@ export const Transactions = ({
       ...(currencyType && { currencyCode: currencyType }),
     };
     try {
-      if (isAdminLocation && payout) {
+      if (isAdminLocation && isIssuedAccount) {
+        await exportAdminIssuedAccountTransactions(accountID, exportParams);
+      } else if (isAdminLocation && payout) {
         await exportAdminPayoutAccountTransactions(accountID, exportParams);
       } else if (isAdminLocation) {
         await exportAdminSingleAccountTransactions(accountID, exportParams);

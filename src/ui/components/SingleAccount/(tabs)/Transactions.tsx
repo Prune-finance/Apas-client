@@ -107,7 +107,7 @@ export const Transactions = ({
   const { status, createdAt, senderName, recipientName, recipientIban, type: txType } = form.values;
 
   const isAdminLocation = location?.startsWith("admin") || location?.endsWith("business-account");
-  const isIssuedAccount = location?.includes("admin/businesses/accounts");
+  const isIssuedAccount = location?.includes("issued-account");
   console.log({ isAdminLocation, isIssuedAccount, location });
 
   const handleExportTransactions = async () => {
@@ -129,7 +129,7 @@ export const Transactions = ({
       ...(currencyType && { currencyCode: currencyType }),
     };
     try {
-      if (isAdminLocation && isIssuedAccount) {
+      if (isIssuedAccount) {
         await exportAdminIssuedAccountTransactions(accountID, exportParams);
       } else if (isAdminLocation && payout) {
         await exportAdminPayoutAccountTransactions(accountID, exportParams);

@@ -83,13 +83,16 @@ export function useSingleTransactions(
   const [transaction, setTransaction] = useState<TransactionType | null>(null);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
+  console.log("Custom params for single transaction:", customParams);
 
   async function fetchTrx() {
+    console.log("Fetching single transaction with ID:", id);
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.currency && { currency: customParams.currency }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -97,7 +100,7 @@ export function useSingleTransactions(
       setLoading(true);
       // const path = id ? `${id}/transactions` : "transactions";
 
-      const { data } = await axios.get(`/admin/transactions/${id}/data`, {
+      const { data } = await axios.get(`/accounts/transactions/${id}/data`, {
         params,
       });
 

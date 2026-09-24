@@ -445,6 +445,7 @@ export function useSingleUserAccountByIBAN(iban: string, currencyCode?: string) 
     if (!iban) return;
     setLoading(true);
     try {
+      console.log("Fetching single user account by IBAN:", iban);
       const { data } = await axios.get(`/accounts/number/${iban}`, {
         params: currencyCode ? { currencyCode } : undefined,
       });

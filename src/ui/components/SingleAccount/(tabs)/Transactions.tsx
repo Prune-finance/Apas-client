@@ -208,7 +208,7 @@ export const Transactions = ({
     const urlMap: { [key: string]: string } = {
       payout: `${baseUrl}/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "admin-account": `${baseUrl}/admin/accounts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
-      "issued_account": `${baseUrl}/admin/accounts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "issued_account": `${baseUrl}/accounts/${accountID}/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,

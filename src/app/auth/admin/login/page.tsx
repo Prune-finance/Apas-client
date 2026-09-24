@@ -61,7 +61,7 @@ async function Login() {
         <Image width={29} height={29} src={PruneIcon} alt="prune icon" />
 
         <Title order={2} className={styles.paper__header}>
-          LOG IN
+          Login
         </Title>
 
         <Text className={styles.paper__text}>

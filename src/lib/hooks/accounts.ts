@@ -442,7 +442,10 @@ export function useSingleUserAccountByIBAN(iban: string, currencyCode?: string) 
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
-    if (!iban) return;
+    if (!iban) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       console.log("Fetching single user account by IBAN:", iban);

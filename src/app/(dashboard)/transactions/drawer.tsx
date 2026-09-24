@@ -61,7 +61,7 @@ export const TransactionDrawer = ({
   // } = useSingleCompanyTransactions(selectedRequest?.id ?? "");
 
   const { account: senderAccount, loading: loadingSenderAcct } =
-    useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
+    useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? selectedRequest?.senderAccountNumber ?? "");
 
   const { details } = useReceipt({
     selectedRequest,

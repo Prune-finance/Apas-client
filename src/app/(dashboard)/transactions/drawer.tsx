@@ -49,7 +49,7 @@ export const TransactionDrawer = ({
   const pdfRef = useRef<HTMLDivElement>(null);
   console.log("Selected request:", selectedRequest);
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
-    selectedRequest?.id ?? "",
+    selectedRequest?.accessId ?? "",
     {currency: selectedRequest?.currencyType}
   );
 

@@ -108,6 +108,7 @@ export const Transactions = ({
 
   const isAdminLocation = location?.startsWith("admin") || location?.endsWith("business-account");
   const isIssuedAccount = location?.includes("admin/businesses/accounts");
+  console.log({ isAdminLocation, isIssuedAccount, location });
 
   const handleExportTransactions = async () => {
     if (!accountID) return;

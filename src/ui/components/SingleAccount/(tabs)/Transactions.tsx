@@ -405,6 +405,7 @@ export const Transactions = ({
       {!payout && (
         <TransactionDrawer
           opened={opened}
+          currency={currencyType ?? data?.currencyType ?? "EUR"}
           close={close}
           selectedRequest={data}
         />

@@ -1154,6 +1154,7 @@ export interface TransactionType {
   currencyType: string;
   currency?: string;
   senderName: string;
+  senderAccountIban: string;
   senderBic: string;
   recipientIban: string;
   recipientBic: string;

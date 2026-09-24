@@ -39,10 +39,12 @@ interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
   close: () => void;
   opened: boolean;
+  currency: string;
 }
 
 export const TransactionDrawer = ({
   selectedRequest,
+  currency,
   close,
   opened,
 }: TransactionDrawerProps) => {
@@ -50,7 +52,7 @@ export const TransactionDrawer = ({
   console.log("Selected request:", selectedRequest);
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.accessId ?? "",
-    {currency: selectedRequest?.currencyType}
+    {currency: currency}
   );
 
   const { clearData } = Transaction();
@@ -133,7 +135,7 @@ export const TransactionDrawer = ({
           "Account Iban": selectedRequest?.senderIban ?? "N/A"
         }
       : {
-          IBAN: selectedRequest?.senderIban,
+          IBAN: selectedRequest?.senderAccountIban ?? selectedRequest?.senderIban,
           BIC: selectedRequest?.senderBic || "ARPYGB21",
         }),
     Bank:
@@ -198,7 +200,7 @@ export const TransactionDrawer = ({
                 {formatNumber(
                   selectedRequest?.amount || 0,
                   true,
-                  selectedRequest?.currencyType ?? "EUR"
+                  currency ?? selectedRequest?.currencyType ?? "EUR"
                 )}
               </Text>
             </Flex>

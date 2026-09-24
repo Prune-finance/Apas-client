@@ -658,6 +658,7 @@ export default function Home() {
 
       {selectedTrxData && (
         <TransactionDrawer
+          currency={selectedTrxData?.currencyType ?? "EUR"}
           opened={openedDrawer}
           close={close}
           selectedRequest={selectedTrxData}

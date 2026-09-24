@@ -116,7 +116,7 @@ function Account() {
   const trxMeta = isPayout ? payoutTrxMeta : companyTrxMeta;
   const revalidateTrx = isPayout ? revalidatePayoutTrx : revalidateCompanyTrx;
 
-  const location = `${currencyCode || accountType || "ghs"}-business-account`.toLowerCase();
+  const location = `${accountType?.toLowerCase() || `${currencyCode ?? "ghs"}-business-account`.toLowerCase()}`;
 
   return (
     <main className={styles.main}>

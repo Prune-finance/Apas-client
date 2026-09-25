@@ -89,7 +89,7 @@ export interface OnboardingBusiness {
   documentData: Record<string, boolean>;
   documents: Document[];
   onboardingStatus: "PENDING" | "PROCESSING" | "COMPLETED";
-  questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED" | "ONBOARDING_INVITED";
+  questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED" | "ONBOARDING_INVITED" | "NOT_ELIGIBLE";
   processStatus: STAGE;
   decision?: { decidedAt: string; decidedBy: { id: string; email: string }; reason: string | null } | null;
   hasActualBusinessAccount: boolean;

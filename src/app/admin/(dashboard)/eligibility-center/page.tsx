@@ -39,6 +39,7 @@ const statusToStage: Record<string, STAGE> = {
   IN_PROGRESS: "In Progress",
   ONBOARDING_INVITED: "Onboarding Invited",
   SUBMITTED: "Submitted",
+  NOT_ELIGIBLE: "REJECTED",
 };
 
 const SERVICE_LABELS: Record<string, string> = {

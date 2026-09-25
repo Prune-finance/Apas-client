@@ -101,11 +101,11 @@ export const stageColor = (stage: STAGE) => {
     case "ACTIVATION":
       return "#FFA940";
     case "REJECTED":
-      return "var(--prune-text-gray-500)";
+      return "#DB340B";
     case "COMPLETED":
       return "#12B76A";
     case "In Progress":
-      return "#DB340B";
+      return "#FFC107";
     case "Onboarding Invited":
       return "var(--prune-primary-700)";
     case "Submitted":

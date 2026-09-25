@@ -21,6 +21,7 @@ const questionnaireStatusLabels: Record<string, string> = {
   IN_PROGRESS: "In Progress",
   ONBOARDING_INVITED: "Onboarding Invited",
   SUBMITTED: "Submitted",
+  NOT_ELIGIBLE: "REJECTED",
 };
 
 export default function ProfileHeader({
@@ -385,6 +386,7 @@ const RejectQuestionnaireModal = ({
         <Textarea
           label="Reason"
           placeholder="Enter rejection reason"
+          required
           value={reason}
           onChange={(e) => setReason(e.currentTarget.value)}
           minRows={4}
@@ -403,6 +405,7 @@ const RejectQuestionnaireModal = ({
             fw={600}
             action={action}
             loading={loading}
+            disabled={!reason.trim()}
           />
         </Flex>
       </Stack>

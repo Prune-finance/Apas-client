@@ -47,15 +47,26 @@ export default function CompanyProfile({
 }: ComponentProps) {
   const [rows, setRows] = useState([1]);
 
+  const isRejected = data?.questionnaireStatus === "NOT_ELIGIBLE";
+
   const summaryData: Record<string, string> = {
     "Application submitted": data?.createdAt
       ? dayjs(data?.createdAt).format("DD-MM-YYYY")
       : "",
     ...(data?.decision?.decidedAt
-      ? { "Onboarding link sent at": dayjs(data.decision.decidedAt).format("DD-MM-YYYY") }
+      ? {
+          [isRejected ? "Rejected at" : "Onboarding link sent at"]:
+            dayjs(data.decision.decidedAt).format("DD-MM-YYYY"),
+        }
       : {}),
     ...(data?.decision?.decidedBy?.email
-      ? { "Onboarding link sent by": data.decision.decidedBy.email }
+      ? {
+          [isRejected ? "Rejected by" : "Onboarding link sent by"]:
+            data.decision.decidedBy.email,
+        }
+      : {}),
+    ...(isRejected && data?.decision?.reason
+      ? { "Rejection reason": data.decision.reason }
       : {}),
   };
   return (

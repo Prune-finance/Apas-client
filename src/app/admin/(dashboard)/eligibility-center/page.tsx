@@ -186,11 +186,11 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
         <TableTd>
           <Stack gap={2}>
             <Text fw={500} fz={14} c="var(--prune-text-gray-700)" tt="capitalize">
-              {row.answers?.legalBusinessName ?? "—"}
+              {row.answers?.legalBusinessName ?? ""}
             </Text>
             {row.contactEmail && (
               <Text fz={12} c="var(--prune-text-gray-500)">
-                {row.contactEmail ?? "—"}
+                {row.contactEmail ?? ""}
               </Text>
             )}
           </Stack>
@@ -200,7 +200,7 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
           <Group gap={8} wrap="nowrap">
             <CountryFlag code={countryCode} size={20} />
             <Text fz={14} c="var(--prune-text-gray-700)">
-              {countryCode || "—"}
+              {countryCode || ""}
             </Text>
           </Group>
         </TableTd>
@@ -225,7 +225,7 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
                     {SERVICE_LABELS[s.name] ?? s.name}
                   </Text>
                 ))
-              : <Text fz={14} c="var(--prune-text-gray-400)">—</Text>}
+              : <Text fz={12} c="var(--prune-text-gray-400)">Not available yet</Text>}
           </Group>
         </TableTd>
         <TableTd>

@@ -18,6 +18,12 @@ interface ProfileHeaderProps {
   loading: boolean;
   revalidate: () => Promise<void>;
 }
+const questionnaireStatusLabels: Record<string, string> = {
+  IN_PROGRESS: "In Progress",
+  ONBOARDING_INVITED: "Onboarding Invited",
+  SUBMITTED: "Submitted",
+};
+
 export default function ProfileHeader({
   data,
   loading,
@@ -189,9 +195,12 @@ export default function ProfileHeader({
 
         <Skeleton loading={loading} w={150}>
           <BadgeComponent
-            status={data?.processStatus || "QUESTIONNAIRE"}
+            status={
+              questionnaireStatusLabels[data?.questionnaireStatus ?? ""] ??
+              data?.processStatus ??
+              "QUESTIONNAIRE"
+            }
             stage
-            // variant="dot"
             w={150}
           />
         </Skeleton>

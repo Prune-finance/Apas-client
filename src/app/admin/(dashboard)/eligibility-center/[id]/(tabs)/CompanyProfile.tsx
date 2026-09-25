@@ -354,51 +354,48 @@ const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
       .catch(() => {});
   }, []);
 
-  const hasServices =
-    Array.isArray(data?.services) &&
-    data.services.length > 0 &&
-    Object.keys(data.services[0]).length > 0;
-
-  if (!hasServices) return null;
+  if (refServices.length === 0) return null;
 
   return (
     <PaperContainer title="Services" mt={20}>
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={24}>
-        {(data?.services ?? []).map((pickedService) => {
-          const refService = refServices.find(
-            (r) => r.value === pickedService.name
+        {refServices.map((refService) => {
+          const pickedService = data?.services?.find(
+            (s) => s.name === refService.value
           );
+          const isServiceActive = !!pickedService;
+
           return (
-            <Stack key={pickedService.name}>
+            <Stack key={refService.value} style={{ opacity: isServiceActive ? 1 : 0.4 }}>
               <Checkbox
-                label={refService?.label ?? pickedService.name}
-                checked
+                label={refService.label}
+                checked={isServiceActive}
                 onChange={() => {}}
                 color="var(--prune-primary-500)"
                 iconColor="var(--prune-text-gray-700)"
               />
-              {pickedService.currencies.length > 0 && (
-                <>
-                  <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
-                    Currencies:
-                  </Text>
-                  <Stack gap={8}>
-                    {pickedService.currencies.map((currencyCode) => {
-                      const currencyLabel =
-                        refCurrencies.find((c) => c.value === currencyCode)
-                          ?.label ?? currencyCode;
-                      return (
-                        <Group key={currencyCode} gap={8}>
-                          <CountryFlag code={currencyCode} size={16} />
-                          <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
-                            {currencyLabel}
-                          </Text>
-                        </Group>
-                      );
-                    })}
-                  </Stack>
-                </>
-              )}
+              <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+                Currencies:
+              </Text>
+              <Stack gap={8}>
+                {refCurrencies.map((refCurrency) => {
+                  const isCurrencyActive =
+                    isServiceActive &&
+                    !!pickedService?.currencies.includes(refCurrency.value);
+                  return (
+                    <Group
+                      key={refCurrency.value}
+                      gap={8}
+                      style={{ opacity: isCurrencyActive ? 1 : 0.4 }}
+                    >
+                      <CountryFlag code={refCurrency.value} size={16} />
+                      <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
+                        {refCurrency.label}
+                      </Text>
+                    </Group>
+                  );
+                })}
+              </Stack>
             </Stack>
           );
         })}

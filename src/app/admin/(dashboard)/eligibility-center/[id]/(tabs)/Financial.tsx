@@ -5,12 +5,19 @@ import {
   ProfileTextInput,
 } from "@/ui/components/InputWithLabel";
 import { formatNumber } from "@/lib/utils";
-import { operationsAccountEstimatedBalance } from "@/lib/static";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PanelWrapper } from "./utils";
 import { OnboardingBusiness } from "@/lib/interface";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
+import createAxiosInstance from "@/lib/axios";
+
+const questAxios = createAxiosInstance("questionnaire");
+
+interface MonetaryBand {
+  value: string;
+  label: string;
+}
 
 interface ComponentProps {
   data: OnboardingBusiness | null;
@@ -19,6 +26,19 @@ interface ComponentProps {
 }
 
 export default function Financial({ data, loading, form }: ComponentProps) {
+  const [monetaryBands, setMonetaryBands] = useState<MonetaryBand[]>([]);
+
+  useEffect(() => {
+    questAxios
+      .get("/business/questionnaire/reference-data", {
+        params: { include: "monetaryBands" },
+      })
+      .then(({ data: res }) => {
+        setMonetaryBands(res.data?.monetaryBands ?? []);
+      })
+      .catch(() => {});
+  }, []);
+
   const boldLabel = (boldText: string, normalText: string) => (
     <Text inherit span>
       <Text inherit span fw={700}>
@@ -144,15 +164,13 @@ export default function Financial({ data, loading, form }: ComponentProps) {
 
       <PaperContainer title="Operations Account Service">
         <Radio.Group
-          value={data?.operationsAccounts?.estimated_balance}
+          value={data?.operationsAccounts?.estimated_balance ?? ""}
           onChange={() => {}}
         >
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-            {Object.entries(operationsAccountEstimatedBalance).map(
-              ([value, label], idx) => (
-                <CustomRadioCard label={label} value={value} key={idx} />
-              )
-            )}
+            {monetaryBands.map(({ value, label }) => (
+              <CustomRadioCard label={label} value={value} key={value} />
+            ))}
           </SimpleGrid>
         </Radio.Group>
       </PaperContainer>

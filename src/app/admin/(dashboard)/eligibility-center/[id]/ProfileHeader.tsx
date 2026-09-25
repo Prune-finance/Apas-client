@@ -34,6 +34,7 @@ export default function ProfileHeader({
   const [openedRejectQuestionnaire, { open: openRejectQuestionnaire, close: closeRejectQuestionnaire }] = useDisclosure(false);
   const [rejectReason, setRejectReason] = useState("");
   const [loadingRejectQuestionnaire, setLoadingRejectQuestionnaire] = useState(false);
+  const [loadingResendInvitation, setLoadingResendInvitation] = useState(false);
   const [loadingLink, setLoadingLink] = useState(false);
   const [loadingProfileApproval, setLoadingProfileApproval] = useState(false);
   const [loadingProfileRejection, setLoadingProfileRejection] = useState(false);
@@ -66,6 +67,21 @@ export default function ProfileHeader({
       return handleError("An Error occurred", parseError(error));
     } finally {
       setLoadingLink(false);
+    }
+  };
+
+  const handleResendInvitation = async () => {
+    setLoadingResendInvitation(true);
+    try {
+      await questAxios.post(
+        `/business/questionnaire/admin/${data?.id}/onboarding-link/resend`
+      );
+      handleSuccess("Invitation Resent", `Onboarding link resent to ${data?.contactPersonEmail}`);
+      await revalidate();
+    } catch (error) {
+      handleError("An Error occurred", parseError(error));
+    } finally {
+      setLoadingResendInvitation(false);
     }
   };
 
@@ -272,6 +288,14 @@ export default function ProfileHeader({
             fw={600}
             action={() => handleSendingLink("questionnaire")}
             loading={loadingLink}
+          />
+        )}
+        {data?.questionnaireStatus === "ONBOARDING_INVITED" && (
+          <PrimaryBtn
+            text="Resend Invitation"
+            fw={600}
+            action={handleResendInvitation}
+            loading={loadingResendInvitation}
           />
         )}
         {data?.questionnaireStatus === "SUBMITTED" && (

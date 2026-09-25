@@ -185,7 +185,7 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
       >
         <TableTd>
           <Stack gap={2}>
-            <Text fw={500} fz={14} c="var(--prune-text-gray-700)">
+            <Text fw={500} fz={14} c="var(--prune-text-gray-700)" tt="capitalize">
               {row.answers?.legalBusinessName ?? "—"}
             </Text>
             {row.contactEmail && (

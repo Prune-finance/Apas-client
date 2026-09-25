@@ -137,51 +137,24 @@ const ContactPerson = ({
   const { handleSuccess } = useNotification();
 
   console.log(form.values);
-  const { queryFn, loading } = useAxios({
-    baseURL: "auth",
-    endpoint: `/admin/onboardings/${data?.id}/update-contact-person`,
-    method: "PATCH",
-    body: {
-      contactPersonFirstName: form.values.contactPersonFirstName,
-      contactPersonLastName: form.values.contactPersonLastName,
-      contactPersonEmail: form.values.contactPersonEmail,
-      contactPersonPhoneNumber: form.values.contactPersonPhoneNumber,
-      contactPersonPOAType: form.values.contactPersonPOAType,
-      contactPersonPOAUrl: form.values.contactPersonPOAUrl,
-      contactPersonIdType: form.values.contactPersonIdType,
-      contactPersonIdUrl: form.values.contactPersonIdUrl,
-      ...(form.values.contactPersonIdUrlBack
-        ? { contactPersonIdUrlBack: form.values.contactPersonIdUrlBack }
-        : {}),
-    },
-    onSuccess: () => {
-      handleSuccess(
-        "Contact Person Updated",
-        "Contact Person updated successfully"
-      );
-      revalidate && revalidate();
-      setEditing(false);
-    },
-  });
 
-  const actionNode = (
-    <Group gap={10}>
-      <SecondaryBtn
-        fz={12}
-        fw={600}
-        text={editing ? "Update" : "Edit"}
-        action={() => (editing ? queryFn() : setEditing((prev) => !prev))}
-        loading={loading}
-        leftSection={<IconPencilMinus size={16} />}
-      />
-      <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
-    </Group>
-  );
+  // const actionNode = (
+  //   <Group gap={10}>
+  //     <SecondaryBtn
+  //       fz={12}
+  //       fw={600}
+  //       text={editing ? "Update" : "Edit"}
+  //       action={() => (editing ? queryFn() : setEditing((prev) => !prev))}
+  //       loading={loading}
+  //       leftSection={<IconPencilMinus size={16} />}
+  //     />
+  //     <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
+  //   </Group>
+  // );
 
   return (
     <PaperContainer
       title="Contact Person Information"
-      actionNode={actionNode}
       mt={20}
     >
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>

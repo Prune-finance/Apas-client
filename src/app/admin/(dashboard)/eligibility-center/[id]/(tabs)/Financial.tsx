@@ -52,8 +52,9 @@ export default function Financial({ data, loading, form }: ComponentProps) {
     <PanelWrapper
       loading={loading}
       rows={
-        data?.questionnaireStatus === "SUBMITTED" ||
-        data?.questionnaireStatus === "APPROVED"
+        ["SUBMITTED", "APPROVED", "ONBOARDING_INVITED"].includes(
+          data?.questionnaireStatus ?? ""
+        )
           ? [1]
           : []
       }

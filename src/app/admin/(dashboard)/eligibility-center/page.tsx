@@ -206,26 +206,7 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
         </TableTd>
         <TableTd>
           <Group gap={4} wrap="wrap">
-            {row.answers?.services?.length
-              ? row.answers.services.map((s) => (
-                  <Text
-                    key={s.name}
-                    fz={12}
-                    fw={500}
-                    px={8}
-                    py={4}
-                    c="var(--prune-text-gray-600)"
-                    style={{
-                      background: "var(--prune-text-gray-50, #f9fafb)",
-                      borderRadius: 999,
-                      border: "1px solid var(--prune-text-gray-200, #eaecf0)",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {SERVICE_LABELS[s.name] ?? s.name}
-                  </Text>
-                ))
-              : <Text fz={12} c="var(--prune-text-gray-400)">Not available yet</Text>}
+            <Text fz={12} c="var(--prune-text-gray-400)">Not available yet</Text>
           </Group>
         </TableTd>
         <TableTd>

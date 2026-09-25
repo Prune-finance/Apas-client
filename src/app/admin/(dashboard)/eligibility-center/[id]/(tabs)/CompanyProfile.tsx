@@ -20,7 +20,6 @@ import { DocumentPreview } from "@/app/(onboarding)/onboarding/DocumentPreview";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { PanelWrapper } from "./utils";
 import { IconPencilMinus } from "@tabler/icons-react";
-import { serviceCategories } from "@/lib/static";
 import CountryFlag from "@/ui/components/CountryFlag";
 
 import Skeleton from "../Skeleton";
@@ -29,6 +28,9 @@ import { OnboardingType } from "@/lib/schema";
 import { OnboardingBusiness } from "@/lib/interface";
 import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";
+import createAxiosInstance from "@/lib/axios";
+
+const questAxios = createAxiosInstance("questionnaire");
 
 interface ComponentProps {
   data: OnboardingBusiness | null;
@@ -331,60 +333,75 @@ const CeoDetails = ({ data, form }: Omit<ComponentProps, "loading">) => {
   );
 };
 
-const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
-  return (
-    <PaperContainer
-      title="Services"
-      mt={20}
-      display={
-        Array.isArray(data?.services) &&
-        (data.services.length === 0 ||
-          (data.services.length === 1 &&
-            Object.keys(data.services[0]).length === 0))
-          ? "none"
-          : undefined
-      }
-    >
-      <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={24}>
-        {serviceCategories.map((service, idx) => (
-          <Stack key={idx}>
-            <Checkbox
-              label={service.title}
-              checked={Boolean(
-                data?.services.find((s) => s.name === service.title)
-              )}
-              onChange={() => {}}
-              color="var(--prune-primary-500)"
-              iconColor="var(--prune-text-gray-700)"
-            />
-            <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
-              Account Type:
-            </Text>
+interface RefOption {
+  value: string;
+  label: string;
+}
 
-            <Stack>
-              {service.accounts.map((currency, idx) => (
-                <Group
-                  key={idx}
-                  gap={8}
-                  style={{
-                    opacity: data?.services
-                      .find((s) => s.name === service.title)
-                      ?.currencies.some(
-                        (c) => c.includes(currency) || currency.includes(c)
-                      )
-                      ? 1
-                      : 0.5,
-                  }}
-                >
-                  <CountryFlag code={currency} size={16} />
-                  <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
-                    {currency}
+const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
+  const [refServices, setRefServices] = React.useState<RefOption[]>([]);
+  const [refCurrencies, setRefCurrencies] = React.useState<RefOption[]>([]);
+
+  React.useEffect(() => {
+    questAxios
+      .get("/business/questionnaire/reference-data", {
+        params: { include: "services,currencies" },
+      })
+      .then(({ data: res }) => {
+        setRefServices(res.data?.services ?? []);
+        setRefCurrencies(res.data?.currencies ?? []);
+      })
+      .catch(() => {});
+  }, []);
+
+  const hasServices =
+    Array.isArray(data?.services) &&
+    data.services.length > 0 &&
+    Object.keys(data.services[0]).length > 0;
+
+  if (!hasServices) return null;
+
+  return (
+    <PaperContainer title="Services" mt={20}>
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={24}>
+        {refServices.map((refService) => {
+          const matched = data?.services.find(
+            (s) => s.name === refService.value
+          );
+          return (
+            <Stack key={refService.value}>
+              <Checkbox
+                label={refService.label}
+                checked={Boolean(matched)}
+                onChange={() => {}}
+                color="var(--prune-primary-500)"
+                iconColor="var(--prune-text-gray-700)"
+              />
+              {matched && (
+                <>
+                  <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
+                    Currencies:
                   </Text>
-                </Group>
-              ))}
+                  <Stack gap={8}>
+                    {matched.currencies.map((currencyCode) => {
+                      const currencyLabel =
+                        refCurrencies.find((c) => c.value === currencyCode)
+                          ?.label ?? currencyCode;
+                      return (
+                        <Group key={currencyCode} gap={8}>
+                          <CountryFlag code={currencyCode} size={16} />
+                          <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
+                            {currencyLabel}
+                          </Text>
+                        </Group>
+                      );
+                    })}
+                  </Stack>
+                </>
+              )}
             </Stack>
-          </Stack>
-        ))}
+          );
+        })}
       </SimpleGrid>
     </PaperContainer>
   );

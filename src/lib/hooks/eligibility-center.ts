@@ -61,6 +61,70 @@ export function useSingleOnboardingBusiness(id: string) {
   return { loading, data, revalidate };
 }
 
+export function useSingleQuestionnaire(reference: string) {
+  const {
+    data,
+    loading,
+    queryFn: revalidate,
+  } = useAxios<QuestionnaireDetail>({
+    baseURL: "questionnaire",
+    endpoint: `/business/questionnaire/admin/${reference}`,
+    dependencies: [reference],
+    enabled: !!!reference,
+  });
+
+  return { loading, data, revalidate };
+}
+
+export interface QuestionnaireDetail {
+  reference: string;
+  contactEmail: string;
+  status: string;
+  progress: {
+    lastCompletedSection: number;
+    nextSection: number | null;
+    isComplete: boolean;
+    sections: { number: number; title: string; completed: boolean }[];
+  };
+  answers: {
+    contactEmail?: string;
+    contactName?: string;
+    contactDesignation?: string;
+    contactPhoneCountryCode?: string;
+    contactPhoneNumber?: string;
+    businessEmail?: string;
+    legalBusinessName?: string;
+    tradingName?: string;
+    countryCode?: string;
+    businessAddress?: string;
+    businessIndustry?: string;
+    phoneCountryCode?: string;
+    phoneNumber?: string;
+    businessDescription?: string;
+    geographicFootprint?: string;
+    isRegulated?: boolean;
+    regulatoryLicence?: string;
+    annualTurnover?: string;
+    services?: { service: string; currencies: string[] }[];
+    virtualAccounts?: {
+      dayOneAccounts?: number;
+      fullCapacityAccounts?: number;
+      singleAccountMaxDaily?: string | number;
+      singleAccountMaxMonthly?: string | number;
+      singleAccountMaxAnnually?: string | number;
+      allAccountsMaxDaily?: string | number;
+      allAccountsMaxMonthly?: string | number;
+      allAccountsMaxAnnually?: string | number;
+      highestTransactionCount?: number;
+    };
+    operationsBalance?: string;
+  };
+  createdAt: string;
+  submittedAt: string | null;
+  decision: unknown;
+  onboarding: unknown;
+}
+
 export interface OnboardingBusinessData {
   id: string;
   businessName: string;

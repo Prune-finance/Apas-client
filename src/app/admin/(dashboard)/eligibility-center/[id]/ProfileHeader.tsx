@@ -34,6 +34,7 @@ export default function ProfileHeader({
     useState(false);
   const { handleSuccess, handleError, handleInfo } = useNotification();
   const axios = createAxiosInstance("auth");
+  const questAxios = createAxiosInstance("questionnaire");
 
   const handleSendingLink = async (reqType: "questionnaire" | "onboarding") => {
     setLoadingLink(true);
@@ -55,6 +56,24 @@ export default function ProfileHeader({
       await revalidate();
     } catch (error) {
       return handleError("An Error occurred", parseError(error));
+    } finally {
+      setLoadingLink(false);
+    }
+  };
+
+  const handleSendOnboardingLink = async () => {
+    setLoadingLink(true);
+    try {
+      await questAxios.post(
+        `/business/questionnaire/admin/${data?.id}/onboarding-link`
+      );
+      handleSuccess(
+        "Onboarding link sent",
+        `Onboarding link sent to ${data?.contactPersonEmail}`
+      );
+      await revalidate();
+    } catch (error) {
+      handleError("An Error occurred", parseError(error));
     } finally {
       setLoadingLink(false);
     }
@@ -230,16 +249,14 @@ export default function ProfileHeader({
             loading={loadingLink}
           />
         )}
-        {(data?.processStatus === "QUESTIONNAIRE" ||
-          data?.processStatus === "ONBOARDING") &&
-          data.questionnaireStatus === "APPROVED" && (
-            <PrimaryBtn
-              text="Send Onboarding Link"
-              fw={600}
-              action={() => handleSendingLink("onboarding")}
-              loading={loadingLink}
-            />
-          )}
+        {data?.questionnaireStatus === "SUBMITTED" && (
+          <PrimaryBtn
+            text="Send Onboarding Link"
+            fw={600}
+            action={handleSendOnboardingLink}
+            loading={loadingLink}
+          />
+        )}
       </Group>
 
       <RejectModal

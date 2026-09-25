@@ -4,6 +4,7 @@ import React, { Suspense, useState } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
 import {
+  ActionIcon,
   Box,
   Flex,
   Grid,
@@ -15,6 +16,7 @@ import {
   TableTr,
   Text,
 } from "@mantine/core";
+import { IconDotsVertical } from "@tabler/icons-react";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
@@ -37,6 +39,14 @@ const statusToStage: Record<string, STAGE> = {
   IN_PROGRESS: "In Progress",
   ONBOARDING_INVITED: "Onboarding Invited",
   SUBMITTED: "Submitted",
+};
+
+const SERVICE_LABELS: Record<string, string> = {
+  OPERATIONS_ACCOUNT: "Ops Account",
+  VIRTUAL_ACCOUNTS: "Virtual Accounts",
+  PAYOUT: "Payout",
+  ACCOUNT_LOOKUP: "Account Lookup",
+  REMITTANCE: "Remittance",
 };
 
 function EligibilityCenter() {
@@ -128,6 +138,7 @@ function EligibilityCenter() {
           head={tableHeaders}
           rows={<Rows data={data} />}
           loading={loading}
+          columnWidths={[300, undefined, undefined, undefined, undefined, 80]}
         />
 
         <EmptyTable
@@ -149,7 +160,7 @@ function EligibilityCenter() {
   );
 }
 
-const tableHeaders = ["Business Name", "Date", "Country", "Stage"];
+const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage", "Actions"];
 
 export default function EligibilityCenterSus() {
   return (
@@ -194,7 +205,40 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
           </Group>
         </TableTd>
         <TableTd>
+          <Group gap={4} wrap="wrap">
+            {row.answers?.services?.length
+              ? row.answers.services.map((s) => (
+                  <Text
+                    key={s.name}
+                    fz={12}
+                    fw={500}
+                    px={8}
+                    py={4}
+                    c="var(--prune-text-gray-600)"
+                    style={{
+                      background: "var(--prune-text-gray-50, #f9fafb)",
+                      borderRadius: 999,
+                      border: "1px solid var(--prune-text-gray-200, #eaecf0)",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {SERVICE_LABELS[s.name] ?? s.name}
+                  </Text>
+                ))
+              : <Text fz={14} c="var(--prune-text-gray-400)">—</Text>}
+          </Group>
+        </TableTd>
+        <TableTd>
           <BadgeComponent stage status={stage} w={140} />
+        </TableTd>
+        <TableTd>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <IconDotsVertical size={16} />
+          </ActionIcon>
         </TableTd>
       </TableTr>
     );

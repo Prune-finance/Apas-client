@@ -429,6 +429,7 @@ const currencies = ["EUR", "GBP", "USD", "NGN"];
 
 export const serviceCategories = [
   {
+    key: "OPERATIONS_ACCOUNT",
     title: "Operations Account",
     description:
       "Prune Payments payout service gives the business access to payouts.",
@@ -436,6 +437,7 @@ export const serviceCategories = [
     icon: IconDatabase,
   },
   {
+    key: "VIRTUAL_ACCOUNTS",
     title: "Virtual Account Services",
     description:
       "The account service lets businesses issue user accounts to clients.",
@@ -443,6 +445,7 @@ export const serviceCategories = [
     icon: IconCreditCard,
   },
   {
+    key: "PAYOUT",
     title: "Payout Services",
     description:
       "This helps businesses manage and disburse funds to recipients.",
@@ -450,6 +453,7 @@ export const serviceCategories = [
     icon: IconMoneybag,
   },
   {
+    key: "ACCOUNT_LOOKUP",
     title: "Account Lookup Services",
     description:
       "This helps businesses quickly verify and access account details for transactions.",
@@ -457,6 +461,7 @@ export const serviceCategories = [
     icon: IconSearch,
   },
   {
+    key: "REMITTANCE",
     title: "Remittance",
     description:
       "This helps businesses quickly verify and access account details for transactions.",

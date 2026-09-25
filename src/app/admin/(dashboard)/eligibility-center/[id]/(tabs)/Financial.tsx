@@ -67,7 +67,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
       }
       panelName="Financial"
     >
-      <PaperContainer title="Finance">
+      <PaperContainer title="Finance" mb={24}>
         <Stack gap={8}>
           <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
             Annual Turnover
@@ -80,7 +80,7 @@ export default function Financial({ data, loading, form }: ComponentProps) {
       </PaperContainer>
 
       {hasVirtualAccounts && (
-        <PaperContainer my={24} title="Virtual Account Service">
+        <PaperContainer mb={24} title="Virtual Account Service">
           <SimpleGrid cols={{ base: 1, md: 2 }}>
             <ProfileTextInput
               label="Account needed as Day 1 requirement"

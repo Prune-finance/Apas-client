@@ -91,6 +91,7 @@ export interface OnboardingBusiness {
   onboardingStatus: "PENDING" | "PROCESSING" | "COMPLETED";
   questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED" | "ONBOARDING_INVITED";
   processStatus: STAGE;
+  decision?: { decidedAt: string; decidedBy: { id: string; email: string }; reason: string | null } | null;
   hasActualBusinessAccount: boolean;
   token: string;
   status: STAGE;

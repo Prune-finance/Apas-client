@@ -121,7 +121,7 @@ export interface QuestionnaireDetail {
   };
   createdAt: string;
   submittedAt: string | null;
-  decision: unknown;
+  decision: { decidedAt: string; decidedBy: { id: string; email: string }; reason: string | null } | null;
   onboarding: unknown;
 }
 

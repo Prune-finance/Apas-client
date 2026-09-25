@@ -47,11 +47,17 @@ export default function CompanyProfile({
 }: ComponentProps) {
   const [rows, setRows] = useState([1]);
 
-  const summaryData = {
+  const summaryData: Record<string, string> = {
     "Application submitted": data?.createdAt
       ? dayjs(data?.createdAt).format("DD-MM-YYYY")
       : "",
     "Submitted by": data?.consentSignedBy || "",
+    ...(data?.decision?.decidedAt
+      ? { "Onboarding link submitted at": dayjs(data.decision.decidedAt).format("DD-MM-YYYY") }
+      : {}),
+    ...(data?.decision?.decidedBy?.email
+      ? { "Onboarding link submitted by": data.decision.decidedBy.email }
+      : {}),
   };
   return (
     <PanelWrapper loading={loading} rows={rows} panelName="Company Profile">

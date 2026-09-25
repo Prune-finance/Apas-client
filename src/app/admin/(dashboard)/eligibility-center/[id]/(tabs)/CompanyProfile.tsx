@@ -364,26 +364,26 @@ const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
   return (
     <PaperContainer title="Services" mt={20}>
       <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={24}>
-        {refServices.map((refService) => {
-          const matched = data?.services.find(
-            (s) => s.name === refService.value
+        {(data?.services ?? []).map((pickedService) => {
+          const refService = refServices.find(
+            (r) => r.value === pickedService.name
           );
           return (
-            <Stack key={refService.value}>
+            <Stack key={pickedService.name}>
               <Checkbox
-                label={refService.label}
-                checked={Boolean(matched)}
+                label={refService?.label ?? pickedService.name}
+                checked
                 onChange={() => {}}
                 color="var(--prune-primary-500)"
                 iconColor="var(--prune-text-gray-700)"
               />
-              {matched && (
+              {pickedService.currencies.length > 0 && (
                 <>
                   <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
                     Currencies:
                   </Text>
                   <Stack gap={8}>
-                    {matched.currencies.map((currencyCode) => {
+                    {pickedService.currencies.map((currencyCode) => {
                       const currencyLabel =
                         refCurrencies.find((c) => c.value === currencyCode)
                           ?.label ?? currencyCode;

@@ -375,7 +375,7 @@ const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
                 iconColor="var(--prune-text-gray-700)"
               />
               <Text fz={12} fw={400} c="var(--prune-text-gray-400)">
-                Currencies:
+                Account Type:
               </Text>
               <Stack gap={8}>
                 {refCurrencies.map((refCurrency) => {
@@ -386,11 +386,11 @@ const Services = ({ data }: Omit<ComponentProps, "loading" | "form">) => {
                     <Group
                       key={refCurrency.value}
                       gap={8}
-                      style={{ opacity: isCurrencyActive ? 1 : 0.4 }}
+                      style={{ opacity: isCurrencyActive ? 1 : 0.3 }}
                     >
                       <CountryFlag code={refCurrency.value} size={16} />
                       <Text fz={14} fw={500} c="var(--prune-text-gray-500)">
-                        {refCurrency.label}
+                        {refCurrency.value}
                       </Text>
                     </Group>
                   );

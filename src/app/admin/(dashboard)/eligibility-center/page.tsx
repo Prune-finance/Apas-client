@@ -4,7 +4,6 @@ import React, { Suspense, useState } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
 import {
-  ActionIcon,
   Box,
   Flex,
   Grid,
@@ -16,10 +15,9 @@ import {
   TableTr,
   Text,
 } from "@mantine/core";
-import { IconDotsVertical } from "@tabler/icons-react";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
-import { PrimaryBtn } from "@/ui/components/Buttons";
+// import { PrimaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
 import { switzer } from "@/ui/fonts";
 import {
@@ -125,14 +123,14 @@ function EligibilityCenter() {
         >
           <SearchInput search={search} setSearch={setSearch} />
 
-          <Flex gap={12}>
+          {/* <Flex gap={12}>
             <PrimaryBtn
               text="Add New Profile"
               link="/admin/eligibility-center/new"
               fw={600}
               fz={12}
             />
-          </Flex>
+          </Flex> */}
         </div>
 
         <TableComponent
@@ -161,7 +159,7 @@ function EligibilityCenter() {
   );
 }
 
-const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage", "Actions"];
+const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage"];
 
 export default function EligibilityCenterSus() {
   return (
@@ -212,15 +210,6 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
         </TableTd>
         <TableTd>
           <BadgeComponent stage status={stage} w={140} />
-        </TableTd>
-        <TableTd>
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <IconDotsVertical size={16} />
-          </ActionIcon>
         </TableTd>
       </TableTr>
     );

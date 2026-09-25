@@ -8,15 +8,15 @@ import { newOnboardingValue, OnboardingType, Tab } from "@/lib/schema";
 import {
   IconBuildingSkyscraper,
   IconCoins,
-  IconFileText,
-  IconUsers,
+  // IconFileText,
+  // IconUsers,
 } from "@tabler/icons-react";
 import Tabs from "@/ui/components/Tabs";
 import CompanyProfile from "./(tabs)/CompanyProfile";
 import Financial from "./(tabs)/Financial";
-import Documents from "./(tabs)/Documents";
-import Directors from "./(tabs)/Directors";
-import Shareholders from "./(tabs)/Shareholders";
+// import Documents from "./(tabs)/Documents";
+// import Directors from "./(tabs)/Directors";
+// import Shareholders from "./(tabs)/Shareholders";
 import {
   useSingleQuestionnaire,
   QuestionnaireDetail,
@@ -198,7 +198,7 @@ export default function OnboardingProfile({
           list: { marginBottom: "24px" },
         }}
       >
-        {[CompanyProfile, Financial, Documents, Directors, Shareholders].map(
+        {[CompanyProfile, Financial].map(
           (Component, idx) => (
             <TabsPanel key={idx} value={tabs[idx].value}>
               <Component
@@ -226,19 +226,19 @@ const tabs: Tab[] = [
     value: "financials",
     icon: <IconCoins size={16} />,
   },
-  {
-    title: "Documents",
-    value: "documents",
-    icon: <IconFileText size={16} />,
-  },
-  {
-    title: "Directors",
-    value: "directors",
-    icon: <IconUsers size={16} />,
-  },
-  {
-    title: "Key Shareholders",
-    value: "shareholders",
-    icon: <IconUsers size={16} />,
-  },
+  // {
+  //   title: "Documents",
+  //   value: "documents",
+  //   icon: <IconFileText size={16} />,
+  // },
+  // {
+  //   title: "Directors",
+  //   value: "directors",
+  //   icon: <IconUsers size={16} />,
+  // },
+  // {
+  //   title: "Key Shareholders",
+  //   value: "shareholders",
+  //   icon: <IconUsers size={16} />,
+  // },
 ];

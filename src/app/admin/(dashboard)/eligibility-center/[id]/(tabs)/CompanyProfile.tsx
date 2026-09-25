@@ -52,10 +52,10 @@ export default function CompanyProfile({
       ? dayjs(data?.createdAt).format("DD-MM-YYYY")
       : "",
     ...(data?.decision?.decidedAt
-      ? { "Onboarding link submitted at": dayjs(data.decision.decidedAt).format("DD-MM-YYYY") }
+      ? { "Onboarding link sent at": dayjs(data.decision.decidedAt).format("DD-MM-YYYY") }
       : {}),
     ...(data?.decision?.decidedBy?.email
-      ? { "Onboarding link submitted by": data.decision.decidedBy.email }
+      ? { "Onboarding link sent by": data.decision.decidedBy.email }
       : {}),
   };
   return (
@@ -63,7 +63,7 @@ export default function CompanyProfile({
       <Text tt="uppercase" fz={12} fw={600} c="var(--prune-text-gray-800)">
         Summary
       </Text>
-      <Flex gap={16} align="center" mt={12}>
+      <Flex gap={40} align="center" mt={12}>
         {Object.entries(summaryData).map(([key, value]) => (
           <Stack key={key} gap={12}>
             <Text fz={12} fw={400} c="var(--prune-text-gray-600)" tt="none">

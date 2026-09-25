@@ -1,7 +1,7 @@
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { Flex, Group, Modal, Stack, Text, Textarea } from "@mantine/core";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Skeleton from "./Skeleton";
 import { OnboardingBusiness } from "@/lib/interface";
 import useAxios from "@/lib/hooks/useAxios";
@@ -292,11 +292,10 @@ export default function ProfileHeader({
           />
         )}
         {data?.questionnaireStatus === "ONBOARDING_INVITED" && (
-          <PrimaryBtn
-            text="Resend Invitation"
-            fw={600}
-            action={handleResendInvitation}
+          <ResendInvitationButton
+            onboarding={data.onboarding ?? null}
             loading={loadingResendInvitation}
+            onResend={handleResendInvitation}
           />
         )}
         {data?.questionnaireStatus === "SUBMITTED" && (
@@ -345,6 +344,70 @@ export default function ProfileHeader({
     </Flex>
   );
 }
+
+function useCountdown(expiresAt: string | null | undefined) {
+  const getRemaining = () => {
+    if (!expiresAt) return null;
+    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (diff <= 0) return null;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return { days, hours, minutes, seconds };
+  };
+
+  const [remaining, setRemaining] = useState(getRemaining);
+
+  useEffect(() => {
+    if (!expiresAt) return;
+    const interval = setInterval(() => setRemaining(getRemaining()), 1000);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expiresAt]);
+
+  return remaining;
+}
+
+interface ResendInvitationButtonProps {
+  onboarding: { linkSentAt: string | null; linkExpiresAt: string | null; linkExpired: boolean } | null;
+  loading: boolean;
+  onResend: () => void;
+}
+
+const ResendInvitationButton = ({ onboarding, loading, onResend }: ResendInvitationButtonProps) => {
+  const remaining = useCountdown(onboarding?.linkExpiresAt);
+  const isExpired = onboarding?.linkExpired || !remaining;
+
+  if (isExpired) {
+    return (
+      <PrimaryBtn
+        text="Resend Invitation"
+        fw={600}
+        action={onResend}
+        loading={loading}
+      />
+    );
+  }
+
+  const { days, hours, minutes, seconds } = remaining!;
+  const parts: string[] = [];
+  if (days > 0) parts.push(`${days}d`);
+  if (hours > 0 || days > 0) parts.push(`${hours}h`);
+  parts.push(`${String(minutes).padStart(2, "0")}m`);
+  parts.push(`${String(seconds).padStart(2, "0")}s`);
+
+  return (
+    <Stack gap={2} align="center">
+      <Text fz={11} c="var(--prune-text-gray-400)" fw={400}>
+        Resend available in
+      </Text>
+      <Text fz={13} fw={600} c="var(--prune-text-gray-600)" style={{ fontVariantNumeric: "tabular-nums" }}>
+        {parts.join(" ")}
+      </Text>
+    </Stack>
+  );
+};
 
 interface RejectQuestionnaireModalProps {
   opened: boolean;

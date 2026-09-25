@@ -82,6 +82,7 @@ function adaptQuestionnaire(data: QuestionnaireDetail | null): OnboardingBusines
     documentData: {},
     documents: [],
     onboardingStatus: "PENDING",
+    onboarding: data.onboarding,
     questionnaireStatus: data.status as OnboardingBusiness["questionnaireStatus"],
     decision: data.decision,
     processStatus: "In Progress",

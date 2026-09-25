@@ -1,29 +1,11 @@
-import Image from "next/image";
-import { StaticImageData } from "next/image";
-
-import EUIcon from "@/assets/EU-icon.png";
-import GBIcon from "@/assets/GB.png";
-import GHIcon from "@/assets/GH.png";
-import USDIcon from "@/assets/USD.png";
-import NGIcon from "@/assets/Nigeria.png";
-
-// Maps both currency codes and ISO 2-letter country codes to local assets.
-// Keys are normalised to uppercase.
-const flagAssets: Record<string, StaticImageData> = {
-  // Currency codes
-  EUR: EUIcon,
-  GBP: GBIcon,
-  USD: USDIcon,
-  GHS: GHIcon,
-  NGN: NGIcon,
-
-  // ISO country codes
-  EU: EUIcon,
-  GB: GBIcon,
-  UK: GBIcon,
-  US: USDIcon,
-  GH: GHIcon,
-  NG: NGIcon,
+// Maps currency codes to their ISO 2-letter country codes for flagcdn.com
+const currencyToCountry: Record<string, string> = {
+  EUR: "eu",
+  GBP: "gb",
+  USD: "us",
+  GHS: "gh",
+  NGN: "ng",
+  UK: "gb",
 };
 
 function getFlagEmoji(code: string) {
@@ -41,28 +23,26 @@ interface CountryFlagProps {
   style?: React.CSSProperties;
 }
 
-/**
- * Renders a flag for a currency code (EUR, GBP, USD, GHS, NGN)
- * or an ISO country code (EU, GB, UK, US, GH, NG).
- * Unknown codes fall back to a Unicode flag emoji.
- */
 export default function CountryFlag({ code, size = 20, style }: CountryFlagProps) {
   const upper = (code ?? "").toUpperCase();
-  const asset = flagAssets[upper];
+  const isoCode = currencyToCountry[upper] ?? (upper.length === 2 ? upper.toLowerCase() : null);
 
-  if (asset) {
+  if (isoCode) {
     return (
-      <Image
-        src={asset}
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={`https://flagcdn.com/w40/${isoCode}.png`}
         alt={upper}
         height={size}
         width={size}
-        style={{ objectFit: "contain", flexShrink: 0, ...style }}
+        style={{ objectFit: "contain", flexShrink: 0, borderRadius: 2, ...style }}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = "none";
+        }}
       />
     );
   }
 
-  // Emoji fallback — works for any valid 2-letter ISO code
   return (
     <span
       style={{ fontSize: size, lineHeight: 1, flexShrink: 0, ...style }}

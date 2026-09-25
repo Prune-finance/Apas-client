@@ -122,7 +122,11 @@ export interface QuestionnaireDetail {
   createdAt: string;
   submittedAt: string | null;
   decision: { decidedAt: string; decidedBy: { id: string; email: string }; reason: string | null } | null;
-  onboarding: unknown;
+  onboarding: {
+    linkSentAt: string | null;
+    linkExpiresAt: string | null;
+    linkExpired: boolean;
+  } | null;
 }
 
 export interface OnboardingBusinessData {

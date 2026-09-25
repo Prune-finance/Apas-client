@@ -1,7 +1,6 @@
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { Flex, Group, Modal, Stack, Text, ThemeIcon } from "@mantine/core";
-import { IconDownload } from "@tabler/icons-react";
+import { Flex, Group, Modal, Stack, Text, Textarea } from "@mantine/core";
 import React, { useState } from "react";
 import Skeleton from "./Skeleton";
 import { OnboardingBusiness } from "@/lib/interface";
@@ -32,6 +31,9 @@ export default function ProfileHeader({
   const [opened, { open, close }] = useDisclosure(false);
   const [openedProfile, { open: openProfile, close: closeProfile }] =
     useDisclosure(false);
+  const [openedRejectQuestionnaire, { open: openRejectQuestionnaire, close: closeRejectQuestionnaire }] = useDisclosure(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [loadingRejectQuestionnaire, setLoadingRejectQuestionnaire] = useState(false);
   const [loadingLink, setLoadingLink] = useState(false);
   const [loadingProfileApproval, setLoadingProfileApproval] = useState(false);
   const [loadingProfileRejection, setLoadingProfileRejection] = useState(false);
@@ -64,6 +66,24 @@ export default function ProfileHeader({
       return handleError("An Error occurred", parseError(error));
     } finally {
       setLoadingLink(false);
+    }
+  };
+
+  const handleRejectQuestionnaire = async () => {
+    setLoadingRejectQuestionnaire(true);
+    try {
+      await questAxios.post(
+        `/business/questionnaire/admin/${data?.id}/reject`,
+        { reason: rejectReason }
+      );
+      handleSuccess("Questionnaire Rejected", "The questionnaire has been rejected");
+      closeRejectQuestionnaire();
+      setRejectReason("");
+      await revalidate();
+    } catch (error) {
+      handleError("An Error occurred", parseError(error));
+    } finally {
+      setLoadingRejectQuestionnaire(false);
     }
   };
 
@@ -207,10 +227,6 @@ export default function ProfileHeader({
       </Group>
 
       <Group gap={10}>
-        <ThemeIcon color="var(--prune-text-gray-700)" variant="light" size={36}>
-          <IconDownload size={24} />
-        </ThemeIcon>
-
         {data?.processStatus === "QUESTIONNAIRE" &&
           data.questionnaireStatus === "SUBMITTED" && (
             <>
@@ -260,6 +276,15 @@ export default function ProfileHeader({
         )}
         {data?.questionnaireStatus === "SUBMITTED" && (
           <PrimaryBtn
+            text="Reject Questionnaire"
+            color="var(--prune-warning)"
+            c="#fff"
+            fw={600}
+            action={openRejectQuestionnaire}
+          />
+        )}
+        {data?.questionnaireStatus === "SUBMITTED" && (
+          <PrimaryBtn
             text="Send Onboarding Link"
             fw={600}
             action={handleSendOnboardingLink}
@@ -282,10 +307,84 @@ export default function ProfileHeader({
         loading={loadingProfileRejection}
       />
 
+      <RejectQuestionnaireModal
+        opened={openedRejectQuestionnaire}
+        close={closeRejectQuestionnaire}
+        reason={rejectReason}
+        setReason={setRejectReason}
+        action={handleRejectQuestionnaire}
+        loading={loadingRejectQuestionnaire}
+      />
+
       {/* <ModalComponent  /> */}
     </Flex>
   );
 }
+
+interface RejectQuestionnaireModalProps {
+  opened: boolean;
+  close: () => void;
+  loading: boolean;
+  action: () => void;
+  reason: string;
+  setReason: (value: string) => void;
+}
+
+const RejectQuestionnaireModal = ({
+  opened,
+  close,
+  loading,
+  action,
+  reason,
+  setReason,
+}: RejectQuestionnaireModalProps) => {
+  return (
+    <Modal
+      opened={opened}
+      onClose={close}
+      title="Reject Questionnaire"
+      size="md"
+      centered
+      styles={{
+        title: {
+          fontSize: "24px",
+          fontWeight: 700,
+          color: "var(--prune-text-gray-700)",
+        },
+      }}
+    >
+      <Stack gap={24}>
+        <Text fz={14} fw={400} c="var(--prune-text-gray-500)">
+          Please provide a reason for rejecting this questionnaire.
+        </Text>
+
+        <Textarea
+          label="Reason"
+          placeholder="Enter rejection reason"
+          value={reason}
+          onChange={(e) => setReason(e.currentTarget.value)}
+          minRows={4}
+          styles={{
+            label: { fontSize: 12, fontWeight: 500, color: "var(--prune-text-gray-500)", marginBottom: 8 },
+            input: { fontSize: 14, borderColor: "var(--prune-text-gray-200)" },
+          }}
+        />
+
+        <Flex justify="end" align="center" gap={12}>
+          <SecondaryBtn text="Cancel" fw={600} action={close} />
+          <PrimaryBtn
+            text="Reject"
+            color="var(--prune-warning)"
+            c="#fff"
+            fw={600}
+            action={action}
+            loading={loading}
+          />
+        </Flex>
+      </Stack>
+    </Modal>
+  );
+};
 
 interface RejectModalProps {
   opened: boolean;

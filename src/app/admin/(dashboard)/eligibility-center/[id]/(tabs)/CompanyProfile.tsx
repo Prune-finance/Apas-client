@@ -51,7 +51,6 @@ export default function CompanyProfile({
     "Application submitted": data?.createdAt
       ? dayjs(data?.createdAt).format("DD-MM-YYYY")
       : "",
-    "Submitted by": data?.consentSignedBy || "",
     ...(data?.decision?.decidedAt
       ? { "Onboarding link submitted at": dayjs(data.decision.decidedAt).format("DD-MM-YYYY") }
       : {}),

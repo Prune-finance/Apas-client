@@ -17,8 +17,9 @@ import {
 } from "@mantine/core";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
-// import { PrimaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
+import { SecondaryBtn } from "@/ui/components/Buttons";
+import Filter from "@/ui/components/Filter";
 import { switzer } from "@/ui/fonts";
 import {
   QuestionnaireAdminItem,
@@ -27,11 +28,15 @@ import {
 } from "@/lib/hooks/eligibility-center";
 import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useDebouncedValue } from "@mantine/hooks";
+import { useRouter } from "next/navigation";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { calculateTotalPages, STAGE } from "@/lib/utils";
+import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { useForm, zodResolver } from "@mantine/form";
 import PaginationComponent from "@/ui/components/Pagination";
 import CountryFlag from "@/ui/components/CountryFlag";
+import { IconListTree } from "@tabler/icons-react";
+import { SelectBox, TextBox } from "@/ui/components/Inputs";
 
 const statusToStage: Record<string, STAGE> = {
   IN_PROGRESS: "In Progress",
@@ -40,31 +45,50 @@ const statusToStage: Record<string, STAGE> = {
   NOT_ELIGIBLE: "REJECTED",
 };
 
-const SERVICE_LABELS: Record<string, string> = {
-  OPERATIONS_ACCOUNT: "Ops Account",
-  VIRTUAL_ACCOUNTS: "Virtual Accounts",
-  PAYOUT: "Payout",
-  ACCOUNT_LOOKUP: "Account Lookup",
-  REMITTANCE: "Remittance",
-};
+const SERVICE_OPTIONS = [
+  "VIRTUAL_ACCOUNTS",
+  "OPERATIONS_ACCOUNT",
+  "PAYOUT",
+  "ACCOUNT_LOOKUP",
+  "REMITTANCE",
+];
 
 function EligibilityCenter() {
-  const searchParams = useSearchParams();
-
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
+  const [opened, { toggle }] = useDisclosure(false);
+  const [appliedFilters, setAppliedFilters] = useState<FilterType>(FilterValues);
 
-  const { countryCode, dateFrom, dateTo } = Object.fromEntries(
-    searchParams.entries(),
-  );
+  const form = useForm<FilterType>({
+    initialValues: FilterValues,
+    validate: zodResolver(FilterSchema),
+  });
+
+  const toLocalDateStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const activeFilterCount = [
+    appliedFilters.country,
+    appliedFilters.type,
+    appliedFilters.createdAt?.[0],
+  ].filter(Boolean).length;
 
   const queryParams = {
     search: debouncedSearch,
-    countryCode: countryCode ?? "",
-    dateFrom: dateFrom ? dayjs(dateFrom).format("YYYY-MM-DD") : "",
-    dateTo: dateTo ? dayjs(dateTo).format("YYYY-MM-DD") : "",
+    countryCode: appliedFilters.country ?? "",
+    service: appliedFilters.type ?? "",
+    dateFrom: appliedFilters.createdAt?.[0]
+      ? toLocalDateStr(appliedFilters.createdAt[0])
+      : "",
+    dateTo: appliedFilters.createdAt?.[1]
+      ? toLocalDateStr(appliedFilters.createdAt[1])
+      : "",
     sortBy: "date",
     sortOrder: "desc",
     page: active,
@@ -118,26 +142,56 @@ function EligibilityCenter() {
           ))}
         </Grid>
 
-        <div
+        <Flex
           className={`${styles.container__search__filter} ${switzer.className}`}
+          justify="space-between"
+          align="center"
+          wrap="wrap"
+          gap={12}
         >
           <SearchInput search={search} setSearch={setSearch} />
 
-          {/* <Flex gap={12}>
-            <PrimaryBtn
-              text="Add New Profile"
-              link="/admin/eligibility-center/new"
-              fw={600}
-              fz={12}
-            />
-          </Flex> */}
-        </div>
+          <SecondaryBtn
+            text="Filter"
+            action={toggle}
+            icon={IconListTree}
+            indicator={activeFilterCount}
+            fw={600}
+            fz={12}
+          />
+        </Flex>
+
+        <Filter<FilterType>
+          opened={opened}
+          toggle={toggle}
+          form={form}
+          noDate={false}
+          onApply={(values) => {
+            setAppliedFilters(values);
+            setActive(1);
+          }}
+          onClear={() => {
+            setAppliedFilters(FilterValues);
+            form.reset();
+            setActive(1);
+          }}
+        >
+          <TextBox
+            placeholder="Country Code (e.g. NG, GH)"
+            {...form.getInputProps("country")}
+          />
+          <SelectBox
+            placeholder="Service"
+            {...form.getInputProps("type")}
+            data={SERVICE_OPTIONS}
+          />
+        </Filter>
 
         <TableComponent
           head={tableHeaders}
           rows={<Rows data={data} />}
           loading={loading}
-          columnWidths={[200, undefined, undefined, undefined, 140]}
+          columnWidths={["30%", "20%", "15%", "15%", "20%"]}
         />
 
         <EmptyTable

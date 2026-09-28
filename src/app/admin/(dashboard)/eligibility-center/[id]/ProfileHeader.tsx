@@ -431,7 +431,7 @@ const RejectQuestionnaireModal = ({
       opened={opened}
       onClose={close}
       title="Reject Questionnaire"
-      size="md"
+      size="lg"
       centered
       styles={{
         title: {
@@ -466,12 +466,12 @@ const RejectQuestionnaireModal = ({
           <SecondaryBtn text="Cancel" fw={600} action={close} />
           <PrimaryBtn
             text="Reject"
-            color="var(--prune-warning)"
-            c="#fff"
+            color={reason.trim() ? "var(--prune-warning)" : "var(--prune-text-gray-300)"}
+            c="var(--prune-text-gray-800)"
             fw={600}
-            action={action}
+            action={reason.trim() ? action : undefined}
             loading={loading}
-            disabled={!reason.trim()}
+            style={{ cursor: reason.trim() ? "pointer" : "not-allowed" }}
           />
         </Flex>
       </Stack>

@@ -452,10 +452,13 @@ const RejectQuestionnaireModal = ({
           required
           value={reason}
           onChange={(e) => setReason(e.currentTarget.value)}
+          maxLength={100}
+          description={`${reason.length}/100 characters`}
           minRows={4}
           styles={{
             label: { fontSize: 12, fontWeight: 500, color: "var(--prune-text-gray-500)", marginBottom: 8 },
             input: { fontSize: 14, borderColor: "var(--prune-text-gray-200)" },
+            description: { textAlign: "right", fontSize: 11, marginTop: 4 },
           }}
         />
 

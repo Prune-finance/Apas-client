@@ -74,9 +74,9 @@ export default function CompanyProfile({
       <Text tt="uppercase" fz={12} fw={600} c="var(--prune-text-gray-800)">
         Summary
       </Text>
-      <Flex gap={40} align="center" mt={12}>
+      <Flex gap={{ base: 20, sm: 40 }} align="flex-start" wrap="wrap" mt={12}>
         {Object.entries(summaryData).map(([key, value]) => (
-          <Stack key={key} gap={12}>
+          <Stack key={key} gap={8} miw={120}>
             <Text fz={12} fw={400} c="var(--prune-text-gray-600)" tt="none">
               {key}
             </Text>

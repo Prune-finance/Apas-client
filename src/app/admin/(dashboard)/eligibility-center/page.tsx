@@ -94,7 +94,7 @@ function EligibilityCenter() {
 
         <Grid align="center" justify="center" mt={26}>
           {InfoCards?.map((d, i) => (
-            <GridCol span={3} key={i}>
+            <GridCol span={{ base: 12, xs: 6, md: 3 }} key={i}>
               <Box className={classes.card} p={24}>
                 <Flex
                   align="flex-start"
@@ -137,7 +137,7 @@ function EligibilityCenter() {
           head={tableHeaders}
           rows={<Rows data={data} />}
           loading={loading}
-          columnWidths={[300, undefined, undefined, undefined, undefined, 80]}
+          columnWidths={[200, undefined, undefined, undefined, 140]}
         />
 
         <EmptyTable

@@ -41,7 +41,7 @@ const EmptyProfileTab = ({
   if (loading)
     return (
       <PaperContainer title={title} h="calc(100vh - 300px)">
-        <SimpleGrid cols={3}>
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
           {Array.from({ length: 6 }).map((_, index) => (
             <Skeleton key={index} h={40} w="100%" color="#fcfcfd" />
           ))}
@@ -157,7 +157,7 @@ export const NewDirectorOrShareholderModal = ({
         onSubmit={form.onSubmit((values) => onSubmit(values))}
         mt={30}
       >
-        <Flex gap={24} w="100%">
+        <Flex gap={24} w="100%" direction={{ base: "column", sm: "row" }}>
           <TextInputWithInsideLabel
             label="First Name"
             w="100%"
@@ -172,7 +172,7 @@ export const NewDirectorOrShareholderModal = ({
           />
         </Flex>
 
-        <Flex gap={24} w="100%">
+        <Flex gap={24} w="100%" direction={{ base: "column", sm: "row" }}>
           <TextInputWithInsideLabel
             label="Email"
             w="100%"
@@ -187,7 +187,7 @@ export const NewDirectorOrShareholderModal = ({
           />
         </Flex>
 
-        <Flex gap={24} w="100%">
+        <Flex gap={24} w="100%" direction={{ base: "column", sm: "row" }}>
           <SelectInputWithInsideLabel
             label="Identity Type"
             w="100%"
@@ -204,7 +204,7 @@ export const NewDirectorOrShareholderModal = ({
           />
         </Flex>
 
-        <Flex gap={24} w="100%">
+        <Flex gap={24} w="100%" wrap="wrap">
           {form.values.identityType && (
             <>
               <OnBoardingDocumentBox

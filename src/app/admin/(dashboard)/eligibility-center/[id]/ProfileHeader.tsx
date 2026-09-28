@@ -243,7 +243,7 @@ export default function ProfileHeader({
         </Skeleton>
       </Group>
 
-      <Group gap={10}>
+      <Group gap={10} wrap="wrap">
         {data?.processStatus === "QUESTIONNAIRE" &&
           data.questionnaireStatus === "SUBMITTED" && (
             <>
@@ -293,7 +293,7 @@ export default function ProfileHeader({
         )}
         {data?.questionnaireStatus === "ONBOARDING_INVITED" && (
           <ResendInvitationButton
-            onboarding={data.onboarding ?? null}
+            decidedAt={data.decision?.decidedAt}
             loading={loadingResendInvitation}
             onResend={handleResendInvitation}
           />
@@ -345,39 +345,39 @@ export default function ProfileHeader({
   );
 }
 
-function useCountdown(expiresAt: string | null | undefined) {
+function useCountdown(sentAt: string | null | undefined) {
   const getRemaining = () => {
-    if (!expiresAt) return null;
-    const diff = new Date(expiresAt).getTime() - Date.now();
+    if (!sentAt) return null;
+    const expiresAt = new Date(sentAt).getTime() + 24 * 60 * 60 * 1000;
+    const diff = expiresAt - Date.now();
     if (diff <= 0) return null;
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const hours = Math.floor(diff / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    return { days, hours, minutes, seconds };
+    return { hours, minutes, seconds };
   };
 
   const [remaining, setRemaining] = useState(getRemaining);
 
   useEffect(() => {
-    if (!expiresAt) return;
+    if (!sentAt) return;
     const interval = setInterval(() => setRemaining(getRemaining()), 1000);
     return () => clearInterval(interval);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expiresAt]);
+  }, [sentAt]);
 
   return remaining;
 }
 
 interface ResendInvitationButtonProps {
-  onboarding: { linkSentAt: string | null; linkExpiresAt: string | null; linkExpired: boolean } | null;
+  decidedAt: string | null | undefined;
   loading: boolean;
   onResend: () => void;
 }
 
-const ResendInvitationButton = ({ onboarding, loading, onResend }: ResendInvitationButtonProps) => {
-  const remaining = useCountdown(onboarding?.linkExpiresAt);
-  const isExpired = onboarding?.linkExpired || !remaining;
+const ResendInvitationButton = ({ decidedAt, loading, onResend }: ResendInvitationButtonProps) => {
+  const remaining = useCountdown(decidedAt);
+  const isExpired = !remaining;
 
   if (isExpired) {
     return (
@@ -390,10 +390,9 @@ const ResendInvitationButton = ({ onboarding, loading, onResend }: ResendInvitat
     );
   }
 
-  const { days, hours, minutes, seconds } = remaining!;
+  const { hours, minutes, seconds } = remaining!;
   const parts: string[] = [];
-  if (days > 0) parts.push(`${days}d`);
-  if (hours > 0 || days > 0) parts.push(`${hours}h`);
+  if (hours > 0) parts.push(`${hours}h`);
   parts.push(`${String(minutes).padStart(2, "0")}m`);
   parts.push(`${String(seconds).padStart(2, "0")}s`);
 

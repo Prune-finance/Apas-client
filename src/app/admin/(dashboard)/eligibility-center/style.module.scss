@@ -9,4 +9,8 @@
     background: #f9f6e6;
     border-color: #c6a700;
   }
+
+  @media (max-width: 576px) {
+    padding: 16px !important;
+  }
 }

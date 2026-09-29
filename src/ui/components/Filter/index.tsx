@@ -135,7 +135,8 @@ export default function Filter<T>({
             size="xs"
             maw={250}
             h={36}
-            styles={{ input: { height: "30px" } }}
+            fz={12}
+            styles={{ input: { height: "30px", fontSize: 12 } }}
             type="range"
             allowSingleDateInRange
             leftSection={<IconCalendarMonth size={12} />}
@@ -160,6 +161,8 @@ export default function Filter<T>({
             size="xs"
             w={120}
             h={36}
+            fz={12}
+            styles={{ input: { fontSize: 12 } }}
             clearable
           />
         )}

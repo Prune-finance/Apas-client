@@ -958,6 +958,10 @@ export function exportBusinessAccounts(params: IParams) {
   return openAccountExportUrl(axios.get("admin/accounts/default/export", { params: sanitizedQueryParams(params) }));
 }
 
+export function exportAllAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/all/export", { params: sanitizedQueryParams(params) }));
+}
+
 export function exportIssuedAdminAccounts(params: IParams) {
   return openAccountExportUrl(axios.get("admin/accounts/export", { params: sanitizedQueryParams(params) }));
 }

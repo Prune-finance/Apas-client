@@ -21,6 +21,10 @@ export async function middleware(request: NextRequest) {
 
     // Handles onboarding
     if (request.nextUrl.pathname.startsWith("/onboarding")) {
+      // Invite pages (/onboarding/[id]) use token-based auth — let them through
+      const segments = request.nextUrl.pathname.split("/").filter(Boolean);
+      if (segments.length > 1) return NextResponse.next();
+
       const req = await fetch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/onboarding/me`,
         {

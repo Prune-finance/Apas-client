@@ -17,3 +17,20 @@ export async function checkToken(id: string) {
     };
   }
 }
+
+export async function checkOnboardingInvite(reference: string, token: string) {
+  try {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_QUESTIONNAIRE_URL}/business/onboarding/auth/invite`,
+      { params: { reference, token } }
+    );
+    return data.data as {
+      email: string;
+      contactName: string;
+      businessName: string;
+    };
+  } catch {
+    redirect("/auth/login");
+    return { email: "", contactName: "", businessName: "" };
+  }
+}

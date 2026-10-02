@@ -11,25 +11,32 @@ import useNotification from "@/lib/hooks/notification";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import createAxiosInstance from "@/lib/axios";
 import { isAxiosError } from "axios";
+import Cookies from "js-cookie";
 import { z } from "zod";
 
-const passwordRules = [
-  { regex: /.{10,}/, message: "Password must be at least 10 characters" },
-  { regex: /[A-Z]/, message: "Password must include an uppercase letter" },
-  { regex: /[a-z]/, message: "Password must include a lowercase letter" },
-  { regex: /[0-9]/, message: "Password must include a number" },
-  { regex: /[^A-Za-z0-9]/, message: "Password must include a special character" },
+const lengthRule = { regex: /.{10,}/, label: "at least 10 characters" };
+const charRules = [
+  { regex: /[A-Z]/, label: "an uppercase letter" },
+  { regex: /[a-z]/, label: "a lowercase letter" },
+  { regex: /[0-9]/, label: "a number" },
+  { regex: /[^A-Za-z0-9]/, label: "a special character" },
 ];
 
 const onboardingRegisterSchema = z
   .object({
     email: z.string().email(),
     password: z.string().superRefine((val, ctx) => {
-      const failed = passwordRules
+      const parts: string[] = [];
+      if (!lengthRule.regex.test(val)) parts.push(`be ${lengthRule.label}`);
+      const failedChars = charRules
         .filter(({ regex }) => !regex.test(val))
-        .map(({ message }) => message);
-      if (failed.length) {
-        ctx.addIssue({ code: z.ZodIssueCode.custom, message: failed.join(", ") });
+        .map(({ label }) => label);
+      if (failedChars.length) parts.push(`include ${failedChars.join(", ")}`);
+      if (parts.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Password must ${parts.join(", and ")}`,
+        });
       }
     }),
     confirmPassword: z.string().min(1, "Confirm Password is required"),
@@ -96,17 +103,19 @@ export default function OnboardingInviteForm({
 
     setProcessing(true);
     try {
-      await questAxios.post("/business/onboarding/auth/signup", {
+      const { data: res } = await questAxios.post("/business/onboarding/auth/signup", {
         reference: params.id,
         token,
         password: form.values.password,
       });
 
-      handleSuccess(
-        "Account Created",
-        "Your account is ready. Please log in to continue.",
-      );
-      window.location.replace("/auth/onboarding/login");
+      const accessToken = res.data?.accessToken;
+      if (accessToken) {
+        Cookies.set("auth", accessToken, { expires: accessToken ? 1 / 96 : 0.25 }); // 15 min
+      }
+
+      handleSuccess("Account Created", "Welcome! Setting up your onboarding.");
+      window.location.replace("/onboarding");
     } catch (error) {
       if (isAxiosError(error)) {
         const issues = error.response?.data?.issues as

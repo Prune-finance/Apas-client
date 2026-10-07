@@ -26,15 +26,13 @@ export async function middleware(request: NextRequest) {
       if (segments.length > 1) return NextResponse.next();
 
       const req = await fetch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/onboarding/me`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/business/onboarding/auth/me`,
         {
           headers: { Authorization: `Bearer ${cookies().get("auth")?.value}` },
         }
       );
       if (!req.ok) {
-        return NextResponse.redirect(
-          new URL("/auth/onboarding/login", request.url)
-        );
+        return NextResponse.redirect(new URL("/auth/login", request.url));
       }
 
       return;
@@ -49,9 +47,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/auth/login", request.url));
     }
   } catch (error) {
+    console.error("[middleware] catch error for path:", request.nextUrl.pathname, error);
     if (request.nextUrl.pathname.startsWith("/admin"))
       return NextResponse.redirect(new URL("/auth/admin/login", request.url));
     return NextResponse.redirect(new URL("/auth/login", request.url));
+
   }
 }
 

@@ -4,13 +4,17 @@ import { Alert, Box, Flex, ThemeIcon } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { CustomPaper } from "../CustomPaper";
 import Navbar from "../Navbar";
-import { BusinessInfo } from "./BusinessInfo";
-import { CEOInfo } from "./CeoInfo";
-import { DocumentInfo } from "./DocumentInfo";
-import { AddDirectorsInfo } from "./AddDirectorsInfo";
-import { AddShareholdersInfo } from "./AddShareholdersInfo";
+import {
+  BusinessInfo,
+  CEOInfo,
+  DocumentInfo,
+  AddDirectorsInfo,
+  AddShareholdersInfo,
+  TermsOfUseInfo,
+  ReferenceData,
+  DEFAULT_REF_DATA,
+} from "@/ui/section/onboarding/shared";
 import { ReviewInfo } from "./ReviewInfo";
-import { TermsOfUseInfo } from "./TermsOfUseInfo";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   CEOSchema,
@@ -24,8 +28,67 @@ import {
 } from "@/lib/schema";
 import OnboardingStore from "@/lib/store/onboarding";
 import useAxios from "@/lib/hooks/useAxios";
-import { OnboardingBusiness, Onboarding as IOnboarding } from "@/lib/interface";
-import dayjs from "dayjs";
+
+
+interface OnboardingProfile {
+  reference: string;
+  email: string;
+  status: string;
+  submittedAt: string | null;
+  progress: {
+    lastCompletedSection: number;
+    nextSection: number;
+    isComplete: boolean;
+    sections: { number: number; title: string; completed: boolean }[];
+  };
+  business: {
+    businessName: string;
+    tradingName: string;
+    businessType: string | null;
+    businessIndustry: string;
+    countryCode: string;
+    businessAddress: string;
+    businessEmail: string;
+    businessPhoneCountryCode: string;
+    businessPhoneNumber: string;
+    businessWebsite: string | null;
+    businessDescription: string;
+    contactIsInitiator: boolean;
+  };
+  contactPerson: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneCountryCode: string;
+    phoneNumber: string;
+    identityType: string | null;
+    proofOfAddressType: string | null;
+    identityDocument: { id: string; kind: string; fileName: string } | null;
+    proofOfAddressDocument: { id: string; kind: string; fileName: string } | null;
+  };
+  ceo: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    phoneCountryCode: string;
+    phoneNumber: string;
+    dateOfBirth: string | null;
+    identityType: string | null;
+    proofOfAddressType: string | null;
+    identityDocument: { id: string; kind: string; fileName: string } | null;
+    identityDocumentBack: { id: string; kind: string; fileName: string } | null;
+    proofOfAddressDocument: { id: string; kind: string; fileName: string } | null;
+  } | null;
+  documents: {
+    incorporationCertificate: { id: string; kind: string; fileName: string } | null;
+    memart: { id: string; kind: string; fileName: string } | null;
+    amlFramework: { id: string; kind: string; fileName: string } | null;
+    operationalLicence: { id: string; kind: string; fileName: string } | null;
+  };
+  directors: any[];
+  shareholders: any[];
+  consent: any | null;
+}
 import { IconExclamationMark } from "@tabler/icons-react";
 
 export default function Onboarding() {
@@ -34,6 +97,7 @@ export default function Onboarding() {
   const [shareholders, setShareholders] =
     useState<OnboardingType["shareholders"]>();
   const { setBusiness, setData } = OnboardingStore();
+  const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
 
   const form = useForm<OnboardingType>({
     mode: "controlled",
@@ -49,72 +113,87 @@ export default function Onboarding() {
     },
   });
 
-  const { data: business } = useAxios<OnboardingBusiness>({
-    baseURL: "auth",
-    endpoint: "/onboarding/me",
+  useAxios<ReferenceData>({
+    baseURL: "questionnaire",
+    endpoint: "/business/onboarding/reference-data",
     method: "GET",
     dependencies: [],
-    // dependencies: [active],
+    onSuccess: (data) => setRefData(data),
+  });
+
+  const { data: profile } = useAxios<OnboardingProfile>({
+    baseURL: "questionnaire",
+    endpoint: "/business/onboarding/profile",
+    method: "GET",
+    dependencies: [],
     enabled: false,
     onSuccess: (data) => {
-      setBusiness(data);
-      setActive((prev) =>
-        prev === 6 && data.stageIdentifier === 6 ? 6 : data.stageIdentifier
-      );
+      if (data.business?.businessName) {
+        setBusiness({ businessName: data.business.businessName } as any);
+      }
+      const next = data.progress?.isComplete
+        ? 5
+        : Math.max(0, (data.progress?.nextSection ?? 1) - 1);
+      setActive(next);
     },
   });
 
   useEffect(() => {
+    if (!profile) return;
+
+    const b = profile.business;
+    const cp = profile.contactPerson;
+    const ceo = profile.ceo;
+    const docs = profile.documents;
+
     const formValues = {
-      // Basic business info - prioritize data over business
-      businessName: business?.businessName || "",
-      businessTradingName: business?.businessTradingName || "",
-      businessAddress: business?.businessAddress || "",
-      businessPhoneNumber: business?.businessPhoneNumber || "",
-      businessEmail: business?.businessEmail || "",
-      makeContactPersonInitiator: business?.makeContactPersonInitiator || false,
+      // Business info
+      businessName: b?.businessName || "",
+      businessTradingName: b?.tradingName || "",
+      businessAddress: b?.businessAddress || "",
+      businessPhoneNumber: b?.businessPhoneNumber || "",
+      businessEmail: b?.businessEmail || "",
+      makeContactPersonInitiator: b?.contactIsInitiator || false,
+      businessDescription: b?.businessDescription || "",
+      businessIndustry: b?.businessIndustry || "",
+      businessCountry: b?.countryCode || null,
+      businessType: b?.businessType || null,
+      businessWebsite: b?.businessWebsite || "https://",
+      businessPhoneNumberCode: b?.businessPhoneCountryCode || "+234",
 
-      // Business-only fields with defaults
-      businessDescription: business?.businessDescription || "",
-      businessIndustry: business?.businessIndustry || "",
-      businessCountry: business?.businessCountry || null,
-      businessType: business?.businessType || null,
-      businessWebsite: business?.businessWebsite || "https://",
-
-      // Contact person information
-      contactPersonPhoneNumber: business?.contactPersonPhoneNumber || "",
-      contactPersonFirstName: business?.contactPersonFirstName || "",
-      contactPersonLastName: business?.contactPersonLastName || "",
-      contactPersonEmail: business?.contactPersonEmail || "",
-      contactPersonIdType: business?.contactPersonIdType || "",
-      contactPersonPOAType: business?.contactPersonPOAType || "",
-      contactPersonIdUrl: business?.contactPersonIdUrl || "",
-      contactPersonIdUrlBack: business?.contactPersonIdUrlBack || "",
-      contactPersonPOAUrl: business?.contactPersonPOAUrl || "",
-      contactPersonPhoneNumberCode: "+234",
-      businessPhoneNumberCode: "+234",
+      // Contact person
+      contactPersonFirstName: cp?.firstName || "",
+      contactPersonLastName: cp?.lastName || "",
+      contactPersonEmail: cp?.email || "",
+      contactPersonPhoneNumber: cp?.phoneNumber || "",
+      contactPersonPhoneNumberCode: cp?.phoneCountryCode || "+234",
+      contactPersonIdType: cp?.identityType || "",
+      contactPersonPOAType: cp?.proofOfAddressType || "",
+      contactPersonIdUrl: cp?.identityDocument?.id || "",
+      contactPersonIdUrlBack: "",
+      contactPersonPOAUrl: cp?.proofOfAddressDocument?.id || "",
 
       // Documents
-      amlCompliance: business?.amlCompliance || "",
-      cacCertificate: business?.cacCertificate || "",
-      mermat: business?.mermat || "",
-      operationalLicense: business?.operationalLicense || "",
+      cacCertificate: docs?.incorporationCertificate?.id || "",
+      mermat: docs?.memart?.id || "",
+      amlCompliance: docs?.amlFramework?.id || "",
+      operationalLicense: docs?.operationalLicence?.id || "",
 
-      // CEO Information
-      ceoFirstName: business?.ceoFirstName || "",
-      ceoLastName: business?.ceoLastName || "",
-      ceoIdType: business?.ceoIdType || "",
-      ceoPOAType: business?.ceoPOAType || "",
-      ceoIdUrl: business?.ceoIdUrl || "",
-      ceoIdUrlBack: business?.ceoIdUrlBack || "",
-      ceoPOAUrl: business?.ceoPOAUrl || "",
-      ceoDOB: new Date(business?.ceoDOB as unknown as Date) || "",
-      ceoEmail: business?.ceoEmail || "",
+      // CEO
+      ceoFirstName: ceo?.firstName || "",
+      ceoLastName: ceo?.lastName || "",
+      ceoEmail: ceo?.email || "",
+      ceoIdType: ceo?.identityType || "",
+      ceoPOAType: ceo?.proofOfAddressType || "",
+      ceoIdUrl: ceo?.identityDocument?.id || "",
+      ceoIdUrlBack: ceo?.identityDocumentBack?.id || "",
+      ceoPOAUrl: ceo?.proofOfAddressDocument?.id || "",
+      ceoDOB: ceo?.dateOfBirth ? new Date(ceo.dateOfBirth) : null,
 
       // Arrays
       directors:
-        (business?.directors || []).length > 0
-          ? business?.directors?.map((director) => ({
+        (profile.directors || []).length > 0
+          ? profile.directors.map((director) => ({
               ...director,
               id: crypto.randomUUID(),
               date_of_birth: director.date_of_birth
@@ -131,8 +210,8 @@ export default function Onboarding() {
             }))
           : [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }],
       shareholders:
-        (business?.shareholders || []).length > 0
-          ? business?.shareholders?.map((shareholder) => ({
+        (profile.shareholders || []).length > 0
+          ? profile.shareholders.map((shareholder) => ({
               ...shareholder,
               id: crypto.randomUUID(),
               date_of_birth: shareholder.date_of_birth
@@ -152,7 +231,7 @@ export default function Onboarding() {
 
     form.setValues(formValues);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [business]);
+  }, [profile]);
 
   return (
     <Box>
@@ -164,20 +243,20 @@ export default function Onboarding() {
         <Box flex={1}>
           <CustomPaper>
             {active === 0 && (
-              <BusinessInfo setActive={setActive} active={active} form={form} />
+              <BusinessInfo setActive={setActive} active={active} form={form} refData={refData} />
             )}
             {active === 1 && (
-              <CEOInfo setActive={setActive} active={active} form={form} />
+              <CEOInfo setActive={setActive} active={active} form={form} refData={refData} />
             )}
             {active === 2 && (
-              <DocumentInfo setActive={setActive} active={active} form={form} />
+              <DocumentInfo setActive={setActive} active={active} form={form} refData={refData} />
             )}
             {active === 3 && (
               <AddDirectorsInfo
                 setActive={setActive}
                 active={active}
                 form={form}
-                // directors={directors}
+                refData={refData}
               />
             )}
             {active === 4 && (
@@ -186,6 +265,7 @@ export default function Onboarding() {
                 active={active}
                 form={form}
                 shareholders={shareholders}
+                refData={refData}
               />
             )}
             {active === 5 && (

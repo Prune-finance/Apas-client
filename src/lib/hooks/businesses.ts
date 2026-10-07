@@ -5,6 +5,7 @@ import createAxiosInstance from "@/lib/axios";
 import { sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("auth");
+const questAxios = createAxiosInstance("questionnaire");
 
 export function useBusiness(
   customParams: IParams = {},
@@ -27,7 +28,7 @@ export function useBusiness(
     };
   }, [customParams]);
 
-  const [businesses, setBusinesses] = useState<BusinessData[]>([]);
+  const [businesses, setBusinesses] = useState<BusinessListItem[]>([]);
   const [stats, setStats] = useState<{ [x: string]: number }[]>([]);
   const [statsMeta, setStatsMeta] = useState<StatsMeta>();
   const [meta, setMeta] = useState<BusinessMeta>();
@@ -59,8 +60,8 @@ export function useBusiness(
 
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `/admin/businesses?${params.toString()}`
+      const { data } = await questAxios.get(
+        `/business/businesses?${params.toString()}`
       );
 
       setMeta(data.meta);
@@ -278,9 +279,13 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
-  in: number;
-  out: number;
-  totalTrx: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  counts: {
+    onboarded: number;
+    onboarding: number;
+  };
 }
 
 export interface SingleBizMeta {
@@ -306,6 +311,25 @@ export interface UserBusinessMeta {
 export interface StatsMeta {
   monthDiff: number;
   weekCount: number;
+}
+
+export interface BusinessListItem {
+  id: string;
+  type: "ONBOARDING_APPLICATION" | "COMPANY";
+  status: "ONBOARDING" | "ONBOARDED";
+  businessName: string;
+  tradingName: string;
+  contactEmail: string;
+  createdAt: string;
+  state: "IN_PROGRESS" | "SUBMITTED" | "INACTIVE" | "ACTIVE";
+  services: string[];
+  verified: boolean;
+  addedByAdmin: boolean;
+  progress: {
+    lastCompletedSection: number;
+    totalSections: number;
+    submittedAt: string | null;
+  } | null;
 }
 
 export interface BusinessData {

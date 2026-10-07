@@ -21,12 +21,10 @@ const createAxiosInstance = (baseURL: keyof typeof BASEURL) => {
           ? window.localStorage.getItem("stage") || "TEST"
           : "TEST";
 
-      // console.log("Token:", window.localStorage.getItem("stage"));
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
 
-      // console.log("Stage:", stage);
       config.headers["X-APP-STAGE"] = stage;
       config.headers["X-App-Stage"] = stage;
 
@@ -36,6 +34,62 @@ const createAxiosInstance = (baseURL: keyof typeof BASEURL) => {
       return Promise.reject(error);
     }
   );
+
+  if (baseURL === "questionnaire") {
+    let isRefreshing = false;
+    let failedQueue: { resolve: (token: string) => void; reject: (err: unknown) => void }[] = [];
+
+    const processQueue = (error: unknown, token: string | null = null) => {
+      failedQueue.forEach((p) => (error ? p.reject(error) : p.resolve(token!)));
+      failedQueue = [];
+    };
+
+    axiosInstance.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const original = error.config as typeof error.config & { _retry?: boolean };
+
+        // Only auto-refresh for user onboarding endpoints, not admin
+        const isUserEndpoint = !original?.url?.includes("/admin/");
+
+        if (error.response?.status === 401 && isUserEndpoint && !original._retry) {
+          if (isRefreshing) {
+            return new Promise<string>((resolve, reject) => {
+              failedQueue.push({ resolve, reject });
+            }).then((token) => {
+              original.headers.Authorization = `Bearer ${token}`;
+              return axiosInstance(original);
+            });
+          }
+
+          original._retry = true;
+          isRefreshing = true;
+
+          try {
+            const { data } = await axios.post(
+              `${BASEURL.questionnaire}/business/onboarding/auth/refresh`,
+              {},
+              { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+            );
+            const newToken: string = data.data.accessToken;
+            const expiresIn: number = data.data.expiresIn ?? 3600;
+            Cookies.set("auth", newToken, { expires: expiresIn / 86400 });
+            axiosInstance.defaults.headers.common.Authorization = `Bearer ${newToken}`;
+            original.headers.Authorization = `Bearer ${newToken}`;
+            processQueue(null, newToken);
+            return axiosInstance(original);
+          } catch (refreshError) {
+            processQueue(refreshError, null);
+            return Promise.reject(refreshError);
+          } finally {
+            isRefreshing = false;
+          }
+        }
+
+        return Promise.reject(error);
+      }
+    );
+  }
 
   return axiosInstance;
 };

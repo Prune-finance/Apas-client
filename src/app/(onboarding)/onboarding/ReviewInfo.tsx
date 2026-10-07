@@ -1,5 +1,5 @@
 import { Box, Flex, Group, Stack, TabsPanel, Text } from "@mantine/core";
-import OnBoardingDocumentBox from "./onBoardingDocumentBox";
+import OnBoardingDocumentBox from "@/ui/section/onboarding/shared/onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { IconEdit } from "@tabler/icons-react";
 import TabsComponent from "@/ui/components/Tabs";

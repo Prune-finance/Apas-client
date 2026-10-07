@@ -16,7 +16,6 @@ import {
   IconDotsVertical,
   IconDownload,
   IconListTree,
-  IconPlus,
   IconRosetteDiscountCheckFilled,
 } from "@tabler/icons-react";
 
@@ -43,7 +42,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 
 export default function OnboardedBusinesses() {
@@ -65,7 +64,7 @@ export default function OnboardedBusinesses() {
     business: name,
     email: contactEmail,
     limit: parseInt(limit ?? "10", 10),
-    service: "API_SERVICE",
+    service: "API",
     page: active,
 
     search: debouncedSearch,
@@ -85,24 +84,16 @@ export default function OnboardedBusinesses() {
 
   const infoDetails = [
     {
-      title: "Total Business",
+      title: "Total Businesses",
       value: meta?.total || 0,
     },
     {
-      title: "Money In",
-      value: meta?.in || 0,
-      formatted: true,
-      currency: "EUR",
+      title: "Onboarded",
+      value: meta?.counts?.onboarded || 0,
     },
     {
-      title: "Money Out",
-      value: meta?.out || 0,
-      formatted: true,
-      currency: "EUR",
-    },
-    {
-      title: "Total Transactions",
-      value: meta?.totalTrx || 0,
+      title: "Onboarding",
+      value: meta?.counts?.onboarding || 0,
     },
   ];
 
@@ -134,13 +125,13 @@ export default function OnboardedBusinesses() {
       </TableTd>
       <TableTd w="30%">
         <Flex wrap="nowrap" gap={9} align="center">
-          {element.kycTrusted && (
+          {element.verified && (
             <IconRosetteDiscountCheckFilled
               size={25}
               color="var(--prune-primary-700)"
             />
           )}
-          {element.name}
+          {element.businessName}
         </Flex>
       </TableTd>
       <TableTd style={{ wordBreak: "break-word" }}>
@@ -151,13 +142,13 @@ export default function OnboardedBusinesses() {
         <Badge
           tt="capitalize"
           variant="light"
-          color={activeBadgeColor(element.companyStatus)}
-          w={82}
+          color={activeBadgeColor(element.state)}
           h={24}
           fw={400}
           fz={12}
+          style={{ minWidth: 82 }}
         >
-          {element.companyStatus.toLowerCase()}
+          {element.state.replace(/_/g, " ").toLowerCase()}
         </Badge>
       </TableTd>
 
@@ -223,22 +214,13 @@ export default function OnboardedBusinesses() {
         <Flex justify="space-between" align="center" mt={24}>
           <SearchInput search={search} setSearch={setSearch} />
 
-          <Flex gap={12}>
-            <SecondaryBtn
-              text="Filter"
-              action={toggle}
-              fw={600}
-              fz={12}
-              leftSection={<IconListTree size={16} />}
-            />
-            <PrimaryBtn
-              text="New Business"
-              link="/admin/businesses/new"
-              leftSection={<IconPlus size={16} />}
-              fw={600}
-              fz={12}
-            />
-          </Flex>
+          <SecondaryBtn
+            text="Filter"
+            action={toggle}
+            fw={600}
+            fz={12}
+            leftSection={<IconListTree size={16} />}
+          />
         </Flex>
         <Filter<FilterType>
           opened={opened}

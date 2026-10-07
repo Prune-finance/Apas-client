@@ -82,19 +82,19 @@ export default function BusinessUsers() {
       </TableTd>
       <TableTd w="25%">
         <Flex wrap="nowrap" gap={9} align="center">
-          {element.kycTrusted && (
+          {element.verified && (
             <IconRosetteDiscountCheckFilled
               size={25}
               color="var(--prune-primary-700)"
             />
           )}
-          {element.name}
+          {element.businessName}
         </Flex>
       </TableTd>
       <TableTd tt="lowercase">{element.contactEmail}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>
-        <BadgeComponent status={element.companyStatus} active />
+        <BadgeComponent status={element.state} active />
       </TableTd>
     </TableTr>
   ));

@@ -2,268 +2,104 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconMail, IconPlus, IconTrash, IconX } from "@tabler/icons-react";
-
-import {
-  Flex,
-  Paper,
-  ThemeIcon,
-  Text,
-  Box,
-  Group,
-  Stepper,
-  Divider,
-  Checkbox,
-} from "@mantine/core";
-import { TextInput, Select, Button } from "@mantine/core";
-import { UseFormReturnType, useForm, zodResolver } from "@mantine/form";
+import { IconHandStop, IconX } from "@tabler/icons-react";
+import { Divider, Flex, Paper, Stepper, Text, Tooltip } from "@mantine/core";
+import { useForm, zodResolver } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
-
-import DropzoneComponent from "@/ui/components/Dropzone";
-import { directorEtShareholderSchema } from "@/lib/schema";
-import {
-  NewBusinessType,
-  newBusiness,
-  basicInfoSchema,
-  documentSchema,
-  directorsSchema,
-  shareholdersSchema,
-} from "@/lib/schema/business";
+import { BackBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import ModalComponent from "@/ui/components/Modal";
+import SuccessModal from "@/ui/components/SuccessModal";
+import SuccessModalImage from "@/assets/success-modal-image.png";
+import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import BasicInfo from "./BasicInfo";
-import Documents from "./Documents";
-import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import ModalComponent from "@/ui/components/Modal";
-import { useDisclosure } from "@mantine/hooks";
-import SuccessModalImage from "@/assets/success-modal-image.png";
-import SuccessModal from "@/ui/components/SuccessModal";
-import createAxiosInstance from "@/lib/axios";
+import useAxios from "@/lib/hooks/useAxios";
 
-interface DirectorEtShareholder
-  extends Omit<
-    typeof directorEtShareholderSchema,
-    "identityType" | "proofOfAddress"
-  > {
-  identityType: string | null;
-  proofOfAddress: string | null;
-}
+import {
+  CEOSchema,
+  newOnboardingValue,
+  onboardingBasicInfoSchema,
+  onboardingDirectors,
+  onboardingDocumentSchema,
+  onboardingShareholders,
+  OnboardingType,
+} from "@/lib/schema";
+
+import {
+  BusinessInfo,
+  CEOInfo,
+  DocumentInfo,
+  AddDirectorsInfo,
+  AddShareholdersInfo,
+  TermsOfUseInfo,
+  ReferenceData,
+  DEFAULT_REF_DATA,
+} from "@/ui/section/onboarding/shared";
+
+const questAxios = createAxiosInstance("questionnaire");
+
+const STEP_LABELS = [
+  "Business Information",
+  "CEO Details",
+  "Documents",
+  "Directors",
+  "Shareholders",
+];
 
 export default function NewBusiness() {
   const router = useRouter();
-  const axios = createAxiosInstance("auth");
-  const [processing, setProcessing] = useState(false);
+  const { handleError, handleSuccess } = useNotification();
+
+  const [active, setActive] = useState(0);
+  const [adminReference, setAdminReference] = useState<string | null>(null);
+  const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
 
   const [opened, { open, close }] = useDisclosure(false);
-
+  const [openedHandOver, { open: openHandOver, close: closeHandOver }] =
+    useDisclosure(false);
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
     useDisclosure(false);
 
-  const { handleError } = useNotification();
-
-  const [active, setActive] = useState(0);
-
-  const form = useForm<NewBusinessType>({
-    initialValues: newBusiness,
-    // validate: zodResolver(validateNewBusiness),
+  const form = useForm<OnboardingType>({
+    initialValues: newOnboardingValue,
     validate: (values) => {
-      if (active === 0) return zodResolver(basicInfoSchema)(values);
-      if (active === 1) return zodResolver(documentSchema)(values);
-      if (active === 2) return zodResolver(directorsSchema)(values);
-      if (active === 3) return zodResolver(shareholdersSchema)(values);
+      if (active === 0) return zodResolver(onboardingBasicInfoSchema)(values);
+      if (active === 1) return zodResolver(CEOSchema)(values);
+      if (active === 2) return zodResolver(onboardingDocumentSchema)(values);
+      if (active === 3) return zodResolver(onboardingDirectors)(values);
+      if (active === 4) return zodResolver(onboardingShareholders)(values);
       return {};
     },
   });
 
-  const prevStep = () =>
-    setActive((current) => (current > 0 ? current - 1 : current));
-
-  const nextStep = () => {
-    const { hasErrors, errors } = form.validate();
-    if (hasErrors) return;
-
-    setActive((current) => {
-      // if (form.validate().hasErrors) return current;
-      const { hasErrors } = form.validate();
-      if (hasErrors) return current;
-
-      return current < 3 ? current + 1 : current;
-    });
-  };
-
-  const removeIdFromObjects = (array?: DirectorEtShareholder[]) => {
-    return array?.map(({ id, ...rest }) => rest);
-  };
-
-  const handleCreate = async () => {
-    setProcessing(true);
-    try {
-      const { errors, hasErrors } = form.validate();
-      const {
-        directors,
-        shareholders,
-        pricingPlan,
-        contactCountryCode,
-        ...rest
-      } = form.values;
-
-      const initialDir = directors && directors[0];
-      const initialShr = shareholders && shareholders[0];
-
-      const initialDirEmpty = Object.values(initialDir ?? {}).every(
-        (val) => !val
-      );
-      const initialShrEmpty = Object.values(initialShr ?? {}).every(
-        (val) => !val
-      );
-
-      if (hasErrors) {
-        throw new Error("Please fill all required fields");
-      }
-
-      // For pricing plan, the key will be "pricingPlanId"
-
-      const data = await axios.post(`/admin/company`, {
-        ...rest,
-        pricingPlanId: pricingPlan,
-        ...(initialDirEmpty
-          ? { directors: [] }
-          : { directors: removeIdFromObjects(directors) }),
-        ...(initialShrEmpty
-          ? { shareholders: [] }
-          : { shareholders: removeIdFromObjects(shareholders) }),
-      });
-
-      // handleSuccess(
-      //   "Business Created",
-      //   `${form.values.name} has been added to your list of business`
-      // );
-      // router.push("/admin/businesses");
-      openSuccess();
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
-    } finally {
-      setProcessing(false);
-    }
-  };
-
-  function isEmpty(value: any): boolean {
-    if (value === null || value === undefined) return true;
-    if (typeof value === "string" && value.trim() === "") return true;
-    if (typeof value === "number" && value === 0) return true;
-    if (typeof value === "boolean" && value === false) return true;
-    if (Array.isArray(value) && value.length === 0) return true;
-    if (typeof value === "object" && Object.keys(value).length === 0)
-      return true;
-    return false;
-  }
-
-  // const makeDirectorAShareholder = (director: DirectorEtShareholder) => {
-  //   form.values.shareholders &&
-  //     form.values.shareholders.map((item, index) => {
-  //       const data = Object.values(item).every(isEmpty);
-
-  //       if (data) form.removeListItem("shareholders", index);
-  //     });
-
-  //   form.insertListItem("shareholders", director);
-  // };
-
-  const makeDirectorAShareholder = (director: DirectorEtShareholder) => {
-    form.values.shareholders &&
-      form.values.shareholders.forEach((item, index) => {
-        const data = Object.entries(item)
-          .filter(([key]) => key !== "id")
-          .every(([, value]) => isEmpty(value));
-
-        if (data) form.removeListItem("shareholders", index);
-      });
-
-    const exists =
-      form.values.shareholders &&
-      form.values.shareholders.find(
-        (shareholder) => shareholder.id === director.id
-      );
-
-    // If the director exists, return the replace the director with the new one
-    if (exists) {
-      const index =
-        form.values.shareholders &&
-        form.values.shareholders.findIndex(
-          (shareholder) => shareholder.id === director.id
-        );
-
-      if (index !== -1 && index !== undefined && form.values.shareholders)
-        return form.setFieldValue(`shareholders.${index}`, director);
-    }
-
-    // If the director doesn't exist, add them as a shareholder
-    form.insertListItem("shareholders", director);
-  };
-
-  const removeShareholder = (director: DirectorEtShareholder) => {
-    // Find the index of the shareholder to remove using director object
-    const index =
-      form.values.shareholders &&
-      form.values.shareholders.findIndex((item) => {
-        return Object.keys(item).every(
-          (key) =>
-            item[key as keyof DirectorEtShareholder] ===
-            director[key as keyof DirectorEtShareholder]
-        );
-      });
-    // Remove the shareholder from the form
-    if (index && index !== -1) form.removeListItem("shareholders", index);
-  };
-
-  const isShareholderADirector = (director: DirectorEtShareholder) => {
-    // return false if the director's value is empty
-    if (Object.values(director).every(isEmpty)) return false;
-
-    return (
-      form.values.shareholders &&
-      form.values.shareholders.some((shareholder) => {
-        return Object.keys(director).every((key) => {
-          return (
-            director[key as keyof DirectorEtShareholder] ===
-            shareholder[key as keyof DirectorEtShareholder]
-          );
-        });
-      })
-    );
-  };
-
-  // const updateShareholders = (
-  //   directors: DirectorEtShareholder[],
-  //   shareholders: DirectorEtShareholder[]
-  // ) => {
-  //   directors.forEach((director) => {
-  //     const exists = shareholders.some(
-  //       (shareholder) => shareholder.id === director.id
-  //     );
-
-  //     if (exists) {
-  //       const index = shareholders.findIndex(
-  //         (shareholder) => shareholder.id === director.id
-  //       );
-
-  //       if (form.values?.shareholders) {
-  //         form.values.shareholders[index] = {
-  //           ...form.values.shareholders[index],
-  //           ...director,
-  //         };
-  //       }
-  //     } else {
-  //       form.insertListItem("shareholders", director);
-  //     }
-  //   });
-  // };
+  useAxios<ReferenceData>({
+    baseURL: "questionnaire",
+    endpoint: "/business/onboarding/reference-data",
+    method: "GET",
+    dependencies: [],
+    onSuccess: (data) => setRefData(data),
+  });
 
   const handleCloseSuccessModal = () => {
     router.push("/admin/businesses");
     closeSuccess();
+  };
+
+  const handleHandOver = async () => {
+    if (!adminReference) return;
+    try {
+      await questAxios.post(
+        `/business/onboarding/admin/${adminReference}/hand-over`
+      );
+      handleSuccess("Application Handed Over", "The application has been handed over to the user");
+      closeHandOver();
+      router.push("/admin/businesses");
+    } catch (error) {
+      handleError("Hand Over Failed", parseError(error));
+    }
   };
 
   return (
@@ -276,16 +112,43 @@ export default function NewBusiness() {
       />
 
       <Paper py={32} px={28} mt={20}>
-        <BackBtn />
+        <Flex align="center" justify="space-between">
+          <BackBtn />
+          <Tooltip
+            label={
+              adminReference
+                ? "Hand over to user to complete"
+                : "Save section 1 first to enable hand over"
+            }
+            withArrow
+            position="left"
+          >
+            <span>
+              <SecondaryBtn
+                text="Hand Over"
+                leftSection={<IconHandStop size={16} />}
+                fw={600}
+                disabled={!adminReference}
+                action={openHandOver}
+              />
+            </span>
+          </Tooltip>
+        </Flex>
 
-        <Text fz={24} fw={600} c="var(--prune-text-gray-700)" mt={28}>
+        <Text
+          fz={24}
+          fw={600}
+          c="var(--prune-text-gray-700)"
+          mt={28}
+          style={{ fontFamily: "'EksellDisplay', serif" }}
+        >
           Create New Business
         </Text>
 
         <Stepper
           active={active}
           onStepClick={setActive}
-          allowNextStepsSelect={form.errors ? false : true}
+          allowNextStepsSelect={false}
           color="var(--prune-primary-700)"
           classNames={{
             stepWrapper: styles.stepWrapper,
@@ -298,170 +161,9 @@ export default function NewBusiness() {
           }}
           mt={32}
         >
-          <Stepper.Step label="Basic Information">
-            <BasicInfo form={form} />
-          </Stepper.Step>
-          <Stepper.Step label="Documents">
-            <Documents form={form} />
-          </Stepper.Step>
-          <Stepper.Step label="Directors">
-            <Group justify="space-between" mb={30}>
-              <Text fz={16} fw={600} c="var(--prune-text-gray-700)">
-                Directors
-              </Text>
-
-              <PrimaryBtn
-                text="Add Director"
-                icon={IconPlus}
-                action={() =>
-                  form.insertListItem("directors", {
-                    ...directorEtShareholderSchema,
-                    id: crypto.randomUUID(),
-                  })
-                }
-                fw={600}
-                h={28}
-              />
-            </Group>
-            <Box>
-              {form.values.directors &&
-                form.values.directors.map((director, index, arr) => (
-                  <Box key={index}>
-                    <Group justify="space-between" mb={5}>
-                      <Button
-                        variant="transparent"
-                        fz={12}
-                        fw={500}
-                        p={0}
-                        m={0}
-                        size="xs"
-                        color="var(--prune-text-gray-700)"
-                      >{`Director ${index + 1}`}</Button>
-
-                      {index !== 0 && (
-                        <ThemeIcon
-                          variant="light"
-                          radius="xl"
-                          color="var(--prune-warning)"
-                          style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            form.removeListItem("directors", index)
-                          }
-                        >
-                          <IconTrash size={14} />
-                        </ThemeIcon>
-                      )}
-                    </Group>
-
-                    <DirectorForm count={index} form={form} />
-
-                    <Checkbox
-                      label="Make this director a shareholder"
-                      mt={20}
-                      fz={8}
-                      styles={{ label: { fontSize: "12px", fontWeight: 500 } }}
-                      color="var(--prune-primary-600)"
-                      checked={isShareholderADirector(director)}
-                      onChange={(e) => {
-                        e.target.checked
-                          ? makeDirectorAShareholder(director)
-                          : removeShareholder(director);
-                      }}
-                    />
-
-                    {arr.length !== index + 1 && <Divider my={20} />}
-                  </Box>
-                ))}
-            </Box>
-          </Stepper.Step>
-          <Stepper.Step label="Shareholders">
-            <Group justify="space-between" mb={30}>
-              <Text fz={16} fw={600} c="var(--prune-text-gray-700)">
-                Shareholders
-              </Text>
-              {/* <Button
-                variant="transparent"
-                fz={14}
-                color="var(--prune-text-gray-700)"
-                leftSection={
-                  <ThemeIcon
-                    color="var(--prune-primary-600)"
-                    radius="xl"
-                    size={24}
-                  >
-                    <IconPlus size={16} color="var(--prune-text-gray-700)" />
-                  </ThemeIcon>
-                }
-                onClick={() =>
-                  form.insertListItem(
-                    "shareholders",
-                    directorEtShareholderSchema
-                  )
-                }
-              >
-                Add New Shareholder
-              </Button> */}
-              <PrimaryBtn
-                text="Add Shareholder"
-                icon={IconPlus}
-                action={() =>
-                  form.insertListItem("shareholders", {
-                    ...directorEtShareholderSchema,
-                    id: crypto.randomUUID(),
-                  })
-                }
-                fw={600}
-                h={28}
-              />
-            </Group>
-            <Box>
-              {form.values.shareholders &&
-                form.values.shareholders.map((shareholder, index, arr) => (
-                  <Box key={index}>
-                    <Group justify="space-between" mb={5}>
-                      <Button
-                        variant="transparent"
-                        fz={12}
-                        fw={500}
-                        p={0}
-                        m={0}
-                        size="xs"
-                        color="var(--prune-text-gray-700)"
-                      >{`Shareholder ${index + 1}`}</Button>
-
-                      {index !== 0 && (
-                        <ThemeIcon
-                          variant="light"
-                          radius="xl"
-                          color="var(--prune-warning)"
-                          style={{ cursor: "pointer" }}
-                          onClick={() =>
-                            form.removeListItem("shareholders", index)
-                          }
-                        >
-                          <IconTrash size={14} />
-                        </ThemeIcon>
-                      )}
-                    </Group>
-
-                    <ShareholderForm count={index} form={form} />
-                    {/* <Checkbox
-                      label="Make this shareholder a director"
-                      mt={20}
-                      fz={8}
-                      onChange={(e) => {
-                        e.target.checked
-                          ? form.insertListItem("directors", shareholder)
-                          : {};
-                      }}
-                      styles={{ label: { fontSize: "12px", fontWeight: 500 } }}
-                      color="var(--prune-primary-600)"
-                    /> */}
-                    {arr.length !== index + 1 && <Divider my={20} />}
-                  </Box>
-                ))}
-            </Box>
-          </Stepper.Step>
+          {STEP_LABELS.map((label) => (
+            <Stepper.Step key={label} label={label} />
+          ))}
           <Stepper.Completed>
             Completed, click back button to get to previous step
           </Stepper.Completed>
@@ -469,21 +171,72 @@ export default function NewBusiness() {
 
         <Divider my={20} />
 
-        <Group justify="space-between">
-          <SecondaryBtn text="Clear Form" action={open} w={126} />
-
-          <Group justify="flex-end">
-            <SecondaryBtn text="Previous" action={prevStep} w={126} />
-            <PrimaryBtn
-              text={active < 3 ? "Next" : "Submit"}
-              w={126}
-              action={active < 3 ? nextStep : handleCreate}
-              loading={processing}
-            />
-          </Group>
-        </Group>
+        {active === 0 && (
+          <BusinessInfo
+            form={form}
+            active={active}
+            setActive={setActive}
+            refData={refData}
+            adminReference={adminReference ?? undefined}
+            onReferenceObtained={(ref) => setAdminReference(ref)}
+            noFloatingLabel
+          />
+        )}
+        {active === 1 && (
+          <CEOInfo
+            form={form}
+            active={active}
+            setActive={setActive}
+            refData={refData}
+            adminReference={adminReference ?? undefined}
+            noFloatingLabel
+          />
+        )}
+        {active === 2 && (
+          <DocumentInfo
+            form={form}
+            active={active}
+            setActive={setActive}
+            refData={refData}
+            adminReference={adminReference ?? undefined}
+          />
+        )}
+        {active === 3 && (
+          <AddDirectorsInfo
+            form={form}
+            active={active}
+            setActive={setActive}
+            refData={refData}
+            adminReference={adminReference ?? undefined}
+            noFloatingLabel
+          />
+        )}
+        {active === 4 && (
+          <AddShareholdersInfo
+            form={form}
+            active={active}
+            setActive={setActive}
+            shareholders={form.values.shareholders}
+            refData={refData}
+            adminReference={adminReference ?? undefined}
+            noFloatingLabel
+          />
+        )}
+        {active === 5 && (
+          <TermsOfUseInfo
+            form={form}
+            active={active}
+            setActive={(next) => {
+              const n = typeof next === "function" ? next(active) : next;
+              setActive(n);
+              if (n > 5) openSuccess();
+            }}
+            adminReference={adminReference ?? undefined}
+          />
+        )}
       </Paper>
 
+      {/* Clear form modal */}
       <ModalComponent
         opened={opened}
         close={close}
@@ -497,6 +250,17 @@ export default function NewBusiness() {
         color="hsl(from var(--prune-warning) h s l / .1)"
       />
 
+      {/* Hand over confirmation modal */}
+      <ModalComponent
+        opened={openedHandOver}
+        close={closeHandOver}
+        icon={<IconHandStop color="var(--prune-primary-700)" />}
+        title="Hand Over Application?"
+        text="Are you sure you want to hand over this application to the user to complete? You will no longer be able to edit it."
+        action={handleHandOver}
+        color="hsl(from var(--prune-primary-700) h s l / .1)"
+      />
+
       <SuccessModal
         openedSuccess={openedSuccess}
         handleCloseSuccessModal={handleCloseSuccessModal}
@@ -505,215 +269,3 @@ export default function NewBusiness() {
     </main>
   );
 }
-
-const DirectorForm = ({
-  count,
-  form,
-}: {
-  count: number;
-  form: UseFormReturnType<NewBusinessType>;
-}) => {
-  return (
-    <>
-      <Flex
-        // mt={26}
-        gap={20}
-      >
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          placeholder="Enter Director's name"
-          {...form.getInputProps(`directors.${count}.name`)}
-        />
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          placeholder="Enter Director's Email"
-          type="email"
-          {...form.getInputProps(`directors.${count}.email`)}
-          rightSection={<IconMail size={14} />}
-        />
-      </Flex>
-
-      <Flex mt={24} gap={20}>
-        <Select
-          placeholder="Select Identity Type"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["ID Card", "Passport", "Residence Permit"]}
-          {...form.getInputProps(`directors.${count}.identityType`)}
-        />
-
-        <Select
-          placeholder="Select Proof of Address"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["Utility Bill"]}
-          {...form.getInputProps(`directors.${count}.proofOfAddress`)}
-        />
-      </Flex>
-
-      <Flex mt={24} gap={20}>
-        {form.values.directors && form.values.directors[count].identityType && (
-          <>
-            <Box flex={1}>
-              <Text fz={12} c="#344054" mb={10}>
-                {`Upload ${form.values.directors[count].identityType} ${
-                  form.values.directors[count].identityType !== "Passport"
-                    ? "(Front)"
-                    : ""
-                }`}
-              </Text>
-              <DropzoneComponent
-                form={form}
-                formKey={`directors.${count}.identityFileUrl`}
-                uploadedFileUrl={form.values.directors[count].identityFileUrl}
-              />
-            </Box>
-
-            <>
-              {form.values.directors[count].identityType !== "Passport" && (
-                <Box flex={1}>
-                  <Text fz={12} c="#344054" mb={10}>
-                    {`Upload
-                ${form.values.directors[count].identityType}  (Back)`}
-                  </Text>
-                  <DropzoneComponent
-                    form={form}
-                    formKey={`directors.${count}.identityFileUrlBack`}
-                    uploadedFileUrl={
-                      form.values.directors[count].identityFileUrlBack
-                    }
-                  />
-                </Box>
-              )}
-            </>
-          </>
-        )}
-
-        {form.values.directors &&
-          form.values.directors[count].proofOfAddress && (
-            <Box flex={1}>
-              <Text fz={12} c="#344054" mb={10}>
-                Upload Utility Bill
-              </Text>
-              <DropzoneComponent
-                form={form}
-                formKey={`directors.${count}.proofOfAddressFileUrl`}
-                uploadedFileUrl={
-                  form.values.directors[count].proofOfAddressFileUrl
-                }
-              />
-            </Box>
-          )}
-      </Flex>
-    </>
-  );
-};
-
-const ShareholderForm = ({
-  count,
-  form,
-}: {
-  count: number;
-  form: UseFormReturnType<NewBusinessType>;
-}) => {
-  return (
-    <>
-      <Flex gap={20}>
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          placeholder="Enter Shareholder's name"
-          {...form.getInputProps(`shareholders.${count}.name`)}
-        />
-        <TextInput
-          classNames={{ input: styles.input }}
-          flex={1}
-          type="email"
-          placeholder="Enter Shareholder's Email"
-          {...form.getInputProps(`shareholders.${count}.email`)}
-          rightSection={<IconMail size={14} />}
-        />
-      </Flex>
-
-      <Flex mt={24} gap={20}>
-        <Select
-          placeholder="Select Identity Type"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["ID Card", "Passport", "Residence Permit"]}
-          {...form.getInputProps(`shareholders.${count}.identityType`)}
-        />
-
-        <Select
-          placeholder="Select Proof of Address"
-          classNames={{ input: styles.input }}
-          flex={1}
-          data={["Utility Bill"]}
-          {...form.getInputProps(`shareholders.${count}.proofOfAddress`)}
-        />
-      </Flex>
-
-      {form.values.shareholders &&
-        form.values.shareholders[count].identityType && (
-          <Flex mt={24} gap={20}>
-            <Box flex={1}>
-              <Text fz={12} c="#344054" mb={10}>
-                {` Upload
-                ${
-                  form.values.shareholders &&
-                  form.values.shareholders[count].identityType
-                } ${
-                  form.values.shareholders[count].identityType !== "Passport"
-                    ? "(Front)"
-                    : ""
-                }`}
-              </Text>
-              <DropzoneComponent
-                form={form}
-                formKey={`shareholders.${count}.identityFileUrl`}
-                uploadedFileUrl={
-                  form.values.shareholders[count].identityFileUrl
-                }
-              />
-            </Box>
-
-            {form.values.shareholders &&
-              form.values.shareholders[count].identityType !== "Passport" && (
-                <Box flex={1}>
-                  <Text fz={12} c="#344054" mb={10}>
-                    {` Upload
-                    ${
-                      form.values.shareholders &&
-                      form.values.shareholders[count].identityType
-                    }
-                    (Back)`}
-                  </Text>
-                  <DropzoneComponent
-                    form={form}
-                    formKey={`shareholders.${count}.identityFileUrlBack`}
-                    uploadedFileUrl={
-                      form.values.shareholders[count].identityFileUrlBack
-                    }
-                  />
-                </Box>
-              )}
-
-            <Box flex={1}>
-              <Text fz={12} c="#344054" mb={10}>
-                Upload utility Bill
-              </Text>
-              <DropzoneComponent
-                form={form}
-                formKey={`shareholders.${count}.proofOfAddressFileUrl`}
-                uploadedFileUrl={
-                  form.values.shareholders[count].proofOfAddressFileUrl
-                }
-              />
-            </Box>
-          </Flex>
-        )}
-    </>
-  );
-};

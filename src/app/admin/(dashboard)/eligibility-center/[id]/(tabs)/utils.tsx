@@ -13,7 +13,7 @@ import {
 
 import React, { ReactNode } from "react";
 import PaperContainer from "../PaperContainer";
-import OnBoardingDocumentBox from "@/app/(onboarding)/onboarding/onBoardingDocumentBox";
+import OnBoardingDocumentBox from "@/ui/section/onboarding/shared/onBoardingDocumentBox";
 import form from "@/app/auth/login/form";
 import {
   TextInputWithInsideLabel,

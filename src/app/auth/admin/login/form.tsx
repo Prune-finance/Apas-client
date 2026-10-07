@@ -9,9 +9,11 @@ import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Box, Checkbox, PasswordInput, Stack, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
+import createAxiosInstance from "@/lib/axios";
 import { Suspense, useState } from "react";
-
 import { useSearchParams } from "next/navigation";
+
+const authAxios = createAxiosInstance("auth");
 
 const fieldStyles = {
   input: {
@@ -45,7 +47,6 @@ function LoginForm() {
   const redirect = searchParams.get("redirect");
   const [processing, setProcessing] = useState(false);
   const { setUser } = User();
-
   const { handleSuccess, handleError } = useNotification();
 
   const form = useForm<LoginType>({
@@ -57,16 +58,20 @@ function LoginForm() {
     setProcessing(true);
     try {
       const { errors, hasErrors } = form.validate();
-      if (hasErrors) {
-        return;
+      if (hasErrors) return;
+
+      const { data } = await axios.post("/api/auth/admin/login", form.values);
+      Cookies.set("auth", data.meta.token, { expires: 0.25 });
+
+      // Fetch full admin profile
+      try {
+        const meRes = await authAxios.get("/admin/me");
+        setUser(meRes.data?.data ?? data.data);
+      } catch {
+        setUser(data.data);
       }
 
-      const authUrl = "/api/auth/admin/login";
-      const { data } = await axios.post(authUrl, form.values);
-
-      Cookies.set("auth", data.meta.token, { expires: 0.25 });
       handleSuccess("Authentication Successful", "Welcome back Admin");
-      setUser({ ...data.data });
       window.location.replace(redirect ? redirect : "/admin/dashboard");
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -74,6 +79,7 @@ function LoginForm() {
       setProcessing(false);
     }
   };
+
   return (
     <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
       <Stack gap={16} mt={24}>
@@ -89,15 +95,12 @@ function LoginForm() {
           {...form.getInputProps("password")}
         />
       </Stack>
-      {/* <LoginInput form={form} label="email" /> */}
-      {/* <LoginInput form={form} label="password" /> */}
 
       <div style={{ marginTop: 16 }}>
         <Checkbox label="Remember me" size="xs" color="#C1DD06" />
       </div>
 
       <PrimaryBtn
-        // action={handleLogin}
         loading={processing}
         fullWidth
         text="Log In"

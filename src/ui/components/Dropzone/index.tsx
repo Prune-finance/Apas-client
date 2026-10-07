@@ -33,6 +33,10 @@ interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   otherForm?: UseFormReturnType<T>;
   isUser?: boolean;
   isOnboarding?: boolean;
+  /** When set, uploads to the questionnaire API (/business/onboarding/files) and stores the returned file ID */
+  questionnaireKind?: string;
+  /** When set alongside questionnaireKind, uses the admin upload endpoint */
+  questionnaireAdminReference?: string;
 }
 
 export default function DropzoneComponent<T>(
@@ -46,6 +50,8 @@ export default function DropzoneComponent<T>(
   const uploadedFileUrl = props.uploadedFileUrl;
   const isUser = props.isUser;
   const isOnboarding = props.isOnboarding;
+  const questionnaireKind = props.questionnaireKind;
+  const questionnaireAdminReference = props.questionnaireAdminReference;
 
   function getNestedValue(obj: any, path: string) {
     return path.split(".").reduce((acc, part) => acc && acc[part], obj);
@@ -66,37 +72,52 @@ export default function DropzoneComponent<T>(
       const formData = new FormData();
       formData.append("file", file);
 
-      const path = isUser ? "auth" : isOnboarding ? "onboarding" : "admin";
+      let storedValue: any;
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/${path}/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      if (questionnaireKind) {
+        formData.append("kind", questionnaireKind);
+        const uploadPath = questionnaireAdminReference
+          ? `/business/onboarding/admin/files`
+          : `/business/onboarding/files`;
+        const { data } = await axios.post(
+          `${process.env.NEXT_PUBLIC_QUESTIONNAIRE_URL}${uploadPath}`,
+          formData,
+          { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        );
+        storedValue = data.data.id;
+      } else {
+        const path = isUser ? "auth" : isOnboarding ? "onboarding" : "admin";
+        const { data } = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/${path}/upload`,
+          formData,
+          { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        );
+        storedValue = data.data.url;
+      }
 
       if (form) {
         if (!formKey) return;
-        form.setFieldValue(formKey, data.data.url);
+        form.setFieldValue(formKey, storedValue);
       }
 
       if (props.removeDirectorForm) {
         if (!formKey) return;
-        props.removeDirectorForm.setFieldValue(formKey, data.data.url);
+        props.removeDirectorForm.setFieldValue(formKey, storedValue);
       }
 
       if (props.otherDocumentForm) {
         if (!formKey) return;
-        props.otherDocumentForm.setFieldValue(formKey, data.data.url);
+        props.otherDocumentForm.setFieldValue(formKey, storedValue);
       }
 
       if (props.DirectorForm) {
         if (!formKey) return;
-        props.DirectorForm.setFieldValue(formKey, data.data.url);
+        props.DirectorForm.setFieldValue(formKey, storedValue);
       }
 
       if (props.otherForm) {
         if (!formKey) return;
-        props.otherForm.setFieldValue(formKey, data.data.url);
+        props.otherForm.setFieldValue(formKey, storedValue);
         if (extensionKey) {
           props.otherForm.setFieldValue(extensionKey, file.type as any);
         }

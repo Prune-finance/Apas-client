@@ -100,6 +100,7 @@ import { IconExclamationMark, IconClockHour3 } from "@tabler/icons-react";
 
 export default function Onboarding() {
   const [active, setActive] = useState(0);
+  const [showReview, setShowReview] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
   const [directors, setDirectors] = useState<OnboardingType["directors"]>();
   const [shareholders, setShareholders] =
@@ -261,7 +262,7 @@ export default function Onboarding() {
               <Flex justify="center" align="center" h={300}>
                 <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />
               </Flex>
-            ) : profile?.documentReview?.state === "IN_REVIEW" ? (
+            ) : profile?.documentReview?.state === "IN_REVIEW" || showReview ? (
               <Flex direction="column" align="center" justify="center" py={48} px={24}>
                 {/* Icon */}
                 <Box
@@ -347,6 +348,7 @@ export default function Onboarding() {
                     setActive={setActive}
                     active={active}
                     form={form}
+                    onSuccess={() => setShowReview(true)}
                   />
                 )}
                 {active === 7 && (

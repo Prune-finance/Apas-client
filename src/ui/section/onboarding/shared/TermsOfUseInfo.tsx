@@ -10,6 +10,7 @@ interface TermsOfUseInfo {
   active: number;
   form: UseFormReturnType<OnboardingType>;
   adminReference?: string;
+  onSuccess?: () => void;
 }
 
 export const TermsOfUseInfo = ({
@@ -17,6 +18,7 @@ export const TermsOfUseInfo = ({
   active,
   form,
   adminReference,
+  onSuccess,
 }: TermsOfUseInfo) => {
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -87,7 +89,7 @@ export const TermsOfUseInfo = ({
         opened={opened}
         close={close}
         adminReference={adminReference}
-        onSuccess={() => setActive(active + 1)}
+        onSuccess={onSuccess ?? (() => setActive(active + 1))}
       />
     </Box>
   );

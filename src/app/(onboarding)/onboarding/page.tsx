@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Box, Flex, Loader, ThemeIcon } from "@mantine/core";
+import { Alert, Box, Flex, Loader, Text, ThemeIcon, Title } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { CustomPaper } from "../CustomPaper";
 import Navbar from "../Navbar";
@@ -88,8 +88,15 @@ interface OnboardingProfile {
   directors: any[];
   shareholders: any[];
   consent: any | null;
+  documentReview: {
+    state: string;
+    total: number;
+    approved: number;
+    rejected: number;
+    pending: number;
+  } | null;
 }
-import { IconExclamationMark } from "@tabler/icons-react";
+import { IconExclamationMark, IconClockHour3 } from "@tabler/icons-react";
 
 export default function Onboarding() {
   const [active, setActive] = useState(0);
@@ -253,6 +260,35 @@ export default function Onboarding() {
             {profileLoading ? (
               <Flex justify="center" align="center" h={300}>
                 <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />
+              </Flex>
+            ) : profile?.documentReview?.state === "IN_REVIEW" ? (
+              <Flex direction="column" align="center" justify="center" py={48} px={24}>
+                {/* Icon */}
+                <Box
+                  style={{
+                    width: 80,
+                    height: 80,
+                    borderRadius: "50%",
+                    background: "#FFF3CD",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    marginBottom: 24,
+                  }}
+                >
+                  <IconClockHour3 size={40} color="#D67507" stroke={1.5} />
+                </Box>
+
+                {/* Heading */}
+                <Title order={3} fw={700} c="var(--prune-text-gray-700)" ta="center" mb={8}>
+                  Application Under Review
+                </Title>
+                <Text fz={14} c="var(--prune-text-gray-500)" ta="center" maw={480} mb={36}>
+                  Your submitted documents are currently being reviewed by our
+                  team. You will receive an email notification once a decision
+                  has been made. This usually takes 24–48 hours.
+                </Text>
+
               </Flex>
             ) : (
               <>

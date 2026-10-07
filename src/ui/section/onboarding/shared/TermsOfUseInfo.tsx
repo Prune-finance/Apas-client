@@ -41,7 +41,7 @@ export const TermsOfUseInfo = ({
         and aim to ensure that regulatory compliance is at the fore of our
         existence through strict adherence to International regulations.
         Resultantly, we are authorized and regulated by the Financial Conduct
-        Authority ("FCA") as an Authorized Payment Institution (firm reference
+        Authority (&quot;FCA&quot;) as an Authorized Payment Institution (firm reference
         number 670226). This license enables us to open multiple doors to
         opportunities across International borders. We have a presence in the
         UK, across Europe and even Africa.

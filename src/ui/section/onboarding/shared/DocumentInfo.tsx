@@ -18,6 +18,7 @@ interface DocumentInfo {
   form: UseFormReturnType<OnboardingType>;
   refData: ReferenceData;
   adminReference?: string;
+  alreadyCompleted?: boolean;
 }
 
 function buildSection3Body(form: UseFormReturnType<OnboardingType>) {
@@ -30,13 +31,14 @@ function buildSection3Body(form: UseFormReturnType<OnboardingType>) {
   };
 }
 
-export const DocumentInfo = ({ setActive, active, form, refData, adminReference }: DocumentInfo) => {
+export const DocumentInfo = ({ setActive, active, form, refData, adminReference, alreadyCompleted }: DocumentInfo) => {
   const { handleSuccess, handleError } = useNotification();
 
   const docLabel = (kind: string, fallback: string) =>
     refData.companyDocuments.find((d) => d.value === kind)?.label ?? fallback;
   const docRequired = (kind: string) =>
     refData.companyDocuments.find((d) => d.value === kind)?.required ?? true;
+  const [mountSnapshot] = useState(() => JSON.stringify(buildSection3Body(form)));
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
 
@@ -60,6 +62,11 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference 
   const handleSaveAndContinue = async () => {
     const { hasErrors } = form.validate();
     if (hasErrors) return;
+
+    if (alreadyCompleted && JSON.stringify(buildSection3Body(form)) === mountSnapshot) {
+      setActive(active + 1);
+      return;
+    }
 
     setCompleting(true);
     try {

@@ -60,9 +60,18 @@ export default function DropzoneComponent<T>(
   const [uploaded, setUploaded] = useState(
     !!form?.values[formKey as keyof NewBusinessType] || !!uploadedFileUrl
   );
+  const [viewUrl, setViewUrl] = useState<string>(
+    uploadedFileUrl?.startsWith("http") ? uploadedFileUrl : ""
+  );
+
+  // Sync viewUrl when the parent resolves the pre-signed URL (e.g. on initial page load)
+  useEffect(() => {
+    if (uploadedFileUrl?.startsWith("http")) {
+      setViewUrl(uploadedFileUrl);
+    }
+  }, [uploadedFileUrl]);
 
   const [processing, setProcessing] = useState(false);
-  // {{auth-srv}}/v1/auth/upload
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -85,6 +94,20 @@ export default function DropzoneComponent<T>(
           { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
         );
         storedValue = data.data.id;
+
+        // Immediately resolve the pre-signed view URL so the View link appears
+        try {
+          const viewPath = questionnaireAdminReference
+            ? `/business/onboarding/admin/files/${storedValue}`
+            : `/business/onboarding/files/${storedValue}`;
+          const { data: viewData } = await axios.get(
+            `${process.env.NEXT_PUBLIC_QUESTIONNAIRE_URL}${viewPath}`,
+            { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+          );
+          setViewUrl(viewData?.data?.url || "");
+        } catch {
+          setViewUrl("");
+        }
       } else {
         const path = isUser ? "auth" : isOnboarding ? "onboarding" : "admin";
         const { data } = await axios.post(
@@ -93,6 +116,7 @@ export default function DropzoneComponent<T>(
           { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
         );
         storedValue = data.data.url;
+        setViewUrl(storedValue);
       }
 
       if (form) {
@@ -139,8 +163,8 @@ export default function DropzoneComponent<T>(
   return (
     <Dropzone
       onDrop={(files) => setFile(files[0])}
-      onReject={(files) =>
-        handleError("File was rejected", files[0].errors[0].message)
+      onReject={() =>
+        handleError("File was rejected", "File must be smaller than 5MB")
       }
       // onReject={(files) => console.log("rejected files", files[0])}
       maxSize={5 * 1024 ** 2}
@@ -216,17 +240,30 @@ export default function DropzoneComponent<T>(
 
         <Flex direction="column" align="center">
           {uploaded && (
-            <Group gap={2} justify="center" align="center" w="30ch">
-              <Text
-                fz={10}
-                // lineClamp={1}
-                truncate="start"
-                // w="25ch"
-                // flex={1}
-              >
-                {(uploadedFileUrl ?? "").split("/").pop()}
+            <Group gap={6} justify="center" align="center" w="30ch">
+              <Text fz={10} truncate="start" style={{ maxWidth: "16ch" }}>
+                {file?.name ||
+                  (viewUrl || uploadedFileUrl || "")
+                    .split("/")
+                    .pop()
+                    ?.split("?")[0]}
               </Text>
-              <Text fz={10} td="underline" c="#97AD05">
+              {viewUrl && (
+                <Text
+                  fz={10}
+                  td="underline"
+                  c="#97AD05"
+                  component="a"
+                  href={viewUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ cursor: "pointer", pointerEvents: "auto" }}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  View
+                </Text>
+              )}
+              <Text fz={10} td="underline" c="#97AD05" style={{ pointerEvents: "auto" }}>
                 Re-upload
               </Text>
             </Group>
@@ -241,7 +278,7 @@ export default function DropzoneComponent<T>(
           )}
           {!uploaded && (
             <Text fz={9} c="dimmed" inline mt={5}>
-              Supported formats: JPEG, PNG, PDF
+              Supported formats: JPEG, PNG, PDF · Max size: 5MB
             </Text>
           )}
         </Flex>

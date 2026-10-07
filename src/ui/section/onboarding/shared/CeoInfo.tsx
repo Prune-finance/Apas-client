@@ -24,6 +24,7 @@ interface CEOInfo {
   refData: ReferenceData;
   adminReference?: string;
   noFloatingLabel?: boolean;
+  alreadyCompleted?: boolean;
 }
 
 function formatDOB(date: Date | string | null | undefined): string | undefined {
@@ -49,8 +50,9 @@ function buildSection2Body(form: UseFormReturnType<OnboardingType>) {
   };
 }
 
-export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFloatingLabel }: CEOInfo) => {
+export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFloatingLabel, alreadyCompleted }: CEOInfo) => {
   const { handleSuccess, handleError } = useNotification();
+  const [mountSnapshot] = useState(() => JSON.stringify(buildSection2Body(form)));
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
 
@@ -93,6 +95,11 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
   const handleSaveAndContinue = async () => {
     const { hasErrors } = form.validate();
     if (hasErrors) return;
+
+    if (alreadyCompleted && JSON.stringify(buildSection2Body(form)) === mountSnapshot) {
+      setActive(active + 1);
+      return;
+    }
 
     setCompleting(true);
     try {

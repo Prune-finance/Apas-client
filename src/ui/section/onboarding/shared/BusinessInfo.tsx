@@ -29,6 +29,8 @@ interface BusinessInfo {
   adminReference?: string;
   onReferenceObtained?: (ref: string) => void;
   noFloatingLabel?: boolean;
+  isAdmin?: boolean;
+  alreadyCompleted?: boolean;
 }
 
 function buildSection1Body(form: UseFormReturnType<OnboardingType>) {
@@ -43,7 +45,9 @@ function buildSection1Body(form: UseFormReturnType<OnboardingType>) {
     businessEmail: v.businessEmail,
     businessPhoneCountryCode: v.businessPhoneNumberCode,
     businessPhoneNumber: v.businessPhoneNumber,
-    businessWebsite: v.businessWebsite,
+    businessWebsite: (v.businessWebsite && v.businessWebsite !== "https://" && v.businessWebsite !== "http://")
+      ? v.businessWebsite
+      : undefined,
     businessDescription: v.businessDescription,
     contactIsInitiator: v.makeContactPersonInitiator,
     contactPerson: {
@@ -60,8 +64,9 @@ function buildSection1Body(form: UseFormReturnType<OnboardingType>) {
   };
 }
 
-export const BusinessInfo = ({ setActive, active, form, refData, adminReference, onReferenceObtained, noFloatingLabel }: BusinessInfo) => {
+export const BusinessInfo = ({ setActive, active, form, refData, adminReference, onReferenceObtained, noFloatingLabel, isAdmin, alreadyCompleted }: BusinessInfo) => {
   const { handleSuccess, handleError } = useNotification();
+  const [mountSnapshot] = useState(() => JSON.stringify(buildSection1Body(form)));
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
 
@@ -106,6 +111,11 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
   const handleSaveAndContinue = async () => {
     const { hasErrors } = form.validate();
     if (hasErrors) return;
+
+    if (alreadyCompleted && JSON.stringify(buildSection1Body(form)) === mountSnapshot) {
+      setActive(active + 1);
+      return;
+    }
 
     setCompleting(true);
     try {
@@ -211,7 +221,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
 
         <Flex gap={24} w="50%">
           <TextInputWithInsideLabel
-            label="Business Website"
+            label="Business Website (Optional)"
             w="100%"
             placeholder="Enter Business Website"
             standard={noFloatingLabel}
@@ -303,6 +313,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
                 uploadedFileUrl={form.getValues().contactPersonIdUrl || ""}
                 kind="IDENTITY"
                 adminReference={adminReference}
+                isAdmin={isAdmin}
               />
 
               {form.values.contactPersonIdType !== "PASSPORT" && (
@@ -313,6 +324,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
                   uploadedFileUrl={form.getValues().contactPersonIdUrlBack || ""}
                   kind="IDENTITY"
                   adminReference={adminReference}
+                  isAdmin={isAdmin}
                 />
               )}
             </>
@@ -326,6 +338,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
               uploadedFileUrl={form.getValues().contactPersonPOAUrl || ""}
               kind="PROOF_OF_ADDRESS"
               adminReference={adminReference}
+              isAdmin={isAdmin}
             />
           )}
         </Flex>

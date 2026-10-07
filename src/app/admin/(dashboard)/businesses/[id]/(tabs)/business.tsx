@@ -44,13 +44,13 @@ export default function Business({
   revalidate,
   services,
   revalidateServices,
-  meta,
+  meta = null,
 }: {
   business: BusinessData;
   revalidate: () => void;
   revalidateServices: () => Promise<void>;
   services: Service[];
-  meta: SingleBizMeta | null;
+  meta?: SingleBizMeta | null;
 }) {
   const axios = createAxiosInstance("auth");
   const { handleSuccess, handleError } = useNotification();

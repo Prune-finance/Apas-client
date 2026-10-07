@@ -107,7 +107,8 @@ export default function OnboardedBusinesses() {
   ];
 
   const handleRowClick = (id: string) => {
-    push(`/admin/businesses/${id}`);
+    const backUrl = `/admin/businesses?${searchParams.toString()}`;
+    push(`/admin/businesses/${id}?back=${encodeURIComponent(backUrl)}`);
   };
 
   // filteredSearch(businesses, ["name", "contactEmail"], debouncedSearch);

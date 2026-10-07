@@ -36,14 +36,17 @@ export default function OnBoardingDocumentBox<T>({
     const val = uploadedFileUrl || "";
     // If val is a file ID (UUID, not an http URL), fetch the pre-signed view URL
     if (val && !val.startsWith("http") && kind) {
+      const viewPath = isAdmin
+        ? `/business/onboarding/admin/files/${val}`
+        : `/business/onboarding/files/${val}`;
       questAxios
-        .get(`/business/onboarding/files/${val}`)
+        .get(viewPath)
         .then((res) => setDisplayUrl(res.data.data.url))
         .catch(() => setDisplayUrl(""));
     } else {
       setDisplayUrl(val);
     }
-  }, [uploadedFileUrl, kind]);
+  }, [uploadedFileUrl, kind, isAdmin]);
 
   return (
     <Box flex={1}>
@@ -61,7 +64,7 @@ export default function OnBoardingDocumentBox<T>({
         uploadedFileUrl={displayUrl}
         isOnboarding={!isAdmin && !kind}
         questionnaireKind={kind}
-        questionnaireAdminReference={adminReference}
+        questionnaireAdminReference={adminReference || (isAdmin && kind ? "admin" : undefined)}
       />
       {form?.errors[formKey || "cacCertificate"] && (
         <Text fz={12} c="var(--prune-warning)" mt={5}>

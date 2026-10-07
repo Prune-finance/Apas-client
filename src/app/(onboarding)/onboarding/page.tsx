@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Box, Flex, ThemeIcon } from "@mantine/core";
+import { Alert, Box, Flex, Loader, ThemeIcon } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { CustomPaper } from "../CustomPaper";
 import Navbar from "../Navbar";
@@ -93,6 +93,7 @@ import { IconExclamationMark } from "@tabler/icons-react";
 
 export default function Onboarding() {
   const [active, setActive] = useState(0);
+  const [reference, setReference] = useState<string | null>(null);
   const [directors, setDirectors] = useState<OnboardingType["directors"]>();
   const [shareholders, setShareholders] =
     useState<OnboardingType["shareholders"]>();
@@ -121,7 +122,7 @@ export default function Onboarding() {
     onSuccess: (data) => setRefData(data),
   });
 
-  const { data: profile } = useAxios<OnboardingProfile>({
+  const { data: profile, loading: profileLoading } = useAxios<OnboardingProfile>({
     baseURL: "questionnaire",
     endpoint: "/business/onboarding/profile",
     method: "GET",
@@ -140,6 +141,8 @@ export default function Onboarding() {
 
   useEffect(() => {
     if (!profile) return;
+
+    if (profile.reference) setReference(profile.reference);
 
     const b = profile.business;
     const cp = profile.contactPerson;
@@ -233,6 +236,11 @@ export default function Onboarding() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile]);
 
+  const isSectionCompleted = (stepIndex: number) =>
+    profile?.progress?.sections?.some(
+      (s) => s.number === stepIndex + 1 && s.completed
+    ) ?? false;
+
   return (
     <Box>
       <Flex gap={20}>
@@ -242,81 +250,109 @@ export default function Onboarding() {
 
         <Box flex={1}>
           <CustomPaper>
-            {active === 0 && (
-              <BusinessInfo setActive={setActive} active={active} form={form} refData={refData} />
-            )}
-            {active === 1 && (
-              <CEOInfo setActive={setActive} active={active} form={form} refData={refData} />
-            )}
-            {active === 2 && (
-              <DocumentInfo setActive={setActive} active={active} form={form} refData={refData} />
-            )}
-            {active === 3 && (
-              <AddDirectorsInfo
-                setActive={setActive}
-                active={active}
-                form={form}
-                refData={refData}
-              />
-            )}
-            {active === 4 && (
-              <AddShareholdersInfo
-                setActive={setActive}
-                active={active}
-                form={form}
-                shareholders={shareholders}
-                refData={refData}
-              />
-            )}
-            {active === 5 && (
-              <ReviewInfo setActive={setActive} active={active} form={form} />
-            )}
-            {active === 6 && (
-              <TermsOfUseInfo
-                setActive={setActive}
-                active={active}
-                form={form}
-              />
-            )}
+            {profileLoading ? (
+              <Flex justify="center" align="center" h={300}>
+                <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />
+              </Flex>
+            ) : (
+              <>
+                {active === 0 && (
+                  <BusinessInfo
+                    setActive={setActive}
+                    active={active}
+                    form={form}
+                    refData={refData}
+                    onReferenceObtained={(ref) => setReference(ref)}
+                    alreadyCompleted={isSectionCompleted(0)}
+                  />
+                )}
+                {active === 1 && (
+                  <CEOInfo
+                    setActive={setActive}
+                    active={active}
+                    form={form}
+                    refData={refData}
+                    alreadyCompleted={isSectionCompleted(1)}
+                  />
+                )}
+                {active === 2 && (
+                  <DocumentInfo
+                    setActive={setActive}
+                    active={active}
+                    form={form}
+                    refData={refData}
+                    alreadyCompleted={isSectionCompleted(2)}
+                  />
+                )}
+                {active === 3 && (
+                  <AddDirectorsInfo
+                    setActive={setActive}
+                    active={active}
+                    form={form}
+                    refData={refData}
+                    alreadyCompleted={isSectionCompleted(3)}
+                  />
+                )}
+                {active === 4 && (
+                  <AddShareholdersInfo
+                    setActive={setActive}
+                    active={active}
+                    form={form}
+                    shareholders={shareholders}
+                    refData={refData}
+                    alreadyCompleted={isSectionCompleted(4)}
+                  />
+                )}
+                {active === 5 && (
+                  <ReviewInfo setActive={setActive} active={active} form={form} />
+                )}
+                {active === 6 && (
+                  <TermsOfUseInfo
+                    setActive={setActive}
+                    active={active}
+                    form={form}
+                  />
+                )}
+                {active === 7 && (
+                  <Box>
+                    <Alert
+                      title="Awaiting Admin Approval"
+                      mb={64}
+                      color="#D67507"
+                      p={16}
+                      variant="outline"
+                      icon={
+                        <ThemeIcon radius="xl" size={24} color="#D67507">
+                          <IconExclamationMark />
+                        </ThemeIcon>
+                      }
+                      styles={{
+                        root: { background: "#FFF9E6", padding: "16px" },
+                        title: {
+                          color: "var(--prune-text-gray-700)",
+                          fontSize: "14px",
+                          fontWeight: 700,
+                        },
+                        message: {
+                          color: "var(--prune-text-gray-500)",
+                          fontSize: "12px",
+                          fontWeight: 400,
+                        },
+                      }}
+                    >
+                      You will get an email regarding your application status within
+                      24-48 hours, once account creation has been approved
+                    </Alert>
 
-            {active === 7 && (
-              <Box>
-                <Alert
-                  title="Awaiting Admin Approval"
-                  mb={64}
-                  color="#D67507"
-                  p={16}
-                  variant="outline"
-                  icon={
-                    <ThemeIcon radius="xl" size={24} color="#D67507">
-                      <IconExclamationMark />
-                    </ThemeIcon>
-                  }
-                  styles={{
-                    root: { background: "#FFF9E6", padding: "16px" },
-                    title: {
-                      color: "var(--prune-text-gray-700)",
-                      fontSize: "14px",
-                      fontWeight: 700,
-                    },
-                    message: {
-                      color: "var(--prune-text-gray-500)",
-                      fontSize: "12px",
-                      fontWeight: 400,
-                    },
-                  }}
-                >
-                  You will get an email regarding your application status within
-                  24-48 hours, once account creation has been approved
-                </Alert>
-
-                <ReviewInfo
-                  setActive={setActive}
-                  active={active}
-                  form={form}
-                  title="Summary"
-                />
-              </Box>
+                    <ReviewInfo
+                      setActive={setActive}
+                      active={active}
+                      form={form}
+                      title="Summary"
+                    />
+                  </Box>
+                )}
+              </>
             )}
           </CustomPaper>
         </Box>

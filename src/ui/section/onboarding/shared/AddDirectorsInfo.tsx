@@ -25,6 +25,7 @@ interface AddDirectorsInfo {
   refData: ReferenceData;
   adminReference?: string;
   noFloatingLabel?: boolean;
+  alreadyCompleted?: boolean;
 }
 
 function formatDOB(date: any): string | undefined {
@@ -58,8 +59,10 @@ export const AddDirectorsInfo = ({
   refData,
   adminReference,
   noFloatingLabel,
+  alreadyCompleted,
 }: AddDirectorsInfo) => {
   const { handleSuccess, handleError } = useNotification();
+  const [mountSnapshot] = useState(() => JSON.stringify(buildSection4Body(form)));
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
 
@@ -83,6 +86,11 @@ export const AddDirectorsInfo = ({
   const handleSaveAndContinue = async () => {
     const { hasErrors } = form.validate();
     if (hasErrors) return;
+
+    if (alreadyCompleted && JSON.stringify(buildSection4Body(form)) === mountSnapshot) {
+      setActive(active + 1);
+      return;
+    }
 
     setCompleting(true);
     try {

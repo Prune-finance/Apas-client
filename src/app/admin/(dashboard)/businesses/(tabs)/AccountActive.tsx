@@ -53,14 +53,13 @@ export default function OnboardedBusinesses() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
 
-  const { status, date, endDate, name, contactEmail } = Object.fromEntries(
+  const { date, endDate, name, contactEmail } = Object.fromEntries(
     searchParams.entries()
   );
 
   const queryParams = {
     date: date ? dayjs(date).format("YYYY-MM-DD") : "",
     endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
-    status: status ? status.toUpperCase() : "",
     business: name,
     email: contactEmail,
     limit: parseInt(limit ?? "10", 10),
@@ -109,7 +108,8 @@ export default function OnboardedBusinesses() {
   ];
 
   const handleRowClick = (id: string) => {
-    push(`/admin/businesses/${id}`);
+    const backUrl = `/admin/businesses?${searchParams.toString()}`;
+    push(`/admin/businesses/${id}?back=${encodeURIComponent(backUrl)}`);
   };
 
   // filteredSearch(businesses, ["name", "contactEmail"], debouncedSearch);

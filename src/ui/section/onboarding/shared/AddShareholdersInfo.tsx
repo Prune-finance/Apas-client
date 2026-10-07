@@ -26,6 +26,7 @@ interface AddShareholdersInfo {
   refData: ReferenceData;
   adminReference?: string;
   noFloatingLabel?: boolean;
+  alreadyCompleted?: boolean;
 }
 
 function formatDOB(date: any): string | undefined {
@@ -60,8 +61,10 @@ export const AddShareholdersInfo = ({
   refData,
   adminReference,
   noFloatingLabel,
+  alreadyCompleted,
 }: AddShareholdersInfo) => {
   const { handleSuccess, handleError } = useNotification();
+  const [mountSnapshot] = useState(() => JSON.stringify(buildSection5Body(form)));
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
 
@@ -85,6 +88,11 @@ export const AddShareholdersInfo = ({
   const handleSaveAndContinue = async () => {
     const { hasErrors } = form.validate();
     if (hasErrors) return;
+
+    if (alreadyCompleted && JSON.stringify(buildSection5Body(form)) === mountSnapshot) {
+      setActive(active + 1);
+      return;
+    }
 
     setCompleting(true);
     try {

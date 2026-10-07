@@ -138,6 +138,35 @@ export function useSingleBusiness(id: string) {
   return { loading, business, revalidate, meta };
 }
 
+export function useBusinessDetail(id: string) {
+  const [business, setBusiness] = useState<BusinessDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchBusiness() {
+    if (!id) return;
+    setLoading(true);
+    try {
+      const { data } = await questAxios.get(`/business/businesses/${id}`);
+      setBusiness(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchBusiness();
+  }
+
+  useEffect(() => {
+    fetchBusiness();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  return { loading, business, revalidate };
+}
+
 export function useBusinessServices(id: string) {
   const [services, setServices] = useState<Service[]>([]);
   const [meta, setMeta] = useState<BusinessMeta>();
@@ -330,6 +359,116 @@ export interface BusinessListItem {
     totalSections: number;
     submittedAt: string | null;
   } | null;
+}
+
+export interface ApplicationSection {
+  number: number;
+  title: string;
+  completed: boolean;
+}
+
+export interface ApplicationProgress {
+  lastCompletedSection: number;
+  nextSection: number | null;
+  isComplete: boolean;
+  sections: ApplicationSection[];
+}
+
+export interface OnboardingBusiness {
+  businessName: string;
+  tradingName: string;
+  businessType: string | null;
+  businessIndustry: string;
+  countryCode: string;
+  businessAddress: string;
+  businessEmail: string;
+  businessPhoneCountryCode: string;
+  businessPhoneNumber: string;
+  businessWebsite: string | null;
+  businessDescription: string;
+  contactIsInitiator: boolean;
+}
+
+export interface OnboardingContactPerson {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  identityType: string | null;
+  proofOfAddressType: string | null;
+  identityDocument: string | null;
+  proofOfAddressDocument: string | null;
+}
+
+export interface OnboardingDocuments {
+  incorporationCertificate: string | null;
+  memart: string | null;
+  amlFramework: string | null;
+  operationalLicence: string | null;
+}
+
+export interface QuestionnaireOnboarding {
+  linkSentAt: string | null;
+  linkExpiresAt: string | null;
+  linkExpired: boolean;
+  signedUpAt: string | null;
+  applicationReference: string;
+  applicationStatus: string;
+  applicationSubmittedAt: string | null;
+}
+
+export interface QuestionnaireDecision {
+  decidedAt: string;
+  decidedBy: { id: string; email: string };
+  reason: string | null;
+}
+
+export interface Questionnaire {
+  reference: string;
+  contactEmail: string;
+  status: string;
+  progress: ApplicationProgress;
+  answers: Record<string, unknown>;
+  createdAt: string;
+  submittedAt: string | null;
+  addedBy: unknown;
+  decision: QuestionnaireDecision | null;
+  onboarding: QuestionnaireOnboarding | null;
+}
+
+export interface BusinessDetail {
+  id: string;
+  type: "COMPANY" | "ONBOARDING_APPLICATION";
+  status: "ONBOARDED" | "ONBOARDING";
+  currentStatus?: string;
+  applicationStatus?: string;
+  services: string[];
+  reference?: string;
+  email?: string;
+  submittedAt?: string | null;
+  // COMPANY fields
+  company?: BusinessData;
+  serviceList?: { id: string; title: string; serviceCode: string; serviceIdentifier: string; currency: string }[];
+  pricingPlan?: { id: string; name: string; cycle: string; cost: number };
+  counts?: { users: number; accounts: number; companyAccounts: number; payoutAccounts: number };
+  // ONBOARDING_APPLICATION fields
+  progress?: ApplicationProgress;
+  documentReview?: { state: string; total: number; approved: number; rejected: number; pending: number } | null;
+  business?: OnboardingBusiness;
+  contactPerson?: OnboardingContactPerson;
+  ceo?: Record<string, unknown> | null;
+  documents?: OnboardingDocuments;
+  directors?: Record<string, unknown>[];
+  shareholders?: Record<string, unknown>[];
+  consent?: Record<string, unknown> | null;
+  questionnaireReference?: string;
+  reviewDocuments?: unknown[];
+  questionnaire?: Questionnaire;
+  addedBy?: unknown;
+  editableByAdmin?: boolean;
+  submittedByAdmin?: unknown;
+  customerAccess?: unknown;
 }
 
 export interface BusinessData {

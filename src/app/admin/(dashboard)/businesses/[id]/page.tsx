@@ -11,7 +11,7 @@ import {
   TabsTab,
   Text,
 } from "@mantine/core";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import {
   IconBuildingSkyscraper,
@@ -27,6 +27,7 @@ import {
   IconShieldCheck,
   IconRosetteDiscountCheckFilled,
   IconCreditCardPay,
+  IconPencilMinus,
 } from "@tabler/icons-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -39,37 +40,35 @@ import Shareholders from "./(tabs)/shareholder";
 import Accounts from "./(tabs)/accounts";
 import Keys from "./(tabs)/keys";
 
-import { useBusinessServices, useSingleBusiness } from "@/lib/hooks/businesses";
+import { useBusinessDetail, useBusinessServices } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { useDisclosure, useInterval } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
-import { BackBtn, PrimaryBtn } from "@/ui/components/Buttons";
+import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { Requests } from "./(tabs)/requests";
-import dayjs from "dayjs";
-import duration from "dayjs/plugin/duration";
-
-dayjs.extend(duration);
-import { notifications } from "@mantine/notifications";
 import createAxiosInstance from "@/lib/axios";
+import ApplicationOverview from "./(tabs)/application-overview";
 
-dayjs.extend(duration);
 
 export default function SingleBusiness() {
-  const router = useRouter();
   const params = useParams<{ id: string }>();
-  const { loading, business, revalidate, meta } = useSingleBusiness(params.id);
+  const { loading, business: detail, revalidate } = useBusinessDetail(params.id);
+  // detail.company is the BusinessData shape used by child tabs
+  const business = detail?.company ?? null;
+  const userCount = detail?.counts?.users ?? 0;
   const axios = createAxiosInstance("auth");
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab")?.toLowerCase() || "business";
+  const backHref = searchParams.get("back") ?? "/admin/businesses";
 
   const { services, revalidate: revalidateServices } = useBusinessServices(
     params.id
   );
 
-  const { handleSuccess, handleError, handleInfo } = useNotification();
+  const { handleSuccess, handleError } = useNotification();
   const [processingLink, setProcessingLink] = useState(false);
   const [processingActive, setProcessingActive] = useState(false);
   const [processingTrust, setProcessingTrust] = useState(false);
@@ -80,6 +79,7 @@ export default function SingleBusiness() {
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(
     new Set([tab || "business"])
   );
+  const [editingApplication, setEditingApplication] = useState(false);
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
@@ -192,60 +192,6 @@ export default function SingleBusiness() {
     }
   }, [business?.kycTrusted]);
 
-  const [remainingTime, setRemainingTime] = useState(0);
-  const [isExpired, setIsExpired] = useState(false);
-
-  useEffect(() => {
-    const activationLinkExpiringTime = meta?.activeActivationLink
-      ? dayjs(meta.activeActivationLink.createdAt).add(72, "hours")
-      : null;
-
-    if (!activationLinkExpiringTime) {
-      setRemainingTime(0);
-      setIsExpired(true); // Mark as expired if there's no valid link
-      return;
-    }
-
-    const initialRemainingTime = activationLinkExpiringTime.diff(
-      dayjs(),
-      "second"
-    );
-
-    if (initialRemainingTime > 0) {
-      setRemainingTime(initialRemainingTime);
-      setIsExpired(false); // Set to false if the countdown is valid
-
-      const interval = setInterval(() => {
-        const now = dayjs();
-
-        const diffInSeconds = activationLinkExpiringTime.diff(now, "second");
-
-        if (diffInSeconds >= 0) {
-          setRemainingTime(diffInSeconds);
-        } else {
-          setRemainingTime(0);
-          setIsExpired(true); // Mark as expired when the time is up
-          clearInterval(interval); // Stop the interval
-        }
-      }, 1000);
-
-      return () => clearInterval(interval); // Clean up the interval
-    } else {
-      setRemainingTime(0);
-      setIsExpired(true); // Time has already expired
-    }
-  }, [meta?.activeActivationLink]);
-
-  const formatDuration = (seconds: number) => {
-    const duration = dayjs.duration(seconds, "seconds");
-    return `${String(duration.days() * 24 + duration.hours()).padStart(
-      2,
-      "0"
-    )}:${String(duration.minutes()).padStart(2, "0")}:${String(
-      duration.seconds()
-    ).padStart(2, "0")}`;
-  };
-
   return (
     <main className={styles.main}>
       <Breadcrumbs
@@ -253,7 +199,7 @@ export default function SingleBusiness() {
           { title: "Businesses", href: "/admin/businesses" },
 
           {
-            title: `${business?.name}`,
+            title: `${business?.name ?? detail?.business?.businessName ?? ""}`,
             href: `/admin/businesses/${params.id}`,
             loading: loading,
           },
@@ -275,7 +221,7 @@ export default function SingleBusiness() {
             Business
           </Text>
         </Group> */}
-        <BackBtn />
+        <BackBtn link={backHref} />
         <div className={styles.container__header}>
           <Group gap={8}>
             {business?.kycTrusted && (
@@ -284,22 +230,34 @@ export default function SingleBusiness() {
                 color="var(--prune-primary-700)"
               />
             )}
-            {business ? (
-              <Text fz={18} fw={600}>
-                {business.name}
+            {detail ? (
+              <Text fz={18} fw={600} tt="capitalize">
+                {business?.name ?? detail?.business?.businessName}
               </Text>
             ) : (
               <Skeleton h={10} w={100} />
             )}
 
-            {business ? (
-              <BadgeComponent status={business.companyStatus} active />
-            ) : (
+            {loading ? (
               <Skeleton h={10} w={100} />
-            )}
+            ) : business ? (
+              <BadgeComponent status={business.companyStatus} active />
+            ) : detail?.applicationStatus ? (
+              <BadgeComponent status={detail.applicationStatus} active />
+            ) : null}
           </Group>
 
-          {activeTab === "business" && (
+          {activeTab === "business" && detail?.type === "ONBOARDING_APPLICATION" && (
+            <div className={styles.header__right}>
+              <SecondaryBtn
+                text="Edit"
+                icon={IconPencilMinus}
+                action={() => setEditingApplication(true)}
+              />
+            </div>
+          )}
+
+          {activeTab === "business" && detail?.type === "COMPANY" && (
             <div className={styles.header__right}>
               <Button size="xs" className={styles.header__right__cta}>
                 <IconDownload color="#344054" stroke={2} size={16} />
@@ -345,7 +303,7 @@ export default function SingleBusiness() {
                 <Skeleton h={30} w={100} />
               ) : (
                 <>
-                  {Boolean(meta?.users) ? (
+                  {Boolean(userCount) ? (
                     <>
                       {!services.find(
                         (service) =>
@@ -363,23 +321,8 @@ export default function SingleBusiness() {
                     </>
                   ) : (
                     <PrimaryBtn
-                      text={
-                        Boolean(meta?.activationLinkCount)
-                          ? isExpired
-                            ? "Resend Activation Link"
-                            : `Link Expires in ${formatDuration(remainingTime)}`
-                          : "Send Activation Link"
-                      }
-                      action={() => {
-                        if (remainingTime && remainingTime > 0) {
-                          notifications.clean();
-                          return handleInfo(
-                            "A valid activation link has been sent to the business",
-                            ""
-                          );
-                        }
-                        return sendActivationLink();
-                      }}
+                      text="Send Activation Link"
+                      action={sendActivationLink}
                       radius={4}
                       loading={processingLink}
                       h={32}
@@ -433,14 +376,26 @@ export default function SingleBusiness() {
             </TabsList>
 
             <TabsPanel value="business">
-              {visitedTabs.has("business") && business && (
-                <Business
-                  business={business}
-                  revalidate={revalidate}
-                  services={services}
-                  revalidateServices={revalidateServices}
-                  meta={meta}
-                />
+              {visitedTabs.has("business") && (
+                <>
+                  {detail?.type === "ONBOARDING_APPLICATION" && detail ? (
+                    <ApplicationOverview
+                      detail={detail}
+                      revalidate={revalidate}
+                      editing={editingApplication}
+                      onEditingChange={setEditingApplication}
+                    />
+                  ) : (
+                    business && (
+                      <Business
+                        business={business}
+                        revalidate={revalidate}
+                        services={services}
+                        revalidateServices={revalidateServices}
+                      />
+                    )
+                  )}
+                </>
               )}
             </TabsPanel>
 

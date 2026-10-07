@@ -54,10 +54,15 @@ export default function OnboardingBusinesses() {
 
   const { push } = useRouter();
 
+  const handleRowClick = (id: string) => {
+    const backUrl = `/admin/businesses?${searchParams.toString()}`;
+    push(`/admin/businesses/${id}?back=${encodeURIComponent(backUrl)}`);
+  };
+
   const rows = businesses.map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => push(`/admin/eligibility-center/${element.id}`)}
+      onClick={() => handleRowClick(element.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd w="25%">{element.businessName}</TableTd>

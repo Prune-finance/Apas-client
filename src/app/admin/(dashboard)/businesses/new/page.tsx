@@ -114,25 +114,22 @@ export default function NewBusiness() {
       <Paper py={32} px={28} mt={20}>
         <Flex align="center" justify="space-between">
           <BackBtn />
-          <Tooltip
-            label={
-              adminReference
-                ? "Hand over to user to complete"
-                : "Save section 1 first to enable hand over"
-            }
-            withArrow
-            position="left"
-          >
-            <span>
-              <SecondaryBtn
-                text="Hand Over"
-                leftSection={<IconHandStop size={16} />}
-                fw={600}
-                disabled={!adminReference}
-                action={openHandOver}
-              />
-            </span>
-          </Tooltip>
+          {active > 0 && (
+            <Tooltip
+              label="Hand over to user to complete"
+              withArrow
+              position="left"
+            >
+              <span>
+                <SecondaryBtn
+                  text="Hand Over"
+                  leftSection={<IconHandStop size={16} />}
+                  fw={600}
+                  action={openHandOver}
+                />
+              </span>
+            </Tooltip>
+          )}
         </Flex>
 
         <Text
@@ -180,6 +177,7 @@ export default function NewBusiness() {
             adminReference={adminReference ?? undefined}
             onReferenceObtained={(ref) => setAdminReference(ref)}
             noFloatingLabel
+            isAdmin
           />
         )}
         {active === 1 && (

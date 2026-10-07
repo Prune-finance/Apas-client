@@ -31,7 +31,7 @@ function BasicInfoCard({ setActive, form }: BasicInfoCard) {
     Email: businessEmail,
     "Business Type": businessType,
     "Business Industry": businessIndustry,
-    "Business Website (URL)": businessWebsite,
+    "Business Website (Optional)": businessWebsite,
     Country: businessCountry,
     "Business Address": businessAddress,
     "Business Bio": businessDescription,

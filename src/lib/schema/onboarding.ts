@@ -124,7 +124,7 @@ export const onboardingBasicInfoSchema = z.object({
     .string()
     .email("Please provide a valid contact email")
     .min(1, "Contact Email is required"),
-  businessWebsite: z.string().url("Please provide a valid url"),
+  businessWebsite: z.string().optional().nullable(),
   contactPersonFirstName: z.string().min(1, "Contact first name is required"),
   contactPersonLastName: z.string().min(1, "Contact last name is required"),
   contactPersonIdType: z.string().nullable(),
@@ -157,14 +157,14 @@ export const CEOSchema = z.object({
 });
 
 export const onboardingDocumentSchema = z.object({
-  cacCertificate: z.string().url("Certificate of Incorporation is required"),
-  mermat: z.string().url("Memart document is required"),
+  cacCertificate: z.string().min(1, "Certificate of Incorporation is required"),
+  mermat: z.string().min(1, "Memart document is required"),
   amlCompliance: z
     .string()
-    .url("AML Compliance Framework document is required"),
+    .min(1, "AML Compliance Framework document is required"),
   operationalLicense: z
     .string()
-    .url("Operational License document is required")
+    .min(1, "Operational License document is required")
     .nullable()
     .optional(),
 });
@@ -208,7 +208,7 @@ export const OnboardingShareholderValues: DirectorType = {
 export const newOnboardingValue: OnboardingType = {
   businessName: "",
   businessTradingName: "",
-  businessWebsite: "https://",
+  businessWebsite: "",
   businessCountry: null,
   businessType: null,
   businessIndustry: null,

@@ -27,7 +27,6 @@ import {
   IconShieldCheck,
   IconRosetteDiscountCheckFilled,
   IconCreditCardPay,
-  IconPencilMinus,
 } from "@tabler/icons-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -246,16 +245,6 @@ export default function SingleBusiness() {
               <BadgeComponent status={detail.applicationStatus} active />
             ) : null}
           </Group>
-
-          {activeTab === "business" && detail?.type === "ONBOARDING_APPLICATION" && (
-            <div className={styles.header__right}>
-              <SecondaryBtn
-                text="Edit"
-                icon={IconPencilMinus}
-                action={() => setEditingApplication(true)}
-              />
-            </div>
-          )}
 
           {activeTab === "business" && detail?.type === "COMPANY" && (
             <div className={styles.header__right}>

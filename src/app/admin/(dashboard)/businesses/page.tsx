@@ -53,7 +53,7 @@ function Businesses() {
           AccountActiveBusinesses,
         ].map((Component, index) => (
           <TabsPanel value={tabs[index].value} key={index}>
-            <Component />
+            {currentTab === tabs[index].value && <Component />}
           </TabsPanel>
         ))}
       </TabsComponent>

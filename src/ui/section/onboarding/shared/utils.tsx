@@ -24,7 +24,9 @@ export const SaveProgressBtn = ({ loading, action }: SaveProgressBtnProps) => (
 
 export const eksellStyle = { fontFamily: "'EksellDisplay', serif" } as const;
 
-export const buildSectionBase = (adminReference: string | undefined, section: number) =>
+export const buildSectionBase = (adminReference: string | undefined, section: number, isAdmin?: boolean) =>
   adminReference
     ? `/business/onboarding/admin/${adminReference}/sections/${section}`
+    : isAdmin
+    ? `/business/onboarding/admin/sections/${section}`
     : `/business/onboarding/sections/${section}`;

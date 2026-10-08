@@ -8,7 +8,7 @@ import {
 import { Box, Flex, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { SaveProgressBtn, eksellStyle, buildSectionBase } from "./utils";
+import { eksellStyle, buildSectionBase } from "./utils";
 import { UseFormReturnType } from "@mantine/form";
 import { OnboardingType } from "@/lib/schema";
 import countries from "@/assets/countries.json";
@@ -67,7 +67,6 @@ function buildSection1Body(form: UseFormReturnType<OnboardingType>) {
 export const BusinessInfo = ({ setActive, active, form, refData, adminReference, onReferenceObtained, noFloatingLabel, isAdmin, alreadyCompleted }: BusinessInfo) => {
   const { handleSuccess, handleError } = useNotification();
   const [mountSnapshot] = useState(() => JSON.stringify(buildSection1Body(form)));
-  const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
 
   const { contactPersonIdType, contactPersonPOAType } = form.getValues();
@@ -89,24 +88,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
     setIdCheck({ ...IdCheck, isContactPOAType: Boolean(value) });
   });
 
-  const sectionBase = buildSectionBase(adminReference, 1);
-
-  const handleSaveProgress = async () => {
-    setSaving(true);
-    try {
-      const res = await questAxios.patch(sectionBase, buildSection1Body(form));
-      const ref = res.data?.data?.reference;
-      if (ref) onReferenceObtained?.(ref);
-      handleSuccess("Progress Saved", "Your progress has been saved");
-    } catch (error) {
-      handleError(
-        "Save failed",
-        isAxiosError(error) ? error.response?.data?.message : "Something went wrong"
-      );
-    } finally {
-      setSaving(false);
-    }
-  };
+  const sectionBase = buildSectionBase(adminReference, 1, isAdmin);
 
   const handleSaveAndContinue = async () => {
     const { hasErrors } = form.validate();
@@ -136,12 +118,9 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
 
   return (
     <Box>
-      <Flex align="center" justify="space-between" w="100%">
-        <Text c="var(--prune-text-gray-700)" fz={16} fw={700} style={eksellStyle}>
-          Business Information
-        </Text>
-        <SaveProgressBtn loading={saving} action={handleSaveProgress} />
-      </Flex>
+      <Text c="var(--prune-text-gray-700)" fz={16} fw={700} style={eksellStyle}>
+        Business Information
+      </Text>
 
       <Stack mt={30} gap={24}>
         <Flex gap={24} w="100%">

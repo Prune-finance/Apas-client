@@ -130,13 +130,13 @@ export default function Filter<T>({
         {!noDate && (
           <DatePickerInput
             placeholder="Date Range"
-            valueFormat="YYYY-MM-DD"
+            valueFormat="DD-MM-YYYY"
             {...form.getInputProps("createdAt")}
             size="xs"
-            maw={250}
+            w={180}
             h={36}
-            fz={12}
-            styles={{ input: { height: "30px", fontSize: 12 } }}
+            fz={10}
+            styles={{ input: { height: "30px", fontSize: 10 } }}
             type="range"
             allowSingleDateInRange
             leftSection={<IconCalendarMonth size={12} />}
@@ -159,10 +159,10 @@ export default function Filter<T>({
                 : ["Active", "Inactive", "Frozen", "Deactivated"]
             }
             size="xs"
-            w={120}
+            w={180}
             h={36}
-            fz={12}
-            styles={{ input: { fontSize: 12 } }}
+            fz={10}
+            styles={{ input: { fontSize: 10 } }}
             clearable
           />
         )}

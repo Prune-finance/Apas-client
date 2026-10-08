@@ -185,13 +185,13 @@ export const SearchInput = ({
 interface TextBoxProps extends TextInputProps {}
 
 export const TextBox = ({ ...props }: TextBoxProps) => {
-  return <TextInput size="xs" w={120} h={36} fz={12} styles={{ input: { fontSize: 12 } }} {...props} />;
+  return <TextInput size="xs" w={180} h={36} fz={10} styles={{ input: { fontSize: 10 } }} {...props} />;
 };
 
 interface SelectBoxProps extends SelectProps {}
 
 export const SelectBox = ({ ...props }: SelectBoxProps) => {
-  return <Select size="xs" w={120} h={36} fz={12} styles={{ input: { fontSize: 12 } }} {...props} />;
+  return <Select size="xs" w={180} h={36} fz={10} styles={{ input: { fontSize: 10 } }} {...props} />;
 };
 
 const insideLabelLeftSectionWidth = rem(52);

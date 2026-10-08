@@ -28,6 +28,7 @@ import {
 } from "@/lib/schema";
 import OnboardingStore from "@/lib/store/onboarding";
 import useAxios from "@/lib/hooks/useAxios";
+import countries from "@/assets/countries.json";
 
 
 interface OnboardingProfile {
@@ -167,7 +168,7 @@ export default function Onboarding() {
       makeContactPersonInitiator: b?.contactIsInitiator || false,
       businessDescription: b?.businessDescription || "",
       businessIndustry: b?.businessIndustry || "",
-      businessCountry: b?.countryCode || null,
+      businessCountry: countries.find((c) => c.code === b?.countryCode)?.name || null,
       businessType: b?.businessType || null,
       businessWebsite: b?.businessWebsite || "https://",
       businessPhoneNumberCode: b?.businessPhoneCountryCode || "+234",

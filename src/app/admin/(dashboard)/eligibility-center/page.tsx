@@ -111,7 +111,7 @@ function EligibilityCenter() {
     <main className={styles.main}>
       <div className={styles.table__container}>
         <div className={styles.container__header}>
-          <Text fz={18} fw={600}>
+          <Text fz={18} fw={600} style={{ fontFamily: "'EksellDisplay', serif" }}>
             Eligibility Center
           </Text>
         </div>

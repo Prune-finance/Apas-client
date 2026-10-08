@@ -10,6 +10,7 @@ import {
 } from "@/ui/components/InputWithLabel/QuestInputs";
 import { useQuestionnaireFormContext } from "@/lib/store/questionnaire";
 import { countriesWithCode } from "@/lib/countries-codes-flags";
+import { businessIndustries } from "@/lib/static";
 
 export const SUPPORTED_ISO_CODES = new Set(["NG", "GB", "FR", "DE", "IT", "ES", "BJ", "ML", "TG", "CI", "US"]);
 
@@ -36,48 +37,7 @@ const COUNTRY_OPTIONS = (() => {
     .sort((a, b) => a.label.localeCompare(b.label));
 })();
 
-const INDUSTRY_OPTIONS = [
-  "Financial Services / FinTech",
-  "Banking",
-  "Insurance",
-  "Technology / Software",
-  "E-commerce / Retail",
-  "Logistics & Transportation",
-  "Healthcare",
-  "Pharmaceuticals",
-  "Education / EdTech",
-  "Real Estate",
-  "Construction",
-  "Manufacturing",
-  "Agriculture / Agribusiness",
-  "Food & Beverage",
-  "Hospitality / Hotels",
-  "Travel & Tourism",
-  "Telecommunications",
-  "Media & Entertainment",
-  "Marketing & Advertising",
-  "Professional Services / Consulting",
-  "Legal Services",
-  "Accounting",
-  "Energy / Oil & Gas",
-  "Renewable Energy",
-  "Automotive",
-  "Aviation",
-  "Import & Export / Trading",
-  "Consumer Goods",
-  "Fashion & Apparel",
-  "Beauty & Cosmetics",
-  "Sports & Fitness",
-  "Security Services",
-  "Government / Public Sector",
-  "Nonprofit / NGO",
-  "Mining",
-  "Telecommunications & IT Services",
-  "Cybersecurity",
-  "Artificial Intelligence",
-  "Cryptocurrency / Blockchain",
-  "Business Process Outsourcing (BPO)",
-].map((item) => ({ value: item, label: item }));
+const INDUSTRY_OPTIONS = businessIndustries.map((item) => ({ value: item, label: item }));
 
 export default function BasicInfo() {
   const form = useQuestionnaireFormContext();

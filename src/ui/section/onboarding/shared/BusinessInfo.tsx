@@ -12,6 +12,7 @@ import { eksellStyle, buildSectionBase } from "./utils";
 import { UseFormReturnType } from "@mantine/form";
 import { OnboardingType } from "@/lib/schema";
 import countries from "@/assets/countries.json";
+import { countriesWithCode } from "@/lib/countries-codes-flags";
 import { useState } from "react";
 import { businessIndustries } from "@/lib/static";
 import createAxiosInstance from "@/lib/axios";
@@ -86,6 +87,14 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
 
   form.watch("contactPersonPOAType", ({ value }) => {
     setIdCheck({ ...IdCheck, isContactPOAType: Boolean(value) });
+  });
+
+  form.watch("businessCountry", ({ value }) => {
+    if (!value) return;
+    const match = countriesWithCode.find(
+      (c) => c.label.split(" ").slice(1).join(" ").toLowerCase() === value.toLowerCase()
+    );
+    if (match) form.setFieldValue("businessPhoneNumberCode", match.value);
   });
 
   const sectionBase = buildSectionBase(adminReference, 1, isAdmin);

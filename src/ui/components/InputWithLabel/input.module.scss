@@ -9,6 +9,10 @@
   border: 1px solid #f2f4f7;
   font-size: 12px;
 
+  &[data-invalid] {
+    border-color: var(--mantine-color-error);
+  }
+
   &::placeholder {
     font-size: 12px;
   }

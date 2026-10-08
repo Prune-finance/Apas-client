@@ -17,7 +17,8 @@ interface ConsentModalProps {
 
 export default function ConsentModal({ opened, close }: ConsentModalProps) {
   const { handleError } = useNotification();
-  const [openedConfirm, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
+  const [openedConfirm, { open: openConfirm, close: closeConfirm }] =
+    useDisclosure(false);
   const [submitting, setSubmitting] = useState(false);
 
   const params = useParams();
@@ -25,18 +26,25 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
 
   const getReference = () =>
     (params?.slug?.[0] as string | undefined) ??
-    (typeof window !== "undefined" ? sessionStorage.getItem("quest_reference") : null);
+    (typeof window !== "undefined"
+      ? sessionStorage.getItem("quest_reference")
+      : null);
 
   const getResumeToken = () =>
     searchParams?.get("token") ??
-    (typeof window !== "undefined" ? sessionStorage.getItem("quest_token") : null);
+    (typeof window !== "undefined"
+      ? sessionStorage.getItem("quest_token")
+      : null);
 
   const handleConsent = async () => {
     const reference = getReference();
     const token = getResumeToken();
 
     if (!reference || !token) {
-      handleError("Unable to submit", "Session reference not found. Please refresh and try again.");
+      handleError(
+        "Unable to submit",
+        "Session reference not found. Please refresh and try again.",
+      );
       return;
     }
 
@@ -45,7 +53,7 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
       await questAxios.post(
         `/business/questionnaire/${reference}/submit`,
         {},
-        { headers: { "X-Resume-Token": token } }
+        { headers: { "X-Resume-Token": token } },
       );
       close();
       openConfirm();
@@ -71,25 +79,41 @@ export default function ConsentModal({ opened, close }: ConsentModalProps) {
         }}
         padding={32}
         centered
-      >
-        <Stack gap={24}>
+        title={
           <Text fz={24} fw={700} c="var(--prune-text-gray-700)">
             Declaration & Consent
           </Text>
-
+        }
+      >
+        <Stack gap={24}>
           <Stack gap={12}>
-            <Text fz={{ base: 14, lg: 16 }} c="var(--prune-text-gray-600)" lh={1.6}>
-              By clicking <strong>I Consent</strong>, you confirm that the information provided in
-              this questionnaire is accurate and complete to the best of your knowledge.
+            <Text
+              fz={{ base: 14, lg: 16 }}
+              c="var(--prune-text-gray-600)"
+              lh={1.6}
+            >
+              By clicking <strong>I Consent</strong>, you confirm that the
+              information provided in this questionnaire is accurate and
+              complete to the best of your knowledge.
             </Text>
-            <Text fz={{ base: 14, lg: 16 }} c="var(--prune-text-gray-600)" lh={1.6}>
-              You consent to Prune Payments collecting, processing, and sharing the information
-              submitted in this form for the purpose of reviewing your business application and
-              conducting any required due diligence in accordance with applicable regulations.
+            <Text
+              fz={{ base: 14, lg: 16 }}
+              c="var(--prune-text-gray-600)"
+              lh={1.6}
+            >
+              You consent to Prune Payments collecting, processing, and sharing
+              the information submitted in this form for the purpose of
+              reviewing your business application and conducting any required
+              due diligence in accordance with applicable regulations.
             </Text>
-            <Text fz={{ base: 14, lg: 16 }} c="var(--prune-text-gray-600)" lh={1.6}>
-              Your information will be handled in accordance with our Privacy Policy and will only
-              be used for purposes related to your onboarding and account management.
+            <Text
+              fz={{ base: 14, lg: 16 }}
+              c="var(--prune-text-gray-600)"
+              lh={1.6}
+            >
+              Your information will be handled in accordance with our Privacy
+              Policy and will only be used for purposes related to your
+              onboarding and account management.
             </Text>
           </Stack>
 

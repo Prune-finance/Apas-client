@@ -26,17 +26,17 @@ import { SelectCountryDialCode } from "../SelectDropdownSearch";
 import { UseFormReturnType } from "@mantine/form";
 import { IconHelp } from "@tabler/icons-react";
 
-const standardStyles = {
+const getStandardStyles = (hasError?: boolean) => ({
   input: {
     height: "48px",
-    border: "1px solid var(--prune-text-gray-100)",
+    border: `1px solid ${hasError ? "var(--mantine-color-error)" : "var(--prune-text-gray-100)"}`,
     borderRadius: "8px",
     paddingLeft: "15px",
     paddingRight: "15px",
     fontSize: "14px",
     color: "var(--prune-text-gray-700)",
   },
-};
+});
 
 interface TextInputWithInsideLabelProps extends TextInputProps {
   standard?: boolean;
@@ -47,7 +47,7 @@ export const TextInputWithInsideLabel = ({
 }: TextInputWithInsideLabelProps) => {
   if (standard) {
     const { label: _label, ...inputProps } = props;
-    return <TextInput styles={standardStyles} {...inputProps} />;
+    return <TextInput styles={getStandardStyles(!!inputProps.error)} {...inputProps} />;
   }
   return <TextInput {...props} classNames={classes} />;
 };
@@ -73,7 +73,7 @@ interface SelectInputWithInsideLabelProps extends SelectProps {
 export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWithInsideLabelProps) => {
   if (standard) {
     const { label: _label, ...inputProps } = props;
-    return <Select styles={standardStyles} {...inputProps} />;
+    return <Select styles={getStandardStyles(!!inputProps.error)} {...inputProps} />;
   }
   return (
     <Select
@@ -91,7 +91,7 @@ interface DateInputWithInsideLabelProps extends DateInputProps {
 export const DateInputWithInsideLabel = ({ standard, ...props }: DateInputWithInsideLabelProps) => {
   if (standard) {
     const { label: _label, ...inputProps } = props;
-    return <DateInput styles={standardStyles} placeholder="Select Date" {...inputProps} />;
+    return <DateInput styles={getStandardStyles(!!inputProps.error)} placeholder="Select Date" {...inputProps} />;
   }
   return <DateInput {...props} placeholder="Select Date" classNames={classes} />;
 };
@@ -109,7 +109,7 @@ export const TextareaWithInsideLabel = ({
       <Textarea
         styles={{
           input: {
-            border: "1px solid var(--prune-text-gray-100)",
+            border: `1px solid ${inputProps.error ? "var(--mantine-color-error)" : "var(--prune-text-gray-100)"}`,
             borderRadius: "8px",
             paddingLeft: "15px",
             paddingRight: "15px",

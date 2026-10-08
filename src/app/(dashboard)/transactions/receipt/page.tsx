@@ -7,19 +7,19 @@ import {
 } from "@/ui/components/TransactionReceipt";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 dayjs.extend(advancedFormat);
 import { jsPDF } from "jspdf";
 import html2canvas from "html2canvas";
 import { Box } from "@mantine/core";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { handlePdfDownload } from "@/lib/actions/auth";
+import { useReceiptDownload } from "@/lib/hooks/receipt-download";
 import { useReceipt } from "@/lib/hooks/receipt";
 import { TransactionType } from "@/lib/hooks/transactions";
 
 export default function Receipt() {
   const receiptRef = useRef<HTMLDivElement>(null);
-  const [processing, setProcessing] = useState(false);
+  const { downloadReceipt, downloadingReceipt } = useReceiptDownload(receiptRef);
 
   const trx = {
     id: "d444bac1-1cfc-44a8-bff2-c74679c8f363",
@@ -58,9 +58,10 @@ export default function Receipt() {
     <Box>
       <PrimaryBtn
         text="Download Receipt"
-        action={() => handlePdfDownload(receiptRef)}
+        action={downloadReceipt}
         fw={600}
-        loading={processing}
+        loading={downloadingReceipt}
+        disabled={downloadingReceipt}
       />
 
       <Box pos="absolute" left={-9999} bottom={700} w="45vw" m={0} p={0}>

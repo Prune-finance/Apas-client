@@ -39,7 +39,7 @@ import {
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
 import { useMemo, useRef, useState } from "react";
-import { handlePdfDownload, parseError } from "@/lib/actions/auth";
+import { parseError } from "@/lib/actions/auth";
 import { AccountData, useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import Transaction from "@/lib/store/transaction";
@@ -50,6 +50,7 @@ import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import createAxiosInstance from "@/lib/axios";
 import { useReceipt } from "@/lib/hooks/receipt";
+import { useReceiptDownload } from "@/lib/hooks/receipt-download";
 
 interface TransactionDrawerProps {
   revalidate?: () => void;
@@ -64,6 +65,7 @@ export const PayoutTransactionDrawer = ({
   isAdmin,
 }: PayoutTransactionDrawer) => {
   const pdfRef = useRef<HTMLDivElement>(null);
+  const { downloadReceipt, downloadingReceipt } = useReceiptDownload(pdfRef);
   const { data, close, opened, setData } = Transaction();
   const [openedModal, { open, close: closeModal }] = useDisclosure(false);
   const [openedCancel, { open: openCancel, close: closeCancel }] =
@@ -419,7 +421,9 @@ export const PayoutTransactionDrawer = ({
                 fullWidth={data?.status === "CANCELLED"}
                 // fullWidth={!isAfter24Hours(data?.createdAt ?? new Date())}
                 fw={600}
-                action={() => handlePdfDownload(pdfRef)}
+                action={downloadReceipt}
+                loading={downloadingReceipt}
+                disabled={downloadingReceipt}
               />
             )}
           </Flex>
@@ -433,7 +437,9 @@ export const PayoutTransactionDrawer = ({
             }`}
             fullWidth
             fw={600}
-            action={() => handlePdfDownload(pdfRef)}
+            action={downloadReceipt}
+            loading={downloadingReceipt}
+            disabled={downloadingReceipt}
           />
         )}
       </Flex>

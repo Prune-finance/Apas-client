@@ -29,11 +29,11 @@ import {
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
 import { useRef } from "react";
-import { handlePdfDownload } from "@/lib/actions/auth";
 import { AccountData, useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import Transaction from "@/lib/store/transaction";
 import { useReceipt } from "@/lib/hooks/receipt";
+import { useReceiptDownload } from "@/lib/hooks/receipt-download";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
@@ -49,6 +49,8 @@ export const TransactionDrawer = ({
   opened,
 }: TransactionDrawerProps) => {
   const pdfRef = useRef<HTMLDivElement>(null);
+  const { downloadReceipt, downloadingReceipt } = useReceiptDownload(pdfRef);
+
   console.log("Selected request:", selectedRequest);
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
     selectedRequest?.accessId ?? "",
@@ -324,7 +326,9 @@ export const TransactionDrawer = ({
             text="Download Receipt"
             fullWidth
             fw={600}
-            action={() => handlePdfDownload(pdfRef)}
+            action={downloadReceipt}
+            loading={downloadingReceipt}
+            disabled={downloadingReceipt}
             mt={20}
           />
         </Box>
@@ -340,7 +344,7 @@ export const TransactionDrawer = ({
           }
           details={details}
           receiptRef={pdfRef}
-          currencyType={selectedRequest?.currencyType}
+          currencyType={selectedRequest?.currencyType ?? currency}
         />
       </Box>
     </Drawer>

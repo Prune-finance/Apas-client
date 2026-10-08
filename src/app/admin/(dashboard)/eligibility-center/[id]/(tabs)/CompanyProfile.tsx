@@ -209,40 +209,6 @@ const ContactPerson = ({
             editing={editing}
           />
         )}
-        <DocumentPreview
-          label="Identity Document"
-          title={data?.contactPersonIdType || ""}
-          value={data?.contactPersonIdUrl || ""}
-          editing={editing}
-          setValue={(value) => form.setFieldValue("contactPersonIdUrl", value)}
-          type={form.values.contactPersonIdType}
-          setType={(value) => form.setFieldValue("contactPersonIdType", value)}
-        />
-        {(data?.contactPersonIdUrlBack ||
-          form.values.contactPersonIdType !== "Passport") && (
-          <DocumentPreview
-            label="Identity Document (Back)"
-            title={data?.contactPersonIdType || ""}
-            value={data?.contactPersonIdUrlBack || ""}
-            editing={editing}
-            setValue={(value) =>
-              form.setFieldValue("contactPersonIdUrlBack", value)
-            }
-            type={form.values.contactPersonIdType}
-            setType={(value) =>
-              form.setFieldValue("contactPersonIdType", value)
-            }
-          />
-        )}
-        <DocumentPreview
-          label="Proof of Address"
-          title={data?.contactPersonPOAType || ""}
-          value={data?.contactPersonPOAUrl || ""}
-          editing={editing}
-          setValue={(value) => form.setFieldValue("contactPersonPOAUrl", value)}
-          type={form.values.contactPersonPOAType}
-          setType={(value) => form.setFieldValue("contactPersonPOAType", value)}
-        />
       </SimpleGrid>
     </PaperContainer>
   );

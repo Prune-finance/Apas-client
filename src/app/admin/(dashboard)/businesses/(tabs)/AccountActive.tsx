@@ -64,6 +64,7 @@ export default function OnboardedBusinesses() {
     email: contactEmail,
     limit: parseInt(limit ?? "10", 10),
     service: "ACCOUNT",
+    status: "ONBOARDED",
     page: active,
 
     search: debouncedSearch,

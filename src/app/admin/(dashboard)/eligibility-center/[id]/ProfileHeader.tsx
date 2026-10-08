@@ -293,7 +293,7 @@ export default function ProfileHeader({
         )}
         {data?.questionnaireStatus === "ONBOARDING_INVITED" && (
           <ResendInvitationButton
-            decidedAt={data.decision?.decidedAt}
+            linkSentAt={data.onboarding?.linkSentAt}
             loading={loadingResendInvitation}
             onResend={handleResendInvitation}
           />
@@ -370,13 +370,13 @@ function useCountdown(sentAt: string | null | undefined) {
 }
 
 interface ResendInvitationButtonProps {
-  decidedAt: string | null | undefined;
+  linkSentAt: string | null | undefined;
   loading: boolean;
   onResend: () => void;
 }
 
-const ResendInvitationButton = ({ decidedAt, loading, onResend }: ResendInvitationButtonProps) => {
-  const remaining = useCountdown(decidedAt);
+const ResendInvitationButton = ({ linkSentAt, loading, onResend }: ResendInvitationButtonProps) => {
+  const remaining = useCountdown(linkSentAt);
   const isExpired = !remaining;
 
   if (isExpired) {

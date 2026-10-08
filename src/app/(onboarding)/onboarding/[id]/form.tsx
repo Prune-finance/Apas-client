@@ -221,7 +221,7 @@ export default function OnboardingInviteForm({
           fw={700}
           p={0}
           c="var(--prune-primary-800)"
-          link="/auth/onboarding/login"
+          link="/auth/login"
         />
       </Flex>
     </Box>

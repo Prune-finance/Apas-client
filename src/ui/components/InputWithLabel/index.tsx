@@ -49,7 +49,13 @@ export const TextInputWithInsideLabel = ({
     const { label: _label, ...inputProps } = props;
     return <TextInput styles={getStandardStyles(!!inputProps.error)} {...inputProps} />;
   }
-  return <TextInput {...props} classNames={classes} />;
+  return (
+    <TextInput
+      {...props}
+      classNames={classes}
+      styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
+    />
+  );
 };
 
 interface NumberInputWithInsideLabelProps extends NumberInputProps {}
@@ -79,7 +85,7 @@ export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWi
     <Select
       placeholder="Select"
       classNames={classes}
-      styles={{ input: { paddingTop: rem(18) } }}
+      styles={{ input: { paddingTop: rem(18), ...(props.error ? { borderColor: "var(--mantine-color-error)" } : {}) } }}
       {...props}
     />
   );
@@ -93,7 +99,14 @@ export const DateInputWithInsideLabel = ({ standard, ...props }: DateInputWithIn
     const { label: _label, ...inputProps } = props;
     return <DateInput styles={getStandardStyles(!!inputProps.error)} placeholder="Select Date" {...inputProps} />;
   }
-  return <DateInput {...props} placeholder="Select Date" classNames={classes} />;
+  return (
+    <DateInput
+      {...props}
+      placeholder="Select Date"
+      classNames={classes}
+      styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
+    />
+  );
 };
 
 interface TextareaWithInsideLabelProps extends TextareaProps {

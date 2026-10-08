@@ -13,7 +13,17 @@ const Director = z.object({
     ])
     .refine((val) => val, {
       message: "Director's Date of birth is required",
-    }),
+    })
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const dob = new Date(val as string | Date);
+        const minAge = new Date();
+        minAge.setFullYear(minAge.getFullYear() - 18);
+        return dob <= minAge;
+      },
+      { message: "Director must be at least 18 years old" }
+    ),
   email: z.string().refine(
     (val) => {
       if (!val) return true;
@@ -63,7 +73,17 @@ export const onboardingShareholders = z.object({
           ])
           .refine((val) => val, {
             message: "Shareholder's Date of birth is required",
-          }),
+          })
+          .refine(
+            (val) => {
+              if (!val) return true;
+              const dob = new Date(val as string | Date);
+              const minAge = new Date();
+              minAge.setFullYear(minAge.getFullYear() - 18);
+              return dob <= minAge;
+            },
+            { message: "Shareholder must be at least 18 years old" }
+          ),
         email: z.string().refine(
           (val) => {
             if (!val) return true;
@@ -148,7 +168,17 @@ export const CEOSchema = z.object({
       z.date({ required_error: "CEO Date of birth is required" }),
       z.string().nullable(),
     ])
-    .refine((val) => val, { message: "CEO Date of birth is required" }),
+    .refine((val) => val, { message: "CEO Date of birth is required" })
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const dob = new Date(val as string | Date);
+        const minAge = new Date();
+        minAge.setFullYear(minAge.getFullYear() - 18);
+        return dob <= minAge;
+      },
+      { message: "CEO must be at least 18 years old" }
+    ),
   ceoIdType: handleNullableString("CEO ID Type"),
   ceoIdUrl: z.string(),
   ceoIdUrlBack: z.string(),

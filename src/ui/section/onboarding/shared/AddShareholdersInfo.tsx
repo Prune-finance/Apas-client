@@ -180,7 +180,7 @@ export const AddShareholdersInfo = ({
               w="100%"
               standard={noFloatingLabel}
               minDate={new Date("1900-01-01")}
-              maxDate={new Date()}
+              maxDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
               key={form.key(`shareholders.${index}.date_of_birth`)}
               {...form.getInputProps(`shareholders.${index}.date_of_birth`)}
             />

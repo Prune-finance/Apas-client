@@ -76,6 +76,7 @@ function EligibilityCenter() {
   const activeFilterCount = [
     appliedFilters.country,
     appliedFilters.type,
+    appliedFilters.status,
     appliedFilters.createdAt?.[0],
   ].filter(Boolean).length;
 
@@ -83,6 +84,7 @@ function EligibilityCenter() {
     search: debouncedSearch,
     countryCode: appliedFilters.country ?? "",
     service: appliedFilters.type ?? "",
+    status: appliedFilters.status ?? "",
     dateFrom: appliedFilters.createdAt?.[0]
       ? toLocalDateStr(appliedFilters.createdAt[0])
       : "",
@@ -166,6 +168,7 @@ function EligibilityCenter() {
           toggle={toggle}
           form={form}
           noDate={false}
+          customStatusOption={Object.keys(statusToStage)}
           onApply={(values) => {
             setAppliedFilters(values);
             setActive(1);

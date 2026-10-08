@@ -126,6 +126,10 @@ export interface QuestionnaireDetail {
     linkSentAt: string | null;
     linkExpiresAt: string | null;
     linkExpired: boolean;
+    signedUpAt: string | null;
+    applicationReference: string | null;
+    applicationStatus: string | null;
+    applicationSubmittedAt: string | null;
   } | null;
 }
 

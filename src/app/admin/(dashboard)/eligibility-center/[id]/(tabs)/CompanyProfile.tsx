@@ -68,6 +68,9 @@ export default function CompanyProfile({
     ...(isRejected && data?.decision?.reason
       ? { "Rejection reason": data.decision.reason }
       : {}),
+    ...(data?.onboarding?.signedUpAt
+      ? { "Customer signed up at": dayjs(data.onboarding.signedUpAt).format("DD-MM-YYYY") }
+      : {}),
   };
   return (
     <PanelWrapper loading={loading} rows={rows} panelName="Company Profile">

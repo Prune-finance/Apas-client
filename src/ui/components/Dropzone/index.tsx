@@ -30,6 +30,7 @@ interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   formKey?: string;
   extensionKey?: string;
   uploadedFileUrl?: string;
+  uploadedFileName?: string;
   otherForm?: UseFormReturnType<T>;
   isUser?: boolean;
   isOnboarding?: boolean;
@@ -48,6 +49,7 @@ export default function DropzoneComponent<T>(
   const formKey = props.formKey;
   const extensionKey = props.extensionKey;
   const uploadedFileUrl = props.uploadedFileUrl;
+  const uploadedFileName = props.uploadedFileName;
   const isUser = props.isUser;
   const isOnboarding = props.isOnboarding;
   const questionnaireKind = props.questionnaireKind;
@@ -63,6 +65,7 @@ export default function DropzoneComponent<T>(
   const [viewUrl, setViewUrl] = useState<string>(
     uploadedFileUrl?.startsWith("http") ? uploadedFileUrl : ""
   );
+  const [resolvedFileName, setResolvedFileName] = useState<string>(uploadedFileName || "");
 
   // Sync viewUrl when the parent resolves the pre-signed URL (e.g. on initial page load)
   useEffect(() => {
@@ -70,6 +73,11 @@ export default function DropzoneComponent<T>(
       setViewUrl(uploadedFileUrl);
     }
   }, [uploadedFileUrl]);
+
+  // Sync fileName when parent resolves it from the API
+  useEffect(() => {
+    if (uploadedFileName) setResolvedFileName(uploadedFileName);
+  }, [uploadedFileName]);
 
   const [processing, setProcessing] = useState(false);
 
@@ -105,6 +113,7 @@ export default function DropzoneComponent<T>(
             { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
           );
           setViewUrl(viewData?.data?.url || "");
+          if (viewData?.data?.fileName) setResolvedFileName(viewData.data.fileName);
         } catch {
           setViewUrl("");
         }
@@ -242,6 +251,7 @@ export default function DropzoneComponent<T>(
           {uploaded && (() => {
             const rawName =
               file?.name ||
+              resolvedFileName ||
               (viewUrl || uploadedFileUrl || "").split("/").pop()?.split("?")[0] ||
               "";
             const dotIdx = rawName.lastIndexOf(".");

@@ -31,6 +31,7 @@ export default function OnBoardingDocumentBox<T>({
   adminReference,
 }: DocumentBoxProps<T>) {
   const [displayUrl, setDisplayUrl] = useState(uploadedFileUrl || "");
+  const [resolvedFileName, setResolvedFileName] = useState("");
 
   useEffect(() => {
     const val = uploadedFileUrl || "";
@@ -41,7 +42,10 @@ export default function OnBoardingDocumentBox<T>({
         : `/business/onboarding/files/${val}`;
       questAxios
         .get(viewPath)
-        .then((res) => setDisplayUrl(res.data.data.url))
+        .then((res) => {
+          setDisplayUrl(res.data.data.url);
+          setResolvedFileName(res.data.data.fileName || "");
+        })
         .catch(() => setDisplayUrl(""));
     } else {
       setDisplayUrl(val);
@@ -62,6 +66,7 @@ export default function OnBoardingDocumentBox<T>({
         otherForm={form}
         formKey={formKey}
         uploadedFileUrl={displayUrl}
+        uploadedFileName={resolvedFileName}
         isOnboarding={!isAdmin && !kind}
         questionnaireKind={kind}
         questionnaireAdminReference={adminReference || (isAdmin && kind ? "admin" : undefined)}

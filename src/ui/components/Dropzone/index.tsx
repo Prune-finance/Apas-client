@@ -239,35 +239,45 @@ export default function DropzoneComponent<T>(
         </Dropzone.Idle>
 
         <Flex direction="column" align="center">
-          {uploaded && (
-            <Group gap={6} justify="center" align="center" w="30ch">
-              <Text fz={10} truncate="start" style={{ maxWidth: "16ch" }}>
-                {file?.name ||
-                  (viewUrl || uploadedFileUrl || "")
-                    .split("/")
-                    .pop()
-                    ?.split("?")[0]}
-              </Text>
-              {viewUrl && (
-                <Text
-                  fz={10}
-                  td="underline"
-                  c="#97AD05"
-                  component="a"
-                  href={viewUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ cursor: "pointer", pointerEvents: "auto" }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  View
-                </Text>
-              )}
-              <Text fz={10} td="underline" c="#97AD05" style={{ pointerEvents: "auto" }}>
-                Re-upload
-              </Text>
-            </Group>
-          )}
+          {uploaded && (() => {
+            const rawName =
+              file?.name ||
+              (viewUrl || uploadedFileUrl || "").split("/").pop()?.split("?")[0] ||
+              "";
+            const dotIdx = rawName.lastIndexOf(".");
+            const baseName = dotIdx > 0 ? rawName.slice(0, dotIdx) : rawName;
+            const ext = dotIdx > 0 ? rawName.slice(dotIdx) : "";
+            return (
+              <Stack gap={4} align="center">
+                <Flex align="center" justify="center" style={{ maxWidth: "22ch" }}>
+                  <Text fz={10} truncate="end" style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "16ch" }}>
+                    {baseName}
+                  </Text>
+                  {ext && <Text fz={10} style={{ flexShrink: 0 }}>{ext}</Text>}
+                </Flex>
+                <Group gap={6} justify="center">
+                  {viewUrl && (
+                    <Text
+                      fz={10}
+                      td="underline"
+                      c="#97AD05"
+                      component="a"
+                      href={viewUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ cursor: "pointer", pointerEvents: "auto" }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      View
+                    </Text>
+                  )}
+                  <Text fz={10} td="underline" c="#97AD05" style={{ pointerEvents: "auto" }}>
+                    Re-upload
+                  </Text>
+                </Group>
+              </Stack>
+            );
+          })()}
           {!uploaded && (
             <Text fz={10} inline>
               Drag and drop file to Upload or{" "}

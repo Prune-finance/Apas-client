@@ -266,6 +266,10 @@ interface QuestPhoneInputProps<T> {
   phoneNumberKey: keyof T & string;
   countryCodeKey: keyof T & string;
   label?: string;
+  inputHeight?: number | string;
+  unfocusedBorderColor?: string;
+  inputBackground?: string;
+  alwaysShowLabel?: boolean;
 }
 
 export const QuestPhoneInput = <T,>({
@@ -273,6 +277,10 @@ export const QuestPhoneInput = <T,>({
   phoneNumberKey,
   countryCodeKey,
   label = "Phone Number",
+  inputHeight = rem(56),
+  unfocusedBorderColor = "#e4e7ec",
+  inputBackground = "#fff",
+  alwaysShowLabel = false,
 }: QuestPhoneInputProps<T>) => {
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
@@ -316,10 +324,10 @@ export const QuestPhoneInput = <T,>({
       <Flex
         align="center"
         style={{
-          height: rem(56),
-          border: `1px solid ${focused ? "var(--prune-primary-600)" : "#e4e7ec"}`,
+          height: inputHeight,
+          border: `1px solid ${focused ? "var(--prune-primary-600)" : unfocusedBorderColor}`,
           borderRadius: 8,
-          background: "#fff",
+          background: inputBackground,
           overflow: "hidden",
           transition: "border-color 0.2s ease",
         }}
@@ -342,7 +350,7 @@ export const QuestPhoneInput = <T,>({
                 alignItems: "center",
                 gap: rem(4),
                 padding: `0 ${rem(8)} 0 ${rem(12)}`,
-                height: rem(56),
+                height: inputHeight,
                 flexShrink: 0,
               }}
             >
@@ -376,17 +384,17 @@ export const QuestPhoneInput = <T,>({
         />
 
         <Box style={{ position: "relative", flex: 1, minWidth: 0, height: "100%" }}>
-          {/* Floating label — sits above the typed number, past the dial-code section */}
+          {/* Label — always at top (alwaysShowLabel) or floating */}
           <Box
             component="span"
             style={{
               position: "absolute",
               left: rem(12),
-              top: floating ? 10 : "50%",
-              transform: floating ? "translateY(0)" : "translateY(-50%)",
-              fontSize: floating ? 11 : 14,
-              color: floating ? "#667085" : "#98a2b3",
-              opacity: floating ? 1 : 0,
+              top: alwaysShowLabel ? 8 : (floating ? 10 : "50%"),
+              transform: alwaysShowLabel ? "translateY(0)" : (floating ? "translateY(0)" : "translateY(-50%)"),
+              fontSize: alwaysShowLabel ? 12 : (floating ? 11 : 14),
+              color: "#667085",
+              opacity: alwaysShowLabel ? 1 : (floating ? 1 : 0),
               pointerEvents: "none",
               zIndex: 1,
               fontWeight: 400,
@@ -410,7 +418,7 @@ export const QuestPhoneInput = <T,>({
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             placeholder={floating ? "" : label}
-            className={classes.phone_input}
+            className={alwaysShowLabel ? classes.phone_input_onboarding : classes.phone_input}
             style={{
               width: "100%",
               minWidth: 0,
@@ -419,8 +427,7 @@ export const QuestPhoneInput = <T,>({
               outline: "none",
               background: "transparent",
               paddingLeft: rem(12),
-              paddingTop: floating ? rem(20) : 0,
-              fontSize: rem(14),
+              paddingTop: alwaysShowLabel ? rem(20) : (floating ? rem(20) : 0),
               color: "var(--prune-text-gray-700)",
               transition: "padding-top 0.22s ease",
             }}

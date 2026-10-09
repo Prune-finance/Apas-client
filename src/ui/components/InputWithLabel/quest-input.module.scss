@@ -127,3 +127,21 @@
     }
   }
 }
+
+// Onboarding variant — matches input.module.scss font sizes
+.phone_input_onboarding {
+  font-size: 12px !important;
+
+  &::placeholder {
+    color: #98a2b3;
+    font-size: 12px !important;
+  }
+
+  @media (min-width: 64em) {
+    font-size: 14px !important;
+
+    &::placeholder {
+      font-size: 14px !important;
+    }
+  }
+}

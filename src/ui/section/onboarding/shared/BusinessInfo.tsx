@@ -1,10 +1,10 @@
 import {
   MakeInitiator,
-  PhoneNumberInput,
   SelectInputWithInsideLabel,
   TextareaWithInsideLabel,
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
+import { PhoneNumberInput } from "@/ui/components/InputWithLabel/QuestInputs";
 import { Box, Flex, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
@@ -203,6 +203,10 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
               form={form}
               phoneNumberKey="businessPhoneNumber"
               countryCodeKey="businessPhoneNumberCode"
+              inputHeight={54}
+              unfocusedBorderColor="#f2f4f7"
+              inputBackground="#fcfcfd"
+              alwaysShowLabel
             />
           </Box>
         </Flex>
@@ -266,6 +270,10 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
               form={form}
               phoneNumberKey="contactPersonPhoneNumber"
               countryCodeKey="contactPersonPhoneNumberCode"
+              inputHeight={54}
+              unfocusedBorderColor="#f2f4f7"
+              inputBackground="#fcfcfd"
+              alwaysShowLabel
             />
           </Box>
         </Flex>

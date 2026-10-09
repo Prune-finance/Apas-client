@@ -84,16 +84,16 @@ export const TransactionDrawer = ({
       selectedRequest?.recipientName ??
       selectedRequest?.beneficiaryName ??
       "N/A",
-    ...(selectedRequest?.currencyType === "GBP"
+    ...(selectedRequest?.currencyType === "GBP" || currency === "GBP"
       ? {
           "Account Number": selectedRequest?.beneficiaryAccountNumber,
           "Sort Code": selectedRequest?.beneficiarySortCode,
         }
-      : selectedRequest?.currencyType === "GHS"
+      : selectedRequest?.currencyType === "GHS" || currency === "GHS"
       ? {
           "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
         }
-      : selectedRequest?.currencyType === "USD"
+      : selectedRequest?.currencyType === "USD" || currency === "USD"
       ? {
           "Account Number": selectedRequest?.beneficiaryAccountNumber ?? "N/A",
         }
@@ -122,16 +122,16 @@ export const TransactionDrawer = ({
     ) : (
       selectedRequest?.senderName
     ),
-    ...(selectedRequest?.currencyType === "GBP"
+    ...(selectedRequest?.currencyType === "GBP" || currency == "GBP"
       ? {
           "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
           "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
         }
-      : selectedRequest?.currencyType === "GHS"
+      : selectedRequest?.currencyType === "GHS" || currency === "GHS"
       ? {
           "Wallet ID": selectedRequest?.senderWalletId ?? "N/A",
         }
-      : selectedRequest?.currencyType === "USD"
+      : selectedRequest?.currencyType === "USD" || currency === "USD"
       ? {
           "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
           "Account Iban": selectedRequest?.senderIban ?? "N/A"

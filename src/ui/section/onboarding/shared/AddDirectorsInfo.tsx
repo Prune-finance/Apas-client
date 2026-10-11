@@ -68,6 +68,15 @@ export const AddDirectorsInfo = ({
 
   const sectionBase = buildSectionBase(adminReference, 4);
 
+  const isFormReady =
+    form.isValid() &&
+    form.getValues().directors.every((d) => {
+      const hasIdentity = Boolean(d.identityType) && Boolean(d.identityFileUrl);
+      const hasIdentityBack = d.identityType === "PASSPORT" || Boolean(d.identityFileUrlBack);
+      const hasPOA = Boolean(d.proofOfAddress) && Boolean(d.proofOfAddressFileUrl);
+      return hasIdentity && hasIdentityBack && hasPOA;
+    });
+
   const handleClearForm = () => {
     form.setFieldValue("directors", [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }]);
   };
@@ -277,7 +286,7 @@ export const AddDirectorsInfo = ({
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!form.isValid()}
+            disabled={!isFormReady}
             styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
           />
         </Flex>

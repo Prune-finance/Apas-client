@@ -77,6 +77,15 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
 
   const sectionBase = buildSectionBase(adminReference, 2);
 
+  const isFormReady = (() => {
+    if (!form.isValid()) return false;
+    const v = form.getValues();
+    if (!v.ceoIdUrl) return false;
+    if (v.ceoIdType !== "PASSPORT" && !v.ceoIdUrlBack) return false;
+    if (!v.ceoPOAUrl) return false;
+    return true;
+  })();
+
   const handleClearForm = () => {
     form.setValues({
       ceoFirstName: "",
@@ -256,7 +265,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!form.isValid()}
+            disabled={!isFormReady}
             styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
           />
         </Flex>

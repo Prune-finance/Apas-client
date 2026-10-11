@@ -70,6 +70,15 @@ export const AddShareholdersInfo = ({
 
   const sectionBase = buildSectionBase(adminReference, 5);
 
+  const isFormReady =
+    form.isValid() &&
+    (form.getValues().shareholders ?? []).every((s) => {
+      const hasIdentity = Boolean(s.identityType) && Boolean(s.identityFileUrl);
+      const hasIdentityBack = s.identityType === "PASSPORT" || Boolean(s.identityFileUrlBack);
+      const hasPOA = Boolean(s.proofOfAddress) && Boolean(s.proofOfAddressFileUrl);
+      return hasIdentity && hasIdentityBack && hasPOA;
+    });
+
   const handleClearForm = () => {
     form.setFieldValue("shareholders", [{ ...OnboardingShareholderValues, id: crypto.randomUUID() }]);
   };
@@ -277,7 +286,7 @@ export const AddShareholdersInfo = ({
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!form.isValid()}
+            disabled={!isFormReady}
             styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
           />
         </Flex>

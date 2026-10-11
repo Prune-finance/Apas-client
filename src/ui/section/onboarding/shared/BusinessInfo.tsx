@@ -99,6 +99,15 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
 
   const sectionBase = buildSectionBase(adminReference, 1, isAdmin);
 
+  const isFormReady = (() => {
+    if (!form.isValid()) return false;
+    const v = form.getValues();
+    if (v.contactPersonIdType && !v.contactPersonIdUrl) return false;
+    if (v.contactPersonIdType && v.contactPersonIdType !== "PASSPORT" && !v.contactPersonIdUrlBack) return false;
+    if (v.contactPersonPOAType && !v.contactPersonPOAUrl) return false;
+    return true;
+  })();
+
   const handleClearForm = () => {
     form.setValues({
       businessName: "",
@@ -391,7 +400,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
           fw={600}
           action={handleSaveAndContinue}
           loading={completing}
-          disabled={!form.isValid()}
+          disabled={!isFormReady}
           styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
         />
       </Flex>

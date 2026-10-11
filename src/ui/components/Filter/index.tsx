@@ -134,9 +134,11 @@ export default function Filter<T>({
             {...form.getInputProps("createdAt")}
             size="xs"
             w={180}
-            h={36}
-            fz={10}
-            styles={{ input: { height: "30px", fontSize: 10 } }}
+            fz={12}
+            styles={{
+              input: { height: "30px", fontSize: 12, paddingTop: 0, paddingBottom: 0 },
+              section: { height: "30px" },
+            }}
             type="range"
             allowSingleDateInRange
             leftSection={<IconCalendarMonth size={12} />}
@@ -161,8 +163,8 @@ export default function Filter<T>({
             size="xs"
             w={180}
             h={36}
-            fz={10}
-            styles={{ input: { fontSize: 10 } }}
+            fz={12}
+            styles={{ input: { height: "30px", fontSize: 12 } }}
             clearable
           />
         )}

@@ -172,9 +172,10 @@ export const SearchInput = ({
     <TextInput
       placeholder="Search here..."
       leftSectionPointerEvents="none"
-      leftSection={<IconSearch style={{ width: 20, height: 20 }} />}
+      leftSection={<IconSearch style={{ width: 16, height: 16 }} />}
+      leftSectionWidth={40}
       w={324}
-      styles={{ input: { border: "1px solid #F5F5F5" } }}
+      styles={{ input: { border: "1px solid #F5F5F5", paddingLeft: 40 } }}
       value={search}
       onChange={(e) => setSearch && setSearch(e.currentTarget.value)}
       {...props}
@@ -184,14 +185,32 @@ export const SearchInput = ({
 
 interface TextBoxProps extends TextInputProps {}
 
-export const TextBox = ({ ...props }: TextBoxProps) => {
-  return <TextInput size="xs" w={180} h={36} fz={10} styles={{ input: { fontSize: 10 } }} {...props} />;
+export const TextBox = ({ styles, ...props }: TextBoxProps) => {
+  return (
+    <TextInput
+      size="xs"
+      fz={12}
+      w={180}
+      h={36}
+      styles={{ input: { height: "30px" }, ...styles }}
+      {...props}
+    />
+  );
 };
 
 interface SelectBoxProps extends SelectProps {}
 
-export const SelectBox = ({ ...props }: SelectBoxProps) => {
-  return <Select size="xs" w={180} h={36} fz={10} styles={{ input: { fontSize: 10 } }} {...props} />;
+export const SelectBox = ({ styles, ...props }: SelectBoxProps) => {
+  return (
+    <Select
+      size="xs"
+      fz={12}
+      w={180}
+      h={36}
+      styles={{ input: { height: "30px" }, ...styles }}
+      {...props}
+    />
+  );
 };
 
 const insideLabelLeftSectionWidth = rem(52);

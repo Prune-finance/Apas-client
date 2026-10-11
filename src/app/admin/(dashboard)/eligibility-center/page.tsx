@@ -181,7 +181,7 @@ function EligibilityCenter() {
           }}
         >
           <TextBox
-            placeholder="Country Code (e.g. NG, GH)"
+            placeholder="Country Code (e.g. NG)"
             {...form.getInputProps("country")}
           />
           <SelectBox

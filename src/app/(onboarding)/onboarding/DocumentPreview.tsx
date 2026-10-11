@@ -1,3 +1,5 @@
+"use client";
+
 import { useDisclosure } from "@mantine/hooks";
 import styles from "./documentPreview.module.scss";
 import {
@@ -9,9 +11,7 @@ import {
   Image,
   FileButton,
   Flex,
-  ThemeIcon,
-  ActionIcon,
-  Group,
+  Loader,
 } from "@mantine/core";
 import useNotification from "@/lib/hooks/notification";
 import FileDisplay from "@/ui/components/DocumentViewer";
@@ -21,12 +21,14 @@ import { PrimaryBtn } from "@/ui/components/Buttons";
 import { ReactNode, useState } from "react";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
-import { IconDownload } from "@tabler/icons-react";
-import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
 import React from "react";
 
-const axios = createAxiosInstance("auth");
+const authAxios = createAxiosInstance("auth");
+const questAxios = createAxiosInstance("questionnaire");
+
+const isUUID = (val: string) =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
 type FormKey =
   | "cacCertificate"
@@ -34,6 +36,7 @@ type FormKey =
   | "mermat"
   | "operationalLicense"
   | (string & {});
+
 interface DocumentPreview {
   label: string;
   title: string;
@@ -70,23 +73,22 @@ export const DocumentPreview = ({
   documentStatus,
   children,
 }: DocumentPreview) => {
-  const [openedFile, { open: openFile, close: closeFile }] =
-    useDisclosure(false);
+  const [openedFile, { open: openFile, close: closeFile }] = useDisclosure(false);
   const { handleError } = useNotification();
   const [loading, setLoading] = useState(false);
+  const [resolving, setResolving] = useState(false);
+  const [resolvedUrl, setResolvedUrl] = useState<string>("");
+  const [resolvedFileName, setResolvedFileName] = useState<string>("");
+  const [resolvedContentType, setResolvedContentType] = useState<string>("");
 
   const handleUpload = async (file: File | null) => {
-    // formKey: string;
     setLoading(true);
     try {
       if (!file) return;
-
       const formData = new FormData();
       formData.append("file", file);
-
       const entity = isUser ? "auth" : isOnboarding ? "onboarding" : "admin";
-      const { data: res } = await axios.post(`/${entity}/upload`, formData);
-
+      const { data: res } = await authAxios.post(`/${entity}/upload`, formData);
       setValue && setValue(res.data.url);
     } catch (error) {
       handleError("An error occurred", parseError(error));
@@ -95,22 +97,43 @@ export const DocumentPreview = ({
     }
   };
 
-  return (
-    <Box flex={1}>
-      <Select
-        readOnly={!editing}
-        className="Switzer"
-        classNames={{
-          input: styles.input,
-          label: styles.label,
-          section: styles.section,
-        }}
-        leftSection={<Image src={PDFICON.src} alt="pdf-icon" h={16} w={16} />}
-        leftSectionPointerEvents="none"
-        rightSectionPointerEvents="auto"
-        rightSectionWidth={documentStatus ? 120 : 100}
-        rightSection={
-          editing ? (
+  const handleView = async () => {
+    if (!value) return;
+    if (!isUUID(value)) {
+      setResolvedUrl(value);
+      openFile();
+      return;
+    }
+    setResolving(true);
+    try {
+      const { data } = await questAxios.get(`/business/onboarding/files/${value}`);
+      setResolvedUrl(data.data.url || value);
+      setResolvedFileName(data.data.fileName || "");
+      setResolvedContentType(data.data.contentType || "");
+    } catch {
+      setResolvedUrl(value);
+    } finally {
+      setResolving(false);
+      openFile();
+    }
+  };
+
+  if (editing) {
+    return (
+      <Box flex={1}>
+        <Select
+          readOnly={false}
+          className="Switzer"
+          classNames={{
+            input: styles.input,
+            label: styles.label,
+            section: styles.section,
+          }}
+          leftSection={<Image src={PDFICON.src} alt="pdf-icon" h={16} w={16} />}
+          leftSectionPointerEvents="none"
+          rightSectionPointerEvents="auto"
+          rightSectionWidth={120}
+          rightSection={
             <FileButton
               disabled={loading}
               onChange={(file) => handleUpload(file)}
@@ -120,9 +143,6 @@ export const DocumentPreview = ({
                 <PrimaryBtn
                   text="Re-upload"
                   fw={600}
-                  // w={200}
-                  // w="100%"
-                  // fullWidth
                   action={props.onClick}
                   loading={loading}
                   loaderProps={{ type: "dots" }}
@@ -130,36 +150,69 @@ export const DocumentPreview = ({
                 />
               )}
             </FileButton>
-          ) : (
-            <Flex align="center" gap={4} mr={20}>
-              <UnstyledButton
-                onClick={openFile}
-                className={styles.input__right__section}
-                bg="#D0D5DD"
-                py={4}
-                px={8}
-                // mr={20}
-                style={{ borderRadius: 4 }}
-              >
+          }
+          label={label}
+          placeholder={title}
+          data={
+            label.includes("Identity Document")
+              ? ["ID Card", "Passport", "Residence Permit"]
+              : ["Utility Bill"]
+          }
+          value={type}
+          onChange={(value) => setType && setType(value)}
+        />
+      </Box>
+    );
+  }
+
+  return (
+    <Box flex={1}>
+      <Text fz={14} fw={400} c="#667085" mb={10}>
+        {label}
+      </Text>
+      <Flex
+        align="center"
+        justify="space-between"
+        bg="#FCFCFD"
+        h={44}
+        px={12}
+        style={{ borderRadius: 4 }}
+      >
+        <Flex align="center" gap={8} style={{ minWidth: 0, flex: 1 }}>
+          <Image src={PDFICON.src} alt="pdf-icon" h={16} w={16} style={{ flexShrink: 0 }} />
+          <Text fz={14} c="#344054" truncate style={{ flex: 1 }}>
+            {title || "—"}
+          </Text>
+        </Flex>
+
+        <Flex align="center" gap={8} style={{ flexShrink: 0 }}>
+          {documentStatus && <BadgeComponent status={documentStatus} />}
+          {value && (
+            <UnstyledButton
+              onClick={handleView}
+              disabled={resolving}
+              py={4}
+              px={8}
+              style={{
+                borderRadius: 4,
+                backgroundColor: "#D0D5DD",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 46,
+              }}
+            >
+              {resolving ? (
+                <Loader size={10} color="#667085" />
+              ) : (
                 <Text fw={600} fz={10} c="#667085">
                   View
                 </Text>
-              </UnstyledButton>
-
-              {documentStatus && <BadgeComponent status={documentStatus} />}
-            </Flex>
-          )
-        }
-        label={label}
-        placeholder={title}
-        data={
-          label.includes("Identity Document")
-            ? ["ID Card", "Passport", "Residence Permit"]
-            : ["Utility Bill"]
-        }
-        value={type}
-        onChange={(value) => setType && setType(value)}
-      />
+              )}
+            </UnstyledButton>
+          )}
+        </Flex>
+      </Flex>
 
       <Modal
         opened={openedFile}
@@ -168,54 +221,24 @@ export const DocumentPreview = ({
         centered
         title={
           <Text fz={14} fw={500}>
-            Document Preview
+            {resolvedFileName || title || "Document Preview"}
           </Text>
         }
       >
         <Box>
           <FileDisplay
-            fileUrl={value || ""}
-            download={!React.Children.count(children)}
-            // download={!children}
+            fileUrl={resolvedUrl || value || ""}
+            contentType={resolvedContentType}
+            download={false}
           />
           {children}
-          {/* {showActions && (
-            <Flex justify="end" align="center" my={16} gap={20}>
-              {value && (
-                <ActionIcon
-                  color="var(--prune-text-gray-700)"
-                  variant="light"
-                  radius="md"
-                  size={40}
-                  component={Link}
-                  href={value}
-                  download
-                >
-                  <IconDownload />
-                </ActionIcon>
-              )}
-              <PrimaryBtn
-                text="Reject"
-                color="var(--prune-warning)"
-                fw={600}
-                c="#fff"
-                action={() => {
-                  handleDocumentApproval &&
-                    formKey &&
-                    handleDocumentApproval("reject", formKey);
-                }}
-              />
-              <PrimaryBtn
-                text="Approve Document"
-                fw={600}
-                action={() => {
-                  handleDocumentApproval &&
-                    formKey &&
-                    handleDocumentApproval("approve", formKey);
-                }}
-              />
+          {(resolvedUrl || value) && (
+            <Flex justify="flex-end" mt={16}>
+              <a href={resolvedUrl || value} download={resolvedFileName || true} target="_blank" rel="noopener noreferrer">
+                <PrimaryBtn text="Download" fw={600} fz={12} />
+              </a>
             </Flex>
-          )} */}
+          )}
         </Box>
       </Modal>
     </Box>

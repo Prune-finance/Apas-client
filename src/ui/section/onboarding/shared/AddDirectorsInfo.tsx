@@ -1,6 +1,6 @@
-import { Box, Flex, Stack, Text, ThemeIcon } from "@mantine/core";
+import { Box, Button, Flex, Stack, Text, ThemeIcon } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn } from "@/ui/components/Buttons";
 import { IconPlus, IconTrash } from "@tabler/icons-react";
 import { SaveProgressBtn, eksellStyle, buildSectionBase } from "./utils";
 import {
@@ -34,7 +34,7 @@ function formatDOB(date: any): string | undefined {
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
   const yyyy = d.getFullYear();
-  return `${mm}-${dd}-${yyyy}`;
+  return `${dd}-${mm}-${yyyy}`;
 }
 
 function buildSection4Body(form: UseFormReturnType<OnboardingType>) {
@@ -67,6 +67,10 @@ export const AddDirectorsInfo = ({
   const [completing, setCompleting] = useState(false);
 
   const sectionBase = buildSectionBase(adminReference, 4);
+
+  const handleClearForm = () => {
+    form.setFieldValue("directors", [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }]);
+  };
 
   const handleSaveProgress = async () => {
     setSaving(true);
@@ -242,20 +246,41 @@ export const AddDirectorsInfo = ({
         </Stack>
       ))}
 
-      <Flex align="center" justify="flex-end" w="100%" mt={20} gap={20}>
-        <SecondaryBtn
-          text="Previous"
-          fw={600}
-          action={() => setActive(active - 1)}
-          disabled={active === 0}
-        />
-        <PrimaryBtn
-          text="Save & Continue"
-          w={160}
-          fw={600}
-          action={handleSaveAndContinue}
-          loading={completing}
-        />
+      <Flex align="center" justify="space-between" w="100%" mt={20}>
+        <Button
+          radius={9999}
+          px={18}
+          h={40}
+          fz={14}
+          fw={500}
+          c="#344054"
+          onClick={handleClearForm}
+          styles={{ root: { backgroundColor: "#FCFCFD", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+        >
+          Clear Form
+        </Button>
+        <Flex gap={20} align="center">
+          <Button
+            radius={9999}
+            px={18}
+            h={40}
+            fz={14}
+            fw={500}
+            c="#344054"
+            onClick={() => setActive(active - 1)}
+            styles={{ root: { backgroundColor: "#F2F4F7", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+          >
+            Previous
+          </Button>
+          <PrimaryBtn
+            text="Save & Continue"
+            fw={600}
+            action={handleSaveAndContinue}
+            loading={completing}
+            disabled={!form.isValid()}
+            styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
+          />
+        </Flex>
       </Flex>
     </Box>
   );

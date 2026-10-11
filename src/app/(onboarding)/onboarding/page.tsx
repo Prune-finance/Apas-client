@@ -251,14 +251,12 @@ export default function Onboarding() {
     ) ?? false;
 
   return (
-    <Box>
-      <Flex gap={20}>
-        <Box h="100%">
-          <Navbar active={active} />
-        </Box>
+    <Box style={{ minHeight: "calc(100vh - 112px)" }}>
+      <Flex gap={24} align="stretch" style={{ minHeight: "calc(100vh - 112px)" }}>
+        <Navbar active={active} />
 
-        <Box flex={1}>
-          <CustomPaper>
+        <Box flex={1} style={{ display: "flex", flexDirection: "column" }}>
+          <CustomPaper px={24} py={32} style={{ flex: 1 }}>
             {profileLoading ? (
               <Flex justify="center" align="center" h={300}>
                 <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />

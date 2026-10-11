@@ -134,6 +134,7 @@ export default function Filter<T>({
             {...form.getInputProps("createdAt")}
             size="xs"
             w={180}
+            h={36}
             fz={12}
             styles={{
               input: { height: "30px", fontSize: 12, paddingTop: 0, paddingBottom: 0 },

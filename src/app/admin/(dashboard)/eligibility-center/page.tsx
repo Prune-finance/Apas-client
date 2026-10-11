@@ -254,12 +254,16 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
         </TableTd>
         <TableTd>{dayjs(row.createdAt).format("Do MMMM, YYYY")}</TableTd>
         <TableTd>
-          <Group gap={8} wrap="nowrap">
-            <CountryFlag code={countryCode} size={20} />
-            <Text fz={14} c="var(--prune-text-gray-700)">
-              {countryCode || ""}
-            </Text>
-          </Group>
+          {countryCode ? (
+            <Group gap={8} wrap="nowrap">
+              <CountryFlag code={countryCode} size={20} />
+              <Text fz={14} c="var(--prune-text-gray-700)">
+                {countryCode}
+              </Text>
+            </Group>
+          ) : (
+            <Text fz={14} c="var(--prune-text-gray-400)">—</Text>
+          )}
         </TableTd>
         <TableTd>
           <Group gap={4} wrap="wrap">
@@ -269,13 +273,16 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
                   key={s.service}
                   variant="outline"
                   radius="xl"
-                  size="sm"
+                  size="xs"
                   fw={500}
+                  tt="none"
                   style={{
                     fontFamily: "inherit",
-                    color: "#475467",
-                    borderColor: "#D0D5DD",
-                    backgroundColor: "#F9FAFB",
+                    fontSize: 11,
+                    color: "#3D5200",
+                    borderColor: "#C6D97A",
+                    backgroundColor: "#F4F8E6",
+                    padding: "3px 8px",
                   }}
                 >
                   {s.service.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}
@@ -287,7 +294,15 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
           </Group>
         </TableTd>
         <TableTd>
-          <BadgeComponent stage status={stage} w={140} />
+          <BadgeComponent
+            stage
+            status={stage}
+            w="auto"
+            h={26}
+            px={10}
+            fw={500}
+            fz={12}
+          />
         </TableTd>
       </TableTr>
     );

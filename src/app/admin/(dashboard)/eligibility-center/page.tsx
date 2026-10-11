@@ -4,6 +4,7 @@ import React, { Suspense, useState } from "react";
 import styles from "@/ui/styles/accounts.module.scss";
 import classes from "./style.module.scss";
 import {
+  Badge,
   Box,
   Flex,
   Grid,
@@ -194,7 +195,7 @@ function EligibilityCenter() {
           head={tableHeaders}
           rows={<Rows data={data} />}
           loading={loading}
-          columnWidths={["30%", "20%", "15%", "15%", "20%"]}
+          columnWidths={["25%", "15%", "10%", "30%", "20%"]}
         />
 
         <EmptyTable
@@ -242,11 +243,11 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
         <TableTd>
           <Stack gap={2}>
             <Text fw={500} fz={14} c="var(--prune-text-gray-700)" tt="capitalize">
-              {row.answers?.legalBusinessName ?? ""}
+              {row.answers?.legalBusinessName || row.answers?.contactName || "—"}
             </Text>
             {row.contactEmail && (
               <Text fz={12} c="var(--prune-text-gray-500)">
-                {row.contactEmail ?? ""}
+                {row.contactEmail}
               </Text>
             )}
           </Stack>
@@ -262,7 +263,27 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
         </TableTd>
         <TableTd>
           <Group gap={4} wrap="wrap">
-            <Text fz={12} c="var(--prune-text-gray-400)">Not available yet</Text>
+            {row.answers?.services?.length ? (
+              row.answers.services.map((s) => (
+                <Badge
+                  key={s.service}
+                  variant="outline"
+                  radius="xl"
+                  size="sm"
+                  fw={500}
+                  style={{
+                    fontFamily: "inherit",
+                    color: "#475467",
+                    borderColor: "#D0D5DD",
+                    backgroundColor: "#F9FAFB",
+                  }}
+                >
+                  {s.service.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}
+                </Badge>
+              ))
+            ) : (
+              <Text fz={12} c="var(--prune-text-gray-400)">—</Text>
+            )}
           </Group>
         </TableTd>
         <TableTd>

@@ -220,8 +220,9 @@ export interface QuestionnaireAdminItem {
   };
   answers: {
     legalBusinessName?: string;
+    contactName?: string;
     countryCode?: string;
-    services?: { name: string; currencies: string[] }[];
+    services?: { service: string; currencies: string[] }[];
     [key: string]: unknown;
   };
   createdAt: string;

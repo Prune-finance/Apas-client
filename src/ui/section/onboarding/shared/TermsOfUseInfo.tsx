@@ -1,5 +1,5 @@
-import { Box, Flex, Text } from "@mantine/core";
-import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { Box, Button, Flex, Text } from "@mantine/core";
+import { PrimaryBtn } from "@/ui/components/Buttons";
 import { OnboardingType } from "@/lib/schema";
 import { UseFormReturnType } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -72,16 +72,33 @@ export const TermsOfUseInfo = ({
       </Text>
 
       <Flex align="center" justify="space-between" w="100%" mt={20}>
-        <SecondaryBtn text="Clear Form" fw={600} action={() => form.reset()} />
+        <Button
+          radius={9999}
+          px={18}
+          h={40}
+          fz={14}
+          fw={500}
+          c="#344054"
+          onClick={() => form.reset()}
+          styles={{ root: { backgroundColor: "#FCFCFD", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+        >
+          Clear Form
+        </Button>
 
-        <Flex align="center" justify="center" gap={20}>
-          <SecondaryBtn
-            text="Previous"
-            fw={600}
-            action={() => setActive(active - 1)}
-            disabled={active === 0}
-          />
-          <PrimaryBtn text="Accept & Submit" w={160} fw={600} action={open} />
+        <Flex align="center" gap={20}>
+          <Button
+            radius={9999}
+            px={18}
+            h={40}
+            fz={14}
+            fw={500}
+            c="#344054"
+            onClick={() => setActive(active - 1)}
+            styles={{ root: { backgroundColor: "#F2F4F7", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+          >
+            Previous
+          </Button>
+          <PrimaryBtn text="Accept & Submit" fw={600} action={open} />
         </Flex>
       </Flex>
 

@@ -11,7 +11,7 @@ import {
   TabsTab,
   Text,
 } from "@mantine/core";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 
 import {
   IconBuildingSkyscraper,
@@ -42,17 +42,19 @@ import Keys from "./(tabs)/keys";
 
 import { useBusinessDetail, useBusinessServices } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
-import { type ApplicationOverviewHandle } from "./(tabs)/application-overview";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
-import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { BackBtn, PrimaryBtn } from "@/ui/components/Buttons";
 import { Requests } from "./(tabs)/requests";
 import createAxiosInstance from "@/lib/axios";
 import ApplicationOverview from "./(tabs)/application-overview";
 import CeoOverview from "./(tabs)/ceo-overview";
+import OnboardingDocuments from "./(tabs)/onboarding-documents";
+import OnboardingDirectors from "./(tabs)/onboarding-directors";
+import OnboardingShareholders from "./(tabs)/onboarding-shareholders";
 
 
 export default function SingleBusiness() {
@@ -82,6 +84,7 @@ export default function SingleBusiness() {
     new Set([tab || "business"])
   );
 
+  const router = useRouter();
   const isOnboardingApp = detail?.type === "ONBOARDING_APPLICATION";
   const appStatus = detail?.applicationStatus ?? detail?.currentStatus;
   const visibleTabs = tabs.filter((t) => {
@@ -89,22 +92,6 @@ export default function SingleBusiness() {
     if (["accounts", "keys", "requests"].includes(t.value)) return !isOnboardingApp;
     return true;
   });
-  const [editingApplication, setEditingApplication] = useState(false);
-  const [savingApplication, setSavingApplication] = useState(false);
-  const overviewRef = useRef<ApplicationOverviewHandle>(null);
-
-  const handleSaveApplication = async () => {
-    if (!overviewRef.current) return;
-    setSavingApplication(true);
-    try {
-      await overviewRef.current.save();
-      setEditingApplication(false);
-    } catch {
-      // error already shown by the component
-    } finally {
-      setSavingApplication(false);
-    }
-  };
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
@@ -274,34 +261,14 @@ export default function SingleBusiness() {
 
           {activeTab === "business" && isOnboardingApp && detail?.editableByAdmin && appStatus === "IN_PROGRESS" && (
             <div className={styles.header__right}>
-              {!editingApplication ? (
-                <PrimaryBtn
-                  text="Edit"
-                  fw={600}
-                  fz={12}
-                  h={32}
-                  radius={4}
-                  action={() => setEditingApplication(true)}
-                />
-              ) : (
-                <>
-                  <SecondaryBtn
-                    text="Cancel"
-                    fw={600}
-                    fz={12}
-                    action={() => setEditingApplication(false)}
-                  />
-                  <PrimaryBtn
-                    text="Save Changes"
-                    fw={600}
-                    fz={12}
-                    h={32}
-                    radius={4}
-                    action={handleSaveApplication}
-                    loading={savingApplication}
-                  />
-                </>
-              )}
+              <PrimaryBtn
+                text="Edit"
+                fw={600}
+                fz={12}
+                h={32}
+                radius={4}
+                action={() => router.push(`/admin/businesses/${params.id}/edit`)}
+              />
             </div>
           )}
 
@@ -428,10 +395,8 @@ export default function SingleBusiness() {
                 <>
                   {detail?.type === "ONBOARDING_APPLICATION" && detail ? (
                     <ApplicationOverview
-                      ref={overviewRef}
                       detail={detail}
                       revalidate={revalidate}
-                      editing={editingApplication}
                     />
                   ) : (
                     business && (
@@ -454,20 +419,26 @@ export default function SingleBusiness() {
             </TabsPanel>
 
             <TabsPanel value="documents">
-              {visitedTabs.has("documents") && business && (
-                <Documents business={business} revalidate={revalidate} />
+              {visitedTabs.has("documents") && (
+                isOnboardingApp && detail
+                  ? <OnboardingDocuments detail={detail} />
+                  : business && <Documents business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
             <TabsPanel value="directors">
-              {visitedTabs.has("directors") && business && (
-                <Directors business={business} revalidate={revalidate} />
+              {visitedTabs.has("directors") && (
+                isOnboardingApp && detail
+                  ? <OnboardingDirectors detail={detail} />
+                  : business && <Directors business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 
             <TabsPanel value="shareholders">
-              {visitedTabs.has("shareholders") && business && (
-                <Shareholders business={business} revalidate={revalidate} />
+              {visitedTabs.has("shareholders") && (
+                isOnboardingApp && detail
+                  ? <OnboardingShareholders detail={detail} />
+                  : business && <Shareholders business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
 

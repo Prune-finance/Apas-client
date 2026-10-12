@@ -37,7 +37,7 @@ export default function OnBoardingDocumentBox<T>({
     const val = uploadedFileUrl || "";
     // If val is a file ID (UUID, not an http URL), fetch the pre-signed view URL
     if (val && !val.startsWith("http") && kind) {
-      const viewPath = isAdmin
+      const viewPath = (isAdmin || Boolean(adminReference))
         ? `/business/onboarding/admin/files/${val}`
         : `/business/onboarding/files/${val}`;
       questAxios

@@ -147,6 +147,7 @@ export default function NewBusiness() {
           onStepClick={setActive}
           allowNextStepsSelect={false}
           color="var(--prune-primary-700)"
+          size="xs"
           classNames={{
             stepWrapper: styles.stepWrapper,
             stepLabel: styles.stepLabel,

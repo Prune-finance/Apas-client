@@ -46,8 +46,15 @@ export const TextInputWithInsideLabel = ({
   ...props
 }: TextInputWithInsideLabelProps) => {
   if (standard) {
-    const { label: _label, ...inputProps } = props;
-    return <TextInput styles={getStandardStyles(!!inputProps.error)} {...inputProps} />;
+    const { label, ...inputProps } = props;
+    return (
+      <TextInput
+        label={label}
+        placeholder={inputProps.placeholder ?? (typeof label === "string" ? label : undefined)}
+        styles={getStandardStyles(!!inputProps.error)}
+        {...inputProps}
+      />
+    );
   }
   return (
     <TextInput
@@ -78,8 +85,15 @@ interface SelectInputWithInsideLabelProps extends SelectProps {
 }
 export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWithInsideLabelProps) => {
   if (standard) {
-    const { label: _label, ...inputProps } = props;
-    return <Select styles={getStandardStyles(!!inputProps.error)} {...inputProps} />;
+    const { label, ...inputProps } = props;
+    return (
+      <Select
+        label={label}
+        placeholder={inputProps.placeholder ?? (typeof label === "string" ? `Select ${label}` : "Select")}
+        styles={getStandardStyles(!!inputProps.error)}
+        {...inputProps}
+      />
+    );
   }
   return (
     <Select
@@ -117,9 +131,11 @@ export const TextareaWithInsideLabel = ({
   ...props
 }: TextareaWithInsideLabelProps) => {
   if (standard) {
-    const { label: _label, ...inputProps } = props;
+    const { label, ...inputProps } = props;
     return (
       <Textarea
+        label={label}
+        placeholder={inputProps.placeholder ?? (typeof label === "string" ? label : undefined)}
         styles={{
           input: {
             border: `1px solid ${inputProps.error ? "var(--mantine-color-error)" : "var(--prune-text-gray-100)"}`,

@@ -80,34 +80,23 @@ export default function DropzoneComponent<T>(
   }, [uploadedFileName]);
 
   const [processing, setProcessing] = useState(false);
-  const [downloading, setDownloading] = useState(false);
 
-  const handleDownload = async (e: React.MouseEvent) => {
+  const handleDownload = (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    if (!viewUrl || downloading) return;
-    setDownloading(true);
-    try {
-      const res = await fetch(viewUrl);
-      const blob = await res.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = blobUrl;
-      const name =
-        file?.name ||
-        resolvedFileName ||
-        (viewUrl || uploadedFileUrl || "").split("/").pop()?.split("?")[0] ||
-        "document";
-      a.download = name;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(blobUrl);
-    } catch {
-      window.open(viewUrl, "_blank");
-    } finally {
-      setDownloading(false);
-    }
+    if (!viewUrl) return;
+    const name =
+      file?.name ||
+      resolvedFileName ||
+      (viewUrl || uploadedFileUrl || "").split("/").pop()?.split("?")[0] ||
+      "document";
+    const proxyUrl = `/api/download?url=${encodeURIComponent(viewUrl)}&name=${encodeURIComponent(name)}`;
+    const a = document.createElement("a");
+    a.href = proxyUrl;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const handleUpload = async () => {
@@ -303,7 +292,7 @@ export default function DropzoneComponent<T>(
                       style={{ cursor: "pointer", pointerEvents: "auto" }}
                       onClick={handleDownload}
                     >
-                      {downloading ? "Downloading…" : "Download"}
+                      Download
                     </Text>
                   )}
                   <Text fz={10} td="underline" c="#97AD05" style={{ pointerEvents: "auto" }}>

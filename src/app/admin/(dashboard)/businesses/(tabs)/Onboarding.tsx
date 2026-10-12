@@ -70,6 +70,23 @@ export default function OnboardingBusinesses() {
       <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>
         <Badge
+          variant="filled"
+          fz={11}
+          fw={500}
+          tt="capitalize"
+          px={10}
+          py={4}
+          style={{
+            borderRadius: 9999,
+            backgroundColor: element.addedByAdmin ? "#1D2939" : "#17B26A",
+            color: "#fff",
+          }}
+        >
+          {element.addedByAdmin ? "Admin" : "User"}
+        </Badge>
+      </TableTd>
+      <TableTd>
+        <Badge
           tt="capitalize"
           variant="light"
           color={activeBadgeColor(element.state)}
@@ -134,5 +151,6 @@ const tableHeaders = [
   "Business",
   "Contact Email",
   "Date Created",
+  "Added by",
   "Status",
 ];

@@ -80,6 +80,35 @@ export default function DropzoneComponent<T>(
   }, [uploadedFileName]);
 
   const [processing, setProcessing] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!viewUrl || downloading) return;
+    setDownloading(true);
+    try {
+      const res = await fetch(viewUrl);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      const name =
+        file?.name ||
+        resolvedFileName ||
+        (viewUrl || uploadedFileUrl || "").split("/").pop()?.split("?")[0] ||
+        "document";
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(viewUrl, "_blank");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -271,14 +300,10 @@ export default function DropzoneComponent<T>(
                       fz={10}
                       td="underline"
                       c="#97AD05"
-                      component="a"
-                      href={viewUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       style={{ cursor: "pointer", pointerEvents: "auto" }}
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={handleDownload}
                     >
-                      View
+                      {downloading ? "Downloading…" : "Download"}
                     </Text>
                   )}
                   <Text fz={10} td="underline" c="#97AD05" style={{ pointerEvents: "auto" }}>

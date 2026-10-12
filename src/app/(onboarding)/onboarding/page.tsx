@@ -99,6 +99,13 @@ interface OnboardingProfile {
 }
 import { IconExclamationMark, IconClockHour3 } from "@tabler/icons-react";
 
+function parseDDMMYYYY(dateStr: string | null | undefined): Date | null {
+  if (!dateStr) return null;
+  const [dd, mm, yyyy] = dateStr.split("-").map(Number);
+  if (!dd || !mm || !yyyy) return null;
+  return new Date(yyyy, mm - 1, dd);
+}
+
 export default function Onboarding() {
   const [active, setActive] = useState(0);
   const [showReview, setShowReview] = useState(false);
@@ -200,43 +207,37 @@ export default function Onboarding() {
       ceoIdUrl: ceo?.identityDocument?.id || "",
       ceoIdUrlBack: ceo?.identityDocumentBack?.id || "",
       ceoPOAUrl: ceo?.proofOfAddressDocument?.id || "",
-      ceoDOB: ceo?.dateOfBirth ? new Date(ceo.dateOfBirth) : null,
+      ceoDOB: parseDDMMYYYY(ceo?.dateOfBirth),
 
       // Arrays
       directors:
         (profile.directors || []).length > 0
-          ? profile.directors.map((director) => ({
-              ...director,
+          ? profile.directors.map((director: any) => ({
               id: crypto.randomUUID(),
-              date_of_birth: director.date_of_birth
-                ? new Date(director.date_of_birth)
-                : null,
-              first_name: director.first_name || "",
-              last_name: director.last_name || "",
+              first_name: director.firstName || "",
+              last_name: director.lastName || "",
               email: director.email || "",
+              date_of_birth: parseDDMMYYYY(director.dateOfBirth),
               identityType: director.identityType || null,
-              proofOfAddress: director.proofOfAddress || null,
-              identityFileUrl: director.identityFileUrl || null,
-              identityFileUrlBack: director.identityFileUrlBack || null,
-              proofOfAddressFileUrl: director.proofOfAddressFileUrl || null,
+              proofOfAddress: director.proofOfAddressType || null,
+              identityFileUrl: director.identityDocument?.id || null,
+              identityFileUrlBack: director.identityDocumentBack?.id || null,
+              proofOfAddressFileUrl: director.proofOfAddressDocument?.id || null,
             }))
           : [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }],
       shareholders:
         (profile.shareholders || []).length > 0
-          ? profile.shareholders.map((shareholder) => ({
-              ...shareholder,
+          ? profile.shareholders.map((shareholder: any) => ({
               id: crypto.randomUUID(),
-              date_of_birth: shareholder.date_of_birth
-                ? new Date(shareholder.date_of_birth)
-                : null,
-              first_name: shareholder.first_name || "",
-              last_name: shareholder.last_name || "",
+              first_name: shareholder.firstName || "",
+              last_name: shareholder.lastName || "",
               email: shareholder.email || "",
+              date_of_birth: parseDDMMYYYY(shareholder.dateOfBirth),
               identityType: shareholder.identityType || null,
-              proofOfAddress: shareholder.proofOfAddress || null,
-              identityFileUrl: shareholder.identityFileUrl || null,
-              identityFileUrlBack: shareholder.identityFileUrlBack || null,
-              proofOfAddressFileUrl: shareholder.proofOfAddressFileUrl || null,
+              proofOfAddress: shareholder.proofOfAddressType || null,
+              identityFileUrl: shareholder.identityDocument?.id || null,
+              identityFileUrlBack: shareholder.identityDocumentBack?.id || null,
+              proofOfAddressFileUrl: shareholder.proofOfAddressDocument?.id || null,
             }))
           : [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }],
     };

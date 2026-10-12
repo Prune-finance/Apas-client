@@ -234,9 +234,23 @@ export const DocumentPreview = ({
           {children}
           {(resolvedUrl || value) && (
             <Flex justify="flex-end" mt={16}>
-              <a href={resolvedUrl || value} download={resolvedFileName || true} target="_blank" rel="noopener noreferrer">
-                <PrimaryBtn text="Download" fw={600} fz={12} />
-              </a>
+              <PrimaryBtn
+                text="Download"
+                fw={600}
+                fz={12}
+                action={() => {
+                  const url = resolvedUrl || value || "";
+                  if (!url) return;
+                  const name = resolvedFileName || title || "document";
+                  const proxyUrl = `/api/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}`;
+                  const a = document.createElement("a");
+                  a.href = proxyUrl;
+                  a.download = name;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                }}
+              />
             </Flex>
           )}
         </Box>

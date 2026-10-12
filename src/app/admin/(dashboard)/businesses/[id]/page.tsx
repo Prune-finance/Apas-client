@@ -27,6 +27,7 @@ import {
   IconShieldCheck,
   IconRosetteDiscountCheckFilled,
   IconCreditCardPay,
+  IconUserStar,
 } from "@tabler/icons-react";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
@@ -41,8 +42,9 @@ import Keys from "./(tabs)/keys";
 
 import { useBusinessDetail, useBusinessServices } from "@/lib/hooks/businesses";
 import useNotification from "@/lib/hooks/notification";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
+import { type ApplicationOverviewHandle } from "./(tabs)/application-overview";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
@@ -50,6 +52,7 @@ import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { Requests } from "./(tabs)/requests";
 import createAxiosInstance from "@/lib/axios";
 import ApplicationOverview from "./(tabs)/application-overview";
+import CeoOverview from "./(tabs)/ceo-overview";
 
 
 export default function SingleBusiness() {
@@ -78,7 +81,30 @@ export default function SingleBusiness() {
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(
     new Set([tab || "business"])
   );
+
+  const isOnboardingApp = detail?.type === "ONBOARDING_APPLICATION";
+  const appStatus = detail?.applicationStatus ?? detail?.currentStatus;
+  const visibleTabs = tabs.filter((t) => {
+    if ((t as any).onboardingOnly) return isOnboardingApp;
+    if (["accounts", "keys", "requests"].includes(t.value)) return !isOnboardingApp;
+    return true;
+  });
   const [editingApplication, setEditingApplication] = useState(false);
+  const [savingApplication, setSavingApplication] = useState(false);
+  const overviewRef = useRef<ApplicationOverviewHandle>(null);
+
+  const handleSaveApplication = async () => {
+    if (!overviewRef.current) return;
+    setSavingApplication(true);
+    try {
+      await overviewRef.current.save();
+      setEditingApplication(false);
+    } catch {
+      // error already shown by the component
+    } finally {
+      setSavingApplication(false);
+    }
+  };
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] =
@@ -242,9 +268,42 @@ export default function SingleBusiness() {
             ) : business ? (
               <BadgeComponent status={business.companyStatus} active />
             ) : detail?.applicationStatus ? (
-              <BadgeComponent status={detail.applicationStatus} active />
+              <BadgeComponent status={detail.applicationStatus} active w="auto" px={10} />
             ) : null}
           </Group>
+
+          {activeTab === "business" && isOnboardingApp && detail?.editableByAdmin && appStatus === "IN_PROGRESS" && (
+            <div className={styles.header__right}>
+              {!editingApplication ? (
+                <PrimaryBtn
+                  text="Edit"
+                  fw={600}
+                  fz={12}
+                  h={32}
+                  radius={4}
+                  action={() => setEditingApplication(true)}
+                />
+              ) : (
+                <>
+                  <SecondaryBtn
+                    text="Cancel"
+                    fw={600}
+                    fz={12}
+                    action={() => setEditingApplication(false)}
+                  />
+                  <PrimaryBtn
+                    text="Save Changes"
+                    fw={600}
+                    fz={12}
+                    h={32}
+                    radius={4}
+                    action={handleSaveApplication}
+                    loading={savingApplication}
+                  />
+                </>
+              )}
+            </div>
+          )}
 
           {activeTab === "business" && detail?.type === "COMPANY" && (
             <div className={styles.header__right}>
@@ -352,7 +411,7 @@ export default function SingleBusiness() {
             }}
           >
             <TabsList>
-              {tabs.map((tab) => (
+              {visibleTabs.map((tab) => (
                 <TabsTab
                   key={tab.value}
                   value={tab.value}
@@ -369,10 +428,10 @@ export default function SingleBusiness() {
                 <>
                   {detail?.type === "ONBOARDING_APPLICATION" && detail ? (
                     <ApplicationOverview
+                      ref={overviewRef}
                       detail={detail}
                       revalidate={revalidate}
                       editing={editingApplication}
-                      onEditingChange={setEditingApplication}
                     />
                   ) : (
                     business && (
@@ -385,6 +444,12 @@ export default function SingleBusiness() {
                     )
                   )}
                 </>
+              )}
+            </TabsPanel>
+
+            <TabsPanel value="ceo">
+              {visitedTabs.has("ceo") && detail && (
+                <CeoOverview detail={detail} />
               )}
             </TabsPanel>
 
@@ -478,6 +543,7 @@ const tabs = [
     value: "business",
     icon: IconBuildingSkyscraper,
   },
+  { title: "CEO Details", value: "ceo", icon: IconUserStar, onboardingOnly: true },
   { value: "documents", icon: IconFiles },
   { value: "directors", icon: IconUsers },
   { title: "Key Shareholders", value: "shareholders", icon: IconUsersGroup },

@@ -38,6 +38,8 @@ interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   questionnaireKind?: string;
   /** When set alongside questionnaireKind, uses the admin upload endpoint */
   questionnaireAdminReference?: string;
+  /** When true, includes the reference in the upload path: /business/onboarding/admin/{ref}/files */
+  questionnaireAdminReferencePath?: boolean;
 }
 
 export default function DropzoneComponent<T>(
@@ -54,6 +56,7 @@ export default function DropzoneComponent<T>(
   const isOnboarding = props.isOnboarding;
   const questionnaireKind = props.questionnaireKind;
   const questionnaireAdminReference = props.questionnaireAdminReference;
+  const questionnaireAdminReferencePath = props.questionnaireAdminReferencePath;
 
   function getNestedValue(obj: any, path: string) {
     return path.split(".").reduce((acc, part) => acc && acc[part], obj);
@@ -112,7 +115,9 @@ export default function DropzoneComponent<T>(
       if (questionnaireKind) {
         formData.append("kind", questionnaireKind);
         const uploadPath = questionnaireAdminReference
-          ? `/business/onboarding/admin/files`
+          ? questionnaireAdminReferencePath
+            ? `/business/onboarding/admin/${questionnaireAdminReference}/files`
+            : `/business/onboarding/admin/files`
           : `/business/onboarding/files`;
         const { data } = await axios.post(
           `${process.env.NEXT_PUBLIC_QUESTIONNAIRE_URL}${uploadPath}`,

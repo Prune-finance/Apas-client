@@ -208,6 +208,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
                 uploadedFileUrl={form.values.ceoIdUrl}
                 kind="IDENTITY"
                 adminReference={adminReference}
+                uploadWithReference={Boolean(adminReference)}
               />
               {form.values.ceoIdType !== "PASSPORT" && (
                 <OnBoardingDocumentBox
@@ -217,6 +218,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
                   uploadedFileUrl={form.values.ceoIdUrlBack}
                   kind="IDENTITY"
                   adminReference={adminReference}
+                  uploadWithReference={Boolean(adminReference)}
                 />
               )}
             </>
@@ -229,6 +231,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
               uploadedFileUrl={form.values.ceoPOAUrl}
               kind="PROOF_OF_ADDRESS"
               adminReference={adminReference}
+              uploadWithReference={Boolean(adminReference)}
             />
           )}
         </Flex>

@@ -228,6 +228,7 @@ export const AddShareholdersInfo = ({
                   form={form}
                   kind="IDENTITY"
                   adminReference={adminReference}
+                  uploadWithReference={Boolean(adminReference)}
                 />
                 {shareholder.identityType !== "PASSPORT" && (
                   <OnBoardingDocumentBox
@@ -237,6 +238,7 @@ export const AddShareholdersInfo = ({
                     form={form}
                     kind="IDENTITY"
                     adminReference={adminReference}
+                    uploadWithReference={Boolean(adminReference)}
                   />
                 )}
               </>
@@ -249,6 +251,7 @@ export const AddShareholdersInfo = ({
                 form={form}
                 kind="PROOF_OF_ADDRESS"
                 adminReference={adminReference}
+                uploadWithReference={Boolean(adminReference)}
               />
             )}
           </Flex>

@@ -175,7 +175,8 @@ export const SearchInput = ({
       leftSection={<IconSearch style={{ width: 16, height: 16 }} />}
       leftSectionWidth={40}
       w={324}
-      styles={{ input: { border: "1px solid #F5F5F5", paddingLeft: 40 } }}
+      radius={9999}
+      styles={{ input: { border: "1px solid #F5F5F5", paddingLeft: 40, borderRadius: 9999 } }}
       value={search}
       onChange={(e) => setSearch && setSearch(e.currentTarget.value)}
       {...props}

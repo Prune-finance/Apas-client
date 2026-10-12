@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { IconHandStop, IconX } from "@tabler/icons-react";
+import { IconHandStop } from "@tabler/icons-react";
 import { Center, Divider, Flex, Loader, Paper, Stepper, Text, Tooltip } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -262,7 +262,7 @@ export default function EditBusiness() {
         <Stepper
           active={active}
           onStepClick={setActive}
-          allowNextStepsSelect={false}
+          allowNextStepsSelect
           color="var(--prune-primary-700)"
           size="xs"
           classNames={{

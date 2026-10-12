@@ -227,6 +227,7 @@ export const AddDirectorsInfo = ({
                   uploadedFileUrl={director.identityFileUrl || ""}
                   kind="IDENTITY"
                   adminReference={adminReference}
+                  uploadWithReference={Boolean(adminReference)}
                 />
                 {director.identityType !== "PASSPORT" && (
                   <OnBoardingDocumentBox
@@ -236,6 +237,7 @@ export const AddDirectorsInfo = ({
                     uploadedFileUrl={director.identityFileUrlBack || ""}
                     kind="IDENTITY"
                     adminReference={adminReference}
+                    uploadWithReference={Boolean(adminReference)}
                   />
                 )}
               </>
@@ -249,6 +251,7 @@ export const AddDirectorsInfo = ({
                 uploadedFileUrl={director.proofOfAddressFileUrl || ""}
                 kind="PROOF_OF_ADDRESS"
                 adminReference={adminReference}
+                uploadWithReference={Boolean(adminReference)}
               />
             )}
           </Flex>

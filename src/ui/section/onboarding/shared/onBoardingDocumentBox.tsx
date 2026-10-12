@@ -18,6 +18,8 @@ interface DocumentBoxProps<T = OnboardingType> {
   kind?: string;
   /** When set alongside kind, uses the admin upload endpoint */
   adminReference?: string;
+  /** When true, includes adminReference in the upload path: /business/onboarding/admin/{ref}/files */
+  uploadWithReference?: boolean;
 }
 
 export default function OnBoardingDocumentBox<T>({
@@ -29,6 +31,7 @@ export default function OnBoardingDocumentBox<T>({
   isAdmin = false,
   kind,
   adminReference,
+  uploadWithReference = false,
 }: DocumentBoxProps<T>) {
   const [displayUrl, setDisplayUrl] = useState(uploadedFileUrl || "");
   const [resolvedFileName, setResolvedFileName] = useState("");
@@ -70,6 +73,7 @@ export default function OnBoardingDocumentBox<T>({
         isOnboarding={!isAdmin && !kind}
         questionnaireKind={kind}
         questionnaireAdminReference={adminReference || (isAdmin && kind ? "admin" : undefined)}
+        questionnaireAdminReferencePath={uploadWithReference && Boolean(adminReference)}
       />
       {form?.errors[formKey || "cacCertificate"] && (
         <Text fz={12} c="var(--prune-warning)" mt={5}>

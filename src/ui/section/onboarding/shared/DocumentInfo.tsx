@@ -121,6 +121,7 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
             uploadedFileUrl={form.getValues().cacCertificate}
             kind="INCORPORATION_CERTIFICATE"
             adminReference={adminReference}
+            uploadWithReference={Boolean(adminReference)}
           />
           <OnBoardingDocumentBox
             title={docLabel("MEMART", "Memart")}
@@ -130,6 +131,7 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
             uploadedFileUrl={form.getValues().mermat}
             kind="MEMART"
             adminReference={adminReference}
+            uploadWithReference={Boolean(adminReference)}
           />
         </Flex>
 
@@ -142,6 +144,7 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
             uploadedFileUrl={form.getValues().amlCompliance || ""}
             kind="AML_FRAMEWORK"
             adminReference={adminReference}
+            uploadWithReference={Boolean(adminReference)}
           />
           <OnBoardingDocumentBox
             title={docLabel("OPERATIONAL_LICENCE", "Operational Licence")}
@@ -151,6 +154,7 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
             uploadedFileUrl={form.getValues().operationalLicense || ""}
             kind="OPERATIONAL_LICENCE"
             adminReference={adminReference}
+            uploadWithReference={Boolean(adminReference)}
           />
         </Flex>
       </Stack>

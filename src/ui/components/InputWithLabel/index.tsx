@@ -110,8 +110,15 @@ interface DateInputWithInsideLabelProps extends DateInputProps {
 }
 export const DateInputWithInsideLabel = ({ standard, ...props }: DateInputWithInsideLabelProps) => {
   if (standard) {
-    const { label: _label, ...inputProps } = props;
-    return <DateInput styles={getStandardStyles(!!inputProps.error)} placeholder="Select Date" {...inputProps} />;
+    const { label, ...inputProps } = props;
+    return (
+      <DateInput
+        label={label}
+        styles={getStandardStyles(!!inputProps.error)}
+        placeholder="Select Date"
+        {...inputProps}
+      />
+    );
   }
   return (
     <DateInput

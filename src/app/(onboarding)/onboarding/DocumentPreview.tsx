@@ -77,6 +77,7 @@ export const DocumentPreview = ({
   const { handleError } = useNotification();
   const [loading, setLoading] = useState(false);
   const [resolving, setResolving] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [resolvedUrl, setResolvedUrl] = useState<string>("");
   const [resolvedFileName, setResolvedFileName] = useState<string>("");
   const [resolvedContentType, setResolvedContentType] = useState<string>("");
@@ -98,7 +99,7 @@ export const DocumentPreview = ({
   };
 
   const handleView = async () => {
-    if (!value) return;
+    if (!value || resolving) return;
     if (!isUUID(value)) {
       setResolvedUrl(value);
       openFile();
@@ -115,6 +116,30 @@ export const DocumentPreview = ({
     } finally {
       setResolving(false);
       openFile();
+    }
+  };
+
+  const handleDownload = async () => {
+    const url = resolvedUrl || value || "";
+    if (!url || downloading) return;
+    const name = resolvedFileName || title || "document";
+    setDownloading(true);
+    try {
+      const proxyUrl = `/api/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}`;
+      const res = await fetch(proxyUrl);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(url, "_blank");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -190,7 +215,6 @@ export const DocumentPreview = ({
           {value && (
             <UnstyledButton
               onClick={handleView}
-              disabled={resolving}
               py={4}
               px={8}
               style={{
@@ -200,10 +224,11 @@ export const DocumentPreview = ({
                 alignItems: "center",
                 justifyContent: "center",
                 minWidth: 46,
+                cursor: resolving ? "not-allowed" : "pointer",
               }}
             >
               {resolving ? (
-                <Loader size={10} color="#667085" />
+                <Loader size={12} color="#667085" type="dots" />
               ) : (
                 <Text fw={600} fz={10} c="#667085">
                   View
@@ -238,18 +263,9 @@ export const DocumentPreview = ({
                 text="Download"
                 fw={600}
                 fz={12}
-                action={() => {
-                  const url = resolvedUrl || value || "";
-                  if (!url) return;
-                  const name = resolvedFileName || title || "document";
-                  const proxyUrl = `/api/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}`;
-                  const a = document.createElement("a");
-                  a.href = proxyUrl;
-                  a.download = name;
-                  document.body.appendChild(a);
-                  a.click();
-                  document.body.removeChild(a);
-                }}
+                action={handleDownload}
+                loading={downloading}
+                loaderProps={{ type: "dots" }}
               />
             </Flex>
           )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { Alert, Box, Flex, Loader, Text, ThemeIcon, Title } from "@mantine/core";
+import { Alert, Box, Flex, Loader, ThemeIcon } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 import { CustomPaper } from "../CustomPaper";
 import Navbar from "../Navbar";
@@ -97,7 +97,7 @@ interface OnboardingProfile {
     pending: number;
   } | null;
 }
-import { IconExclamationMark, IconClockHour3 } from "@tabler/icons-react";
+import { IconExclamationMark } from "@tabler/icons-react";
 
 function parseDDMMYYYY(dateStr: string | null | undefined): Date | null {
   if (!dateStr) return null;
@@ -263,34 +263,42 @@ export default function Onboarding() {
                 <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />
               </Flex>
             ) : profile?.documentReview?.state === "IN_REVIEW" || showReview ? (
-              <Flex direction="column" align="center" justify="center" py={48} px={24}>
-                {/* Icon */}
-                <Box
-                  style={{
-                    width: 80,
-                    height: 80,
-                    borderRadius: "50%",
-                    background: "#FFF3CD",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginBottom: 24,
+              <Box>
+                <Alert
+                  title="Awaiting Admin Approval"
+                  mb={64}
+                  color="#D67507"
+                  p={16}
+                  variant="outline"
+                  icon={
+                    <ThemeIcon radius="xl" size={24} color="#D67507">
+                      <IconExclamationMark />
+                    </ThemeIcon>
+                  }
+                  styles={{
+                    root: { background: "#FFF9E6", padding: "16px" },
+                    title: {
+                      color: "var(--prune-text-gray-700)",
+                      fontSize: "14px",
+                      fontWeight: 700,
+                    },
+                    message: {
+                      color: "var(--prune-text-gray-500)",
+                      fontSize: "12px",
+                      fontWeight: 400,
+                    },
                   }}
                 >
-                  <IconClockHour3 size={40} color="#D67507" stroke={1.5} />
-                </Box>
-
-                {/* Heading */}
-                <Title order={3} fw={700} c="var(--prune-text-gray-700)" ta="center" mb={8}>
-                  Application Under Review
-                </Title>
-                <Text fz={14} c="var(--prune-text-gray-500)" ta="center" maw={480} mb={36}>
-                  Your submitted documents are currently being reviewed by our
-                  team. You will receive an email notification once a decision
-                  has been made. This usually takes 24–48 hours.
-                </Text>
-
-              </Flex>
+                  You will get an email regarding your application status within
+                  24-48 hours, once account creation has been approved
+                </Alert>
+                <ReviewInfo
+                  setActive={setActive}
+                  active={active}
+                  form={form}
+                  title="Summary"
+                />
+              </Box>
             ) : (
               <>
                 {active === 0 && (

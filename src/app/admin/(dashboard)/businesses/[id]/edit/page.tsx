@@ -96,10 +96,10 @@ function buildInitialValues(detail: BusinessDetail): OnboardingType {
     ceoPOAUrl: (ceo?.proofOfAddressDocument as any)?.id ?? "",
     ceoPOAType: ceo?.proofOfAddressType ?? "",
 
-    cacCertificate: docs?.incorporationCertificate ?? "",
-    mermat: docs?.memart ?? "",
-    amlCompliance: docs?.amlFramework ?? "",
-    operationalLicense: docs?.operationalLicence ?? null,
+    cacCertificate: (typeof docs?.incorporationCertificate === "object" ? docs?.incorporationCertificate?.id : docs?.incorporationCertificate) ?? "",
+    mermat: (typeof docs?.memart === "object" ? docs?.memart?.id : docs?.memart) ?? "",
+    amlCompliance: (typeof docs?.amlFramework === "object" ? docs?.amlFramework?.id : docs?.amlFramework) ?? "",
+    operationalLicense: (typeof docs?.operationalLicence === "object" ? docs?.operationalLicence?.id : docs?.operationalLicence) ?? null,
 
     directors: (detail.directors as any[])?.length
       ? (detail.directors as any[]).map((d) => ({

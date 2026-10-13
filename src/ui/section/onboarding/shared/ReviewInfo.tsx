@@ -30,7 +30,7 @@ const SectionTitle = ({ children }: { children: React.ReactNode }) => (
 export const ReviewInfo = ({ form, active, setActive }: ReviewInfoProps) => {
   const v = form.values;
 
-  const formatDate = (d: Date | null | undefined) => {
+  const formatDate = (d: Date | string | null | undefined) => {
     if (!d) return null;
     try {
       return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });

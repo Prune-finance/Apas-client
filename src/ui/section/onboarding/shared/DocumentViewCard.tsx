@@ -65,7 +65,9 @@ export default function DocumentViewCard({
     try {
       if (isUUID(fileId)) {
         const path = isAdmin
-          ? `/business/onboarding/admin/files/${fileId}`
+          ? applicationReference
+            ? `/business/onboarding/admin/${applicationReference}/files/${fileId}`
+            : `/business/onboarding/admin/files/${fileId}`
           : `/business/onboarding/files/${fileId}`;
         const { data } = await questAxios.get(path);
         setResolvedUrl(data.data.url || fileId);

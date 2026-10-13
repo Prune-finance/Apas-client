@@ -193,6 +193,11 @@ export const AddDirectorsInfo = ({
               standard={noFloatingLabel}
               minDate={new Date("1900-01-01")}
               maxDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
+              getDayProps={(date) => {
+                const max = new Date();
+                max.setFullYear(max.getFullYear() - 18);
+                return date > max ? { style: { display: "none" } } : {};
+              }}
               key={form.key(`directors.${index}.date_of_birth`)}
               {...form.getInputProps(`directors.${index}.date_of_birth`)}
             />
@@ -267,7 +272,7 @@ export const AddDirectorsInfo = ({
           fw={500}
           c="#344054"
           onClick={handleClearForm}
-          styles={{ root: { backgroundColor: "#FCFCFD", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+          styles={{ root: { backgroundColor: "#fff", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
         >
           Clear Form
         </Button>

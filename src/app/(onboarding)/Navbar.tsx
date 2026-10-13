@@ -1,6 +1,7 @@
 import { Box, Stack, Text, Timeline, TimelineItem } from "@mantine/core";
 import { IconPointFilled } from "@tabler/icons-react";
 import React from "react";
+import { PiSparkleFill } from "react-icons/pi";
 import { CustomPaper } from "./CustomPaper";
 
 interface NavbarProps {
@@ -44,9 +45,7 @@ export default function Navbar({ active }: NavbarProps) {
           <Stack gap={10}>
             {tips.map((tip, i) => (
               <Box key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                <Text fz={10} c="var(--prune-primary-700)" style={{ flexShrink: 0, marginTop: 1 }}>
-                  ✦
-                </Text>
+                <PiSparkleFill size={10} color="var(--prune-text-gray-700)" style={{ flexShrink: 0, marginTop: 2 }} />
                 <Text fz={11} c="var(--prune-text-gray-600)" lh={1.5}>
                   {tip}
                 </Text>

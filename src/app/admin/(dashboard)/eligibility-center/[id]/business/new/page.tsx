@@ -86,7 +86,7 @@ export default function NewBusiness() {
   });
 
   const handleCloseSuccessModal = () => {
-    router.push("/admin/businesses");
+    router.push("/admin/eligibility-center");
     closeSuccess();
   };
 
@@ -98,7 +98,7 @@ export default function NewBusiness() {
       );
       handleSuccess("Application Handed Over", "The application has been handed over to the user");
       closeHandOver();
-      router.push("/admin/businesses");
+      router.push("/admin/eligibility-center");
     } catch (error) {
       handleError("Hand Over Failed", parseError(error));
     }
@@ -108,8 +108,8 @@ export default function NewBusiness() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "Businesses", href: "/admin/businesses" },
-          { title: "Create New Business", href: "/admin/businesses/new" },
+          { title: "Eligibility Center", href: "/admin/eligibility-center" },
+          { title: "Create New Business", href: "#" },
         ]}
       />
 

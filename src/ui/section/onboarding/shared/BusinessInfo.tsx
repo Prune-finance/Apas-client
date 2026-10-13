@@ -391,7 +391,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
           fw={500}
           c="#344054"
           onClick={handleClearForm}
-          styles={{ root: { backgroundColor: "#FCFCFD", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+          styles={{ root: { backgroundColor: "#fff", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
         >
           Clear Form
         </Button>

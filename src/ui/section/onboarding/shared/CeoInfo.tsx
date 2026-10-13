@@ -177,6 +177,11 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             standard={noFloatingLabel}
             minDate={new Date("1900-01-01")}
             maxDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
+            getDayProps={(date) => {
+              const max = new Date();
+              max.setFullYear(max.getFullYear() - 18);
+              return date > max ? { style: { display: "none" } } : {};
+            }}
             {...form.getInputProps("ceoDOB")}
           />
         </Flex>
@@ -246,7 +251,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
           fw={500}
           c="#344054"
           onClick={handleClearForm}
-          styles={{ root: { backgroundColor: "#FCFCFD", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+          styles={{ root: { backgroundColor: "#fff", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
         >
           Clear Form
         </Button>

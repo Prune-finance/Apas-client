@@ -201,7 +201,7 @@ export const TextBox = ({ styles, ...props }: TextBoxProps) => {
       fz={12}
       w={180}
       h={36}
-      styles={{ input: { height: "30px" }, ...styles }}
+      styles={{ input: { height: "30px", fontSize: 12 }, ...styles }}
       {...props}
     />
   );
@@ -216,7 +216,7 @@ export const SelectBox = ({ styles, ...props }: SelectBoxProps) => {
       fz={12}
       w={180}
       h={36}
-      styles={{ input: { height: "30px" }, ...styles }}
+      styles={{ input: { height: "30px", fontSize: 12 }, ...styles }}
       {...props}
     />
   );

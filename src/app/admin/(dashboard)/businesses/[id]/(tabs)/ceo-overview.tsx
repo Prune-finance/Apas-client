@@ -11,6 +11,13 @@ interface CeoOverviewProps {
 
 export default function CeoOverview({ detail }: CeoOverviewProps) {
   const ceo = detail.ceo as Record<string, any> | null | undefined;
+  const applicationReference = detail.reference;
+  const applicationStatus = detail.applicationStatus;
+
+  const reviewMap = new Map<string, string>();
+  for (const rd of detail.reviewDocuments ?? []) {
+    if (rd.review?.status) reviewMap.set(rd.id, rd.review.status);
+  }
 
   if (!ceo) {
     return (

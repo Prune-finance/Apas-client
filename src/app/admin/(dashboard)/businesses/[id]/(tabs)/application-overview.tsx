@@ -40,6 +40,14 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
     const contact = detail.contactPerson;
     const biz = detail.business;
     const progress = detail.progress;
+    const applicationReference = detail.reference;
+    const applicationStatus = detail.applicationStatus;
+
+    const reviewMap = new Map<string, string>();
+    for (const rd of detail.reviewDocuments ?? []) {
+      if (rd.review?.status) reviewMap.set(rd.id, rd.review.status);
+    }
+
     const { handleSuccess, handleError } = useNotification();
     const [saving, setSaving] = useState(false);
 
@@ -264,6 +272,10 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
                     title={(contact as any).identityDocument.fileName || "Identity Document"}
                     fileId={(contact as any).identityDocument.id}
                     isAdmin
+                    applicationReference={applicationReference}
+                    applicationStatus={applicationStatus}
+                    reviewStatus={(reviewMap.get((contact as any).identityDocument.id) as any) ?? null}
+                    onReview={revalidate}
                   />
                 )}
                 {(contact as any).proofOfAddressDocument && (
@@ -272,6 +284,10 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
                     title={(contact as any).proofOfAddressDocument.fileName || "Proof of Address"}
                     fileId={(contact as any).proofOfAddressDocument.id}
                     isAdmin
+                    applicationReference={applicationReference}
+                    applicationStatus={applicationStatus}
+                    reviewStatus={(reviewMap.get((contact as any).proofOfAddressDocument.id) as any) ?? null}
+                    onReview={revalidate}
                   />
                 )}
               </Box>

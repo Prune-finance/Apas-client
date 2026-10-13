@@ -135,6 +135,9 @@ export default function CeoOverview({ detail }: CeoOverviewProps) {
                 title={identityDoc.fileName}
                 fileId={identityDoc.id}
                 isAdmin
+                applicationReference={applicationReference}
+                applicationStatus={applicationStatus}
+                reviewStatus={(reviewMap.get(identityDoc.id) as any) ?? null}
               />
             )}
             {identityDocBack && (
@@ -143,6 +146,9 @@ export default function CeoOverview({ detail }: CeoOverviewProps) {
                 title={identityDocBack.fileName}
                 fileId={identityDocBack.id}
                 isAdmin
+                applicationReference={applicationReference}
+                applicationStatus={applicationStatus}
+                reviewStatus={(reviewMap.get(identityDocBack.id) as any) ?? null}
               />
             )}
             {poaDoc && (
@@ -151,6 +157,9 @@ export default function CeoOverview({ detail }: CeoOverviewProps) {
                 title={poaDoc.fileName}
                 fileId={poaDoc.id}
                 isAdmin
+                applicationReference={applicationReference}
+                applicationStatus={applicationStatus}
+                reviewStatus={(reviewMap.get(poaDoc.id) as any) ?? null}
               />
             )}
           </Flex>

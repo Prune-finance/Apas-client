@@ -121,7 +121,7 @@ function EligibilityCenter() {
         {currentTab === "onboarding" && (
           <PrimaryBtn
             text="New Business"
-            link="/admin/businesses/new"
+            link="/admin/eligibility-center/new/business/new"
             leftSection={<IconPlus size={16} />}
             fw={600}
             fz={14}

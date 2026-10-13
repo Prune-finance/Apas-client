@@ -210,6 +210,7 @@ export default function DocumentViewCard({
         }}
         size={480}
         centered
+        zIndex={400}
         title={
           <Text fz={16} fw={600}>
             Reject Document
@@ -265,15 +266,21 @@ export default function DocumentViewCard({
         size={800}
         centered
         title={
-          <Flex align="center" gap={10}>
-            <Text fz={14} fw={500}>
+          <Flex align="center" gap={10} style={{ minWidth: 0 }}>
+            <Text
+              fz={14}
+              fw={500}
+              truncate
+              title={resolvedFileName || title}
+              style={{ maxWidth: 600, minWidth: 0 }}
+            >
               {resolvedFileName || title}
             </Text>
             {statusStyle && (
               <Box
                 px={8}
                 py={2}
-                style={{ borderRadius: 9999, backgroundColor: statusStyle.bg }}
+                style={{ borderRadius: 9999, backgroundColor: statusStyle.bg, flexShrink: 0 }}
               >
                 <Text fz={10} fw={600} c={statusStyle.color}>
                   {statusStyle.label}

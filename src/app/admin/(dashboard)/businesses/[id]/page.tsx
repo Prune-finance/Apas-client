@@ -414,7 +414,7 @@ export default function SingleBusiness() {
 
             <TabsPanel value="ceo">
               {visitedTabs.has("ceo") && detail && (
-                <CeoOverview detail={detail} />
+                <CeoOverview detail={detail} revalidate={revalidate} />
               )}
             </TabsPanel>
 

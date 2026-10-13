@@ -7,9 +7,10 @@ import { DocumentViewCard } from "@/ui/section/onboarding/shared";
 
 interface CeoOverviewProps {
   detail: BusinessDetail;
+  revalidate?: () => void;
 }
 
-export default function CeoOverview({ detail }: CeoOverviewProps) {
+export default function CeoOverview({ detail, revalidate }: CeoOverviewProps) {
   const ceo = detail.ceo as Record<string, any> | null | undefined;
   const applicationReference = detail.reference;
   const applicationStatus = detail.applicationStatus;
@@ -138,6 +139,7 @@ export default function CeoOverview({ detail }: CeoOverviewProps) {
                 applicationReference={applicationReference}
                 applicationStatus={applicationStatus}
                 reviewStatus={(reviewMap.get(identityDoc.id) as any) ?? null}
+                onReview={revalidate}
               />
             )}
             {identityDocBack && (
@@ -149,6 +151,7 @@ export default function CeoOverview({ detail }: CeoOverviewProps) {
                 applicationReference={applicationReference}
                 applicationStatus={applicationStatus}
                 reviewStatus={(reviewMap.get(identityDocBack.id) as any) ?? null}
+                onReview={revalidate}
               />
             )}
             {poaDoc && (
@@ -160,6 +163,7 @@ export default function CeoOverview({ detail }: CeoOverviewProps) {
                 applicationReference={applicationReference}
                 applicationStatus={applicationStatus}
                 reviewStatus={(reviewMap.get(poaDoc.id) as any) ?? null}
+                onReview={revalidate}
               />
             )}
           </Flex>

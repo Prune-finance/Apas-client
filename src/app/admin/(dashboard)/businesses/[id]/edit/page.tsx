@@ -8,7 +8,7 @@ import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
-import styles from "../../new/styles.module.scss";
+import styles from "./styles.module.scss";
 import { BackBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import SuccessModal from "@/ui/components/SuccessModal";

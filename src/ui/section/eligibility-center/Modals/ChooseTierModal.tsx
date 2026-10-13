@@ -4,6 +4,7 @@ import { Box, Flex, Modal, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { IconBuildingBank, IconBuildingStore } from "@tabler/icons-react";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 interface ChooseTierModalProps {
   opened: boolean;
@@ -12,13 +13,13 @@ interface ChooseTierModalProps {
   loading: boolean;
 }
 
-type Currency = { emoji: string; label: string };
+type Currency = { code: string; label: string };
 type ServiceCol = { name: string; currencies: Currency[]; dimmed?: boolean };
 
-const EUR: Currency = { emoji: "🇪🇺", label: "Euro" };
-const USD: Currency = { emoji: "🇺🇸", label: "USD" };
-const GBP: Currency = { emoji: "🇬🇧", label: "GBP" };
-const NGN: Currency = { emoji: "🇳🇬", label: "NGN" };
+const EUR: Currency = { code: "EUR", label: "Euro" };
+const USD: Currency = { code: "USD", label: "USD" };
+const GBP: Currency = { code: "GBP", label: "GBP" };
+const NGN: Currency = { code: "NGN", label: "NGN" };
 
 const TIERS: {
   id: "TIER_1" | "TIER_2";
@@ -160,9 +161,7 @@ export default function ChooseTierModal({
                               gap={6}
                               style={{ opacity: svc.dimmed ? 0.35 : 1 }}
                             >
-                              <span style={{ fontSize: 14, lineHeight: 1 }}>
-                                {cur.emoji}
-                              </span>
+                              <CountryFlag code={cur.code} size={16} />
                               <Text fz={13} c={svc.dimmed ? "#98A2B3" : "#344054"}>
                                 {cur.label}
                               </Text>

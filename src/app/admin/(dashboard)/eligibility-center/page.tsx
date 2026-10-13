@@ -14,7 +14,9 @@ import {
   Stack,
   TableTd,
   TableTr,
+  TabsPanel,
   Text,
+  Title,
 } from "@mantine/core";
 import {
   IconUsersGroup,
@@ -35,15 +37,19 @@ import {
 } from "@/lib/hooks/eligibility-center";
 import dayjs from "dayjs";
 import { BadgeComponent } from "@/ui/components/Badge";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { calculateTotalPages, STAGE } from "@/lib/utils";
-import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
+import { FilterSchema, FilterType, FilterValues, Tab } from "@/lib/schema";
 import { useForm, zodResolver } from "@mantine/form";
 import PaginationComponent from "@/ui/components/Pagination";
 import CountryFlag from "@/ui/components/CountryFlag";
 import { IconListTree } from "@tabler/icons-react";
 import { SelectBox, TextBox } from "@/ui/components/Inputs";
+import OnboardedBusinesses from "../businesses/(tabs)/Onboarded";
+import TabsComponent from "@/ui/components/Tabs";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { IconPlus } from "@tabler/icons-react";
 
 const statusToStage: Record<string, STAGE> = {
   IN_PROGRESS: "In Progress",
@@ -61,13 +67,131 @@ const SERVICE_OPTIONS = [
 ];
 
 function EligibilityCenter() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") || "questionnaire";
+
+  const handleTabChange = (value: string | null) => {
+    if (!value) return;
+    router.push(`/admin/eligibility-center?tab=${value}`);
+  };
+
+  const { stats, loading: statsLoading } = useQuestionnairesStats();
+
+  const InfoCards = [
+    {
+      title: "Total leads",
+      num: stats?.totalLeads,
+      icon: IconUsersGroup,
+      iconBg: "#D1FAE5",
+      iconColor: "#059669",
+    },
+    {
+      title: "Total approved",
+      num: stats?.approved,
+      icon: IconCircleCheck,
+      iconBg: "#D1FAE5",
+      iconColor: "#059669",
+    },
+    {
+      title: "Total onboarded",
+      num: stats?.onboarded,
+      icon: IconBuildingSkyscraper,
+      iconBg: "#F2F4F7",
+      iconColor: "#344054",
+    },
+    {
+      title: "Pending",
+      num: stats?.pending,
+      icon: IconClock,
+      iconBg: "#FEF3C7",
+      iconColor: "#D97706",
+    },
+  ];
+
+  return (
+    <Box px={20}>
+      <Flex justify="space-between" align="flex-start">
+        <Box>
+          <Title order={2} fw={700}>Eligibility Center</Title>
+          <Text fz={14} c="var(--prune-text-gray-500)" mt={4}>
+            View and manage all eligibility profiles on the platform.
+          </Text>
+        </Box>
+        {currentTab === "onboarding" && (
+          <PrimaryBtn
+            text="New Business"
+            link="/admin/businesses/new"
+            leftSection={<IconPlus size={16} />}
+            fw={600}
+            fz={14}
+          />
+        )}
+      </Flex>
+
+      {/* Stat cards */}
+      <Grid align="stretch" mt={32} mb={24}>
+        {InfoCards.map((d, i) => (
+          <GridCol span={{ base: 12, xs: 6, md: 3 }} key={i}>
+            <Box className={classes.stat__card}>
+              <Flex align="flex-start" justify="space-between">
+                <div
+                  className={classes.icon__wrap}
+                  style={{ backgroundColor: d.iconBg }}
+                >
+                  <d.icon size={20} color={d.iconColor} stroke={1.8} />
+                </div>
+              </Flex>
+
+              <Box mt={16}>
+                <Text fz={13} fw={400} c="var(--prune-text-gray-500)">
+                  {d.title}
+                </Text>
+                {statsLoading ? (
+                  <Skeleton w={60} h={32} mt={4} />
+                ) : (
+                  <Text
+                    fz={30}
+                    fw={600}
+                    c="var(--prune-text-gray-800)"
+                    lh={1.2}
+                    mt={4}
+                  >
+                    {d.num ?? 0}
+                  </Text>
+                )}
+              </Box>
+            </Box>
+          </GridCol>
+        ))}
+      </Grid>
+
+      {/* Tabs */}
+      <TabsComponent
+        tabs={eligibilityTabs}
+        mt={32}
+        value={currentTab}
+        onChange={handleTabChange}
+      >
+        <TabsPanel value="questionnaire">
+          <QuestionnaireTab />
+        </TabsPanel>
+
+        <TabsPanel value="onboarding">
+          {currentTab === "onboarding" && <OnboardedBusinesses hideOverview />}
+        </TabsPanel>
+      </TabsComponent>
+    </Box>
+  );
+}
+
+function QuestionnaireTab() {
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const [opened, { toggle }] = useDisclosure(false);
-  const [appliedFilters, setAppliedFilters] =
-    useState<FilterType>(FilterValues);
+  const [appliedFilters, setAppliedFilters] = useState<FilterType>(FilterValues);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -106,169 +230,87 @@ function EligibilityCenter() {
   };
 
   const { data, meta, loading } = useQuestionnairesAdmin(queryParams);
-  const { stats, loading: statsLoading } = useQuestionnairesStats();
-
-  const isLoading = loading || statsLoading;
-
-  const InfoCards = [
-    {
-      title: "Total leads",
-      num: stats?.totalLeads,
-      icon: IconUsersGroup,
-      iconBg: "#D1FAE5",
-      iconColor: "#059669",
-    },
-    {
-      title: "Total approved",
-      num: stats?.approved,
-      icon: IconCircleCheck,
-      iconBg: "#D1FAE5",
-      iconColor: "#059669",
-    },
-    {
-      title: "Total onboarded",
-      num: stats?.onboarded,
-      icon: IconBuildingSkyscraper,
-      iconBg: "#F2F4F7",
-      iconColor: "#344054",
-    },
-    {
-      title: "Pending",
-      num: stats?.pending,
-      icon: IconClock,
-      iconBg: "#FEF3C7",
-      iconColor: "#D97706",
-    },
-  ];
 
   return (
-    <main className={styles.main}>
-      <div className={styles.table__container}>
-        {/* Page header */}
-        <div className={classes.hero}>
-          <div style={{ position: "relative", zIndex: 1 }}>
-            <Text
-              fz={28}
-              fw={700}
-              c="var(--prune-text-gray-800)"
-              style={{ fontFamily: "'EksellDisplay', serif" }}
-            >
-              Eligibility Center
-            </Text>
-          </div>
+    <>
+      <Flex
+        className={`${styles.container__search__filter} ${switzer.className}`}
+        justify="space-between"
+        align="center"
+        wrap="wrap"
+        gap={12}
+        mt={24}
+      >
+        <SearchInput search={search} setSearch={setSearch} />
 
-        </div>
-
-        {/* Stat cards */}
-        <Grid align="stretch" mb={8}>
-          {InfoCards.map((d, i) => (
-            <GridCol span={{ base: 12, xs: 6, md: 3 }} key={i}>
-              <Box className={classes.stat__card}>
-                <Flex align="flex-start" justify="space-between">
-                  <div
-                    className={classes.icon__wrap}
-                    style={{ backgroundColor: d.iconBg }}
-                  >
-                    <d.icon size={20} color={d.iconColor} stroke={1.8} />
-                  </div>
-                </Flex>
-
-                <Box mt={16}>
-                  <Text fz={13} fw={400} c="var(--prune-text-gray-500)">
-                    {d.title}
-                  </Text>
-                  {isLoading ? (
-                    <Skeleton w={60} h={32} mt={4} />
-                  ) : (
-                    <Text
-                      fz={30}
-                      fw={600}
-                      c="var(--prune-text-gray-800)"
-                      lh={1.2}
-                      mt={4}
-                    >
-                      {d.num ?? 0}
-                    </Text>
-                  )}
-                </Box>
-              </Box>
-            </GridCol>
-          ))}
-        </Grid>
-
-        <Flex
-          className={`${styles.container__search__filter} ${switzer.className}`}
-          justify="space-between"
-          align="center"
-          wrap="wrap"
-          gap={12}
-        >
-          <SearchInput search={search} setSearch={setSearch} />
-
-          <SecondaryBtn
-            text="Filter"
-            action={toggle}
-            icon={IconListTree}
-            indicator={activeFilterCount}
-            fw={600}
-            fz={12}
-          />
-        </Flex>
-
-        <Filter<FilterType>
-          opened={opened}
-          toggle={toggle}
-          form={form}
-          noDate={false}
-          customStatusOption={Object.keys(statusToStage)}
-          onApply={(values) => {
-            setAppliedFilters(values);
-            setActive(1);
-          }}
-          onClear={() => {
-            setAppliedFilters(FilterValues);
-            form.reset();
-            setActive(1);
-          }}
-        >
-          <TextBox
-            placeholder="Country Code (e.g. NG)"
-            {...form.getInputProps("country")}
-          />
-          <SelectBox
-            placeholder="Service"
-            {...form.getInputProps("type")}
-            data={SERVICE_OPTIONS}
-          />
-        </Filter>
-
-        <TableComponent
-          head={tableHeaders}
-          rows={<Rows data={data} />}
-          loading={loading}
-          columnWidths={["25%", "15%", "10%", "30%", "20%"]}
+        <SecondaryBtn
+          text="Filter"
+          action={toggle}
+          icon={IconListTree}
+          indicator={activeFilterCount}
+          fw={600}
+          fz={12}
         />
+      </Flex>
 
-        <EmptyTable
-          rows={data || []}
-          loading={loading}
-          title="There are no profiles"
-          text="When a profile is created, it will appear here."
+      <Filter<FilterType>
+        opened={opened}
+        toggle={toggle}
+        form={form}
+        noDate={false}
+        customStatusOption={Object.keys(statusToStage)}
+        onApply={(values) => {
+          setAppliedFilters(values);
+          setActive(1);
+        }}
+        onClear={() => {
+          setAppliedFilters(FilterValues);
+          form.reset();
+          setActive(1);
+        }}
+      >
+        <TextBox
+          placeholder="Country Code (e.g. NG)"
+          {...form.getInputProps("country")}
         />
+        <SelectBox
+          placeholder="Service"
+          {...form.getInputProps("type")}
+          data={SERVICE_OPTIONS}
+        />
+      </Filter>
 
-        <PaginationComponent
-          active={active}
-          setActive={setActive}
-          setLimit={setLimit}
-          limit={limit}
-          total={calculateTotalPages(limit, meta?.total)}
-        />
-      </div>
-    </main>
+      <TableComponent
+        head={tableHeaders}
+        rows={<Rows data={data} />}
+        loading={loading}
+        columnWidths={["25%", "15%", "10%", "30%", "20%"]}
+      />
+
+      <EmptyTable
+        rows={data || []}
+        loading={loading}
+        title="There are no profiles"
+        text="When a profile is created, it will appear here."
+      />
+
+      <PaginationComponent
+        active={active}
+        setActive={setActive}
+        setLimit={setLimit}
+        limit={limit}
+        total={calculateTotalPages(limit, meta?.total)}
+      />
+    </>
   );
 }
 
 const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage"];
+
+const eligibilityTabs: Tab[] = [
+  { title: "Questionnaire", value: "questionnaire" },
+  { title: "Onboarding", value: "onboarding" },
+];
 
 export default function EligibilityCenterSus() {
   return (

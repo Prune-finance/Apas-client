@@ -45,7 +45,12 @@ import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 
-export default function OnboardedBusinesses() {
+interface OnboardedBusinessesProps {
+  hideOverview?: boolean;
+  status?: string;
+}
+
+export default function OnboardedBusinesses({ hideOverview, status = "ONBOARDED" }: OnboardedBusinessesProps = {}) {
   const searchParams = useSearchParams();
 
   const [active, setActive] = useState(1);
@@ -60,7 +65,7 @@ export default function OnboardedBusinesses() {
   const queryParams = {
     date: date ? dayjs(date).format("YYYY-MM-DD") : "",
     endDate: endDate ? dayjs(endDate).format("YYYY-MM-DD") : "",
-    status: "ONBOARDED",
+    status,
     business: name,
     email: contactEmail,
     limit: parseInt(limit ?? "10", 10),
@@ -193,23 +198,9 @@ export default function OnboardedBusinesses() {
             Businesses
           </Text>
         </div> */}
-        <InfoCards title="Overview" details={infoDetails} loading={loading}>
-          {/* <Select
-            data={["Last Week", "Last Month"]}
-            variant="filled"
-            placeholder="Last Week"
-            defaultValue={"Last Week"}
-            w={130}
-            // h={22}
-            color="var(--prune-text-gray-500)"
-            styles={{
-              input: {
-                outline: "none",
-                border: "none",
-              },
-            }}
-          /> */}
-        </InfoCards>
+        {!hideOverview && (
+          <InfoCards title="Overview" details={infoDetails} loading={loading} />
+        )}
         <Flex justify="space-between" align="center" mt={24}>
           <SearchInput search={search} setSearch={setSearch} />
 

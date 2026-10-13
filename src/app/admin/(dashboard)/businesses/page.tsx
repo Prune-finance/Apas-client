@@ -5,11 +5,9 @@ import TabsComponent from "@/ui/components/Tabs";
 import { Box, Flex, Text, TabsPanel, Title } from "@mantine/core";
 import { Suspense } from "react";
 import OnboardedBusinesses from "./(tabs)/Onboarded";
-import OnboardingBusinesses from "./(tabs)/Onboarding";
+// import OnboardingBusinesses from "./(tabs)/Onboarding";
 import ApiActiveBusinesses from "./(tabs)/ApiActive";
 import AccountActiveBusinesses from "./(tabs)/AccountActive";
-import { PrimaryBtn } from "@/ui/components/Buttons";
-import { IconPlus } from "@tabler/icons-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 function Businesses() {
@@ -31,13 +29,6 @@ function Businesses() {
             View and manage all businesses on the platform.
           </Text>
         </Box>
-        <PrimaryBtn
-          text="New Business"
-          link="/admin/businesses/new"
-          leftSection={<IconPlus size={16} />}
-          fw={600}
-          fz={14}
-        />
       </Flex>
 
       <TabsComponent
@@ -48,7 +39,7 @@ function Businesses() {
       >
         {[
           OnboardedBusinesses,
-          OnboardingBusinesses,
+          // OnboardingBusinesses,
           ApiActiveBusinesses,
           AccountActiveBusinesses,
         ].map((Component, index) => (
@@ -71,7 +62,7 @@ export default function BusinessesSuspense() {
 
 const tabs: Tab[] = [
   { title: "Onboarded", value: "onboarded" },
-  { title: "Onboarding", value: "onboarding" },
+  // { title: "Onboarding", value: "onboarding" },
   { title: "API Active", value: "api" },
   { title: "Account Active", value: "account" },
 ];

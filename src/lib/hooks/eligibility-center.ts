@@ -214,6 +214,7 @@ export interface QuestionnaireAdminItem {
   reference: string;
   contactEmail: string;
   status: string;
+  businessId?: string | null;
   progress: {
     isComplete: boolean;
     sections: { section: number; isComplete: boolean }[];

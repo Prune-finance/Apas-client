@@ -2,7 +2,7 @@
   .table__container {
     margin-top: 20px;
     padding: 20px 0;
-    background-color: #fff;
+    background-color: var(--dashboard-page-background, #fff);
 
     .tabs {
       .tabs__list {

@@ -386,6 +386,12 @@ a {
   }
 }
 
+// Search input pill override — beats the 8px rule above via higher specificity
+[data-search-input] .mantine-TextInput-input {
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+}
+
 // Focus ring on wrapper-level elements (PasswordInput, MultiSelect, PillsInput)
 .mantine-PasswordInput-input,
 .mantine-MultiSelect-input,

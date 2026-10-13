@@ -259,7 +259,7 @@ export default function SingleBusiness() {
             ) : null}
           </Group>
 
-          {activeTab === "business" && isOnboardingApp && detail?.editableByAdmin && appStatus === "IN_PROGRESS" && (
+          {isOnboardingApp && detail?.editableByAdmin && appStatus === "IN_PROGRESS" && (
             <div className={styles.header__right}>
               <PrimaryBtn
                 text="Edit"
@@ -421,7 +421,12 @@ export default function SingleBusiness() {
             <TabsPanel value="documents">
               {visitedTabs.has("documents") && (
                 isOnboardingApp && detail
-                  ? <OnboardingDocuments detail={detail} />
+                  ? <OnboardingDocuments
+                      detail={detail}
+                      applicationReference={detail.reference}
+                      applicationStatus={detail.applicationStatus}
+                      onReview={revalidate}
+                    />
                   : business && <Documents business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
@@ -429,7 +434,12 @@ export default function SingleBusiness() {
             <TabsPanel value="directors">
               {visitedTabs.has("directors") && (
                 isOnboardingApp && detail
-                  ? <OnboardingDirectors detail={detail} />
+                  ? <OnboardingDirectors
+                      detail={detail}
+                      applicationReference={detail.reference}
+                      applicationStatus={detail.applicationStatus}
+                      onReview={revalidate}
+                    />
                   : business && <Directors business={business} revalidate={revalidate} />
               )}
             </TabsPanel>
@@ -437,7 +447,12 @@ export default function SingleBusiness() {
             <TabsPanel value="shareholders">
               {visitedTabs.has("shareholders") && (
                 isOnboardingApp && detail
-                  ? <OnboardingShareholders detail={detail} />
+                  ? <OnboardingShareholders
+                      detail={detail}
+                      applicationReference={detail.reference}
+                      applicationStatus={detail.applicationStatus}
+                      onReview={revalidate}
+                    />
                   : business && <Shareholders business={business} revalidate={revalidate} />
               )}
             </TabsPanel>

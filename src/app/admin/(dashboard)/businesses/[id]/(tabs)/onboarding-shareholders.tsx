@@ -2,15 +2,23 @@
 
 import { Flex, Grid, GridCol, Text, TextInput } from "@mantine/core";
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessDetail } from "@/lib/hooks/businesses";
+import { BusinessDetail, ReviewStatus } from "@/lib/hooks/businesses";
 import { DocumentViewCard } from "@/ui/section/onboarding/shared";
 
 interface Props {
   detail: BusinessDetail;
+  applicationReference?: string;
+  applicationStatus?: string;
+  onReview?: () => void;
 }
 
-export default function OnboardingShareholders({ detail }: Props) {
+export default function OnboardingShareholders({ detail, applicationReference, applicationStatus, onReview }: Props) {
   const shareholders = (detail.shareholders ?? []) as Record<string, any>[];
+
+  const reviewMap = new Map<string, ReviewStatus>();
+  for (const rd of detail.reviewDocuments ?? []) {
+    if (rd.review?.status) reviewMap.set(rd.id, rd.review.status as ReviewStatus);
+  }
 
   if (!shareholders.length) {
     return (
@@ -124,6 +132,10 @@ export default function OnboardingShareholders({ detail }: Props) {
                     title={identityDoc.fileName}
                     fileId={identityDoc.id}
                     isAdmin
+                    applicationReference={applicationReference}
+                    applicationStatus={applicationStatus}
+                    reviewStatus={reviewMap.get(identityDoc.id) ?? null}
+                    onReview={onReview}
                   />
                 )}
                 {identityDocBack && (
@@ -132,6 +144,10 @@ export default function OnboardingShareholders({ detail }: Props) {
                     title={identityDocBack.fileName}
                     fileId={identityDocBack.id}
                     isAdmin
+                    applicationReference={applicationReference}
+                    applicationStatus={applicationStatus}
+                    reviewStatus={reviewMap.get(identityDocBack.id) ?? null}
+                    onReview={onReview}
                   />
                 )}
                 {poaDoc && (
@@ -140,6 +156,10 @@ export default function OnboardingShareholders({ detail }: Props) {
                     title={poaDoc.fileName}
                     fileId={poaDoc.id}
                     isAdmin
+                    applicationReference={applicationReference}
+                    applicationStatus={applicationStatus}
+                    reviewStatus={reviewMap.get(poaDoc.id) ?? null}
+                    onReview={onReview}
                   />
                 )}
               </Flex>

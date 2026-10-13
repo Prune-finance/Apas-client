@@ -4,21 +4,6 @@
   margin-bottom: 24px;
 }
 
-.hero__wave {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 280px;
-  width: 60%;
-  pointer-events: none;
-  z-index: 0;
-
-  svg {
-    width: 100%;
-    height: 100%;
-  }
-}
-
 .stat__card {
   background: #fff;
   border: 1px solid #f2f4f7;

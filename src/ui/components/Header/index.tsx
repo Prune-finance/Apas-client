@@ -132,7 +132,7 @@ export default function Header() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   return (
     <header className={styles.header}>
-      <div className={`${styles.search} ${switzer.className}`}>
+      <div className={`${styles.search} ${styles.admin__search} ${switzer.className}`}>
         <TextInput
           placeholder="Search here for businesses, payments, accounts, etc"
           leftSectionPointerEvents="none"

@@ -38,6 +38,7 @@ import {
   DocumentInfo,
   AddDirectorsInfo,
   AddShareholdersInfo,
+  ReviewInfo,
   TermsOfUseInfo,
   ReferenceData,
   DEFAULT_REF_DATA,
@@ -51,6 +52,7 @@ const STEP_LABELS = [
   "Documents",
   "Directors",
   "Shareholders",
+  "Review",
 ];
 
 function buildInitialValues(detail: BusinessDetail): OnboardingType {
@@ -279,9 +281,7 @@ export default function EditBusiness() {
           {STEP_LABELS.map((label) => (
             <Stepper.Step key={label} label={label} />
           ))}
-          <Stepper.Completed>
-            Completed, click back button to get to previous step
-          </Stepper.Completed>
+          <Stepper.Completed>{null}</Stepper.Completed>
         </Stepper>
 
         <Divider my={20} />
@@ -342,15 +342,19 @@ export default function EditBusiness() {
           />
         )}
         {active === 5 && (
+          <ReviewInfo form={form} active={active} setActive={setActive} />
+        )}
+        {active === 6 && (
           <TermsOfUseInfo
             form={form}
             active={active}
             setActive={(next) => {
               const n = typeof next === "function" ? next(active) : next;
               setActive(n);
-              if (n > 5) openSuccess();
+              if (n > 6) openSuccess();
             }}
             adminReference={adminReference ?? undefined}
+            isAdmin
           />
         )}
       </Paper>

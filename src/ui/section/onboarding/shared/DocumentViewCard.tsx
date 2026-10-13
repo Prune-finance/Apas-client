@@ -8,28 +8,28 @@ import PDFICON from "@/assets/pdf-icon.png";
 import FileDisplay from "@/ui/components/DocumentViewer";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import createAxiosInstance from "@/lib/axios";
+import type { ReviewStatus } from "@/lib/hooks/businesses";
 
 const questAxios = createAxiosInstance("questionnaire");
 
 const isUUID = (val: string) =>
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val);
 
+const STATUS_STYLES: Record<ReviewStatus, { bg: string; color: string; label: string }> = {
+  PENDING: { bg: "#FEF3C7", color: "#D97706", label: "Pending" },
+  APPROVED: { bg: "#D1FAE5", color: "#059669", label: "Approved" },
+  REJECTED: { bg: "#FEE2E2", color: "#DC2626", label: "Rejected" },
+};
+
 interface DocumentViewCardProps {
-  /** Label shown above the card */
   label: string;
-  /** Document title / fallback file name shown in the card row */
   title: string;
-  /**
-   * Either a UUID (file ID stored in the questionnaire service)
-   * or a direct HTTPS URL.
-   */
   fileId?: string | null;
-  /**
-   * Pass true when this is an admin context so the correct endpoint is used:
-   *   admin → /business/onboarding/admin/files/{id}
-   *   user  → /business/onboarding/files/{id}
-   */
   isAdmin?: boolean;
+  applicationReference?: string;
+  applicationStatus?: string;
+  reviewStatus?: ReviewStatus | null;
+  onReview?: () => void;
 }
 
 export default function DocumentViewCard({
@@ -37,23 +37,27 @@ export default function DocumentViewCard({
   title,
   fileId,
   isAdmin = false,
+  applicationReference,
+  applicationStatus,
+  reviewStatus,
+  onReview,
 }: DocumentViewCardProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [resolving, setResolving] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [approving, setApproving] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   const [resolvedUrl, setResolvedUrl] = useState("");
   const [resolvedFileName, setResolvedFileName] = useState("");
   const [resolvedContentType, setResolvedContentType] = useState("");
 
   if (!fileId) return null;
 
+  const canReview = applicationStatus === "SUBMITTED" && applicationReference && fileId;
+
   const handleView = async () => {
     if (resolving) return;
-    // Already resolved — just open
-    if (resolvedUrl) {
-      open();
-      return;
-    }
+    if (resolvedUrl) { open(); return; }
     setResolving(true);
     try {
       if (isUUID(fileId)) {
@@ -65,7 +69,6 @@ export default function DocumentViewCard({
         setResolvedFileName(data.data.fileName || title);
         setResolvedContentType(data.data.contentType || "");
       } else {
-        // Already a URL
         setResolvedUrl(fileId);
         setResolvedFileName(title);
       }
@@ -101,6 +104,26 @@ export default function DocumentViewCard({
     }
   };
 
+  const handleReview = async (action: "approve" | "reject") => {
+    if (!applicationReference || !fileId) return;
+    if (action === "approve") setApproving(true);
+    else setRejecting(true);
+    try {
+      await questAxios.post(
+        `/business/onboarding/admin/${applicationReference}/documents/${fileId}/${action}`
+      );
+      close();
+      onReview?.();
+    } catch {
+      // silently fail — user can retry
+    } finally {
+      setApproving(false);
+      setRejecting(false);
+    }
+  };
+
+  const statusStyle = reviewStatus ? STATUS_STYLES[reviewStatus] : null;
+
   return (
     <Box style={{ minWidth: 200, flex: 1 }}>
       <Text fz={12} c="#667085" mb={8}>
@@ -128,29 +151,45 @@ export default function DocumentViewCard({
           </Text>
         </Flex>
 
-        <UnstyledButton
-          onClick={handleView}
-          py={4}
-          px={8}
-          style={{
-            borderRadius: 4,
-            backgroundColor: "#D0D5DD",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            minWidth: 46,
-            cursor: resolving ? "not-allowed" : "pointer",
-            flexShrink: 0,
-          }}
-        >
-          {resolving ? (
-            <Loader size={12} color="#667085" type="dots" />
-          ) : (
-            <Text fw={600} fz={10} c="#667085">
-              View
-            </Text>
+        <Flex align="center" gap={6} style={{ flexShrink: 0 }}>
+          {statusStyle && (
+            <Box
+              px={8}
+              py={2}
+              style={{
+                borderRadius: 9999,
+                backgroundColor: statusStyle.bg,
+              }}
+            >
+              <Text fz={10} fw={600} c={statusStyle.color}>
+                {statusStyle.label}
+              </Text>
+            </Box>
           )}
-        </UnstyledButton>
+
+          <UnstyledButton
+            onClick={handleView}
+            py={4}
+            px={8}
+            style={{
+              borderRadius: 4,
+              backgroundColor: "#D0D5DD",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minWidth: 46,
+              cursor: resolving ? "not-allowed" : "pointer",
+            }}
+          >
+            {resolving ? (
+              <Loader size={12} color="#667085" type="dots" />
+            ) : (
+              <Text fw={600} fz={10} c="#667085">
+                View
+              </Text>
+            )}
+          </UnstyledButton>
+        </Flex>
       </Flex>
 
       <Modal
@@ -159,9 +198,22 @@ export default function DocumentViewCard({
         size={800}
         centered
         title={
-          <Text fz={14} fw={500}>
-            {resolvedFileName || title}
-          </Text>
+          <Flex align="center" gap={10}>
+            <Text fz={14} fw={500}>
+              {resolvedFileName || title}
+            </Text>
+            {statusStyle && (
+              <Box
+                px={8}
+                py={2}
+                style={{ borderRadius: 9999, backgroundColor: statusStyle.bg }}
+              >
+                <Text fz={10} fw={600} c={statusStyle.color}>
+                  {statusStyle.label}
+                </Text>
+              </Box>
+            )}
+          </Flex>
         }
       >
         <FileDisplay
@@ -170,7 +222,7 @@ export default function DocumentViewCard({
           download={false}
         />
         {(resolvedUrl || fileId) && (
-          <Flex justify="flex-end" mt={16}>
+          <Flex justify="flex-end" mt={16} gap={12} wrap="wrap">
             <PrimaryBtn
               text="Download"
               fw={600}
@@ -179,6 +231,28 @@ export default function DocumentViewCard({
               loading={downloading}
               loaderProps={{ type: "dots" }}
             />
+            {canReview && (
+              <>
+                <PrimaryBtn
+                  text="Reject"
+                  fw={600}
+                  fz={12}
+                  color="var(--prune-warning)"
+                  c="#fff"
+                  action={() => handleReview("reject")}
+                  loading={rejecting}
+                  loaderProps={{ type: "dots" }}
+                />
+                <PrimaryBtn
+                  text="Approve"
+                  fw={600}
+                  fz={12}
+                  action={() => handleReview("approve")}
+                  loading={approving}
+                  loaderProps={{ type: "dots" }}
+                />
+              </>
+            )}
           </Flex>
         )}
       </Modal>

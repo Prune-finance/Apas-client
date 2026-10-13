@@ -3,6 +3,7 @@ export { CEOInfo } from "./CeoInfo";
 export { DocumentInfo } from "./DocumentInfo";
 export { AddDirectorsInfo } from "./AddDirectorsInfo";
 export { AddShareholdersInfo } from "./AddShareholdersInfo";
+export { ReviewInfo } from "./ReviewInfo";
 export { TermsOfUseInfo } from "./TermsOfUseInfo";
 export { default as SubmitOnboardingModal } from "./SubmitOnboardingModal";
 export { default as OnBoardingDocumentBox } from "./onBoardingDocumentBox";

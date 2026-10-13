@@ -401,11 +401,47 @@ export interface OnboardingContactPerson {
   proofOfAddressDocument: string | null;
 }
 
+export interface OnboardingDocumentFile {
+  id: string;
+  kind: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  review?: {
+    status: string;
+    reviewedAt: string | null;
+    reviewedBy: string | null;
+    reason: string | null;
+  } | null;
+}
+
 export interface OnboardingDocuments {
-  incorporationCertificate: string | null;
-  memart: string | null;
-  amlFramework: string | null;
-  operationalLicence: string | null;
+  incorporationCertificate: OnboardingDocumentFile | string | null;
+  memart: OnboardingDocumentFile | string | null;
+  amlFramework: OnboardingDocumentFile | string | null;
+  operationalLicence: OnboardingDocumentFile | string | null;
+}
+
+export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface ReviewDocument {
+  id: string;
+  label: string;
+  kind: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  review: {
+    status: ReviewStatus;
+    reviewedAt: string | null;
+    reviewedBy: string | null;
+    reason: string | null;
+    fix: string | null;
+    applicantNotifiedAt: string | null;
+  };
+  earlierVersions: ReviewDocument[];
 }
 
 export interface QuestionnaireOnboarding {
@@ -463,7 +499,7 @@ export interface BusinessDetail {
   shareholders?: Record<string, unknown>[];
   consent?: Record<string, unknown> | null;
   questionnaireReference?: string;
-  reviewDocuments?: unknown[];
+  reviewDocuments?: ReviewDocument[];
   questionnaire?: Questionnaire;
   addedBy?: unknown;
   editableByAdmin?: boolean;

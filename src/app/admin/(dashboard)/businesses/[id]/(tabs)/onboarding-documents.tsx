@@ -2,11 +2,14 @@
 
 import { Flex, Text } from "@mantine/core";
 import styles from "@/ui/styles/singlebusiness.module.scss";
-import { BusinessDetail } from "@/lib/hooks/businesses";
+import { BusinessDetail, OnboardingDocumentFile, ReviewStatus } from "@/lib/hooks/businesses";
 import { DocumentViewCard } from "@/ui/section/onboarding/shared";
 
 interface Props {
   detail: BusinessDetail;
+  applicationReference?: string;
+  applicationStatus?: string;
+  onReview?: () => void;
 }
 
 const DOC_LABELS: { key: keyof NonNullable<BusinessDetail["documents"]>; label: string }[] = [
@@ -16,8 +19,24 @@ const DOC_LABELS: { key: keyof NonNullable<BusinessDetail["documents"]>; label: 
   { key: "operationalLicence", label: "Operational Licence" },
 ];
 
-export default function OnboardingDocuments({ detail }: Props) {
+function resolveDocId(doc: OnboardingDocumentFile | string | null | undefined): string | null {
+  if (!doc) return null;
+  if (typeof doc === "string") return doc || null;
+  return doc.id ?? null;
+}
+
+function resolveFileName(doc: OnboardingDocumentFile | string | null | undefined, fallback: string): string {
+  if (!doc || typeof doc === "string") return fallback;
+  return doc.fileName || fallback;
+}
+
+export default function OnboardingDocuments({ detail, applicationReference, applicationStatus, onReview }: Props) {
   const docs = detail.documents;
+
+  const reviewMap = new Map<string, ReviewStatus>();
+  for (const rd of detail.reviewDocuments ?? []) {
+    if (rd.review?.status) reviewMap.set(rd.id, rd.review.status as ReviewStatus);
+  }
 
   const hasAny = docs && DOC_LABELS.some(({ key }) => Boolean(docs[key]));
 
@@ -34,17 +53,24 @@ export default function OnboardingDocuments({ detail }: Props) {
           </Text>
         ) : (
           <Flex gap={16} wrap="wrap">
-            {DOC_LABELS.map(({ key, label }) =>
-              docs?.[key] ? (
+            {DOC_LABELS.map(({ key, label }) => {
+              const doc = docs?.[key];
+              const fileId = resolveDocId(doc);
+              if (!fileId) return null;
+              return (
                 <DocumentViewCard
                   key={key}
                   label={label}
-                  title={label}
-                  fileId={docs[key] as string}
+                  title={resolveFileName(doc, label)}
+                  fileId={fileId}
                   isAdmin
+                  applicationReference={applicationReference}
+                  applicationStatus={applicationStatus}
+                  reviewStatus={reviewMap.get(fileId) ?? null}
+                  onReview={onReview}
                 />
-              ) : null
-            )}
+              );
+            })}
           </Flex>
         )}
       </div>

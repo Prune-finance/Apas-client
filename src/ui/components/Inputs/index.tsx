@@ -169,18 +169,26 @@ export const SearchInput = ({
   ...props
 }: SearchInputProps) => {
   return (
-    <TextInput
-      placeholder="Search here..."
-      leftSectionPointerEvents="none"
-      leftSection={<IconSearch style={{ width: 16, height: 16 }} />}
-      leftSectionWidth={40}
-      w={324}
-      radius={9999}
-      styles={{ input: { border: "1px solid #F5F5F5", paddingLeft: 40, borderRadius: 9999 } }}
-      value={search}
-      onChange={(e) => setSearch && setSearch(e.currentTarget.value)}
-      {...props}
-    />
+    <div data-search-input>
+      <TextInput
+        placeholder="Search here..."
+        leftSectionPointerEvents="none"
+        leftSection={<IconSearch style={{ width: 16, height: 16 }} />}
+        leftSectionWidth={40}
+        w={324}
+        fz={12}
+        styles={{
+          input: {
+            border: "1px solid #F5F5F5",
+            paddingLeft: 40,
+            fontSize: "12px",
+          },
+        }}
+        value={search}
+        onChange={(e) => setSearch && setSearch(e.currentTarget.value)}
+        {...props}
+      />
+    </div>
   );
 };
 

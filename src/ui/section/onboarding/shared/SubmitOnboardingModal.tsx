@@ -30,6 +30,7 @@ interface SubmitOnboardingModalProps {
   close: () => void;
   adminReference?: string;
   onSuccess?: () => void;
+  isAdmin?: boolean;
 }
 
 export default function SubmitOnboardingModal({
@@ -37,6 +38,7 @@ export default function SubmitOnboardingModal({
   close,
   adminReference,
   onSuccess,
+  isAdmin,
 }: SubmitOnboardingModalProps) {
   const { handleError } = useNotification();
   const [loading, setLoading] = useState(false);
@@ -181,10 +183,12 @@ export default function SubmitOnboardingModal({
             <Image src={CompleteIcon.src} alt="Complete" w={278} h={156} />
           </Center>
           <Text fz={24} fw={700} c="var(--prune-text-gray-700)">
-            We have received your company details
+            {isAdmin ? "Application Submitted Successfully" : "We have received your company details"}
           </Text>
           <Text fz={16} fw={400} c="var(--prune-text-gray-700)">
-            We will be in touch regarding your application.
+            {isAdmin
+              ? "The application has been submitted successfully on behalf of the business."
+              : "We will be in touch regarding your application."}
           </Text>
           <Flex justify="end">
             <PrimaryBtn

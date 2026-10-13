@@ -10,6 +10,7 @@ import { useDisclosure } from "@mantine/hooks";
 
 import Header from "@/ui/components/Header";
 import Navbar from "@/ui/components/Navbar";
+import DashboardWave from "./DashboardWave";
 
 import styles from "@/ui/styles/layout.module.scss";
 import { switzer } from "@/ui/fonts";
@@ -34,8 +35,9 @@ export default function RootLayout({
           }}
           padding="xl"
           classNames={{ main: styles.main }}
+          className={styles.admin__shell}
         >
-          <AppShellHeader withBorder={false}>
+          <AppShellHeader withBorder={false} className={styles.admin__header}>
             <Header />
           </AppShellHeader>
 
@@ -44,6 +46,7 @@ export default function RootLayout({
           </AppShellNavbar>
 
           <AppShellMain>
+            <DashboardWave />
             <Container p={0} fluid>
               {children}
             </Container>

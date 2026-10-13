@@ -1,6 +1,6 @@
 "use client";
 
-import { Flex, Text } from "@mantine/core";
+import { SimpleGrid, Text } from "@mantine/core";
 import styles from "@/ui/styles/singlebusiness.module.scss";
 import { BusinessDetail, OnboardingDocumentFile, ReviewStatus } from "@/lib/hooks/businesses";
 import { DocumentViewCard } from "@/ui/section/onboarding/shared";
@@ -52,7 +52,7 @@ export default function OnboardingDocuments({ detail, applicationReference, appl
             No documents have been submitted yet.
           </Text>
         ) : (
-          <Flex gap={16} wrap="wrap">
+          <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing={16}>
             {DOC_LABELS.map(({ key, label }) => {
               const doc = docs?.[key];
               const fileId = resolveDocId(doc);
@@ -71,7 +71,7 @@ export default function OnboardingDocuments({ detail, applicationReference, appl
                 />
               );
             })}
-          </Flex>
+          </SimpleGrid>
         )}
       </div>
     </div>

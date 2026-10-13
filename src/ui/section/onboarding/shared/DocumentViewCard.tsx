@@ -134,7 +134,7 @@ export default function DocumentViewCard({
   const statusStyle = reviewStatus ? STATUS_STYLES[reviewStatus] : null;
 
   return (
-    <Box style={{ minWidth: 200, flex: 1 }}>
+    <Box style={{ minWidth: 0, width: "100%" }}>
       <Text fz={12} c="#667085" mb={8}>
         {label}
       </Text>

@@ -73,20 +73,7 @@ export const TermsOfUseInfo = ({
         to you within the mobile application or on our website.
       </Text>
 
-      <Flex align="center" justify="space-between" w="100%" mt={20}>
-        <Button
-          radius={9999}
-          px={18}
-          h={40}
-          fz={14}
-          fw={500}
-          c="#344054"
-          onClick={() => form.reset()}
-          styles={{ root: { backgroundColor: "#FCFCFD", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
-        >
-          Clear Form
-        </Button>
-
+      <Flex align="center" justify="flex-end" w="100%" mt={20}>
         <Flex align="center" gap={20}>
           <Button
             radius={9999}

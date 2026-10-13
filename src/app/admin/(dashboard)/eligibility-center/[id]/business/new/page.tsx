@@ -115,7 +115,7 @@ export default function NewBusiness() {
 
       <Paper py={32} px={28} mt={20}>
         <Flex align="center" justify="space-between">
-          <BackBtn />
+          {/* <BackBtn /> */}
           {active > 0 && (
             <Tooltip
               label="Hand over to user to complete"

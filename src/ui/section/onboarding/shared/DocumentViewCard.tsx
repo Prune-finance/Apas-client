@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Flex, Loader, Modal, Text, UnstyledButton } from "@mantine/core";
+import { Box, Button, Flex, Loader, Modal, Stack, Text, TextInput, Textarea, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import Image from "next/image";
@@ -43,10 +43,13 @@ export default function DocumentViewCard({
   onReview,
 }: DocumentViewCardProps) {
   const [opened, { open, close }] = useDisclosure(false);
+  const [rejectOpened, { open: openRejectModal, close: closeRejectModal }] = useDisclosure(false);
   const [resolving, setResolving] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
+  const [rejectReason, setRejectReason] = useState("");
+  const [rejectFix, setRejectFix] = useState("");
   const [resolvedUrl, setResolvedUrl] = useState("");
   const [resolvedFileName, setResolvedFileName] = useState("");
   const [resolvedContentType, setResolvedContentType] = useState("");
@@ -104,15 +107,17 @@ export default function DocumentViewCard({
     }
   };
 
-  const handleReview = async (action: "approve" | "reject") => {
+  const handleReview = async (action: "approve" | "reject", body?: { reason: string; fix: string }) => {
     if (!applicationReference || !fileId) return;
     if (action === "approve") setApproving(true);
     else setRejecting(true);
     try {
       await questAxios.post(
-        `/business/onboarding/admin/${applicationReference}/documents/${fileId}/${action}`
+        `/business/onboarding/admin/${applicationReference}/documents/${fileId}/${action}`,
+        body
       );
       close();
+      closeRejectModal();
       onReview?.();
     } catch {
       // silently fail — user can retry
@@ -120,6 +125,10 @@ export default function DocumentViewCard({
       setApproving(false);
       setRejecting(false);
     }
+  };
+
+  const handleRejectSubmit = () => {
+    handleReview("reject", { reason: rejectReason, fix: rejectFix });
   };
 
   const statusStyle = reviewStatus ? STATUS_STYLES[reviewStatus] : null;
@@ -193,6 +202,64 @@ export default function DocumentViewCard({
       </Flex>
 
       <Modal
+        opened={rejectOpened}
+        onClose={() => {
+          closeRejectModal();
+          setRejectReason("");
+          setRejectFix("");
+        }}
+        size={480}
+        centered
+        title={
+          <Text fz={16} fw={600}>
+            Reject Document
+          </Text>
+        }
+      >
+        <Stack gap={16}>
+          <TextInput
+            label="Reason"
+            placeholder="e.g. Blurry image"
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.currentTarget.value)}
+          />
+          <Textarea
+            label="Fix"
+            placeholder="e.g. Upload a clear document"
+            value={rejectFix}
+            onChange={(e) => setRejectFix(e.currentTarget.value)}
+            minRows={3}
+            autosize
+          />
+          <Flex justify="flex-end" gap={12} mt={8}>
+            <Button
+              variant="default"
+              fz={12}
+              fw={600}
+              onClick={() => {
+                closeRejectModal();
+                setRejectReason("");
+                setRejectFix("");
+              }}
+            >
+              Cancel
+            </Button>
+            <PrimaryBtn
+              text="Submit Rejection"
+              fw={600}
+              fz={12}
+              color="var(--prune-warning)"
+              c="#fff"
+              action={handleRejectSubmit}
+              loading={rejecting}
+              loaderProps={{ type: "dots" }}
+              disabled={!rejectReason.trim() || !rejectFix.trim()}
+            />
+          </Flex>
+        </Stack>
+      </Modal>
+
+      <Modal
         opened={opened}
         onClose={close}
         size={800}
@@ -239,9 +306,7 @@ export default function DocumentViewCard({
                   fz={12}
                   color="var(--prune-warning)"
                   c="#fff"
-                  action={() => handleReview("reject")}
-                  loading={rejecting}
-                  loaderProps={{ type: "dots" }}
+                  action={openRejectModal}
                 />
                 <PrimaryBtn
                   text="Approve"

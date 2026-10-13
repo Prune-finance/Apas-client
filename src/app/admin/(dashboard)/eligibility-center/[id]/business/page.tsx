@@ -1,15 +1,21 @@
 "use client";
 
 import {
+  Box,
   Button,
+  Flex,
   Group,
+  Modal,
+  Radio,
   Skeleton,
+  Stack,
   Switch,
   Tabs,
   TabsList,
   TabsPanel,
   TabsTab,
   Text,
+  TextInput,
 } from "@mantine/core";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 
@@ -56,6 +62,8 @@ import OnboardingDocuments from "../../../businesses/[id]/(tabs)/onboarding-docu
 import OnboardingDirectors from "../../../businesses/[id]/(tabs)/onboarding-directors";
 import OnboardingShareholders from "../../../businesses/[id]/(tabs)/onboarding-shareholders";
 
+const questAxios = createAxiosInstance("questionnaire");
+
 export default function SingleEligibilityBusiness() {
   const params = useParams<{ id: string }>();
   const { loading, business: detail, revalidate } = useBusinessDetail(params.id);
@@ -81,12 +89,65 @@ export default function SingleEligibilityBusiness() {
 
   const router = useRouter();
   const isOnboardingApp = detail?.type === "ONBOARDING_APPLICATION";
+
+  const allDocumentsApproved =
+    (detail?.reviewDocuments?.length ?? 0) > 0 &&
+    (detail?.reviewDocuments ?? []).every((rd: any) => rd.review?.status === "APPROVED");
+
+  const handleRejectBusiness = async () => {
+    if (!detail?.reference) return;
+    setProcessingRejectBiz(true);
+    try {
+      await questAxios.post(
+        `/business/onboarding/admin/${detail.reference}/reject`,
+        { reason: rejectBizReason }
+      );
+      closeRejectBiz();
+      setRejectBizReason("");
+      revalidate();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessingRejectBiz(false);
+    }
+  };
+
+  const handleActivate = async () => {
+    if (!detail?.reference) return;
+    setProcessingActivate(true);
+    try {
+      await questAxios.post(
+        `/business/onboarding/admin/${detail.reference}/activate`,
+        { tier: selectedTier }
+      );
+      const email =
+        detail.business?.businessEmail ?? (business as any)?.contactEmail ?? "";
+      setActivationEmail(email);
+      closeTier();
+      openActivateSuccess();
+      revalidate();
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
+    } finally {
+      setProcessingActivate(false);
+    }
+  };
   const appStatus = detail?.applicationStatus ?? detail?.currentStatus;
   const visibleTabs = tabs.filter((t) => {
     if ((t as any).onboardingOnly) return isOnboardingApp;
     if (["accounts", "keys", "requests"].includes(t.value)) return !isOnboardingApp;
     return true;
   });
+
+  const [holdUpOpened, { open: openHoldUp, close: closeHoldUp }] = useDisclosure(false);
+  const [rejectBizOpened, { open: openRejectBiz, close: closeRejectBiz }] = useDisclosure(false);
+  const [tierOpened, { open: openTier, close: closeTier }] = useDisclosure(false);
+  const [activateSuccessOpened, { open: openActivateSuccess, close: closeActivateSuccess }] = useDisclosure(false);
+  const [rejectBizReason, setRejectBizReason] = useState("");
+  const [selectedTier, setSelectedTier] = useState<"TIER_1" | "TIER_2">("TIER_1");
+  const [processingRejectBiz, setProcessingRejectBiz] = useState(false);
+  const [processingActivate, setProcessingActivate] = useState(false);
+  const [activationEmail, setActivationEmail] = useState("");
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedTrust, { open: openTrust, close: closeTrust }] = useDisclosure(false);
@@ -226,6 +287,35 @@ export default function SingleEligibilityBusiness() {
                 h={32}
                 radius={4}
                 action={() => router.push(`/admin/businesses/${params.id}/edit`)}
+              />
+            </div>
+          )}
+
+          {isOnboardingApp && appStatus === "SUBMITTED" && (
+            <div className={styles.header__right}>
+              <PrimaryBtn
+                text="Reject Business"
+                fw={600}
+                fz={12}
+                h={32}
+                radius={4}
+                color="#D92D20"
+                c="#fff"
+                action={() => {
+                  if (!allDocumentsApproved) { openHoldUp(); return; }
+                  openRejectBiz();
+                }}
+              />
+              <PrimaryBtn
+                text="Send Activation Link"
+                fw={600}
+                fz={12}
+                h={32}
+                radius={4}
+                action={() => {
+                  if (!allDocumentsApproved) { openHoldUp(); return; }
+                  openTier();
+                }}
               />
             </div>
           )}
@@ -405,6 +495,135 @@ export default function SingleEligibilityBusiness() {
           </Tabs>
         </div>
       </div>
+
+      {/* Hold up — documents not all approved */}
+      <Modal
+        opened={holdUpOpened}
+        onClose={closeHoldUp}
+        size={480}
+        centered
+        title={
+          <Text fz={20} fw={700} c="#344054">
+            Hold up!!!
+          </Text>
+        }
+      >
+        <Text fz={16} c="#344054" lh={1.5} mb={24}>
+          {`You haven't approved this business' documents. You need to approve them before being able to activate this business.`}
+        </Text>
+        <Flex justify="flex-end">
+          <PrimaryBtn text="Okay" fw={600} fz={14} action={closeHoldUp} />
+        </Flex>
+      </Modal>
+
+      {/* Reject Business modal */}
+      <Modal
+        opened={rejectBizOpened}
+        onClose={() => { closeRejectBiz(); setRejectBizReason(""); }}
+        size={560}
+        centered
+        title={
+          <Text fz={20} fw={700} c="#1D2939">
+            Why are you rejecting this business?
+          </Text>
+        }
+      >
+        <Stack gap={16}>
+          <Text fz={16} fw={600} c="#344054">Reason for rejecting this business</Text>
+          <TextInput
+            placeholder="Enter reason"
+            value={rejectBizReason}
+            onChange={(e) => setRejectBizReason(e.currentTarget.value)}
+          />
+          <Flex justify="flex-end" mt={8}>
+            <PrimaryBtn
+              text="Reject"
+              fw={600}
+              fz={14}
+              color="#D92D20"
+              c="#fff"
+              action={handleRejectBusiness}
+              loading={processingRejectBiz}
+              loaderProps={{ type: "dots" }}
+              disabled={!rejectBizReason.trim()}
+            />
+          </Flex>
+        </Stack>
+      </Modal>
+
+      {/* Choose Business Tier modal */}
+      <Modal
+        opened={tierOpened}
+        onClose={closeTier}
+        size={560}
+        centered
+        title={
+          <Text fz={20} fw={700} c="#344054">
+            Choose Business Tier
+          </Text>
+        }
+      >
+        <Stack gap={16}>
+          <Radio.Group
+            value={selectedTier}
+            onChange={(val) => setSelectedTier(val as "TIER_1" | "TIER_2")}
+          >
+            <Stack gap={12}>
+              {(["TIER_1", "TIER_2"] as const).map((tier) => (
+                <Box
+                  key={tier}
+                  onClick={() => setSelectedTier(tier)}
+                  p={16}
+                  style={{
+                    border: `1px solid ${selectedTier === tier ? "var(--prune-primary-700)" : "#EAECF0"}`,
+                    borderRadius: 8,
+                    cursor: "pointer",
+                    background: selectedTier === tier ? "hsl(from var(--prune-primary-700) h s l / .06)" : "#fff",
+                  }}
+                >
+                  <Flex align="center" gap={12}>
+                    <Radio value={tier} color="var(--prune-primary-700)" />
+                    <Text fz={15} fw={600} c="#344054">
+                      {tier === "TIER_1" ? "Tier 1" : "Tier 2"}
+                    </Text>
+                  </Flex>
+                </Box>
+              ))}
+            </Stack>
+          </Radio.Group>
+          <Flex justify="flex-end" mt={8}>
+            <PrimaryBtn
+              text="Send Activation Link"
+              fw={600}
+              fz={14}
+              action={handleActivate}
+              loading={processingActivate}
+              loaderProps={{ type: "dots" }}
+            />
+          </Flex>
+        </Stack>
+      </Modal>
+
+      {/* Activation success modal */}
+      <Modal
+        opened={activateSuccessOpened}
+        onClose={closeActivateSuccess}
+        size={480}
+        centered
+        title={
+          <Text fz={20} fw={700} c="#344054">
+            Activation link sent successfully
+          </Text>
+        }
+      >
+        <Text fz={16} c="#344054" lh={1.5} mb={24}>
+          You have successfully sent an activation link to{" "}
+          <Text span fw={700}>{activationEmail}.</Text>
+        </Text>
+        <Flex justify="flex-end">
+          <PrimaryBtn text="Okay" fw={600} fz={14} action={closeActivateSuccess} />
+        </Flex>
+      </Modal>
 
       <ModalComponent
         opened={opened}

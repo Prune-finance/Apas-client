@@ -48,9 +48,14 @@ import EmptyTable from "@/ui/components/EmptyTable";
 interface OnboardedBusinessesProps {
   hideOverview?: boolean;
   status?: string;
+  getDetailHref?: (id: string) => string;
 }
 
-export default function OnboardedBusinesses({ hideOverview, status = "ONBOARDED" }: OnboardedBusinessesProps = {}) {
+export default function OnboardedBusinesses({
+  hideOverview,
+  status = "ONBOARDED",
+  getDetailHref,
+}: OnboardedBusinessesProps = {}) {
   const searchParams = useSearchParams();
 
   const [active, setActive] = useState(1);
@@ -112,8 +117,12 @@ export default function OnboardedBusinesses({ hideOverview, status = "ONBOARDED"
   ];
 
   const handleRowClick = (id: string) => {
-    const backUrl = `/admin/businesses?${searchParams.toString()}`;
-    push(`/admin/businesses/${id}?back=${encodeURIComponent(backUrl)}`);
+    const defaultHref = `/admin/businesses/${id}`;
+    const href = getDetailHref ? getDetailHref(id) : defaultHref;
+    const backUrl = getDetailHref
+      ? `/admin/eligibility-center?tab=onboarding`
+      : `/admin/businesses?${searchParams.toString()}`;
+    push(`${href}?back=${encodeURIComponent(backUrl)}`);
   };
 
   // filteredSearch(businesses, ["name", "contactEmail"], debouncedSearch);

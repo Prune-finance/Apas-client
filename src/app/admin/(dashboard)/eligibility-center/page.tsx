@@ -178,7 +178,13 @@ function EligibilityCenter() {
         </TabsPanel>
 
         <TabsPanel value="onboarding">
-          {currentTab === "onboarding" && <OnboardedBusinesses hideOverview />}
+          {currentTab === "onboarding" && (
+            <OnboardedBusinesses
+              hideOverview
+              status="ONBOARDING"
+              getDetailHref={(id) => `/admin/eligibility-center/${id}/business`}
+            />
+          )}
         </TabsPanel>
       </TabsComponent>
     </Box>

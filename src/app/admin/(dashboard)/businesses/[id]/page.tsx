@@ -233,7 +233,7 @@ export default function SingleBusiness() {
             Business
           </Text>
         </Group> */}
-        <BackBtn link={backHref} />
+        {/* <BackBtn link={backHref} /> */}
         <div className={styles.container__header}>
           <Group gap={8}>
             {business?.kycTrusted && (

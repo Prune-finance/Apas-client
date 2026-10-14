@@ -56,6 +56,7 @@ const statusToStage: Record<string, STAGE> = {
   ONBOARDING_INVITED: "Onboarding Invited",
   SUBMITTED: "Submitted",
   NOT_ELIGIBLE: "REJECTED",
+  QUESTIONNAIRE_COMPLETED: "Questionnaire Completed",
 };
 
 const SERVICE_OPTIONS = [

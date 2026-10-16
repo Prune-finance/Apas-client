@@ -1,5 +1,5 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Box, Divider, Flex, Group, Stack, Text } from "@mantine/core";
+import { Box, Divider, Flex, Stack, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
@@ -53,20 +53,20 @@ function ShareholderInfoCard({ setActive, form }: ShareholderInfoCard) {
 
           <Stack gap={10} mt={20}>
             {Object.entries(shareholder).map(([key, value]) => (
-              <Group key={key} justify="space-between" align="start">
-                <Text c="#667085" fz={12}>
+              <Flex key={key} justify="space-between" align="flex-start" gap={12}>
+                <Text c="#667085" fz={12} style={{ flexShrink: 0 }}>
                   {key}:
                 </Text>
                 <Text
                   c="#344054"
                   ta="right"
-                  w={244}
                   fz={12}
                   tt={key === "Email" ? "lowercase" : "capitalize"}
+                  style={{ flex: 1, wordBreak: "break-word" }}
                 >
                   {value}
                 </Text>
-              </Group>
+              </Flex>
             ))}
             <Box mt={16}>
               <Text c="var(--prune-text-gray-700)" fz={14} fw={600}>

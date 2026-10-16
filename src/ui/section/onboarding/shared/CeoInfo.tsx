@@ -175,8 +175,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             label="Date of Birth"
             w="100%"
             standard={noFloatingLabel}
-            minDate={new Date("1900-01-01")}
-            maxDate={new Date(new Date().setFullYear(new Date().getFullYear() - 18))}
+            maxDate={new Date()}
             {...form.getInputProps("ceoDOB")}
           />
         </Flex>

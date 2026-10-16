@@ -2,10 +2,18 @@ import { z } from "zod";
 
 const emailSchema = z.string().email();
 
+const nameField = (label: string) =>
+  z
+    .string()
+    .min(1, `${label} is required`)
+    .min(2, `${label} must be at least 2 characters`)
+    .max(50, `${label} cannot exceed 50 characters`)
+    .refine((v) => v.trim().length > 0, `${label} cannot be only spaces`);
+
 const Director = z.object({
   id: z.string().uuid(),
-  first_name: z.string().min(1, "Director's first name is required"),
-  last_name: z.string().min(1, "Director's last name is required"),
+  first_name: nameField("Director's first name"),
+  last_name: nameField("Director's last name"),
   date_of_birth: z
     .union([
       z.date({ required_error: "Director's Date of birth is required" }),
@@ -62,8 +70,8 @@ export const onboardingShareholders = z.object({
     .array(
       z.object({
         id: z.string().uuid(),
-        first_name: z.string().min(1, "Shareholder's first name is required"),
-        last_name: z.string().min(1, "Shareholder's last name is required"),
+        first_name: nameField("Shareholder's first name"),
+        last_name: nameField("Shareholder's last name"),
         date_of_birth: z
           .union([
             z.date({
@@ -145,8 +153,8 @@ export const onboardingBasicInfoSchema = z.object({
     .email("Please provide a valid contact email")
     .min(1, "Contact Email is required"),
   businessWebsite: z.string().optional().nullable(),
-  contactPersonFirstName: z.string().min(1, "Contact first name is required"),
-  contactPersonLastName: z.string().min(1, "Contact last name is required"),
+  contactPersonFirstName: nameField("Contact first name"),
+  contactPersonLastName: nameField("Contact last name"),
   contactPersonIdType: z.string().nullable(),
   contactPersonPOAType: z.string().nullable(),
   contactPersonIdUrl: z.string(),
@@ -160,8 +168,8 @@ export const onboardingBasicInfoSchema = z.object({
 export type OnboardingBasicInfoType = z.infer<typeof onboardingBasicInfoSchema>;
 
 export const CEOSchema = z.object({
-  ceoFirstName: z.string().min(1, "CEO first name is required"),
-  ceoLastName: z.string().min(1, "CEO last name is required"),
+  ceoFirstName: nameField("CEO first name"),
+  ceoLastName: nameField("CEO last name"),
   ceoEmail: z.string().email("Please provide a valid email"),
   ceoDOB: z
     .union([

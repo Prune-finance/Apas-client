@@ -5,7 +5,7 @@ import {
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
 import { PhoneNumberInput } from "@/ui/components/InputWithLabel/QuestInputs";
-import { Box, Button, Flex, Stack, Text } from "@mantine/core";
+import { Box, Flex, Stack, Text } from "@mantine/core";
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { eksellStyle, buildSectionBase } from "./utils";
@@ -108,33 +108,6 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
     return true;
   })();
 
-  const handleClearForm = () => {
-    form.setValues({
-      businessName: "",
-      businessTradingName: "",
-      businessType: null,
-      businessIndustry: null,
-      businessCountry: null,
-      businessAddress: "",
-      businessEmail: "",
-      businessPhoneNumberCode: "+234",
-      businessPhoneNumber: "",
-      businessWebsite: "",
-      businessDescription: "",
-      contactPersonFirstName: "",
-      contactPersonLastName: "",
-      contactPersonEmail: "",
-      contactPersonPhoneNumberCode: "+234",
-      contactPersonPhoneNumber: "",
-      contactPersonIdType: "",
-      contactPersonPOAType: "",
-      contactPersonIdUrl: "",
-      contactPersonIdUrlBack: "",
-      contactPersonPOAUrl: "",
-      makeContactPersonInitiator: false,
-    });
-  };
-
   const handleSaveAndContinue = async () => {
     const { hasErrors } = form.validate();
     if (hasErrors) return;
@@ -174,6 +147,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             w="100%"
             placeholder="Enter Business Name"
             standard={noFloatingLabel}
+            disabled={!isAdmin}
             {...form.getInputProps("businessName")}
           />
           <TextInputWithInsideLabel
@@ -181,6 +155,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             w="100%"
             placeholder="Enter Trading Name"
             standard={noFloatingLabel}
+            disabled={!isAdmin}
             {...form.getInputProps("businessTradingName")}
           />
         </Flex>
@@ -299,6 +274,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             w="100%"
             placeholder="Enter Email"
             standard={noFloatingLabel}
+            disabled={!isAdmin}
             {...form.getInputProps("contactPersonEmail")}
           />
           <Box w="100%">
@@ -382,19 +358,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
         />
       </Stack>
 
-      <Flex align="center" justify="space-between" w="100%" mt={20}>
-        <Button
-          radius={9999}
-          px={18}
-          h={40}
-          fz={14}
-          fw={500}
-          c="#344054"
-          onClick={handleClearForm}
-          styles={{ root: { backgroundColor: "#fff", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
-        >
-          Clear Form
-        </Button>
+      <Flex justify="flex-end" w="100%" mt={20}>
         <PrimaryBtn
           text="Save & Continue"
           fw={600}

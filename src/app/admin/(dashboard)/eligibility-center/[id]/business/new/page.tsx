@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { IconHandStop, IconX } from "@tabler/icons-react";
+import { IconHandStop } from "@tabler/icons-react";
 import { Divider, Flex, Paper, Stepper, Text, Tooltip } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
@@ -59,7 +59,6 @@ export default function NewBusiness() {
   const [adminReference, setAdminReference] = useState<string | null>(null);
   const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
 
-  const [opened, { open, close }] = useDisclosure(false);
   const [openedHandOver, { open: openHandOver, close: closeHandOver }] =
     useDisclosure(false);
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
@@ -238,20 +237,6 @@ export default function NewBusiness() {
           />
         )}
       </Paper>
-
-      {/* Clear form modal */}
-      <ModalComponent
-        opened={opened}
-        close={close}
-        icon={<IconX color="var(--prune-warning)" />}
-        title="Clear Form?"
-        text="Are you sure you want to clear this form? All entered data will be permanently lost."
-        action={() => {
-          form.reset();
-          close();
-        }}
-        color="hsl(from var(--prune-warning) h s l / .1)"
-      />
 
       {/* Hand over confirmation modal */}
       <ModalComponent

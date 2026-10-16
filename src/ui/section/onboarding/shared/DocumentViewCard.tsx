@@ -1,8 +1,24 @@
 "use client";
 
-import { Box, Button, Flex, Loader, Modal, Stack, Text, TextInput, Textarea, UnstyledButton } from "@mantine/core";
+import { Box, Button, Flex, Loader, Modal, Select, Stack, Text, TextInput, Textarea, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
+
+const DOCUMENT_REJECTION_REASONS = [
+  "Document is blurry or unreadable",
+  "Document is expired",
+  "Incorrect document submitted",
+  "Document is incomplete",
+  "Required information is missing",
+  "Information does not match business details",
+  "Document is invalid",
+  "Document cannot be verified",
+  "Document is not properly signed or stamped",
+  "Duplicate document submitted",
+  "Unsupported document type",
+  "Document does not meet the required criteria",
+  "Other",
+];
 import Image from "next/image";
 import PDFICON from "@/assets/pdf-icon.png";
 import FileDisplay from "@/ui/components/DocumentViewer";
@@ -48,7 +64,8 @@ export default function DocumentViewCard({
   const [downloading, setDownloading] = useState(false);
   const [approving, setApproving] = useState(false);
   const [rejecting, setRejecting] = useState(false);
-  const [rejectReason, setRejectReason] = useState("");
+  const [rejectReason, setRejectReason] = useState<string | null>(null);
+  const [rejectReasonOther, setRejectReasonOther] = useState("");
   const [rejectFix, setRejectFix] = useState("");
   const [resolvedUrl, setResolvedUrl] = useState("");
   const [resolvedFileName, setResolvedFileName] = useState("");
@@ -129,8 +146,10 @@ export default function DocumentViewCard({
     }
   };
 
+  const resolvedRejectReason = rejectReason === "Other" ? rejectReasonOther : (rejectReason ?? "");
+
   const handleRejectSubmit = () => {
-    handleReview("reject", { reason: rejectReason, fix: rejectFix });
+    handleReview("reject", { reason: resolvedRejectReason, fix: rejectFix });
   };
 
   const statusStyle = reviewStatus ? STATUS_STYLES[reviewStatus] : null;
@@ -207,7 +226,8 @@ export default function DocumentViewCard({
         opened={rejectOpened}
         onClose={() => {
           closeRejectModal();
-          setRejectReason("");
+          setRejectReason(null);
+          setRejectReasonOther("");
           setRejectFix("");
         }}
         size={480}
@@ -220,12 +240,21 @@ export default function DocumentViewCard({
         }
       >
         <Stack gap={16}>
-          <TextInput
+          <Select
             label="Reason"
-            placeholder="e.g. Blurry image"
+            placeholder="Select a reason"
+            data={DOCUMENT_REJECTION_REASONS}
             value={rejectReason}
-            onChange={(e) => setRejectReason(e.currentTarget.value)}
+            onChange={setRejectReason}
           />
+          {rejectReason === "Other" && (
+            <TextInput
+              label="Please specify"
+              placeholder="Enter reason"
+              value={rejectReasonOther}
+              onChange={(e) => setRejectReasonOther(e.currentTarget.value)}
+            />
+          )}
           <Textarea
             label="Fix"
             placeholder="e.g. Upload a clear document"
@@ -241,7 +270,8 @@ export default function DocumentViewCard({
               fw={600}
               onClick={() => {
                 closeRejectModal();
-                setRejectReason("");
+                setRejectReason(null);
+                setRejectReasonOther("");
                 setRejectFix("");
               }}
             >
@@ -256,7 +286,7 @@ export default function DocumentViewCard({
               action={handleRejectSubmit}
               loading={rejecting}
               loaderProps={{ type: "dots" }}
-              disabled={!rejectReason.trim() || !rejectFix.trim()}
+              disabled={!resolvedRejectReason.trim() || !rejectFix.trim()}
             />
           </Flex>
         </Stack>

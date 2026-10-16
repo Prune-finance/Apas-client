@@ -1,9 +1,7 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import { Alert, Box, Flex, Loader, ThemeIcon } from "@mantine/core";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CustomPaper } from "../CustomPaper";
 import Navbar from "../Navbar";
@@ -109,7 +107,7 @@ function parseDDMMYYYY(dateStr: string | null | undefined): Date | null {
   return new Date(yyyy, mm - 1, dd);
 }
 
-export default function Onboarding() {
+function OnboardingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const syncingFromUrl = useRef(false);
@@ -433,5 +431,19 @@ export default function Onboarding() {
         </Box>
       </Flex>
     </Box>
+  );
+}
+
+export default function Onboarding() {
+  return (
+    <Suspense
+      fallback={
+        <Flex justify="center" align="center" h="100vh">
+          <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />
+        </Flex>
+      }
+    >
+      <OnboardingPage />
+    </Suspense>
   );
 }

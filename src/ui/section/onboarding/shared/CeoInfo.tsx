@@ -155,12 +155,22 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             w="100%"
             standard={noFloatingLabel}
             {...form.getInputProps("ceoFirstName")}
+            error={
+              (form.values.ceoFirstName?.length ?? 0) > 50
+                ? "CEO first name cannot exceed 50 characters"
+                : form.errors.ceoFirstName
+            }
           />
           <TextInputWithInsideLabel
             label="Last Name"
             w="100%"
             standard={noFloatingLabel}
             {...form.getInputProps("ceoLastName")}
+            error={
+              (form.values.ceoLastName?.length ?? 0) > 50
+                ? "CEO last name cannot exceed 50 characters"
+                : form.errors.ceoLastName
+            }
           />
         </Flex>
 

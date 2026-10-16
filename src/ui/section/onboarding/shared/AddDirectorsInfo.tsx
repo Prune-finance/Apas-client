@@ -173,6 +173,11 @@ export const AddDirectorsInfo = ({
               standard={noFloatingLabel}
               key={form.key(`directors.${index}.first_name`)}
               {...form.getInputProps(`directors.${index}.first_name`)}
+              error={
+                (form.values.directors[index]?.first_name?.length ?? 0) > 50
+                  ? "Director's first name cannot exceed 50 characters"
+                  : form.errors[`directors.${index}.first_name`]
+              }
             />
             <TextInputWithInsideLabel
               label="Last Name"
@@ -180,6 +185,11 @@ export const AddDirectorsInfo = ({
               standard={noFloatingLabel}
               key={form.key(`directors.${index}.last_name`)}
               {...form.getInputProps(`directors.${index}.last_name`)}
+              error={
+                (form.values.directors[index]?.last_name?.length ?? 0) > 50
+                  ? "Director's last name cannot exceed 50 characters"
+                  : form.errors[`directors.${index}.last_name`]
+              }
             />
           </Flex>
 

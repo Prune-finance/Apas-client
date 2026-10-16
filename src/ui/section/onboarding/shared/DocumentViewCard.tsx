@@ -246,6 +246,7 @@ export default function DocumentViewCard({
             data={DOCUMENT_REJECTION_REASONS}
             value={rejectReason}
             onChange={setRejectReason}
+            comboboxProps={{ zIndex: 500 }}
           />
           {rejectReason === "Other" && (
             <TextInput

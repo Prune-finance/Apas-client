@@ -174,6 +174,11 @@ export const AddShareholdersInfo = ({
               standard={noFloatingLabel}
               key={form.key(`shareholders.${index}.first_name`)}
               {...form.getInputProps(`shareholders.${index}.first_name`)}
+              error={
+                ((form.values.shareholders ?? [])[index]?.first_name?.length ?? 0) > 50
+                  ? "Shareholder's first name cannot exceed 50 characters"
+                  : form.errors[`shareholders.${index}.first_name`]
+              }
             />
             <TextInputWithInsideLabel
               label="Last Name"
@@ -181,6 +186,11 @@ export const AddShareholdersInfo = ({
               standard={noFloatingLabel}
               key={form.key(`shareholders.${index}.last_name`)}
               {...form.getInputProps(`shareholders.${index}.last_name`)}
+              error={
+                ((form.values.shareholders ?? [])[index]?.last_name?.length ?? 0) > 50
+                  ? "Shareholder's last name cannot exceed 50 characters"
+                  : form.errors[`shareholders.${index}.last_name`]
+              }
             />
           </Flex>
 

@@ -4,6 +4,14 @@ import {
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
 import { Box, Button, Flex, Stack, Text } from "@mantine/core";
+
+const nameError = (value: string | undefined, label: string, formError: React.ReactNode) => {
+  const raw = value ?? "";
+  if (raw.length > 50) return `${label} cannot exceed 50 characters`;
+  if (raw.length > 0 && raw.trim().length === 0) return `${label} cannot be only spaces`;
+  if (raw.length > 0 && raw.length < 2) return `${label} must be at least 2 characters`;
+  return formError;
+};
 import OnBoardingDocumentBox from "./onBoardingDocumentBox";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { SaveProgressBtn, eksellStyle, buildSectionBase } from "./utils";
@@ -155,22 +163,14 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             w="100%"
             standard={noFloatingLabel}
             {...form.getInputProps("ceoFirstName")}
-            error={
-              (form.values.ceoFirstName?.length ?? 0) > 50
-                ? "CEO first name cannot exceed 50 characters"
-                : form.errors.ceoFirstName
-            }
+            error={nameError(form.values.ceoFirstName, "CEO first name", form.errors.ceoFirstName)}
           />
           <TextInputWithInsideLabel
             label="Last Name"
             w="100%"
             standard={noFloatingLabel}
             {...form.getInputProps("ceoLastName")}
-            error={
-              (form.values.ceoLastName?.length ?? 0) > 50
-                ? "CEO last name cannot exceed 50 characters"
-                : form.errors.ceoLastName
-            }
+            error={nameError(form.values.ceoLastName, "CEO last name", form.errors.ceoLastName)}
           />
         </Flex>
 
@@ -187,6 +187,15 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             standard={noFloatingLabel}
             maxDate={new Date()}
             {...form.getInputProps("ceoDOB")}
+            error={(() => {
+              const dob = form.values.ceoDOB;
+              if (!dob) return form.errors.ceoDOB;
+              const cutoff = new Date();
+              cutoff.setFullYear(cutoff.getFullYear() - 18);
+              return new Date(dob as string | Date) > cutoff
+                ? "CEO must be at least 18 years old"
+                : form.errors.ceoDOB;
+            })()}
           />
         </Flex>
 

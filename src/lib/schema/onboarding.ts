@@ -195,16 +195,10 @@ export const CEOSchema = z.object({
 });
 
 export const onboardingDocumentSchema = z.object({
-  cacCertificate: z.string().min(1, "Certificate of Incorporation is required"),
-  mermat: z.string().min(1, "Memart document is required"),
-  amlCompliance: z
-    .string()
-    .min(1, "AML Compliance Framework document is required"),
-  operationalLicense: z
-    .string()
-    .min(1, "Operational License document is required")
-    .nullable()
-    .optional(),
+  cacCertificate: z.string(),
+  mermat: z.string(),
+  amlCompliance: z.string(),
+  operationalLicense: z.string().nullable().optional(),
 });
 
 export const onboardingSchema = onboardingBasicInfoSchema

@@ -18,6 +18,14 @@ import { ReferenceData } from "./types";
 
 const questAxios = createAxiosInstance("questionnaire");
 
+const nameError = (value: string | undefined, label: string, formError: React.ReactNode) => {
+  const raw = value ?? "";
+  if (raw.length > 50) return `${label} cannot exceed 50 characters`;
+  if (raw.length > 0 && raw.trim().length === 0) return `${label} cannot be only spaces`;
+  if (raw.length > 0 && raw.length < 2) return `${label} must be at least 2 characters`;
+  return formError;
+};
+
 interface AddDirectorsInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
@@ -173,11 +181,11 @@ export const AddDirectorsInfo = ({
               standard={noFloatingLabel}
               key={form.key(`directors.${index}.first_name`)}
               {...form.getInputProps(`directors.${index}.first_name`)}
-              error={
-                (form.values.directors[index]?.first_name?.length ?? 0) > 50
-                  ? "Director's first name cannot exceed 50 characters"
-                  : form.errors[`directors.${index}.first_name`]
-              }
+              error={nameError(
+                form.values.directors[index]?.first_name,
+                "Director's first name",
+                form.errors[`directors.${index}.first_name`]
+              )}
             />
             <TextInputWithInsideLabel
               label="Last Name"
@@ -185,11 +193,11 @@ export const AddDirectorsInfo = ({
               standard={noFloatingLabel}
               key={form.key(`directors.${index}.last_name`)}
               {...form.getInputProps(`directors.${index}.last_name`)}
-              error={
-                (form.values.directors[index]?.last_name?.length ?? 0) > 50
-                  ? "Director's last name cannot exceed 50 characters"
-                  : form.errors[`directors.${index}.last_name`]
-              }
+              error={nameError(
+                form.values.directors[index]?.last_name,
+                "Director's last name",
+                form.errors[`directors.${index}.last_name`]
+              )}
             />
           </Flex>
 
@@ -208,6 +216,15 @@ export const AddDirectorsInfo = ({
               maxDate={new Date()}
               key={form.key(`directors.${index}.date_of_birth`)}
               {...form.getInputProps(`directors.${index}.date_of_birth`)}
+              error={(() => {
+                const dob = form.values.directors[index]?.date_of_birth;
+                if (!dob) return form.errors[`directors.${index}.date_of_birth`];
+                const cutoff = new Date();
+                cutoff.setFullYear(cutoff.getFullYear() - 18);
+                return new Date(dob as string | Date) > cutoff
+                  ? "Director must be at least 18 years old"
+                  : form.errors[`directors.${index}.date_of_birth`];
+              })()}
             />
           </Flex>
 

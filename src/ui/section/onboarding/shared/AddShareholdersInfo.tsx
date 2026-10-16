@@ -18,6 +18,14 @@ import { ReferenceData } from "./types";
 
 const questAxios = createAxiosInstance("questionnaire");
 
+const nameError = (value: string | undefined, label: string, formError: React.ReactNode) => {
+  const raw = value ?? "";
+  if (raw.length > 50) return `${label} cannot exceed 50 characters`;
+  if (raw.length > 0 && raw.trim().length === 0) return `${label} cannot be only spaces`;
+  if (raw.length > 0 && raw.length < 2) return `${label} must be at least 2 characters`;
+  return formError;
+};
+
 interface AddShareholdersInfo {
   setActive: React.Dispatch<React.SetStateAction<number>>;
   active: number;
@@ -174,11 +182,11 @@ export const AddShareholdersInfo = ({
               standard={noFloatingLabel}
               key={form.key(`shareholders.${index}.first_name`)}
               {...form.getInputProps(`shareholders.${index}.first_name`)}
-              error={
-                ((form.values.shareholders ?? [])[index]?.first_name?.length ?? 0) > 50
-                  ? "Shareholder's first name cannot exceed 50 characters"
-                  : form.errors[`shareholders.${index}.first_name`]
-              }
+              error={nameError(
+                (form.values.shareholders ?? [])[index]?.first_name,
+                "Shareholder's first name",
+                form.errors[`shareholders.${index}.first_name`]
+              )}
             />
             <TextInputWithInsideLabel
               label="Last Name"
@@ -186,11 +194,11 @@ export const AddShareholdersInfo = ({
               standard={noFloatingLabel}
               key={form.key(`shareholders.${index}.last_name`)}
               {...form.getInputProps(`shareholders.${index}.last_name`)}
-              error={
-                ((form.values.shareholders ?? [])[index]?.last_name?.length ?? 0) > 50
-                  ? "Shareholder's last name cannot exceed 50 characters"
-                  : form.errors[`shareholders.${index}.last_name`]
-              }
+              error={nameError(
+                (form.values.shareholders ?? [])[index]?.last_name,
+                "Shareholder's last name",
+                form.errors[`shareholders.${index}.last_name`]
+              )}
             />
           </Flex>
 
@@ -209,6 +217,15 @@ export const AddShareholdersInfo = ({
               maxDate={new Date()}
               key={form.key(`shareholders.${index}.date_of_birth`)}
               {...form.getInputProps(`shareholders.${index}.date_of_birth`)}
+              error={(() => {
+                const dob = (form.values.shareholders ?? [])[index]?.date_of_birth;
+                if (!dob) return form.errors[`shareholders.${index}.date_of_birth`];
+                const cutoff = new Date();
+                cutoff.setFullYear(cutoff.getFullYear() - 18);
+                return new Date(dob as string | Date) > cutoff
+                  ? "Shareholder must be at least 18 years old"
+                  : form.errors[`shareholders.${index}.date_of_birth`];
+              })()}
             />
           </Flex>
 

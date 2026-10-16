@@ -37,7 +37,7 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
   const docLabel = (kind: string, fallback: string) =>
     refData.companyDocuments.find((d) => d.value === kind)?.label ?? fallback;
   const docRequired = (kind: string) =>
-    refData.companyDocuments.find((d) => d.value === kind)?.required ?? true;
+    refData.companyDocuments.find((d) => d.value === kind)?.required ?? false;
   const [mountSnapshot] = useState(() => JSON.stringify(buildSection3Body(form)));
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
@@ -45,7 +45,6 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
   const sectionBase = buildSectionBase(adminReference, 3);
 
   const isFormReady = (() => {
-    if (!form.isValid()) return false;
     const v = form.getValues();
     if (!v.cacCertificate) return false;
     if (!v.mermat) return false;
@@ -79,8 +78,22 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
   };
 
   const handleSaveAndContinue = async () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) return;
+    const v = form.getValues();
+    const errors: Record<string, string> = {};
+
+    if (docRequired("INCORPORATION_CERTIFICATE") && !v.cacCertificate)
+      errors.cacCertificate = `${docLabel("INCORPORATION_CERTIFICATE", "CAC Certificate")} is required`;
+    if (docRequired("MEMART") && !v.mermat)
+      errors.mermat = `${docLabel("MEMART", "Memart")} is required`;
+    if (docRequired("AML_FRAMEWORK") && !v.amlCompliance)
+      errors.amlCompliance = `${docLabel("AML_FRAMEWORK", "AML Compliance Framework")} is required`;
+    if (docRequired("OPERATIONAL_LICENCE") && !v.operationalLicense)
+      errors.operationalLicense = `${docLabel("OPERATIONAL_LICENCE", "Operational Licence")} is required`;
+
+    if (Object.keys(errors).length > 0) {
+      form.setErrors(errors);
+      return;
+    }
 
     if (alreadyCompleted && JSON.stringify(buildSection3Body(form)) === mountSnapshot) {
       setActive(active + 1);

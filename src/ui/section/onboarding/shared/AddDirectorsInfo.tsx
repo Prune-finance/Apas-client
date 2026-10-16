@@ -69,12 +69,16 @@ export const AddDirectorsInfo = ({
   const sectionBase = buildSectionBase(adminReference, 4);
 
   const isFormReady =
-    form.isValid() &&
+    form.getValues().directors.length > 0 &&
     form.getValues().directors.every((d) => {
+      const hasBasicFields =
+        Boolean(d.first_name?.trim()) &&
+        Boolean(d.last_name?.trim()) &&
+        Boolean(d.date_of_birth);
       const hasIdentity = Boolean(d.identityType) && Boolean(d.identityFileUrl);
       const hasIdentityBack = d.identityType === "PASSPORT" || Boolean(d.identityFileUrlBack);
       const hasPOA = Boolean(d.proofOfAddress) && Boolean(d.proofOfAddressFileUrl);
-      return hasIdentity && hasIdentityBack && hasPOA;
+      return hasBasicFields && hasIdentity && hasIdentityBack && hasPOA;
     });
 
   const handleClearForm = () => {

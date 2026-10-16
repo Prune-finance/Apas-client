@@ -71,12 +71,16 @@ export const AddShareholdersInfo = ({
   const sectionBase = buildSectionBase(adminReference, 5);
 
   const isFormReady =
-    form.isValid() &&
+    (form.getValues().shareholders ?? []).length > 0 &&
     (form.getValues().shareholders ?? []).every((s) => {
+      const hasBasicFields =
+        Boolean(s.first_name?.trim()) &&
+        Boolean(s.last_name?.trim()) &&
+        Boolean(s.date_of_birth);
       const hasIdentity = Boolean(s.identityType) && Boolean(s.identityFileUrl);
       const hasIdentityBack = s.identityType === "PASSPORT" || Boolean(s.identityFileUrlBack);
       const hasPOA = Boolean(s.proofOfAddress) && Boolean(s.proofOfAddressFileUrl);
-      return hasIdentity && hasIdentityBack && hasPOA;
+      return hasBasicFields && hasIdentity && hasIdentityBack && hasPOA;
     });
 
   const handleClearForm = () => {

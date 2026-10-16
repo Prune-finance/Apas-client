@@ -19,9 +19,10 @@ interface ReviewInfo {
   active: number;
   form: UseFormReturnType<OnboardingType>;
   title?: string;
+  readOnly?: boolean;
 }
 
-export const ReviewInfo = ({ setActive, active, form, title }: ReviewInfo) => {
+export const ReviewInfo = ({ setActive, active, form, title, readOnly }: ReviewInfo) => {
   return (
     <Box>
       <Text c="var(--prune-text-gray-700)" fz={16} fw={700}>
@@ -42,7 +43,7 @@ export const ReviewInfo = ({ setActive, active, form, title }: ReviewInfo) => {
         ))}
       </TabsComponent>
 
-      {active === 5 && (
+      {active === 5 && !readOnly && (
         <Flex align="center" justify="flex-end" w="100%" mt={20}>
           <Flex align="center" justify="center" gap={20}>
             <SecondaryBtn

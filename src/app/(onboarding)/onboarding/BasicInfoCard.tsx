@@ -63,7 +63,7 @@ function BasicInfoCard({ setActive, form }: BasicInfoCard) {
               ta="right"
               fz={12}
               tt="none"
-              style={{ flex: 1, wordBreak: "break-word" }}
+              style={{ flex: 1, wordBreak: "break-word", overflowWrap: "anywhere", minWidth: 0 }}
             >
               {value}
             </Text>

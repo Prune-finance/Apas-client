@@ -297,6 +297,7 @@ export default function Onboarding() {
                   active={active}
                   form={form}
                   title="Summary"
+                  readOnly
                 />
               </Box>
             ) : (
@@ -395,6 +396,7 @@ export default function Onboarding() {
                       active={active}
                       form={form}
                       title="Summary"
+                      readOnly
                     />
                   </Box>
                 )}

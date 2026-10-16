@@ -1,7 +1,8 @@
 "use client";
 
 import { Alert, Box, Flex, Loader, ThemeIcon } from "@mantine/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { CustomPaper } from "../CustomPaper";
 import Navbar from "../Navbar";
 import {
@@ -107,6 +108,10 @@ function parseDDMMYYYY(dateStr: string | null | undefined): Date | null {
 }
 
 export default function Onboarding() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const syncingFromUrl = useRef(false);
+
   const [active, setActive] = useState(0);
   const [showReview, setShowReview] = useState(false);
   const [reference, setReference] = useState<string | null>(null);
@@ -115,6 +120,26 @@ export default function Onboarding() {
     useState<OnboardingType["shareholders"]>();
   const { setBusiness, setData } = OnboardingStore();
   const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
+
+  // Push a history entry whenever the user moves between steps
+  useEffect(() => {
+    if (syncingFromUrl.current) {
+      syncingFromUrl.current = false;
+      return;
+    }
+    router.push(`?step=${active}`, { scroll: false });
+  }, [active]);
+
+  // Restore active from URL when the browser back/forward button is used
+  useEffect(() => {
+    const stepParam = searchParams.get("step");
+    if (stepParam === null) return;
+    const step = parseInt(stepParam, 10);
+    if (!isNaN(step) && step >= 0 && step !== active) {
+      syncingFromUrl.current = true;
+      setActive(step);
+    }
+  }, [searchParams]);
 
   const form = useForm<OnboardingType>({
     mode: "controlled",

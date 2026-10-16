@@ -36,6 +36,20 @@ export interface MaxValueAllVirtualAccounts {
   annually: number;
 }
 
+export interface AdminVirtualAccounts {
+  id: string;
+  profileId: string;
+  dayOneAccounts: number;
+  fullCapacityAccounts: number;
+  singleAccountMaxDaily: string | number;
+  singleAccountMaxMonthly: string | number;
+  singleAccountMaxAnnually: string | number;
+  allAccountsMaxDaily: string | number;
+  allAccountsMaxMonthly: string | number;
+  allAccountsMaxAnnually: string | number;
+  highestTransactionCount: number;
+}
+
 export interface OnboardingBusiness {
   id: string;
   businessName: string | null;
@@ -97,7 +111,7 @@ export interface OnboardingBusiness {
   token: string;
   status: STAGE;
   services: Service[];
-  virtualAccounts: VirtualAccounts;
+  virtualAccounts: AdminVirtualAccounts;
   operationsAccounts: OperationsAccounts;
   annualTurnover: null | string;
 }

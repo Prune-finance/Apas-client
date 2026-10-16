@@ -6,9 +6,9 @@ import Photo5 from "@/assets/questionnaire/questionnaire5.png";
 import Icon from "@/assets/LogoWhite.png";
 import { BackgroundImage, Group, Image, Stack, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 
-export default function Navbar() {
+function NavbarContent() {
   const searchParams = useSearchParams();
   const stepParam = searchParams?.get("step");
   const step = stepParam !== null ? parseInt(stepParam, 10) : null;
@@ -43,6 +43,20 @@ export default function Navbar() {
         </Stack>
       </Stack>
     </BackgroundImage>
+  );
+}
+
+export default function Navbar() {
+  return (
+    <Suspense fallback={
+      <BackgroundImage src={Photo1.src} w="100%" h="100vh" p={32}>
+        <Group gap={8} wrap="nowrap">
+          <Image src={Icon.src} h={36} alt="prune logo" fit="contain" />
+        </Group>
+      </BackgroundImage>
+    }>
+      <NavbarContent />
+    </Suspense>
   );
 }
 

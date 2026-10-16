@@ -4,31 +4,19 @@ import Photo3 from "@/assets/questionnaire/questionnaire3.png";
 import Photo4 from "@/assets/questionnaire/questionnaire4.png";
 import Photo5 from "@/assets/questionnaire/questionnaire5.png";
 import Icon from "@/assets/LogoWhite.png";
-import { BackgroundImage, Box, Group, Image, Stack, Text } from "@mantine/core";
-import { useParams } from "next/navigation";
+import { BackgroundImage, Group, Image, Stack, Text } from "@mantine/core";
+import { useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 
 export default function Navbar() {
-  const { slug } = useParams();
-  const isServices = slug && slug[0] === "services";
-  const isOperationsAccount = isServices && slug[1] === "operations-account";
-  const isVirtualAccount = isServices && slug[1] === "virtual-account";
+  const searchParams = useSearchParams();
+  const stepParam = searchParams?.get("step");
+  const step = stepParam !== null ? parseInt(stepParam, 10) : null;
 
   const selectedTestimonial = useMemo(() => {
-    switch (true) {
-      case slug === undefined:
-        return navBarPhotos[0];
-      case isOperationsAccount:
-        return navBarPhotos[2];
-      case isVirtualAccount:
-        return navBarPhotos[3];
-      case isServices:
-        return navBarPhotos[1];
-      default:
-        return navBarPhotos[4];
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug?.[0], slug?.[1], isOperationsAccount, isServices]);
+    if (step === null || isNaN(step) || step < 0 || step > 4) return navBarPhotos[0];
+    return navBarPhotos[step];
+  }, [step]);
 
   return (
     <BackgroundImage

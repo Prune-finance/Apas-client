@@ -95,23 +95,15 @@ function adaptQuestionnaire(data: QuestionnaireDetail | null): OnboardingBusines
       currencies: s.currencies,
     })),
     virtualAccounts: {
-      day_one_requirement: va?.dayOneAccounts ?? 0,
-      total_number_of_virtual_accounts: va?.fullCapacityAccounts ?? 0,
-      max_value_per_transaction: {
-        daily: Number(va?.singleAccountMaxDaily ?? 0),
-        monthly: Number(va?.singleAccountMaxMonthly ?? 0),
-        annually: Number(va?.singleAccountMaxAnnually ?? 0),
-      },
-      max_value_all_virtual_accounts: {
-        daily: Number(va?.allAccountsMaxDaily ?? 0),
-        monthly: Number(va?.allAccountsMaxMonthly ?? 0),
-        annually: Number(va?.allAccountsMaxAnnually ?? 0),
-      },
-      total_highest_transaction_count: {
-        daily: va?.highestTransactionCount ?? 0,
-        monthly: 0,
-        annually: 0,
-      },
+      dayOneAccounts: va?.dayOneAccounts ?? 0,
+      fullCapacityAccounts: va?.fullCapacityAccounts ?? 0,
+      singleAccountMaxDaily: va?.singleAccountMaxDaily ?? 0,
+      singleAccountMaxMonthly: va?.singleAccountMaxMonthly ?? 0,
+      singleAccountMaxAnnually: va?.singleAccountMaxAnnually ?? 0,
+      allAccountsMaxDaily: va?.allAccountsMaxDaily ?? 0,
+      allAccountsMaxMonthly: va?.allAccountsMaxMonthly ?? 0,
+      allAccountsMaxAnnually: va?.allAccountsMaxAnnually ?? 0,
+      highestTransactionCount: va?.highestTransactionCount ?? 0,
     },
     operationsAccounts: {
       estimated_balance: a.operationsBalance ?? "",

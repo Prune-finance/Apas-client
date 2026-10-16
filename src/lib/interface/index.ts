@@ -37,8 +37,8 @@ export interface MaxValueAllVirtualAccounts {
 }
 
 export interface AdminVirtualAccounts {
-  id: string;
-  profileId: string;
+  id?: string;
+  profileId?: string;
   dayOneAccounts: number;
   fullCapacityAccounts: number;
   singleAccountMaxDaily: string | number;

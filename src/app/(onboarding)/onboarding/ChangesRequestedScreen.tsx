@@ -106,8 +106,12 @@ export default function ChangesRequestedScreen({ profile, onRefresh, onSuccess }
   const allUploaded = uploadedCount >= rejected && rejected > 0;
 
   const handleReplaced = (sectionKey: string) => {
-    setUploaded((prev) => { const next = new Set(prev); next.add(sectionKey); return next; });
-    onRefresh();
+    setUploaded((prev) => {
+      const next = new Set(prev);
+      next.add(sectionKey);
+      if (next.size >= rejected) onRefresh();
+      return next;
+    });
   };
 
   const handleSubmit = async () => {

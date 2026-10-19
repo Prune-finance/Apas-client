@@ -288,7 +288,7 @@ export default function SingleEligibilityBusiness() {
             </div>
           )}
 
-          {isOnboardingApp && appStatus === "SUBMITTED" && (
+          {isOnboardingApp && (appStatus === "SUBMITTED" || appStatus === "RESUBMITTED") && (
             <div className={styles.header__right}>
               <PrimaryBtn
                 text="Reject Business"

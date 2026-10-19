@@ -36,7 +36,7 @@ export const formatNumber = (
 export const activeBadgeColor = (status: string) => {
   if (status === "ACTIVE" || status === "ONBOARDED") return "#12B76A";
   if (status === "FROZEN") return "#344054";
-  if (status === "PENDING" || status === "IN_PROGRESS" || status === "ONBOARDING") return "#C6A700";
+  if (status === "PENDING" || status === "IN_PROGRESS" || status === "ONBOARDING" || status === "RESUBMITTED") return "#C6A700";
   if (status === "SUBMITTED") return "#1570EF";
   if (status === "ACTIVATION_SENT" || status === "ONBOARDING_INVITED") return "var(--prune-primary-700)";
   return "#D92D20";

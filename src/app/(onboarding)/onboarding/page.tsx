@@ -16,6 +16,7 @@ import {
   DEFAULT_REF_DATA,
 } from "@/ui/section/onboarding/shared";
 import { ReviewInfo } from "./ReviewInfo";
+import ChangesRequestedScreen from "./ChangesRequestedScreen";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   CEOSchema,
@@ -32,7 +33,14 @@ import useAxios from "@/lib/hooks/useAxios";
 import countries from "@/assets/countries.json";
 
 
-interface OnboardingProfile {
+export interface ProfileDocFile {
+  id: string;
+  kind: string;
+  fileName: string;
+  review?: { status: string; reason?: string; fix?: string } | null;
+}
+
+export interface OnboardingProfile {
   reference: string;
   email: string;
   status: string;
@@ -65,31 +73,50 @@ interface OnboardingProfile {
     phoneNumber: string;
     identityType: string | null;
     proofOfAddressType: string | null;
-    identityDocument: { id: string; kind: string; fileName: string } | null;
-    proofOfAddressDocument: { id: string; kind: string; fileName: string } | null;
+    identityDocument: ProfileDocFile | null;
+    proofOfAddressDocument: ProfileDocFile | null;
   };
   ceo: {
     firstName: string;
     lastName: string;
     email: string;
-    phoneCountryCode: string;
-    phoneNumber: string;
+    phoneCountryCode: string | null;
+    phoneNumber: string | null;
     dateOfBirth: string | null;
     identityType: string | null;
     proofOfAddressType: string | null;
-    identityDocument: { id: string; kind: string; fileName: string } | null;
-    identityDocumentBack: { id: string; kind: string; fileName: string } | null;
-    proofOfAddressDocument: { id: string; kind: string; fileName: string } | null;
+    identityDocument: ProfileDocFile | null;
+    identityDocumentBack: ProfileDocFile | null;
+    proofOfAddressDocument: ProfileDocFile | null;
   } | null;
   documents: {
-    incorporationCertificate: { id: string; kind: string; fileName: string } | null;
-    memart: { id: string; kind: string; fileName: string } | null;
-    amlFramework: { id: string; kind: string; fileName: string } | null;
-    operationalLicence: { id: string; kind: string; fileName: string } | null;
+    incorporationCertificate: ProfileDocFile | null;
+    memart: ProfileDocFile | null;
+    amlFramework: ProfileDocFile | null;
+    operationalLicence: ProfileDocFile | null;
   };
-  directors: any[];
-  shareholders: any[];
-  consent: any | null;
+  directors: {
+    firstName: string; lastName: string; email: string;
+    dateOfBirth: string | null;
+    identityType: string | null; proofOfAddressType: string | null;
+    identityDocument: ProfileDocFile | null;
+    identityDocumentBack: ProfileDocFile | null;
+    proofOfAddressDocument: ProfileDocFile | null;
+  }[];
+  shareholders: {
+    firstName: string; lastName: string; email: string;
+    dateOfBirth: string | null;
+    identityType: string | null; proofOfAddressType: string | null;
+    identityDocument: ProfileDocFile | null;
+    identityDocumentBack: ProfileDocFile | null;
+    proofOfAddressDocument: ProfileDocFile | null;
+  }[];
+  consent: {
+    signedBy: string;
+    designation: string;
+    signature: string;
+    email: string;
+  } | null;
   documentReview: {
     state: string;
     total: number;
@@ -287,6 +314,11 @@ function OnboardingPage() {
               <Flex justify="center" align="center" h={300}>
                 <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />
               </Flex>
+            ) : profile?.status === "PENDING_CUSTOMER" && profile?.documentReview?.state === "CHANGES_REQUESTED" ? (
+              <ChangesRequestedScreen
+                profile={profile}
+                onSuccess={() => setShowReview(true)}
+              />
             ) : profile?.documentReview?.state === "IN_REVIEW" || showReview ? (
               <Box>
                 <Alert

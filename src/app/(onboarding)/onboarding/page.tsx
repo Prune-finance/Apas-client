@@ -190,7 +190,7 @@ function OnboardingPage() {
     onSuccess: (data) => setRefData(data),
   });
 
-  const { data: profile, loading: profileLoading } = useAxios<OnboardingProfile>({
+  const { data: profile, loading: profileLoading, queryFn: refreshProfile } = useAxios<OnboardingProfile>({
     baseURL: "questionnaire",
     endpoint: "/business/onboarding/profile",
     method: "GET",
@@ -317,6 +317,7 @@ function OnboardingPage() {
             ) : profile?.status === "PENDING_CUSTOMER" && profile?.documentReview?.state === "CHANGES_REQUESTED" ? (
               <ChangesRequestedScreen
                 profile={profile}
+                onRefresh={refreshProfile}
                 onSuccess={() => setShowReview(true)}
               />
             ) : profile?.documentReview?.state === "IN_REVIEW" || showReview ? (

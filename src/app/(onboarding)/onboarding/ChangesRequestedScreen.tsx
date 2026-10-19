@@ -15,6 +15,7 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconExclamationMark } from "@tabler/icons-react";
+import { FiFileText } from "react-icons/fi";
 import Image from "next/image";
 import { useState } from "react";
 import PDFICON from "@/assets/pdf-icon.png";
@@ -22,7 +23,6 @@ import { PrimaryBtn } from "@/ui/components/Buttons";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { isAxiosError } from "axios";
-import SubmitOnboardingModal from "@/ui/section/onboarding/shared/SubmitOnboardingModal";
 import FileDisplay from "@/ui/components/DocumentViewer";
 import type { OnboardingProfile, ProfileDocFile } from "./page";
 
@@ -31,7 +31,7 @@ const questAxios = createAxiosInstance("questionnaire");
 interface RejectedDocEntry {
   sectionKey: string;
   label: string;
-  docId: string;
+  docId: string;          // current document UUID (used in replace endpoint)
   fileName: string;
   kind: string;
   reason: string;
@@ -88,141 +88,47 @@ function collectRejectedDocs(profile: OnboardingProfile): RejectedDocEntry[] {
   return docs;
 }
 
-async function saveAffectedSections(
-  profile: OnboardingProfile,
-  newFileIds: Record<string, string>
-) {
-  const companyKeys = ["incorporationCertificate", "memart", "amlFramework", "operationalLicence"];
-  const ceoKeys = ["ceoIdentity", "ceoIdentityBack", "ceoPOA"];
-  const cpKeys = ["contactPersonIdentity", "contactPersonPOA"];
-
-  if (companyKeys.some((k) => newFileIds[k])) {
-    await questAxios.patch("/business/onboarding/sections/3", {
-      incorporationCertificateId: newFileIds["incorporationCertificate"] || profile.documents.incorporationCertificate?.id || null,
-      memartId: newFileIds["memart"] || profile.documents.memart?.id || null,
-      amlFrameworkId: newFileIds["amlFramework"] || profile.documents.amlFramework?.id || null,
-      operationalLicenceId: newFileIds["operationalLicence"] || profile.documents.operationalLicence?.id || null,
-    });
-  }
-
-  if (ceoKeys.some((k) => newFileIds[k]) && profile.ceo) {
-    await questAxios.patch("/business/onboarding/sections/2", {
-      firstName: profile.ceo.firstName,
-      lastName: profile.ceo.lastName,
-      email: profile.ceo.email,
-      dateOfBirth: profile.ceo.dateOfBirth,
-      identityType: profile.ceo.identityType || undefined,
-      proofOfAddressType: profile.ceo.proofOfAddressType || undefined,
-      identityDocumentId: newFileIds["ceoIdentity"] || profile.ceo.identityDocument?.id || undefined,
-      identityDocumentBackId: newFileIds["ceoIdentityBack"] || profile.ceo.identityDocumentBack?.id || undefined,
-      proofOfAddressDocumentId: newFileIds["ceoPOA"] || profile.ceo.proofOfAddressDocument?.id || undefined,
-    });
-  }
-
-  if (cpKeys.some((k) => newFileIds[k])) {
-    await questAxios.patch("/business/onboarding/sections/1", {
-      contactPerson: {
-        firstName: profile.contactPerson.firstName,
-        lastName: profile.contactPerson.lastName,
-        email: profile.contactPerson.email,
-        phoneCountryCode: profile.contactPerson.phoneCountryCode,
-        phoneNumber: profile.contactPerson.phoneNumber,
-        identityType: profile.contactPerson.identityType || undefined,
-        proofOfAddressType: profile.contactPerson.proofOfAddressType || undefined,
-        identityDocumentId: newFileIds["contactPersonIdentity"] || profile.contactPerson.identityDocument?.id || undefined,
-        proofOfAddressDocumentId: newFileIds["contactPersonPOA"] || profile.contactPerson.proofOfAddressDocument?.id || undefined,
-      },
-    });
-  }
-
-  if (Object.keys(newFileIds).some((k) => k.startsWith("director_"))) {
-    await questAxios.patch("/business/onboarding/sections/4", {
-      directors: (profile.directors ?? []).map((d, i) => ({
-        firstName: d.firstName,
-        lastName: d.lastName,
-        email: d.email,
-        dateOfBirth: d.dateOfBirth,
-        identityType: d.identityType || undefined,
-        proofOfAddressType: d.proofOfAddressType || undefined,
-        identityDocumentId: newFileIds[`director_${i}_identity`] || d.identityDocument?.id || undefined,
-        identityDocumentBackId: newFileIds[`director_${i}_identityBack`] || d.identityDocumentBack?.id || undefined,
-        proofOfAddressDocumentId: newFileIds[`director_${i}_poa`] || d.proofOfAddressDocument?.id || undefined,
-      })),
-    });
-  }
-
-  if (Object.keys(newFileIds).some((k) => k.startsWith("shareholder_"))) {
-    await questAxios.patch("/business/onboarding/sections/5", {
-      shareholders: (profile.shareholders ?? []).map((s, i) => ({
-        firstName: s.firstName,
-        lastName: s.lastName,
-        email: s.email,
-        dateOfBirth: s.dateOfBirth,
-        identityType: s.identityType || undefined,
-        proofOfAddressType: s.proofOfAddressType || undefined,
-        identityDocumentId: newFileIds[`shareholder_${i}_identity`] || s.identityDocument?.id || undefined,
-        proofOfAddressDocumentId: newFileIds[`shareholder_${i}_poa`] || s.proofOfAddressDocument?.id || undefined,
-      })),
-    });
-  }
-}
-
 interface ChangesRequestedScreenProps {
   profile: OnboardingProfile;
+  onRefresh: () => void;
   onSuccess: () => void;
 }
 
-export default function ChangesRequestedScreen({ profile, onSuccess }: ChangesRequestedScreenProps) {
+export default function ChangesRequestedScreen({ profile, onRefresh, onSuccess }: ChangesRequestedScreenProps) {
   const { handleError } = useNotification();
-  const [submitOpened, { open: openSubmit, close: closeSubmit }] = useDisclosure(false);
-  const [saving, setSaving] = useState(false);
-  const [uploading, setUploading] = useState<Record<string, boolean>>({});
-  const [newFileIds, setNewFileIds] = useState<Record<string, string>>({});
-  const [newFileNames, setNewFileNames] = useState<Record<string, string>>({});
+  const [submitting, setSubmitting] = useState(false);
+  const [uploaded, setUploaded] = useState<Set<string>>(new Set());
 
   const rejectedDocs = collectRejectedDocs(profile);
   const { total = 0, approved = 0, rejected = 0 } = profile.documentReview ?? {};
-  const uploadedCount = Object.keys(newFileIds).length;
+  const uploadedCount = uploaded.size;
   const remainingCount = rejected - uploadedCount;
+  const allUploaded = uploadedCount >= rejected && rejected > 0;
 
-  const handleReupload = async (sectionKey: string, kind: string, file: File | null) => {
-    if (!file) return;
-    setUploading((prev) => ({ ...prev, [sectionKey]: true }));
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("kind", kind);
-      const { data } = await questAxios.post("/business/onboarding/files", formData);
-      const newId = data.data.id;
-      const newName = file.name;
-      setNewFileIds((prev) => ({ ...prev, [sectionKey]: newId }));
-      setNewFileNames((prev) => ({ ...prev, [sectionKey]: newName }));
-    } catch (error) {
-      handleError(
-        "Upload failed",
-        isAxiosError(error) ? error.response?.data?.message : "Failed to upload document"
-      );
-    } finally {
-      setUploading((prev) => ({ ...prev, [sectionKey]: false }));
-    }
+  const handleReplaced = (sectionKey: string) => {
+    setUploaded((prev) => { const next = new Set(prev); next.add(sectionKey); return next; });
+    onRefresh();
   };
 
-  const handleSubmitClick = async () => {
-    if (Object.keys(newFileIds).length === 0) {
-      openSubmit();
-      return;
-    }
-    setSaving(true);
+  const handleSubmit = async () => {
+    if (!profile.consent) return;
+    setSubmitting(true);
     try {
-      await saveAffectedSections(profile, newFileIds);
-      openSubmit();
+      await questAxios.post("/business/onboarding/submit", {
+        acceptTerms: true,
+        signedBy: profile.consent.signedBy,
+        designation: profile.consent.designation,
+        signature: profile.consent.signature,
+        email: profile.consent.email,
+      });
+      onSuccess();
     } catch (error) {
       handleError(
-        "Save failed",
-        isAxiosError(error) ? error.response?.data?.message : "Failed to save documents"
+        "Submission failed",
+        isAxiosError(error) ? error.response?.data?.message : "An error occurred"
       );
     } finally {
-      setSaving(false);
+      setSubmitting(false);
     }
   };
 
@@ -241,7 +147,6 @@ export default function ChangesRequestedScreen({ profile, onSuccess }: ChangesRe
         styles={{
           root: { background: "#FFF9E6" },
           title: { color: "var(--prune-text-gray-700)", fontSize: "14px", fontWeight: 700 },
-          message: { color: "var(--prune-text-gray-500)", fontSize: "12px", fontWeight: 400 },
         }}
       >
         Some of your documents were not approved
@@ -256,17 +161,17 @@ export default function ChangesRequestedScreen({ profile, onSuccess }: ChangesRe
           boxShadow: "0px 4px 8px -2px rgba(23,23,23,0.1), 0px 2px 4px -2px rgba(23,23,23,0.06)",
         }}
       >
-        {/* Card header */}
         <Flex align="center" justify="space-between" px={24} py={20}>
           <Text fz={24} fw={500} c="var(--prune-text-gray-800)">
             Documents
           </Text>
           <Text fz={16} fw={500} c="#667085">
-            {remainingCount > 0 ? `${remainingCount} document${remainingCount !== 1 ? "s" : ""} left` : "All documents uploaded"}
+            {remainingCount > 0
+              ? `${remainingCount} document${remainingCount !== 1 ? "s" : ""} left`
+              : "All documents uploaded"}
           </Text>
         </Flex>
 
-        {/* Progress bar */}
         <Progress
           value={total > 0 ? ((approved + uploadedCount) / total) * 100 : 0}
           color="var(--prune-primary-700)"
@@ -274,16 +179,13 @@ export default function ChangesRequestedScreen({ profile, onSuccess }: ChangesRe
           size={4}
         />
 
-        {/* Rejected docs list */}
         <Box px={24} py={24}>
           {rejectedDocs.map((doc, idx) => (
             <RejectedDocRow
               key={doc.sectionKey}
               doc={doc}
-              uploading={!!uploading[doc.sectionKey]}
-              newFileName={newFileNames[doc.sectionKey]}
-              newFileId={newFileIds[doc.sectionKey]}
-              onReupload={(file) => handleReupload(doc.sectionKey, doc.kind, file)}
+              isUploaded={uploaded.has(doc.sectionKey)}
+              onReplaced={() => handleReplaced(doc.sectionKey)}
               showDivider={idx < rejectedDocs.length - 1}
             />
           ))}
@@ -295,41 +197,59 @@ export default function ChangesRequestedScreen({ profile, onSuccess }: ChangesRe
         </Box>
       </Box>
 
-      {/* Submit button */}
+      {/* Submit row */}
       <Flex justify="flex-end" mt={24} pt={20} style={{ borderTop: "1px solid #EAECF0" }}>
         <PrimaryBtn
           text="Submit"
           fw={600}
           w={126}
-          action={handleSubmitClick}
-          loading={saving}
+          action={handleSubmit}
+          loading={submitting}
           loaderProps={{ type: "dots" }}
+          disabled={!allUploaded}
         />
       </Flex>
-
-      <SubmitOnboardingModal
-        opened={submitOpened}
-        close={closeSubmit}
-        onSuccess={onSuccess}
-      />
     </Box>
   );
 }
 
 interface RejectedDocRowProps {
   doc: RejectedDocEntry;
-  uploading: boolean;
-  newFileName?: string;
-  newFileId?: string;
-  onReupload: (file: File | null) => void;
+  isUploaded: boolean;
+  onReplaced: () => void;
   showDivider: boolean;
 }
 
-function RejectedDocRow({ doc, uploading, newFileName, newFileId, onReupload, showDivider }: RejectedDocRowProps) {
+function RejectedDocRow({ doc, isUploaded, onReplaced, showDivider }: RejectedDocRowProps) {
+  const { handleError } = useNotification();
+  const [uploading, setUploading] = useState(false);
+  const [uploadedFileName, setUploadedFileName] = useState("");
+
+  // View state
   const [viewOpened, { open: openView, close: closeView }] = useDisclosure(false);
   const [resolving, setResolving] = useState(false);
   const [resolvedUrl, setResolvedUrl] = useState("");
   const [resolvedContentType, setResolvedContentType] = useState("");
+
+  const handleReplace = async (file: File | null) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("kind", doc.kind);
+      await questAxios.post(`/business/onboarding/documents/${doc.docId}/replace`, formData);
+      setUploadedFileName(file.name);
+      onReplaced();
+    } catch (error) {
+      handleError(
+        "Upload failed",
+        isAxiosError(error) ? error.response?.data?.message : "Failed to replace document"
+      );
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleView = async () => {
     if (resolving) return;
@@ -347,116 +267,138 @@ function RejectedDocRow({ doc, uploading, newFileName, newFileId, onReupload, sh
     }
   };
 
-  const displayFileName = newFileName || doc.fileName;
-  const isReuploaded = !!newFileId;
-
   return (
     <>
-      <Box py={4}>
-        <Text fz={12} c="#667085" mb={10}>
-          {doc.label}
-        </Text>
+      {isUploaded ? (
+        /* ── After upload: show file row with View + Re-upload ── */
+        <Box py={4}>
+          <Text fz={12} c="#667085" mb={10}>{doc.label}</Text>
+          <Flex
+            align="center"
+            justify="space-between"
+            bg="#FCFCFD"
+            h={44}
+            px={12}
+            style={{ borderRadius: 4, border: "1px solid #EAECF0" }}
+          >
+            <Flex align="center" gap={8} style={{ minWidth: 0, flex: 1 }}>
+              <Image src={PDFICON.src} alt="document" width={16} height={16} style={{ flexShrink: 0 }} />
+              <Text fz={13} c="#344054" truncate style={{ flex: 1 }}>
+                {uploadedFileName || doc.fileName}
+              </Text>
+            </Flex>
 
-        <Flex
-          align="center"
-          justify="space-between"
-          bg="#FCFCFD"
-          h={44}
-          px={12}
-          style={{ borderRadius: 4, border: "1px solid #EAECF0" }}
-        >
-          <Flex align="center" gap={8} style={{ minWidth: 0, flex: 1 }}>
-            <Image src={PDFICON.src} alt="document" width={16} height={16} style={{ flexShrink: 0 }} />
-            <Text fz={13} c="#344054" truncate style={{ flex: 1 }}>
-              {displayFileName}
-            </Text>
-          </Flex>
-
-          <Flex align="center" gap={6} style={{ flexShrink: 0 }}>
-            {isReuploaded && (
-              <Box
-                px={8}
-                py={2}
-                style={{ borderRadius: 9999, backgroundColor: "#D1FAE5" }}
-              >
+            <Flex align="center" gap={6} style={{ flexShrink: 0 }}>
+              <Box px={8} py={2} style={{ borderRadius: 9999, backgroundColor: "#D1FAE5" }}>
                 <Text fz={10} fw={600} c="#059669">Uploaded</Text>
               </Box>
-            )}
 
-            <UnstyledButton
-              onClick={handleView}
-              py={4}
-              px={8}
-              style={{
-                borderRadius: 4,
-                backgroundColor: "#D0D5DD",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                minWidth: 46,
-                cursor: resolving ? "not-allowed" : "pointer",
-              }}
-            >
-              {resolving ? (
-                <Loader size={12} color="#667085" type="dots" />
-              ) : (
-                <Text fw={600} fz={10} c="#667085">View</Text>
-              )}
-            </UnstyledButton>
+              <UnstyledButton
+                onClick={handleView}
+                py={4}
+                px={8}
+                style={{
+                  borderRadius: 4,
+                  backgroundColor: "#D0D5DD",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: 46,
+                  cursor: resolving ? "not-allowed" : "pointer",
+                }}
+              >
+                {resolving ? (
+                  <Loader size={12} color="#667085" type="dots" />
+                ) : (
+                  <Text fw={600} fz={10} c="#667085">View</Text>
+                )}
+              </UnstyledButton>
 
-            <FileButton onChange={onReupload} accept="image/png,image/jpeg,application/pdf">
-              {(props) => (
-                <UnstyledButton
-                  {...props}
-                  py={4}
-                  px={8}
-                  style={{
-                    borderRadius: 4,
-                    backgroundColor: uploading ? "#E8F5A3" : "var(--prune-primary-700)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: uploading ? "not-allowed" : "pointer",
-                    minWidth: 70,
-                  }}
-                >
-                  {uploading ? (
-                    <Loader size={12} color="#667085" type="dots" />
-                  ) : (
-                    <Text fw={600} fz={10} c="#344054">Re-upload</Text>
-                  )}
-                </UnstyledButton>
-              )}
-            </FileButton>
+              <FileButton onChange={handleReplace} accept="image/png,image/jpeg,application/pdf">
+                {(props) => (
+                  <UnstyledButton
+                    {...props}
+                    py={4}
+                    px={8}
+                    style={{
+                      borderRadius: 4,
+                      backgroundColor: uploading ? "#E8F5A3" : "var(--prune-primary-700)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      minWidth: 72,
+                      cursor: uploading ? "not-allowed" : "pointer",
+                    }}
+                  >
+                    {uploading ? (
+                      <Loader size={12} color="#667085" type="dots" />
+                    ) : (
+                      <Text fw={600} fz={10} c="#344054">Re-upload</Text>
+                    )}
+                  </UnstyledButton>
+                )}
+              </FileButton>
+            </Flex>
           </Flex>
+        </Box>
+      ) : (
+        /* ── Before upload: doc name + Rejected badge + reason + Upload button ── */
+        <Flex align="center" gap={16} py={12} justify="space-between">
+          <Flex align="center" gap={16} style={{ minWidth: 0, flex: 1 }}>
+            {/* File icon */}
+            <Box
+              p={8}
+              style={{ borderRadius: 4, backgroundColor: "#FBFEE6", flexShrink: 0 }}
+            >
+              <FiFileText size={24} color="#758604" />
+            </Box>
+
+            {/* Name + reason */}
+            <Box style={{ minWidth: 0 }}>
+              <Flex align="center" gap={8} wrap="wrap">
+                <Text fz={16} fw={500} c="#344054">{doc.label}</Text>
+                <Box
+                  px={8}
+                  py={4}
+                  style={{ borderRadius: 9999, backgroundColor: "#FFF3F0", display: "flex", alignItems: "center", gap: 4 }}
+                >
+                  <Text fz={12} fw={500} c="#DB340B">Rejected</Text>
+                  <Text fz={12} c="#DB340B">×</Text>
+                </Box>
+              </Flex>
+              {(doc.reason || doc.fix) && (
+                <Text fz={12} c="#667085" mt={4}>
+                  {doc.reason || doc.fix}
+                </Text>
+              )}
+            </Box>
+          </Flex>
+
+          {/* Upload button */}
+          <FileButton onChange={handleReplace} accept="image/png,image/jpeg,application/pdf">
+            {(props) => (
+              <PrimaryBtn
+                {...props}
+                text={uploading ? "" : "Upload new document"}
+                loading={uploading}
+                loaderProps={{ type: "dots" }}
+                fw={600}
+                fz={14}
+                style={{ flexShrink: 0 }}
+              />
+            )}
+          </FileButton>
         </Flex>
+      )}
 
-        {(doc.reason || doc.fix) && (
-          <Box mt={8} px={2}>
-            {doc.reason && (
-              <Text fz={12} c="#DB340B">
-                Reason: {doc.reason}
-              </Text>
-            )}
-            {doc.fix && (
-              <Text fz={12} c="#667085" mt={2}>
-                Fix: {doc.fix}
-              </Text>
-            )}
-          </Box>
-        )}
-      </Box>
-
-      {showDivider && <Divider my={16} color="#EAECF0" />}
+      {showDivider && <Divider my={8} color="#EAECF0" />}
 
       <Modal
         opened={viewOpened}
         onClose={closeView}
         size={800}
         centered
-        title={
-          <Text fz={14} fw={500}>{displayFileName}</Text>
-        }
+        title={<Text fz={14} fw={500}>{uploadedFileName || doc.fileName}</Text>}
       >
         {resolvedUrl ? (
           <FileDisplay fileUrl={resolvedUrl} contentType={resolvedContentType} download={false} />

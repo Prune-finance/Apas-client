@@ -24,6 +24,7 @@ import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { isAxiosError } from "axios";
 import FileDisplay from "@/ui/components/DocumentViewer";
+
 import type { OnboardingProfile, ProfileDocFile } from "./page";
 
 const questAxios = createAxiosInstance("questionnaire");
@@ -95,8 +96,6 @@ interface ChangesRequestedScreenProps {
 }
 
 export default function ChangesRequestedScreen({ profile, onRefresh, onSuccess }: ChangesRequestedScreenProps) {
-  const { handleError } = useNotification();
-  const [submitting, setSubmitting] = useState(false);
   const [uploaded, setUploaded] = useState<Set<string>>(new Set());
 
   const rejectedDocs = collectRejectedDocs(profile);
@@ -109,27 +108,8 @@ export default function ChangesRequestedScreen({ profile, onRefresh, onSuccess }
     setUploaded((prev) => { const next = new Set(prev); next.add(sectionKey); return next; });
   };
 
-  const handleSubmit = async () => {
-    if (!profile.consent) return;
-    setSubmitting(true);
-    try {
-      await questAxios.post("/business/onboarding/submit", {
-        acceptTerms: true,
-        signedBy: profile.consent.signedBy,
-        designation: profile.consent.designation,
-        signature: profile.consent.signature,
-        email: profile.consent.email,
-      });
-      onRefresh();
-      onSuccess();
-    } catch (error) {
-      handleError(
-        "Submission failed",
-        isAxiosError(error) ? error.response?.data?.message : "An error occurred"
-      );
-    } finally {
-      setSubmitting(false);
-    }
+  const handleSubmit = () => {
+    window.location.reload();
   };
 
   return (
@@ -204,8 +184,6 @@ export default function ChangesRequestedScreen({ profile, onRefresh, onSuccess }
           fw={600}
           w={126}
           action={handleSubmit}
-          loading={submitting}
-          loaderProps={{ type: "dots" }}
           disabled={!allUploaded}
         />
       </Flex>
@@ -316,26 +294,16 @@ function RejectedDocRow({ doc, isUploaded, onReplaced, showDivider }: RejectedDo
 
               <FileButton onChange={handleReplace} accept="image/png,image/jpeg,application/pdf">
                 {(props) => (
-                  <UnstyledButton
+                  <PrimaryBtn
                     {...props}
-                    py={4}
-                    px={8}
-                    style={{
-                      borderRadius: 4,
-                      backgroundColor: uploading ? "#E8F5A3" : "var(--prune-primary-700)",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      minWidth: 72,
-                      cursor: uploading ? "not-allowed" : "pointer",
-                    }}
-                  >
-                    {uploading ? (
-                      <Loader size={12} color="#667085" type="dots" />
-                    ) : (
-                      <Text fw={600} fz={10} c="#344054">Re-upload</Text>
-                    )}
-                  </UnstyledButton>
+                    text="Re-upload"
+                    loading={uploading}
+                    loaderProps={{ type: "dots" }}
+                    fw={600}
+                    fz={10}
+                    h={28}
+                    px={10}
+                  />
                 )}
               </FileButton>
             </Flex>

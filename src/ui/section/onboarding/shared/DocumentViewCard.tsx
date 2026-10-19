@@ -73,7 +73,12 @@ export default function DocumentViewCard({
 
   if (!fileId) return null;
 
-  const canReview = applicationStatus === "SUBMITTED" && applicationReference && fileId;
+  const NON_REVIEWABLE = ["IN_PROGRESS", "DRAFT", "ACTIVATION_SENT", "ACTIVE"];
+  const canReview =
+    isAdmin &&
+    applicationReference &&
+    fileId &&
+    (!applicationStatus || !NON_REVIEWABLE.includes(applicationStatus));
 
   const handleView = async () => {
     if (resolving) return;

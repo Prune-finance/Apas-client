@@ -304,7 +304,7 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
               </Text>
               <Badge
                 variant="light"
-                color={progress.isComplete ? "green" : "yellow"}
+                color={progress.isComplete ? "var(--prune-primary-700)" : "yellow"}
                 fz={11}
               >
                 {progress.isComplete
@@ -328,7 +328,7 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
                             i === 0
                               ? "transparent"
                               : progress.sections[i - 1].completed
-                              ? "var(--prune-success-500)"
+                              ? "var(--prune-primary-700)"
                               : "var(--mantine-color-gray-3)",
                         }}
                       />
@@ -336,7 +336,7 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
                         size={28}
                         radius="xl"
                         color={
-                          section.completed ? "var(--prune-success-500)" : "gray"
+                          section.completed ? "var(--prune-primary-700)" : "gray"
                         }
                         variant={section.completed ? "filled" : "light"}
                         style={{ flexShrink: 0 }}
@@ -355,7 +355,7 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
                             i === progress.sections.length - 1
                               ? "transparent"
                               : section.completed
-                              ? "var(--prune-success-500)"
+                              ? "var(--prune-primary-700)"
                               : "var(--mantine-color-gray-3)",
                         }}
                       />

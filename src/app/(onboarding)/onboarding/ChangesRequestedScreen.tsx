@@ -106,12 +106,7 @@ export default function ChangesRequestedScreen({ profile, onRefresh, onSuccess }
   const allUploaded = uploadedCount >= rejected && rejected > 0;
 
   const handleReplaced = (sectionKey: string) => {
-    setUploaded((prev) => {
-      const next = new Set(prev);
-      next.add(sectionKey);
-      if (next.size >= rejected) onRefresh();
-      return next;
-    });
+    setUploaded((prev) => { const next = new Set(prev); next.add(sectionKey); return next; });
   };
 
   const handleSubmit = async () => {
@@ -125,6 +120,7 @@ export default function ChangesRequestedScreen({ profile, onRefresh, onSuccess }
         signature: profile.consent.signature,
         email: profile.consent.email,
       });
+      onRefresh();
       onSuccess();
     } catch (error) {
       handleError(

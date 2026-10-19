@@ -338,16 +338,18 @@ export default function DocumentViewCard({
               loading={downloading}
               loaderProps={{ type: "dots" }}
             />
-            {canReview && (
+            {canReview && reviewStatus !== "APPROVED" && (
               <>
-                <PrimaryBtn
-                  text="Reject"
-                  fw={600}
-                  fz={12}
-                  color="var(--prune-warning)"
-                  c="#fff"
-                  action={openRejectModal}
-                />
+                {reviewStatus !== "REJECTED" && (
+                  <PrimaryBtn
+                    text="Reject"
+                    fw={600}
+                    fz={12}
+                    color="var(--prune-warning)"
+                    c="#fff"
+                    action={openRejectModal}
+                  />
+                )}
                 <PrimaryBtn
                   text="Approve"
                   fw={600}

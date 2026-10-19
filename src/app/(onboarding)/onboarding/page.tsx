@@ -277,12 +277,12 @@ function OnboardingPage() {
     ) ?? false;
 
   return (
-    <Box style={{ minHeight: "calc(100vh - 112px)" }}>
-      <Flex gap={24} align="stretch" style={{ minHeight: "calc(100vh - 112px)" }}>
+    <Box style={{ height: "calc(100vh - 112px)", overflow: "hidden" }}>
+      <Flex gap={24} align="stretch" style={{ height: "100%" }}>
         <Navbar active={active} />
 
-        <Box flex={1} style={{ display: "flex", flexDirection: "column" }}>
-          <CustomPaper px={24} py={32} style={{ flex: 1 }}>
+        <Box flex={1} style={{ display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <CustomPaper px={24} py={32} style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
             {profileLoading ? (
               <Flex justify="center" align="center" h={300}>
                 <Loader color="rgba(151, 173, 5)" size="lg" type="dots" />

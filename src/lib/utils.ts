@@ -112,7 +112,7 @@ export const stageColor = (stage: STAGE) => {
     case "Onboarding Invited":
       return "var(--prune-primary-700)";
     case "Submitted":
-      return "#12B76A";
+      return "#1570EF";
     case "Questionnaire Completed":
       return "#12B76A";
     default:

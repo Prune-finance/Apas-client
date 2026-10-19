@@ -212,7 +212,7 @@ export const DocumentPreview = ({
 
         <Flex align="center" gap={8} style={{ flexShrink: 0 }}>
           {documentStatus && <BadgeComponent status={documentStatus} />}
-          {value && (
+          {value ? (
             <UnstyledButton
               onClick={handleView}
               py={4}
@@ -235,6 +235,10 @@ export const DocumentPreview = ({
                 </Text>
               )}
             </UnstyledButton>
+          ) : (
+            <Text fz={11} c="#98A2B3" fs="italic">
+              No document uploaded
+            </Text>
           )}
         </Flex>
       </Flex>

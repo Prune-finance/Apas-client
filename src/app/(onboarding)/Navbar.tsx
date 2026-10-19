@@ -17,7 +17,7 @@ const tips = [
 
 export default function Navbar({ active }: NavbarProps) {
   return (
-    <CustomPaper w={288} p={24} style={{ height: "100%" }}>
+    <CustomPaper w={288} p={24} style={{ height: "100%", overflow: "hidden", flexShrink: 0 }}>
       <Timeline
         active={active}
         bulletSize={24}

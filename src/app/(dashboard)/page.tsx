@@ -36,7 +36,7 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { checkToken } from "@/lib/actions/checkToken";
 import { BarChartComponent } from "@/ui/components/Charts";
 import Image from "next/image";
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import { SendMoney } from "@/ui/components/SingleAccount/(tabs)/SendMoney";
 import { useTrxAnalytics } from "@/lib/hooks/useTrxAnalytics";

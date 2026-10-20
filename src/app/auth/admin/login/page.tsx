@@ -4,7 +4,7 @@ import Image from "next/image";
 import { redirect } from "next/navigation";
 
 import styles from "@/ui/styles/auth.module.scss";
-import PruneIcon from "@/assets/icon.png";
+import PruneIcon from "@/assets/img/icon.png";
 import { inter, pjs } from "@/ui/fonts";
 import { CardOne, CardThree, CardTwo } from "./cards";
 import { checkToken } from "@/lib/actions/checkToken";

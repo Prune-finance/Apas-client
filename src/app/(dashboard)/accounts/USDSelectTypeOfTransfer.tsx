@@ -1,8 +1,8 @@
 import React from "react";
 import { Flex, Image, Stack, Text } from "@mantine/core";
 import CountryFlag from "@/ui/components/CountryFlag";
-import EarthIcon from "@/assets/earth.png";
-import ActiveMobileMoney from "@/assets/active-mm.png";
+import EarthIcon from "@/assets/img/earth.png";
+import ActiveMobileMoney from "@/assets/img/active-mm.png";
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
 
 const USDSelectTypeOfTransfer = ({

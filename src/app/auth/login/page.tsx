@@ -2,7 +2,7 @@ import { Box, Flex, Group, Stack, Text, Title } from "@mantine/core";
 import { Suspense } from "react";
 import Image from "next/image";
 
-import LogoWhite from "@/assets/LogoWhite.png";
+import LogoWhite from "@/assets/img/LogoWhite.png";
 import signInBg from "@/assets/auth-bg/sign-in.png";
 import LoginForm from "./form";
 import { checkToken } from "@/lib/actions/checkToken";

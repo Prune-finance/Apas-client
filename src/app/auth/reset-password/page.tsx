@@ -9,7 +9,7 @@ import {
   Text,
 } from "@mantine/core";
 import Image from "next/image";
-import PruneIcon from "@/assets/icon.png";
+import PruneIcon from "@/assets/img/icon.png";
 import styles from "./style.module.scss";
 import { inter } from "@/ui/fonts";
 import { PrimaryBtn } from "@/ui/components/Buttons";

@@ -2,7 +2,7 @@ import { Box, Flex, Group, Text, Title } from "@mantine/core";
 import Image from "next/image";
 
 import styles from "@/ui/styles/auth.module.scss";
-import LogoWhite from "@/assets/LogoWhite.png";
+import LogoWhite from "@/assets/img/LogoWhite.png";
 import signInBg from "@/assets/auth-bg/sign-in.png";
 
 import FormComponent from "./form";

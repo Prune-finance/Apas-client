@@ -13,7 +13,7 @@ import {
   Text,
 } from "@mantine/core";
 import React, { useState } from "react";
-import PruneIcon from "@/assets/icon.png";
+import PruneIcon from "@/assets/img/icon.png";
 import Image from "next/image";
 import CountryFlag from "@/ui/components/CountryFlag";
 import { TableComponent } from "@/ui/components/DownloadStatementTable";

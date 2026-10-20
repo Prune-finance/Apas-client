@@ -12,7 +12,7 @@ import styles from "./styles.module.scss";
 import { BackBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import SuccessModal from "@/ui/components/SuccessModal";
-import SuccessModalImage from "@/assets/success-modal-image.png";
+import SuccessModalImage from "@/assets/img/success-modal-image.png";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";

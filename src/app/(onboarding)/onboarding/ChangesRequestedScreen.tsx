@@ -18,7 +18,7 @@ import { IconExclamationMark } from "@tabler/icons-react";
 import { FiFileText } from "react-icons/fi";
 import Image from "next/image";
 import { useState } from "react";
-import PDFICON from "@/assets/pdf-icon.png";
+import PDFICON from "@/assets/img/pdf-icon.png";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";

@@ -3,7 +3,7 @@
 import { Flex, Modal, Text } from "@mantine/core";
 import Image from "next/image";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import successIcon from "@/assets/activation-success.png";
+import successIcon from "@/assets/img/activation-success.png";
 
 interface ActivationSuccessModalProps {
   opened: boolean;

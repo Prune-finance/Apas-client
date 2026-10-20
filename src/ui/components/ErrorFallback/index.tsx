@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { FallbackProps } from "react-error-boundary";
 import { useMediaQuery } from "@mantine/hooks";
-import PruneIcon from "@/assets/logo.svg";
+import PruneIcon from "@/assets/img/logo.svg";
 
 export default function ErrorFallback({
   error,

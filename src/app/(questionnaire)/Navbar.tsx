@@ -3,7 +3,7 @@ import Photo2 from "@/assets/questionnaire/questionnaire2.png";
 import Photo3 from "@/assets/questionnaire/questionnaire3.png";
 import Photo4 from "@/assets/questionnaire/questionnaire4.png";
 import Photo5 from "@/assets/questionnaire/questionnaire5.png";
-import Icon from "@/assets/LogoWhite.png";
+import Icon from "@/assets/img/LogoWhite.png";
 import { BackgroundImage, Group, Image, Stack, Text } from "@mantine/core";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useMemo } from "react";

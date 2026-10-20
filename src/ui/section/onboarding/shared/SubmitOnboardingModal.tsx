@@ -12,7 +12,7 @@ import { z } from "zod";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { useState } from "react";
-import CompleteIcon from "@/assets/CompleteOnboardingIcon.png";
+import CompleteIcon from "@/assets/img/CompleteOnboardingIcon.png";
 
 const questAxios = createAxiosInstance("questionnaire");
 

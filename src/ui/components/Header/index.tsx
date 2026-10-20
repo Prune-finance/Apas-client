@@ -24,7 +24,7 @@ import localFont from "next/font/local";
 import { Fragment, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-import AdminAvatar from "@/assets/avatar.png";
+import AdminAvatar from "@/assets/img/avatar.png";
 import styles from "./styles.module.scss";
 import User from "@/lib/store/user";
 import { checkToken, clearSession } from "@/lib/actions/checkToken";

@@ -1,5 +1,5 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import requestReceived from "@/assets/request-recieved.gif";
+import requestReceived from "@/assets/img/request-recieved.gif";
 import { Flex, Modal, Stack, Text } from "@mantine/core";
 import { useRouter } from "next/navigation";
 

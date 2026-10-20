@@ -3,7 +3,7 @@
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { IconExclamationMark, IconX } from "@tabler/icons-react";
 import styles from "./sendMoney.module.scss";
-import SendMoneyBanner from "@/assets/sendMoney-new-bg.png";
+import SendMoneyBanner from "@/assets/img/sendMoney-new-bg.png";
 
 import {
   Flex,

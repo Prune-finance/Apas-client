@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import useNotification from "@/lib/hooks/notification";
 import FileDisplay from "@/ui/components/DocumentViewer";
-import PDFICON from "@/assets/pdf-icon.png";
+import PDFICON from "@/assets/img/pdf-icon.png";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 
 import { ReactNode, useState } from "react";

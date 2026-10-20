@@ -2,7 +2,7 @@ import { Box, Flex, Group, Stack, Text, Title } from "@mantine/core";
 import Image from "next/image";
 import { Suspense } from "react";
 
-import LogoWhite from "@/assets/LogoWhite.png";
+import LogoWhite from "@/assets/img/LogoWhite.png";
 import Photo1 from "@/assets/questionnaire/questionnaire1.png";
 
 import { checkOnboardingInvite } from "@/lib/actions/server";

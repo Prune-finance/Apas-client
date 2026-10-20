@@ -20,7 +20,7 @@ const DOCUMENT_REJECTION_REASONS = [
   "Other",
 ];
 import Image from "next/image";
-import PDFICON from "@/assets/pdf-icon.png";
+import PDFICON from "@/assets/img/pdf-icon.png";
 import FileDisplay from "@/ui/components/DocumentViewer";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import createAxiosInstance from "@/lib/axios";

@@ -13,7 +13,7 @@ dayjs.extend(advancedFormat);
 
 import styles from "@/ui/styles/business.module.scss";
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";

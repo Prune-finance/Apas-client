@@ -2,7 +2,7 @@
 
 import { Box, Text, Title } from "@mantine/core";
 import Image from "next/image";
-import LogoWhite from "@/assets/LogoWhite.png";
+import LogoWhite from "@/assets/img/LogoWhite.png";
 import signInBg from "@/assets/auth-bg/sign-in.png";
 import authStyles from "@/ui/styles/auth.module.scss";
 import { PrimaryBtn } from "@/ui/components/Buttons";

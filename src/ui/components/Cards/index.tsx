@@ -24,7 +24,7 @@ import styles from "./styles.module.scss";
 import { approvedBadgeColor, formatNumber, getInitials } from "@/lib/utils";
 import dayjs from "dayjs";
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 import Image from "next/image";
 import { BadgeComponent } from "../Badge";
 import { DebitRequest } from "@/lib/hooks/requests";

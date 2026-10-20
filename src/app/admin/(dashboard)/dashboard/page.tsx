@@ -48,7 +48,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 
 dayjs.extend(advancedFormat);
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 import Image from "next/image";
 import Link from "next/link";
 import { TableComponent } from "@/ui/components/Table";

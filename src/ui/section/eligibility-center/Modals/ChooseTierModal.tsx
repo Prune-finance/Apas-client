@@ -4,6 +4,11 @@ import { Box, Divider, Flex, Modal, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { IconBuildingBank, IconBuildingStore, IconCheck } from "@tabler/icons-react";
+import Image from "next/image";
+import FlagEU from "@/assets/img/flag-eu.png";
+import FlagUS from "@/assets/img/flag-us.png";
+import FlagGB from "@/assets/img/flag-gb.png";
+import FlagNG from "@/assets/img/flag-ng.png";
 
 interface ChooseTierModalProps {
   opened: boolean;
@@ -12,15 +17,22 @@ interface ChooseTierModalProps {
   loading: boolean;
 }
 
-type CurrencyItem = { code: string; flag: string; label: string; enabled: boolean };
+const FLAG_MAP: Record<string, { src: any; alt: string }> = {
+  EUR: { src: FlagEU, alt: "EU" },
+  USD: { src: FlagUS, alt: "US" },
+  GBP: { src: FlagGB, alt: "GB" },
+  NGN: { src: FlagNG, alt: "NG" },
+};
+
+type CurrencyItem = { code: string; label: string; enabled: boolean };
 type ServiceCol = { name: string; currencies: CurrencyItem[]; included: boolean };
 
 function makeCurrencies(enabledCodes: string[]): CurrencyItem[] {
   return [
-    { code: "EUR", flag: "eu", label: "Euro", enabled: enabledCodes.includes("EUR") },
-    { code: "USD", flag: "us", label: "USD", enabled: enabledCodes.includes("USD") },
-    { code: "GBP", flag: "gb", label: "GBP", enabled: enabledCodes.includes("GBP") },
-    { code: "NGN", flag: "ng", label: "NGN", enabled: enabledCodes.includes("NGN") },
+    { code: "EUR", label: "Euro", enabled: enabledCodes.includes("EUR") },
+    { code: "USD", label: "USD", enabled: enabledCodes.includes("USD") },
+    { code: "GBP", label: "GBP", enabled: enabledCodes.includes("GBP") },
+    { code: "NGN", label: "NGN", enabled: enabledCodes.includes("NGN") },
   ];
 }
 
@@ -59,15 +71,16 @@ const TIERS: {
   },
 ];
 
-function FlagImg({ flag }: { flag: string }) {
+function FlagImg({ code }: { code: string }) {
+  const flag = FLAG_MAP[code];
+  if (!flag) return null;
   return (
-    <img
-      src={`https://flagcdn.com/16x12/${flag}.png`}
-      srcSet={`https://flagcdn.com/32x24/${flag}.png 2x`}
+    <Image
+      src={flag.src}
+      alt={flag.alt}
       width={16}
-      height={12}
-      alt={flag}
-      style={{ borderRadius: 2, objectFit: "cover", flexShrink: 0 }}
+      height={16}
+      style={{ borderRadius: "50%", objectFit: "cover", flexShrink: 0 }}
     />
   );
 }
@@ -198,7 +211,7 @@ export default function ChooseTierModal({
                               gap={6}
                               style={{ opacity: active ? 1 : 0.35 }}
                             >
-                              <FlagImg flag={cur.flag} />
+                              <FlagImg code={cur.code} />
                               <Text fz={13} c={active ? "#344054" : "#98A2B3"}>
                                 {cur.label}
                               </Text>

@@ -241,6 +241,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             minRows={5}
             placeholder="Enter Company's Description"
             standard={noFloatingLabel}
+            maxLength={500}
             {...form.getInputProps("businessDescription")}
           />
         </Flex>

@@ -167,6 +167,7 @@ export default function BasicInfo({ form }: Props) {
         label="Business Bio"
         placeholder="Business Bio"
         classNames={{ input: styles.input, label: styles.label }}
+        maxLength={500}
         {...form.getInputProps("businessBio")}
       />
 

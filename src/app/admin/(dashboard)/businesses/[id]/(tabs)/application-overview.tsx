@@ -196,6 +196,7 @@ const ApplicationOverview = forwardRef<ApplicationOverviewHandle, Props>(
                 label="Business Description"
                 minRows={3}
                 autosize
+                maxLength={500}
                 {...bizForm.getInputProps("businessDescription")}
               />
             </GridCol>

@@ -291,7 +291,7 @@ export default function SingleEligibilityBusiness() {
           {isOnboardingApp && (appStatus === "SUBMITTED" || appStatus === "RESUBMITTED") && (
             <div className={styles.header__right}>
               <PrimaryBtn
-                text="Reject Business"
+                text="Reject"
                 fw={600}
                 fz={12}
                 h={32}
@@ -304,7 +304,7 @@ export default function SingleEligibilityBusiness() {
                 }}
               />
               <PrimaryBtn
-                text="Send Activation Link"
+                text="Approve"
                 fw={600}
                 fz={12}
                 h={32}

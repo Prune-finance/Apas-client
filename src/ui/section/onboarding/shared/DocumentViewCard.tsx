@@ -73,12 +73,7 @@ export default function DocumentViewCard({
 
   if (!fileId) return null;
 
-  const NON_REVIEWABLE = ["IN_PROGRESS", "DRAFT", "ACTIVATION_SENT", "ACTIVE"];
-  const canReview =
-    isAdmin &&
-    applicationReference &&
-    fileId &&
-    (!applicationStatus || !NON_REVIEWABLE.includes(applicationStatus));
+  const canReview = isAdmin && Boolean(applicationReference) && Boolean(fileId);
 
   const handleView = async () => {
     if (resolving) return;
@@ -259,6 +254,7 @@ export default function DocumentViewCard({
               placeholder="Enter reason"
               value={rejectReasonOther}
               onChange={(e) => setRejectReasonOther(e.currentTarget.value)}
+              maxLength={150}
             />
           )}
           <Textarea
@@ -268,6 +264,7 @@ export default function DocumentViewCard({
             onChange={(e) => setRejectFix(e.currentTarget.value)}
             minRows={3}
             autosize
+            maxLength={150}
           />
           <Flex justify="flex-end" gap={12} mt={8}>
             <Button

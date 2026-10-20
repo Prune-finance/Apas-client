@@ -12,13 +12,17 @@ interface ChooseTierModalProps {
   loading: boolean;
 }
 
-type Currency = { code: string; flag: string; label: string };
-type ServiceCol = { name: string; currencies: Currency[]; included: boolean };
+type CurrencyItem = { code: string; flag: string; label: string; enabled: boolean };
+type ServiceCol = { name: string; currencies: CurrencyItem[]; included: boolean };
 
-const EUR: Currency = { code: "EUR", flag: "eu", label: "Euro" };
-const USD: Currency = { code: "USD", flag: "us", label: "USD" };
-const GBP: Currency = { code: "GBP", flag: "gb", label: "GBP" };
-const NGN: Currency = { code: "NGN", flag: "ng", label: "NGN" };
+function makeCurrencies(enabledCodes: string[]): CurrencyItem[] {
+  return [
+    { code: "EUR", flag: "eu", label: "Euro", enabled: enabledCodes.includes("EUR") },
+    { code: "USD", flag: "us", label: "USD", enabled: enabledCodes.includes("USD") },
+    { code: "GBP", flag: "gb", label: "GBP", enabled: enabledCodes.includes("GBP") },
+    { code: "NGN", flag: "ng", label: "NGN", enabled: enabledCodes.includes("NGN") },
+  ];
+}
 
 const TIERS: {
   id: "TIER_1" | "TIER_2";
@@ -33,11 +37,11 @@ const TIERS: {
     description: "Basic business tier with remittance, account lookup, and payout services.",
     icon: <IconBuildingBank size={16} color="#667085" />,
     services: [
-      { name: "Remittance", currencies: [EUR], included: true },
-      { name: "Account Lookup", currencies: [EUR], included: true },
-      { name: "Payout Services", currencies: [EUR], included: true },
-      { name: "Operations Account", currencies: [EUR, USD, GBP, NGN], included: false },
-      { name: "Virtual Account", currencies: [EUR, USD, GBP, NGN], included: false },
+      { name: "Remittance", currencies: makeCurrencies(["EUR"]), included: true },
+      { name: "Account Lookup", currencies: makeCurrencies(["EUR"]), included: true },
+      { name: "Payout Services", currencies: makeCurrencies(["EUR"]), included: true },
+      { name: "Operations Account", currencies: makeCurrencies([]), included: false },
+      { name: "Virtual Account", currencies: makeCurrencies([]), included: false },
     ],
   },
   {
@@ -46,11 +50,11 @@ const TIERS: {
     description: "Full business tier with all services and multi-currency support.",
     icon: <IconBuildingStore size={16} color="#667085" />,
     services: [
-      { name: "Operations Account", currencies: [EUR, USD, GBP, NGN], included: true },
-      { name: "Virtual Account", currencies: [EUR, USD, GBP, NGN], included: true },
-      { name: "Remittance", currencies: [EUR], included: true },
-      { name: "Payout Services", currencies: [EUR], included: true },
-      { name: "Account Lookup", currencies: [EUR], included: true },
+      { name: "Operations Account", currencies: makeCurrencies(["EUR", "USD", "GBP", "NGN"]), included: true },
+      { name: "Virtual Account", currencies: makeCurrencies(["EUR", "USD", "GBP", "NGN"]), included: true },
+      { name: "Remittance", currencies: makeCurrencies(["EUR"]), included: true },
+      { name: "Payout Services", currencies: makeCurrencies(["EUR"]), included: true },
+      { name: "Account Lookup", currencies: makeCurrencies(["EUR"]), included: true },
     ],
   },
 ];
@@ -173,7 +177,6 @@ export default function ChooseTierModal({
                         borderRight: i < tier.services.length - 1 ? "1px solid #F2F4F7" : "none",
                         paddingRight: 12,
                         paddingLeft: i > 0 ? 12 : 0,
-                        opacity: svc.included ? 1 : 0.35,
                       }}
                     >
                       <Text
@@ -186,14 +189,22 @@ export default function ChooseTierModal({
                         {svc.name}
                       </Text>
                       <Stack gap={8}>
-                        {svc.currencies.map((cur) => (
-                          <Flex key={cur.code} align="center" gap={6}>
-                            <FlagImg flag={cur.flag} />
-                            <Text fz={13} c={svc.included ? "#344054" : "#98A2B3"}>
-                              {cur.label}
-                            </Text>
-                          </Flex>
-                        ))}
+                        {svc.currencies.map((cur) => {
+                          const active = svc.included && cur.enabled;
+                          return (
+                            <Flex
+                              key={cur.code}
+                              align="center"
+                              gap={6}
+                              style={{ opacity: active ? 1 : 0.35 }}
+                            >
+                              <FlagImg flag={cur.flag} />
+                              <Text fz={13} c={active ? "#344054" : "#98A2B3"}>
+                                {cur.label}
+                              </Text>
+                            </Flex>
+                          );
+                        })}
                       </Stack>
                     </Box>
                   ))}

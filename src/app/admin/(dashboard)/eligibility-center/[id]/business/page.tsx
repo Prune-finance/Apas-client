@@ -298,10 +298,7 @@ export default function SingleEligibilityBusiness() {
                 radius={4}
                 color="#D92D20"
                 c="#fff"
-                action={() => {
-                  if (!allDocumentsApproved) { openHoldUp(); return; }
-                  openRejectBiz();
-                }}
+                action={openRejectBiz}
               />
               <PrimaryBtn
                 text="Approve"

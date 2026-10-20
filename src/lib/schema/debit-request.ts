@@ -109,13 +109,7 @@ export const sendMoneyIndividualValidate = z
       ) // Allows empty string
       .optional(),
 
-    accountNumber: z
-      .string()
-      .regex(
-        /^$|^[0-9]{8,17}$|^PR-GH\d+$/,
-        "Invalid account number format (8-17 digits or PR-GH format for GHS)"
-      ) // Allows empty string or PR-GH format
-      .optional(),
+    accountNumber: z.string().optional(),
 
     routingNumber: z
       .string()
@@ -182,6 +176,30 @@ export const sendMoneyIndividualValidate = z
       .optional(),
   })
   .superRefine((data, ctx) => {
+    if (
+      data.accountNumber &&
+      data.currency === "GHS" &&
+      !/^(?:[0-9]{8,17}|PR-GH\d+)$/.test(data.accountNumber)
+    ) {
+      ctx.addIssue({
+        path: ["accountNumber"],
+        code: z.ZodIssueCode.custom,
+        message: "Invalid account number format (8-17 digits or PR-GH format for GHS)",
+      });
+    }
+
+    if (
+      data.accountNumber &&
+      data.currency === "USD" &&
+      !/^\d+$/.test(data.accountNumber)
+    ) {
+      ctx.addIssue({
+        path: ["accountNumber"],
+        code: z.ZodIssueCode.custom,
+        message: "Account number must contain only digits",
+      });
+    }
+
     // Require transfer type only for applicable currencies
     if (data.currency === "GHS" && !data.gshTransferType) {
       ctx.addIssue({
@@ -391,13 +409,7 @@ export const sendMoneyCompanyValidate = z
       ) // Allows empty string
       .optional(),
 
-    accountNumber: z
-      .string()
-      .regex(
-        /^$|^[0-9]{8,17}$|^PR-GH\d+$/,
-        "Invalid account number format (8-17 digits or PR-GH format for GHS)"
-      ) // Allows empty string or PR-GH format
-      .optional(),
+    accountNumber: z.string().optional(),
 
     routingNumber: z
       .string()
@@ -456,6 +468,30 @@ export const sendMoneyCompanyValidate = z
       .optional(),
   })
   .superRefine((data, ctx) => {
+    if (
+      data.accountNumber &&
+      data.currency === "GHS" &&
+      !/^(?:[0-9]{8,17}|PR-GH\d+)$/.test(data.accountNumber)
+    ) {
+      ctx.addIssue({
+        path: ["accountNumber"],
+        code: z.ZodIssueCode.custom,
+        message: "Invalid account number format (8-17 digits or PR-GH format for GHS)",
+      });
+    }
+
+    if (
+      data.accountNumber &&
+      data.currency === "USD" &&
+      !/^\d+$/.test(data.accountNumber)
+    ) {
+      ctx.addIssue({
+        path: ["accountNumber"],
+        code: z.ZodIssueCode.custom,
+        message: "Account number must contain only digits",
+      });
+    }
+
     if (data.currency === "EUR") {
       if (!data.destinationIBAN || data.destinationIBAN.trim() === "") {
         ctx.addIssue({

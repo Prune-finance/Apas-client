@@ -83,7 +83,7 @@ export default function RejectBusinessModal({
             placeholder="Enter reason"
             value={otherReason}
             onChange={(e) => setOtherReason(e.currentTarget.value)}
-            maxLength={150}
+            maxLength={40}
           />
         )}
         <Flex justify="flex-end" mt={8}>

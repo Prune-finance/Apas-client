@@ -16,7 +16,7 @@ import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import useAxios from "@/lib/hooks/useAxios";
-import { useSingleQuestionnaire } from "@/lib/hooks/eligibility-center";
+import { useBusinessDetail } from "@/lib/hooks/businesses";
 import { ReferenceData, DEFAULT_REF_DATA } from "@/ui/section/onboarding/shared";
 
 import AdminStep1BusinessInfo from "@/ui/section/admin-new-business/AdminStep1BusinessInfo";
@@ -122,9 +122,10 @@ export default function EditBusiness() {
   const router = useRouter();
   const { handleError, handleSuccess } = useNotification();
 
-  const { data: questionnaire, loading } = useSingleQuestionnaire(params.id);
+  const { loading, business: detail } = useBusinessDetail(params.id);
 
   const [active, setActive] = useState(0);
+  const [adminReference, setAdminReference] = useState<string | null>(null);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
   const [initialized, setInitialized] = useState(false);
@@ -143,41 +144,62 @@ export default function EditBusiness() {
   });
 
   useEffect(() => {
-    if (!loading && questionnaire && !initialized) {
-      const services = (questionnaire.answers?.services ?? []).map((s) => s.service);
+    if (!loading && detail && !initialized) {
+      const ref = detail.reference ?? params.id;
+      setAdminReference(ref);
+
+      const questionnaireAnswers = detail.questionnaire?.answers as Record<string, unknown> | undefined;
+      const services = (
+        (questionnaireAnswers?.services as { service: string }[] | undefined) ?? []
+      ).map((s) => s.service);
       setSelectedServices(services);
-      const lastSection = questionnaire.progress?.lastCompletedSection ?? 0;
+
+      const lastSection = detail.progress?.lastCompletedSection ?? 0;
       setActive(Math.min(lastSection, STEP_LABELS.length - 1));
       setInitialized(true);
     }
-  }, [loading, questionnaire, initialized]);
+  }, [loading, detail, initialized, params.id]);
 
-  const step1InitialValues = questionnaire
-    ? (() => {
-        const a = questionnaire.answers;
-        const nameParts = (a.contactName ?? "").split(" ");
-        return {
-          businessName: a.legalBusinessName ?? "",
-          tradingName: a.tradingName ?? "",
-          businessIndustry: a.businessIndustry ?? "",
-          country: a.countryCode ?? "",
-          businessAddress: a.businessAddress ?? "",
-          businessEmail: a.businessEmail ?? "",
-          phoneNumberCode: a.phoneCountryCode ?? "+234",
-          phoneNumber: a.phoneNumber ?? "",
-          businessDescription: a.businessDescription ?? "",
-          isRegulated: a.isRegulated ?? false,
-          regulatoryLicence: a.regulatoryLicence ?? "",
-          annualTurnover: a.annualTurnover ?? "",
-          contactFirstName: nameParts[0] ?? "",
-          contactLastName: nameParts.slice(1).join(" ") || "",
-          contactDesignation: a.contactDesignation ?? "",
-          contactEmail: a.contactEmail ?? "",
-          contactPhoneNumberCode: a.contactPhoneCountryCode ?? "+234",
-          contactPhoneNumber: a.contactPhoneNumber ?? "",
-        };
-      })()
+  const biz = detail?.business;
+  const contactPerson = detail?.contactPerson;
+  const questionnaireAnswers = detail?.questionnaire?.answers as Record<string, unknown> | undefined;
+
+  const step1InitialValues = biz
+    ? {
+        businessName: biz.businessName ?? "",
+        tradingName: biz.tradingName ?? "",
+        businessType: biz.businessType ?? "",
+        businessIndustry: biz.businessIndustry ?? "",
+        country: biz.countryCode ?? "",
+        businessAddress: biz.businessAddress ?? "",
+        businessEmail: biz.businessEmail ?? "",
+        phoneNumberCode: biz.businessPhoneCountryCode ?? "+234",
+        phoneNumber: biz.businessPhoneNumber ?? "",
+        businessWebsite: biz.businessWebsite ?? "",
+        businessDescription: biz.businessDescription ?? "",
+        isRegulated: (questionnaireAnswers?.isRegulated as boolean | undefined) ?? false,
+        regulatoryLicence: (questionnaireAnswers?.regulatoryLicence as string | undefined) ?? "",
+        annualTurnover: (questionnaireAnswers?.annualTurnover as string | undefined) ?? "",
+        contactFirstName: contactPerson?.firstName ?? "",
+        contactLastName: contactPerson?.lastName ?? "",
+        contactDesignation: (questionnaireAnswers?.contactDesignation as string | undefined) ?? "",
+        contactEmail: contactPerson?.email ?? "",
+        contactPhoneNumberCode: contactPerson?.phoneCountryCode ?? "+234",
+        contactPhoneNumber: contactPerson?.phoneNumber ?? "",
+        contactIdentityType: contactPerson?.identityType ?? "",
+        contactProofOfAddressType: contactPerson?.proofOfAddressType ?? "",
+        contactIdentityDocumentId:
+          typeof contactPerson?.identityDocument === "string"
+            ? contactPerson.identityDocument
+            : (contactPerson?.identityDocument as any)?.id ?? "",
+        contactProofOfAddressDocumentId:
+          typeof contactPerson?.proofOfAddressDocument === "string"
+            ? contactPerson.proofOfAddressDocument
+            : (contactPerson?.proofOfAddressDocument as any)?.id ?? "",
+      }
     : undefined;
+
+  const businessName = biz?.businessName ?? detail?.business?.businessName ?? "";
 
   const handleCloseSuccessModal = () => {
     router.push(`/admin/eligibility-center/${params.id}`);
@@ -185,10 +207,9 @@ export default function EditBusiness() {
   };
 
   const handleHandOver = async () => {
+    if (!adminReference) return;
     try {
-      await questAxios.post(
-        `/business/onboarding/admin/${params.id}/hand-over`
-      );
+      await questAxios.post(`/business/onboarding/admin/${adminReference}/hand-over`);
       handleSuccess("Application Handed Over", "The application has been handed over to the user");
       closeHandOver();
       router.push(`/admin/eligibility-center/${params.id}`);
@@ -213,7 +234,7 @@ export default function EditBusiness() {
         items={[
           { title: "Eligibility Center", href: "/admin/eligibility-center" },
           {
-            title: questionnaire?.answers?.legalBusinessName ?? "Business",
+            title: businessName || "Business",
             href: `/admin/eligibility-center/${params.id}`,
           },
           { title: "Edit Business", href: "#" },
@@ -254,17 +275,17 @@ export default function EditBusiness() {
 
         <Divider my={20} />
 
-        {active === 0 && (
+        {active === 0 && adminReference && (
           <AdminStep1BusinessInfo
             refData={refData}
-            adminReference={params.id}
+            adminReference={adminReference}
             initialValues={step1InitialValues}
             onComplete={() => setActive(1)}
           />
         )}
-        {active === 1 && (
+        {active === 1 && adminReference && (
           <AdminStep2Services
-            adminReference={params.id}
+            adminReference={adminReference}
             onBack={() => setActive(0)}
             onComplete={(services) => {
               setSelectedServices(services);
@@ -272,25 +293,25 @@ export default function EditBusiness() {
             }}
           />
         )}
-        {active === 2 && (
+        {active === 2 && adminReference && (
           <AdminStep3Financials
-            adminReference={params.id}
+            adminReference={adminReference}
             selectedServices={selectedServices}
             onBack={() => setActive(1)}
             onComplete={() => setActive(3)}
           />
         )}
-        {active === 3 && (
+        {active === 3 && adminReference && (
           <AdminStep4People
-            adminReference={params.id}
+            adminReference={adminReference}
             refData={refData}
             onBack={() => setActive(2)}
             onComplete={() => setActive(4)}
           />
         )}
-        {active === 4 && (
+        {active === 4 && adminReference && (
           <AdminStep5Documents
-            adminReference={params.id}
+            adminReference={adminReference}
             onBack={() => setActive(3)}
             onComplete={openSuccess}
           />

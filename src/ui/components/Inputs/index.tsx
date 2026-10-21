@@ -259,6 +259,7 @@ export const TextInputWithInsideLabel = ({
       leftSectionWidth={
         leftSectionWidth ?? (hasLeftSection ? insideLabelLeftSectionWidth : undefined)
       }
+      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : " ")}
       classNames={insideLabelClasses}
       styles={hasLeftSection ? insideLabelTextInputStyles : styles}
     />
@@ -282,7 +283,7 @@ export const NumberInputWithInsideLabel = ({
       leftSectionWidth={
         leftSectionWidth ?? (hasLeftSection ? insideLabelLeftSectionWidth : undefined)
       }
-      placeholder="Enter number"
+      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Enter number")}
       classNames={insideLabelClasses}
       styles={hasLeftSection ? insideLabelNumberInputStyles : styles}
       thousandSeparator=","
@@ -296,5 +297,5 @@ interface TextareaWithInsideLabelProps extends TextareaProps {}
 export const TextareaWithInsideLabel = ({
   ...props
 }: TextareaWithInsideLabelProps) => {
-  return <Textarea {...props} classNames={insideLabelClasses} />;
+  return <Textarea {...props} placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : " ")} classNames={insideLabelClasses} />;
 };

@@ -1,0 +1,64 @@
+// Follow the rendered value, including uncontrolled fields, resets and autofill.
+// Focus alone must not lift the label of an empty field.
+@mixin floating-label {
+  .root {
+    position: relative;
+  }
+
+  .label {
+    position: absolute;
+    top: 18px;
+    padding-top: 0;
+    line-height: 16px;
+    opacity: 0;
+    transform: translateY(0);
+    pointer-events: none;
+    transition: transform 180ms ease, opacity 180ms ease;
+    font-size: 13px !important;
+    font-weight: 400;
+    color: var(--prune-text-gray-500);
+    max-width: calc(100% - 36px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .input,
+  .textarea {
+    padding-top: 0;
+    font-size: 16px !important;
+    color: var(--prune-text-gray-700);
+    transition: padding-top 180ms ease, border-color 180ms ease;
+  }
+
+  textarea.input,
+  .textarea {
+    padding-top: 14px;
+  }
+
+  .root:has(.label):has(:is(.input, .textarea):not(:placeholder-shown)) {
+    .label {
+      opacity: 1;
+      transform: translateY(-11px);
+    }
+
+    .input,
+    .textarea {
+      padding-top: 18px;
+      font-weight: 500;
+    }
+
+    textarea.input,
+    .textarea {
+      padding-top: 25px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .label,
+    .input,
+    .textarea {
+      transition: none;
+    }
+  }
+}

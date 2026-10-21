@@ -1,6 +1,8 @@
+@use "./floating-label";
+
 // Floating label inputs for questionnaire forms.
 // Default: only placeholder text visible (label hidden).
-// Floating (focused or has value): label slides up to top, placeholder hides.
+// Filled: label slides up inside the field.
 
 .root {
   position: relative;
@@ -29,14 +31,8 @@
   }
 
   // When floating: push value text down to make room for label at top
-  [data-floating] & {
-    padding-top: 20px;
-  }
 
   // Hide the placeholder text when label is showing
-  [data-floating] &::placeholder {
-    color: transparent;
-  }
 }
 
 .label {
@@ -64,13 +60,6 @@
   }
 
   // Floating: label moves up inside the field — stays small regardless of screen size
-  [data-floating] & {
-    top: 10px;
-    transform: translateY(0);
-    font-size: 11px !important;
-    color: #667085;
-    opacity: 1;
-  }
 }
 
 // Textarea variant — taller, label anchors to top
@@ -97,13 +86,7 @@
     border-color: var(--prune-primary-600);
   }
 
-  [data-floating] & {
-    padding-top: 26px;
-  }
 
-  [data-floating] &::placeholder {
-    color: transparent;
-  }
 }
 
 .error {
@@ -143,5 +126,15 @@
     &::placeholder {
       font-size: 14px !important;
     }
+  }
+}
+
+@include floating-label.floating-label;
+
+@media (prefers-reduced-motion: reduce) {
+  .phone_label,
+  .phone_input,
+  .phone_input_onboarding {
+    transition: none !important;
   }
 }

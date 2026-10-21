@@ -59,6 +59,7 @@ export const TextInputWithInsideLabel = ({
   return (
     <TextInput
       {...props}
+      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : " ")}
       classNames={classes}
       styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
     />
@@ -73,7 +74,7 @@ export const NumberInputWithInsideLabel = ({
   return (
     <NumberInput
       {...props}
-      placeholder="Enter number"
+      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Enter number")}
       classNames={classes}
       thousandSeparator=","
       min={0}
@@ -97,10 +98,10 @@ export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWi
   }
   return (
     <Select
-      placeholder="Select"
       classNames={classes}
-      styles={{ input: { paddingTop: rem(18), ...(props.error ? { borderColor: "var(--mantine-color-error)" } : {}) } }}
+      styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
       {...props}
+      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Select")}
     />
   );
 };
@@ -123,7 +124,7 @@ export const DateInputWithInsideLabel = ({ standard, ...props }: DateInputWithIn
   return (
     <DateInput
       {...props}
-      placeholder="Select Date"
+      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Select Date")}
       classNames={classes}
       styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
     />
@@ -157,7 +158,7 @@ export const TextareaWithInsideLabel = ({
       />
     );
   }
-  return <Textarea {...props} classNames={classes} />;
+  return <Textarea {...props} placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : " ")} classNames={classes} />;
 };
 
 interface PhoneNumberInputProps<T> {

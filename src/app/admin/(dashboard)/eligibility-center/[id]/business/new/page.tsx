@@ -3,13 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { IconHandStop } from "@tabler/icons-react";
-import { Divider, Flex, Paper, Stepper, Text, Tooltip } from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
+import { Box, Divider, Flex, Paper, Text, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
-import { BackBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import SuccessModal from "@/ui/components/SuccessModal";
 import SuccessModalImage from "@/assets/img/success-modal-image.png";
@@ -17,39 +16,105 @@ import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import useAxios from "@/lib/hooks/useAxios";
+import { ReferenceData, DEFAULT_REF_DATA } from "@/ui/section/onboarding/shared";
 
-import {
-  CEOSchema,
-  newOnboardingValue,
-  onboardingBasicInfoSchema,
-  onboardingDirectors,
-  onboardingDocumentSchema,
-  onboardingShareholders,
-  OnboardingType,
-} from "@/lib/schema";
-
-import {
-  BusinessInfo,
-  CEOInfo,
-  DocumentInfo,
-  AddDirectorsInfo,
-  AddShareholdersInfo,
-  ReviewInfo,
-  TermsOfUseInfo,
-  ReferenceData,
-  DEFAULT_REF_DATA,
-} from "@/ui/section/onboarding/shared";
+import AdminStep1BusinessInfo from "@/ui/section/admin-new-business/AdminStep1BusinessInfo";
+import AdminStep2Services from "@/ui/section/admin-new-business/AdminStep2Services";
+import AdminStep3Financials from "@/ui/section/admin-new-business/AdminStep3Financials";
+import AdminStep4People from "@/ui/section/admin-new-business/AdminStep4People";
+import AdminStep5Documents from "@/ui/section/admin-new-business/AdminStep5Documents";
 
 const questAxios = createAxiosInstance("questionnaire");
 
 const STEP_LABELS = [
   "Business Information",
-  "CEO Details",
+  "Services",
+  "Financials",
+  "People",
   "Documents",
-  "Directors",
-  "Shareholders",
-  "Review",
 ];
+
+const PRIMARY = "var(--prune-primary-700)";
+const GRAY_LINE = "#EAECF0";
+const GRAY_BORDER = "#D0D5DD";
+const GRAY_TEXT = "#667085";
+
+function AdminStepper({ active, steps }: { active: number; steps: string[] }) {
+  return (
+    <Box w="100%" mt={32} mb={4}>
+      <Flex align="flex-start" w="100%">
+        {steps.map((label, idx) => {
+          const isDone = idx < active;
+          const isCurrent = idx === active;
+
+          const leftLineColor = idx <= active ? PRIMARY : GRAY_LINE;
+          const rightLineColor = idx < active ? PRIMARY : GRAY_LINE;
+
+          const circleStyle: React.CSSProperties = isDone
+            ? {
+                width: 24,
+                height: 24,
+                borderRadius: "50%",
+                background: PRIMARY,
+                border: "none",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                paddingBottom: 2,
+              }
+            : isCurrent
+            ? {
+                width: 24,
+                height: 24,
+                borderRadius: "50%",
+                background: "#fff",
+                border: `1px solid ${PRIMARY}`,
+                boxShadow: "0px 0px 0px 4px rgba(117, 134, 4, 0.16)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                paddingBottom: 2,
+              }
+            : {
+                width: 24,
+                height: 24,
+                borderRadius: "50%",
+                background: "#fff",
+                border: `1px solid ${GRAY_BORDER}`,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+                paddingBottom: 2,
+              };
+
+          const numColor = isDone ? "#fff" : isCurrent ? PRIMARY : GRAY_TEXT;
+
+          return (
+            <Box key={label} style={{ flex: "1 0 0", minWidth: 1 }}>
+              <Flex align="center" gap={4} w="100%">
+                <Box style={{ flex: "1 0 0", minWidth: 1, height: 2, background: leftLineColor }} />
+                <Box style={circleStyle}>
+                  <Text fz={14} fw={600} c={numColor} lh={1}>
+                    {idx + 1}
+                  </Text>
+                </Box>
+                <Box style={{ flex: "1 0 0", minWidth: 1, height: 2, background: rightLineColor }} />
+              </Flex>
+              <Flex justify="center" px={12} mt={10}>
+                <Text fz={12} fw={700} c="#344054" ta="center">
+                  {label}
+                </Text>
+              </Flex>
+            </Box>
+          );
+        })}
+      </Flex>
+    </Box>
+  );
+}
 
 export default function NewBusiness() {
   const router = useRouter();
@@ -63,18 +128,6 @@ export default function NewBusiness() {
     useDisclosure(false);
   const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
     useDisclosure(false);
-
-  const form = useForm<OnboardingType>({
-    initialValues: newOnboardingValue,
-    validate: (values) => {
-      if (active === 0) return zodResolver(onboardingBasicInfoSchema)(values);
-      if (active === 1) return zodResolver(CEOSchema)(values);
-      if (active === 2) return zodResolver(onboardingDocumentSchema)(values);
-      if (active === 3) return zodResolver(onboardingDirectors)(values);
-      if (active === 4) return zodResolver(onboardingShareholders)(values);
-      return {};
-    },
-  });
 
   useAxios<ReferenceData>({
     baseURL: "questionnaire",
@@ -114,7 +167,6 @@ export default function NewBusiness() {
 
       <Paper py={32} px={28} mt={20}>
         <Flex align="center" justify="space-between">
-          {/* <BackBtn /> */}
           {active > 0 && (
             <Tooltip
               label="Hand over to user to complete"
@@ -143,102 +195,50 @@ export default function NewBusiness() {
           Create New Business
         </Text>
 
-        <Stepper
-          active={active}
-          onStepClick={setActive}
-          allowNextStepsSelect={false}
-          color="var(--prune-primary-700)"
-          size="xs"
-          classNames={{
-            stepWrapper: styles.stepWrapper,
-            stepLabel: styles.stepLabel,
-            stepBody: styles.stepBody,
-            steps: styles.steps,
-            separator: styles.separator,
-            stepIcon: styles.stepIcon,
-            step: styles.step,
-          }}
-          mt={32}
-        >
-          {STEP_LABELS.map((label) => (
-            <Stepper.Step key={label} label={label} />
-          ))}
-          <Stepper.Completed>{null}</Stepper.Completed>
-        </Stepper>
+        <AdminStepper active={active} steps={STEP_LABELS} />
 
         <Divider my={20} />
 
         {active === 0 && (
-          <BusinessInfo
-            form={form}
-            active={active}
-            setActive={setActive}
+          <AdminStep1BusinessInfo
             refData={refData}
-            adminReference={adminReference ?? undefined}
-            onReferenceObtained={(ref) => setAdminReference(ref)}
-            noFloatingLabel
-            isAdmin
-          />
-        )}
-        {active === 1 && (
-          <CEOInfo
-            form={form}
-            active={active}
-            setActive={setActive}
-            refData={refData}
-            adminReference={adminReference ?? undefined}
-            noFloatingLabel
-          />
-        )}
-        {active === 2 && (
-          <DocumentInfo
-            form={form}
-            active={active}
-            setActive={setActive}
-            refData={refData}
-            adminReference={adminReference ?? undefined}
-          />
-        )}
-        {active === 3 && (
-          <AddDirectorsInfo
-            form={form}
-            active={active}
-            setActive={setActive}
-            refData={refData}
-            adminReference={adminReference ?? undefined}
-            noFloatingLabel
-          />
-        )}
-        {active === 4 && (
-          <AddShareholdersInfo
-            form={form}
-            active={active}
-            setActive={setActive}
-            shareholders={form.values.shareholders}
-            refData={refData}
-            adminReference={adminReference ?? undefined}
-            noFloatingLabel
-          />
-        )}
-        {active === 5 && (
-          <ReviewInfo form={form} active={active} setActive={setActive} />
-        )}
-        {active === 6 && (
-          <TermsOfUseInfo
-            form={form}
-            active={active}
-            setActive={(next) => {
-              const n = typeof next === "function" ? next(active) : next;
-              setActive(n);
-              if (n > 6) openSuccess();
+            onComplete={(ref) => {
+              setAdminReference(ref);
+              setActive(1);
             }}
-            adminReference={adminReference ?? undefined}
-            isAdmin
+          />
+        )}
+        {active === 1 && adminReference && (
+          <AdminStep2Services
+            adminReference={adminReference}
+            onBack={() => setActive(0)}
+            onComplete={() => setActive(2)}
+          />
+        )}
+        {active === 2 && adminReference && (
+          <AdminStep3Financials
+            adminReference={adminReference}
+            onBack={() => setActive(1)}
+            onComplete={() => setActive(3)}
+          />
+        )}
+        {active === 3 && adminReference && (
+          <AdminStep4People
+            adminReference={adminReference}
+            refData={refData}
+            onBack={() => setActive(2)}
+            onComplete={() => setActive(4)}
+          />
+        )}
+        {active === 4 && adminReference && (
+          <AdminStep5Documents
+            adminReference={adminReference}
+            onBack={() => setActive(3)}
+            onComplete={openSuccess}
           />
         )}
       </Paper>
 
-      {/* Hand over confirmation modal */}
       <ModalComponent
         opened={openedHandOver}
         close={closeHandOver}

@@ -53,19 +53,17 @@ export const QuestInput = ({
   wrapperProps,
   ...props
 }: QuestInputProps) => {
-  const [focused, setFocused] = useState(false);
-  const floating = focused || Boolean(value);
   const hasIcon = Boolean(leftSection);
 
   return (
     <TextInput
       label={label}
-      placeholder={typeof label === "string" ? label : undefined}
+      placeholder={typeof label === "string" ? label : " "}
       value={value}
       leftSection={leftSection}
       leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
       classNames={classes}
-      wrapperProps={{ ...wrapperProps, "data-floating": floating || undefined }}
+      wrapperProps={wrapperProps}
       styles={(theme, inputProps, ctx) => {
         const customStyles =
           typeof styles === "function" ? styles(theme, inputProps, ctx) : styles;
@@ -77,14 +75,8 @@ export const QuestInput = ({
           },
         };
       }}
-      onFocus={(e) => {
-        setFocused(true);
-        onFocus?.(e);
-      }}
-      onBlur={(e) => {
-        setFocused(false);
-        onBlur?.(e);
-      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
       {...props}
     />
   );
@@ -106,8 +98,6 @@ export const QuestSelect = ({
   tooltip,
   ...props
 }: QuestSelectProps) => {
-  const [focused, setFocused] = useState(false);
-  const floating = focused || Boolean(value);
   const hasIcon = Boolean(leftSection);
   const leftPad = leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : rem(12));
 
@@ -123,7 +113,7 @@ export const QuestSelect = ({
   return (
     <Select
       label={labelNode}
-      placeholder={typeof label === "string" ? label : undefined}
+      placeholder={typeof label === "string" ? label : " "}
       value={value}
       leftSection={leftSection}
       leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
@@ -131,24 +121,11 @@ export const QuestSelect = ({
       styles={{
         label: {
           paddingLeft: leftPad,
-          opacity: floating ? 1 : 0,
-          top: floating ? rem(10) : "50%",
-          transform: floating ? "translateY(0)" : "translateY(-50%)",
-          fontSize: floating ? 11 : 14,
-          color: floating ? "#667085" : "#98a2b3",
         },
-        input: { paddingTop: floating ? 20 : 0 },
       }}
-      onFocus={(e) => {
-        setFocused(true);
-        onFocus?.(e);
-      }}
-      onBlur={(e) => {
-        setFocused(false);
-        onBlur?.(e);
-      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
       {...props}
-      wrapperProps={{ ...props.wrapperProps, "data-floating": floating || undefined }}
     />
   );
 };
@@ -166,14 +143,12 @@ export const QuestNumberInput = ({
   leftSectionWidth,
   ...props
 }: QuestNumberInputProps) => {
-  const [focused, setFocused] = useState(false);
-  const floating = focused || value !== undefined && value !== "" && value !== null;
   const hasIcon = Boolean(leftSection);
 
   return (
     <NumberInput
       label={label}
-      placeholder={typeof label === "string" ? label : undefined}
+      placeholder={typeof label === "string" ? label : " "}
       value={value}
       leftSection={leftSection}
       leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
@@ -182,16 +157,9 @@ export const QuestNumberInput = ({
       thousandSeparator=","
       min={0}
       hideControls
-      onFocus={(e) => {
-        setFocused(true);
-        onFocus?.(e);
-      }}
-      onBlur={(e) => {
-        setFocused(false);
-        onBlur?.(e);
-      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
       {...props}
-      wrapperProps={{ ...props.wrapperProps, "data-floating": floating || undefined }}
     />
   );
 };
@@ -207,26 +175,16 @@ export const QuestTextarea = ({
   onBlur,
   ...props
 }: QuestTextareaProps) => {
-  const [focused, setFocused] = useState(false);
-  const floating = focused || Boolean(value);
-
   return (
     <Textarea
       label={label}
-      placeholder={typeof label === "string" ? label : undefined}
+      placeholder={typeof label === "string" ? label : " "}
       value={value}
       classNames={{ ...classes, input: classes.textarea }}
       styles={noIconLabelStyle}
-      onFocus={(e) => {
-        setFocused(true);
-        onFocus?.(e);
-      }}
-      onBlur={(e) => {
-        setFocused(false);
-        onBlur?.(e);
-      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
       {...props}
-      wrapperProps={{ ...props.wrapperProps, "data-floating": floating || undefined }}
     />
   );
 };
@@ -269,6 +227,7 @@ interface QuestPhoneInputProps<T> {
   inputHeight?: number | string;
   unfocusedBorderColor?: string;
   inputBackground?: string;
+  /** @deprecated Retains onboarding sizing; label visibility now follows the value. */
   alwaysShowLabel?: boolean;
 }
 
@@ -287,7 +246,7 @@ export const QuestPhoneInput = <T,>({
 
   const dialCode = (form.values[countryCodeKey] as string) || "+234";
   const phoneValue = (form.values[phoneNumberKey] as string) || "";
-  const floating = focused || Boolean(phoneValue);
+  const floating = Boolean(phoneValue);
 
   const selectedCountry = countriesWithCode.find((c) => c.value === dialCode);
   const flagEmoji = selectedCountry?.label.split(" ")[0] ?? "🌍";
@@ -384,17 +343,19 @@ export const QuestPhoneInput = <T,>({
         />
 
         <Box style={{ position: "relative", flex: 1, minWidth: 0, height: "100%" }}>
-          {/* Label — always at top (alwaysShowLabel) or floating */}
+          {/* Show the label only once a phone number has been entered. */}
           <Box
             component="span"
+            className={classes.phone_label}
             style={{
               position: "absolute",
               left: rem(12),
-              top: alwaysShowLabel ? 8 : (floating ? 10 : "50%"),
-              transform: alwaysShowLabel ? "translateY(0)" : (floating ? "translateY(0)" : "translateY(-50%)"),
-              fontSize: alwaysShowLabel ? 12 : (floating ? 11 : 14),
+              top: floating ? 8 : "50%",
+              transform: floating ? "translateY(0)" : "translateY(-50%)",
+              fontSize: floating ? 13 : 14,
+              lineHeight: "16px",
               color: "#667085",
-              opacity: alwaysShowLabel ? 1 : (floating ? 1 : 0),
+              opacity: floating ? 1 : 0,
               pointerEvents: "none",
               zIndex: 1,
               fontWeight: 400,
@@ -427,7 +388,8 @@ export const QuestPhoneInput = <T,>({
               outline: "none",
               background: "transparent",
               paddingLeft: rem(12),
-              paddingTop: alwaysShowLabel ? rem(20) : (floating ? rem(20) : 0),
+              paddingTop: floating ? rem(18) : 0,
+              fontWeight: floating ? 500 : 400,
               color: "var(--prune-text-gray-700)",
               transition: "padding-top 0.22s ease",
             }}

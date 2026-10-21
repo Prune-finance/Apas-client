@@ -1,3 +1,5 @@
+@use "./floating-label";
+
 .root {
   position: relative;
 }
@@ -51,3 +53,5 @@
     font-size: 16px !important;
   }
 }
+
+@include floating-label.floating-label;

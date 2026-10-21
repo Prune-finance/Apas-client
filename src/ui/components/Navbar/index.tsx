@@ -425,11 +425,6 @@ export function UserNavbar() {
                   color="var(--prune-primary-900, #596603)"
                   styles={{ label: { fontSize: 12 } }}
                   classNames={{ root: styles.root }}
-                  style={{
-                    borderRight: isActive(item.link)
-                      ? "3px solid var(--prune-primary-900, #596603)"
-                      : "none",
-                  }}
                 />
               );
             })}
@@ -454,11 +449,6 @@ export function UserNavbar() {
                   color="var(--prune-primary-900, #596603)"
                   styles={{ label: { fontSize: 12 } }}
                   classNames={{ root: styles.root }}
-                  style={{
-                    borderRight: isActive(item.link)
-                      ? "3px solid var(--prune-primary-900, #596603)"
-                      : "none",
-                  }}
                 />
               );
             })}

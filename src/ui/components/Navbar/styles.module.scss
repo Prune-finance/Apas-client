@@ -131,10 +131,25 @@
   }
 }
 
+.root {
+  border-radius: 8px;
+  color: var(--prune-text-gray-600, #475467);
+
+  &[data-active] {
+    background-color: var(--prune-primary-50);
+    border-radius: 8px;
+    color: var(--prune-primary-900, #596603);
+    font-weight: 500;
+  }
+
+  &:hover:not([data-active]) {
+    background-color: var(--prune-text-gray-25, #FCFCFD);
+    border-radius: 8px;
+  }
+}
+
 .root:focus,
 .root:focus-visible {
-  // border: none !important;
-  // outline: none !important;
-  outline: 0.4 solid var(--prune-text-gray-100) !important;
-  border-radius: 4px 0 0 4px;
+  outline: 0.4px solid var(--prune-text-gray-100) !important;
+  border-radius: 8px;
 }

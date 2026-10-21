@@ -291,9 +291,13 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
       )}
 
       <Flex justify="space-between" mt={32}>
-        <SecondaryBtn text={subStep === 0 ? "Back" : "Previous"} action={subStep === 0 ? onBack : () => setSubStep((s) => s - 1)} fw={600} />
+        <SaveProgressBtn loading={saving} action={handleSaveProgress} />
         <Flex gap={12}>
-          {subStep > 0 && <SaveProgressBtn loading={saving} action={handleSaveProgress} />}
+          <SecondaryBtn
+            text="Previous"
+            action={subStep === 0 ? onBack : () => setSubStep((s) => s - 1)}
+            fw={600}
+          />
           {subStep < 2 ? (
             <PrimaryBtn text="Next" fw={600} action={handleNextSubStep} />
           ) : (

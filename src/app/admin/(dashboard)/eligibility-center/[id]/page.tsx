@@ -3,6 +3,7 @@
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { Box, TabsPanel, Text } from "@mantine/core";
 import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ProfileHeader from "./ProfileHeader";
 import { newOnboardingValue, OnboardingType, Tab } from "@/lib/schema";
 import {
@@ -116,6 +117,7 @@ export default function OnboardingProfile({
 }: {
   params: { id: string };
 }) {
+  const router = useRouter();
   const { data, loading, revalidate } = useSingleQuestionnaire(params.id);
 
   const adapted = adaptQuestionnaire(data);
@@ -181,7 +183,12 @@ export default function OnboardingProfile({
           },
         ]}
       />
-      <ProfileHeader data={adapted} loading={loading} revalidate={revalidate} />
+      <ProfileHeader
+        data={adapted}
+        loading={loading}
+        revalidate={revalidate}
+        onEdit={() => router.push(`/admin/eligibility-center/${params.id}/business/edit`)}
+      />
       <Tabs
         tabs={tabs}
         tt="capitalize"

@@ -66,7 +66,7 @@ const SERVICE_META: Record<string, { description: string; icon: ForwardRefExotic
 interface Props {
   adminReference: string;
   onBack: () => void;
-  onComplete: () => void;
+  onComplete: (selectedServices: string[]) => void;
 }
 
 export default function AdminStep2Services({ adminReference, onBack, onComplete }: Props) {
@@ -144,7 +144,7 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
     try {
       await questAxios.post(`/business/onboarding/admin/${adminReference}/steps/2/complete`, buildPayload());
       handleSuccess("Services", "Services saved successfully");
-      onComplete();
+      onComplete(selected.map((s) => s.service));
     } catch (error) {
       handleError("An error occurred", isAxiosError(error) ? error.response?.data?.message : "Something went wrong");
     } finally {
@@ -204,9 +204,9 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
       </SimpleGrid>
 
       <Flex justify="space-between" mt={32}>
-        <SecondaryBtn text="Back" action={onBack} fw={600} />
+        <SaveProgressBtn loading={saving} action={handleSaveProgress} />
         <Flex gap={12}>
-          <SaveProgressBtn loading={saving} action={handleSaveProgress} />
+          <SecondaryBtn text="Previous" action={onBack} fw={600} />
           <PrimaryBtn
             text="Save & Continue"
             fw={600}

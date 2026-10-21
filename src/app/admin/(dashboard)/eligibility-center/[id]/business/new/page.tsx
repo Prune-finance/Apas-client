@@ -122,6 +122,7 @@ export default function NewBusiness() {
 
   const [active, setActive] = useState(0);
   const [adminReference, setAdminReference] = useState<string | null>(null);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
 
   const [openedHandOver, { open: openHandOver, close: closeHandOver }] =
@@ -212,12 +213,16 @@ export default function NewBusiness() {
           <AdminStep2Services
             adminReference={adminReference}
             onBack={() => setActive(0)}
-            onComplete={() => setActive(2)}
+            onComplete={(services) => {
+              setSelectedServices(services);
+              setActive(2);
+            }}
           />
         )}
         {active === 2 && adminReference && (
           <AdminStep3Financials
             adminReference={adminReference}
+            selectedServices={selectedServices}
             onBack={() => setActive(1)}
             onComplete={() => setActive(3)}
           />

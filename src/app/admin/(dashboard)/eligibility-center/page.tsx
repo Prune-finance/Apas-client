@@ -23,6 +23,7 @@ import {
   IconCircleCheck,
   IconBuildingSkyscraper,
   IconClock,
+  IconPencilMinus,
 } from "@tabler/icons-react";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -119,15 +120,13 @@ function EligibilityCenter() {
             View and manage all eligibility profiles on the platform.
           </Text>
         </Box>
-        {currentTab === "onboarding" && (
-          <PrimaryBtn
-            text="New Business"
-            link="/admin/eligibility-center/new/business/new"
-            leftSection={<IconPlus size={16} />}
-            fw={600}
-            fz={14}
-          />
-        )}
+        <PrimaryBtn
+          text="New Business"
+          link="/admin/eligibility-center/new/business/new"
+          leftSection={<IconPlus size={16} />}
+          fw={600}
+          fz={14}
+        />
       </Flex>
 
       {/* Stat cards */}
@@ -291,7 +290,7 @@ function QuestionnaireTab() {
         head={tableHeaders}
         rows={<Rows data={data} />}
         loading={loading}
-        columnWidths={["25%", "15%", "10%", "30%", "20%"]}
+        columnWidths={["22%", "13%", "9%", "26%", "16%", "14%"]}
       />
 
       <EmptyTable
@@ -312,7 +311,7 @@ function QuestionnaireTab() {
   );
 }
 
-const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage"];
+const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage", "Action"];
 
 const eligibilityTabs: Tab[] = [
   { title: "Questionnaire", value: "questionnaire" },
@@ -416,6 +415,15 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
             px={10}
             fw={500}
             fz={12}
+          />
+        </TableTd>
+        <TableTd onClick={(e) => e.stopPropagation()}>
+          <SecondaryBtn
+            text="Edit"
+            leftSection={<IconPencilMinus size={14} />}
+            fw={600}
+            fz={12}
+            action={() => push(`/admin/eligibility-center/${row.reference}/business/edit`)}
           />
         </TableTd>
       </TableTr>

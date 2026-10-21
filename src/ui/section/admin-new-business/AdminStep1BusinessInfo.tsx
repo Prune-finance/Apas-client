@@ -54,11 +54,13 @@ type AdminStep1Values = {
 interface Props {
   refData: ReferenceData;
   onComplete: (adminReference: string) => void;
+  adminReference?: string;
+  initialValues?: Partial<AdminStep1Values>;
 }
 
 interface RefOption { value: string; label: string }
 
-export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
+export default function AdminStep1BusinessInfo({ refData, onComplete, adminReference, initialValues }: Props) {
   const { handleSuccess, handleError } = useNotification();
   const [completing, setCompleting] = useState(false);
   const [monetaryBands, setMonetaryBands] = useState<RefOption[]>([]);
@@ -118,6 +120,13 @@ export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
     },
   });
 
+  useEffect(() => {
+    if (initialValues && Object.keys(initialValues).length > 0) {
+      form.setValues((current) => ({ ...current, ...initialValues }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   form.watch("country", ({ value }) => {
     if (!value) return;
     const match = countriesWithCode.find(
@@ -171,8 +180,11 @@ export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
 
     setCompleting(true);
     try {
-      const res = await questAxios.post("/business/onboarding/admin/steps/1/complete", buildPayload());
-      const ref = res.data?.data?.reference;
+      const endpoint = adminReference
+        ? `/business/onboarding/admin/${adminReference}/steps/1/complete`
+        : "/business/onboarding/admin/steps/1/complete";
+      const res = await questAxios.post(endpoint, buildPayload());
+      const ref = adminReference ?? res.data?.data?.reference;
       handleSuccess("Business Information", "Business information saved");
       onComplete(ref ?? "");
     } catch (error) {

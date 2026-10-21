@@ -140,9 +140,9 @@ export default function AdminStep5Documents({ adminReference, onBack, onComplete
       </Stack>
 
       <Flex justify="space-between" mt={32}>
-        <SecondaryBtn text="Back" action={onBack} fw={600} />
+        <SaveProgressBtn loading={saving} action={handleSaveProgress} />
         <Flex gap={12}>
-          <SaveProgressBtn loading={saving} action={handleSaveProgress} />
+          <SecondaryBtn text="Previous" action={onBack} fw={600} />
           <PrimaryBtn
             text="Save & Continue"
             fw={600}

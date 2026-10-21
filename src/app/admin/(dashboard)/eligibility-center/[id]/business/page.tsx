@@ -283,7 +283,7 @@ export default function SingleEligibilityBusiness() {
                 fz={12}
                 h={32}
                 radius={4}
-                action={() => router.push(`/admin/businesses/${params.id}/edit`)}
+                action={() => router.push(`/admin/eligibility-center/${params.id}/business/edit`)}
               />
             </div>
           )}

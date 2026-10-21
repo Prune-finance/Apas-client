@@ -16,6 +16,7 @@ interface ProfileHeaderProps {
   data: OnboardingBusiness | null;
   loading: boolean;
   revalidate: () => Promise<void>;
+  onEdit?: () => void;
 }
 const questionnaireStatusLabels: Record<string, string> = {
   IN_PROGRESS: "In Progress",
@@ -28,6 +29,7 @@ export default function ProfileHeader({
   data,
   loading,
   revalidate,
+  onEdit,
 }: ProfileHeaderProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [openedProfile, { open: openProfile, close: closeProfile }] =
@@ -244,6 +246,16 @@ export default function ProfileHeader({
       </Group>
 
       <Group gap={10} wrap="wrap">
+        {onEdit && (
+          <SecondaryBtn
+            text="Edit"
+            fw={600}
+            fz={12}
+            h={32}
+            radius={4}
+            action={onEdit}
+          />
+        )}
         {data?.processStatus === "QUESTIONNAIRE" &&
           data.questionnaireStatus === "SUBMITTED" && (
             <>

@@ -102,8 +102,8 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
       ceoIdentityDocumentBackId: "",
       ceoProofOfAddressType: "",
       ceoProofOfAddressDocumentId: "",
-      directors: [],
-      shareholders: [],
+      directors: [emptyPerson()],
+      shareholders: [emptyPerson()],
     },
     validate: {
       ceoFirstName: (v) => (!v.trim() ? "First name is required" : null),

@@ -240,7 +240,7 @@ export default function EditBusiness() {
       />
 
       <Paper py={32} px={28} mt={20}>
-        <Flex align="center" justify="space-between">
+        <Flex align="center" justify="flex-end">
           {active > 0 && (
             <Tooltip
               label="Hand over to user to complete"

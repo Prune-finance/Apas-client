@@ -82,29 +82,19 @@ export default function AdminStep3Financials({ adminReference, selectedServices,
     const payload: Record<string, unknown> = {};
 
     if (hasVirtualAccounts) {
-      payload.virtualAccounts = {
-        day_one_requirement: v.dayOneRequirement || undefined,
-        total_number_of_virtual_accounts: v.totalVirtualAccounts || undefined,
-        max_value_per_transaction: {
-          daily: v.singleMaxDaily || undefined,
-          monthly: v.singleMaxMonthly || undefined,
-          annually: v.singleMaxAnnually || undefined,
-        },
-        max_value_all_virtual_accounts: {
-          daily: v.allMaxDaily || undefined,
-          monthly: v.allMaxMonthly || undefined,
-          annually: v.allMaxAnnually || undefined,
-        },
-        total_highest_transaction_count: {
-          daily: v.highestTransactionCountDaily || undefined,
-        },
-      };
+      if (v.dayOneRequirement !== "") payload.dayOneAccounts = v.dayOneRequirement;
+      if (v.totalVirtualAccounts !== "") payload.fullCapacityAccounts = v.totalVirtualAccounts;
+      if (v.singleMaxDaily !== "") payload.singleAccountMaxDaily = String(v.singleMaxDaily);
+      if (v.singleMaxMonthly !== "") payload.singleAccountMaxMonthly = String(v.singleMaxMonthly);
+      if (v.singleMaxAnnually !== "") payload.singleAccountMaxAnnually = String(v.singleMaxAnnually);
+      if (v.allMaxDaily !== "") payload.allAccountsMaxDaily = String(v.allMaxDaily);
+      if (v.allMaxMonthly !== "") payload.allAccountsMaxMonthly = String(v.allMaxMonthly);
+      if (v.allMaxAnnually !== "") payload.allAccountsMaxAnnually = String(v.allMaxAnnually);
+      if (v.highestTransactionCountDaily !== "") payload.highestTransactionCount = v.highestTransactionCountDaily;
     }
 
-    if (hasOperationsAccount) {
-      payload.operationsAccounts = {
-        estimated_balance: v.operationsEstimatedBalance || undefined,
-      };
+    if (hasOperationsAccount && v.operationsEstimatedBalance) {
+      payload.operationsBalance = v.operationsEstimatedBalance;
     }
 
     return payload;

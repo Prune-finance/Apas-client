@@ -50,6 +50,16 @@ import OnboardedBusinesses from "../businesses/(tabs)/Onboarded";
 import TabsComponent from "@/ui/components/Tabs";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { IconPlus } from "@tabler/icons-react";
+import countries from "@/assets/countries.json";
+
+const toCountryCode = (value: string): string => {
+  if (!value) return "";
+  if (value.length <= 3) return value.toUpperCase();
+  const match = countries.find(
+    (c) => c.name.toLowerCase() === value.toLowerCase()
+  );
+  return match?.code ?? value;
+};
 
 const statusToStage: Record<string, STAGE> = {
   IN_PROGRESS: "In Progress",
@@ -330,7 +340,7 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
 
   return data?.map((row) => {
     const stage = statusToStage[row.status] ?? "PROFILE";
-    const countryCode = row.answers?.countryCode ?? "";
+    const countryCode = toCountryCode(row.answers?.countryCode ?? "");
 
     return (
       <TableTr

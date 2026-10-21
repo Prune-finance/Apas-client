@@ -93,39 +93,20 @@
   font-size: 12px;
 }
 
-// Plain <input> inside the unified phone field container
-.phone_input {
-  font-size: 14px !important;
-
-  &::placeholder {
-    color: #98a2b3;
-    font-size: 14px !important;
-  }
-
-  @media (min-width: 64em) {
-    font-size: 16px !important;
-
-    &::placeholder {
-      font-size: 16px !important;
-    }
-  }
-}
-
-// Onboarding variant — matches input.module.scss font sizes
+// Both phone variants share the same typography as the other filled fields.
+.phone_input,
 .phone_input_onboarding {
-  font-size: 12px !important;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 16px !important;
+  line-height: normal;
+  padding-bottom: 0;
+  padding-right: 12px;
 
   &::placeholder {
-    color: #98a2b3;
-    font-size: 12px !important;
-  }
-
-  @media (min-width: 64em) {
+    color: var(--prune-text-gray-400);
     font-size: 14px !important;
-
-    &::placeholder {
-      font-size: 14px !important;
-    }
+    font-weight: 400;
   }
 }
 

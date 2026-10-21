@@ -5,10 +5,11 @@ import {
   TextareaWithInsideLabel,
   TextInputWithInsideLabel,
 } from "@/ui/components/InputWithLabel";
-import { PhoneNumberInput, NumberInputWithInsideLabel } from "@/ui/components/InputWithLabel/QuestInputs";
-import { Box, Flex, Stack, Switch, Text } from "@mantine/core";
+import { PhoneNumberInput } from "@/ui/components/InputWithLabel/QuestInputs";
+import CustomRadio from "@/ui/components/CustomRadio";
+import { Box, Flex, RadioGroup, SimpleGrid, Stack, Switch, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { isAxiosError } from "axios";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import OnBoardingDocumentBox from "@/ui/section/onboarding/shared/onBoardingDocumentBox";
@@ -36,7 +37,7 @@ type AdminStep1Values = {
   businessDescription: string;
   isRegulated: boolean;
   regulatoryLicence: string;
-  annualTurnover: number | "";
+  annualTurnover: string;
   contactFirstName: string;
   contactLastName: string;
   contactDesignation: string;
@@ -55,9 +56,23 @@ interface Props {
   onComplete: (adminReference: string) => void;
 }
 
+interface RefOption { value: string; label: string }
+
 export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
   const { handleSuccess, handleError } = useNotification();
   const [completing, setCompleting] = useState(false);
+  const [monetaryBands, setMonetaryBands] = useState<RefOption[]>([]);
+
+  useEffect(() => {
+    questAxios
+      .get("/business/questionnaire/reference-data", {
+        params: { include: "monetaryBands" },
+      })
+      .then(({ data: res }) => {
+        setMonetaryBands(res.data?.monetaryBands ?? []);
+      })
+      .catch(() => {});
+  }, []);
 
   const form = useForm<AdminStep1Values>({
     initialValues: {
@@ -68,7 +83,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
       country: "",
       businessAddress: "",
       businessEmail: "",
-      phoneNumberCode: "",
+      phoneNumberCode: "+234",
       phoneNumber: "",
       businessWebsite: "",
       businessDescription: "",
@@ -79,7 +94,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
       contactLastName: "",
       contactDesignation: "",
       contactEmail: "",
-      contactPhoneNumberCode: "",
+      contactPhoneNumberCode: "+234",
       contactPhoneNumber: "",
       contactIdentityType: "",
       contactIdentityDocumentId: "",
@@ -248,21 +263,12 @@ export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
           </Box>
         </Flex>
 
-        <Flex gap={24} w="100%">
+        <Flex gap={24} w="50%">
           <TextInputWithInsideLabel
             label="Business Website (Optional)"
             w="100%"
             placeholder="Enter Business Website"
             {...form.getInputProps("businessWebsite")}
-          />
-          <NumberInputWithInsideLabel
-            label="Annual Turnover (Optional)"
-            w="100%"
-            placeholder="Enter Annual Turnover"
-            allowDecimal={false}
-            allowNegative={false}
-            min={0}
-            {...form.getInputProps("annualTurnover")}
           />
         </Flex>
 
@@ -299,9 +305,33 @@ export default function AdminStep1BusinessInfo({ refData, onComplete }: Props) {
             />
           </Flex>
         )}
+
+        {monetaryBands.length > 0 && (
+          <Box>
+            <RadioGroup
+              name="annualTurnover"
+              label="What is this entity's annual turnover?"
+              {...form.getInputProps("annualTurnover")}
+              key={form.key("annualTurnover")}
+              errorProps={{ mt: 10 }}
+              labelProps={{
+                fz: 14,
+                fw: 500,
+                c: "var(--prune-text-gray-700)",
+                mb: 16,
+              }}
+            >
+              <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing={12}>
+                {monetaryBands.map((option) => (
+                  <CustomRadio key={option.value} value={option.value} label={option.label} />
+                ))}
+              </SimpleGrid>
+            </RadioGroup>
+          </Box>
+        )}
       </Stack>
 
-      <Text c="var(--prune-text-gray-700)" fz={16} fw={700} style={eksellStyle}>
+      <Text c="var(--prune-text-gray-700)" fz={16} fw={700} style={eksellStyle} mt={32}>
         Contact Person
       </Text>
 

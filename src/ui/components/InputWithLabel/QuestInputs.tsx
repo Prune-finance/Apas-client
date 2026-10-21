@@ -350,7 +350,7 @@ export const QuestPhoneInput = <T,>({
             style={{
               position: "absolute",
               left: rem(12),
-              top: floating ? 8 : "50%",
+              top: floating ? 7 : "50%",
               transform: floating ? "translateY(0)" : "translateY(-50%)",
               fontSize: floating ? 13 : 14,
               lineHeight: "16px",

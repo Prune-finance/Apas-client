@@ -142,17 +142,19 @@ export default function Header() {
       </div>
 
       <Switch
-        color="var(--prune-primary-600)"
-        c={stage === "LIVE" ? "var(--prune-primary-600)" : "dimmed"}
+        color="var(--prune-primary-700)"
+        c="var(--prune-primary-700)"
         fz={14}
         fw={500}
         labelPosition="left"
         checked={stage === "LIVE"}
-        // defaultChecked={stage === "LIVE"}
         size="xs"
         tt="capitalize"
         label={`${(stage ?? "test").toLowerCase()} Mode`}
-        styles={{ label: { fontSize: 14 } }}
+        styles={{
+          label: { fontSize: 14, fontWeight: 500, color: "var(--prune-primary-700)" },
+          thumb: { borderColor: "var(--prune-primary-700)" },
+        }}
         onChange={(event) => {
           const newStage = event.currentTarget.checked ? "LIVE" : "TEST";
 
@@ -376,17 +378,19 @@ export function UserHeader() {
         </div>
 
         <Switch
-          color="var(--prune-primary-600)"
-          c={stage === "LIVE" ? "var(--prune-primary-600)" : "dimmed"}
+          color="var(--prune-primary-700)"
+          c="var(--prune-primary-700)"
           fz={14}
           fw={500}
           labelPosition="left"
           checked={stage === "LIVE"}
-          // defaultChecked={stage === "LIVE"}
           size="xs"
           tt="capitalize"
           label={`${(stage ?? "test").toLowerCase()} Mode`}
-          styles={{ label: { fontSize: 14 } }}
+          styles={{
+            label: { fontSize: 14, fontWeight: 500, color: "var(--prune-primary-700)" },
+            thumb: { borderColor: "var(--prune-primary-700)" },
+          }}
           onChange={(event) => {
             if (!liveModeService && event.currentTarget.checked) {
               handleInfo(

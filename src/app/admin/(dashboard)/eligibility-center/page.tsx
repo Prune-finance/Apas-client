@@ -23,7 +23,6 @@ import {
   IconCircleCheck,
   IconBuildingSkyscraper,
   IconClock,
-  IconPencilMinus,
 } from "@tabler/icons-react";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
@@ -290,7 +289,7 @@ function QuestionnaireTab() {
         head={tableHeaders}
         rows={<Rows data={data} />}
         loading={loading}
-        columnWidths={["22%", "13%", "9%", "26%", "16%", "14%"]}
+        columnWidths={["28%", "16%", "10%", "30%", "16%"]}
       />
 
       <EmptyTable
@@ -311,7 +310,7 @@ function QuestionnaireTab() {
   );
 }
 
-const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage", "Action"];
+const tableHeaders = ["Business Name", "Date", "Country", "Services", "Stage"];
 
 const eligibilityTabs: Tab[] = [
   { title: "Questionnaire", value: "questionnaire" },
@@ -415,15 +414,6 @@ const Rows = ({ data }: { data: QuestionnaireAdminItem[] | null }) => {
             px={10}
             fw={500}
             fz={12}
-          />
-        </TableTd>
-        <TableTd onClick={(e) => e.stopPropagation()}>
-          <SecondaryBtn
-            text="Edit"
-            leftSection={<IconPencilMinus size={14} />}
-            fw={600}
-            fz={12}
-            action={() => push(`/admin/eligibility-center/${row.reference}/business/edit`)}
           />
         </TableTd>
       </TableTr>

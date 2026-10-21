@@ -501,6 +501,47 @@ export interface BusinessDetail {
   questionnaireReference?: string;
   reviewDocuments?: ReviewDocument[];
   questionnaire?: Questionnaire;
+  wizard?: {
+    steps: { number: number; title: string; completed: boolean; missing: string[] }[];
+    nextStep: number;
+    questionnaireReference: string | null;
+    questionnaireStatus: string | null;
+    questionnaireEditable: boolean;
+    answers: {
+      "1"?: {
+        businessName?: string;
+        tradingName?: string;
+        businessType?: string | null;
+        businessIndustry?: string;
+        countryCode?: string;
+        businessAddress?: string;
+        businessEmail?: string;
+        phoneCountryCode?: string;
+        phoneNumber?: string;
+        businessWebsite?: string | null;
+        businessDescription?: string;
+        isRegulated?: boolean;
+        regulatoryLicence?: string | null;
+        annualTurnover?: string | null;
+        contactPerson?: {
+          name?: string;
+          designation?: string;
+          phoneCountryCode?: string;
+          phoneNumber?: string;
+          email?: string;
+          identityType?: string | null;
+          proofOfAddressType?: string | null;
+          identityDocument?: string | null;
+          identityDocumentBack?: string | null;
+          proofOfAddressDocument?: string | null;
+        };
+      };
+      "2"?: {
+        services?: { service: string; currencies: string[] }[];
+      };
+      "3"?: Record<string, unknown>;
+    };
+  };
   addedBy?: unknown;
   editableByAdmin?: boolean;
   submittedByAdmin?: unknown;

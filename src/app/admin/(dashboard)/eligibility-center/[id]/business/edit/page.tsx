@@ -18,6 +18,7 @@ import { parseError } from "@/lib/actions/auth";
 import useAxios from "@/lib/hooks/useAxios";
 import { useBusinessDetail } from "@/lib/hooks/businesses";
 import { ReferenceData, DEFAULT_REF_DATA } from "@/ui/section/onboarding/shared";
+import countries from "@/assets/countries.json";
 
 import AdminStep1BusinessInfo from "@/ui/section/admin-new-business/AdminStep1BusinessInfo";
 import AdminStep2Services from "@/ui/section/admin-new-business/AdminStep2Services";
@@ -143,63 +144,60 @@ export default function EditBusiness() {
     onSuccess: (data) => setRefData(data),
   });
 
+  const codeToCountryName = (code: string | null | undefined): string => {
+    if (!code) return "";
+    return countries.find((c) => c.code.toUpperCase() === code.toUpperCase())?.name ?? "";
+  };
+
   useEffect(() => {
     if (!loading && detail && !initialized) {
       const ref = detail.reference ?? params.id;
       setAdminReference(ref);
 
-      const questionnaireAnswers = detail.questionnaire?.answers as Record<string, unknown> | undefined;
-      const services = (
-        (questionnaireAnswers?.services as { service: string }[] | undefined) ?? []
-      ).map((s) => s.service);
+      const services = (detail.wizard?.answers?.["2"]?.services ?? []).map((s) => s.service);
       setSelectedServices(services);
 
-      const lastSection = detail.progress?.lastCompletedSection ?? 0;
-      setActive(Math.min(lastSection, STEP_LABELS.length - 1));
+      const nextStep = detail.wizard?.nextStep ?? 1;
+      setActive(Math.min(nextStep - 1, STEP_LABELS.length - 1));
       setInitialized(true);
     }
   }, [loading, detail, initialized, params.id]);
 
-  const biz = detail?.business;
+  const step1Answers = detail?.wizard?.answers?.["1"];
+  const contactPersonAnswers = step1Answers?.contactPerson;
   const contactPerson = detail?.contactPerson;
-  const questionnaireAnswers = detail?.questionnaire?.answers as Record<string, unknown> | undefined;
 
-  const step1InitialValues = biz
+  const step1InitialValues = step1Answers
     ? {
-        businessName: biz.businessName ?? "",
-        tradingName: biz.tradingName ?? "",
-        businessType: biz.businessType ?? "",
-        businessIndustry: biz.businessIndustry ?? "",
-        country: biz.countryCode ?? "",
-        businessAddress: biz.businessAddress ?? "",
-        businessEmail: biz.businessEmail ?? "",
-        phoneNumberCode: biz.businessPhoneCountryCode ?? "+234",
-        phoneNumber: biz.businessPhoneNumber ?? "",
-        businessWebsite: biz.businessWebsite ?? "",
-        businessDescription: biz.businessDescription ?? "",
-        isRegulated: (questionnaireAnswers?.isRegulated as boolean | undefined) ?? false,
-        regulatoryLicence: (questionnaireAnswers?.regulatoryLicence as string | undefined) ?? "",
-        annualTurnover: (questionnaireAnswers?.annualTurnover as string | undefined) ?? "",
-        contactFirstName: contactPerson?.firstName ?? "",
-        contactLastName: contactPerson?.lastName ?? "",
-        contactDesignation: (questionnaireAnswers?.contactDesignation as string | undefined) ?? "",
-        contactEmail: contactPerson?.email ?? "",
-        contactPhoneNumberCode: contactPerson?.phoneCountryCode ?? "+234",
-        contactPhoneNumber: contactPerson?.phoneNumber ?? "",
-        contactIdentityType: contactPerson?.identityType ?? "",
-        contactProofOfAddressType: contactPerson?.proofOfAddressType ?? "",
-        contactIdentityDocumentId:
-          typeof contactPerson?.identityDocument === "string"
-            ? contactPerson.identityDocument
-            : (contactPerson?.identityDocument as any)?.id ?? "",
-        contactProofOfAddressDocumentId:
-          typeof contactPerson?.proofOfAddressDocument === "string"
-            ? contactPerson.proofOfAddressDocument
-            : (contactPerson?.proofOfAddressDocument as any)?.id ?? "",
+        businessName: step1Answers.businessName ?? "",
+        tradingName: step1Answers.tradingName ?? "",
+        businessType: step1Answers.businessType ?? "",
+        businessIndustry: step1Answers.businessIndustry ?? "",
+        country: codeToCountryName(step1Answers.countryCode),
+        businessAddress: step1Answers.businessAddress ?? "",
+        businessEmail: step1Answers.businessEmail ?? "",
+        phoneNumberCode: step1Answers.phoneCountryCode ?? "+234",
+        phoneNumber: step1Answers.phoneNumber ?? "",
+        businessWebsite: step1Answers.businessWebsite ?? "",
+        businessDescription: step1Answers.businessDescription ?? "",
+        isRegulated: step1Answers.isRegulated ?? false,
+        regulatoryLicence: step1Answers.regulatoryLicence ?? "",
+        annualTurnover: step1Answers.annualTurnover ?? "",
+        contactFirstName: contactPersonAnswers?.name?.split(" ")[0] ?? contactPerson?.firstName ?? "",
+        contactLastName: contactPersonAnswers?.name?.split(" ").slice(1).join(" ") || contactPerson?.lastName || "",
+        contactDesignation: contactPersonAnswers?.designation ?? "",
+        contactEmail: contactPersonAnswers?.email ?? contactPerson?.email ?? "",
+        contactPhoneNumberCode: contactPersonAnswers?.phoneCountryCode ?? contactPerson?.phoneCountryCode ?? "+234",
+        contactPhoneNumber: contactPersonAnswers?.phoneNumber ?? contactPerson?.phoneNumber ?? "",
+        contactIdentityType: contactPersonAnswers?.identityType ?? contactPerson?.identityType ?? "",
+        contactProofOfAddressType: contactPersonAnswers?.proofOfAddressType ?? contactPerson?.proofOfAddressType ?? "",
+        contactIdentityDocumentId: contactPersonAnswers?.identityDocument ?? "",
+        contactIdentityDocumentBackId: contactPersonAnswers?.identityDocumentBack ?? "",
+        contactProofOfAddressDocumentId: contactPersonAnswers?.proofOfAddressDocument ?? "",
       }
     : undefined;
 
-  const businessName = biz?.businessName ?? detail?.business?.businessName ?? "";
+  const businessName = detail?.business?.businessName ?? "";
 
   const handleCloseSuccessModal = () => {
     router.push(`/admin/eligibility-center/${params.id}`);

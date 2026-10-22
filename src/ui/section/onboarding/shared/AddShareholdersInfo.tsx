@@ -180,6 +180,7 @@ export const AddShareholdersInfo = ({
               label="First Name"
               w="100%"
               standard={noFloatingLabel}
+              withAsterisk
               key={form.key(`shareholders.${index}.first_name`)}
               {...form.getInputProps(`shareholders.${index}.first_name`)}
               error={nameError(
@@ -192,6 +193,7 @@ export const AddShareholdersInfo = ({
               label="Last Name"
               w="100%"
               standard={noFloatingLabel}
+              withAsterisk
               key={form.key(`shareholders.${index}.last_name`)}
               {...form.getInputProps(`shareholders.${index}.last_name`)}
               error={nameError(

@@ -86,6 +86,7 @@ export const PrimaryBtn = ({
       fz={14}
       fw={600}
       leftSection={Icon && <Icon size={14} />}
+      loaderProps={{ color: "var(--prune-text-gray-800)", size: "xs" }}
       component={Link}
       href={link}
       onClick={(e) => {
@@ -105,6 +106,7 @@ export const PrimaryBtn = ({
       fz={14}
       fw={600}
       leftSection={Icon && <Icon size={14} />}
+      loaderProps={{ color: "var(--prune-text-gray-800)", size: "xs" }}
       onClick={(e) => {
         e.stopPropagation();
         onClick?.(e);

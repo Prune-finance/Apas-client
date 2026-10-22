@@ -162,6 +162,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             label="First Name"
             w="100%"
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("ceoFirstName")}
             error={nameError(form.values.ceoFirstName, "CEO first name", form.errors.ceoFirstName)}
           />
@@ -169,6 +170,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             label="Last Name"
             w="100%"
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("ceoLastName")}
             error={nameError(form.values.ceoLastName, "CEO last name", form.errors.ceoLastName)}
           />
@@ -179,12 +181,14 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             label="Email"
             w="100%"
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("ceoEmail")}
           />
           <DateInputWithInsideLabel
             label="Date of Birth"
             w="100%"
             standard={noFloatingLabel}
+            withAsterisk
             maxDate={new Date()}
             {...form.getInputProps("ceoDOB")}
             error={(() => {

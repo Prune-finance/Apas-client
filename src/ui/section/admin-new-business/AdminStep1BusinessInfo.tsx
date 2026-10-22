@@ -209,6 +209,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             label="Business Name"
             w="100%"
             placeholder="Enter Business Name"
+            withAsterisk
             {...form.getInputProps("businessName")}
           />
           <TextInputWithInsideLabel
@@ -226,6 +227,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             w="100%"
             searchable
             placeholder="Select Business Type"
+            withAsterisk
             {...form.getInputProps("businessType")}
           />
           <SelectInputWithInsideLabel
@@ -234,6 +236,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             searchable
             placeholder="Select Business Industry"
             data={businessIndustries}
+            withAsterisk
             {...form.getInputProps("businessIndustry")}
           />
         </Flex>
@@ -245,12 +248,14 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             searchable
             placeholder="Select Country"
             data={countries.map((c) => c.name)}
+            withAsterisk
             {...form.getInputProps("country")}
           />
           <TextInputWithInsideLabel
             label="Address"
             w="100%"
             placeholder="Enter Address"
+            withAsterisk
             {...form.getInputProps("businessAddress")}
           />
         </Flex>
@@ -260,6 +265,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             label="Email"
             w="100%"
             placeholder="Enter Email"
+            withAsterisk
             {...form.getInputProps("businessEmail")}
           />
           <Box w="100%">
@@ -293,6 +299,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             minRows={5}
             placeholder="Enter Company's Description"
             maxLength={500}
+            withAsterisk
             {...form.getInputProps("businessDescription")}
           />
         </Flex>
@@ -353,12 +360,14 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             label="First Name"
             w="100%"
             placeholder="Enter First Name"
+            withAsterisk
             {...form.getInputProps("contactFirstName")}
           />
           <TextInputWithInsideLabel
             label="Last Name"
             w="100%"
             placeholder="Enter Last Name"
+            withAsterisk
             {...form.getInputProps("contactLastName")}
           />
         </Flex>
@@ -374,6 +383,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             label="Email"
             w="100%"
             placeholder="Enter Email"
+            withAsterisk
             {...form.getInputProps("contactEmail")}
           />
         </Flex>

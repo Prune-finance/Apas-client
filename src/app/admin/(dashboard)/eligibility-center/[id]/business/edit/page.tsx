@@ -273,47 +273,47 @@ export default function EditBusiness() {
 
         <Divider my={20} />
 
-        {active === 0 && adminReference && (
+        <Box style={{ display: active === 0 ? "block" : "none" }}>
           <AdminStep1BusinessInfo
             refData={refData}
-            adminReference={adminReference}
+            adminReference={adminReference ?? undefined}
             initialValues={step1InitialValues}
             onComplete={() => setActive(1)}
           />
-        )}
-        {active === 1 && adminReference && (
+        </Box>
+        <Box style={{ display: active === 1 ? "block" : "none" }}>
           <AdminStep2Services
-            adminReference={adminReference}
+            adminReference={adminReference!}
             onBack={() => setActive(0)}
             onComplete={(services) => {
               setSelectedServices(services);
               setActive(2);
             }}
           />
-        )}
-        {active === 2 && adminReference && (
+        </Box>
+        <Box style={{ display: active === 2 ? "block" : "none" }}>
           <AdminStep3Financials
-            adminReference={adminReference}
+            adminReference={adminReference!}
             selectedServices={selectedServices}
             onBack={() => setActive(1)}
             onComplete={() => setActive(3)}
           />
-        )}
-        {active === 3 && adminReference && (
+        </Box>
+        <Box style={{ display: active === 3 ? "block" : "none" }}>
           <AdminStep4People
-            adminReference={adminReference}
+            adminReference={adminReference!}
             refData={refData}
             onBack={() => setActive(2)}
             onComplete={() => setActive(4)}
           />
-        )}
-        {active === 4 && adminReference && (
+        </Box>
+        <Box style={{ display: active === 4 ? "block" : "none" }}>
           <AdminStep5Documents
-            adminReference={adminReference}
+            adminReference={adminReference!}
             onBack={() => setActive(3)}
             onComplete={openSuccess}
           />
-        )}
+        </Box>
       </Paper>
 
       <ModalComponent

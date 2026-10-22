@@ -148,6 +148,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             placeholder="Enter Business Name"
             standard={noFloatingLabel}
             disabled={!isAdmin}
+            withAsterisk
             {...form.getInputProps("businessName")}
           />
           <TextInputWithInsideLabel
@@ -177,6 +178,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             placeholder="Select Business Industry"
             data={businessIndustries}
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("businessIndustry")}
           />
         </Flex>
@@ -189,6 +191,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             placeholder="Select Country"
             data={countries.map((country) => country.name)}
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("businessCountry")}
           />
           <TextInputWithInsideLabel
@@ -196,6 +199,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             w="100%"
             placeholder="Enter Address"
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("businessAddress")}
           />
         </Flex>
@@ -206,6 +210,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             w="100%"
             placeholder="Enter Email"
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("businessEmail")}
           />
 
@@ -242,6 +247,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             placeholder="Enter Company's Description"
             standard={noFloatingLabel}
             maxLength={500}
+            withAsterisk
             {...form.getInputProps("businessDescription")}
           />
         </Flex>
@@ -258,6 +264,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             w="100%"
             placeholder="Enter First Name"
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("contactPersonFirstName")}
           />
           <TextInputWithInsideLabel
@@ -265,6 +272,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             w="100%"
             placeholder="Enter Last Name"
             standard={noFloatingLabel}
+            withAsterisk
             {...form.getInputProps("contactPersonLastName")}
           />
         </Flex>
@@ -276,6 +284,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             placeholder="Enter Email"
             standard={noFloatingLabel}
             disabled={!isAdmin}
+            withAsterisk
             {...form.getInputProps("contactPersonEmail")}
           />
           <Box w="100%">

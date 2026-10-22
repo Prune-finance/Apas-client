@@ -17,7 +17,13 @@ import CompleteIcon from "@/assets/img/CompleteOnboardingIcon.png";
 const questAxios = createAxiosInstance("questionnaire");
 
 const schema = z.object({
-  signedBy: z.string().min(1, "Name is required"),
+  signedBy: z
+    .string()
+    .min(1, "Name is required")
+    .regex(
+      /^[a-zA-Z\s'\-]+$/,
+      "Name can only contain letters, spaces, hyphens and apostrophes"
+    ),
   designation: z.string().min(1, "Designation is required"),
   signature: z.string().min(1, "Signature is required"),
   email: z.string().email("Invalid email address").min(1, "Email is required"),

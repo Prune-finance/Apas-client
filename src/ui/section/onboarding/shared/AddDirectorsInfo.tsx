@@ -179,6 +179,7 @@ export const AddDirectorsInfo = ({
               label="First Name"
               w="100%"
               standard={noFloatingLabel}
+              withAsterisk
               key={form.key(`directors.${index}.first_name`)}
               {...form.getInputProps(`directors.${index}.first_name`)}
               error={nameError(
@@ -191,6 +192,7 @@ export const AddDirectorsInfo = ({
               label="Last Name"
               w="100%"
               standard={noFloatingLabel}
+              withAsterisk
               key={form.key(`directors.${index}.last_name`)}
               {...form.getInputProps(`directors.${index}.last_name`)}
               error={nameError(

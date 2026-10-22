@@ -330,11 +330,11 @@ function CEOSubStep({
       </Text>
       <Stack gap={24}>
         <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="First Name" w="100%" placeholder="Enter First Name" {...form.getInputProps("ceoFirstName")} />
-          <TextInputWithInsideLabel label="Last Name" w="100%" placeholder="Enter Last Name" {...form.getInputProps("ceoLastName")} />
+          <TextInputWithInsideLabel label="First Name" w="100%" placeholder="Enter First Name" withAsterisk {...form.getInputProps("ceoFirstName")} />
+          <TextInputWithInsideLabel label="Last Name" w="100%" placeholder="Enter Last Name" withAsterisk {...form.getInputProps("ceoLastName")} />
         </Flex>
         <Flex gap={24} w="100%">
-          <TextInputWithInsideLabel label="Email" w="100%" placeholder="Enter Email" {...form.getInputProps("ceoEmail")} />
+          <TextInputWithInsideLabel label="Email" w="100%" placeholder="Enter Email" withAsterisk {...form.getInputProps("ceoEmail")} />
           <DateInputWithInsideLabel
             label="Date of Birth"
             w="100%"
@@ -459,12 +459,14 @@ function PersonListSubStep({
                   label="First Name"
                   w="100%"
                   placeholder="Enter First Name"
+                  withAsterisk
                   {...form.getInputProps(`${listKey}.${idx}.firstName`)}
                 />
                 <TextInputWithInsideLabel
                   label="Last Name"
                   w="100%"
                   placeholder="Enter Last Name"
+                  withAsterisk
                   {...form.getInputProps(`${listKey}.${idx}.lastName`)}
                 />
               </Flex>

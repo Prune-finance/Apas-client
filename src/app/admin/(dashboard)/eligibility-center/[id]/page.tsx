@@ -187,7 +187,11 @@ export default function OnboardingProfile({
         data={adapted}
         loading={loading}
         revalidate={revalidate}
-        onEdit={() => router.push(`/admin/eligibility-center/${params.id}/business/edit`)}
+        onEdit={
+          data?.status === "IN_PROGRESS" && data?.addedBy != null
+            ? () => router.push(`/admin/eligibility-center/${params.id}/business/edit`)
+            : undefined
+        }
       />
       <Tabs
         tabs={tabs}

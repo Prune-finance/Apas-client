@@ -2,7 +2,7 @@
 
 import { Box, Flex, Group, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { isAxiosError } from "axios";
 import { IconCurrencyPound } from "@tabler/icons-react";
 import { NumberInputWithInsideLabel } from "@/ui/components/InputWithLabel/QuestInputs";
@@ -50,6 +50,7 @@ export default function AdminStep3Financials({ adminReference, selectedServices,
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
   const [monetaryBands, setMonetaryBands] = useState<RefOption[]>([]);
+  const hasSaved = useRef(false);
 
   const hasVirtualAccounts = selectedServices.includes("VIRTUAL_ACCOUNTS");
   const hasOperationsAccount = selectedServices.includes("OPERATIONS_ACCOUNT");
@@ -113,9 +114,15 @@ export default function AdminStep3Financials({ adminReference, selectedServices,
   };
 
   const handleSaveAndContinue = async () => {
+    if (hasSaved.current && !form.isDirty()) {
+      onComplete();
+      return;
+    }
     setCompleting(true);
     try {
       await questAxios.post(`/business/onboarding/admin/${adminReference}/steps/3/complete`, buildPayload());
+      hasSaved.current = true;
+      form.resetDirty();
       handleSuccess("Financials", "Financial information saved");
       onComplete();
     } catch (error) {

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { IconHandStop } from "@tabler/icons-react";
 import { Box, Center, Divider, Flex, Loader, Paper, Text, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
@@ -118,9 +118,10 @@ function AdminStepper({ active, steps }: { active: number; steps: string[] }) {
   );
 }
 
-export default function EditBusiness() {
+function EditBusiness() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { handleError, handleSuccess } = useNotification();
 
   const { loading, business: detail } = useBusinessDetail(params.id);
@@ -130,6 +131,8 @@ export default function EditBusiness() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
   const [initialized, setInitialized] = useState(false);
+  const syncingFromUrl = useRef(false);
+  const didInitialUrl = useRef(false);
 
   const [openedHandOver, { open: openHandOver, close: closeHandOver }] =
     useDisclosure(false);
@@ -148,6 +151,34 @@ export default function EditBusiness() {
     if (!code) return "";
     return countries.find((c) => c.code.toUpperCase() === code.toUpperCase())?.name ?? "";
   };
+
+  // Push step to URL so the browser back button restores the previous step
+  useEffect(() => {
+    if (!initialized) return;
+    if (syncingFromUrl.current) {
+      syncingFromUrl.current = false;
+      return;
+    }
+    if (!didInitialUrl.current) {
+      didInitialUrl.current = true;
+      router.replace(`?step=${active}`, { scroll: false });
+      return;
+    }
+    router.push(`?step=${active}`, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [active, initialized]);
+
+  // Restore active from URL when the browser back/forward button is used
+  useEffect(() => {
+    if (!initialized) return;
+    const stepParam = searchParams.get("step");
+    if (stepParam === null) return;
+    const step = parseInt(stepParam, 10);
+    if (isNaN(step) || step === active) return;
+    syncingFromUrl.current = true;
+    setActive(Math.min(step, STEP_LABELS.length - 1));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams, initialized]);
 
   useEffect(() => {
     if (!loading && detail && !initialized) {
@@ -249,7 +280,7 @@ export default function EditBusiness() {
             >
               <span>
                 <SecondaryBtn
-                  text="Hand Over"
+                  text="Hand Over to User"
                   leftSection={<IconHandStop size={16} />}
                   fw={600}
                   action={openHandOver}
@@ -332,5 +363,13 @@ export default function EditBusiness() {
         image={SuccessModalImage.src}
       />
     </main>
+  );
+}
+
+export default function EditBusinessPage() {
+  return (
+    <Suspense fallback={<Center h={400}><Loader color="var(--prune-primary-700)" /></Center>}>
+      <EditBusiness />
+    </Suspense>
   );
 }

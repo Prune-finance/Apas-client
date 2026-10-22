@@ -9,7 +9,7 @@ import {
   Text,
   ThemeIcon,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   IconDatabase,
   IconCreditCard,
@@ -75,6 +75,7 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
   const [selected, setSelected] = useState<ServiceSelection[]>([]);
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const savedSelectionsRef = useRef<ServiceSelection[]>([]);
 
   useEffect(() => {
     questAxios
@@ -135,14 +136,28 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
     }
   };
 
+  const selectionsEqual = (a: ServiceSelection[], b: ServiceSelection[]) => {
+    if (a.length !== b.length) return false;
+    return a.every((itemA) => {
+      const itemB = b.find((x) => x.service === itemA.service);
+      if (!itemB) return false;
+      return JSON.stringify([...itemA.currencies].sort()) === JSON.stringify([...itemB.currencies].sort());
+    });
+  };
+
   const handleSaveAndContinue = async () => {
     if (selected.length === 0) {
       handleError("Validation", "Please select at least one service");
       return;
     }
+    if (savedSelectionsRef.current.length > 0 && selectionsEqual(selected, savedSelectionsRef.current)) {
+      onComplete(selected.map((s) => s.service));
+      return;
+    }
     setCompleting(true);
     try {
       await questAxios.post(`/business/onboarding/admin/${adminReference}/steps/2/complete`, buildPayload());
+      savedSelectionsRef.current = selected.map((s) => ({ ...s, currencies: [...s.currencies] }));
       handleSuccess("Services", "Services saved successfully");
       onComplete(selected.map((s) => s.service));
     } catch (error) {

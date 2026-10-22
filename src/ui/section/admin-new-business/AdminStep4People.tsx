@@ -10,7 +10,7 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { isAxiosError } from "axios";
 import { IconPlus, IconTrash, IconUser, IconUsers } from "@tabler/icons-react";
 import {
@@ -90,6 +90,7 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
   const [subStep, setSubStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const hasSaved = useRef(false);
 
   const form = useForm<PeopleForm>({
     initialValues: {
@@ -169,9 +170,15 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
       setSubStep(0);
       return;
     }
+    if (hasSaved.current && !form.isDirty()) {
+      onComplete();
+      return;
+    }
     setCompleting(true);
     try {
       await questAxios.post(`/business/onboarding/admin/${adminReference}/steps/4/complete`, buildPayload());
+      hasSaved.current = true;
+      form.resetDirty();
       handleSuccess("People", "People information saved");
       onComplete();
     } catch (error) {

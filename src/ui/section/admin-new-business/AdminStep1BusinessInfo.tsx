@@ -123,6 +123,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
   useEffect(() => {
     if (initialValues && Object.keys(initialValues).length > 0) {
       form.setValues((current) => ({ ...current, ...initialValues }));
+      form.resetDirty();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -180,6 +181,11 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
     const { hasErrors } = form.validate();
     if (hasErrors) return;
 
+    if (adminReference && !form.isDirty()) {
+      onComplete(adminReference);
+      return;
+    }
+
     setCompleting(true);
     try {
       const endpoint = adminReference
@@ -187,6 +193,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
         : "/business/onboarding/admin/steps/1/complete";
       const res = await questAxios.post(endpoint, buildPayload());
       const ref = adminReference ?? res.data?.data?.reference;
+      form.resetDirty();
       handleSuccess("Business Information", "Business information saved");
       onComplete(ref ?? "");
     } catch (error) {

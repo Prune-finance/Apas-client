@@ -2,7 +2,7 @@
 
 import { Box, Flex, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { isAxiosError } from "axios";
 import OnBoardingDocumentBox from "@/ui/section/onboarding/shared/onBoardingDocumentBox";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
@@ -29,6 +29,7 @@ export default function AdminStep5Documents({ adminReference, onBack, onComplete
   const { handleSuccess, handleError } = useNotification();
   const [saving, setSaving] = useState(false);
   const [completing, setCompleting] = useState(false);
+  const hasSaved = useRef(false);
 
   const form = useForm<DocsForm>({
     initialValues: {
@@ -72,9 +73,15 @@ export default function AdminStep5Documents({ adminReference, onBack, onComplete
       handleError("Validation", "Please upload all required documents");
       return;
     }
+    if (hasSaved.current && !form.isDirty()) {
+      onComplete();
+      return;
+    }
     setCompleting(true);
     try {
       await questAxios.post(`/business/onboarding/admin/${adminReference}/steps/5/complete`, buildPayload());
+      hasSaved.current = true;
+      form.resetDirty();
       handleSuccess("Documents", "Documents uploaded successfully");
       onComplete();
     } catch (error) {

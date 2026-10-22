@@ -87,7 +87,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
       businessEmail: "",
       phoneNumberCode: "+234",
       phoneNumber: "",
-      businessWebsite: "",
+      businessWebsite: "https://",
       businessDescription: "",
       isRegulated: false,
       regulatoryLicence: "",
@@ -154,7 +154,9 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
       businessEmail: v.businessEmail,
       phoneCountryCode: v.phoneNumberCode,
       phoneNumber: v.phoneNumber,
-      businessWebsite: v.businessWebsite || undefined,
+      businessWebsite: (v.businessWebsite && v.businessWebsite !== "https://" && v.businessWebsite !== "http://")
+        ? v.businessWebsite
+        : undefined,
       businessDescription: v.businessDescription,
       isRegulated: v.isRegulated,
       regulatoryLicence: v.isRegulated ? (v.regulatoryLicence || undefined) : undefined,

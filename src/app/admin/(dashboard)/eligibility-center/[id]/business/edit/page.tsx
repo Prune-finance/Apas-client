@@ -178,7 +178,7 @@ export default function EditBusiness() {
         businessEmail: step1Answers.businessEmail ?? "",
         phoneNumberCode: step1Answers.phoneCountryCode ?? "+234",
         phoneNumber: step1Answers.phoneNumber ?? "",
-        businessWebsite: step1Answers.businessWebsite ?? "",
+        businessWebsite: step1Answers.businessWebsite || "https://",
         businessDescription: step1Answers.businessDescription ?? "",
         isRegulated: step1Answers.isRegulated ?? false,
         regulatoryLicence: step1Answers.regulatoryLicence ?? "",

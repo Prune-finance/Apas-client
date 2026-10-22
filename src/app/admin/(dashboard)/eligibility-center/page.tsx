@@ -21,7 +21,6 @@ import {
 import {
   IconUsersGroup,
   IconCircleCheck,
-  IconBuildingSkyscraper,
   IconClock,
 } from "@tabler/icons-react";
 import { TableComponent } from "@/ui/components/Table";
@@ -105,13 +104,6 @@ function EligibilityCenter() {
       iconColor: "#059669",
     },
     {
-      title: "Total onboarded",
-      num: stats?.onboarded,
-      icon: IconBuildingSkyscraper,
-      iconBg: "#F2F4F7",
-      iconColor: "#344054",
-    },
-    {
       title: "Pending",
       num: stats?.pending,
       icon: IconClock,
@@ -141,7 +133,7 @@ function EligibilityCenter() {
       {/* Stat cards */}
       <Grid align="stretch" mt={32} mb={24}>
         {InfoCards.map((d, i) => (
-          <GridCol span={{ base: 12, xs: 6, md: 3 }} key={i}>
+          <GridCol span={{ base: 12, xs: 6, md: 4 }} key={i}>
             <Box className={classes.stat__card}>
               <Flex align="flex-start" justify="space-between">
                 <div

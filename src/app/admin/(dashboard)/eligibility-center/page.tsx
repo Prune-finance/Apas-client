@@ -63,10 +63,10 @@ const toCountryCode = (value: string): string => {
 
 const statusToStage: Record<string, STAGE> = {
   IN_PROGRESS: "In Progress",
-  ONBOARDING_INVITED: "Onboarding Invited",
+  ONBOARDING_INVITED: "Invited",
   SUBMITTED: "Submitted",
   NOT_ELIGIBLE: "REJECTED",
-  QUESTIONNAIRE_COMPLETED: "Questionnaire Completed",
+  QUESTIONNAIRE_COMPLETED: "Completed",
 };
 
 const SERVICE_OPTIONS = [

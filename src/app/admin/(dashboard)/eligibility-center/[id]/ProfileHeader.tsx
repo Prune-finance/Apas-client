@@ -23,6 +23,7 @@ const questionnaireStatusLabels: Record<string, string> = {
   ONBOARDING_INVITED: "Onboarding Invited",
   SUBMITTED: "Submitted",
   NOT_ELIGIBLE: "REJECTED",
+  QUESTIONNAIRE_COMPLETED: "Questionnaire Completed",
 };
 
 export default function ProfileHeader({
@@ -247,7 +248,7 @@ export default function ProfileHeader({
 
       <Group gap={10} wrap="wrap">
         {onEdit && (
-          <SecondaryBtn
+          <PrimaryBtn
             text="Edit"
             fw={600}
             fz={12}

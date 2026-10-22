@@ -91,7 +91,9 @@ export type STAGE =
   | "In Progress"
   | "Onboarding Invited"
   | "Submitted"
-  | "Questionnaire Completed";
+  | "Questionnaire Completed"
+  | "Completed"
+  | "Invited";
 
 export const stageColor = (stage: STAGE) => {
   switch (stage) {
@@ -110,10 +112,12 @@ export const stageColor = (stage: STAGE) => {
     case "In Progress":
       return "#FFC107";
     case "Onboarding Invited":
+    case "Invited":
       return "var(--prune-primary-700)";
     case "Submitted":
       return "#1570EF";
     case "Questionnaire Completed":
+    case "Completed":
       return "#12B76A";
     default:
       return "#FFA940";

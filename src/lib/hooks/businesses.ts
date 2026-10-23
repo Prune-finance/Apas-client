@@ -531,9 +531,9 @@ export interface BusinessDetail {
           email?: string;
           identityType?: string | null;
           proofOfAddressType?: string | null;
-          identityDocument?: string | null;
-          identityDocumentBack?: string | null;
-          proofOfAddressDocument?: string | null;
+          identityDocument?: { id: string; kind?: string; fileName?: string } | null;
+          identityDocumentBack?: { id: string; kind?: string; fileName?: string } | null;
+          proofOfAddressDocument?: { id: string; kind?: string; fileName?: string } | null;
         };
       };
       "2"?: {

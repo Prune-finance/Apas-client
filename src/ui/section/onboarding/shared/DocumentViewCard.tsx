@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, Button, Flex, Loader, Modal, Select, Stack, Text, TextInput, Textarea, UnstyledButton } from "@mantine/core";
+import { Box, Button, Flex, Loader, Modal, Select, Stack, Text, Textarea, UnstyledButton } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 
@@ -24,6 +24,8 @@ import PDFICON from "@/assets/img/pdf-icon.png";
 import FileDisplay from "@/ui/components/DocumentViewer";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import createAxiosInstance from "@/lib/axios";
+import { parseError } from "@/lib/actions/auth";
+import useNotification from "@/lib/hooks/notification";
 import type { ReviewStatus } from "@/lib/hooks/businesses";
 
 const questAxios = createAxiosInstance("questionnaire");
@@ -60,6 +62,7 @@ export default function DocumentViewCard({
 }: DocumentViewCardProps) {
   const [opened, { open, close }] = useDisclosure(false);
   const [rejectOpened, { open: openRejectModal, close: closeRejectModal }] = useDisclosure(false);
+  const { handleError } = useNotification();
   const [resolving, setResolving] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [approving, setApproving] = useState(false);
@@ -138,8 +141,8 @@ export default function DocumentViewCard({
       close();
       closeRejectModal();
       onReview?.();
-    } catch {
-      // silently fail — user can retry
+    } catch (error) {
+      handleError("An error occurred", parseError(error));
     } finally {
       setApproving(false);
       setRejecting(false);
@@ -249,12 +252,15 @@ export default function DocumentViewCard({
             comboboxProps={{ zIndex: 500 }}
           />
           {rejectReason === "Other" && (
-            <TextInput
+            <Textarea
               label="Please specify"
               placeholder="Enter reason"
               value={rejectReasonOther}
               onChange={(e) => setRejectReasonOther(e.currentTarget.value)}
-              maxLength={150}
+              maxLength={40}
+              description={`${rejectReasonOther.length}/40 characters`}
+              minRows={2}
+              autosize
             />
           )}
           <Textarea

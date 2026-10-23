@@ -304,7 +304,7 @@ export default function ProfileHeader({
             loading={loadingLink}
           />
         )}
-        {data?.questionnaireStatus === "ONBOARDING_INVITED" && !data.onboarding?.signedUpAt && (
+        {data?.questionnaireStatus === "ONBOARDING_INVITED" && (
           <ResendInvitationButton
             linkSentAt={data.onboarding?.linkSentAt}
             loading={loadingResendInvitation}

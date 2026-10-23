@@ -116,7 +116,7 @@ export default function SingleEligibilityBusiness() {
     setProcessingActivate(true);
     try {
       await questAxios.post(
-        `/business/onboarding/admin/${detail.reference}/activate`,
+        `/business/onboarding/admin/${detail.reference}/approve`,
         { tier }
       );
       const email =

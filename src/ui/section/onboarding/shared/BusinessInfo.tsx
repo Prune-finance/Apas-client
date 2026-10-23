@@ -17,7 +17,8 @@ import { useState } from "react";
 import { businessIndustries } from "@/lib/static";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
-import { isAxiosError } from "axios";
+import { extractApiErrors } from "./utils";
+
 import { ReferenceData } from "./types";
 
 const questAxios = createAxiosInstance("questionnaire");
@@ -125,10 +126,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
       handleSuccess("Business Information", "Business information saved");
       setActive(active + 1);
     } catch (error) {
-      handleError(
-        "An error occurred",
-        isAxiosError(error) ? error.response?.data?.message : "Something went wrong"
-      );
+      handleError("An error occurred", extractApiErrors(error));
     } finally {
       setCompleting(false);
     }

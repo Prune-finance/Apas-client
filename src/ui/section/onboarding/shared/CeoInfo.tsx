@@ -20,7 +20,7 @@ import { UseFormReturnType } from "@mantine/form";
 import { useState } from "react";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
-import { isAxiosError } from "axios";
+import { extractApiErrors } from "./utils";
 import { ReferenceData } from "./types";
 
 const questAxios = createAxiosInstance("questionnaire");
@@ -114,10 +114,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
       await questAxios.patch(sectionBase, buildSection2Body(form));
       handleSuccess("Progress Saved", "Your progress has been saved");
     } catch (error) {
-      handleError(
-        "Save failed",
-        isAxiosError(error) ? error.response?.data?.message : "Something went wrong"
-      );
+      handleError("Save failed", extractApiErrors(error));
     } finally {
       setSaving(false);
     }
@@ -138,10 +135,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
       handleSuccess("CEO Details", "CEO details saved");
       setActive(active + 1);
     } catch (error) {
-      handleError(
-        "An error occurred",
-        isAxiosError(error) ? error.response?.data?.message : "Something went wrong"
-      );
+      handleError("An error occurred", extractApiErrors(error));
     } finally {
       setCompleting(false);
     }

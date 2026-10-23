@@ -7,10 +7,10 @@ import {
 import { Box, Center, Flex, Image, Modal, Stack, Text } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { isAxiosError } from "axios";
 import { z } from "zod";
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
+import { extractApiErrors } from "./utils";
 import { useState } from "react";
 import CompleteIcon from "@/assets/img/CompleteOnboardingIcon.png";
 
@@ -25,7 +25,13 @@ const schema = z.object({
       "Name can only contain letters, spaces, hyphens and apostrophes"
     ),
   designation: z.string().min(1, "Designation is required"),
-  signature: z.string().min(1, "Signature is required"),
+  signature: z
+    .string()
+    .min(1, "Signature is required")
+    .regex(
+      /^[a-zA-Z\s'\-]+$/,
+      "Signature can only contain letters, spaces, hyphens and apostrophes"
+    ),
   email: z.string().email("Invalid email address").min(1, "Email is required"),
 });
 
@@ -80,14 +86,7 @@ export default function SubmitOnboardingModal({
       close();
       openSuccess();
     } catch (error) {
-      if (isAxiosError(error)) {
-        const msg =
-          error.response?.data?.message ??
-          "An error occurred while submitting";
-        handleError("Submission failed", msg);
-      } else {
-        handleError("Submission failed", "An error occurred while submitting");
-      }
+      handleError("Submission failed", extractApiErrors(error));
     } finally {
       setLoading(false);
     }

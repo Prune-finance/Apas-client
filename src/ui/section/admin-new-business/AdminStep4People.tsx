@@ -158,7 +158,7 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
       await questAxios.patch(`/business/onboarding/admin/${adminReference}/steps/4`, buildPayload());
       handleSuccess("Progress Saved", "Your progress has been saved");
     } catch (error) {
-      handleError("Save failed", isAxiosError(error) ? error.response?.data?.message : "Something went wrong");
+      handleError("Save failed", isAxiosError(error) ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong") : "Something went wrong");
     } finally {
       setSaving(false);
     }
@@ -182,7 +182,7 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
       handleSuccess("People", "People information saved");
       onComplete();
     } catch (error) {
-      handleError("An error occurred", isAxiosError(error) ? error.response?.data?.message : "Something went wrong");
+      handleError("An error occurred", isAxiosError(error) ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong") : "Something went wrong");
     } finally {
       setCompleting(false);
     }
@@ -385,7 +385,7 @@ function CEOSubStep({
                   formKey="ceoIdentityDocumentBackId"
                   form={form}
                   uploadedFileUrl={form.values.ceoIdentityDocumentBackId}
-                  kind="IDENTITY"
+                  kind="IDENTITY_BACK"
                   adminReference={adminReference}
                   uploadWithReference
                 />
@@ -527,7 +527,7 @@ function PersonListSubStep({
                         formKey={`${listKey}.${idx}.identityDocumentBackId`}
                         form={form}
                         uploadedFileUrl={person.identityDocumentBackId}
-                        kind="IDENTITY"
+                        kind="IDENTITY_BACK"
                         adminReference={adminReference}
                         uploadWithReference
                       />

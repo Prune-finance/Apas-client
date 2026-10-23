@@ -130,7 +130,7 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
       await questAxios.patch(`/business/onboarding/admin/${adminReference}/steps/2`, buildPayload());
       handleSuccess("Progress Saved", "Your progress has been saved");
     } catch (error) {
-      handleError("Save failed", isAxiosError(error) ? error.response?.data?.message : "Something went wrong");
+      handleError("Save failed", isAxiosError(error) ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong") : "Something went wrong");
     } finally {
       setSaving(false);
     }
@@ -161,7 +161,7 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
       handleSuccess("Services", "Services saved successfully");
       onComplete(selected.map((s) => s.service));
     } catch (error) {
-      handleError("An error occurred", isAxiosError(error) ? error.response?.data?.message : "Something went wrong");
+      handleError("An error occurred", isAxiosError(error) ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong") : "Something went wrong");
     } finally {
       setCompleting(false);
     }
@@ -173,7 +173,7 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
         Services
       </Text>
       <Text fz={13} c="var(--prune-text-gray-500)" mt={4} mb={20}>
-        Select the services this business will use and the currencies for each.
+        What service(s) is this Entity interested in?
       </Text>
 
       <SimpleGrid cols={{ base: 1, md: 2 }}>

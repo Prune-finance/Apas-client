@@ -62,7 +62,7 @@ export default function AdminStep5Documents({ adminReference, onBack, onComplete
       await questAxios.patch(`/business/onboarding/admin/${adminReference}/steps/5`, buildPayload());
       handleSuccess("Progress Saved", "Your progress has been saved");
     } catch (error) {
-      handleError("Save failed", isAxiosError(error) ? error.response?.data?.message : "Something went wrong");
+      handleError("Save failed", isAxiosError(error) ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong") : "Something went wrong");
     } finally {
       setSaving(false);
     }
@@ -85,7 +85,7 @@ export default function AdminStep5Documents({ adminReference, onBack, onComplete
       handleSuccess("Documents", "Documents uploaded successfully");
       onComplete();
     } catch (error) {
-      handleError("An error occurred", isAxiosError(error) ? error.response?.data?.message : "Something went wrong");
+      handleError("An error occurred", isAxiosError(error) ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong") : "Something went wrong");
     } finally {
       setCompleting(false);
     }

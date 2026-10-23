@@ -199,7 +199,9 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
     } catch (error) {
       handleError(
         "An error occurred",
-        isAxiosError(error) ? error.response?.data?.message : "Something went wrong"
+        isAxiosError(error)
+          ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong")
+          : "Something went wrong"
       );
     } finally {
       setCompleting(false);
@@ -445,7 +447,7 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
                   formKey="contactIdentityDocumentBackId"
                   form={form}
                   uploadedFileUrl={form.values.contactIdentityDocumentBackId}
-                  kind="IDENTITY"
+                  kind="IDENTITY_BACK"
                   isAdmin
                 />
               )}

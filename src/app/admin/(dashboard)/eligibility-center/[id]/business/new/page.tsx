@@ -187,7 +187,7 @@ function NewBusiness() {
       <Breadcrumbs
         items={[
           { title: "Eligibility Center", href: "/admin/eligibility-center" },
-          { title: "Create New Business", href: "#" },
+          { title: "Create New Profile", href: "#" },
         ]}
       />
 
@@ -218,7 +218,7 @@ function NewBusiness() {
           mt={28}
           style={{ fontFamily: "'EksellDisplay', serif" }}
         >
-          Create New Business
+          Create New Profile
         </Text>
 
         <AdminStepper active={active} steps={STEP_LABELS} />

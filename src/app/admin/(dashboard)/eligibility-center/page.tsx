@@ -122,9 +122,8 @@ function EligibilityCenter() {
           </Text>
         </Box>
         <PrimaryBtn
-          text="New Profile"
+          text="Add New Profile"
           link="/admin/eligibility-center/new/business/new"
-          leftSection={<IconPlus size={16} />}
           fw={600}
           fz={14}
         />

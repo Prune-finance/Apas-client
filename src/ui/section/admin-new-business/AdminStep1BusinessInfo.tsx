@@ -7,7 +7,15 @@ import {
 } from "@/ui/components/InputWithLabel";
 import { PhoneNumberInput } from "@/ui/components/InputWithLabel/QuestInputs";
 import CustomRadio from "@/ui/components/CustomRadio";
-import { Box, Flex, RadioGroup, SimpleGrid, Stack, Switch, Text } from "@mantine/core";
+import {
+  Box,
+  Flex,
+  RadioGroup,
+  SimpleGrid,
+  Stack,
+  Switch,
+  Text,
+} from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState, useEffect } from "react";
 import { isAxiosError } from "axios";
@@ -58,9 +66,17 @@ interface Props {
   initialValues?: Partial<AdminStep1Values>;
 }
 
-interface RefOption { value: string; label: string }
+interface RefOption {
+  value: string;
+  label: string;
+}
 
-export default function AdminStep1BusinessInfo({ refData, onComplete, adminReference, initialValues }: Props) {
+export default function AdminStep1BusinessInfo({
+  refData,
+  onComplete,
+  adminReference,
+  initialValues,
+}: Props) {
   const { handleSuccess, handleError } = useNotification();
   const [completing, setCompleting] = useState(false);
   const [monetaryBands, setMonetaryBands] = useState<RefOption[]>([]);
@@ -110,13 +126,25 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
       businessIndustry: (v) => (!v ? "Business industry is required" : null),
       country: (v) => (!v ? "Country is required" : null),
       businessAddress: (v) => (!v.trim() ? "Address is required" : null),
-      businessEmail: (v) => (!v.trim() ? "Email is required" : !/^\S+@\S+\.\S+$/.test(v) ? "Invalid email" : null),
+      businessEmail: (v) =>
+        !v.trim()
+          ? "Email is required"
+          : !/^\S+@\S+\.\S+$/.test(v)
+            ? "Invalid email"
+            : null,
       phoneNumber: (v) => (!v.trim() ? "Phone number is required" : null),
-      businessDescription: (v) => (!v.trim() ? "Description is required" : null),
+      businessDescription: (v) =>
+        !v.trim() ? "Description is required" : null,
       contactFirstName: (v) => (!v.trim() ? "First name is required" : null),
       contactLastName: (v) => (!v.trim() ? "Last name is required" : null),
-      contactEmail: (v) => (!v.trim() ? "Email is required" : !/^\S+@\S+\.\S+$/.test(v) ? "Invalid email" : null),
-      contactPhoneNumber: (v) => (!v.trim() ? "Phone number is required" : null),
+      contactEmail: (v) =>
+        !v.trim()
+          ? "Email is required"
+          : !/^\S+@\S+\.\S+$/.test(v)
+            ? "Invalid email"
+            : null,
+      contactPhoneNumber: (v) =>
+        !v.trim() ? "Phone number is required" : null,
     },
   });
 
@@ -131,7 +159,9 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
   form.watch("country", ({ value }) => {
     if (!value) return;
     const match = countriesWithCode.find(
-      (c) => c.label.split(" ").slice(1).join(" ").toLowerCase() === value.toLowerCase()
+      (c) =>
+        c.label.split(" ").slice(1).join(" ").toLowerCase() ===
+        value.toLowerCase(),
     );
     if (match) form.setFieldValue("phoneNumberCode", match.value);
   });
@@ -140,7 +170,9 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
   const isFormReady =
     form.isValid() &&
     (!v.contactIdentityType || v.contactIdentityDocumentId) &&
-    (!v.contactIdentityType || v.contactIdentityType === "PASSPORT" || v.contactIdentityDocumentBackId) &&
+    (!v.contactIdentityType ||
+      v.contactIdentityType === "PASSPORT" ||
+      v.contactIdentityDocumentBackId) &&
     (!v.contactProofOfAddressType || v.contactProofOfAddressDocumentId);
 
   const buildPayload = () => {
@@ -155,12 +187,17 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
       businessEmail: v.businessEmail,
       phoneCountryCode: v.phoneNumberCode,
       phoneNumber: v.phoneNumber,
-      businessWebsite: (v.businessWebsite && v.businessWebsite !== "https://" && v.businessWebsite !== "http://")
-        ? v.businessWebsite
-        : undefined,
+      businessWebsite:
+        v.businessWebsite &&
+        v.businessWebsite !== "https://" &&
+        v.businessWebsite !== "http://"
+          ? v.businessWebsite
+          : undefined,
       businessDescription: v.businessDescription,
       isRegulated: v.isRegulated,
-      regulatoryLicence: v.isRegulated ? (v.regulatoryLicence || undefined) : undefined,
+      regulatoryLicence: v.isRegulated
+        ? v.regulatoryLicence || undefined
+        : undefined,
       annualTurnover: v.annualTurnover || undefined,
       contactPerson: {
         name: `${v.contactFirstName} ${v.contactLastName}`.trim(),
@@ -172,7 +209,8 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
         proofOfAddressType: v.contactProofOfAddressType || undefined,
         identityDocumentId: v.contactIdentityDocumentId || undefined,
         identityDocumentBackId: v.contactIdentityDocumentBackId || undefined,
-        proofOfAddressDocumentId: v.contactProofOfAddressDocumentId || undefined,
+        proofOfAddressDocumentId:
+          v.contactProofOfAddressDocumentId || undefined,
       },
     };
   };
@@ -200,8 +238,10 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
       handleError(
         "An error occurred",
         isAxiosError(error)
-          ? (error.response?.data?.issues?.[0]?.message ?? error.response?.data?.message ?? "Something went wrong")
-          : "Something went wrong"
+          ? (error.response?.data?.issues?.[0]?.message ??
+              error.response?.data?.message ??
+              "Something went wrong")
+          : "Something went wrong",
       );
     } finally {
       setCompleting(false);
@@ -315,13 +355,22 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
           />
         </Flex>
 
-        <Flex gap={24} w="100%" align="center" mb={form.values.isRegulated ? 0 : 16}>
+        <Flex
+          gap={24}
+          w="100%"
+          align="center"
+          mb={form.values.isRegulated ? 0 : 16}
+        >
           <Switch
             label="Is the business regulated?"
             checked={form.values.isRegulated}
-            onChange={(e) => form.setFieldValue("isRegulated", e.currentTarget.checked)}
+            onChange={(e) =>
+              form.setFieldValue("isRegulated", e.currentTarget.checked)
+            }
             color="var(--prune-primary-700)"
-            styles={{ label: { fontSize: 14, color: "var(--prune-text-gray-700)" } }}
+            styles={{
+              label: { fontSize: 14, color: "var(--prune-text-gray-700)" },
+            }}
           />
         </Flex>
 
@@ -353,7 +402,11 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             >
               <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing={12}>
                 {monetaryBands.map((option) => (
-                  <CustomRadio key={option.value} value={option.value} label={option.label} />
+                  <CustomRadio
+                    key={option.value}
+                    value={option.value}
+                    label={option.label}
+                  />
                 ))}
               </SimpleGrid>
             </RadioGroup>
@@ -361,7 +414,13 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
         )}
       </Stack>
 
-      <Text c="var(--prune-text-gray-700)" fz={16} fw={700} style={eksellStyle} mt={32}>
+      <Text
+        c="var(--prune-text-gray-700)"
+        fz={16}
+        fw={700}
+        style={eksellStyle}
+        mt={32}
+      >
         Contact Person
       </Text>
 
@@ -390,16 +449,6 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             placeholder="Enter Designation"
             {...form.getInputProps("contactDesignation")}
           />
-          <TextInputWithInsideLabel
-            label="Email"
-            w="100%"
-            placeholder="Enter Email"
-            withAsterisk
-            {...form.getInputProps("contactEmail")}
-          />
-        </Flex>
-
-        <Box w="50%">
           <PhoneNumberInput<AdminStep1Values>
             form={form}
             phoneNumberKey="contactPhoneNumber"
@@ -408,6 +457,16 @@ export default function AdminStep1BusinessInfo({ refData, onComplete, adminRefer
             unfocusedBorderColor="#f2f4f7"
             inputBackground="#fcfcfd"
             alwaysShowLabel
+          />
+        </Flex>
+
+        <Box w="100%">
+          <TextInputWithInsideLabel
+            label="Email"
+            w="100%"
+            placeholder="Enter Email"
+            withAsterisk
+            {...form.getInputProps("contactEmail")}
           />
         </Box>
 

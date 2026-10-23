@@ -3,12 +3,12 @@
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { IconHandStop } from "@tabler/icons-react";
-import { Box, Center, Divider, Flex, Loader, Paper, Text, Tooltip } from "@mantine/core";
+import { Box, Center, Divider, Flex, Loader, Modal, Paper, Stack, Text, ThemeIcon, Tooltip } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "./styles.module.scss";
-import { SecondaryBtn } from "@/ui/components/Buttons";
+import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import ModalComponent from "@/ui/components/Modal";
 import SuccessModal from "@/ui/components/SuccessModal";
 import SuccessModalImage from "@/assets/img/success-modal-image.png";
@@ -129,7 +129,9 @@ function NewBusiness() {
 
   const [openedHandOver, { open: openHandOver, close: closeHandOver }] =
     useDisclosure(false);
-  const [openedSuccess, { open: openSuccess, close: closeSuccess }] =
+  const [openedFinalStep, { open: openFinalStep, close: closeFinalStep }] =
+    useDisclosure(false);
+  const [openedSuccess, { close: closeSuccess }] =
     useDisclosure(false);
 
   useAxios<ReferenceData>({
@@ -176,6 +178,7 @@ function NewBusiness() {
       );
       handleSuccess("Application Handed Over", "The application has been handed over to the user");
       closeHandOver();
+      closeFinalStep();
       router.push("/admin/eligibility-center");
     } catch (error) {
       handleError("Hand Over Failed", parseError(error));
@@ -268,12 +271,42 @@ function NewBusiness() {
               <AdminStep5Documents
                 adminReference={adminReference}
                 onBack={() => setActive(3)}
-                onComplete={openSuccess}
+                onComplete={openFinalStep}
               />
             </Box>
           </Box>
         )}
       </Paper>
+
+      <Modal
+        opened={openedFinalStep}
+        onClose={closeFinalStep}
+        centered
+        size="sm"
+        withCloseButton={false}
+        padding="xl"
+        radius="md"
+      >
+        <Stack align="center" gap={16}>
+          <ThemeIcon
+            size={64}
+            radius="xl"
+            color="hsl(from var(--prune-primary-700) h s l / .1)"
+          >
+            <IconHandStop size={32} color="var(--prune-primary-700)" />
+          </ThemeIcon>
+          <Text fz={18} fw={700} c="var(--prune-text-gray-700)" ta="center" style={{ fontFamily: "'EksellDisplay', serif" }}>
+            One More Step!
+          </Text>
+          <Text fz={14} c="var(--prune-text-gray-500)" ta="center">
+            All admin steps are complete. The next step is for the customer to review and agree to the terms & conditions and complete the consent form. Hand over to the customer to proceed.
+          </Text>
+          <Flex gap={12} mt={8} w="100%" justify="center">
+            <SecondaryBtn text="Do It Later" action={closeFinalStep} fw={600} />
+            <PrimaryBtn text="Hand Over to User" action={handleHandOver} fw={600} leftSection={<IconHandStop size={16} />} />
+          </Flex>
+        </Stack>
+      </Modal>
 
       <ModalComponent
         opened={openedHandOver}

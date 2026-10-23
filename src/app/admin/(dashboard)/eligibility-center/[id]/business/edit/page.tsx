@@ -222,9 +222,9 @@ function EditBusiness() {
         contactPhoneNumber: contactPersonAnswers?.phoneNumber ?? contactPerson?.phoneNumber ?? "",
         contactIdentityType: contactPersonAnswers?.identityType ?? contactPerson?.identityType ?? "",
         contactProofOfAddressType: contactPersonAnswers?.proofOfAddressType ?? contactPerson?.proofOfAddressType ?? "",
-        contactIdentityDocumentId: contactPersonAnswers?.identityDocument ?? "",
-        contactIdentityDocumentBackId: contactPersonAnswers?.identityDocumentBack ?? "",
-        contactProofOfAddressDocumentId: contactPersonAnswers?.proofOfAddressDocument ?? "",
+        contactIdentityDocumentId: contactPersonAnswers?.identityDocument?.id ?? "",
+        contactIdentityDocumentBackId: contactPersonAnswers?.identityDocumentBack?.id ?? "",
+        contactProofOfAddressDocumentId: contactPersonAnswers?.proofOfAddressDocument?.id ?? "",
       }
     : undefined;
 

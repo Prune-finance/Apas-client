@@ -15,6 +15,7 @@ import {
   Stack,
   Switch,
   Text,
+  Tooltip,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useState, useEffect } from "react";
@@ -137,6 +138,7 @@ export default function AdminStep1BusinessInfo({
         !v.trim() ? "Description is required" : null,
       contactFirstName: (v) => (!v.trim() ? "First name is required" : null),
       contactLastName: (v) => (!v.trim() ? "Last name is required" : null),
+      contactDesignation: (v) => (!v.trim() ? "Designation is required" : null),
       contactEmail: (v) =>
         !v.trim()
           ? "Email is required"
@@ -447,6 +449,7 @@ export default function AdminStep1BusinessInfo({
             label="Designation"
             w="100%"
             placeholder="Enter Designation"
+            withAsterisk
             {...form.getInputProps("contactDesignation")}
           />
           <PhoneNumberInput<AdminStep1Values>
@@ -460,15 +463,23 @@ export default function AdminStep1BusinessInfo({
           />
         </Flex>
 
-        <Box w="100%">
-          <TextInputWithInsideLabel
-            label="Email"
-            w="100%"
-            placeholder="Enter Email"
-            withAsterisk
-            {...form.getInputProps("contactEmail")}
-          />
-        </Box>
+        <Tooltip
+          label="All notifications and correspondence will be sent to this email address"
+          withArrow
+          position="top"
+          multiline
+          w={260}
+        >
+          <Box w="100%">
+            <TextInputWithInsideLabel
+              label="Email"
+              w="100%"
+              placeholder="Enter Email"
+              withAsterisk
+              {...form.getInputProps("contactEmail")}
+            />
+          </Box>
+        </Tooltip>
 
         <Flex gap={24} w="100%">
           <SelectInputWithInsideLabel

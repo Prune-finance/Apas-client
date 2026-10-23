@@ -124,6 +124,7 @@ function NewBusiness() {
   const [active, setActive] = useState(0);
   const [adminReference, setAdminReference] = useState<string | null>(null);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [handingOver, setHandingOver] = useState(false);
   const [refData, setRefData] = useState<ReferenceData>(DEFAULT_REF_DATA);
   const syncingFromUrl = useRef(false);
 
@@ -172,6 +173,7 @@ function NewBusiness() {
 
   const handleHandOver = async () => {
     if (!adminReference) return;
+    setHandingOver(true);
     try {
       await questAxios.post(
         `/business/onboarding/admin/${adminReference}/hand-over`
@@ -182,6 +184,8 @@ function NewBusiness() {
       router.push("/admin/eligibility-center");
     } catch (error) {
       handleError("Hand Over Failed", parseError(error));
+    } finally {
+      setHandingOver(false);
     }
   };
 
@@ -303,7 +307,7 @@ function NewBusiness() {
           </Text>
           <Flex gap={12} mt={8} w="100%" justify="center">
             <SecondaryBtn text="Do It Later" action={closeFinalStep} fw={600} />
-            <PrimaryBtn text="Hand Over to User" action={handleHandOver} fw={600} leftSection={<IconHandStop size={16} />} />
+            <PrimaryBtn text="Hand Over to User" action={handleHandOver} fw={600} loading={handingOver} leftSection={<IconHandStop size={16} />} />
           </Flex>
         </Stack>
       </Modal>
@@ -315,6 +319,7 @@ function NewBusiness() {
         title="Hand Over Application?"
         text="Are you sure you want to hand over this application to the user to complete? You will no longer be able to edit it."
         action={handleHandOver}
+        processing={handingOver}
         color="hsl(from var(--prune-primary-700) h s l / .1)"
       />
 

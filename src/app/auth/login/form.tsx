@@ -12,6 +12,7 @@ import axios from "axios";
 import createAxiosInstance from "@/lib/axios";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import TwoFactorModals, { type TwoFactorStep } from "./TwoFactorModals";
 
 const authAxios = createAxiosInstance("auth");
 
@@ -59,6 +60,10 @@ function LoginForm() {
   const { setUser } = User();
   const { handleSuccess, handleError } = useNotification();
 
+  // 2FA state
+  const [challengeToken, setChallengeToken] = useState("");
+  const [twoFactorStep, setTwoFactorStep] = useState<TwoFactorStep | null>(null);
+
   const form = useForm<LoginType>({
     initialValues: loginValues,
     validate: zodResolver(validateLogin),
@@ -91,11 +96,11 @@ function LoginForm() {
       if (hasErrors) return;
 
       const { data } = await axios.post("/api/auth/login", form.values);
-      Cookies.set("auth", data.meta.token, { expires: 0.25 });
-      handleSuccess("Authentication Successful", "Welcome back");
 
+      // Onboarding accounts still get a token directly
       if (data.meta.accountType === "ONBOARDING") {
-        // Fetch full onboarding profile and store it
+        Cookies.set("auth", data.meta.token, { expires: 0.25 });
+        handleSuccess("Authentication Successful", "Welcome back");
         try {
           const meRes = await authAxios.get("/business/onboarding/auth/me");
           setUser(meRes.data?.data ?? data.data);
@@ -106,9 +111,25 @@ function LoginForm() {
         return;
       }
 
-      // Fully onboarded user — use login response data
-      setUser(data.data);
-      window.location.replace(redirect ? redirect : "/");
+      // Dashboard user
+      const { token, challengeToken: ct, twoFactorSetupRequired, twoFactorRequired } = data.meta;
+
+      // If server returns a token directly (no 2FA enforced yet), proceed normally
+      if (token && !ct) {
+        Cookies.set("auth", token, { expires: 0.25 });
+        handleSuccess("Authentication Successful", "Welcome back");
+        setUser(data.data);
+        window.location.replace(redirect ? redirect : "/");
+        return;
+      }
+
+      // 2FA challenge — show the appropriate modal
+      setChallengeToken(ct ?? "");
+      if (twoFactorSetupRequired) {
+        setTwoFactorStep("protect");
+      } else if (twoFactorRequired) {
+        setTwoFactorStep("enter");
+      }
     } catch (error: any) {
       const status = error?.response?.status ?? error?.response?.data?.code;
       if (status === 429) {
@@ -122,67 +143,83 @@ function LoginForm() {
     }
   };
 
+  const handleTwoFactorComplete = (token: string, userData: any) => {
+    Cookies.set("auth", token, { expires: 0.25 });
+    handleSuccess("Authentication Successful", "Welcome back");
+    setUser(userData);
+    window.location.replace(redirect ? redirect : "/");
+  };
+
   const isCoolingDown = cooldown > 0;
 
   return (
-    <Box component="form" mt={32} onSubmit={form.onSubmit(() => handleLogin())}>
-      <Stack gap={16}>
-        <TextInput
-          styles={fieldStyles}
-          placeholder="Email"
-          {...form.getInputProps("email")}
-        />
+    <>
+      <Box component="form" mt={32} onSubmit={form.onSubmit(() => handleLogin())}>
+        <Stack gap={16}>
+          <TextInput
+            styles={fieldStyles}
+            placeholder="Email"
+            {...form.getInputProps("email")}
+          />
 
-        <PasswordInput
-          styles={passwordStyles}
-          placeholder="Password"
-          {...form.getInputProps("password")}
-        />
-      </Stack>
+          <PasswordInput
+            styles={passwordStyles}
+            placeholder="Password"
+            {...form.getInputProps("password")}
+          />
+        </Stack>
 
-      <Stack gap={16} mt={24}>
-        <Checkbox
-          label="Remember me"
-          size="sm"
-          color="var(--prune-primary-600)"
-          styles={{
-            label: { fontSize: "14px", color: "var(--prune-text-gray-700)" },
-            input: { borderRadius: "4px" },
-          }}
-        />
+        <Stack gap={16} mt={24}>
+          <Checkbox
+            label="Remember me"
+            size="sm"
+            color="var(--prune-primary-600)"
+            styles={{
+              label: { fontSize: "14px", color: "var(--prune-text-gray-700)" },
+              input: { borderRadius: "4px" },
+            }}
+          />
+
+          <PrimaryBtn
+            loading={processing}
+            disabled={isCoolingDown}
+            fullWidth
+            text={isCoolingDown ? formatCountdown(cooldown) : "Log In"}
+            type="submit"
+            h={48}
+            radius={4}
+            fz={16}
+            fw={500}
+          />
+
+          {isCoolingDown && (
+            <Text fz={12} c="var(--prune-text-gray-500)" ta="center">
+              Too many login attempts. Please wait before trying again.
+            </Text>
+          )}
+        </Stack>
 
         <PrimaryBtn
-          loading={processing}
-          disabled={isCoolingDown}
+          text="Forgot Password?"
+          variant="transparent"
+          fz={14}
+          fw={600}
+          mt={16}
+          p={0}
+          c="var(--prune-primary-800)"
+          link="/auth/forgot-password"
           fullWidth
-          text={isCoolingDown ? formatCountdown(cooldown) : "Log In"}
-          type="submit"
-          h={48}
-          radius={4}
-          fz={16}
-          fw={500}
+          style={{ textAlign: "center" }}
         />
+      </Box>
 
-        {isCoolingDown && (
-          <Text fz={12} c="var(--prune-text-gray-500)" ta="center">
-            Too many login attempts. Please wait before trying again.
-          </Text>
-        )}
-      </Stack>
-
-      <PrimaryBtn
-        text="Forgot Password?"
-        variant="transparent"
-        fz={14}
-        fw={600}
-        mt={16}
-        p={0}
-        c="var(--prune-primary-800)"
-        link="/auth/forgot-password"
-        fullWidth
-        style={{ textAlign: "center" }}
+      <TwoFactorModals
+        step={twoFactorStep}
+        challengeToken={challengeToken}
+        onStepChange={setTwoFactorStep}
+        onComplete={handleTwoFactorComplete}
       />
-    </Box>
+    </>
   );
 }
 

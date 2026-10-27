@@ -18,21 +18,19 @@
   color: var(--prune-text-gray-700);
   transition: border-color 0.2s ease, padding-top 0.22s ease;
 
-  @media (min-width: 64em) {
-    font-size: 16px !important;
-
-    &::placeholder {
-      font-size: 16px !important;
-    }
+  &::placeholder {
+    font-size: 14px !important;
   }
 
   &:focus {
     border-color: var(--prune-primary-600);
   }
 
-  // When floating: push value text down to make room for label at top
-
-  // Hide the placeholder text when label is showing
+  &[data-invalid] {
+    border-color: #ff9175;
+    border-width: 2px;
+    background-color: #fff3f0;
+  }
 }
 
 .label {
@@ -48,18 +46,16 @@
   transform: translateY(-50%);
   opacity: 0; // invisible — placeholder shows instead
 
+  &[data-invalid] {
+    color: #db340b;
+  }
+
   transition:
     top 0.22s cubic-bezier(0.4, 0, 0.2, 1),
     transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
     font-size 0.22s cubic-bezier(0.4, 0, 0.2, 1),
     color 0.22s ease,
     opacity 0.15s ease;
-
-  @media (min-width: 64em) {
-    font-size: 16px;
-  }
-
-  // Floating: label moves up inside the field — stays small regardless of screen size
 }
 
 // Textarea variant — taller, label anchors to top
@@ -74,19 +70,19 @@
   transition: border-color 0.2s ease, padding-top 0.22s ease;
   resize: vertical;
 
-  @media (min-width: 64em) {
-    font-size: 16px !important;
-
-    &::placeholder {
-      font-size: 16px !important;
-    }
+  &::placeholder {
+    font-size: 14px !important;
   }
 
   &:focus {
     border-color: var(--prune-primary-600);
   }
 
-
+  &[data-invalid] {
+    border-color: #ff9175;
+    border-width: 2px;
+    background-color: #fff3f0;
+  }
 }
 
 .error {
@@ -98,7 +94,7 @@
 .phone_input_onboarding {
   box-sizing: border-box;
   font-family: inherit;
-  font-size: 16px !important;
+  font-size: 14px !important;
   line-height: normal;
   padding-bottom: 0;
   padding-right: 12px;

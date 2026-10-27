@@ -526,6 +526,7 @@ export default function Questionnaire() {
         <QuestionnaireNav
           onNext={handleNext}
           loading={saving}
+          hidePrev={active === 0}
           disabled={
             savingDraft ||
             (active === 2 && form.values.services.length === 0) ||

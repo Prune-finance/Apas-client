@@ -206,6 +206,7 @@ export const AddDirectorsInfo = ({
               {...form.getInputProps(`directors.${index}.email`)}
             />
             <DateInputWithInsideLabel
+              minimumAge={18}
               label="Date of Birth"
               w="100%"
               standard={noFloatingLabel}

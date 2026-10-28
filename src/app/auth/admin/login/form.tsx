@@ -162,7 +162,6 @@ function LoginForm() {
         challengeToken={challengeToken}
         onStepChange={setTwoFactorStep}
         onComplete={completeLogin}
-        apiBase="/api/auth/admin/2fa"
       />
     </>
   );

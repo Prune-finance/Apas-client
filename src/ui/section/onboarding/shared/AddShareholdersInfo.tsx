@@ -207,6 +207,7 @@ export const AddShareholdersInfo = ({
               {...form.getInputProps(`shareholders.${index}.email`)}
             />
             <DateInputWithInsideLabel
+              minimumAge={18}
               label="Date of Birth"
               w="100%"
               standard={noFloatingLabel}

@@ -179,6 +179,7 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             {...form.getInputProps("ceoEmail")}
           />
           <DateInputWithInsideLabel
+            minimumAge={18}
             label="Date of Birth"
             w="100%"
             standard={noFloatingLabel}

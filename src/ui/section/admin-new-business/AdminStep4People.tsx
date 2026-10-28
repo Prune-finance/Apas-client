@@ -343,6 +343,7 @@ function CEOSubStep({
         <Flex gap={24} w="100%">
           <TextInputWithInsideLabel label="Email" w="100%" placeholder="Enter Email" withAsterisk {...form.getInputProps("ceoEmail")} />
           <DateInputWithInsideLabel
+            minimumAge={18}
             label="Date of Birth"
             w="100%"
             placeholder="DD/MM/YYYY"
@@ -485,6 +486,7 @@ function PersonListSubStep({
                   {...form.getInputProps(`${listKey}.${idx}.email`)}
                 />
                 <DateInputWithInsideLabel
+                  minimumAge={18}
                   label="Date of Birth"
                   w="100%"
                   placeholder="DD/MM/YYYY"

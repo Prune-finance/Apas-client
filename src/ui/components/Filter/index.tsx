@@ -8,6 +8,9 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ReactNode, useState } from "react";
 import { SecondaryBtn } from "../Buttons";
 import dayjs from "dayjs";
+import classes from "./filter.module.scss";
+
+export type StatusOption = string | { value: string; label: string };
 
 type Props<T> = {
   opened: boolean;
@@ -17,11 +20,14 @@ type Props<T> = {
   isStatus?: boolean;
   approvalStatus?: boolean;
   frozenStatus?: boolean;
-  customStatusOption?: string[];
+  /** Plain strings, or { value, label } to show a friendly label and send the enum value */
+  customStatusOption?: StatusOption[];
   noDate?: boolean;
   onApply?: (values: T) => void;
   onAfterApply?: (values: T) => void;
   onClear?: () => void;
+  /** Stretch the fields to fill the whole row */
+  stretch?: boolean;
 };
 
 export default function Filter<T>({
@@ -37,6 +43,7 @@ export default function Filter<T>({
   onApply,
   onAfterApply,
   onClear,
+  stretch,
 }: Props<T>) {
   const { push, replace } = useRouter();
   const pathname = usePathname();
@@ -124,7 +131,13 @@ export default function Filter<T>({
 
         <SecondaryBtn icon={IconX} action={toggle} text="Close" p={10} />
       </Group>
-      <Flex gap={12} align="center" mih={40} wrap="wrap">
+      <Flex
+        gap={12}
+        align="center"
+        mih={40}
+        wrap="wrap"
+        className={stretch ? classes.stretch : undefined}
+      >
         {children}
 
         {!noDate && (
@@ -173,6 +186,7 @@ export default function Filter<T>({
         <Flex
           // ml="auto"
           gap={12}
+          className={stretch ? classes.actions : undefined}
         >
           <Button
             variant="light"

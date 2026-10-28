@@ -49,12 +49,18 @@ interface OnboardedBusinessesProps {
   hideOverview?: boolean;
   status?: string;
   getDetailHref?: (id: string) => string;
+  /** Stretch the filter fields across the row (used in Eligibility Center) */
+  filterStretch?: boolean;
+  /** Hide the status dropdown (the list is already fixed to one status) */
+  hideStatusFilter?: boolean;
 }
 
 export default function OnboardedBusinesses({
   hideOverview,
   status = "ONBOARDED",
   getDetailHref,
+  filterStretch,
+  hideStatusFilter,
 }: OnboardedBusinessesProps = {}) {
   const searchParams = useSearchParams();
 
@@ -226,6 +232,8 @@ export default function OnboardedBusinesses({
           toggle={toggle}
           form={form}
           customStatusOption={["Active", "Inactive"]}
+          stretch={filterStretch}
+          isStatus={hideStatusFilter}
         >
           <TextBox placeholder="Business" {...form.getInputProps("name")} />
 

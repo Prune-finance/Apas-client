@@ -1,0 +1,14 @@
+// Opt-in layout (via the `stretch` prop): fields share the full row width.
+.stretch {
+  flex-wrap: wrap;
+
+  > *:not(.actions) {
+    flex: 1 1 0 !important;
+    min-width: 160px;
+    width: auto !important;
+  }
+}
+
+.actions {
+  flex: 0 0 auto;
+}

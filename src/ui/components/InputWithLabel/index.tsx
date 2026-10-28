@@ -21,6 +21,7 @@ import classes from "./input.module.scss";
 import styles from "./styles.module.scss";
 import profile_styles from "./profile.module.scss";
 import { DateInput, DateInputProps } from "@mantine/dates";
+import dayjs from "dayjs";
 
 import { SelectCountryDialCode } from "../SelectDropdownSearch";
 import { UseFormReturnType } from "@mantine/form";
@@ -108,8 +109,39 @@ export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWi
 
 interface DateInputWithInsideLabelProps extends DateInputProps {
   standard?: boolean;
+  minimumAge?: number;
 }
-export const DateInputWithInsideLabel = ({ standard, ...props }: DateInputWithInsideLabelProps) => {
+export const DateInputWithInsideLabel = ({ standard, minimumAge, ...props }: DateInputWithInsideLabelProps) => {
+  const ageCutoff = minimumAge === undefined
+    ? undefined
+    : dayjs().subtract(minimumAge, "year").startOf("day").toDate();
+  const maxDate = ageCutoff && (!props.maxDate || ageCutoff < props.maxDate)
+    ? ageCutoff
+    : props.maxDate;
+  const calendarProps: Partial<DateInputProps> = {
+    maxDate,
+    defaultDate: props.defaultDate ?? props.value ?? props.defaultValue ?? ageCutoff,
+    ...(ageCutoff && maxDate ? {
+      getYearControlProps: (date: Date) => {
+        const control = props.getYearControlProps?.(date);
+        return dayjs(date).isAfter(maxDate, "year")
+          ? { ...control, style: [control?.style, { visibility: "hidden" as const }] }
+          : control ?? {};
+      },
+      getMonthControlProps: (date: Date) => {
+        const control = props.getMonthControlProps?.(date);
+        return dayjs(date).isAfter(maxDate, "month")
+          ? { ...control, style: [control?.style, { visibility: "hidden" as const }] }
+          : control ?? {};
+      },
+      getDayProps: (date: Date) => {
+        const control = props.getDayProps?.(date);
+        return dayjs(date).isAfter(maxDate, "day")
+          ? { ...control, style: [control?.style, { visibility: "hidden" as const }] }
+          : control ?? {};
+      },
+    } : {}),
+  };
   if (standard) {
     const { label, ...inputProps } = props;
     return (
@@ -118,12 +150,14 @@ export const DateInputWithInsideLabel = ({ standard, ...props }: DateInputWithIn
         styles={getStandardStyles(!!inputProps.error)}
         placeholder="Select Date"
         {...inputProps}
+        {...calendarProps}
       />
     );
   }
   return (
     <DateInput
       {...props}
+      {...calendarProps}
       placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Select Date")}
       classNames={classes}
       styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}

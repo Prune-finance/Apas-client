@@ -68,13 +68,25 @@ const statusToStage: Record<string, STAGE> = {
   QUESTIONNAIRE_COMPLETED: "Completed",
 };
 
+// Shown to the admin as readable labels; the enum `value` is what goes to the API
+const toLabel = (value: string) =>
+  value
+    .replace(/_/g, " ")
+    .toLowerCase()
+    .replace(/^\w/, (c) => c.toUpperCase());
+
+const STATUS_OPTIONS = Object.keys(statusToStage).map((value) => ({
+  value,
+  label: toLabel(value),
+}));
+
 const SERVICE_OPTIONS = [
   "VIRTUAL_ACCOUNTS",
   "OPERATIONS_ACCOUNT",
   "PAYOUT",
   "ACCOUNT_LOOKUP",
   "REMITTANCE",
-];
+].map((value) => ({ value, label: toLabel(value) }));
 
 function EligibilityCenter() {
   const router = useRouter();
@@ -181,6 +193,8 @@ function EligibilityCenter() {
           {currentTab === "onboarding" && (
             <OnboardedBusinesses
               hideOverview
+              filterStretch
+              hideStatusFilter
               status="ONBOARDING"
               getDetailHref={(id) => `/admin/eligibility-center/${id}/business`}
             />
@@ -264,7 +278,8 @@ function QuestionnaireTab() {
         toggle={toggle}
         form={form}
         noDate={false}
-        customStatusOption={Object.keys(statusToStage)}
+        customStatusOption={STATUS_OPTIONS}
+        stretch
         onApply={(values) => {
           setAppliedFilters(values);
           setActive(1);

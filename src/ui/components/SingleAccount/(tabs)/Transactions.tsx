@@ -9,7 +9,7 @@ import InfoCards from "../../Cards/InfoCards";
 import EmptyTable from "../../EmptyTable";
 import { SearchInput, SelectBox, TextBox } from "../../Inputs";
 import { TableComponent } from "../../Table";
-import { TransactionType } from "@/lib/hooks/transactions";
+import { exportAdminIssuedAccountTransactions, TransactionType } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 
@@ -199,11 +199,11 @@ export const Transactions = ({
     const baseUrl = process.env.NEXT_PUBLIC_ACCOUNTS_URL;
 
     const headers = { Authorization: `Bearer ${Cookies.get("auth")}` };
-
     // Define the possible URLs based on location
     const urlMap: { [key: string]: string } = {
       payout: `${baseUrl}/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "admin-account": `${baseUrl}/admin/accounts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
+      "issued_account": `${baseUrl}/admin/accounts/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`,
       "admin-payout": `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "admin-default": `${baseUrl}/admin/accounts/business/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
       "own-account": `${baseUrl}/accounts/company/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}`,
@@ -400,6 +400,7 @@ export const Transactions = ({
       {!payout && (
         <TransactionDrawer
           opened={opened}
+          currency={currencyType ?? data?.currencyType ?? "EUR"}
           close={close}
           selectedRequest={data}
         />

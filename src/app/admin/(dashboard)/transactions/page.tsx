@@ -20,6 +20,7 @@ function TransactionForAccount() {
   const [tabCounts, setTabCounts] = useState<Record<string, number>>({});
 
   const { data, close, opened: openedDrawer } = Transaction();
+  const currency = searchParams.get("currency");
 
   const customStatusOption = [
     "PENDING",
@@ -91,6 +92,7 @@ function TransactionForAccount() {
           <TransactionDrawer
             opened={openedDrawer}
             close={close}
+            currency={currency ?? data?.currencyType ?? "EUR"}
             selectedRequest={data}
           />
         )}

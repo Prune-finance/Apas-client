@@ -219,7 +219,7 @@ export default function Accounts({
   ).map((element, index) => (
     <TableTr
       key={index}
-      onClick={() => push(`/admin/businesses/${params.id}/default/${element.id}?accountType=${element.accountType}`)}
+      onClick={() => push(`/admin/businesses/${params.id}/default/${element.id}?accountType=${element.accountType}&currency=${element.currency}`)}
       style={{ cursor: "pointer" }}
     >
       <TableTd className={styles.table__td}>

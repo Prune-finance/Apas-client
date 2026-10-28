@@ -83,13 +83,16 @@ export function useSingleTransactions(
   const [transaction, setTransaction] = useState<TransactionType | null>(null);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [loading, setLoading] = useState(true);
+  console.log("Custom params for single transaction:", customParams);
 
   async function fetchTrx() {
+    console.log("Fetching single transaction with ID:", id);
     const queryParams = {
       ...(customParams.limit && { limit: customParams.limit }),
       ...(customParams.date && { date: customParams.date }),
       ...(customParams.status && { status: customParams.status }),
       ...(customParams.page && { page: customParams.page }),
+      ...(customParams.currency && { currency: customParams.currency }),
     };
 
     const params = new URLSearchParams(queryParams as Record<string, string>);
@@ -97,7 +100,7 @@ export function useSingleTransactions(
       setLoading(true);
       // const path = id ? `${id}/transactions` : "transactions";
 
-      const { data } = await axios.get(`/admin/transactions/${id}/data`, {
+      const { data } = await axios.get(`/accounts/transactions/${id}/data`, {
         params,
       });
 
@@ -295,6 +298,7 @@ export function useBusinessAccountTransactions(
         recipientName: customParams.recipientName,
       }),
       ...(customParams.senderName && { senderName: customParams.senderName }),
+      ...(customParams.accountType && { accountType: customParams.accountType }),
     };
   }, [customParams]);
 
@@ -305,6 +309,7 @@ export function useBusinessAccountTransactions(
     endDate,
     status,
     type,
+    accountType,
     recipientIban,
     recipientName,
     senderName,
@@ -319,13 +324,25 @@ export function useBusinessAccountTransactions(
     try {
       setLoading(true);
 
-      const { data } = await axios.get(
-        `/admin/accounts/business/company-account/${id}/transactions`,
-        { params }
-      );
+      if ((accountType === "ISSUED_ACCOUNT" || accountType === "PAYOUT_ACCOUNT") && currencyCode != 'EUR') {
+        // Add any specific logic for ISSUED_ACCOUNT type here
+        const { data } = await axios.get(
+          `/currency-account-transactions/${id}/${currencyCode}`,
+          { params }
+        );
 
-      setTransactions(data.data);
-      setMeta(data.meta);
+        setTransactions(data.data);
+        setMeta(data.meta);
+      } else {
+
+        const { data } = await axios.get(
+          `/admin/accounts/business/company-account/${id}/transactions`,
+          { params }
+        );
+
+        setTransactions(data.data);
+        setMeta(data.meta);
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -1137,6 +1154,7 @@ export interface TransactionType {
   currencyType: string;
   currency?: string;
   senderName: string;
+  senderAccountIban: string;
   senderBic: string;
   recipientIban: string;
   recipientBic: string;

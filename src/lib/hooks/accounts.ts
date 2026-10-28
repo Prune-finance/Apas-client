@@ -442,9 +442,13 @@ export function useSingleUserAccountByIBAN(iban: string, currencyCode?: string) 
   const [loading, setLoading] = useState(true);
 
   async function fetchAccount() {
-    if (!iban) return;
+    if (!iban) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
+      console.log("Fetching single user account by IBAN:", iban);
       const { data } = await axios.get(`/accounts/number/${iban}`, {
         params: currencyCode ? { currencyCode } : undefined,
       });
@@ -954,6 +958,10 @@ export function exportBusinessAccounts(params: IParams) {
   return openAccountExportUrl(axios.get("admin/accounts/default/export", { params: sanitizedQueryParams(params) }));
 }
 
+export function exportAllAccounts(params: IParams) {
+  return openAccountExportUrl(axios.get("admin/accounts/all/export", { params: sanitizedQueryParams(params) }));
+}
+
 export function exportIssuedAdminAccounts(params: IParams) {
   return openAccountExportUrl(axios.get("admin/accounts/export", { params: sanitizedQueryParams(params) }));
 }
@@ -984,6 +992,7 @@ export interface AccountData {
   updatedAt: Date;
   deletedAt: null;
   accountBalance: number;
+  accountIdentifier: string;
   Company: {
     name: string;
     id: string;

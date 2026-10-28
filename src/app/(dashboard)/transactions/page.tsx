@@ -20,7 +20,8 @@ function AccountTrx() {
   const searchParam = useSearchParams();
   const router = useRouter();
   const tab = searchParam.get("tab");
-
+  const currency = searchParam.get("currency");
+  console.log(currency, searchParam, "currency from search params");
   return (
     <main>
       <Paper>
@@ -60,7 +61,7 @@ function AccountTrx() {
         </TabsComponent>
       </Paper>
 
-      <TransactionDrawer opened={opened} close={close} selectedRequest={data} />
+    <TransactionDrawer opened={opened} close={close} selectedRequest={data} currency={currency ?? data?.currencyType ?? "EUR"} />
     </main>
   );
 }

@@ -193,6 +193,7 @@ export default function AccountTransactions() {
       />
 
       <TransactionDrawer
+        currency={currencyCode ?? selectedRequest?.currencyType ?? "EUR"}
         opened={openedDrawer}
         close={closeDrawer}
         selectedRequest={selectedRequest}

@@ -175,11 +175,11 @@ export default function Account() {
         params={params}
         revalidate={revalidateAcct}
       /> */}
-
+      
         <SingleAccountBody
           accountID={params?.id}
           account={account}
-          location="admin-account"
+          location="issued-account"
           transactions={transactions as TransactionType[]}
           loading={loading}
           loadingTrx={loadingTrx}

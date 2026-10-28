@@ -78,6 +78,7 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
 
       {!payout && (
         <TransactionDrawer
+          currency={data?.currencyType ?? "EUR"}
           opened={opened}
           close={close}
           selectedRequest={data}

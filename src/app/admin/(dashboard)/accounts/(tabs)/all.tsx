@@ -22,9 +22,10 @@ import {
   IconListTree,
   IconCheck,
   IconDotsVertical,
+  IconFileExport,
 } from "@tabler/icons-react";
 
-import { AccountData, AccountMeta } from "@/lib/hooks/accounts";
+import { AccountData, AccountMeta, exportBusinessAccounts, exportAllAccounts } from "@/lib/hooks/accounts";
 import { formatNumber, getUserType } from "@/lib/utils";
 
 import { parseError } from "@/lib/actions/auth";
@@ -57,8 +58,9 @@ const currencyTabs = [
 
 export default function AllAccounts() {
   const searchParams = useSearchParams();
+  const [exporting, setExporting] = useState(false);
 
-  const { status, date, endDate, accountName, accountNumber, type } =
+  const { status, date, endDate, accountName, accountNumber, type, tab } =
     Object.fromEntries(searchParams.entries());
 
   const router = useRouter();
@@ -75,8 +77,10 @@ export default function AllAccounts() {
     ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
     ...(status && { status: status.toUpperCase() }),
     ...(type && { type: type === "Individual" ? "USER" : "CORPORATE" }),
+    ...(tab && { accountType: tab }),
     ...(accountName && { accountName }),
     ...(accountNumber && { accountNumber }),
+    ...(activeCurrency && { currencyCode: activeCurrency }),
     page: activePage,
     limit: parseInt(limit ?? "10", 10),
     search: debouncedSearch,
@@ -149,6 +153,16 @@ export default function AllAccounts() {
       requestForm.reset();
     },
   });
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      await exportAllAccounts(params);
+    } finally {
+      setExporting(false);
+    }
+  };
+  
 
   const { queryFn: deactivateAccount, loading: loadingDeactivate } = useAxios({
     endpoint: `/admin/accounts/${rowId}/deactivate`,
@@ -232,6 +246,13 @@ export default function AllAccounts() {
       <Group justify="space-between" align="center" mt={24}>
         <SearchInput search={search} setSearch={setSearch} />
         <Group gap={12}>
+          <SecondaryBtn
+            text="Export"
+            icon={IconFileExport}
+            action={handleExport}
+            loading={exporting}
+            fw={600}
+          />
           <SecondaryBtn
             text="Filter"
             icon={IconListTree}

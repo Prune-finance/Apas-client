@@ -29,26 +29,32 @@ import {
   TransactionReceipt,
 } from "@/ui/components/TransactionReceipt";
 import { useRef } from "react";
-import { handlePdfDownload } from "@/lib/actions/auth";
 import { AccountData, useSingleUserAccountByIBAN } from "@/lib/hooks/accounts";
 import { AmountGroup } from "@/ui/components/AmountGroup";
 import Transaction from "@/lib/store/transaction";
 import { useReceipt } from "@/lib/hooks/receipt";
+import { useReceiptDownload } from "@/lib/hooks/receipt-download";
 
 interface TransactionDrawerProps {
   selectedRequest: TransactionType | null;
   close: () => void;
   opened: boolean;
+  currency: string;
 }
 
 export const TransactionDrawer = ({
   selectedRequest,
+  currency,
   close,
   opened,
 }: TransactionDrawerProps) => {
   const pdfRef = useRef<HTMLDivElement>(null);
+  const { downloadReceipt, downloadingReceipt } = useReceiptDownload(pdfRef);
+
+  console.log("Selected request:", selectedRequest);
   const { transaction, loading: loadingTransaction } = useSingleTransactions(
-    selectedRequest?.id ?? ""
+    selectedRequest?.accessId ?? "",
+    {currency: currency}
   );
 
   const { clearData } = Transaction();
@@ -59,7 +65,7 @@ export const TransactionDrawer = ({
   // } = useSingleCompanyTransactions(selectedRequest?.id ?? "");
 
   const { account: senderAccount, loading: loadingSenderAcct } =
-    useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? "");
+    useSingleUserAccountByIBAN(selectedRequest?.senderIban ?? selectedRequest?.senderAccountNumber ?? "");
 
   const { details } = useReceipt({
     selectedRequest,
@@ -78,16 +84,16 @@ export const TransactionDrawer = ({
       selectedRequest?.recipientName ??
       selectedRequest?.beneficiaryName ??
       "N/A",
-    ...(selectedRequest?.currencyType === "GBP"
+    ...(selectedRequest?.currencyType === "GBP" || currency === "GBP"
       ? {
           "Account Number": selectedRequest?.beneficiaryAccountNumber,
           "Sort Code": selectedRequest?.beneficiarySortCode,
         }
-      : selectedRequest?.currencyType === "GHS"
+      : selectedRequest?.currencyType === "GHS" || currency === "GHS"
       ? {
           "Wallet ID": selectedRequest?.beneficiaryWalletId ?? "N/A",
         }
-      : selectedRequest?.currencyType === "USD"
+      : selectedRequest?.currencyType === "USD" || currency === "USD"
       ? {
           "Account Number": selectedRequest?.beneficiaryAccountNumber ?? "N/A",
         }
@@ -116,22 +122,22 @@ export const TransactionDrawer = ({
     ) : (
       selectedRequest?.senderName
     ),
-    ...(selectedRequest?.currencyType === "GBP"
+    ...(selectedRequest?.currencyType === "GBP" || currency == "GBP"
       ? {
           "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
           "Sort Code": selectedRequest?.senderSortCode ?? "N/A",
         }
-      : selectedRequest?.currencyType === "GHS"
+      : selectedRequest?.currencyType === "GHS" || currency === "GHS"
       ? {
           "Wallet ID": selectedRequest?.senderWalletId ?? "N/A",
         }
-      : selectedRequest?.currencyType === "USD"
+      : selectedRequest?.currencyType === "USD" || currency === "USD"
       ? {
           "Account Number": selectedRequest?.senderAccountNumber ?? "N/A",
           "Account Iban": selectedRequest?.senderIban ?? "N/A"
         }
       : {
-          IBAN: selectedRequest?.senderIban,
+          IBAN: selectedRequest?.senderAccountIban ?? selectedRequest?.senderIban,
           BIC: selectedRequest?.senderBic || "ARPYGB21",
         }),
     Bank:
@@ -196,7 +202,7 @@ export const TransactionDrawer = ({
                 {formatNumber(
                   selectedRequest?.amount || 0,
                   true,
-                  selectedRequest?.currencyType ?? "EUR"
+                  currency ?? selectedRequest?.currencyType ?? "EUR"
                 )}
               </Text>
             </Flex>
@@ -320,7 +326,9 @@ export const TransactionDrawer = ({
             text="Download Receipt"
             fullWidth
             fw={600}
-            action={() => handlePdfDownload(pdfRef)}
+            action={downloadReceipt}
+            loading={downloadingReceipt}
+            disabled={downloadingReceipt}
             mt={20}
           />
         </Box>
@@ -336,7 +344,7 @@ export const TransactionDrawer = ({
           }
           details={details}
           receiptRef={pdfRef}
-          currencyType={selectedRequest?.currencyType}
+          currencyType={selectedRequest?.currencyType ?? currency}
         />
       </Box>
     </Drawer>

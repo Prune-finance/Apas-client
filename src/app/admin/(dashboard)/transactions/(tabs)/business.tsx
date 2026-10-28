@@ -152,7 +152,7 @@ export const BusinessAccountTransactions = ({
           <SearchInput search={search} setSearch={setSearch} />
           <Flex gap={12}>
             <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
-            <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} indicator={activeFilterCount} />
+            <SecondaryBtn text={opened ? "Close filter" : "Filter"} action={toggle} icon={IconListTree} indicator={activeFilterCount} />
             {/* <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} /> */}
             <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
           </Flex>

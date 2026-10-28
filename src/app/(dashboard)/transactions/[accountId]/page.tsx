@@ -187,7 +187,7 @@ export default function AccountTransactions() {
       <Group justify="space-between" mt={30}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn text={opened ? "Close filter" : "Filter"} action={toggle} icon={IconListTree} />
       </Group>
       <Filter<FilterType> opened={opened} toggle={toggle} form={form} />
 

@@ -302,7 +302,7 @@ export const Transactions = ({
         <Group gap={12}>
           <SecondaryBtn
             action={toggle}
-            text="Filter"
+            text={openedFilter ? "Close filter" : "Filter"}
             icon={IconListTree}
             fw={600}
             indicator={appliedFilterCount}

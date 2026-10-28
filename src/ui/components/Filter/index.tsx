@@ -1,12 +1,11 @@
 "use client";
 
-import { Button, Collapse, Flex, Group, Select, Text } from "@mantine/core";
-import { DateInput, DatePickerInput } from "@mantine/dates";
+import { Button, Collapse, Flex, Select, Text } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
 import { UseFormReturnType } from "@mantine/form";
-import { IconCalendarMonth, IconX } from "@tabler/icons-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ReactNode, useState } from "react";
-import { SecondaryBtn } from "../Buttons";
+import { IconCalendarMonth } from "@tabler/icons-react";
+import { usePathname } from "next/navigation";
+import { FocusEvent, KeyboardEvent, ReactNode, useEffect, useRef } from "react";
 import dayjs from "dayjs";
 import classes from "./filter.module.scss";
 
@@ -14,7 +13,8 @@ export type StatusOption = string | { value: string; label: string };
 
 type Props<T> = {
   opened: boolean;
-  toggle: () => void;
+  /** Kept for existing callers; the page's Filter button toggles the panel */
+  toggle?: () => void;
   children?: ReactNode;
   form: UseFormReturnType<T>;
   isStatus?: boolean;
@@ -30,9 +30,20 @@ type Props<T> = {
   stretch?: boolean;
 };
 
+// Date ranges with only the start picked are still being edited — don't apply yet
+const hasPartialRange = (values: Record<string, unknown>) =>
+  Object.values(values).some(
+    (v) => Array.isArray(v) && v.length === 2 && !!v[0] !== !!v[1]
+  );
+
+// A focused text field (not a read-only Select input) means the user is still typing
+const isTypingIn = (el: Element | null) =>
+  el instanceof HTMLInputElement &&
+  !el.readOnly &&
+  ["text", "search", "email", "number", "tel", ""].includes(el.type);
+
 export default function Filter<T>({
   opened,
-  toggle,
   children,
   form,
   isStatus,
@@ -45,98 +56,110 @@ export default function Filter<T>({
   onClear,
   stretch,
 }: Props<T>) {
-  const { push, replace } = useRouter();
   const pathname = usePathname();
-  const [processing, setProcessing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const initialValues = useRef(JSON.stringify(form.values));
+  const lastApplied = useRef(initialValues.current);
 
-  const handleApply = async () => {
-    setProcessing(true);
-    try {
-      if (onApply) {
-        onApply(form.values as T);
+  const applyFilters = () => {
+    const values = form.values as Record<string, unknown>;
+    const serialized = JSON.stringify(values);
+    if (serialized === lastApplied.current || hasPartialRange(values)) return;
+    lastApplied.current = serialized;
+
+    if (onApply) {
+      onApply(form.values as T);
+      return;
+    }
+
+    const currentSearchParams = new URLSearchParams(window.location.search);
+
+    Object.entries(values).forEach(([key, val]) => {
+      if (key === "createdAt") {
+        currentSearchParams.delete("date");
+        currentSearchParams.delete("endDate");
+
+        const [startDate, endDate] = Array.isArray(val)
+          ? (val as [Date | null, Date | null])
+          : [null, null];
+        const start = startDate ? dayjs(startDate).format("YYYY-MM-DD") : null;
+        const end = endDate ? dayjs(endDate).format("YYYY-MM-DD") : null;
+
+        if (start && end) {
+          currentSearchParams.set("date", start);
+          // Same start and end means a single day
+          if (start !== end) currentSearchParams.set("endDate", end);
+        }
         return;
       }
 
-      const filteredValues = Object.fromEntries(
-        Object.entries(form.values as Record<string, unknown>)
-          .filter(([key, value]) => value)
-          .flatMap(([key, val]) => {
-            // Format and return startDate and endDate separately if the key is "createdAt"
-            if (key === "createdAt" && Array.isArray(val) && val.length === 2) {
-              const [startDate, endDate] = val as [Date | null, Date | null];
+      if (!val) {
+        currentSearchParams.delete(key);
+        return;
+      }
 
-              // Only include dates if they are valid
-              const formattedStartDate = startDate
-                ? dayjs(startDate).format("YYYY-MM-DD")
-                : null;
-              const formattedEndDate = endDate
-                ? dayjs(endDate).format("YYYY-MM-DD")
-                : null;
+      // Status values are sent uppercase
+      currentSearchParams.set(
+        key,
+        key === "status" && typeof val === "string" ? val.toUpperCase() : String(val)
+      );
+    });
 
-              // If both dates are valid and equal, return only "date"
-              if (
-                formattedStartDate &&
-                formattedEndDate &&
-                formattedStartDate === formattedEndDate
-              ) {
-                return [["date", formattedStartDate]];
-              }
+    const query = currentSearchParams.toString();
+    window.history.pushState({}, "", query ? `${pathname}?${query}` : pathname);
+    onAfterApply?.(form.values as T);
+  };
 
-              // Return dates only if both are valid, otherwise return an empty array
-              return formattedStartDate && formattedEndDate
-                ? [
-                    ["date", formattedStartDate],
-                    ["endDate", formattedEndDate],
-                  ]
-                : [];
-            }
+  // Selects and the date picker apply as soon as a value is picked;
+  // text fields wait for blur or Enter.
+  const serializedValues = JSON.stringify(form.values);
+  useEffect(() => {
+    if (isTypingIn(document.activeElement) && containerRef.current?.contains(document.activeElement)) return;
+    applyFilters();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serializedValues]);
 
-            // Format the status field if it exists and is valid, turning it to uppercase
-            if (key === "status" && typeof val === "string") {
-              const status = val.toUpperCase();
-              return [[key, status]];
-            }
+  const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
+    if (isTypingIn(e.target)) applyFilters();
+  };
 
-            // Return other fields as they are
-            return [[key, val]];
-          })
-      ) as Record<string, string>;
-
-      // Get current URL and its search params
-      const currentUrl = new URL(window.location.href);
-      const currentSearchParams = new URLSearchParams(currentUrl.search);
-
-      // Add new filter values to the existing search params
-      Object.entries(filteredValues).forEach(([key, value]) => {
-        currentSearchParams.set(key, value);
-      });
-
-      // Create new URL with the combined parameters
-      const newUrl = `${pathname}?${currentSearchParams.toString()}`;
-
-      // push(`${newUrl}`);
-      window.history.pushState({}, "", newUrl);
-      onAfterApply?.(form.values as T);
-    } finally {
-      setProcessing(false);
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === "Enter" && isTypingIn(e.target as Element)) {
+      e.preventDefault();
+      applyFilters();
     }
+  };
+
+  const handleClear = () => {
+    form.reset();
+    lastApplied.current = initialValues.current;
+
+    const currentUrl = new URL(window.location.href);
+    const kept = new URLSearchParams();
+    const tabParam = currentUrl.searchParams.get("tab");
+    const currencyParam = currentUrl.searchParams.get("currency");
+    if (tabParam) kept.set("tab", tabParam);
+    if (currencyParam) kept.set("currency", currencyParam);
+    const query = kept.toString();
+    window.history.pushState({}, "", query ? `${pathname}?${query}` : pathname);
+    onClear?.();
   };
 
   return (
     <Collapse in={opened}>
-      <Group justify="space-between" align="center" mt={24} mb={20}>
-        <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
-          Filter By
-        </Text>
+      <Text fz={14} fw={600} c="var(--prune-text-gray-700)" mt={24} mb={20}>
+        Filter By
+      </Text>
 
-        <SecondaryBtn icon={IconX} action={toggle} text="Close" p={10} />
-      </Group>
       <Flex
+        ref={containerRef}
         gap={12}
         align="center"
         mih={40}
         wrap="wrap"
         className={stretch ? classes.stretch : undefined}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
       >
         {children}
 
@@ -183,46 +206,16 @@ export default function Filter<T>({
           />
         )}
 
-        <Flex
-          // ml="auto"
-          gap={12}
-          className={stretch ? classes.actions : undefined}
-        >
-          <Button
-            variant="light"
-            color="var(--prune-text-gray-700)"
-            w={80}
-            // h={30}
-            fz={12}
-            size="xs"
-            onClick={handleApply}
-            loading={processing}
-            loaderProps={{ type: "dots" }}
-          >
-            Apply
-          </Button>
+        <Flex gap={12} className={stretch ? classes.actions : undefined}>
           <Button
             variant="transparent"
             color="var(--prune-text-gray-700)"
-            onClick={() => {
-              form.reset();
-              const currentUrl = new URL(window.location.href);
-              const kept = new URLSearchParams();
-              const tabParam = currentUrl.searchParams.get("tab");
-              const currencyParam = currentUrl.searchParams.get("currency");
-              if (tabParam) kept.set("tab", tabParam);
-              if (currencyParam) kept.set("currency", currencyParam);
-              const query = kept.toString();
-              window.history.pushState({}, "", query ? `${pathname}?${query}` : pathname);
-              onClear?.();
-            }}
-            // w={62}
-            // h={36}
+            onClick={handleClear}
             fz={12}
             px={0}
             fw={400}
           >
-            Clear
+            Clear filters
           </Button>
         </Flex>
       </Flex>

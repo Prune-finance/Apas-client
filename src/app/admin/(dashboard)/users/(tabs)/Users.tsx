@@ -289,7 +289,7 @@ export default function Users() {
 
         <Group gap={12}>
           <SecondaryBtn
-            text="Filter"
+            text={openedFilter ? "Close filter" : "Filter"}
             action={toggle}
             icon={IconListTree}
             fw={600}
@@ -423,7 +423,7 @@ const tableHeaders = [
 //           />
 
 //           <Group gap={12}>
-//             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+//             <SecondaryBtn text={openedFilter ? "Close filter" : "Filter"} action={toggle} icon={IconListTree} />
 //             <PrimaryBtn
 //               text="Invite New User"
 //               action={() => {

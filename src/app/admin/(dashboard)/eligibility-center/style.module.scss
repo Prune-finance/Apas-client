@@ -59,3 +59,17 @@
     padding: 16px !important;
   }
 }
+
+// Search + filter fields on this page use 12px text and placeholders.
+// Overrides the global 14px/16px !important rules in globals.scss.
+.compact__inputs {
+  :global(.mantine-TextInput-input),
+  :global(.mantine-Select-input),
+  :global(.mantine-DatePickerInput-input) {
+    font-size: 12px !important;
+
+    &::placeholder {
+      font-size: 12px !important;
+    }
+  }
+}

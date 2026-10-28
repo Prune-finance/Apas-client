@@ -200,7 +200,7 @@ function BusinessAccountRequests() {
         >
           <SearchInput search={search} setSearch={setSearch} />
           <SecondaryBtn
-            text="Filter"
+            text={opened ? "Close filter" : "Filter"}
             icon={IconListTree}
             action={toggle}
             fw={600}

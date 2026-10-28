@@ -55,7 +55,7 @@ const toCountryCode = (value: string): string => {
   if (!value) return "";
   if (value.length <= 3) return value.toUpperCase();
   const match = countries.find(
-    (c) => c.name.toLowerCase() === value.toLowerCase()
+    (c) => c.name.toLowerCase() === value.toLowerCase(),
   );
   return match?.code ?? value;
 };
@@ -128,7 +128,9 @@ function EligibilityCenter() {
     <Box px={20}>
       <Flex justify="space-between" align="flex-start">
         <Box>
-          <Title order={2} fw={700}>Eligibility Center</Title>
+          <Title order={2} fw={700}>
+            Eligibility Center
+          </Title>
           <Text fz={14} c="var(--prune-text-gray-500)" mt={4}>
             View and manage all eligibility profiles on the platform.
           </Text>
@@ -179,28 +181,32 @@ function EligibilityCenter() {
       </Grid>
 
       {/* Tabs */}
-      <TabsComponent
-        tabs={eligibilityTabs}
-        mt={32}
-        value={currentTab}
-        onChange={handleTabChange}
-      >
-        <TabsPanel value="questionnaire">
-          <QuestionnaireTab />
-        </TabsPanel>
+      <Box className={classes.compact__inputs}>
+        <TabsComponent
+          tabs={eligibilityTabs}
+          mt={32}
+          value={currentTab}
+          onChange={handleTabChange}
+        >
+          <TabsPanel value="questionnaire">
+            <QuestionnaireTab />
+          </TabsPanel>
 
-        <TabsPanel value="onboarding">
-          {currentTab === "onboarding" && (
-            <OnboardedBusinesses
-              hideOverview
-              filterStretch
-              hideStatusFilter
-              status="ONBOARDING"
-              getDetailHref={(id) => `/admin/eligibility-center/${id}/business`}
-            />
-          )}
-        </TabsPanel>
-      </TabsComponent>
+          <TabsPanel value="onboarding">
+            {currentTab === "onboarding" && (
+              <OnboardedBusinesses
+                hideOverview
+                filterStretch
+                hideStatusFilter
+                status="ONBOARDING"
+                getDetailHref={(id) =>
+                  `/admin/eligibility-center/${id}/business`
+                }
+              />
+            )}
+          </TabsPanel>
+        </TabsComponent>
+      </Box>
     </Box>
   );
 }
@@ -211,7 +217,8 @@ function QuestionnaireTab() {
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 1000);
   const [opened, { toggle }] = useDisclosure(false);
-  const [appliedFilters, setAppliedFilters] = useState<FilterType>(FilterValues);
+  const [appliedFilters, setAppliedFilters] =
+    useState<FilterType>(FilterValues);
 
   const form = useForm<FilterType>({
     initialValues: FilterValues,
@@ -264,7 +271,7 @@ function QuestionnaireTab() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text="Filter"
+          text={opened ? "Close filter" : "Filter"}
           action={toggle}
           icon={IconListTree}
           indicator={activeFilterCount}

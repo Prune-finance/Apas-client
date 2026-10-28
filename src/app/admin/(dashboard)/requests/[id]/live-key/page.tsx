@@ -217,7 +217,7 @@ export default function SingleLiveKey() {
       <Group justify="space-between">
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn text={opened ? "Close filter" : "Filter"} action={toggle} icon={IconListTree} />
       </Group>
 
       <Filter<BusinessFilterType>

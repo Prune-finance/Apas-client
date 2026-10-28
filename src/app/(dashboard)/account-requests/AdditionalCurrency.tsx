@@ -93,7 +93,7 @@ function AdditionalCurrency() {
         <SearchInput value={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text="Filter"
+          text={openedFilter ? "Close filter" : "Filter"}
           action={toggle}
           icon={IconListTree}
           fw={600}

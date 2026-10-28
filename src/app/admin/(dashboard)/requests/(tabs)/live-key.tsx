@@ -151,7 +151,7 @@ function LiveKey() {
       <div className={`${styles.container__search__filter}`}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
+        <SecondaryBtn text={openedFilter ? "Close filter" : "Filter"} action={toggle} icon={IconListTree} />
       </div>
 
       <Filter<FilterType>

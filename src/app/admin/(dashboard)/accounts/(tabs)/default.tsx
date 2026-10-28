@@ -384,7 +384,7 @@ export default function BusinessAccounts() {
             fw={600}
           />
           <SecondaryBtn
-            text="Filter"
+            text={filterOpened ? "Close filter" : "Filter"}
             icon={IconListTree}
             action={toggle}
             fw={600}

@@ -209,13 +209,13 @@ export default function Filter<T>({
         <Flex gap={12} className={stretch ? classes.actions : undefined}>
           <Button
             variant="transparent"
-            color="var(--prune-text-gray-700)"
+            color="#758604"
             onClick={handleClear}
-            fz={12}
+            fz={14}
             px={0}
-            fw={400}
+            fw={500}
           >
-            Clear filters
+            Clear Filter
           </Button>
         </Flex>
       </Flex>

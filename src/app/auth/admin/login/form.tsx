@@ -12,6 +12,9 @@ import axios from "axios";
 import createAxiosInstance from "@/lib/axios";
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import TwoFactorModals, {
+  type TwoFactorStep,
+} from "../../login/TwoFactorModals";
 
 const authAxios = createAxiosInstance("auth");
 
@@ -49,10 +52,31 @@ function LoginForm() {
   const { setUser } = User();
   const { handleSuccess, handleError } = useNotification();
 
+  // 2FA state
+  const [challengeToken, setChallengeToken] = useState("");
+  const [twoFactorStep, setTwoFactorStep] = useState<TwoFactorStep | null>(
+    null,
+  );
+
   const form = useForm<LoginType>({
     initialValues: loginValues,
     validate: zodResolver(validateLogin),
   });
+
+  const completeLogin = async (token: string, userData: any) => {
+    Cookies.set("auth", token, { expires: 0.25 });
+
+    // Fetch full admin profile
+    try {
+      const meRes = await authAxios.get("/admin/me");
+      setUser(meRes.data?.data ?? userData);
+    } catch {
+      setUser(userData);
+    }
+
+    handleSuccess("Authentication Successful", "Welcome back Admin");
+    window.location.replace(redirect ? redirect : "/admin/dashboard");
+  };
 
   const handleLogin = async () => {
     setProcessing(true);
@@ -61,18 +85,26 @@ function LoginForm() {
       if (hasErrors) return;
 
       const { data } = await axios.post("/api/auth/admin/login", form.values);
-      Cookies.set("auth", data.meta.token, { expires: 0.25 });
+      const {
+        token,
+        challengeToken: ct,
+        twoFactorSetupRequired,
+        twoFactorRequired,
+      } = data.meta ?? {};
 
-      // Fetch full admin profile
-      try {
-        const meRes = await authAxios.get("/admin/me");
-        setUser(meRes.data?.data ?? data.data);
-      } catch {
-        setUser(data.data);
+      // If server returns a token directly (no 2FA enforced yet), proceed normally
+      if (token && !ct) {
+        await completeLogin(token, data.data);
+        return;
       }
 
-      handleSuccess("Authentication Successful", "Welcome back Admin");
-      window.location.replace(redirect ? redirect : "/admin/dashboard");
+      // 2FA challenge — show the appropriate modal
+      setChallengeToken(ct ?? "");
+      if (twoFactorSetupRequired) {
+        setTwoFactorStep("protect");
+      } else if (twoFactorRequired) {
+        setTwoFactorStep("enter");
+      }
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -81,48 +113,58 @@ function LoginForm() {
   };
 
   return (
-    <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
-      <Stack gap={16} mt={24}>
-        <TextInput
-          styles={fieldStyles}
-          placeholder="Email"
-          {...form.getInputProps("email")}
+    <>
+      <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
+        <Stack gap={16} mt={24}>
+          <TextInput
+            styles={fieldStyles}
+            placeholder="Email"
+            {...form.getInputProps("email")}
+          />
+
+          <PasswordInput
+            styles={passwordStyles}
+            placeholder="Enter Password"
+            {...form.getInputProps("password")}
+          />
+        </Stack>
+
+        <div style={{ marginTop: 16 }}>
+          <Checkbox label="Remember me" size="xs" color="#C1DD06" />
+        </div>
+
+        <PrimaryBtn
+          loading={processing}
+          fullWidth
+          text="Log In"
+          type="submit"
+          fz={14}
+          fw={600}
+          mt={32}
         />
 
-        <PasswordInput
-          styles={passwordStyles}
-          placeholder="Enter Password"
-          {...form.getInputProps("password")}
+        <PrimaryBtn
+          text="Forgot Password?"
+          variant="transparent"
+          fz={14}
+          fw={600}
+          mt={32}
+          w="15ch"
+          p={0}
+          c="var(--prune-primary-800)"
+          td="underline"
+          link="/auth/admin/forgot-password"
         />
-      </Stack>
+      </Box>
 
-      <div style={{ marginTop: 16 }}>
-        <Checkbox label="Remember me" size="xs" color="#C1DD06" />
-      </div>
-
-      <PrimaryBtn
-        loading={processing}
-        fullWidth
-        text="Log In"
-        type="submit"
-        fz={14}
-        fw={600}
-        mt={32}
+      <TwoFactorModals
+        step={twoFactorStep}
+        challengeToken={challengeToken}
+        onStepChange={setTwoFactorStep}
+        onComplete={completeLogin}
+        apiBase="/api/auth/admin/2fa"
       />
-
-      <PrimaryBtn
-        text="Forgot Password?"
-        variant="transparent"
-        fz={14}
-        fw={600}
-        mt={32}
-        w="15ch"
-        p={0}
-        c="var(--prune-primary-800)"
-        td="underline"
-        link="/auth/admin/forgot-password"
-      />
-    </Box>
+    </>
   );
 }
 

@@ -32,6 +32,8 @@ interface TwoFactorModalsProps {
   challengeToken: string;
   onStepChange: (step: TwoFactorStep | null) => void;
   onComplete: (token: string, userData: any) => void;
+  /** Base path of the 2FA proxy routes. Admin login passes "/api/auth/admin/2fa". */
+  apiBase?: string;
 }
 
 const modalStyles = {
@@ -372,6 +374,7 @@ export default function TwoFactorModals({
   challengeToken,
   onStepChange,
   onComplete,
+  apiBase = "/api/auth/2fa",
 }: TwoFactorModalsProps) {
   const { handleError, handleSuccess } = useNotification();
   const [loading, setLoading] = useState(false);
@@ -388,7 +391,7 @@ export default function TwoFactorModals({
   const handleSetupContinue = async () => {
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/auth/2fa/setup", { challengeToken });
+      const { data } = await axios.post(`${apiBase}/setup`, { challengeToken });
       setQrCode(data.data?.qrCode ?? "");
       setManualKey(data.data?.manualKey ?? "");
       onStepChange("qr");
@@ -403,7 +406,7 @@ export default function TwoFactorModals({
   const handleConfirmSetup = async (code: string) => {
     setConfirmLoading(true);
     try {
-      const { data } = await axios.post("/api/auth/2fa/setup/confirm", { challengeToken, code });
+      const { data } = await axios.post(`${apiBase}/setup/confirm`, { challengeToken, code });
       setBackupCodes(data.data?.backupCodes ?? []);
       setPendingToken(data.meta?.token ?? "");
       setPendingUserData(data.data ?? null);
@@ -432,7 +435,7 @@ export default function TwoFactorModals({
   const handleEnter2FA = async (code: string) => {
     setConfirmLoading(true);
     try {
-      const { data } = await axios.post("/api/auth/2fa", { challengeToken, code });
+      const { data } = await axios.post(apiBase, { challengeToken, code });
       const token = data.meta?.token ?? "";
       const userData = data.data ?? null;
 

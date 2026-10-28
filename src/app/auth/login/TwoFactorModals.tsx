@@ -10,8 +10,8 @@ import {
   Text,
   UnstyledButton,
 } from "@mantine/core";
-import { IconCopy } from "@tabler/icons-react";
 import LockIcon from "@/assets/img/lock.svg";
+import CopyIcon from "@/assets/img/copy.svg";
 import { useState } from "react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
@@ -291,24 +291,24 @@ function BackupCodesModal({
 
       <Box
         p={16}
-        style={{ border: "1px solid #EAECF0", borderRadius: 8, position: "relative" }}
+        style={{
+          backgroundColor: "#f2f4f7",
+          border: "1px solid #d0d5dd",
+          borderRadius: 8,
+          position: "relative",
+        }}
       >
         <UnstyledButton
           onClick={handleCopy}
-          style={{ position: "absolute", top: 12, right: 12 }}
+          aria-label="Copy backup codes"
+          style={{ position: "absolute", top: 16, right: 16, lineHeight: 0 }}
         >
-          <IconCopy size={18} color="var(--prune-text-gray-500)" />
+          <img src={CopyIcon.src} alt="" width={24} height={24} />
         </UnstyledButton>
 
-        <Box
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "10px 24px",
-          }}
-        >
+        <Box style={{ display: "flex", flexWrap: "wrap", gap: 16, paddingRight: 40 }}>
           {codes.map((code, i) => (
-            <Text key={i} fz={13} fw={500} c="var(--prune-text-gray-700)" style={{ fontFamily: "monospace" }}>
+            <Text key={i} w={140} fz={16} lh={1.5} c="#1d2939">
               {code}
             </Text>
           ))}

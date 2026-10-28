@@ -1,4 +1,5 @@
 import { z } from "zod";
+import "./error-map";
 
 const emailSchema = z.string().email();
 
@@ -136,7 +137,7 @@ export const onboardingBasicInfoSchema = z.object({
     .string()
     .trim()
     .min(3, "Business name must be a minimum of 3 characters"),
-  businessTradingName: z.string().trim().optional(),
+  businessTradingName: z.string().trim().nullish(),
   businessCountry: handleNullableString("Country"),
   businessType: handleNullableString("Business Type"),
   businessIndustry: handleNullableString("Business Industry"),

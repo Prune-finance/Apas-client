@@ -222,23 +222,31 @@ function ConfirmSetupModal({
         {description}
       </Text>
 
-      <Flex justify="center" mb={40}>
-        <OtpInput value={code} onChange={setCode} />
-      </Flex>
+      {/* A form so pressing Enter (e.g. after pasting the code) submits */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (code.length === 6 && !loading) onConfirm(code);
+        }}
+      >
+        <Flex justify="center" mb={40}>
+          <OtpInput value={code} onChange={setCode} />
+        </Flex>
 
-      <PrimaryBtn
-        text="Confirm"
-        fw={500}
-        fz={16}
-        fullWidth
-        h={48}
-        radius={4}
-        loading={loading}
-        disabled={code.length < 6}
-        action={() => { if (code.length === 6) onConfirm(code); }}
-        color={code.length < 6 ? "#eaecf0" : undefined}
-        c={code.length < 6 ? "#98a2b3" : undefined}
-      />
+        <PrimaryBtn
+          text="Confirm"
+          type="submit"
+          fw={500}
+          fz={16}
+          fullWidth
+          h={48}
+          radius={4}
+          loading={loading}
+          disabled={code.length < 6}
+          color={code.length < 6 ? "#eaecf0" : undefined}
+          c={code.length < 6 ? "#98a2b3" : undefined}
+        />
+      </form>
     </Modal>
   );
 }

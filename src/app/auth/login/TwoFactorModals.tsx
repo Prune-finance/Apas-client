@@ -357,7 +357,7 @@ function SecuredModal({ opened, onOkay }: { opened: boolean; onOkay: () => void 
       withCloseButton
     >
       <Text fz={14} c="var(--prune-text-gray-500)" mb={32}>
-        2FA is now active. Next time you log in, we'll ask for your code.
+        2FA is now active. Next time you log in, we&apos;ll ask for your code.
       </Text>
       <Flex justify="flex-end">
         <PrimaryBtn text="Okay" fw={600} fz={12} action={onOkay} radius={4} h={40} px={18} />

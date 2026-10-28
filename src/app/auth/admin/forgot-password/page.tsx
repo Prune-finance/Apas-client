@@ -35,12 +35,14 @@ export default function UserForgotPassword() {
         { ...form.values }
       );
       handleSuccess(
-        "Email Sent",
-        `A password reset link has been sent to your email. `
+        "Code Sent",
+        "A 6-digit reset code has been sent to your email. It expires in 10 minutes."
       );
-      push("/auth/admin/reset-password");
+      push(
+        `/auth/admin/reset-password?email=${encodeURIComponent(form.values.email)}`
+      );
     } catch (error) {
-      handleError("Sending Reset Link Failed", parseError(error));
+      handleError("Sending Reset Code Failed", parseError(error));
     } finally {
       setProcessing(false);
     }
@@ -77,7 +79,7 @@ export default function UserForgotPassword() {
           />
 
           <PrimaryBtn
-            text="Send Reset Link"
+            text="Send Reset Code"
             fullWidth
             mt={39}
             fw={600}

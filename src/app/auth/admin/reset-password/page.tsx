@@ -1,18 +1,12 @@
 "use client";
 
-import {
-  Box,
-  Paper,
-  PasswordInput,
-  PinInput,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Box, Paper, PasswordInput, Stack, Text, UnstyledButton } from "@mantine/core";
 import Image from "next/image";
 import PruneIcon from "@/assets/img/icon.png";
 import styles from "./style.module.scss";
 import { inter } from "@/ui/fonts";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import { OtpInput } from "@/ui/components/OtpInput";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   resetPasswordSchema,
@@ -25,13 +19,16 @@ import { Suspense, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import axios from "axios";
 
-function UserForgotPassword() {
+function AdminResetPassword() {
   const [processing, setProcessing] = useState(false);
+  const [resending, setResending] = useState(false);
   const { handleError, handleSuccess } = useNotification();
   const { push } = useRouter();
 
   const searchParams = useSearchParams();
   const code = searchParams.get("code") ?? "";
+  const email = searchParams.get("email") ?? "";
+
   const form = useForm<ResetPasswordType>({
     initialValues: { ...resetPasswordValues, otp: code },
     validate: zodResolver(resetPasswordSchema),
@@ -41,19 +38,37 @@ function UserForgotPassword() {
     setProcessing(true);
     const { otp, password } = form.values;
     try {
+      // The API expects the 6-digit code as a plain number
       await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/reset-password`,
         { token: Number(otp), password }
       );
       handleSuccess(
-        "Successful! Password Reset",
-        "Your password has been changed successfully"
+        "Password Reset Complete",
+        "Your password has been changed. Please log in with your new password."
       );
       push("/auth/admin/login");
     } catch (error) {
       handleError("Password Reset Failed", parseError(error));
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleResend = async () => {
+    if (!email) return push("/auth/admin/forgot-password");
+    setResending(true);
+    try {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/forgot-password`,
+        { email }
+      );
+      form.setFieldValue("otp", "");
+      handleSuccess("Code Sent", "A new 6-digit code has been sent to your email.");
+    } catch (error) {
+      handleError("Sending Reset Code Failed", parseError(error));
+    } finally {
+      setResending(false);
     }
   };
 
@@ -69,10 +84,13 @@ function UserForgotPassword() {
           fw={400}
           m={0}
           p={0}
+          ta="center"
           c="var(--prune-text-gray-600)"
           style={{ fontFamily: inter.style.fontFamily }}
         >
-          Create a new password.
+          {email
+            ? `Enter the 6-digit code sent to ${email}. It expires in 10 minutes.`
+            : "Enter the 6-digit code from your email. It expires in 10 minutes."}
         </Text>
 
         <Box
@@ -80,36 +98,50 @@ function UserForgotPassword() {
           onSubmit={form.onSubmit(() => handleResetPassword())}
           w="100%"
         >
-          <PasswordInput
-            mt={42}
-            placeholder="Enter New Password"
-            {...form.getInputProps("password")}
-            classNames={{ input: styles.input }}
-          />
-
-          <PasswordInput
-            mt={42}
-            placeholder="Confirm New Password"
-            {...form.getInputProps("confirmPassword")}
-            classNames={{ input: styles.input }}
-          />
-
-          <Stack gap={3}>
-            <PinInput
-              oneTimeCode
+          <Stack gap={6} mt={32} align="center">
+            <OtpInput
+              boxSize={52}
               {...form.getInputProps("otp")}
-              mt={30}
-              type="number"
-              length={6}
               error={!!form.errors.otp}
             />
 
             {!!form.errors.otp && (
               <Text fz={12} c="var(--prune-warning)">
-                {form.errors && form.errors.otp}
+                {form.errors.otp}
               </Text>
             )}
+
+            <Text fz={12} c="var(--prune-text-gray-500)">
+              Didn&apos;t get a code?{" "}
+              <UnstyledButton
+                type="button"
+                onClick={handleResend}
+                disabled={resending}
+                fz={12}
+                fw={600}
+                c="var(--prune-primary-800)"
+                td="underline"
+              >
+                {resending ? "Sending..." : "Resend code"}
+              </UnstyledButton>
+            </Text>
           </Stack>
+
+          <PasswordInput
+            mt={32}
+            placeholder="Enter New Password"
+            description="At least 8 characters, with an uppercase letter, a lowercase letter, a number and a special character."
+            inputWrapperOrder={["input", "description", "error"]}
+            {...form.getInputProps("password")}
+            classNames={{ input: styles.input }}
+          />
+
+          <PasswordInput
+            mt={24}
+            placeholder="Confirm New Password"
+            {...form.getInputProps("confirmPassword")}
+            classNames={{ input: styles.input }}
+          />
 
           <PrimaryBtn
             text="Reset Password"
@@ -123,7 +155,7 @@ function UserForgotPassword() {
 
         <PrimaryBtn
           text="Go back to Login"
-          link="/auth/login"
+          link="/auth/admin/login"
           mt={10}
           td="underline"
           variant="transparent"
@@ -136,10 +168,10 @@ function UserForgotPassword() {
   );
 }
 
-export default function UserForgotPasswordSuspense() {
+export default function AdminResetPasswordSuspense() {
   return (
     <Suspense>
-      <UserForgotPassword />
+      <AdminResetPassword />
     </Suspense>
   );
 }

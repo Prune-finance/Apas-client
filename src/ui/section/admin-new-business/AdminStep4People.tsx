@@ -343,6 +343,7 @@ function CEOSubStep({
         <Flex gap={24} w="100%">
           <TextInputWithInsideLabel label="Email" w="100%" placeholder="Enter Email" withAsterisk {...form.getInputProps("ceoEmail")} />
           <DateInputWithInsideLabel
+            withAsterisk={false}
             minimumAge={18}
             label="Date of Birth"
             w="100%"
@@ -352,6 +353,7 @@ function CEOSubStep({
         </Flex>
         <Flex gap={24} w="100%">
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Identity Type"
             data={refData.identityTypes}
             w="100%"
@@ -360,6 +362,7 @@ function CEOSubStep({
             {...form.getInputProps("ceoIdentityType")}
           />
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Proof of Address"
             w="100%"
             searchable
@@ -486,6 +489,7 @@ function PersonListSubStep({
                   {...form.getInputProps(`${listKey}.${idx}.email`)}
                 />
                 <DateInputWithInsideLabel
+                  withAsterisk={false}
                   minimumAge={18}
                   label="Date of Birth"
                   w="100%"
@@ -495,6 +499,7 @@ function PersonListSubStep({
               </Flex>
               <Flex gap={24} w="100%">
                 <SelectInputWithInsideLabel
+                  withAsterisk={false}
                   label="Identity Type"
                   data={refData.identityTypes}
                   w="100%"
@@ -503,6 +508,7 @@ function PersonListSubStep({
                   {...form.getInputProps(`${listKey}.${idx}.identityType`)}
                 />
                 <SelectInputWithInsideLabel
+                  withAsterisk={false}
                   label="Proof of Address"
                   w="100%"
                   searchable

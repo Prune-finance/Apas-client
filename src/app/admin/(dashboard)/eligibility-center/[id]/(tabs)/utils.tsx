@@ -174,6 +174,7 @@ export const NewDirectorOrShareholderModal = ({
 
         <Flex gap={24} w="100%" direction={{ base: "column", sm: "row" }}>
           <TextInputWithInsideLabel
+            withAsterisk={false}
             label="Email"
             w="100%"
             key={form.key(`email`)}
@@ -189,6 +190,7 @@ export const NewDirectorOrShareholderModal = ({
 
         <Flex gap={24} w="100%" direction={{ base: "column", sm: "row" }}>
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Identity Type"
             w="100%"
             key={form.key(`identityType`)}
@@ -196,6 +198,7 @@ export const NewDirectorOrShareholderModal = ({
             {...form.getInputProps(`identityType`)}
           />
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Proof of Address"
             w="100%"
             data={["Utility Bill"]}

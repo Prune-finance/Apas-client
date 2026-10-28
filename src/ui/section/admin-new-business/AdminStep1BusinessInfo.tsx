@@ -266,6 +266,7 @@ export default function AdminStep1BusinessInfo({
             {...form.getInputProps("businessName")}
           />
           <TextInputWithInsideLabel
+            withAsterisk={false}
             label="Trading Name"
             w="100%"
             placeholder="Enter Trading Name"
@@ -379,6 +380,7 @@ export default function AdminStep1BusinessInfo({
         {form.values.isRegulated && (
           <Flex gap={24} w="50%" mb={16}>
             <TextInputWithInsideLabel
+              withAsterisk={false}
               label="Regulatory Licence"
               w="100%"
               placeholder="Enter Regulatory Licence"
@@ -483,6 +485,7 @@ export default function AdminStep1BusinessInfo({
 
         <Flex gap={24} w="100%">
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Identity Type"
             data={refData.identityTypes}
             w="100%"
@@ -491,6 +494,7 @@ export default function AdminStep1BusinessInfo({
             {...form.getInputProps("contactIdentityType")}
           />
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Proof of Address"
             w="100%"
             searchable

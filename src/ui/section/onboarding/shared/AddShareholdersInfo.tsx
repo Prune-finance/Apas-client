@@ -200,6 +200,7 @@ export const AddShareholdersInfo = ({
 
           <Flex gap={24} w="100%">
             <TextInputWithInsideLabel
+              withAsterisk={false}
               label="Email"
               w="100%"
               standard={noFloatingLabel}
@@ -228,6 +229,7 @@ export const AddShareholdersInfo = ({
 
           <Flex gap={24} w="100%">
             <SelectInputWithInsideLabel
+              withAsterisk={false}
               label="Identity Type"
               w="100%"
               data={refData.identityTypes}
@@ -236,6 +238,7 @@ export const AddShareholdersInfo = ({
               {...form.getInputProps(`shareholders.${index}.identityType`)}
             />
             <SelectInputWithInsideLabel
+              withAsterisk={false}
               label="Proof of Address"
               w="100%"
               data={refData.proofOfAddressTypes}

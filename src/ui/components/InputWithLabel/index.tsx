@@ -18,6 +18,7 @@ import {
   Tooltip,
 } from "@mantine/core";
 import classes from "./input.module.scss";
+import { requiredPlaceholder, showAsterisk } from "./required-placeholder";
 import styles from "./styles.module.scss";
 import profile_styles from "./profile.module.scss";
 import { DateInput, DateInputProps } from "@mantine/dates";
@@ -54,13 +55,18 @@ export const TextInputWithInsideLabel = ({
         placeholder={inputProps.placeholder ?? (typeof label === "string" ? label : undefined)}
         styles={getStandardStyles(!!inputProps.error)}
         {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
       />
     );
   }
   return (
     <TextInput
       {...props}
-      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : " ")}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : " "),
+        props
+      )}
       classNames={classes}
       styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
     />
@@ -75,7 +81,11 @@ export const NumberInputWithInsideLabel = ({
   return (
     <NumberInput
       {...props}
-      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Enter number")}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : "Enter number"),
+        props
+      )}
       classNames={classes}
       thousandSeparator=","
       min={0}
@@ -94,6 +104,7 @@ export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWi
         placeholder={inputProps.placeholder ?? (typeof label === "string" ? `Select ${label}` : "Select")}
         styles={getStandardStyles(!!inputProps.error)}
         {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
       />
     );
   }
@@ -102,7 +113,11 @@ export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWi
       classNames={classes}
       styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
       {...props}
-      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Select")}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : "Select"),
+        props
+      )}
     />
   );
 };
@@ -150,6 +165,7 @@ export const DateInputWithInsideLabel = ({ standard, minimumAge, ...props }: Dat
         styles={getStandardStyles(!!inputProps.error)}
         placeholder="Select Date"
         {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
         {...calendarProps}
       />
     );
@@ -158,7 +174,11 @@ export const DateInputWithInsideLabel = ({ standard, minimumAge, ...props }: Dat
     <DateInput
       {...props}
       {...calendarProps}
-      placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : "Select Date")}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : "Select Date"),
+        props
+      )}
       classNames={classes}
       styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
     />
@@ -189,10 +209,21 @@ export const TextareaWithInsideLabel = ({
           },
         }}
         {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
       />
     );
   }
-  return <Textarea {...props} placeholder={props.placeholder ?? (typeof props.label === "string" ? props.label : " ")} classNames={classes} />;
+  return (
+    <Textarea
+      {...props}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : " "),
+        props
+      )}
+      classNames={classes}
+    />
+  );
 };
 
 interface PhoneNumberInputProps<T> {

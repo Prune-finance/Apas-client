@@ -138,6 +138,7 @@ export default function AdminStep3Financials({ adminReference, selectedServices,
         {label}
       </Text>
       <NumberInputWithInsideLabel
+        withAsterisk={false}
         leftSection={<IconCurrencyPound size={16} />}
         label="Amount"
         w="100%"
@@ -158,6 +159,7 @@ export default function AdminStep3Financials({ adminReference, selectedServices,
             </Text>
 
             <NumberInputWithInsideLabel
+              withAsterisk={false}
               label="How many virtual accounts do you need as a day one requirement?"
               allowDecimal={false}
               allowNegative={false}
@@ -167,6 +169,7 @@ export default function AdminStep3Financials({ adminReference, selectedServices,
             />
 
             <NumberInputWithInsideLabel
+              withAsterisk={false}
               label="What is the projected total number of virtual accounts needed at full capacity?"
               allowDecimal={false}
               allowNegative={false}
@@ -206,6 +209,7 @@ export default function AdminStep3Financials({ adminReference, selectedServices,
                 What is the total highest transaction count that all issued virtual accounts will process?
               </Text>
               <NumberInputWithInsideLabel
+                withAsterisk={false}
                 label="Count"
                 allowDecimal={false}
                 allowNegative={false}

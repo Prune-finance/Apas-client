@@ -23,6 +23,7 @@ import { useState } from "react";
 import { UseFormReturnType } from "@mantine/form";
 import { IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
 import classes from "./quest-input.module.scss";
+import { requiredPlaceholder, showAsterisk } from "./required-placeholder";
 import { countriesWithCode } from "@/lib/countries-codes-flags";
 
 // ─── shared helpers ────────────────────────────────────────────────────────
@@ -58,7 +59,6 @@ export const QuestInput = ({
   return (
     <TextInput
       label={label}
-      placeholder={typeof label === "string" ? label : " "}
       value={value}
       leftSection={leftSection}
       leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
@@ -78,6 +78,11 @@ export const QuestInput = ({
       onFocus={onFocus}
       onBlur={onBlur}
       {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
     />
   );
 };
@@ -113,7 +118,6 @@ export const QuestSelect = ({
   return (
     <Select
       label={labelNode}
-      placeholder={typeof label === "string" ? label : " "}
       value={value}
       leftSection={leftSection}
       leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
@@ -126,6 +130,11 @@ export const QuestSelect = ({
       onFocus={onFocus}
       onBlur={onBlur}
       {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
     />
   );
 };
@@ -148,7 +157,6 @@ export const QuestNumberInput = ({
   return (
     <NumberInput
       label={label}
-      placeholder={typeof label === "string" ? label : " "}
       value={value}
       leftSection={leftSection}
       leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
@@ -160,6 +168,11 @@ export const QuestNumberInput = ({
       onFocus={onFocus}
       onBlur={onBlur}
       {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
     />
   );
 };
@@ -178,13 +191,17 @@ export const QuestTextarea = ({
   return (
     <Textarea
       label={label}
-      placeholder={typeof label === "string" ? label : " "}
       value={value}
       classNames={{ ...classes, input: classes.textarea }}
       styles={noIconLabelStyle}
       onFocus={onFocus}
       onBlur={onBlur}
       {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
     />
   );
 };
@@ -229,6 +246,8 @@ interface QuestPhoneInputProps<T> {
   inputBackground?: string;
   /** @deprecated Retains onboarding sizing; label visibility now follows the value. */
   alwaysShowLabel?: boolean;
+  /** Shows the red required asterisk on the label (phone numbers are required by default) */
+  required?: boolean;
 }
 
 export const QuestPhoneInput = <T,>({
@@ -240,6 +259,7 @@ export const QuestPhoneInput = <T,>({
   unfocusedBorderColor = "#e4e7ec",
   inputBackground = "#fff",
   alwaysShowLabel = false,
+  required = true,
 }: QuestPhoneInputProps<T>) => {
   const [focused, setFocused] = useState(false);
   const [search, setSearch] = useState("");
@@ -346,7 +366,7 @@ export const QuestPhoneInput = <T,>({
         />
 
         <Box style={{ position: "relative", flex: 1, minWidth: 0, height: "100%" }}>
-          {/* Show the label only once a phone number has been entered. */}
+          {/* Empty: the label stands in for the placeholder (with the red asterisk). Filled: it floats up. */}
           <Box
             component="span"
             className={classes.phone_label}
@@ -357,8 +377,7 @@ export const QuestPhoneInput = <T,>({
               transform: floating ? "translateY(0)" : "translateY(-50%)",
               fontSize: floating ? 13 : 14,
               lineHeight: "16px",
-              color: hasError ? "#db340b" : "#667085",
-              opacity: floating ? 1 : 0,
+              color: hasError ? "#db340b" : floating ? "#667085" : "#98a2b3",
               pointerEvents: "none",
               zIndex: 1,
               fontWeight: 400,
@@ -368,6 +387,9 @@ export const QuestPhoneInput = <T,>({
             }}
           >
             {label}
+            {required && (
+              <span style={{ color: "var(--mantine-color-error)" }}> *</span>
+            )}
           </Box>
           {/* Phone number — plain input with no border */}
           <Box
@@ -381,7 +403,7 @@ export const QuestPhoneInput = <T,>({
             }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            placeholder={floating ? "" : label}
+            placeholder=""
             className={alwaysShowLabel ? classes.phone_input_onboarding : classes.phone_input}
             style={{
               width: "100%",

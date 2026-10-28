@@ -150,6 +150,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             {...form.getInputProps("businessName")}
           />
           <TextInputWithInsideLabel
+            withAsterisk={false}
             label="Trading Name"
             w="100%"
             placeholder="Enter Trading Name"
@@ -300,6 +301,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
 
         <Flex gap={24} w="100%">
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Identity Type"
             data={refData.identityTypes}
             w="100%"
@@ -309,6 +311,7 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
             {...form.getInputProps("contactPersonIdType")}
           />
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Proof of Address"
             w="100%"
             searchable

@@ -26,7 +26,7 @@ const metadata: Metadata = {
 };
 
 const theme = createTheme({
-  fontFamily: "var(--font-ibm-plex-sans)",
+  fontFamily: "var(--font-switzer), sans-serif",
   headings: {
     fontFamily: "'EksellDisplay', serif",
   },
@@ -55,11 +55,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${switzer.variable} ${ibmPlexSans.variable}`}>
       <head>
         <ColorSchemeScript />
       </head>
-      <body className={`${switzer.variable} ${ibmPlexSans.variable}`}>
+      <body>
         <MantineProvider theme={theme}>
           <NotificationProvider />
           {/* <Notifications

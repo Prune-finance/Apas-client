@@ -2,23 +2,21 @@
 
 import {
   Box,
-  Button,
   Checkbox,
   Divider,
   Flex,
-  Group,
   Modal,
-  PinInput,
   Stack,
   Text,
-  ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
-import { IconCopy, IconLock } from "@tabler/icons-react";
+import { IconCopy } from "@tabler/icons-react";
+import LockIcon from "@/assets/img/lock.svg";
 import { useState } from "react";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { OtpInput } from "@/ui/components/OtpInput";
 import { parseError } from "@/lib/actions/auth";
 
 export type TwoFactorStep =
@@ -36,21 +34,17 @@ interface TwoFactorModalsProps {
   onComplete: (token: string, userData: any) => void;
 }
 
-const pinStyles = {
-  input: {
-    width: 52,
-    height: 52,
-    fontSize: 20,
-    fontWeight: 600,
-    borderRadius: 8,
-    border: "1px solid #EAECF0",
-    color: "var(--prune-text-gray-700)",
-  },
+const modalStyles = {
+  title: { fontSize: 24, fontWeight: 500, color: "#101828", fontFamily: "var(--mantine-font-family)" },
+  header: { padding: "24px 24px 0" },
+  body: { padding: "8px 24px 24px" },
 };
 
-const modalStyles = {
-  title: { fontSize: 24, fontWeight: 700, color: "var(--prune-text-gray-700)" },
-  body: { padding: "8px 0 0" },
+const confirmModalStyles = {
+  content: { borderRadius: 8 },
+  title: { fontSize: 24, fontWeight: 500, color: "#000000", fontFamily: "var(--mantine-font-family)" },
+  header: { padding: "32px 32px 0", minHeight: 0 },
+  body: { padding: "16px 32px 32px" },
 };
 
 // ─── Protect Your Account ───────────────────────────────────────────────────
@@ -75,37 +69,63 @@ function ProtectAccountModal({
       centered
       withCloseButton={false}
     >
-      <Text fz={14} c="var(--prune-text-gray-500)" mb={24}>
+      <Text fz={14} c="#667085" mb={24}>
         Choose how you want to receive your authentication codes.
       </Text>
 
       <Box
-        px={16}
-        py={14}
-        style={{
-          border: "1px solid #EAECF0",
-          borderRadius: 8,
-          display: "flex",
-          alignItems: "center",
-          gap: 12,
-        }}
+        py={12}
+        style={{ display: "flex", alignItems: "center", gap: 16, width: "100%" }}
       >
-        <ThemeIcon size={40} radius="xl" color="#E8F5E9" variant="light">
-          <IconLock size={20} color="var(--prune-primary-700)" />
-        </ThemeIcon>
-        <Box>
-          <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
+        <Box
+          style={{
+            background: "#dcf5e6",
+            borderRadius: 9999,
+            padding: 8,
+            width: 40,
+            height: 40,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            overflow: "hidden",
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={LockIcon.src} alt="lock" width={24} height={24} />
+        </Box>
+        <Box style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Text fz={14} lh="20px" c="#101828">
             Set up using Authenticator app
           </Text>
-          <Text fz={12} c="var(--prune-text-gray-500)">
+          <Text fz={12} lh="18px" c="#667085">
             Use an authenticator app to get authentication code
           </Text>
         </Box>
       </Box>
 
-      <Flex justify="flex-end" gap={12} mt={32}>
-        <SecondaryBtn text="Cancel" fw={600} action={onCancel} />
-        <PrimaryBtn text="Continue" fw={600} loading={loading} action={onContinue} />
+      <Flex justify="flex-end" gap={12} mt={24}>
+        <SecondaryBtn
+          text="Cancel"
+          fw={600}
+          fz={12}
+          action={onCancel}
+          radius={4}
+          h={40}
+          w={106}
+          styles={{ root: { border: "1px solid #d0d5dd", color: "#344054" } }}
+          c="#344054"
+        />
+        <PrimaryBtn
+          text="Continue"
+          fw={600}
+          fz={12}
+          loading={loading}
+          action={onContinue}
+          radius={4}
+          h={40}
+          px={18}
+        />
       </Flex>
     </Modal>
   );
@@ -164,8 +184,8 @@ function ConnectAppModal({
       </Box>
 
       <Flex justify="flex-end" gap={12} mt={32}>
-        <SecondaryBtn text="Cancel" fw={600} action={onCancel} />
-        <PrimaryBtn text="Continue" fw={600} action={onContinue} />
+        <SecondaryBtn text="Cancel" fw={600} fz={12} action={onCancel} radius={4} h={40} w={106} c="#344054" styles={{ root: { border: "1px solid #d0d5dd" } }} />
+        <PrimaryBtn text="Continue" fw={600} fz={12} action={onContinue} radius={4} h={40} px={18} />
       </Flex>
     </Modal>
   );
@@ -194,36 +214,30 @@ function ConfirmSetupModal({
       opened={opened}
       onClose={() => { setCode(""); onClose(); }}
       title={title}
-      styles={modalStyles}
-      size={440}
+      styles={confirmModalStyles}
+      size={500}
       centered
     >
-      <Text fz={14} c="var(--prune-text-gray-500)" mb={28}>
+      <Text fz={16} lh={1.5} c="#667085" mb={40}>
         {description}
       </Text>
 
-      <Flex justify="center" mb={32}>
-        <PinInput
-          length={6}
-          type="number"
-          oneTimeCode
-          value={code}
-          onChange={setCode}
-          styles={pinStyles}
-          gap={8}
-        />
+      <Flex justify="center" mb={40}>
+        <OtpInput value={code} onChange={setCode} />
       </Flex>
 
       <PrimaryBtn
         text="Confirm"
-        fw={600}
+        fw={500}
+        fz={16}
         fullWidth
-        h={44}
+        h={48}
+        radius={4}
         loading={loading}
         disabled={code.length < 6}
         action={() => { if (code.length === 6) onConfirm(code); }}
-        color={code.length < 6 ? "var(--prune-text-gray-200)" : undefined}
-        c={code.length < 6 ? "var(--prune-text-gray-400)" : undefined}
+        color={code.length < 6 ? "#eaecf0" : undefined}
+        c={code.length < 6 ? "#98a2b3" : undefined}
       />
     </Modal>
   );
@@ -312,10 +326,14 @@ function BackupCodesModal({
       />
 
       <Flex justify="flex-end" gap={12}>
-        <SecondaryBtn text="Download as TXT" fw={600} action={handleDownload} />
+        <SecondaryBtn text="Download as TXT" fw={600} fz={12} action={handleDownload} radius={4} h={40} c="#344054" styles={{ root: { border: "1px solid #d0d5dd" } }} />
         <PrimaryBtn
           text="Continue"
           fw={600}
+          fz={12}
+          radius={4}
+          h={40}
+          px={18}
           disabled={!saved}
           action={onContinue}
           color={!saved ? "var(--prune-text-gray-200)" : undefined}
@@ -342,7 +360,7 @@ function SecuredModal({ opened, onOkay }: { opened: boolean; onOkay: () => void 
         2FA is now active. Next time you log in, we'll ask for your code.
       </Text>
       <Flex justify="flex-end">
-        <PrimaryBtn text="Okay" fw={600} action={onOkay} />
+        <PrimaryBtn text="Okay" fw={600} fz={12} action={onOkay} radius={4} h={40} px={18} />
       </Flex>
     </Modal>
   );

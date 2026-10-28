@@ -32,6 +32,7 @@ import {
 
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import styles from "@/ui/styles/singlebusiness.module.scss";
+import viewStyles from "./view.module.scss";
 
 import Business from "../../../businesses/[id]/(tabs)/business";
 import Documents from "../../../businesses/[id]/(tabs)/documents";
@@ -239,7 +240,7 @@ export default function SingleEligibilityBusiness() {
   }, [business?.kycTrusted]);
 
   return (
-    <main className={styles.main}>
+    <main className={`${styles.main} ${viewStyles.view__mode}`}>
       <Breadcrumbs
         items={[
           { title: "Eligibility Center", href: "/admin/eligibility-center?tab=onboarding" },

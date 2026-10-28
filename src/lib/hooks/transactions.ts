@@ -1284,3 +1284,11 @@ export function exportAdminPayoutAccountTransactions(accountID: string, params: 
     })
   );
 }
+
+export function exportAdminIssuedAccountTransactions(accountID: string, params: IParams) {
+  return openExportUrl(
+    axios.get(`admin/accounts/issued/${accountID}/transactions/export`, {
+      params: sanitizedQueryParams(params),
+    })
+  );
+}

@@ -504,3 +504,22 @@ a {
     font-size: 16px !important;
   }
 }
+// Validation error state for every Mantine input (TextInput, PasswordInput, Select,
+// Textarea, NumberInput, Date inputs, PinInput…). !important is needed because many
+// inputs set their border through inline `styles`, which would otherwise hide it.
+.mantine-Input-input[data-error],
+.mantine-Input-input[data-error]:focus,
+.mantine-Input-input[data-error]:focus-within {
+  border: 2px solid #ff9175 !important;
+  background-color: #fff3f0 !important;
+  box-shadow: none !important;
+}
+
+// Error label + password eye icon colour (Figma: semantic/fg/error)
+.mantine-InputWrapper-root:has(.mantine-Input-input[data-error]) > .mantine-InputWrapper-label {
+  color: #db340b !important;
+}
+
+.mantine-Input-wrapper:has(.mantine-Input-input[data-error]) .mantine-PasswordInput-visibilityToggle {
+  color: #db340b;
+}

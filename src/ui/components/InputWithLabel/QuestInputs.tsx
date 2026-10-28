@@ -247,6 +247,7 @@ export const QuestPhoneInput = <T,>({
   const dialCode = (form.values[countryCodeKey] as string) || "+234";
   const phoneValue = (form.values[phoneNumberKey] as string) || "";
   const floating = Boolean(phoneValue);
+  const hasError = Boolean(form.errors[phoneNumberKey]);
 
   const selectedCountry = countriesWithCode.find((c) => c.value === dialCode);
   const flagEmoji = selectedCountry?.label.split(" ")[0] ?? "🌍";
@@ -284,9 +285,11 @@ export const QuestPhoneInput = <T,>({
         align="center"
         style={{
           height: inputHeight,
-          border: `1px solid ${focused ? "var(--prune-primary-600)" : unfocusedBorderColor}`,
+          border: hasError
+            ? "2px solid #ff9175"
+            : `1px solid ${focused ? "var(--prune-primary-600)" : unfocusedBorderColor}`,
           borderRadius: 8,
-          background: inputBackground,
+          background: hasError ? "#fff3f0" : inputBackground,
           overflow: "hidden",
           transition: "border-color 0.2s ease",
         }}
@@ -354,7 +357,7 @@ export const QuestPhoneInput = <T,>({
               transform: floating ? "translateY(0)" : "translateY(-50%)",
               fontSize: floating ? 13 : 14,
               lineHeight: "16px",
-              color: "#667085",
+              color: hasError ? "#db340b" : "#667085",
               opacity: floating ? 1 : 0,
               pointerEvents: "none",
               zIndex: 1,
@@ -398,7 +401,7 @@ export const QuestPhoneInput = <T,>({
       </Flex>
 
       {form.errors[phoneNumberKey] && (
-        <Text fz={12} c="red.6" mt={4}>
+        <Text fz={12} c="#db340b" mt={4}>
           {String(form.errors[phoneNumberKey])}
         </Text>
       )}

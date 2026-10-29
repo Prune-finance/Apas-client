@@ -23,7 +23,12 @@ export default function Navbar({ active }: NavbarProps) {
         bulletSize={24}
         lineWidth={2}
         color="var(--prune-primary-700)"
-        styles={{ itemBody: { height: "40px" } }}
+        styles={{
+          itemBody: { height: "40px" },
+          // Bullets are 24px tall and pinned to the top of each item, so give the
+          // title the same line height to centre the text on the bullet
+          itemTitle: { lineHeight: "24px", marginBottom: 0 },
+        }}
       >
         {timelines.map((item, index) => (
           <TimelineItem

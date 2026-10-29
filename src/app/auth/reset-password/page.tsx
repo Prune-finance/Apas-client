@@ -18,6 +18,10 @@ import useNotification from "@/lib/hooks/notification";
 import { Suspense, useState } from "react";
 import { parseError } from "@/lib/actions/auth";
 import axios from "axios";
+import useCountdown from "@/lib/hooks/countdown";
+
+// A code is sent before this page opens, so the resend timer starts straight away
+const RESEND_COOLDOWN = 90;
 
 const passwordStyles = {
   input: {
@@ -37,6 +41,7 @@ const passwordStyles = {
 function UserResetPassword() {
   const [processing, setProcessing] = useState(false);
   const [resending, setResending] = useState(false);
+  const resendTimer = useCountdown(RESEND_COOLDOWN, true);
   const { handleError, handleSuccess } = useNotification();
   const { push } = useRouter();
 
@@ -72,6 +77,7 @@ function UserResetPassword() {
 
   const handleResend = async () => {
     if (!email) return push("/auth/forgot-password");
+    if (resendTimer.running) return;
     setResending(true);
     try {
       await axios.post(
@@ -79,6 +85,7 @@ function UserResetPassword() {
         { email }
       );
       form.setFieldValue("otp", "");
+      resendTimer.start();
       handleSuccess("Code Sent", "A new 6-digit code has been sent to your email.");
     } catch (error) {
       handleError("Sending Reset Code Failed", parseError(error));
@@ -157,13 +164,18 @@ function UserResetPassword() {
                 <UnstyledButton
                   type="button"
                   onClick={handleResend}
-                  disabled={resending}
+                  disabled={resending || resendTimer.running}
                   fz={12}
                   fw={600}
-                  c="var(--prune-primary-800)"
-                  td="underline"
+                  c={resendTimer.running ? "var(--prune-text-gray-400)" : "var(--prune-primary-800)"}
+                  td={resendTimer.running ? "none" : "underline"}
+                  style={{ cursor: resendTimer.running ? "default" : "pointer" }}
                 >
-                  {resending ? "Sending..." : "Resend code"}
+                  {resending
+                  ? "Sending..."
+                  : resendTimer.running
+                  ? `Resend in ${resendTimer.label}`
+                  : "Resend code"}
                 </UnstyledButton>
               </Text>
             </Stack>

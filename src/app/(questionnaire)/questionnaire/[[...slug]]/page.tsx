@@ -16,6 +16,7 @@ import VirtualAccount from "./VirtualAccount";
 import BasicInfo, { SUPPORTED_ISO_CODES } from "./BasicInfo";
 import ConsentModal from "./ConsentModal";
 import ContactEntry from "./ContactEntry";
+import SubmittedSummary, { SubmittedContact } from "./SubmittedSummary";
 
 import {
   QuestionnaireFormProvider,
@@ -47,6 +48,13 @@ const STEP_TITLES: Record<number, string> = {
 };
 const questAxios = createAxiosInstance("questionnaire");
 
+const errorStatus = (err: unknown) =>
+  (err as { response?: { status?: number } })?.response?.status;
+const errorMessage = (err: unknown) =>
+  (err as { response?: { data?: { message?: string } } })?.response?.data?.message ?? "";
+const isAlreadySubmitted = (err: unknown) =>
+  errorStatus(err) === 400 && /already been submitted/i.test(errorMessage(err));
+
 export default function Questionnaire() {
   const { handleSuccess, handleError } = useNotification();
 
@@ -65,6 +73,10 @@ export default function Questionnaire() {
   const isResume = Boolean(questionnaireId && resumeToken);
 
   const [resumeLoading, setResumeLoading] = useState(isResume);
+
+  // Submitted questionnaires (data.readOnly) are shown as a read-only summary
+  const [readOnly, setReadOnly] = useState(false);
+  const [submittedContact, setSubmittedContact] = useState<SubmittedContact>({});
 
   // Baseline snapshot — set when data loads; compared on each "Save & Continue"
   const savedRef = useRef<QuestionnaireType | null>(null);
@@ -156,7 +168,7 @@ export default function Questionnaire() {
       try {
         const { data: res } = await questAxios.get(
           `/business/questionnaire/${questionnaireId}`,
-          { params: { token: resumeToken } }
+          { params: { token: resumeToken }, headers: { "X-Resume-Token": resumeToken } }
         );
 
         const a = res.data?.answers ?? {};
@@ -210,6 +222,20 @@ export default function Questionnaire() {
         form.setValues({ ...questionnaireValues, ...partial });
         savedRef.current = { ...questionnaireValues, ...partial };
 
+        // Submitted (any final status): show every answer read-only, no inputs or actions
+        if (res.data?.readOnly) {
+          const phone = [a.contactPhoneCountryCode, a.contactPhoneNumber].filter(Boolean).join(" ");
+          setSubmittedContact({
+            contactEmail: res.data?.contactEmail ?? a.contactEmail ?? null,
+            contactName: a.contactName ?? null,
+            contactDesignation: a.contactDesignation ?? null,
+            contactPhone: phone || null,
+          });
+          setReadOnly(true);
+          setEntryDone(true);
+          return;
+        }
+
         // Section 1 = ContactEntry (done), section 2 = BasicInfo (active 0), etc.
         const isComplete = progress?.isComplete === true || progress?.nextSection === null;
         let resolvedStep: number;
@@ -229,8 +255,17 @@ export default function Questionnaire() {
         setEntryDone(true);
         pushStepToURL(resolvedStep);
         if (isComplete) open();
-      } catch {
-        // If fetch fails, show ContactEntry so user can re-enter
+      } catch (err) {
+        // Expired, replaced or invalid link: back to the email screen to request a new one
+        try {
+          sessionStorage.removeItem("quest_reference");
+          sessionStorage.removeItem("quest_token");
+        } catch {}
+        handleError(
+          errorStatus(err) === 401 ? "Link expired" : "Unable to open questionnaire",
+          errorMessage(err) || parseError(err)
+        );
+        router.replace("/questionnaire");
       } finally {
         setResumeLoading(false);
       }
@@ -352,6 +387,11 @@ export default function Questionnaire() {
       );
       handleSuccess("Progress saved", "Your progress has been saved successfully.");
     } catch (err: unknown) {
+      if (isAlreadySubmitted(err)) {
+        handleError("Already submitted", errorMessage(err));
+        setReadOnly(true);
+        return;
+      }
       let msg = parseError(err);
       if (
         typeof err === "object" &&
@@ -438,8 +478,9 @@ export default function Questionnaire() {
       } else {
         goNext();
       }
-    } catch {
-      // errors surface via notifications
+    } catch (err) {
+      // errors surface via notifications; a submitted questionnaire switches to the read-only view
+      if (isAlreadySubmitted(err)) setReadOnly(true);
     } finally {
       setSaving(false);
     }
@@ -472,6 +513,24 @@ export default function Questionnaire() {
             pushStepToURL(step);
           }}
         />
+      </Box>
+    );
+  }
+
+  if (readOnly) {
+    return (
+      <Box>
+        <Box pos="sticky" top={0} style={{ zIndex: 100 }} bg="#FCFCFD">
+          <Box px={{ base: 24, sm: 48, lg: 120 }} pt={32} pb={15}>
+            <Title order={3} ta="left" mb={15} c="var(--prune-text-gray-700)">
+              Prune Onboarding: Company Profile
+            </Title>
+            <Progress value={100} color="var(--prune-primary-600)" />
+          </Box>
+        </Box>
+        <Box px={{ base: 24, sm: 48, lg: 120 }} mt={40} pb={64}>
+          <SubmittedSummary values={form.values} contact={submittedContact} />
+        </Box>
       </Box>
     );
   }

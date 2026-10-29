@@ -9,6 +9,7 @@ import {
   Title,
   ThemeIcon,
   Alert,
+  Anchor,
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { z } from "zod";
@@ -64,7 +65,10 @@ const ContactSchema = z.object({
 });
 
 type ContactFormType = z.infer<typeof ContactSchema>;
-type Phase = "email" | "contact" | "returning";
+type Phase = "email" | "contact" | "returning" | "submitted" | "hasAccount";
+
+const errorStatus = (err: unknown) =>
+  (err as { response?: { status?: number } })?.response?.status;
 
 interface Props {
   onComplete: (data: {
@@ -95,7 +99,7 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
       contactCountryCode: "+234",
     },
     validate: (values) => {
-      if (phase === "email") return zodResolver(EmailSchema)(values);
+      if (phase === "email" || phase === "hasAccount") return zodResolver(EmailSchema)(values);
       if (phase === "contact") return zodResolver(ContactSchema)(values);
       return {};
     },
@@ -140,15 +144,21 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
       );
 
       if (res.data?.returning) {
-        // Existing customer — email link already sent by the API
-        setPhase("returning");
+        // Existing customer — the API has emailed a link: "continue" if in progress,
+        // "view your answers" if already submitted
+        setPhase(res.data?.submitted ? "submitted" : "returning");
         startCooldown();
       } else {
         // New customer — show contact fields
         setPhase("contact");
       }
     } catch (err) {
-      handleError("Check failed", parseError(err));
+      if (errorStatus(err) === 409) setPhase("hasAccount");
+      else
+        handleError(
+          errorStatus(err) === 429 ? "Too many requests" : "Check failed",
+          parseError(err)
+        );
     } finally {
       setChecking(false);
     }
@@ -163,7 +173,7 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
       });
       startCooldown();
     } catch (err) {
-      handleError("Resend failed", parseError(err));
+      handleError(errorStatus(err) === 429 ? "Too many requests" : "Resend failed", parseError(err));
     } finally {
       setResending(false);
     }
@@ -187,6 +197,13 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
         contactPhoneNumber: String(form.values.contactPhoneNumber).replace(/\D/g, ""),
       });
 
+      // Email already has a questionnaire: the API emailed a link instead of creating one
+      if (res.data?.returning) {
+        setPhase(res.data?.submitted ? "submitted" : "returning");
+        startCooldown();
+        return;
+      }
+
       // Persist so subsequent steps can use them without URL params
       try {
         if (res.data?.reference) sessionStorage.setItem("quest_reference", res.data.reference);
@@ -200,14 +217,22 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
         phone: form.values.contactPhoneNumber,
       });
     } catch (err) {
-      handleError("Submission failed", parseError(err));
+      if (errorStatus(err) === 409) setPhase("hasAccount");
+      else
+        handleError(
+          errorStatus(err) === 429 ? "Too many requests" : "Submission failed",
+          parseError(err)
+        );
     } finally {
       setChecking(false);
     }
   };
 
   const isContact = phase === "contact";
-  const isReturning = phase === "returning";
+  const isSubmitted = phase === "submitted";
+  const hasAccount = phase === "hasAccount";
+  // Both "returning" states share the email-sent notice, resend and "use a different email"
+  const isReturning = phase === "returning" || isSubmitted;
 
   return (
     <Box
@@ -244,7 +269,7 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
           {...form.getInputProps("email")}
           key={form.key("email")}
           onKeyDown={(e) => {
-            if (phase === "email" && e.key === "Enter") handleEmailContinue();
+            if ((phase === "email" || phase === "hasAccount") && e.key === "Enter") handleEmailContinue();
           }}
         />
 
@@ -266,11 +291,14 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
               radius={8}
             >
               <Text fz={14} fw={500} c="var(--prune-text-gray-700)">
-                A link has been sent to your email
+                {isSubmitted
+                  ? "You've already submitted your questionnaire"
+                  : "Check your email to continue where you left off"}
               </Text>
               <Text fz={13} c="#667085" mt={4}>
-                Check your inbox and click the link to continue filling your
-                questionnaire from where you left off.
+                {isSubmitted
+                  ? "We've emailed you a link to view your answers."
+                  : "We've emailed you a \u201cComplete Questionnaire\u201d link. Click it to continue filling your questionnaire from where you left off."}
               </Text>
             </Alert>
 
@@ -292,6 +320,22 @@ export default function ContactEntry({ onComplete, onReturning }: Props) {
               />
             </Flex>
           </Stack>
+        </Collapse>
+
+        {/* Email already belongs to a Prune account */}
+        <Collapse in={hasAccount} transitionDuration={380} transitionTimingFunction="ease">
+          <Alert color="var(--prune-primary-600)" variant="light" radius={8}>
+            <Text fz={14} fw={500} c="var(--prune-text-gray-700)">
+              This email already has a Prune account
+            </Text>
+            <Text fz={13} c="#667085" mt={4}>
+              Please{" "}
+              <Anchor href="/auth/login" fz={13} fw={600} c="var(--prune-primary-800)">
+                sign in to your dashboard
+              </Anchor>{" "}
+              instead.
+            </Text>
+          </Alert>
         </Collapse>
 
         {/* New customer — contact fields */}

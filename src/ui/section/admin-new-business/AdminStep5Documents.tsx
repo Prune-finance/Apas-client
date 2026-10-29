@@ -70,7 +70,13 @@ export default function AdminStep5Documents({ adminReference, onBack, onComplete
 
   const handleSaveAndContinue = async () => {
     if (!isFormReady) {
-      handleError("Validation", "Please upload all required documents");
+      // Mark each missing required document in red
+      const docErrors: Record<string, string> = {};
+      if (!form.values.incorporationCertificateId)
+        docErrors.incorporationCertificateId = "Certificate of incorporation is required";
+      if (!form.values.memartId) docErrors.memartId = "MEMART is required";
+      if (!form.values.amlFrameworkId) docErrors.amlFrameworkId = "AML framework is required";
+      form.setErrors(docErrors);
       return;
     }
     if (hasSaved.current && !form.isDirty()) {
@@ -155,7 +161,6 @@ export default function AdminStep5Documents({ adminReference, onBack, onComplete
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!isFormReady}
           />
         </Flex>
       </Flex>

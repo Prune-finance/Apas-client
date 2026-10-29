@@ -76,18 +76,6 @@ export const AddDirectorsInfo = ({
 
   const sectionBase = buildSectionBase(adminReference, 4);
 
-  const isFormReady =
-    form.getValues().directors.length > 0 &&
-    form.getValues().directors.every((d) => {
-      const hasBasicFields =
-        Boolean(d.first_name?.trim()) &&
-        Boolean(d.last_name?.trim()) &&
-        Boolean(d.date_of_birth);
-      const hasIdentity = Boolean(d.identityType) && Boolean(d.identityFileUrl);
-      const hasIdentityBack = d.identityType === "PASSPORT" || Boolean(d.identityFileUrlBack);
-      const hasPOA = Boolean(d.proofOfAddress) && Boolean(d.proofOfAddressFileUrl);
-      return hasBasicFields && hasIdentity && hasIdentityBack && hasPOA;
-    });
 
   const handleClearForm = () => {
     form.setFieldValue("directors", [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }]);
@@ -106,8 +94,24 @@ export const AddDirectorsInfo = ({
   };
 
   const handleSaveAndContinue = async () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) return;
+    // The button stays enabled: on click, mark every missing field (uploads included) in red
+    const { errors, hasErrors } = form.validate();
+    const v = form.getValues();
+    const docErrors: Record<string, string> = {};
+    (v.directors ?? []).forEach((p, i) => {
+      const base = `directors.${i}`;
+      if (!p.identityType) docErrors[`${base}.identityType`] = "Identity type is required";
+      else if (!p.identityFileUrl) docErrors[`${base}.identityFileUrl`] = "Identity document is required";
+      if (p.identityType && p.identityType !== "PASSPORT" && !p.identityFileUrlBack)
+        docErrors[`${base}.identityFileUrlBack`] = "Back of identity document is required";
+      if (!p.proofOfAddress) docErrors[`${base}.proofOfAddress`] = "Proof of address is required";
+      else if (!p.proofOfAddressFileUrl)
+        docErrors[`${base}.proofOfAddressFileUrl`] = "Proof of address document is required";
+    });
+    if (hasErrors || Object.keys(docErrors).length > 0) {
+      form.setErrors({ ...errors, ...docErrors });
+      return;
+    }
 
     if (alreadyCompleted && JSON.stringify(buildSection4Body(form)) === mountSnapshot) {
       setActive(active + 1);
@@ -136,8 +140,11 @@ export const AddDirectorsInfo = ({
           <SaveProgressBtn loading={saving} action={handleSaveProgress} />
           <PrimaryBtn
             text="Add Directors"
-            leftSection={<IconPlus size={18} />}
-            fw={600}
+            icon={IconPlus}
+            showIcon
+            h={36}
+            fz={13}
+            fw={500}
             action={() => {
               form.insertListItem("directors", {
                 ...OnboardingDirectorValues,
@@ -228,7 +235,6 @@ export const AddDirectorsInfo = ({
 
           <Flex gap={24} w="100%">
             <SelectInputWithInsideLabel
-              withAsterisk={false}
               label="Identity Type"
               w="100%"
               data={refData.identityTypes}
@@ -237,7 +243,6 @@ export const AddDirectorsInfo = ({
               {...form.getInputProps(`directors.${index}.identityType`)}
             />
             <SelectInputWithInsideLabel
-              withAsterisk={false}
               label="Proof of Address"
               w="100%"
               data={refData.proofOfAddressTypes}
@@ -319,8 +324,6 @@ export const AddDirectorsInfo = ({
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!isFormReady}
-            styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
           />
         </Flex>
       </Flex>

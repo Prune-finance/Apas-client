@@ -227,7 +227,6 @@ export default function AdminStep2Services({ adminReference, onBack, onComplete 
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={selected.length === 0}
           />
         </Flex>
       </Flex>

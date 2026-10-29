@@ -44,14 +44,6 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
 
   const sectionBase = buildSectionBase(adminReference, 3);
 
-  const isFormReady = (() => {
-    const v = form.getValues();
-    if (!v.cacCertificate) return false;
-    if (!v.mermat) return false;
-    if (!v.amlCompliance) return false;
-    if (docRequired("OPERATIONAL_LICENCE") && !v.operationalLicense) return false;
-    return true;
-  })();
 
   const handleClearForm = () => {
     form.setValues({
@@ -197,8 +189,6 @@ export const DocumentInfo = ({ setActive, active, form, refData, adminReference,
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!isFormReady}
-            styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
           />
         </Flex>
       </Flex>

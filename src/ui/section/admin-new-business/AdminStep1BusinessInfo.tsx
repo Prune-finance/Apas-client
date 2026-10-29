@@ -169,13 +169,6 @@ export default function AdminStep1BusinessInfo({
   });
 
   const v = form.getValues();
-  const isFormReady =
-    form.isValid() &&
-    (!v.contactIdentityType || v.contactIdentityDocumentId) &&
-    (!v.contactIdentityType ||
-      v.contactIdentityType === "PASSPORT" ||
-      v.contactIdentityDocumentBackId) &&
-    (!v.contactProofOfAddressType || v.contactProofOfAddressDocumentId);
 
   const buildPayload = () => {
     const v = form.getValues();
@@ -218,8 +211,20 @@ export default function AdminStep1BusinessInfo({
   };
 
   const handleSaveAndContinue = async () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) return;
+    // The button stays enabled: on click, mark every missing field (uploads included) in red
+    const { errors, hasErrors } = form.validate();
+    const v = form.getValues();
+    const docErrors: Record<string, string> = {};
+    if (v.contactIdentityType && !v.contactIdentityDocumentId)
+      docErrors.contactIdentityDocumentId = "Identity document is required";
+    if (v.contactIdentityType && v.contactIdentityType !== "PASSPORT" && !v.contactIdentityDocumentBackId)
+      docErrors.contactIdentityDocumentBackId = "Back of identity document is required";
+    if (v.contactProofOfAddressType && !v.contactProofOfAddressDocumentId)
+      docErrors.contactProofOfAddressDocumentId = "Proof of address document is required";
+    if (hasErrors || Object.keys(docErrors).length > 0) {
+      form.setErrors({ ...errors, ...docErrors });
+      return;
+    }
 
     if (adminReference && !form.isDirty()) {
       onComplete(adminReference);
@@ -546,7 +551,6 @@ export default function AdminStep1BusinessInfo({
           fw={600}
           action={handleSaveAndContinue}
           loading={completing}
-          disabled={!isFormReady}
         />
       </Flex>
     </Box>

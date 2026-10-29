@@ -394,12 +394,20 @@ export default function Questionnaire() {
 
   // Save with validation — POST /sections/{n}/complete
   const handleNext = async () => {
-    if (
+    // The button stays enabled: on click, mark every missing/invalid field in red
+    const { errors, hasErrors } = form.validate();
+    const unsupportedCountry =
       active === 0 &&
-      form.values.businessCountry &&
-      !SUPPORTED_ISO_CODES.has(form.values.businessCountry.toUpperCase())
-    ) return;
-    if (form.validate().hasErrors) return;
+      Boolean(form.values.businessCountry) &&
+      !SUPPORTED_ISO_CODES.has(form.values.businessCountry.toUpperCase());
+    if (unsupportedCountry) {
+      form.setErrors({
+        ...errors,
+        businessCountry: "We don't support businesses in this country yet",
+      });
+      return;
+    }
+    if (hasErrors) return;
     if (!isDirty()) { goNext(); return; }
 
     setSaving(true);
@@ -527,13 +535,7 @@ export default function Questionnaire() {
           onNext={handleNext}
           loading={saving}
           hidePrev={active === 0}
-          disabled={
-            savingDraft ||
-            (active === 2 && form.values.services.length === 0) ||
-            (active === 0 &&
-              Boolean(form.values.businessCountry) &&
-              !SUPPORTED_ISO_CODES.has(form.values.businessCountry.toUpperCase()))
-          }
+          disabled={savingDraft}
           onPrevious={goPrev}
           nextText={active === 4 ? "Submit" : "Save & Continue"}
         />

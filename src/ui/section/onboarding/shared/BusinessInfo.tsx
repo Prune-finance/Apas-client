@@ -100,18 +100,22 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
 
   const sectionBase = buildSectionBase(adminReference, 1, isAdmin);
 
-  const isFormReady = (() => {
-    if (!form.isValid()) return false;
-    const v = form.getValues();
-    if (v.contactPersonIdType && !v.contactPersonIdUrl) return false;
-    if (v.contactPersonIdType && v.contactPersonIdType !== "PASSPORT" && !v.contactPersonIdUrlBack) return false;
-    if (v.contactPersonPOAType && !v.contactPersonPOAUrl) return false;
-    return true;
-  })();
 
   const handleSaveAndContinue = async () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) return;
+    // The button stays enabled: on click, mark every missing field (uploads included) in red
+    const { errors, hasErrors } = form.validate();
+    const v = form.getValues();
+    const docErrors: Record<string, string> = {};
+    if (v.contactPersonIdType && !v.contactPersonIdUrl)
+      docErrors.contactPersonIdUrl = "Identity document is required";
+    if (v.contactPersonIdType && v.contactPersonIdType !== "PASSPORT" && !v.contactPersonIdUrlBack)
+      docErrors.contactPersonIdUrlBack = "Back of identity document is required";
+    if (v.contactPersonPOAType && !v.contactPersonPOAUrl)
+      docErrors.contactPersonPOAUrl = "Proof of address document is required";
+    if (hasErrors || Object.keys(docErrors).length > 0) {
+      form.setErrors({ ...errors, ...docErrors });
+      return;
+    }
 
     if (alreadyCompleted && JSON.stringify(buildSection1Body(form)) === mountSnapshot) {
       setActive(active + 1);
@@ -375,8 +379,6 @@ export const BusinessInfo = ({ setActive, active, form, refData, adminReference,
           fw={600}
           action={handleSaveAndContinue}
           loading={completing}
-          disabled={!isFormReady}
-          styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
         />
       </Flex>
     </Box>

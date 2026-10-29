@@ -2,7 +2,6 @@
 
 import {
   Box,
-  Button,
   Flex,
   Stack,
   Text,
@@ -559,17 +558,16 @@ function PersonListSubStep({
         ))}
       </Stack>
 
-      <Button
-        variant="subtle"
-        leftSection={<IconPlus size={14} />}
-        mt={24}
-        color="var(--prune-primary-700)"
-        fw={600}
+      <PrimaryBtn
+        text={`Add ${title.slice(0, -1)}`}
+        icon={IconPlus}
+        showIcon
+        h={36}
         fz={13}
-        onClick={addPerson}
-      >
-        Add {title.slice(0, -1)}
-      </Button>
+        fw={500}
+        mt={24}
+        action={addPerson}
+      />
     </Box>
   );
 }

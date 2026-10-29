@@ -85,14 +85,6 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
 
   const sectionBase = buildSectionBase(adminReference, 2);
 
-  const isFormReady = (() => {
-    if (!form.isValid()) return false;
-    const v = form.getValues();
-    if (!v.ceoIdUrl) return false;
-    if (v.ceoIdType !== "PASSPORT" && !v.ceoIdUrlBack) return false;
-    if (!v.ceoPOAUrl) return false;
-    return true;
-  })();
 
   const handleClearForm = () => {
     form.setValues({
@@ -121,8 +113,18 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
   };
 
   const handleSaveAndContinue = async () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) return;
+    // The button stays enabled: on click, mark every missing field (uploads included) in red
+    const { errors, hasErrors } = form.validate();
+    const v = form.getValues();
+    const docErrors: Record<string, string> = {};
+    if (v.ceoIdType && !v.ceoIdUrl) docErrors.ceoIdUrl = "Identity document is required";
+    if (v.ceoIdType && v.ceoIdType !== "PASSPORT" && !v.ceoIdUrlBack)
+      docErrors.ceoIdUrlBack = "Back of identity document is required";
+    if (v.ceoPOAType && !v.ceoPOAUrl) docErrors.ceoPOAUrl = "Proof of address document is required";
+    if (hasErrors || Object.keys(docErrors).length > 0) {
+      form.setErrors({ ...errors, ...docErrors });
+      return;
+    }
 
     if (alreadyCompleted && JSON.stringify(buildSection2Body(form)) === mountSnapshot) {
       setActive(active + 1);
@@ -285,8 +287,6 @@ export const CEOInfo = ({ setActive, active, form, refData, adminReference, noFl
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!isFormReady}
-            styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
           />
         </Flex>
       </Flex>

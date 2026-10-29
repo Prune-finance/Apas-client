@@ -78,18 +78,6 @@ export const AddShareholdersInfo = ({
 
   const sectionBase = buildSectionBase(adminReference, 5);
 
-  const isFormReady =
-    (form.getValues().shareholders ?? []).length > 0 &&
-    (form.getValues().shareholders ?? []).every((s) => {
-      const hasBasicFields =
-        Boolean(s.first_name?.trim()) &&
-        Boolean(s.last_name?.trim()) &&
-        Boolean(s.date_of_birth);
-      const hasIdentity = Boolean(s.identityType) && Boolean(s.identityFileUrl);
-      const hasIdentityBack = s.identityType === "PASSPORT" || Boolean(s.identityFileUrlBack);
-      const hasPOA = Boolean(s.proofOfAddress) && Boolean(s.proofOfAddressFileUrl);
-      return hasBasicFields && hasIdentity && hasIdentityBack && hasPOA;
-    });
 
   const handleClearForm = () => {
     form.setFieldValue("shareholders", [{ ...OnboardingShareholderValues, id: crypto.randomUUID() }]);
@@ -108,8 +96,24 @@ export const AddShareholdersInfo = ({
   };
 
   const handleSaveAndContinue = async () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) return;
+    // The button stays enabled: on click, mark every missing field (uploads included) in red
+    const { errors, hasErrors } = form.validate();
+    const v = form.getValues();
+    const docErrors: Record<string, string> = {};
+    (v.shareholders ?? []).forEach((p, i) => {
+      const base = `shareholders.${i}`;
+      if (!p.identityType) docErrors[`${base}.identityType`] = "Identity type is required";
+      else if (!p.identityFileUrl) docErrors[`${base}.identityFileUrl`] = "Identity document is required";
+      if (p.identityType && p.identityType !== "PASSPORT" && !p.identityFileUrlBack)
+        docErrors[`${base}.identityFileUrlBack`] = "Back of identity document is required";
+      if (!p.proofOfAddress) docErrors[`${base}.proofOfAddress`] = "Proof of address is required";
+      else if (!p.proofOfAddressFileUrl)
+        docErrors[`${base}.proofOfAddressFileUrl`] = "Proof of address document is required";
+    });
+    if (hasErrors || Object.keys(docErrors).length > 0) {
+      form.setErrors({ ...errors, ...docErrors });
+      return;
+    }
 
     if (alreadyCompleted && JSON.stringify(buildSection5Body(form)) === mountSnapshot) {
       setActive(active + 1);
@@ -138,8 +142,11 @@ export const AddShareholdersInfo = ({
           <SaveProgressBtn loading={saving} action={handleSaveProgress} />
           <PrimaryBtn
             text="Add Shareholder"
-            leftSection={<IconPlus size={18} />}
-            fw={600}
+            icon={IconPlus}
+            showIcon
+            h={36}
+            fz={13}
+            fw={500}
             action={() => {
               form.insertListItem("shareholders", {
                 ...OnboardingShareholderValues,
@@ -229,7 +236,6 @@ export const AddShareholdersInfo = ({
 
           <Flex gap={24} w="100%">
             <SelectInputWithInsideLabel
-              withAsterisk={false}
               label="Identity Type"
               w="100%"
               data={refData.identityTypes}
@@ -238,7 +244,6 @@ export const AddShareholdersInfo = ({
               {...form.getInputProps(`shareholders.${index}.identityType`)}
             />
             <SelectInputWithInsideLabel
-              withAsterisk={false}
               label="Proof of Address"
               w="100%"
               data={refData.proofOfAddressTypes}
@@ -319,8 +324,6 @@ export const AddShareholdersInfo = ({
             fw={600}
             action={handleSaveAndContinue}
             loading={completing}
-            disabled={!isFormReady}
-            styles={{ root: { "&[data-disabled]": { backgroundColor: "#EAECF0", color: "#98A2B3", opacity: 1 } } }}
           />
         </Flex>
       </Flex>

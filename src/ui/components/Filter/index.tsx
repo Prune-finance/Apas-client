@@ -169,17 +169,30 @@ export default function Filter<T>({
             valueFormat="DD-MM-YYYY"
             {...form.getInputProps("createdAt")}
             size="xs"
-            w={180}
+            // A full range ("01-10-2026 – 30-10-2026") plus the icon and clear button
+            // needs ~220px; keep it on one line on narrower screens
+            w={220}
             h={36}
             fz={12}
+            className={classes.date__field}
             styles={{
-              input: { height: "30px", fontSize: 12, paddingTop: 0, paddingBottom: 0 },
+              input: {
+                height: "30px",
+                fontSize: 12,
+                paddingTop: 0,
+                paddingBottom: 0,
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              },
               section: { height: "30px" },
             }}
             type="range"
             allowSingleDateInRange
             leftSection={<IconCalendarMonth size={12} />}
             numberOfColumns={2}
+            // Two calendar months don't fit on small screens
+            popoverProps={{ middlewares: { flip: true, shift: true } }}
             clearable
           />
         )}

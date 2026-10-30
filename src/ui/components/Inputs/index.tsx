@@ -169,13 +169,14 @@ export const SearchInput = ({
   ...props
 }: SearchInputProps) => {
   return (
-    <div data-search-input>
+    // Up to 324px wide, shrinking on narrower screens instead of overflowing
+    <div data-search-input style={{ width: "100%", maxWidth: 324, minWidth: 0 }}>
       <TextInput
         placeholder="Search here..."
         leftSectionPointerEvents="none"
         leftSection={<IconSearch style={{ width: 16, height: 16 }} />}
         leftSectionWidth={40}
-        w={324}
+        w="100%"
         fz={12}
         styles={{
           input: {

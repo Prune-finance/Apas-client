@@ -3,13 +3,31 @@ import "./error-map";
 
 const emailSchema = z.string().email();
 
+// Mantine's zodResolver keeps only the LAST issue per field, so each of these rules
+// reports a single, most-relevant message instead of chaining checks.
 const nameField = (label: string) =>
-  z
-    .string()
-    .min(1, `${label} is required`)
-    .min(2, `${label} must be at least 2 characters`)
-    .max(50, `${label} cannot exceed 50 characters`)
-    .refine((v) => v.trim().length > 0, `${label} cannot be only spaces`);
+  z.string().superRefine((v, ctx) => {
+    const message = !v
+      ? `${label} is required`
+      : !v.trim()
+      ? `${label} cannot be only spaces`
+      : v.trim().length < 2
+      ? `${label} must be at least 2 characters`
+      : v.length > 50
+      ? `${label} cannot exceed 50 characters`
+      : null;
+    if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  });
+
+const requiredEmail = (who: string) =>
+  z.string().superRefine((v, ctx) => {
+    const message = !v?.trim()
+      ? `${who} email is required`
+      : !emailSchema.safeParse(v.trim()).success
+      ? `Invalid ${who.toLowerCase()} email`
+      : null;
+    if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  });
 
 const Director = z.object({
   id: z.string().uuid(),
@@ -33,13 +51,7 @@ const Director = z.object({
       },
       { message: "Director must be at least 18 years old" }
     ),
-  email: z.string().refine(
-    (val) => {
-      if (!val) return true;
-      return emailSchema.safeParse(val).success;
-    },
-    { message: "Invalid director's email" }
-  ),
+  email: requiredEmail("Director's"),
   identityType: z.string().nullable(),
   proofOfAddress: z.string().nullable(),
   identityFileUrl: z.string().nullable(),
@@ -93,13 +105,7 @@ export const onboardingShareholders = z.object({
             },
             { message: "Shareholder must be at least 18 years old" }
           ),
-        email: z.string().refine(
-          (val) => {
-            if (!val) return true;
-            return emailSchema.safeParse(val).success;
-          },
-          { message: "Invalid shareholder's email" }
-        ),
+        email: requiredEmail("Shareholder's"),
         identityType: z.string().nullable(),
         proofOfAddress: z.string().nullable(),
         identityFileUrl: z.string().nullable(),

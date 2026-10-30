@@ -206,7 +206,6 @@ export const AddDirectorsInfo = ({
 
           <Flex gap={24} w="100%">
             <TextInputWithInsideLabel
-              withAsterisk={false}
               label="Email"
               w="100%"
               standard={noFloatingLabel}

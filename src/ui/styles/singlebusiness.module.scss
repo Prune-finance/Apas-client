@@ -10,6 +10,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-top: 12px;
 
       .header__left {
         display: flex;
@@ -59,7 +60,7 @@
     }
 
     .container__body {
-      margin-top: 50px;
+      margin-top: 24px;
 
       .tabs {
         .tabs__list {
@@ -99,7 +100,7 @@
             .grid__container {
               .grid {
                 .label {
-                  font-size: 12px;
+                  font-size: 14px;
                   font-weight: 400;
                   color: var(--prune-text-gray-600);
                   margin-bottom: 10px;
@@ -125,7 +126,7 @@
                   height: 44px;
 
                   &::placeholder {
-                    font-size: 13px;
+                    font-size: 14px;
                     color: var(--prune-text-gray-600);
                   }
                 }
@@ -160,7 +161,7 @@
             .grid__container {
               .grid {
                 .label {
-                  font-size: 12px;
+                  font-size: 14px;
                   font-weight: 400;
                   color: var(--prune-text-gray-600);
                   margin-bottom: 10px;
@@ -173,7 +174,7 @@
                   height: 44px;
 
                   &::placeholder {
-                    font-size: 13px;
+                    font-size: 14px;
                     color: var(--prune-text-gray-600);
                   }
                 }
@@ -221,7 +222,7 @@
               border: 1px solid var(--prune-text-gray-200);
 
               .label {
-                font-size: 12px;
+                font-size: 14px;
                 font-weight: 400;
                 color: var(--prune-text-gray-600);
                 margin-bottom: 10px;
@@ -244,7 +245,7 @@
                 height: 44px;
 
                 &::placeholder {
-                  font-size: 13px;
+                  font-size: 14px;
                   color: var(--prune-text-gray-600);
                 }
               }

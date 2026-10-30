@@ -5,6 +5,7 @@ import createAxiosInstance from "@/lib/axios";
 import { sanitizeURL } from "../utils";
 
 const axios = createAxiosInstance("auth");
+const questAxios = createAxiosInstance("questionnaire");
 
 export function useBusiness(
   customParams: IParams = {},
@@ -27,7 +28,7 @@ export function useBusiness(
     };
   }, [customParams]);
 
-  const [businesses, setBusinesses] = useState<BusinessData[]>([]);
+  const [businesses, setBusinesses] = useState<BusinessListItem[]>([]);
   const [stats, setStats] = useState<{ [x: string]: number }[]>([]);
   const [statsMeta, setStatsMeta] = useState<StatsMeta>();
   const [meta, setMeta] = useState<BusinessMeta>();
@@ -59,8 +60,8 @@ export function useBusiness(
 
     try {
       setLoading(true);
-      const { data } = await axios.get(
-        `/admin/businesses?${params.toString()}`
+      const { data } = await questAxios.get(
+        `/business/businesses?${params.toString()}`
       );
 
       setMeta(data.meta);
@@ -135,6 +136,35 @@ export function useSingleBusiness(id: string) {
   }, [id]);
 
   return { loading, business, revalidate, meta };
+}
+
+export function useBusinessDetail(id: string) {
+  const [business, setBusiness] = useState<BusinessDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  async function fetchBusiness() {
+    if (!id) return;
+    setLoading(true);
+    try {
+      const { data } = await questAxios.get(`/business/businesses/${id}`);
+      setBusiness(data.data);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function revalidate() {
+    fetchBusiness();
+  }
+
+  useEffect(() => {
+    fetchBusiness();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  return { loading, business, revalidate };
 }
 
 export function useBusinessServices(id: string) {
@@ -278,9 +308,13 @@ export interface Director {
 
 export interface BusinessMeta {
   total: number;
-  in: number;
-  out: number;
-  totalTrx: number;
+  pageNumber: number;
+  pageSize: number;
+  totalPages: number;
+  counts: {
+    onboarded: number;
+    onboarding: number;
+  };
 }
 
 export interface SingleBizMeta {
@@ -306,6 +340,212 @@ export interface UserBusinessMeta {
 export interface StatsMeta {
   monthDiff: number;
   weekCount: number;
+}
+
+export interface BusinessListItem {
+  id: string;
+  type: "ONBOARDING_APPLICATION" | "COMPANY";
+  status: "ONBOARDING" | "ONBOARDED";
+  businessName: string;
+  tradingName: string;
+  contactEmail: string;
+  createdAt: string;
+  state: "IN_PROGRESS" | "SUBMITTED" | "INACTIVE" | "ACTIVE";
+  services: string[];
+  verified: boolean;
+  addedByAdmin: boolean;
+  progress: {
+    lastCompletedSection: number;
+    totalSections: number;
+    submittedAt: string | null;
+  } | null;
+}
+
+export interface ApplicationSection {
+  number: number;
+  title: string;
+  completed: boolean;
+}
+
+export interface ApplicationProgress {
+  lastCompletedSection: number;
+  nextSection: number | null;
+  isComplete: boolean;
+  sections: ApplicationSection[];
+}
+
+export interface OnboardingBusiness {
+  businessName: string;
+  tradingName: string;
+  businessType: string | null;
+  businessIndustry: string;
+  countryCode: string;
+  businessAddress: string;
+  businessEmail: string;
+  businessPhoneCountryCode: string;
+  businessPhoneNumber: string;
+  businessWebsite: string | null;
+  businessDescription: string;
+  contactIsInitiator: boolean;
+}
+
+export interface OnboardingContactPerson {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phoneCountryCode: string;
+  phoneNumber: string;
+  identityType: string | null;
+  proofOfAddressType: string | null;
+  identityDocument: string | null;
+  proofOfAddressDocument: string | null;
+}
+
+export interface OnboardingDocumentFile {
+  id: string;
+  kind: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  review?: {
+    status: string;
+    reviewedAt: string | null;
+    reviewedBy: string | null;
+    reason: string | null;
+  } | null;
+}
+
+export interface OnboardingDocuments {
+  incorporationCertificate: OnboardingDocumentFile | string | null;
+  memart: OnboardingDocumentFile | string | null;
+  amlFramework: OnboardingDocumentFile | string | null;
+  operationalLicence: OnboardingDocumentFile | string | null;
+}
+
+export type ReviewStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export interface ReviewDocument {
+  id: string;
+  label: string;
+  kind: string;
+  fileName: string;
+  mimeType: string;
+  sizeBytes: number;
+  uploadedAt: string;
+  review: {
+    status: ReviewStatus;
+    reviewedAt: string | null;
+    reviewedBy: string | null;
+    reason: string | null;
+    fix: string | null;
+    applicantNotifiedAt: string | null;
+  };
+  earlierVersions: ReviewDocument[];
+}
+
+export interface QuestionnaireOnboarding {
+  linkSentAt: string | null;
+  linkExpiresAt: string | null;
+  linkExpired: boolean;
+  signedUpAt: string | null;
+  applicationReference: string;
+  applicationStatus: string;
+  applicationSubmittedAt: string | null;
+}
+
+export interface QuestionnaireDecision {
+  decidedAt: string;
+  decidedBy: { id: string; email: string };
+  reason: string | null;
+}
+
+export interface Questionnaire {
+  reference: string;
+  contactEmail: string;
+  status: string;
+  progress: ApplicationProgress;
+  answers: Record<string, unknown>;
+  createdAt: string;
+  submittedAt: string | null;
+  addedBy: unknown;
+  decision: QuestionnaireDecision | null;
+  onboarding: QuestionnaireOnboarding | null;
+}
+
+export interface BusinessDetail {
+  id: string;
+  type: "COMPANY" | "ONBOARDING_APPLICATION";
+  status: "ONBOARDED" | "ONBOARDING";
+  currentStatus?: string;
+  applicationStatus?: string;
+  services: string[];
+  reference?: string;
+  email?: string;
+  submittedAt?: string | null;
+  // COMPANY fields
+  company?: BusinessData;
+  serviceList?: { id: string; title: string; serviceCode: string; serviceIdentifier: string; currency: string }[];
+  pricingPlan?: { id: string; name: string; cycle: string; cost: number };
+  counts?: { users: number; accounts: number; companyAccounts: number; payoutAccounts: number };
+  // ONBOARDING_APPLICATION fields
+  progress?: ApplicationProgress;
+  documentReview?: { state: string; total: number; approved: number; rejected: number; pending: number } | null;
+  business?: OnboardingBusiness;
+  contactPerson?: OnboardingContactPerson;
+  ceo?: Record<string, unknown> | null;
+  documents?: OnboardingDocuments;
+  directors?: Record<string, unknown>[];
+  shareholders?: Record<string, unknown>[];
+  consent?: Record<string, unknown> | null;
+  questionnaireReference?: string;
+  reviewDocuments?: ReviewDocument[];
+  questionnaire?: Questionnaire;
+  wizard?: {
+    steps: { number: number; title: string; completed: boolean; missing: string[] }[];
+    nextStep: number;
+    questionnaireReference: string | null;
+    questionnaireStatus: string | null;
+    questionnaireEditable: boolean;
+    answers: {
+      "1"?: {
+        businessName?: string;
+        tradingName?: string;
+        businessType?: string | null;
+        businessIndustry?: string;
+        countryCode?: string;
+        businessAddress?: string;
+        businessEmail?: string;
+        phoneCountryCode?: string;
+        phoneNumber?: string;
+        businessWebsite?: string | null;
+        businessDescription?: string;
+        isRegulated?: boolean;
+        regulatoryLicence?: string | null;
+        annualTurnover?: string | null;
+        contactPerson?: {
+          name?: string;
+          designation?: string;
+          phoneCountryCode?: string;
+          phoneNumber?: string;
+          email?: string;
+          identityType?: string | null;
+          proofOfAddressType?: string | null;
+          identityDocument?: { id: string; kind?: string; fileName?: string } | null;
+          identityDocumentBack?: { id: string; kind?: string; fileName?: string } | null;
+          proofOfAddressDocument?: { id: string; kind?: string; fileName?: string } | null;
+        };
+      };
+      "2"?: {
+        services?: { service: string; currencies: string[] }[];
+      };
+      "3"?: Record<string, unknown>;
+    };
+  };
+  addedBy?: unknown;
+  editableByAdmin?: boolean;
+  submittedByAdmin?: unknown;
+  customerAccess?: unknown;
 }
 
 export interface BusinessData {

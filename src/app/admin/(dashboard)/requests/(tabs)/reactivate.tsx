@@ -277,7 +277,7 @@ function Reactivate() {
           <SecondaryBtn
             icon={IconListTree}
             action={toggle}
-            text="Filter"
+            text={openedFilter ? "Close filter" : "Filter"}
             fw={600}
           />
         </Flex>

@@ -30,9 +30,16 @@ interface DropzoneCustomProps<T = unknown> extends Partial<DropzoneProps> {
   formKey?: string;
   extensionKey?: string;
   uploadedFileUrl?: string;
+  uploadedFileName?: string;
   otherForm?: UseFormReturnType<T>;
   isUser?: boolean;
   isOnboarding?: boolean;
+  /** When set, uploads to the questionnaire API (/business/onboarding/files) and stores the returned file ID */
+  questionnaireKind?: string;
+  /** When set alongside questionnaireKind, uses the admin upload endpoint */
+  questionnaireAdminReference?: string;
+  /** When true, includes the reference in the upload path: /business/onboarding/admin/{ref}/files */
+  questionnaireAdminReferencePath?: boolean;
 }
 
 export default function DropzoneComponent<T>(
@@ -44,8 +51,12 @@ export default function DropzoneComponent<T>(
   const formKey = props.formKey;
   const extensionKey = props.extensionKey;
   const uploadedFileUrl = props.uploadedFileUrl;
+  const uploadedFileName = props.uploadedFileName;
   const isUser = props.isUser;
   const isOnboarding = props.isOnboarding;
+  const questionnaireKind = props.questionnaireKind;
+  const questionnaireAdminReference = props.questionnaireAdminReference;
+  const questionnaireAdminReferencePath = props.questionnaireAdminReferencePath;
 
   function getNestedValue(obj: any, path: string) {
     return path.split(".").reduce((acc, part) => acc && acc[part], obj);
@@ -54,9 +65,42 @@ export default function DropzoneComponent<T>(
   const [uploaded, setUploaded] = useState(
     !!form?.values[formKey as keyof NewBusinessType] || !!uploadedFileUrl
   );
+  const [viewUrl, setViewUrl] = useState<string>(
+    uploadedFileUrl?.startsWith("http") ? uploadedFileUrl : ""
+  );
+  const [resolvedFileName, setResolvedFileName] = useState<string>(uploadedFileName || "");
+
+  // Sync viewUrl when the parent resolves the pre-signed URL (e.g. on initial page load)
+  useEffect(() => {
+    if (uploadedFileUrl?.startsWith("http")) {
+      setViewUrl(uploadedFileUrl);
+    }
+  }, [uploadedFileUrl]);
+
+  // Sync fileName when parent resolves it from the API
+  useEffect(() => {
+    if (uploadedFileName) setResolvedFileName(uploadedFileName);
+  }, [uploadedFileName]);
 
   const [processing, setProcessing] = useState(false);
-  // {{auth-srv}}/v1/auth/upload
+
+  const handleDownload = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (!viewUrl) return;
+    const name =
+      file?.name ||
+      resolvedFileName ||
+      (viewUrl || uploadedFileUrl || "").split("/").pop()?.split("?")[0] ||
+      "document";
+    const proxyUrl = `/api/download?url=${encodeURIComponent(viewUrl)}&name=${encodeURIComponent(name)}`;
+    const a = document.createElement("a");
+    a.href = proxyUrl;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   const handleUpload = async () => {
     setProcessing(true);
@@ -66,37 +110,70 @@ export default function DropzoneComponent<T>(
       const formData = new FormData();
       formData.append("file", file);
 
-      const path = isUser ? "auth" : isOnboarding ? "onboarding" : "admin";
+      let storedValue: any;
 
-      const { data } = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/${path}/upload`,
-        formData,
-        { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
-      );
+      if (questionnaireKind) {
+        formData.append("kind", questionnaireKind);
+        const uploadPath = questionnaireAdminReference
+          ? questionnaireAdminReferencePath
+            ? `/business/onboarding/admin/${questionnaireAdminReference}/files`
+            : `/business/onboarding/admin/files`
+          : `/business/onboarding/files`;
+        const { data } = await axios.post(
+          `${process.env.NEXT_PUBLIC_QUESTIONNAIRE_URL}${uploadPath}`,
+          formData,
+          { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        );
+        storedValue = data.data.id;
+
+        // Immediately resolve the pre-signed view URL so the View link appears
+        try {
+          const viewPath = questionnaireAdminReference
+            ? `/business/onboarding/admin/files/${storedValue}`
+            : `/business/onboarding/files/${storedValue}`;
+          const { data: viewData } = await axios.get(
+            `${process.env.NEXT_PUBLIC_QUESTIONNAIRE_URL}${viewPath}`,
+            { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+          );
+          setViewUrl(viewData?.data?.url || "");
+          if (viewData?.data?.fileName) setResolvedFileName(viewData.data.fileName);
+        } catch {
+          setViewUrl("");
+        }
+      } else {
+        const path = isUser ? "auth" : isOnboarding ? "onboarding" : "admin";
+        const { data } = await axios.post(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/${path}/upload`,
+          formData,
+          { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
+        );
+        storedValue = data.data.url;
+        setViewUrl(storedValue);
+      }
 
       if (form) {
         if (!formKey) return;
-        form.setFieldValue(formKey, data.data.url);
+        form.setFieldValue(formKey, storedValue);
       }
 
       if (props.removeDirectorForm) {
         if (!formKey) return;
-        props.removeDirectorForm.setFieldValue(formKey, data.data.url);
+        props.removeDirectorForm.setFieldValue(formKey, storedValue);
       }
 
       if (props.otherDocumentForm) {
         if (!formKey) return;
-        props.otherDocumentForm.setFieldValue(formKey, data.data.url);
+        props.otherDocumentForm.setFieldValue(formKey, storedValue);
       }
 
       if (props.DirectorForm) {
         if (!formKey) return;
-        props.DirectorForm.setFieldValue(formKey, data.data.url);
+        props.DirectorForm.setFieldValue(formKey, storedValue);
       }
 
       if (props.otherForm) {
         if (!formKey) return;
-        props.otherForm.setFieldValue(formKey, data.data.url);
+        props.otherForm.setFieldValue(formKey, storedValue);
         if (extensionKey) {
           props.otherForm.setFieldValue(extensionKey, file.type as any);
         }
@@ -118,8 +195,8 @@ export default function DropzoneComponent<T>(
   return (
     <Dropzone
       onDrop={(files) => setFile(files[0])}
-      onReject={(files) =>
-        handleError("File was rejected", files[0].errors[0].message)
+      onReject={() =>
+        handleError("File was rejected", "File must be smaller than 5MB")
       }
       // onReject={(files) => console.log("rejected files", files[0])}
       maxSize={5 * 1024 ** 2}
@@ -194,22 +271,42 @@ export default function DropzoneComponent<T>(
         </Dropzone.Idle>
 
         <Flex direction="column" align="center">
-          {uploaded && (
-            <Group gap={2} justify="center" align="center" w="30ch">
-              <Text
-                fz={10}
-                // lineClamp={1}
-                truncate="start"
-                // w="25ch"
-                // flex={1}
-              >
-                {(uploadedFileUrl ?? "").split("/").pop()}
-              </Text>
-              <Text fz={10} td="underline" c="#97AD05">
-                Re-upload
-              </Text>
-            </Group>
-          )}
+          {uploaded && (() => {
+            const rawName =
+              file?.name ||
+              resolvedFileName ||
+              (viewUrl || uploadedFileUrl || "").split("/").pop()?.split("?")[0] ||
+              "";
+            const dotIdx = rawName.lastIndexOf(".");
+            const baseName = dotIdx > 0 ? rawName.slice(0, dotIdx) : rawName;
+            const ext = dotIdx > 0 ? rawName.slice(dotIdx) : "";
+            return (
+              <Stack gap={4} align="center">
+                <Flex align="center" justify="center" style={{ maxWidth: "22ch" }}>
+                  <Text fz={10} truncate="end" style={{ overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis", maxWidth: "16ch" }}>
+                    {baseName}
+                  </Text>
+                  {ext && <Text fz={10} style={{ flexShrink: 0 }}>{ext}</Text>}
+                </Flex>
+                <Group gap={6} justify="center">
+                  {viewUrl && (
+                    <Text
+                      fz={10}
+                      td="underline"
+                      c="#97AD05"
+                      style={{ cursor: "pointer", pointerEvents: "auto" }}
+                      onClick={handleDownload}
+                    >
+                      Download
+                    </Text>
+                  )}
+                  <Text fz={10} td="underline" c="#97AD05" style={{ pointerEvents: "auto" }}>
+                    Re-upload
+                  </Text>
+                </Group>
+              </Stack>
+            );
+          })()}
           {!uploaded && (
             <Text fz={10} inline>
               Drag and drop file to Upload or{" "}
@@ -220,7 +317,7 @@ export default function DropzoneComponent<T>(
           )}
           {!uploaded && (
             <Text fz={9} c="dimmed" inline mt={5}>
-              Supported formats: JPEG, PNG, PDF
+              Supported formats: JPEG, PNG, PDF · Max size: 5MB
             </Text>
           )}
         </Flex>

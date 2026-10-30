@@ -126,7 +126,7 @@ function DebitRequests() {
 
           <Group gap={12}>
             <SecondaryBtn
-              text="Filter"
+              text={openedFilter ? "Close filter" : "Filter"}
               icon={IconAlignCenter}
               action={toggle}
               fw={600}

@@ -46,18 +46,15 @@ import useAxios from "@/lib/hooks/useAxios";
 import AccountInfoCards from "@/ui/components/AccountInfoCards";
 import { BadgeComponent } from "@/ui/components/Badge";
 import Link from "next/link";
-import { Image } from "@mantine/core";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import { exportIssuedAdminAccounts } from "@/lib/hooks/accounts";
 
 type Currency = "EUR" | "GBP" | "USD";
 
 const currencyTabs = [
-  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
-  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
-  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
+  { title: "EUR", currency: "EUR" as Currency },
+  { title: "GBP", currency: "GBP" as Currency },
+  { title: "USD", currency: "USD" as Currency },
 ];
 
 export default function IssuedAccounts() {
@@ -319,7 +316,7 @@ export default function IssuedAccounts() {
                 transition: "background-color 0.15s ease, color 0.15s ease",
               }}
             >
-              <Image src={t.icon} alt="icon" h={20} w={20} />
+              <CountryFlag code={t.currency} size={20} />
               {t.title}
             </button>
           );
@@ -364,7 +361,7 @@ export default function IssuedAccounts() {
             fw={600}
           />
           <SecondaryBtn
-            text="Filter"
+            text={filterOpened ? "Close filter" : "Filter"}
             icon={IconListTree}
             action={toggle}
             fw={600}
@@ -510,21 +507,24 @@ const RowComponent = ({
   const { push } = useRouter();
 
   const handleRowClick = (businessId: string) => {
-    push(`/admin/businesses/${businessId}/default?accountType=issued&currency=${currency}`);
+    push(`/admin/accounts/${businessId}/default?accountType=issued&currency=${currency}`);
   };
   return accounts.map((element, index) => (
     <TableTr
       key={index}
+      onClick={() => handleRowClick(element.Company.id)}
       style={{ cursor: "pointer" }}
     >
       <TableTd tt="capitalize" td="underline" c="var(--prune-primary-800)">
-        <Link href={`/admin/businesses/${element.Company.id}/default/${element.id}?accountType=ISSUED_ACCOUNT&currency=${currency}`}>
+        <Link href={`/admin/accounts/${element.Company.id}/default?accountType=issued&currency=${currency}`}>
           {element.accountName}
         </Link>
       </TableTd>
       <TableTd>
         {currency === "USD"
           ? element.accountIban ?? element.accountNumber
+          : currency === "GHS"
+          ? element.walletId ?? element.accountNumber
           : element.accountNumber}
       </TableTd>
       <TableTd>{formatNumber(element.accountBalance, true, currency)}</TableTd>

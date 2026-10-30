@@ -36,6 +36,20 @@ export interface MaxValueAllVirtualAccounts {
   annually: number;
 }
 
+export interface AdminVirtualAccounts {
+  id?: string;
+  profileId?: string;
+  dayOneAccounts: number;
+  fullCapacityAccounts: number;
+  singleAccountMaxDaily: string | number;
+  singleAccountMaxMonthly: string | number;
+  singleAccountMaxAnnually: string | number;
+  allAccountsMaxDaily: string | number;
+  allAccountsMaxMonthly: string | number;
+  allAccountsMaxAnnually: string | number;
+  highestTransactionCount: number;
+}
+
 export interface OnboardingBusiness {
   id: string;
   businessName: string | null;
@@ -89,13 +103,15 @@ export interface OnboardingBusiness {
   documentData: Record<string, boolean>;
   documents: Document[];
   onboardingStatus: "PENDING" | "PROCESSING" | "COMPLETED";
-  questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED";
+  questionnaireStatus: "APPROVED" | "PENDING" | "SUBMITTED" | "REJECTED" | "ONBOARDING_INVITED" | "NOT_ELIGIBLE";
   processStatus: STAGE;
+  decision?: { decidedAt: string; decidedBy: { id: string; email: string }; reason: string | null } | null;
+  onboarding?: { linkSentAt: string | null; linkExpiresAt: string | null; linkExpired: boolean; signedUpAt: string | null; applicationReference: string | null; applicationStatus: string | null; applicationSubmittedAt: string | null } | null;
   hasActualBusinessAccount: boolean;
   token: string;
   status: STAGE;
   services: Service[];
-  virtualAccounts: VirtualAccounts;
+  virtualAccounts: AdminVirtualAccounts;
   operationsAccounts: OperationsAccounts;
   annualTurnover: null | string;
 }

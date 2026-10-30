@@ -1,10 +1,75 @@
-.card {
+.hero {
+  position: relative;
+  padding: 8px 0 20px;
+  margin-bottom: 24px;
+}
+
+.stat__card {
+  background: #fff;
   border: 1px solid #f2f4f7;
-  border-radius: 4px;
-  transition: background-color 0.3s, border-color 0.3s;
+  border-radius: 12px;
+  padding: 20px 24px 16px;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+  transition: box-shadow 0.2s;
 
   &:hover {
-    border: 1px solid #c6a700;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  @media (max-width: 576px) {
+    padding: 16px;
+  }
+}
+
+.icon__wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.sparkline {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 120px;
+  height: 56px;
+  pointer-events: none;
+}
+
+/* legacy card kept for backwards compat */
+.card {
+  background: #ffffff;
+  border: 1px solid #f2f4f7;
+  border-radius: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+  cursor: default;
+
+  &:hover {
     background: #f9f6e6;
+    border-color: #c6a700;
+  }
+
+  @media (max-width: 576px) {
+    padding: 16px !important;
+  }
+}
+
+// Search + filter fields on this page use 12px text and placeholders.
+// Overrides the global 14px/16px !important rules in globals.scss.
+.compact__inputs {
+  :global(.mantine-TextInput-input),
+  :global(.mantine-Select-input),
+  :global(.mantine-DatePickerInput-input) {
+    font-size: 12px !important;
+
+    &::placeholder {
+      font-size: 12px !important;
+    }
   }
 }

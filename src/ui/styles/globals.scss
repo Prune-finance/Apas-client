@@ -33,7 +33,7 @@
 
   --prune-success-50: #ecfdf3;
   --prune-success-500: #12b76a;
-  --prune-warning: #ff4d4f;
+  --prune-warning: #ff5226;
 
   --prune-divider-gray: #f0f2f5;
 }
@@ -45,6 +45,28 @@
 //   font-weight: normal;
 //   font-style: normal;
 // }
+
+@font-face {
+  font-family: "EksellDisplay";
+  src: url("/fonts/eksell/ekselldisplaytrial-small.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EksellDisplay";
+  src: url("/fonts/eksell/ekselldisplaytrial-medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EksellDisplay";
+  src: url("/fonts/eksell/ekselldisplaytrial-large.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
 
 @font-face {
   font-family: "Switzer";
@@ -199,10 +221,21 @@ body {
   overflow-x: hidden;
 }
 
+// Hide scrollbars everywhere while keeping scroll functionality
+* {
+  scrollbar-width: none; // Firefox
+  -ms-overflow-style: none; // IE / Edge
+
+  &::-webkit-scrollbar {
+    display: none; // Chrome / Safari / Opera
+  }
+}
+
 body {
   color: var(--prune-text-gray-700);
   background: #f6f6f6;
-  font-family: var(--font-switzer);
+  font-family: var(--font-switzer), sans-serif;
+  font-size: 12px;
 }
 
 a {
@@ -315,15 +348,178 @@ a {
 .mantine-RichTextEditor-content,
 .m_6c018570,
 .mantine-PillsInput-wrapper {
-  font-family: var(--font-switzer);
+  font-family: var(--font-switzer), sans-serif;
 
   &:focus {
-    border: 1px solid var(--prune-primary-700) !important;
+    border-color: var(--prune-primary-600) !important;
+    box-shadow: 0 0 0 3px rgba(193, 221, 6, 0.2) !important;
   }
 
   &::placeholder {
-    font-size: 12px !important;
-    font-family: var(--font-switzer);
-    // font-family: "Switzer" !important;
+    color: var(--prune-text-gray-400) !important;
+    font-size: 14px !important;
+    font-family: var(--font-switzer), sans-serif;
   }
+}
+
+// Suppress browser autofill blue tint
+.mantine-TextInput-input,
+.mantine-PasswordInput-innerInput {
+  &:-webkit-autofill,
+  &:-webkit-autofill:hover,
+  &:-webkit-autofill:focus,
+  &:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 9999px white inset !important;
+    -webkit-text-fill-color: var(--prune-text-gray-700) !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+}
+
+// Input visual elements — border, radius, disabled state
+.mantine-TextInput-input,
+.mantine-PasswordInput-input,
+.mantine-DateInput-input,
+.mantine-DatePickerInput-input,
+.mantine-YearPickerInput-input,
+.mantine-MultiSelect-input,
+.mantine-Textarea-input,
+.mantine-NumberInput-input,
+.mantine-PillsInput-wrapper,
+.mantine-Select-input {
+  border-radius: 8px !important;
+  border: 1px solid var(--prune-text-gray-100) !important;
+
+  &:disabled,
+  &[data-disabled] {
+    background: #f5f5f5 !important;
+    opacity: 1 !important;
+  }
+}
+
+// Search input pill override — beats the 8px rule above via higher specificity
+[data-search-input] .mantine-TextInput-input {
+  border-radius: 9999px !important;
+  font-size: 12px !important;
+}
+
+// Focus ring on wrapper-level elements (PasswordInput, MultiSelect, PillsInput)
+.mantine-PasswordInput-input,
+.mantine-MultiSelect-input,
+.mantine-PillsInput-wrapper {
+  &:focus-within {
+    border-color: var(--prune-primary-600) !important;
+    box-shadow: 0 0 0 3px rgba(193, 221, 6, 0.2) !important;
+  }
+}
+
+// Input labels (base: 12px)
+.mantine-TextInput-label,
+.mantine-PasswordInput-label,
+.mantine-Select-label,
+.mantine-DateInput-label,
+.mantine-DatePickerInput-label,
+.mantine-YearPickerInput-label,
+.mantine-MultiSelect-label,
+.mantine-Textarea-label,
+.mantine-NumberInput-label {
+  font-size: 12px;
+  font-weight: 400;
+  color: #475467;
+}
+
+// lg screens (≥ 64em / 1024px)
+@media (min-width: 64em) {
+  // Input/textarea/select text
+  .mantine-TextInput-input,
+  .mantine-PasswordInput-innerInput,
+  .mantine-Select-input,
+  .mantine-MultiSelect-input,
+  .mantine-Textarea-input,
+  .mantine-NumberInput-input,
+  .mantine-DateInput-input,
+  .mantine-DatePickerInput-input,
+  .mantine-YearPickerInput-input {
+    font-size: 14px !important;
+
+    &::placeholder {
+      font-size: 14px !important;
+    }
+  }
+
+  // Labels
+  .mantine-TextInput-label,
+  .mantine-PasswordInput-label,
+  .mantine-Select-label,
+  .mantine-DateInput-label,
+  .mantine-DatePickerInput-label,
+  .mantine-YearPickerInput-label,
+  .mantine-MultiSelect-label,
+  .mantine-Textarea-label,
+  .mantine-NumberInput-label {
+    font-size: 14px !important;
+  }
+
+  // Checkbox / radio labels
+  .mantine-Checkbox-label,
+  .mantine-Radio-label {
+    font-size: 14px !important;
+  }
+}
+
+// 2xl screens (≥ 96em / 1536px)
+@media (min-width: 96em) {
+  // Input/textarea/select text
+  .mantine-TextInput-input,
+  .mantine-PasswordInput-innerInput,
+  .mantine-Select-input,
+  .mantine-MultiSelect-input,
+  .mantine-Textarea-input,
+  .mantine-NumberInput-input,
+  .mantine-DateInput-input,
+  .mantine-DatePickerInput-input,
+  .mantine-YearPickerInput-input {
+    font-size: 16px !important;
+
+    &::placeholder {
+      font-size: 16px !important;
+    }
+  }
+
+  // Labels
+  .mantine-TextInput-label,
+  .mantine-PasswordInput-label,
+  .mantine-Select-label,
+  .mantine-DateInput-label,
+  .mantine-DatePickerInput-label,
+  .mantine-YearPickerInput-label,
+  .mantine-MultiSelect-label,
+  .mantine-Textarea-label,
+  .mantine-NumberInput-label {
+    font-size: 16px !important;
+  }
+
+  // Checkbox / radio labels
+  .mantine-Checkbox-label,
+  .mantine-Radio-label {
+    font-size: 16px !important;
+  }
+}
+// Validation error state for every Mantine input (TextInput, PasswordInput, Select,
+// Textarea, NumberInput, Date inputs, PinInput…). !important is needed because many
+// inputs set their border through inline `styles`, which would otherwise hide it.
+.mantine-Input-input[data-error],
+.mantine-Input-input[data-error]:focus,
+.mantine-Input-input[data-error]:focus-within {
+  border: 2px solid #ff9175 !important;
+  background-color: #fff3f0 !important;
+  box-shadow: none !important;
+}
+
+// Error label + password eye icon colour (Figma: semantic/fg/error)
+.mantine-InputWrapper-root:has(.mantine-Input-input[data-error]) > .mantine-InputWrapper-label {
+  color: #db340b !important;
+}
+
+.mantine-Input-wrapper:has(.mantine-Input-input[data-error]) .mantine-PasswordInput-visibilityToggle {
+  color: #db340b;
 }

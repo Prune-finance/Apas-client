@@ -18,7 +18,7 @@ import { IconListTree } from "@tabler/icons-react";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 
 import { formatNumber } from "@/lib/utils";
 import {
@@ -162,7 +162,7 @@ function Debit() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text="Filter"
+          text={openedFilter ? "Close filter" : "Filter"}
           action={toggle}
           fw={600}
           icon={IconListTree}

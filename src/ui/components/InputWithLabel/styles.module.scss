@@ -1,15 +1,39 @@
 .label {
   font-size: 12px;
   margin-bottom: 7px;
+
+  @media (min-width: 64em) {
+    font-size: 14px;
+  }
+
+  @media (min-width: 96em) {
+    font-size: 16px;
+  }
 }
 
 .input {
   height: 35px;
   border: 1px solid #eaecf0;
   border-radius: 8px;
-  font-size: 14px;
+  font-size: 12px;
 
   &::placeholder {
     font-size: 12px;
+  }
+
+  @media (min-width: 64em) {
+    font-size: 14px;
+
+    &::placeholder {
+      font-size: 14px;
+    }
+  }
+
+  @media (min-width: 96em) {
+    font-size: 16px;
+
+    &::placeholder {
+      font-size: 16px;
+    }
   }
 }

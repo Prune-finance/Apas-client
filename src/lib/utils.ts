@@ -34,9 +34,11 @@ export const formatNumber = (
 };
 
 export const activeBadgeColor = (status: string) => {
-  if (status === "ACTIVE") return "#12B76A";
+  if (status === "ACTIVE" || status === "ONBOARDED") return "#12B76A";
   if (status === "FROZEN") return "#344054";
-  if (status === "PENDING") return "#C6A700";
+  if (status === "PENDING" || status === "IN_PROGRESS" || status === "ONBOARDING" || status === "RESUBMITTED") return "#C6A700";
+  if (status === "SUBMITTED") return "#1570EF";
+  if (status === "ACTIVATION_SENT" || status === "ONBOARDING_INVITED") return "var(--prune-primary-700)";
   return "#D92D20";
 };
 
@@ -85,7 +87,13 @@ export type STAGE =
   | "ONBOARDING"
   | "ACTIVATION"
   | "REJECTED"
-  | "COMPLETED";
+  | "COMPLETED"
+  | "In Progress"
+  | "Onboarding Invited"
+  | "Submitted"
+  | "Questionnaire Completed"
+  | "Completed"
+  | "Invited";
 
 export const stageColor = (stage: STAGE) => {
   switch (stage) {
@@ -98,8 +106,18 @@ export const stageColor = (stage: STAGE) => {
     case "ACTIVATION":
       return "#FFA940";
     case "REJECTED":
-      return "var(--prune-text-gray-500)";
+      return "#DB340B";
     case "COMPLETED":
+      return "#12B76A";
+    case "In Progress":
+      return "#FFC107";
+    case "Onboarding Invited":
+    case "Invited":
+      return "var(--prune-primary-700)";
+    case "Submitted":
+      return "#1570EF";
+    case "Questionnaire Completed":
+    case "Completed":
       return "#12B76A";
     default:
       return "#FFA940";

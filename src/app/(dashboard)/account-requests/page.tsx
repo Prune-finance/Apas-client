@@ -46,7 +46,7 @@ import { getUserType } from "@/lib/utils";
 import createAxiosInstance from "@/lib/axios";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import TabsComponent from "@/ui/components/Tabs";
-import AccountRequestIcon from "@/assets/account-req-icon.png";
+import AccountRequestIcon from "@/assets/img/account-req-icon.png";
 import AdditionalCurrency from "./AdditionalCurrency";
 
 const axios = createAxiosInstance("accounts");
@@ -170,7 +170,7 @@ function AccountRequests() {
               <SearchInput search={search} setSearch={setSearch} />
 
               <SecondaryBtn
-                text="Filter"
+                text={openedFilter ? "Close filter" : "Filter"}
                 action={toggle}
                 icon={IconListTree}
                 fw={600}

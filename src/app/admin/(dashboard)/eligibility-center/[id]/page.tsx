@@ -3,80 +3,163 @@
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import { Box, TabsPanel, Text } from "@mantine/core";
 import React, { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import ProfileHeader from "./ProfileHeader";
 import { newOnboardingValue, OnboardingType, Tab } from "@/lib/schema";
 import {
   IconBuildingSkyscraper,
   IconCoins,
-  IconFileText,
-  IconUsers,
+  // IconFileText,
+  // IconUsers,
 } from "@tabler/icons-react";
 import Tabs from "@/ui/components/Tabs";
 import CompanyProfile from "./(tabs)/CompanyProfile";
 import Financial from "./(tabs)/Financial";
-import Documents from "./(tabs)/Documents";
-import Directors from "./(tabs)/Directors";
-import Shareholders from "./(tabs)/Shareholders";
-import { useSingleOnboardingBusiness } from "@/lib/hooks/eligibility-center";
+// import Documents from "./(tabs)/Documents";
+// import Directors from "./(tabs)/Directors";
+// import Shareholders from "./(tabs)/Shareholders";
+import {
+  useSingleQuestionnaire,
+  QuestionnaireDetail,
+} from "@/lib/hooks/eligibility-center";
+import { OnboardingBusiness } from "@/lib/interface";
 import { useForm } from "@mantine/form";
+
+function adaptQuestionnaire(data: QuestionnaireDetail | null): OnboardingBusiness | null {
+  if (!data) return null;
+  const a = data.answers;
+  const nameParts = (a.contactName ?? "").split(" ");
+  const va = a.virtualAccounts;
+  return {
+    id: data.reference,
+    businessName: a.legalBusinessName ?? null,
+    businessTradingName: a.tradingName ?? null,
+    businessType: null,
+    businessIndustry: a.businessIndustry ?? null,
+    businessCountry: a.countryCode ?? null,
+    businessAddress: a.businessAddress ?? null,
+    businessEmail: a.businessEmail ?? "",
+    businessPhoneNumber: a.phoneNumber ?? null,
+    businessWebsite: null,
+    businessDescription: a.businessDescription ?? null,
+    contactPersonFirstName: nameParts[0] ?? null,
+    contactPersonLastName: nameParts.slice(1).join(" ") || null,
+    contactPersonEmail: a.contactEmail ?? null,
+    contactPersonPhoneNumber: a.contactPhoneNumber ?? null,
+    contactPersonPOAType: null,
+    contactPersonPOAUrl: null,
+    contactPersonIdType: null,
+    contactPersonIdUrl: null,
+    contactPersonIdUrlBack: null,
+    makeContactPersonInitiator: false,
+    cacCertificate: null,
+    mermat: null,
+    amlCompliance: null,
+    operationalLicense: null,
+    ceoFirstName: null,
+    ceoLastName: null,
+    ceoEmail: null,
+    ceoDOB: null,
+    ceoPOAType: null,
+    ceoPOAUrl: null,
+    ceoIdType: null,
+    ceoIdUrl: null,
+    ceoIdUrlBack: null,
+    directors: [],
+    shareholders: [],
+    createdAt: new Date(data.createdAt),
+    password: "",
+    updatedAt: new Date(data.createdAt),
+    migrated: false,
+    questionnaireId: data.reference,
+    stageIdentifier: 0,
+    geoFootprint: a.geographicFootprint ?? "",
+    questionnaireSentAt: null,
+    consentDesignation: "",
+    consentEmail: "",
+    consentSignature: "",
+    consentSignedBy: "",
+    consentPhoneNumber: "",
+    documentData: {},
+    documents: [],
+    onboardingStatus: "PENDING",
+    onboarding: data.onboarding,
+    questionnaireStatus: data.status as OnboardingBusiness["questionnaireStatus"],
+    decision: data.decision,
+    processStatus: "In Progress",
+    hasActualBusinessAccount: false,
+    token: "",
+    status: "In Progress",
+    annualTurnover: a.annualTurnover ?? null,
+    services: (a.services ?? []).map((s) => ({
+      name: s.service,
+      currencies: s.currencies,
+    })),
+    virtualAccounts: {
+      dayOneAccounts: va?.dayOneAccounts ?? 0,
+      fullCapacityAccounts: va?.fullCapacityAccounts ?? 0,
+      singleAccountMaxDaily: va?.singleAccountMaxDaily ?? 0,
+      singleAccountMaxMonthly: va?.singleAccountMaxMonthly ?? 0,
+      singleAccountMaxAnnually: va?.singleAccountMaxAnnually ?? 0,
+      allAccountsMaxDaily: va?.allAccountsMaxDaily ?? 0,
+      allAccountsMaxMonthly: va?.allAccountsMaxMonthly ?? 0,
+      allAccountsMaxAnnually: va?.allAccountsMaxAnnually ?? 0,
+      highestTransactionCount: va?.highestTransactionCount ?? 0,
+    },
+    operationsAccounts: {
+      estimated_balance: a.operationsBalance ?? "",
+    },
+  };
+}
 
 export default function OnboardingProfile({
   params,
 }: {
   params: { id: string };
 }) {
-  const { data, loading, revalidate } = useSingleOnboardingBusiness(params.id);
+  const router = useRouter();
+  const { data, loading, revalidate } = useSingleQuestionnaire(params.id);
+
+  const adapted = adaptQuestionnaire(data);
 
   const initialValues: OnboardingType = {
-    businessName: data?.businessName || "",
-    businessCountry: data?.businessCountry || null,
-    businessType: data?.businessType || null,
-    businessIndustry: data?.businessIndustry || null,
-    businessPhoneNumber: data?.businessPhoneNumber || "",
+    businessName: adapted?.businessName || "",
+    businessCountry: adapted?.businessCountry || null,
+    businessType: adapted?.businessType || null,
+    businessIndustry: adapted?.businessIndustry || null,
+    businessPhoneNumber: adapted?.businessPhoneNumber || "",
     businessPhoneNumberCode: "",
-    businessTradingName: data?.businessTradingName || "",
-    businessAddress: data?.businessAddress || "",
-    businessEmail: data?.businessEmail || "",
-    businessDescription: data?.businessDescription || "",
-    businessWebsite: data?.businessWebsite || "",
-    makeContactPersonInitiator: data?.makeContactPersonInitiator || false,
-    ceoIdType: data?.ceoIdType || "",
-    ceoIdUrl: data?.ceoIdUrl || "",
-    ceoIdUrlBack: data?.ceoIdUrlBack || "",
-    ceoPOAType: data?.ceoPOAType || "",
-    ceoPOAUrl: data?.ceoPOAUrl || "",
-    ceoDOB: data?.ceoDOB ? new Date(data.ceoDOB) : null,
-    contactPersonIdType: data?.contactPersonIdType || "",
-    contactPersonPOAType: data?.contactPersonPOAType || "",
-    contactPersonIdUrl: data?.contactPersonIdUrl || "",
-    contactPersonIdUrlBack: data?.contactPersonIdUrlBack || "",
-    contactPersonPOAUrl: data?.contactPersonPOAUrl || "",
-    contactPersonPhoneNumber: data?.contactPersonPhoneNumber || "",
+    businessTradingName: adapted?.businessTradingName || "",
+    businessAddress: adapted?.businessAddress || "",
+    businessEmail: adapted?.businessEmail || "",
+    businessDescription: adapted?.businessDescription || "",
+    businessWebsite: adapted?.businessWebsite || "",
+    makeContactPersonInitiator: adapted?.makeContactPersonInitiator || false,
+    ceoIdType: "",
+    ceoIdUrl: "",
+    ceoIdUrlBack: "",
+    ceoPOAType: "",
+    ceoPOAUrl: "",
+    ceoDOB: null,
+    contactPersonIdType: "",
+    contactPersonPOAType: "",
+    contactPersonIdUrl: "",
+    contactPersonIdUrlBack: "",
+    contactPersonPOAUrl: "",
+    contactPersonPhoneNumber: adapted?.contactPersonPhoneNumber || "",
     contactPersonPhoneNumberCode: "",
-    amlCompliance: data?.amlCompliance || "",
-    operationalLicense: data?.operationalLicense || "",
-    cacCertificate: data?.cacCertificate || "",
-    mermat: data?.mermat || "",
-    ceoFirstName: data?.ceoFirstName || "",
-    ceoLastName: data?.ceoLastName || "",
-    ceoEmail: data?.ceoEmail || "",
-    contactPersonFirstName: data?.contactPersonFirstName || "",
-    contactPersonLastName: data?.contactPersonLastName || "",
-    contactPersonEmail: data?.contactPersonEmail || "",
-    directors:
-      data?.directors.map((director) => ({
-        ...director,
-        date_of_birth: director.date_of_birth
-          ? new Date(director.date_of_birth)
-          : null,
-      })) || [],
-    shareholders:
-      data?.shareholders.map((shareholder) => ({
-        ...shareholder,
-        date_of_birth: shareholder.date_of_birth
-          ? new Date(shareholder.date_of_birth)
-          : null,
-      })) || [],
+    amlCompliance: "",
+    operationalLicense: "",
+    cacCertificate: "",
+    mermat: "",
+    ceoFirstName: "",
+    ceoLastName: "",
+    ceoEmail: "",
+    contactPersonFirstName: adapted?.contactPersonFirstName || "",
+    contactPersonLastName: adapted?.contactPersonLastName || "",
+    contactPersonEmail: adapted?.contactPersonEmail || "",
+    directors: [],
+    shareholders: [],
   };
 
   const form = useForm<OnboardingType>({
@@ -94,13 +177,22 @@ export default function OnboardingProfile({
         items={[
           { title: "Eligibility Center", href: "/admin/eligibility-center" },
           {
-            title: data?.businessName || "",
-            href: `/admin/eligibility-center/${data?.id}`,
+            title: adapted?.businessName || "",
+            href: `/admin/eligibility-center/${params.id}`,
             loading: loading,
           },
         ]}
       />
-      <ProfileHeader data={data} loading={loading} revalidate={revalidate} />
+      <ProfileHeader
+        data={adapted}
+        loading={loading}
+        revalidate={revalidate}
+        onEdit={
+          data?.status === "IN_PROGRESS" && data?.addedBy != null
+            ? () => router.push(`/admin/eligibility-center/${params.id}/business/edit`)
+            : undefined
+        }
+      />
       <Tabs
         tabs={tabs}
         tt="capitalize"
@@ -110,11 +202,11 @@ export default function OnboardingProfile({
           list: { marginBottom: "24px" },
         }}
       >
-        {[CompanyProfile, Financial, Documents, Directors, Shareholders].map(
+        {[CompanyProfile, Financial].map(
           (Component, idx) => (
             <TabsPanel key={idx} value={tabs[idx].value}>
               <Component
-                data={data}
+                data={adapted}
                 loading={loading}
                 form={form}
                 revalidate={revalidate}
@@ -138,19 +230,19 @@ const tabs: Tab[] = [
     value: "financials",
     icon: <IconCoins size={16} />,
   },
-  {
-    title: "Documents",
-    value: "documents",
-    icon: <IconFileText size={16} />,
-  },
-  {
-    title: "Directors",
-    value: "directors",
-    icon: <IconUsers size={16} />,
-  },
-  {
-    title: "Key Shareholders",
-    value: "shareholders",
-    icon: <IconUsers size={16} />,
-  },
+  // {
+  //   title: "Documents",
+  //   value: "documents",
+  //   icon: <IconFileText size={16} />,
+  // },
+  // {
+  //   title: "Directors",
+  //   value: "directors",
+  //   icon: <IconUsers size={16} />,
+  // },
+  // {
+  //   title: "Key Shareholders",
+  //   value: "shareholders",
+  //   icon: <IconUsers size={16} />,
+  // },
 ];

@@ -1,3 +1,5 @@
+@use "./floating-label";
+
 .root {
   position: relative;
 }
@@ -7,14 +9,31 @@
   padding-top: 25px;
   background-color: #fcfcfd;
   border: 1px solid #f2f4f7;
+  font-size: 14px;
+
+  &[data-invalid] {
+    border-color: #ff9175;
+    border-width: 2px;
+    background-color: #fff3f0;
+  }
+
+  &::placeholder {
+    font-size: 14px;
+  }
 }
 
 .label {
   font-weight: 400;
   position: absolute;
   pointer-events: none;
-  font-size: var(--mantine-font-size-xs);
+  font-size: 14px;
   padding-left: var(--mantine-spacing-sm);
   padding-top: calc(var(--mantine-spacing-sm) / 2);
   z-index: 1;
+
+  &[data-invalid] {
+    color: #db340b;
+  }
 }
+
+@include floating-label.floating-label;

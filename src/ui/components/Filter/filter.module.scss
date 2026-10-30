@@ -1,0 +1,30 @@
+// Opt-in layout (via the `stretch` prop): fields share the full row width.
+.stretch {
+  flex-wrap: wrap;
+
+  > *:not(.actions) {
+    flex: 1 1 0 !important;
+    min-width: 160px;
+    width: auto !important;
+  }
+
+  // The date range needs more room than the other fields to stay on one line
+  > .date__field {
+    flex: 1.3 1 0 !important;
+    min-width: 220px;
+  }
+}
+
+// Phones: every field takes the full row
+@media (max-width: 36em) {
+  .stretch > *:not(.actions),
+  .date__field {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    min-width: 0;
+  }
+}
+
+.actions {
+  flex: 0 0 auto;
+}

@@ -24,7 +24,7 @@ import localFont from "next/font/local";
 import { Fragment, useEffect, useState } from "react";
 import Cookies from "js-cookie";
 
-import AdminAvatar from "@/assets/avatar.png";
+import AdminAvatar from "@/assets/img/avatar.png";
 import styles from "./styles.module.scss";
 import User from "@/lib/store/user";
 import { checkToken, clearSession } from "@/lib/actions/checkToken";
@@ -132,7 +132,7 @@ export default function Header() {
   const searchIcon = <IconSearch style={{ width: 20, height: 20 }} />;
   return (
     <header className={styles.header}>
-      <div className={`${styles.search} ${switzer.className}`}>
+      <div className={`${styles.search} ${styles.admin__search} ${switzer.className}`}>
         <TextInput
           placeholder="Search here for businesses, payments, accounts, etc"
           leftSectionPointerEvents="none"
@@ -142,17 +142,19 @@ export default function Header() {
       </div>
 
       <Switch
-        color="var(--prune-primary-600)"
-        c={stage === "LIVE" ? "var(--prune-primary-600)" : "dimmed"}
+        color="var(--prune-primary-700)"
+        c="var(--prune-primary-700)"
         fz={14}
         fw={500}
         labelPosition="left"
         checked={stage === "LIVE"}
-        // defaultChecked={stage === "LIVE"}
         size="xs"
         tt="capitalize"
         label={`${(stage ?? "test").toLowerCase()} Mode`}
-        styles={{ label: { fontSize: 14 } }}
+        styles={{
+          label: { fontSize: 14, fontWeight: 500, color: "var(--prune-primary-700)" },
+          thumb: { borderColor: "var(--prune-primary-700)" },
+        }}
         onChange={(event) => {
           const newStage = event.currentTarget.checked ? "LIVE" : "TEST";
 
@@ -376,17 +378,19 @@ export function UserHeader() {
         </div>
 
         <Switch
-          color="var(--prune-primary-600)"
-          c={stage === "LIVE" ? "var(--prune-primary-600)" : "dimmed"}
+          color="var(--prune-primary-700)"
+          c="var(--prune-primary-700)"
           fz={14}
           fw={500}
           labelPosition="left"
           checked={stage === "LIVE"}
-          // defaultChecked={stage === "LIVE"}
           size="xs"
           tt="capitalize"
           label={`${(stage ?? "test").toLowerCase()} Mode`}
-          styles={{ label: { fontSize: 14 } }}
+          styles={{
+            label: { fontSize: 14, fontWeight: 500, color: "var(--prune-primary-700)" },
+            thumb: { borderColor: "var(--prune-primary-700)" },
+          }}
           onChange={(event) => {
             if (!liveModeService && event.currentTarget.checked) {
               handleInfo(

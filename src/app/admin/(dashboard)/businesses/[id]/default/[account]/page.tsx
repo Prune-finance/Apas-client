@@ -63,7 +63,6 @@ function Account() {
       ...(date && { date: dayjs(date).format("YYYY-MM-DD") }),
       ...(endDate && { endDate: dayjs(endDate).format("YYYY-MM-DD") }),
       ...(type && { type }),
-      ...(accountType && { accountType: accountType }),
       ...(senderName && { senderName }),
       ...(recipientName && { recipientName }),
       ...(recipientIban && { recipientIban }),
@@ -87,7 +86,7 @@ function Account() {
   ]);
 
   const accountIdForTrx = account?.id ?? params.account;
-  console.log(accountIdForTrx);
+
   const {
     transactions: companyTrx,
     loading: loadingCompanyTrx,
@@ -98,7 +97,6 @@ function Account() {
     customParams,
     !isPayout && transactionsEnabled
   );
-  console.log(customParams, companyTrxMeta,  !isPayout, transactionsEnabled, customParams);
 
   const {
     transactions: payoutTrx,
@@ -116,7 +114,7 @@ function Account() {
   const trxMeta = isPayout ? payoutTrxMeta : companyTrxMeta;
   const revalidateTrx = isPayout ? revalidatePayoutTrx : revalidateCompanyTrx;
 
-  const location = `${accountType?.toLowerCase() || `${currencyCode ?? "ghs"}-business-account`.toLowerCase()}`;
+  const location = `${currencyCode || accountType || "ghs"}-business-account`.toLowerCase();
 
   return (
     <main className={styles.main}>

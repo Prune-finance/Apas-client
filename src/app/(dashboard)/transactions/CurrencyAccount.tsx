@@ -95,7 +95,7 @@ export const CurrencyAccount = ({
         <Group>
           <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} fw={600} />
           <SecondaryBtn text="Export" action={onExport} icon={IconFileExport} loading={exporting} fw={600} />
-          <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} fw={600} indicator={filterCount} />
+          <SecondaryBtn text={opened ? "Close filter" : "Filter"} action={toggle} icon={IconListTree} fw={600} indicator={filterCount} />
         </Group>
       </Group>
 

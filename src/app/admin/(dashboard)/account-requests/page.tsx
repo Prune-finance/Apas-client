@@ -195,7 +195,7 @@ function AccountRequests() {
           <SearchInput search={search} setSearch={setSearch} />
 
           {/* <Group gap={12}>
-            <SecondaryBtn text="Filter" icon={IconListTree} action={toggle} />
+            <SecondaryBtn text={opened ? "Close filter" : "Filter"} icon={IconListTree} action={toggle} />
           </Group> */}
         </Group>
 

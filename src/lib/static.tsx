@@ -374,35 +374,46 @@ export const PayoutRequestsTableHeaders = [
 ];
 
 export const businessIndustries: string[] = [
-  "Agriculture",
-  "Automotive",
-  "Banking & Financial Services",
-  "Construction",
-  "Consulting",
-  "Consumer Goods",
-  "E-commerce",
-  "Education",
-  "Energy & Utilities",
-  "Entertainment & Media",
-  "Environmental Services",
-  "Fashion & Apparel",
-  "Food & Beverage",
-  "Government",
-  "Healthcare & Medical",
-  "Hospitality",
+  "Financial Services / FinTech",
+  "Banking",
   "Insurance",
-  "Legal Services",
+  "Technology / Software",
+  "E-commerce / Retail",
   "Logistics & Transportation",
-  "Manufacturing",
-  "Marketing & Advertising",
-  "Nonprofit & NGOs",
-  "Pharmaceuticals & Biotechnology",
+  "Healthcare",
+  "Pharmaceuticals",
+  "Education / EdTech",
   "Real Estate",
-  "Retail",
-  "Software & Technology",
-  "Telecommunications",
+  "Construction",
+  "Manufacturing",
+  "Agriculture / Agribusiness",
+  "Food & Beverage",
+  "Hospitality / Hotels",
   "Travel & Tourism",
-  "Wholesale & Distribution",
+  "Telecommunications",
+  "Media & Entertainment",
+  "Marketing & Advertising",
+  "Professional Services / Consulting",
+  "Legal Services",
+  "Accounting",
+  "Energy / Oil & Gas",
+  "Renewable Energy",
+  "Automotive",
+  "Aviation",
+  "Import & Export / Trading",
+  "Consumer Goods",
+  "Fashion & Apparel",
+  "Beauty & Cosmetics",
+  "Sports & Fitness",
+  "Security Services",
+  "Government / Public Sector",
+  "Nonprofit / NGO",
+  "Mining",
+  "Telecommunications & IT Services",
+  "Cybersecurity",
+  "Artificial Intelligence",
+  "Cryptocurrency / Blockchain",
+  "Business Process Outsourcing (BPO)",
 ];
 
 export const operationsAccountEstimatedBalance = {
@@ -429,6 +440,7 @@ const currencies = ["EUR", "GBP", "USD", "NGN"];
 
 export const serviceCategories = [
   {
+    key: "OPERATIONS_ACCOUNT",
     title: "Operations Account",
     description:
       "Prune Payments payout service gives the business access to payouts.",
@@ -436,6 +448,7 @@ export const serviceCategories = [
     icon: IconDatabase,
   },
   {
+    key: "VIRTUAL_ACCOUNTS",
     title: "Virtual Account Services",
     description:
       "The account service lets businesses issue user accounts to clients.",
@@ -443,6 +456,7 @@ export const serviceCategories = [
     icon: IconCreditCard,
   },
   {
+    key: "PAYOUT",
     title: "Payout Services",
     description:
       "This helps businesses manage and disburse funds to recipients.",
@@ -450,6 +464,7 @@ export const serviceCategories = [
     icon: IconMoneybag,
   },
   {
+    key: "ACCOUNT_LOOKUP",
     title: "Account Lookup Services",
     description:
       "This helps businesses quickly verify and access account details for transactions.",
@@ -457,6 +472,7 @@ export const serviceCategories = [
     icon: IconSearch,
   },
   {
+    key: "REMITTANCE",
     title: "Remittance",
     description:
       "This helps businesses quickly verify and access account details for transactions.",

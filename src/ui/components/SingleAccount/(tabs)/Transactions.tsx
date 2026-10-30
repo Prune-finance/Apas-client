@@ -107,8 +107,6 @@ export const Transactions = ({
   const { status, createdAt, senderName, recipientName, recipientIban, type: txType } = form.values;
 
   const isAdminLocation = location?.startsWith("admin") || location?.endsWith("business-account");
-  const isIssuedAccount = location?.toLowerCase().includes("issued");
-  console.log({ isAdminLocation, isIssuedAccount, location });
 
   const handleExportTransactions = async () => {
     if (!accountID) return;
@@ -129,9 +127,7 @@ export const Transactions = ({
       ...(currencyType && { currencyCode: currencyType }),
     };
     try {
-      if (isIssuedAccount) {
-        await exportAdminIssuedAccountTransactions(accountID, exportParams);
-      } else if (isAdminLocation && payout) {
+      if (isAdminLocation && payout) {
         await exportAdminPayoutAccountTransactions(accountID, exportParams);
       } else if (isAdminLocation) {
         await exportAdminSingleAccountTransactions(accountID, exportParams);
@@ -227,7 +223,6 @@ export const Transactions = ({
       payout && isAdminLocation
         ? `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`
         : null;
-    console.log(location, payoutAdminUrl);
 
     // Use the default URL if location is undefined or not in urlMap
     const url =
@@ -307,7 +302,7 @@ export const Transactions = ({
         <Group gap={12}>
           <SecondaryBtn
             action={toggle}
-            text="Filter"
+            text={openedFilter ? "Close filter" : "Filter"}
             icon={IconListTree}
             fw={600}
             indicator={appliedFilterCount}

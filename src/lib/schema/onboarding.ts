@@ -1,11 +1,38 @@
 import { z } from "zod";
+import "./error-map";
 
 const emailSchema = z.string().email();
 
+// Mantine's zodResolver keeps only the LAST issue per field, so each of these rules
+// reports a single, most-relevant message instead of chaining checks.
+const nameField = (label: string) =>
+  z.string().superRefine((v, ctx) => {
+    const message = !v
+      ? `${label} is required`
+      : !v.trim()
+      ? `${label} cannot be only spaces`
+      : v.trim().length < 2
+      ? `${label} must be at least 2 characters`
+      : v.length > 50
+      ? `${label} cannot exceed 50 characters`
+      : null;
+    if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  });
+
+const requiredEmail = (who: string) =>
+  z.string().superRefine((v, ctx) => {
+    const message = !v?.trim()
+      ? `${who} email is required`
+      : !emailSchema.safeParse(v.trim()).success
+      ? `Invalid ${who.toLowerCase()} email`
+      : null;
+    if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, message });
+  });
+
 const Director = z.object({
   id: z.string().uuid(),
-  first_name: z.string().min(1, "Director's first name is required"),
-  last_name: z.string().min(1, "Director's last name is required"),
+  first_name: nameField("Director's first name"),
+  last_name: nameField("Director's last name"),
   date_of_birth: z
     .union([
       z.date({ required_error: "Director's Date of birth is required" }),
@@ -13,14 +40,18 @@ const Director = z.object({
     ])
     .refine((val) => val, {
       message: "Director's Date of birth is required",
-    }),
-  email: z.string().refine(
-    (val) => {
-      if (!val) return true;
-      return emailSchema.safeParse(val).success;
-    },
-    { message: "Invalid director's email" }
-  ),
+    })
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const dob = new Date(val as string | Date);
+        const minAge = new Date();
+        minAge.setFullYear(minAge.getFullYear() - 18);
+        return dob <= minAge;
+      },
+      { message: "Director must be at least 18 years old" }
+    ),
+  email: requiredEmail("Director's"),
   identityType: z.string().nullable(),
   proofOfAddress: z.string().nullable(),
   identityFileUrl: z.string().nullable(),
@@ -52,8 +83,8 @@ export const onboardingShareholders = z.object({
     .array(
       z.object({
         id: z.string().uuid(),
-        first_name: z.string().min(1, "Shareholder's first name is required"),
-        last_name: z.string().min(1, "Shareholder's last name is required"),
+        first_name: nameField("Shareholder's first name"),
+        last_name: nameField("Shareholder's last name"),
         date_of_birth: z
           .union([
             z.date({
@@ -63,14 +94,18 @@ export const onboardingShareholders = z.object({
           ])
           .refine((val) => val, {
             message: "Shareholder's Date of birth is required",
-          }),
-        email: z.string().refine(
-          (val) => {
-            if (!val) return true;
-            return emailSchema.safeParse(val).success;
-          },
-          { message: "Invalid shareholder's email" }
-        ),
+          })
+          .refine(
+            (val) => {
+              if (!val) return true;
+              const dob = new Date(val as string | Date);
+              const minAge = new Date();
+              minAge.setFullYear(minAge.getFullYear() - 18);
+              return dob <= minAge;
+            },
+            { message: "Shareholder must be at least 18 years old" }
+          ),
+        email: requiredEmail("Shareholder's"),
         identityType: z.string().nullable(),
         proofOfAddress: z.string().nullable(),
         identityFileUrl: z.string().nullable(),
@@ -108,7 +143,7 @@ export const onboardingBasicInfoSchema = z.object({
     .string()
     .trim()
     .min(3, "Business name must be a minimum of 3 characters"),
-  businessTradingName: z.string().trim().optional(),
+  businessTradingName: z.string().trim().nullish(),
   businessCountry: handleNullableString("Country"),
   businessType: handleNullableString("Business Type"),
   businessIndustry: handleNullableString("Business Industry"),
@@ -124,9 +159,9 @@ export const onboardingBasicInfoSchema = z.object({
     .string()
     .email("Please provide a valid contact email")
     .min(1, "Contact Email is required"),
-  businessWebsite: z.string().url("Please provide a valid url"),
-  contactPersonFirstName: z.string().min(1, "Contact first name is required"),
-  contactPersonLastName: z.string().min(1, "Contact last name is required"),
+  businessWebsite: z.string().optional().nullable(),
+  contactPersonFirstName: nameField("Contact first name"),
+  contactPersonLastName: nameField("Contact last name"),
   contactPersonIdType: z.string().nullable(),
   contactPersonPOAType: z.string().nullable(),
   contactPersonIdUrl: z.string(),
@@ -140,15 +175,25 @@ export const onboardingBasicInfoSchema = z.object({
 export type OnboardingBasicInfoType = z.infer<typeof onboardingBasicInfoSchema>;
 
 export const CEOSchema = z.object({
-  ceoFirstName: z.string().min(1, "CEO first name is required"),
-  ceoLastName: z.string().min(1, "CEO last name is required"),
+  ceoFirstName: nameField("CEO first name"),
+  ceoLastName: nameField("CEO last name"),
   ceoEmail: z.string().email("Please provide a valid email"),
   ceoDOB: z
     .union([
       z.date({ required_error: "CEO Date of birth is required" }),
       z.string().nullable(),
     ])
-    .refine((val) => val, { message: "CEO Date of birth is required" }),
+    .refine((val) => val, { message: "CEO Date of birth is required" })
+    .refine(
+      (val) => {
+        if (!val) return true;
+        const dob = new Date(val as string | Date);
+        const minAge = new Date();
+        minAge.setFullYear(minAge.getFullYear() - 18);
+        return dob <= minAge;
+      },
+      { message: "CEO must be at least 18 years old" }
+    ),
   ceoIdType: handleNullableString("CEO ID Type"),
   ceoIdUrl: z.string(),
   ceoIdUrlBack: z.string(),
@@ -157,16 +202,10 @@ export const CEOSchema = z.object({
 });
 
 export const onboardingDocumentSchema = z.object({
-  cacCertificate: z.string().url("Certificate of Incorporation is required"),
-  mermat: z.string().url("Memart document is required"),
-  amlCompliance: z
-    .string()
-    .url("AML Compliance Framework document is required"),
-  operationalLicense: z
-    .string()
-    .url("Operational License document is required")
-    .nullable()
-    .optional(),
+  cacCertificate: z.string(),
+  mermat: z.string(),
+  amlCompliance: z.string(),
+  operationalLicense: z.string().nullable().optional(),
 });
 
 export const onboardingSchema = onboardingBasicInfoSchema
@@ -208,7 +247,7 @@ export const OnboardingShareholderValues: DirectorType = {
 export const newOnboardingValue: OnboardingType = {
   businessName: "",
   businessTradingName: "",
-  businessWebsite: "https://",
+  businessWebsite: "",
   businessCountry: null,
   businessType: null,
   businessIndustry: null,

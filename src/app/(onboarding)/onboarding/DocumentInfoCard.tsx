@@ -1,5 +1,5 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { Box, Flex, Group, Stack, Text } from "@mantine/core";
+import { Box, Flex, Text } from "@mantine/core";
 import { IconEdit } from "@tabler/icons-react";
 import React from "react";
 import { DocumentPreview } from "./DocumentPreview";
@@ -46,13 +46,11 @@ function DocumentInfoCard({ setActive, form }: DocumentInfoCard) {
             title="AML Compliance Framework"
             value={amlCompliance}
           />
-          {operationalLicense && (
-            <DocumentPreview
-              label="Operational License"
-              title="Operational License"
-              value={operationalLicense}
-            />
-          )}
+          <DocumentPreview
+            label="Operational License"
+            title="Operational License"
+            value={operationalLicense ?? undefined}
+          />
         </Flex>
       </Box>
     </Box>

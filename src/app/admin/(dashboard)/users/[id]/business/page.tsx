@@ -196,7 +196,7 @@ export default function AllBusinessUsers() {
 
         <Group>
           <SecondaryBtn
-            text="Filter"
+            text={opened ? "Close filter" : "Filter"}
             icon={IconListTree}
             action={toggle}
             fw={600}

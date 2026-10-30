@@ -187,17 +187,25 @@ export interface AdminData {
 export interface UserData {
   id: string;
   email: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: null;
-  firstName: string;
-  lastName: string;
-  lastLogin: Date | null;
-  lastLogIn: Date | null;
-  status: "ACTIVE" | "INACTIVE" | "INVITE_PENDING";
-  role: "USER" | "INITIATOR";
-  roles: string[];
-  permissions: string[];
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  deletedAt?: null;
+  firstName?: string;
+  lastName?: string;
+  lastLogin?: Date | string | null;
+  lastLogIn?: Date | string | null;
+  lastLoginAt?: string | null;
+  status?: string;
+  role?: string;
+  roles?: string[];
+  permissions?: string[];
   company?: { name: string; id: string };
   companyId?: string;
+  // onboarding-specific fields
+  reference?: string;
+  businessName?: string;
+  contactName?: string;
+  questionnaireReference?: string;
+  lastCompletedSection?: number;
+  submittedAt?: string | null;
 }

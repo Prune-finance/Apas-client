@@ -13,7 +13,7 @@ dayjs.extend(advancedFormat);
 
 import styles from "@/ui/styles/business.module.scss";
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 import { useBusiness } from "@/lib/hooks/businesses";
 import Filter from "@/ui/components/Filter";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
@@ -82,19 +82,19 @@ export default function BusinessUsers() {
       </TableTd>
       <TableTd w="25%">
         <Flex wrap="nowrap" gap={9} align="center">
-          {element.kycTrusted && (
+          {element.verified && (
             <IconRosetteDiscountCheckFilled
               size={25}
               color="var(--prune-primary-700)"
             />
           )}
-          {element.name}
+          {element.businessName}
         </Flex>
       </TableTd>
       <TableTd tt="lowercase">{element.contactEmail}</TableTd>
       <TableTd>{dayjs(element.createdAt).format("Do MMMM, YYYY")}</TableTd>
       <TableTd>
-        <BadgeComponent status={element.companyStatus} active />
+        <BadgeComponent status={element.state} active />
       </TableTd>
     </TableTr>
   ));
@@ -105,7 +105,7 @@ export default function BusinessUsers() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text="Filter"
+          text={opened ? "Close filter" : "Filter"}
           icon={IconListTree}
           action={toggle}
           fw={600}

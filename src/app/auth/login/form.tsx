@@ -6,141 +6,220 @@ import useNotification from "@/lib/hooks/notification";
 import { LoginType, loginValues, validateLogin } from "@/lib/schema/auth";
 import User from "@/lib/store/user";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { LoginInput } from "@/ui/components/Inputs";
-import {
-  Box,
-  Checkbox,
-  Group,
-  PasswordInput,
-  Text,
-  TextInput,
-} from "@mantine/core";
+import { Box, Checkbox, PasswordInput, Stack, Text, TextInput } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import axios from "axios";
-import { Suspense, useState } from "react";
-
-import styles from "@/ui/styles/auth.module.scss";
-import classes from "@/ui/styles/containedInput.module.scss";
+import createAxiosInstance from "@/lib/axios";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import TwoFactorModals, { type TwoFactorStep } from "./TwoFactorModals";
+
+const authAxios = createAxiosInstance("auth");
+
+const COOLDOWN_SECONDS = 3 * 60;
+
+const fieldStyles = {
+  input: {
+    height: "48px",
+    border: "1px solid var(--prune-text-gray-100)",
+    borderRadius: "8px",
+    paddingLeft: "15px",
+    paddingRight: "15px",
+    fontSize: "14px",
+    color: "var(--prune-text-gray-700)",
+  },
+};
+
+const passwordStyles = {
+  input: {
+    height: "48px",
+    border: "1px solid var(--prune-text-gray-100)",
+    borderRadius: "8px",
+  },
+  innerInput: {
+    paddingLeft: "15px",
+    paddingRight: "15px",
+    fontSize: "14px",
+    color: "var(--prune-text-gray-700)",
+    height: "100%",
+  },
+};
+
+function formatCountdown(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `Retry in ${m}:${String(s).padStart(2, "0")}`;
+}
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect");
   const [processing, setProcessing] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { setUser } = User();
-
   const { handleSuccess, handleError } = useNotification();
+
+  // 2FA state
+  const [challengeToken, setChallengeToken] = useState("");
+  const [twoFactorStep, setTwoFactorStep] = useState<TwoFactorStep | null>(null);
 
   const form = useForm<LoginType>({
     initialValues: loginValues,
     validate: zodResolver(validateLogin),
   });
 
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const startCooldown = () => {
+    setCooldown(COOLDOWN_SECONDS);
+    timerRef.current = setInterval(() => {
+      setCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current!);
+          timerRef.current = null;
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const handleLogin = async () => {
     setProcessing(true);
     try {
       const { errors, hasErrors } = form.validate();
-      if (hasErrors) {
+      if (hasErrors) return;
+
+      const { data } = await axios.post("/api/auth/login", form.values);
+
+      // Onboarding accounts still get a token directly
+      if (data.meta.accountType === "ONBOARDING") {
+        Cookies.set("auth", data.meta.token, { expires: 0.25 });
+        handleSuccess("Authentication Successful", "Welcome back");
+        try {
+          const meRes = await authAxios.get("/business/onboarding/auth/me");
+          setUser(meRes.data?.data ?? data.data);
+        } catch {
+          setUser(data.data);
+        }
+        window.location.replace("/onboarding");
         return;
       }
 
-      const authUrl = "/api/auth/login";
-      const { data } = await axios.post(authUrl, form.values);
+      // Dashboard user
+      const { token, challengeToken: ct, twoFactorSetupRequired, twoFactorRequired } = data.meta;
 
-      setUser({ ...data.data });
+      // If server returns a token directly (no 2FA enforced yet), proceed normally
+      if (token && !ct) {
+        Cookies.set("auth", token, { expires: 0.25 });
+        handleSuccess("Authentication Successful", "Welcome back");
+        setUser(data.data);
+        window.location.replace(redirect ? redirect : "/");
+        return;
+      }
 
-      Cookies.set("auth", data.meta.token, { expires: 0.25 });
-      handleSuccess("Authentication Successful", "Welcome back");
-      window.location.replace(redirect ? redirect : "/");
-    } catch (error) {
-      handleError("An error occurred", parseError(error));
+      // 2FA challenge — show the appropriate modal
+      setChallengeToken(ct ?? "");
+      if (twoFactorSetupRequired) {
+        setTwoFactorStep("protect");
+      } else if (twoFactorRequired) {
+        setTwoFactorStep("enter");
+      }
+    } catch (error: any) {
+      const status = error?.response?.status ?? error?.response?.data?.code;
+      if (status === 429) {
+        startCooldown();
+        handleError("Too many attempts", "Please wait 3 minutes before trying again.");
+      } else {
+        handleError("An error occurred", parseError(error));
+      }
     } finally {
       setProcessing(false);
     }
   };
 
+  const handleTwoFactorComplete = (token: string, userData: any) => {
+    Cookies.set("auth", token, { expires: 0.25 });
+    handleSuccess("Authentication Successful", "Welcome back");
+    setUser(userData);
+    window.location.replace(redirect ? redirect : "/");
+  };
+
+  const isCoolingDown = cooldown > 0;
+
   return (
-    <Box component="form" onSubmit={form.onSubmit(() => handleLogin())}>
-      <TextInput
-        mt="md"
-        classNames={classes}
-        label="Email"
-        size="xs"
-        flex={1}
-        placeholder="Enter Email"
-        {...form.getInputProps("email")}
-      />
+    <>
+      <Box component="form" mt={32} onSubmit={form.onSubmit(() => handleLogin())}>
+        <Stack gap={16}>
+          <TextInput
+            styles={fieldStyles}
+            placeholder="Email"
+            {...form.getInputProps("email")}
+          />
 
-      <PasswordInput
-        mt="md"
-        classNames={classes}
-        styles={{
-          input: {
-            border: "1px solid var(--prune-text-gray-300)",
-            "&:focus": { border: "none", outline: "none" },
-            "&:active": { border: "none", outline: "none" },
-          },
+          <PasswordInput
+            styles={passwordStyles}
+            placeholder="Password"
+            {...form.getInputProps("password")}
+          />
+        </Stack>
 
-          innerInput: {
-            border: "none",
-            outline: "none",
-            paddingTop: "18px",
-            height: "100%",
-          },
-        }}
-        label="Password"
-        flex={1}
-        placeholder="Enter Password"
-        size="xs"
-        {...form.getInputProps("password")}
-        color="#C1DD06"
-      />
+        <Stack gap={16} mt={24}>
+          <Checkbox
+            label="Remember me"
+            size="sm"
+            color="var(--prune-primary-600)"
+            styles={{
+              label: { fontSize: "14px", color: "var(--prune-text-gray-700)" },
+              input: { borderRadius: "4px" },
+            }}
+          />
 
-      {/* <LoginInput form={form} label="email" />
-      <LoginInput form={form} label="password" /> */}
+          <PrimaryBtn
+            loading={processing}
+            disabled={isCoolingDown}
+            fullWidth
+            text={isCoolingDown ? formatCountdown(cooldown) : "Log In"}
+            type="submit"
+            h={48}
+            radius={4}
+            fz={16}
+            fw={500}
+          />
 
-      <div className={styles.login__actions}>
-        <Checkbox label="Remember me" size="xs" color="#C1DD06" />
-      </div>
+          {isCoolingDown && (
+            <Text fz={12} c="var(--prune-text-gray-500)" ta="center">
+              Too many login attempts. Please wait before trying again.
+            </Text>
+          )}
+        </Stack>
 
-      <PrimaryBtn
-        // action={handleLogin}
-        loading={processing}
-        fullWidth
-        text="Log In"
-        type="submit"
-        fz={14}
-        fw={600}
-        mt={32}
-      />
-
-      <PrimaryBtn
-        text="Forgot Password?"
-        variant="transparent"
-        fz={14}
-        fw={600}
-        mt={32}
-        w="15ch"
-        p={0}
-        c="var(--prune-primary-800)"
-        link="/auth/forgot-password"
-      />
-
-      {/* <Group gap={2}>
-        <Text fz={14} className={styles.rdr__text}>
-          New user?{" "}
-        </Text>
         <PrimaryBtn
-          text="Learn how to sign up"
+          text="Forgot Password?"
           variant="transparent"
           fz={14}
           fw={600}
+          mt={16}
           p={0}
           c="var(--prune-primary-800)"
-          link="https://prune-payments.gitbook.io/prune-api-services/"
+          link="/auth/forgot-password"
+          fullWidth
+          style={{ textAlign: "center" }}
         />
-      </Group> */}
-    </Box>
+      </Box>
+
+      <TwoFactorModals
+        step={twoFactorStep}
+        challengeToken={challengeToken}
+        onStepChange={setTwoFactorStep}
+        onComplete={handleTwoFactorComplete}
+      />
+    </>
   );
 }
 

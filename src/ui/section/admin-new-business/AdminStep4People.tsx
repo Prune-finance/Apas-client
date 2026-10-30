@@ -164,9 +164,13 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
   };
 
   const handleSaveAndContinue = async () => {
-    const { hasErrors } = form.validate();
-    if (hasErrors) {
-      setSubStep(0);
+    const { errors: ceoErrors, hasErrors } = form.validate();
+    const directorErrors = personErrors("directors");
+    const shareholderErrors = personErrors("shareholders");
+    if (hasErrors || Object.keys(directorErrors).length || Object.keys(shareholderErrors).length) {
+      form.setErrors({ ...ceoErrors, ...directorErrors, ...shareholderErrors });
+      // Jump to the first sub-step that needs attention
+      setSubStep(hasErrors ? 0 : Object.keys(directorErrors).length ? 1 : 2);
       return;
     }
     if (hasSaved.current && !form.isDirty()) {
@@ -187,10 +191,39 @@ export default function AdminStep4People({ adminReference, refData, onBack, onCo
     }
   };
 
+  // Directors/shareholders: a started entry needs a name and an email (email is compulsory);
+  // a completely blank entry is skipped so the section can still be left empty
+  const isBlankPerson = (p: PersonEntry) =>
+    !p.firstName?.trim() &&
+    !p.lastName?.trim() &&
+    !p.email?.trim() &&
+    !p.dateOfBirth &&
+    !p.identityType &&
+    !p.proofOfAddressType;
+
+  const personErrors = (listKey: "directors" | "shareholders") => {
+    const errors: Record<string, string> = {};
+    form.getValues()[listKey].forEach((p, i) => {
+      if (isBlankPerson(p)) return;
+      const base = `${listKey}.${i}`;
+      if (!p.firstName?.trim()) errors[`${base}.firstName`] = "First name is required";
+      if (!p.lastName?.trim()) errors[`${base}.lastName`] = "Last name is required";
+      if (!p.email?.trim()) errors[`${base}.email`] = "Email is required";
+      else if (!/^\S+@\S+\.\S+$/.test(p.email.trim())) errors[`${base}.email`] = "Invalid email";
+    });
+    return errors;
+  };
+
   const handleNextSubStep = () => {
     if (subStep === 0) {
       const { hasErrors } = form.validate();
       if (hasErrors) return;
+    } else {
+      const errors = personErrors(subStep === 1 ? "directors" : "shareholders");
+      if (Object.keys(errors).length > 0) {
+        form.setErrors(errors);
+        return;
+      }
     }
     setSubStep((s) => Math.min(s + 1, 2));
   };
@@ -482,7 +515,7 @@ function PersonListSubStep({
               </Flex>
               <Flex gap={24} w="100%">
                 <TextInputWithInsideLabel
-                  label="Email (Optional)"
+                  label="Email"
                   w="100%"
                   placeholder="Enter Email"
                   {...form.getInputProps(`${listKey}.${idx}.email`)}

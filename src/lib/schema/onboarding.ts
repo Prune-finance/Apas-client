@@ -24,7 +24,7 @@ const requiredEmail = (who: string) =>
     const message = !v?.trim()
       ? `${who} email is required`
       : !emailSchema.safeParse(v.trim()).success
-      ? `Invalid ${who.toLowerCase()} email`
+      ? `Invalid ${who === who.toUpperCase() ? who : who.toLowerCase()} email`
       : null;
     if (message) ctx.addIssue({ code: z.ZodIssueCode.custom, message });
   });
@@ -177,7 +177,7 @@ export type OnboardingBasicInfoType = z.infer<typeof onboardingBasicInfoSchema>;
 export const CEOSchema = z.object({
   ceoFirstName: nameField("CEO first name"),
   ceoLastName: nameField("CEO last name"),
-  ceoEmail: z.string().email("Please provide a valid email"),
+  ceoEmail: requiredEmail("CEO"),
   ceoDOB: z
     .union([
       z.date({ required_error: "CEO Date of birth is required" }),

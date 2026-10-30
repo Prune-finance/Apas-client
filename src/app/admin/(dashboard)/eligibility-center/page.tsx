@@ -75,9 +75,14 @@ const toLabel = (value: string) =>
     .toLowerCase()
     .replace(/^\w/, (c) => c.toUpperCase());
 
+// Labels that differ from the plain enum wording (matches the "Invited" stage badge)
+const STATUS_LABELS: Record<string, string> = {
+  ONBOARDING_INVITED: "Invited",
+};
+
 const STATUS_OPTIONS = Object.keys(statusToStage).map((value) => ({
   value,
-  label: toLabel(value),
+  label: STATUS_LABELS[value] ?? toLabel(value),
 }));
 
 const SERVICE_OPTIONS = [

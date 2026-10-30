@@ -126,7 +126,20 @@ interface DateInputWithInsideLabelProps extends DateInputProps {
   standard?: boolean;
   minimumAge?: number;
 }
-export const DateInputWithInsideLabel = ({ standard, minimumAge, ...props }: DateInputWithInsideLabelProps) => {
+export const DateInputWithInsideLabel = ({ standard, minimumAge, ...rawProps }: DateInputWithInsideLabelProps) => {
+  // Some forms (e.g. the admin People step) store an empty date as "" — treat that, and
+  // any unparsable string, as "no date" so the calendar opens at the age cutoff
+  // instead of an invalid month. Date strings from the API are converted to Date.
+  const toDate = (v: unknown) => {
+    if (v === "" || v === undefined || v === null) return v === undefined ? undefined : null;
+    const d = v instanceof Date ? v : dayjs(v as string).toDate();
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const props = {
+    ...rawProps,
+    ...("value" in rawProps ? { value: toDate(rawProps.value) } : {}),
+    ...("defaultValue" in rawProps ? { defaultValue: toDate(rawProps.defaultValue) } : {}),
+  } as typeof rawProps;
   const ageCutoff = minimumAge === undefined
     ? undefined
     : dayjs().subtract(minimumAge, "year").startOf("day").toDate();

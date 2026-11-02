@@ -85,10 +85,11 @@ export const config = {
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
+     * - images/rate/ (public Rate design assets)
      * - favicon.ico (favicon file)
      * - pdf.worker.min.mjs (PDF worker file)
      * - questionnaire (questionnaire pages)
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|auth|404|pdf.worker.min.mjs|questionnaire).*)",
+    "/((?!api|_next/static|_next/image|images/rate/|favicon.ico|auth|404|pdf.worker.min.mjs|questionnaire).*)",
   ],
 };

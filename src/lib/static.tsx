@@ -63,6 +63,11 @@ export const AdminMainLinks = [
     icon: <IconRosetteDiscountCheck size={16} />,
   },
   {
+    text: "Rate",
+    link: "/admin/rate",
+    icon: <IconArrowsRightLeft size={16} />,
+  },
+  {
     text: "Transactions",
     link: "/admin/transactions",
     icon: <IconArrowsSort size={16} />,

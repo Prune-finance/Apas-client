@@ -1,0 +1,101 @@
+.page {
+  padding: 0 20px;
+  color: var(--prune-text-gray-700);
+}
+.header { padding: 0 10px; }
+.card {
+  padding: 24px;
+  border-radius: 8px;
+  background: white;
+  min-height: 108px;
+  border: 1px solid var(--prune-text-gray-100, #f2f4f7);
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: #f9f6e6;
+    border-color: #c6a700;
+  }
+}
+.secondary {
+  height: 48px;
+  padding: 0 32px;
+  font-weight: 500;
+  background: #f2f4f7;
+  border: 0;
+  box-shadow: 0 1px 4px #14141414, 0 0 0.5px #1414141f;
+}
+// Same compact typography as Eligibility Center, including breakpoint overrides.
+.compactInputs {
+  :global(.mantine-TextInput-input),
+  :global(.mantine-Select-input) {
+    font-size: 12px !important;
+    font-weight: 400;
+
+    &::placeholder {
+      font-size: 12px !important;
+      font-weight: 400;
+    }
+  }
+}
+.tableWrap { border-radius: 16px; overflow: hidden; }
+.table {
+  margin-top: 0;
+  min-width: 1006px;
+  background: white;
+  thead { background: #f2f4f7; }
+  th { height: 48px; padding: 8px; letter-spacing: 0; color: var(--prune-text-gray-700); }
+  td { height: 72px; padding: 12px 8px; font-size: 14px; font-weight: 400; border-color: #f2f4f7; }
+}
+.badge { height: 20px; padding: 4px 8px; font-size: 12px; line-height: 1; font-weight: 500; text-transform: none; }
+.flags {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  width: 44px;
+  margin-left: -2px;
+  img + img { margin-left: -8px; }
+}
+.switchTrack { width: 40px; min-width: 40px; height: 24px; cursor: pointer; }
+@media (max-width: 48em) {
+  .page { padding: 0; }
+  .header { padding: 0; }
+}
+
+.disableDialog {
+  background: #f9f9f9;
+  color: var(--prune-text-gray-700);
+  box-shadow: 0 0 1px #1414141f, 0 1px 8px #14141414;
+}
+.disableHeader {
+  padding: 24px;
+  border-bottom: 1px solid #eaecf0;
+  min-height: 98px;
+}
+.disableIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff3f0;
+}
+.disableBody { padding: 16px 24px; }
+.checkIcon { display: flex; flex-shrink: 0; }
+.disableReasonLabel {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--prune-text-gray-500);
+  margin-bottom: 10px;
+}
+.disableReason {
+  min-height: 66px;
+  padding: 16px;
+  background: #f9f9f9;
+  font-weight: 400;
+}
+.disableFooter {
+  padding: 40px 24px 24px;
+  border-top: 1px solid #eaecf0;
+}

@@ -168,8 +168,6 @@ export default function AdminStep1BusinessInfo({
     if (match) form.setFieldValue("phoneNumberCode", match.value);
   });
 
-  const v = form.getValues();
-
   const buildPayload = () => {
     const v = form.getValues();
     return {
@@ -459,15 +457,19 @@ export default function AdminStep1BusinessInfo({
             withAsterisk
             {...form.getInputProps("contactDesignation")}
           />
-          <PhoneNumberInput<AdminStep1Values>
-            form={form}
-            phoneNumberKey="contactPhoneNumber"
-            countryCodeKey="contactPhoneNumberCode"
-            inputHeight={54}
-            unfocusedBorderColor="#f2f4f7"
-            inputBackground="#fcfcfd"
-            alwaysShowLabel
-          />
+          {/* Full-width wrapper so phone and Designation split the row 50/50,
+              like the business phone above */}
+          <Box w="100%">
+            <PhoneNumberInput<AdminStep1Values>
+              form={form}
+              phoneNumberKey="contactPhoneNumber"
+              countryCodeKey="contactPhoneNumberCode"
+              inputHeight={54}
+              unfocusedBorderColor="#f2f4f7"
+              inputBackground="#fcfcfd"
+              alwaysShowLabel
+            />
+          </Box>
         </Flex>
 
         <Tooltip

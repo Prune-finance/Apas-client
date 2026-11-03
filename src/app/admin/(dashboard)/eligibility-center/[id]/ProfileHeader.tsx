@@ -241,7 +241,10 @@ export default function ProfileHeader({
               "QUESTIONNAIRE"
             }
             stage
-            w={150}
+            // Size to the label ("Submitted" … "Questionnaire Completed") instead of a fixed width
+            w="auto"
+            px={10}
+            style={{ whiteSpace: "nowrap", flexShrink: 0 }}
           />
         </Skeleton>
       </Group>

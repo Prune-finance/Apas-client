@@ -43,6 +43,9 @@ export const BadgeComponent = ({
     ? stageColor(status as STAGE)
     : approvedBadgeColor(status);
 
+  // Show enum values as plain text: "PENDING_CUSTOMER" → "Pending Customer"
+  const label = status?.replace(/_/g, " ").toLowerCase();
+
   return (
     <Badge
       tt="capitalize"
@@ -57,10 +60,10 @@ export const BadgeComponent = ({
       {stage ? (
         <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
           <StageDot color={color} />
-          {status?.toLowerCase()}
+          {label}
         </span>
       ) : (
-        status?.toLowerCase()
+        label
       )}
     </Badge>
   );

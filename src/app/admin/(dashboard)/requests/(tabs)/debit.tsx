@@ -162,7 +162,7 @@ function Debit() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text={openedFilter ? "Close filter" : "Filter"}
+          text="Filter"
           action={toggle}
           fw={600}
           icon={IconListTree}

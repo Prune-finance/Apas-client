@@ -3,8 +3,7 @@
 import { ActionIcon, Box, Group, Modal, Stack, Text, Textarea } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { RatePair } from "./data";
-import classes from "./styles.module.scss";
+import classes from "../styles.module.scss";
 
 const consequences = [
   "New transactions and currency conversions using this pair are blocked via API.",
@@ -17,10 +16,11 @@ function ModalIcon({ name }: { name: string }) {
   return <img src={`/images/rate/${name}.svg`} alt="" aria-hidden="true" />;
 }
 
-export default function DisableRateModal({ pair, onClose, onConfirm }: {
-  pair: RatePair;
+export default function DisableRateModal({ pair, onClose, onConfirm, processing }: {
+  pair: { code: string; statusLabel: string };
   onClose: () => void;
   onConfirm: (reason: string) => void;
+  processing?: boolean;
 }) {
   const form = useForm({
     initialValues: { reason: "" },
@@ -35,8 +35,8 @@ export default function DisableRateModal({ pair, onClose, onConfirm }: {
         <Group className={classes.disableHeader} wrap="nowrap" gap={22}>
           <Box className={classes.disableIcon}><ModalIcon name="disable" /></Box>
           <Box flex={1}>
-            <Text id="disable-rate-title" fz={24} fw={600} lh={1.2}>Disable {pair.base}/{pair.quote}</Text>
-            <Text fz={14} lh={1} c="var(--prune-text-gray-500)" mt={8}>Currently {pair.status}</Text>
+            <Text id="disable-rate-title" fz={24} fw={600} lh={1.2}>Disable {pair.code}</Text>
+            <Text fz={14} lh={1} c="var(--prune-text-gray-500)" mt={8}>Currently {pair.statusLabel}</Text>
           </Box>
           <ActionIcon variant="transparent" size={24} aria-label="Close disable confirmation" onClick={onClose}>
             <ModalIcon name="close" />
@@ -56,7 +56,7 @@ export default function DisableRateModal({ pair, onClose, onConfirm }: {
         </Stack>
         <Group justify="space-between" className={classes.disableFooter}>
           <SecondaryBtn text="Cancel" action={onClose} bg="#FBFEE6" bd="none" fw={500} />
-          <PrimaryBtn text="Disable pair" type="submit" color="#FF5226" c="white" fw={500} />
+          <PrimaryBtn text="Disable pair" type="submit" color="#FF5226" c="white" fw={500} loading={processing} />
         </Group>
       </form>
     </Modal>

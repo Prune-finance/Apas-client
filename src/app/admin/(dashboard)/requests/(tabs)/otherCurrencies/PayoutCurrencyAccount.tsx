@@ -21,8 +21,8 @@ import { IconCheck, IconListTree, IconX } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { useSearchParams } from "next/navigation";
 import React, { Fragment, useState } from "react";
-import SingleCurrencyModal from "./SingleCurrencyModal";
-import RejectModalComponent from "./RejectCurrencyModal";
+import SingleCurrencyModal from "./modals/SingleCurrencyModal";
+import RejectModalComponent from "./modals/RejectCurrencyModal";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
 import Cookies from "js-cookie";
@@ -168,7 +168,7 @@ function PayoutCurrencyAccount() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text={openedFilter ? "Close filter" : "Filter"}
+          text="Filter"
           action={toggle}
           icon={IconListTree}
           fw={600}

@@ -316,7 +316,7 @@ export default function ActiveUsers() {
 
         <Group gap={12}>
           <SecondaryBtn
-            text={openedFilter ? "Close filter" : "Filter"}
+            text="Filter"
             icon={IconListTree}
             action={toggle}
             fw={600}

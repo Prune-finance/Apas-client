@@ -22,7 +22,7 @@ import ModalComponent from "@/ui/components/Modal";
 
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
+import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 
 import useNotification from "@/lib/hooks/notification";
 

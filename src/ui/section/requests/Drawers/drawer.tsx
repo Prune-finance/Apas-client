@@ -12,7 +12,7 @@ import { useState } from "react";
 import { formatNumber } from "@/lib/utils";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
+import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";

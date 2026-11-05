@@ -50,7 +50,7 @@ import PaginationComponent from "@/ui/components/Pagination";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
 import { SecondaryBtn } from "@/ui/components/Buttons";
-import RequestDrawer from "../RequestDrawer";
+import RequestDrawer from "@/ui/section/requests/Drawers/RequestDrawer";
 import { FilterType, FilterValues, FilterSchema } from "@/lib/schema";
 
 function Reactivate() {
@@ -277,7 +277,7 @@ function Reactivate() {
           <SecondaryBtn
             icon={IconListTree}
             action={toggle}
-            text={openedFilter ? "Close filter" : "Filter"}
+            text="Filter"
             fw={600}
           />
         </Flex>

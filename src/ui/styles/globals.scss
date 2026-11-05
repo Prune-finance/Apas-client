@@ -48,22 +48,29 @@
 
 @font-face {
   font-family: "EksellDisplay";
-  src: url("/fonts/eksell/ekselldisplaytrial-small.otf") format("opentype");
+  src: url("/fonts/eksell/EksellDisplay-Small.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "EksellDisplay";
-  src: url("/fonts/eksell/ekselldisplaytrial-medium.otf") format("opentype");
+  src: url("/fonts/eksell/EksellDisplay-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 @font-face {
   font-family: "EksellDisplay";
-  src: url("/fonts/eksell/ekselldisplaytrial-large.otf") format("opentype");
+  src: url("/fonts/eksell/EksellDisplay-Large.ttf") format("truetype");
   font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "EksellDisplayStencil";
+  src: url("/fonts/eksell/EksellDisplay-Stencil.ttf") format("truetype");
+  font-weight: 400;
   font-style: normal;
   font-display: swap;
 }

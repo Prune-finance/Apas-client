@@ -14,7 +14,7 @@ import { UseFormReturnType } from "@mantine/form";
 import { newAdmin } from "@/lib/schema";
 import { Dispatch, SetStateAction } from "react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import { closeButtonProps } from "../businesses/[id]/(tabs)/utils";
+import { closeButtonProps } from "../../businesses/[id]/(tabs)/utils";
 
 export default function ModalComponent({
   opened,

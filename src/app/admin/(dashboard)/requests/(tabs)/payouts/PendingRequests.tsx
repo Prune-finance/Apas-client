@@ -22,7 +22,7 @@ import {
   PayoutTransactionRequest,
   usePayoutTransactionRequests,
 } from "@/lib/hooks/requests";
-import { PayoutTransactionRequestDrawer } from "./drawer";
+import { PayoutTransactionRequestDrawer } from "./drawers/drawer";
 import Transaction from "@/lib/store/transaction";
 import ModalComponent from "@/ui/components/Modal";
 import { notifications } from "@mantine/notifications";
@@ -133,7 +133,7 @@ export const PendingPayoutRequests = () => {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text={openedFilter ? "Close filter" : "Filter"}
+          text="Filter"
           action={toggle}
           icon={IconListTree}
           fw={600}

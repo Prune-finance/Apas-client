@@ -38,7 +38,7 @@ import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
 import { calculateTotalPages } from "@/lib/utils";
-import AddUserModal from "./AddUserModal";
+import AddUserModal from "./modals/AddUserModal";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { switzer } from "@/ui/fonts";
 
@@ -196,7 +196,7 @@ export default function AllBusinessUsers() {
 
         <Group>
           <SecondaryBtn
-            text={opened ? "Close filter" : "Filter"}
+            text="Filter"
             icon={IconListTree}
             action={toggle}
             fw={600}

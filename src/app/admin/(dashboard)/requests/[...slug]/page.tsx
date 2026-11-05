@@ -52,7 +52,7 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
-import DebitDrawer from "../drawer";
+import DebitDrawer from "@/ui/section/requests/Drawers/drawer";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import { debitTableHeaders } from "@/lib/static";
 import createAxiosInstance from "@/lib/axios";
@@ -246,7 +246,7 @@ function CompanyRequestType() {
           <SearchInput search={search} setSearch={setSearch} />
 
           <SecondaryBtn
-            text={openedFilter ? "Close filter" : "Filter"}
+            text="Filter"
             action={toggle}
             fw={600}
             icon={IconListTree}

@@ -50,7 +50,7 @@ import { filteredSearch } from "@/lib/search";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
-import ModalComponent from "../modal";
+import ModalComponent from "@/ui/section/accounts/Modals";
 import { validateRequest } from "@/lib/schema";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
@@ -377,7 +377,7 @@ export default function PayoutAccounts() {
             fw={600}
           />
           <SecondaryBtn
-            text={filterOpened ? "Close filter" : "Filter"}
+            text="Filter"
             icon={IconListTree}
             action={toggle}
             fw={600}

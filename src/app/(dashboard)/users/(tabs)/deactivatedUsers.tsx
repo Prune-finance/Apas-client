@@ -217,7 +217,7 @@ export default function DeactivatedUsers() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text={openedFilter ? "Close filter" : "Filter"}
+          text="Filter"
           icon={IconListTree}
           action={toggle}
           fw={600}

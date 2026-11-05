@@ -1,7 +1,7 @@
 import { Text, Modal, Flex, Textarea, Select } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 
-import styles from "./styles.module.scss";
+import styles from "../styles.module.scss";
 import { UseFormReturnType } from "@mantine/form";
 import DropzoneComponent from "@/ui/components/Dropzone";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";

@@ -170,7 +170,7 @@ function AccountRequests() {
               <SearchInput search={search} setSearch={setSearch} />
 
               <SecondaryBtn
-                text={openedFilter ? "Close filter" : "Filter"}
+                text="Filter"
                 action={toggle}
                 icon={IconListTree}
                 fw={600}

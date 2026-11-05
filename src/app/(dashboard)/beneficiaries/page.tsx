@@ -655,7 +655,7 @@ const Beneficiaries = () => {
                 <Group gap={12}>
                   {/* <SecondaryBtn
                     action={toggle}
-                    text={openedFilter ? "Close filter" : "Filter"}
+                    text="Filter"
                     icon={IconListTree}
                     fw={600}
                   /> */}

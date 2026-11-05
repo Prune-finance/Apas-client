@@ -104,7 +104,7 @@ export default function OnboardingBusinesses() {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text={opened ? "Close filter" : "Filter"}
+          text="Filter"
           action={toggle}
           fw={600}
           fz={12}

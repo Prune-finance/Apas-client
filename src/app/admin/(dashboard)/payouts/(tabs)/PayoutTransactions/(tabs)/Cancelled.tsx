@@ -75,7 +75,7 @@ export const CancelledPayoutTransactions = () => {
         <SearchInput search={search} setSearch={setSearch} />
 
         <SecondaryBtn
-          text={opened ? "Close filter" : "Filter"}
+          text="Filter"
           action={toggle}
           icon={IconListTree}
           fw={600}

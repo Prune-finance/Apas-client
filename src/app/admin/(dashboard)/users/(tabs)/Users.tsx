@@ -27,7 +27,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAdmins } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import ModalComponent from "../modal";
+import ModalComponent from "../modals/modal";
 import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
@@ -289,7 +289,7 @@ export default function Users() {
 
         <Group gap={12}>
           <SecondaryBtn
-            text={openedFilter ? "Close filter" : "Filter"}
+            text="Filter"
             action={toggle}
             icon={IconListTree}
             fw={600}
@@ -423,7 +423,7 @@ const tableHeaders = [
 //           />
 
 //           <Group gap={12}>
-//             <SecondaryBtn text={openedFilter ? "Close filter" : "Filter"} action={toggle} icon={IconListTree} />
+//             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} />
 //             <PrimaryBtn
 //               text="Invite New User"
 //               action={() => {

@@ -9,19 +9,13 @@ import {
   Stack,
   Skeleton,
   Text,
-  Image,
 } from "@mantine/core";
 import { GiEuropeanFlag } from "react-icons/gi";
 import { PrimaryBtn } from "../../Buttons";
 import { Account, DefaultAccount } from "@/lib/hooks/accounts";
-import GBImage from "@/assets/GB.png";
-import EUImage from "@/assets/EU-icon.png";
-import NGNImage from "@/assets/Nigeria.png";
-import GHSImage from "@/assets/GH.png";
-import USDImage from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 interface CurrencyConfig {
-  icon: string;
   name: string;
   bankIdLabel: string;
   accountIdLabel: string;
@@ -39,7 +33,6 @@ interface Props {
 
 const currencyConfigs: Record<string, CurrencyConfig> = {
   EUR: {
-    icon: EUImage.src,
     name: "EUR",
     bankIdLabel: "BIC",
     accountIdLabel: "IBAN/Account Number",
@@ -47,7 +40,6 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     getAccountIdValue: (account) => account?.accountNumber ?? "",
   },
   GBP: {
-    icon: GBImage.src,
     name: "GBP",
     bankIdLabel: "Sort Code",
     accountIdLabel: "Account Number",
@@ -55,7 +47,6 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     getAccountIdValue: (account) => account?.accountNumber ?? "",
   },
   NGN: {
-    icon: NGNImage.src,
     name: "NGN",
     bankIdLabel: "Bank Code",
     accountIdLabel: "Account Number",
@@ -63,7 +54,6 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     getAccountIdValue: (account) => account?.accountNumber ?? "",
   },
   GHS: {
-    icon: GHSImage.src,
     name: "GHS",
     bankIdLabel: "Wallet Owner",
     accountIdLabel: "Wallet ID",
@@ -71,10 +61,9 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
     getAccountIdValue: (account) => account?.walletId ?? "",
   },
   USD: {
-    icon: USDImage.src,
     name: "USD",
     bankIdLabel: "SWIFT/BIC",
-    accountIdLabel: "IBAN",    
+    accountIdLabel: "IBAN",
     getBankIdValue: () => "ARPYGB21",
     getAccountIdValue: (account) => account?.accountIban ?? "",
     accountNumberLabel: "Account Number",
@@ -105,7 +94,7 @@ export default function DefaultAccountDetails({
       <Group gap={7}>
         <ThemeIcon radius="xl" color="transparent">
           {!loading ? (
-            <Image src={config.icon} alt={config.name} w={20} h={20} />
+            <CountryFlag code={config.name} size={20} />
           ) : (
             <Skeleton w={20} h={20} />
           )}

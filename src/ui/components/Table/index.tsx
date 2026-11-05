@@ -17,9 +17,10 @@ interface Props extends TableProps {
   head: string[];
   rows: JSX.Element[] | JSX.Element;
   noBg?: boolean;
+  columnWidths?: (string | number | undefined)[];
 }
 
-export function TableComponent({ loading, rows, head, noBg, ...props }: Props) {
+export function TableComponent({ loading, rows, head, noBg, columnWidths, ...props }: Props) {
   return (
     <TableScrollContainer minWidth={500} mt={props.mt}>
       <Table
@@ -32,7 +33,11 @@ export function TableComponent({ loading, rows, head, noBg, ...props }: Props) {
         <TableThead bg={noBg ? "transparent" : "#F9F9F9"}>
           <TableTr>
             {head.map((header, index) => (
-              <TableTh key={index} className={styles.table__th}>
+              <TableTh
+                key={index}
+                className={styles.table__th}
+                w={columnWidths?.[index]}
+              >
                 {header}
               </TableTh>
             ))}

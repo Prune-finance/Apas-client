@@ -48,7 +48,7 @@ import dayjs from "dayjs";
 import { DynamicSkeleton, DynamicSkeleton2 } from "@/lib/static";
 import { filteredSearch } from "@/lib/search";
 import { approvedBadgeColor, getInitials, getUserType } from "@/lib/utils";
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 import { TableComponent } from "@/ui/components/Table";
 import { approveRequest, rejectRequest } from "@/lib/actions/account-requests";
 import useNotification from "@/lib/hooks/notification";

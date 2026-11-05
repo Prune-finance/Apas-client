@@ -27,7 +27,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { useAdmins } from "@/lib/hooks/admins";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import ModalComponent from "../modal";
+import ModalComponent from "../modals/modal";
 import { useForm, zodResolver } from "@mantine/form";
 import { newAdmin, validateNewAdmin } from "@/lib/schema";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";

@@ -21,7 +21,7 @@ import {
 import { DynamicSkeleton } from "@/lib/static";
 import { formatNumber } from "@/lib/utils";
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 
 import { useParams, useRouter } from "next/navigation";
 import { TransactionType, useUserTransactions } from "@/lib/hooks/transactions";

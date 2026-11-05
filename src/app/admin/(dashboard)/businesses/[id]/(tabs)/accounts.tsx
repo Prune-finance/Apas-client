@@ -1,7 +1,5 @@
-import { Badge, TableTd, TableTr, TabsPanel, SimpleGrid, Image } from "@mantine/core";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
+import { Badge, TableTd, TableTr, TabsPanel, SimpleGrid } from "@mantine/core";
+import CountryFlag from "@/ui/components/CountryFlag";
 import localFont from "next/font/local";
 import { BusinessData, useBusinessServices } from "@/lib/hooks/businesses";
 import { useState, useEffect } from "react";
@@ -432,7 +430,7 @@ export default function Accounts({
                   transition: "background-color 0.15s ease, color 0.15s ease",
                 }}
               >
-                <Image src={t.icon} alt={t.currency} h={20} w={20} />
+                <CountryFlag code={t.currency} size={20} />
                 {t.title}
               </button>
             );
@@ -513,7 +511,7 @@ const tableHead = [
 ];
 
 const issuedAccountSubTabs = [
-  { value: "eur-account", title: "EUR Accounts", currency: "EUR" as const, icon: EUIcon.src },
-  { value: "gbp-accounts", title: "GBP Accounts", currency: "GBP" as const, icon: GBPIcon.src },
-  { value: "usd-accounts", title: "USD Accounts", currency: "USD" as const, icon: USDIcon.src },
+  { value: "eur-account", title: "EUR Accounts", currency: "EUR" as const },
+  { value: "gbp-accounts", title: "GBP Accounts", currency: "GBP" as const },
+  { value: "usd-accounts", title: "USD Accounts", currency: "USD" as const },
 ];

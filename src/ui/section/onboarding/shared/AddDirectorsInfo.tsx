@@ -1,0 +1,331 @@
+import { Box, Button, Flex, Stack, Text, ThemeIcon } from "@mantine/core";
+import OnBoardingDocumentBox from "./onBoardingDocumentBox";
+import { PrimaryBtn } from "@/ui/components/Buttons";
+import { IconPlus, IconTrash } from "@tabler/icons-react";
+import { SaveProgressBtn, eksellStyle, buildSectionBase } from "./utils";
+import {
+  DateInputWithInsideLabel,
+  SelectInputWithInsideLabel,
+  TextInputWithInsideLabel,
+} from "@/ui/components/InputWithLabel";
+import { OnboardingDirectorValues, OnboardingType } from "@/lib/schema";
+import { UseFormReturnType } from "@mantine/form";
+import { useState } from "react";
+import createAxiosInstance from "@/lib/axios";
+import useNotification from "@/lib/hooks/notification";
+import { extractApiErrors } from "./utils";
+import { ReferenceData } from "./types";
+
+const questAxios = createAxiosInstance("questionnaire");
+
+const nameError = (value: string | undefined, label: string, formError: React.ReactNode) => {
+  const raw = value ?? "";
+  if (raw.length > 50) return `${label} cannot exceed 50 characters`;
+  if (raw.length > 0 && raw.trim().length === 0) return `${label} cannot be only spaces`;
+  if (raw.length > 0 && raw.length < 2) return `${label} must be at least 2 characters`;
+  return formError;
+};
+
+interface AddDirectorsInfo {
+  setActive: React.Dispatch<React.SetStateAction<number>>;
+  active: number;
+  form: UseFormReturnType<OnboardingType>;
+  refData: ReferenceData;
+  adminReference?: string;
+  noFloatingLabel?: boolean;
+  alreadyCompleted?: boolean;
+}
+
+function formatDOB(date: any): string | undefined {
+  if (!date) return undefined;
+  const d = new Date(date);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  return `${dd}-${mm}-${yyyy}`;
+}
+
+function buildSection4Body(form: UseFormReturnType<OnboardingType>) {
+  return {
+    directors: form.getValues().directors.map((d) => ({
+      firstName: d.first_name,
+      lastName: d.last_name,
+      email: d.email,
+      dateOfBirth: formatDOB(d.date_of_birth),
+      identityType: d.identityType || undefined,
+      proofOfAddressType: d.proofOfAddress || undefined,
+      identityDocumentId: d.identityFileUrl || undefined,
+      proofOfAddressDocumentId: d.proofOfAddressFileUrl || undefined,
+    })),
+  };
+}
+
+export const AddDirectorsInfo = ({
+  setActive,
+  active,
+  form,
+  refData,
+  adminReference,
+  noFloatingLabel,
+  alreadyCompleted,
+}: AddDirectorsInfo) => {
+  const { handleSuccess, handleError } = useNotification();
+  const [mountSnapshot] = useState(() => JSON.stringify(buildSection4Body(form)));
+  const [saving, setSaving] = useState(false);
+  const [completing, setCompleting] = useState(false);
+
+  const sectionBase = buildSectionBase(adminReference, 4);
+
+
+  const handleClearForm = () => {
+    form.setFieldValue("directors", [{ ...OnboardingDirectorValues, id: crypto.randomUUID() }]);
+  };
+
+  const handleSaveProgress = async () => {
+    setSaving(true);
+    try {
+      await questAxios.patch(sectionBase, buildSection4Body(form));
+      handleSuccess("Progress Saved", "Your progress has been saved");
+    } catch (error) {
+      handleError("Save failed", extractApiErrors(error));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleSaveAndContinue = async () => {
+    // The button stays enabled: on click, mark every missing field (uploads included) in red
+    const { errors, hasErrors } = form.validate();
+    const v = form.getValues();
+    const docErrors: Record<string, string> = {};
+    (v.directors ?? []).forEach((p, i) => {
+      const base = `directors.${i}`;
+      if (!p.identityType) docErrors[`${base}.identityType`] = "Identity type is required";
+      else if (!p.identityFileUrl) docErrors[`${base}.identityFileUrl`] = "Identity document is required";
+      if (p.identityType && p.identityType !== "PASSPORT" && !p.identityFileUrlBack)
+        docErrors[`${base}.identityFileUrlBack`] = "Back of identity document is required";
+      if (!p.proofOfAddress) docErrors[`${base}.proofOfAddress`] = "Proof of address is required";
+      else if (!p.proofOfAddressFileUrl)
+        docErrors[`${base}.proofOfAddressFileUrl`] = "Proof of address document is required";
+    });
+    if (hasErrors || Object.keys(docErrors).length > 0) {
+      form.setErrors({ ...errors, ...docErrors });
+      return;
+    }
+
+    if (alreadyCompleted && JSON.stringify(buildSection4Body(form)) === mountSnapshot) {
+      setActive(active + 1);
+      return;
+    }
+
+    setCompleting(true);
+    try {
+      await questAxios.post(`${sectionBase}/complete`, buildSection4Body(form));
+      handleSuccess("Business Directors", "Directors saved");
+      setActive(active + 1);
+    } catch (error) {
+      handleError("An error occurred", extractApiErrors(error));
+    } finally {
+      setCompleting(false);
+    }
+  };
+
+  return (
+    <Box>
+      <Flex align="center" justify="space-between" w="100%">
+        <Text c="var(--prune-text-gray-700)" fz={16} fw={700} style={eksellStyle}>
+          Add Directors
+        </Text>
+        <Flex align="center" gap={12}>
+          <SaveProgressBtn loading={saving} action={handleSaveProgress} />
+          <PrimaryBtn
+            text="Add Directors"
+            icon={IconPlus}
+            showIcon
+            h={36}
+            fz={13}
+            fw={500}
+            action={() => {
+              form.insertListItem("directors", {
+                ...OnboardingDirectorValues,
+                id: crypto.randomUUID(),
+              });
+            }}
+          />
+        </Flex>
+      </Flex>
+
+      {form.getValues().directors?.map((director, index) => (
+        <Stack mt={30} gap={24} key={director.id ?? index}>
+          <Flex justify="space-between" align="center" w="100%">
+            <Text c="var(--prune-text-gray-700)" fz={16} fw={700} style={eksellStyle}>
+              Director {index + 1}
+            </Text>
+
+            {index !== 0 && (
+              <ThemeIcon
+                color="var(--prune-warning)"
+                style={{ cursor: "pointer" }}
+                variant="transparent"
+                size={25}
+                onClick={() => form.removeListItem("directors", index)}
+              >
+                <IconTrash />
+              </ThemeIcon>
+            )}
+          </Flex>
+
+          <Flex gap={24} w="100%">
+            <TextInputWithInsideLabel
+              label="First Name"
+              w="100%"
+              standard={noFloatingLabel}
+              withAsterisk
+              key={form.key(`directors.${index}.first_name`)}
+              {...form.getInputProps(`directors.${index}.first_name`)}
+              error={nameError(
+                form.values.directors[index]?.first_name,
+                "Director's first name",
+                form.errors[`directors.${index}.first_name`]
+              )}
+            />
+            <TextInputWithInsideLabel
+              label="Last Name"
+              w="100%"
+              standard={noFloatingLabel}
+              withAsterisk
+              key={form.key(`directors.${index}.last_name`)}
+              {...form.getInputProps(`directors.${index}.last_name`)}
+              error={nameError(
+                form.values.directors[index]?.last_name,
+                "Director's last name",
+                form.errors[`directors.${index}.last_name`]
+              )}
+            />
+          </Flex>
+
+          <Flex gap={24} w="100%">
+            <TextInputWithInsideLabel
+              label="Email"
+              w="100%"
+              standard={noFloatingLabel}
+              key={form.key(`directors.${index}.email`)}
+              {...form.getInputProps(`directors.${index}.email`)}
+            />
+            <DateInputWithInsideLabel
+              minimumAge={18}
+              label="Date of Birth"
+              w="100%"
+              standard={noFloatingLabel}
+              maxDate={new Date()}
+              key={form.key(`directors.${index}.date_of_birth`)}
+              {...form.getInputProps(`directors.${index}.date_of_birth`)}
+              error={(() => {
+                const dob = form.values.directors[index]?.date_of_birth;
+                if (!dob) return form.errors[`directors.${index}.date_of_birth`];
+                const cutoff = new Date();
+                cutoff.setFullYear(cutoff.getFullYear() - 18);
+                return new Date(dob as string | Date) > cutoff
+                  ? "Director must be at least 18 years old"
+                  : form.errors[`directors.${index}.date_of_birth`];
+              })()}
+            />
+          </Flex>
+
+          <Flex gap={24} w="100%">
+            <SelectInputWithInsideLabel
+              label="Identity Type"
+              w="100%"
+              data={refData.identityTypes}
+              standard={noFloatingLabel}
+              key={form.key(`directors.${index}.identityType`)}
+              {...form.getInputProps(`directors.${index}.identityType`)}
+            />
+            <SelectInputWithInsideLabel
+              label="Proof of Address"
+              w="100%"
+              data={refData.proofOfAddressTypes}
+              standard={noFloatingLabel}
+              key={form.key(`directors.${index}.proofOfAddress`)}
+              {...form.getInputProps(`directors.${index}.proofOfAddress`)}
+            />
+          </Flex>
+
+          <Flex gap={24} w="100%">
+            {director.identityType && (
+              <>
+                <OnBoardingDocumentBox
+                  title="Upload Identity Document"
+                  formKey={`directors.${index}.identityFileUrl`}
+                  form={form}
+                  uploadedFileUrl={director.identityFileUrl || ""}
+                  kind="IDENTITY"
+                  adminReference={adminReference}
+                  uploadWithReference={Boolean(adminReference)}
+                />
+                {director.identityType !== "PASSPORT" && (
+                  <OnBoardingDocumentBox
+                    title="Upload Identity Document (Back)"
+                    formKey={`directors.${index}.identityFileUrlBack`}
+                    form={form}
+                    uploadedFileUrl={director.identityFileUrlBack || ""}
+                    kind="IDENTITY"
+                    adminReference={adminReference}
+                    uploadWithReference={Boolean(adminReference)}
+                  />
+                )}
+              </>
+            )}
+
+            {director.proofOfAddress && (
+              <OnBoardingDocumentBox
+                title="Upload Proof of Address"
+                formKey={`directors.${index}.proofOfAddressFileUrl`}
+                form={form}
+                uploadedFileUrl={director.proofOfAddressFileUrl || ""}
+                kind="PROOF_OF_ADDRESS"
+                adminReference={adminReference}
+                uploadWithReference={Boolean(adminReference)}
+              />
+            )}
+          </Flex>
+        </Stack>
+      ))}
+
+      <Flex align="center" justify="space-between" w="100%" mt={20}>
+        <Button
+          radius={9999}
+          px={18}
+          h={40}
+          fz={14}
+          fw={500}
+          c="#344054"
+          onClick={handleClearForm}
+          styles={{ root: { backgroundColor: "#fff", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+        >
+          Clear Form
+        </Button>
+        <Flex gap={20} align="center">
+          <Button
+            radius={9999}
+            px={18}
+            h={40}
+            fz={14}
+            fw={500}
+            c="#344054"
+            onClick={() => setActive(active - 1)}
+            styles={{ root: { backgroundColor: "#F2F4F7", border: "1px solid #EAECF0", boxShadow: "0px 1px 2px 0px rgba(16,24,40,0.05)" } }}
+          >
+            Previous
+          </Button>
+          <PrimaryBtn
+            text="Save & Continue"
+            fw={600}
+            action={handleSaveAndContinue}
+            loading={completing}
+          />
+        </Flex>
+      </Flex>
+    </Box>
+  );
+};

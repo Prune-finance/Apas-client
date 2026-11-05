@@ -6,7 +6,6 @@ import {
   CopyButton,
   Flex,
   Group,
-  Image,
   Loader,
   LoadingOverlay,
   Skeleton,
@@ -19,18 +18,15 @@ import { useRouter } from "next/navigation";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import createAxiosInstance from "@/lib/axios";
-import newAccountImageEuro from "@/assets/new-account-card.png";
-import AccountImageGBP from "@/assets/gbp-account-card.png";
-import CediBgImage from "@/assets/cedi-background-image.png";
-import USDBgImage from "@/assets/usd-background.png";
+import newAccountImageEuro from "@/assets/img/new-account-card.png";
+import AccountImageGBP from "@/assets/img/gbp-account-card.png";
+import CediBgImage from "@/assets/img/cedi-background-image.png";
+import USDBgImage from "@/assets/img/usd-background.png";
 import { GiEuropeanFlag, GiNigeria } from "react-icons/gi";
 import { formatNumber } from "@/lib/utils";
 import { SecondaryBtn } from "../Buttons";
 import { IconCheck, IconCopy, IconReload } from "@tabler/icons-react";
-import GBImage from "@/assets/GB.png";
-import EUImage from "@/assets/EU-icon.png";
-import CediIcon from "@/assets/cedis-icon.png";
-import USDImage from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import { SeeAll } from ".";
 
 interface Props extends CardProps {
@@ -68,7 +64,7 @@ type CurrencyConfig = {
 const currencyConfigs: Record<string, CurrencyConfig> = {
   EUR: {
     background: newAccountImageEuro.src,
-    icon: <Image src={EUImage.src} alt="EUR" width={20} height={20} />,
+    icon: <CountryFlag code="EUR" size={20} />,
     bankIdLabel: "BIC",
     accountIdLabel: "IBAN",
     currencySymbol: "€",
@@ -78,7 +74,7 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
   },
   GBP: {
     background: AccountImageGBP.src,
-    icon: <Image src={GBImage.src} alt="GBP" width={20} height={20} />,
+    icon: <CountryFlag code="GBP" size={20} />,
     bankIdLabel: "Sort Code",
     accountIdLabel: "Account Number",
     currencySymbol: "£",
@@ -88,7 +84,7 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
   },
   GHS: {
     background: CediBgImage.src,
-    icon: <Image src={CediIcon.src} alt="GHS" width={20} height={20} />,
+    icon: <CountryFlag code="GHS" size={20} />,
     bankIdLabel: "Wallet Owner",
     accountIdLabel: "Wallet ID",
     currencySymbol: "₵",
@@ -99,7 +95,7 @@ const currencyConfigs: Record<string, CurrencyConfig> = {
 
   USD: {
     background: USDBgImage.src,
-    icon: <Image src={USDImage.src} alt="USD" width={20} height={20} />,
+    icon: <CountryFlag code="USD" size={20} />,
     bankIdLabel: "SWIFT/BIC",
     accountIdLabel: "IBAN",
     currencySymbol: "$",

@@ -1,9 +1,9 @@
 import React from "react";
 import { Box, Flex, Image, Stack, Text } from "@mantine/core";
-import UnActiveMobileMoney from "@/assets/un-active-mm.png";
-import UnActiveBankTransfer from "@/assets/un-active-bt.png";
-import ActiveBankTransfer from "@/assets/active-bt.png";
-import ActiveMobileMoney from "@/assets/active-mm.png";
+import UnActiveMobileMoney from "@/assets/img/un-active-mm.png";
+import UnActiveBankTransfer from "@/assets/img/un-active-bt.png";
+import ActiveBankTransfer from "@/assets/img/active-bt.png";
+import ActiveMobileMoney from "@/assets/img/active-mm.png";
 import useTransferCurrencySwitchStore from "@/lib/store/transfer-currency-type";
 
 const SelectTypeOfTransfer = ({

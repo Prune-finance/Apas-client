@@ -24,8 +24,8 @@ import {
   UserOtherLinks,
 } from "@/lib/static";
 
-import PruneLogo from "@/assets/logo-with-text.svg";
-// import PruneTintLogo from "@/assets/logo-tint.png";
+import PruneLogo from "@/assets/img/logo.svg";
+// import PruneTintLogo from "@/assets/img/logo-tint.png";
 import styles from "./styles.module.scss";
 import { useDisclosure, useIdle } from "@mantine/hooks";
 import ModalComponent from "../Modal";
@@ -425,11 +425,6 @@ export function UserNavbar() {
                   color="var(--prune-primary-900, #596603)"
                   styles={{ label: { fontSize: 12 } }}
                   classNames={{ root: styles.root }}
-                  style={{
-                    borderRight: isActive(item.link)
-                      ? "3px solid var(--prune-primary-900, #596603)"
-                      : "none",
-                  }}
                 />
               );
             })}
@@ -454,11 +449,6 @@ export function UserNavbar() {
                   color="var(--prune-primary-900, #596603)"
                   styles={{ label: { fontSize: 12 } }}
                   classNames={{ root: styles.root }}
-                  style={{
-                    borderRight: isActive(item.link)
-                      ? "3px solid var(--prune-primary-900, #596603)"
-                      : "none",
-                  }}
                 />
               );
             })}

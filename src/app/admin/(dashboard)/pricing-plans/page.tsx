@@ -27,7 +27,7 @@ import { TableComponent } from "@/ui/components/Table";
 import { calculateTotalPages, formatNumber, sanitizeURL } from "@/lib/utils";
 import Plan from "@/lib/store/plan";
 import PaginationComponent from "@/ui/components/Pagination";
-import PlanDrawer from "./drawer";
+import PlanDrawer from "./drawers/drawer";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { PricingPlan, usePricingPlan } from "@/lib/hooks/pricing-plan";

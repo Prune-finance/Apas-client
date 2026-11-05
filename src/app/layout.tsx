@@ -14,7 +14,7 @@ import "@mantine/notifications/styles.css";
 import "@/ui/styles/globals.scss";
 import { NotificationProvider } from "@/ui/components/NotificationProvider";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { switzer } from "@/ui/fonts";
+import { switzer, ibmPlexSans } from "@/ui/fonts";
 
 // export const switzer = localFont({
 //   src: "../assets/fonts/Switzer-Regular.woff2",
@@ -26,12 +26,13 @@ const metadata: Metadata = {
 };
 
 const theme = createTheme({
-  fontFamily: switzer.className,
+  fontFamily: "var(--font-switzer), sans-serif",
   headings: {
-    fontFamily: switzer.style.fontFamily,
+    fontFamily: "'EksellDisplay', serif",
   },
   primaryColor: "prune",
   primaryShade: 5,
+  defaultRadius: 6,
   colors: {
     prune: [
       "#fbfee6", // 0 - primary-50
@@ -54,11 +55,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${switzer.variable} ${ibmPlexSans.variable}`}>
       <head>
         <ColorSchemeScript />
       </head>
-      <body className={switzer.className}>
+      <body>
         <MantineProvider theme={theme}>
           <NotificationProvider />
           {/* <Notifications

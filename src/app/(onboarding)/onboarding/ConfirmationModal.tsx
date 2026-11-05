@@ -1,6 +1,6 @@
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { Center, Flex, Image, Modal, Stack, Text } from "@mantine/core";
-import CompleteIcon from "@/assets/CompleteOnboardingIcon.png";
+import CompleteIcon from "@/assets/img/CompleteOnboardingIcon.png";
 
 interface ConfirmationModalProps {
   opened: boolean;

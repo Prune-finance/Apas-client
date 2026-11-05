@@ -130,7 +130,8 @@ export default function RatePage() {
       <SimpleGrid cols={{ base: 1, xs: 2, lg: 4 }} spacing={16} mt={48}>
         {summaries.map(([label, count]) => <Box key={label} className={classes.card}>
           <Text fz={14} lh={1} c="var(--prune-text-gray-500)">{label}</Text>
-          {stats ? <Text fz={24} fw={500} lh={1.2} mt={16}>{count ?? 0}</Text> : <Skeleton h={28} w={48} mt={16} />}
+          {/* Skeleton only while loading; no stats (failed request or none sent) shows 0 */}
+          {loading && !stats ? <Skeleton h={28} w={48} mt={16} /> : <Text fz={24} fw={500} lh={1.2} mt={16}>{count ?? 0}</Text>}
         </Box>)}
       </SimpleGrid>
 

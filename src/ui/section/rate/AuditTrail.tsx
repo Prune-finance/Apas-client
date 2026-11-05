@@ -122,14 +122,15 @@ export default function AuditTrail({ pairId, showPair, showStats = true, onQuery
       {/* Cards (stats always cover every event for this scope) */}
       {showStats && <Box className={classes.statRow}>
         {[
-          ["Total events", stats ? String(stats.totalEvents) : null],
+          // Missing stats show 0 (or "-" for the date) once loading is done
+          ["Total events", String(stats?.totalEvents ?? 0)],
           // The API returns a date here, not a count (integration guide §12)
-          ["Last change", stats ? (stats.lastChangeAt ? dayjs(stats.lastChangeAt).format("DD MMM YYYY") : "-") : null],
-          ["Made via API", stats ? String(stats.viaApi) : null],
+          ["Last change", stats?.lastChangeAt ? dayjs(stats.lastChangeAt).format("DD MMM YYYY") : "-"],
+          ["Made via API", String(stats?.viaApi ?? 0)],
         ].map(([label, value]) => (
           <Box key={label} className={classes.statCard}>
             <span className={classes.statLabel}>{label}</span>
-            {value === null ? <Skeleton h={29} w={60} /> : <span className={classes.statValue}>{value}</span>}
+            {loading && !stats ? <Skeleton h={29} w={60} /> : <span className={classes.statValue}>{value}</span>}
           </Box>
         ))}
       </Box>}

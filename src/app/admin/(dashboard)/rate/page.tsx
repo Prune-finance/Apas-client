@@ -31,6 +31,9 @@ const statusColors: Record<PairStatus, [string, string]> = {
   ENABLED: ["#E8FAF0", "#12B76A"], DISABLED: ["#EAECF0", "#667085"],
   PENDING: ["#FFFAE6", "#B86E00"], SCHEDULED: ["#FAFFE6", "#8AA600"],
 };
+// Figma flag group: 24px circles, the second overlapping by 4px
+const roundFlag = { borderRadius: "50%", objectFit: "cover" as const, width: 24, height: 24 };
+
 const statusLabel = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
 function Asset({ name }: { name: string }) {
@@ -178,7 +181,7 @@ export default function RatePage() {
       </Box>
 
       <Box mt={24} className={classes.tableWrap}>
-        <TableComponent loading={loading} head={["", "Currency Pair", "Base Rate", "Adjustment", "Final Rate", "Status", "Effective from", "Actions"]} columnWidths={[51, undefined, 113, 114, 113, 120, 120, 93]} className={classes.table} rows={pairs.map(row => {
+        <TableComponent loading={loading} head={["ON/OFF", "Currency Pair", "Base Rate", "Adjustment", "Final Rate", "Status", "Effective from", "Actions"]} columnWidths={["7%", "26%", "11%", "11%", "11%", "12%", "12%", "10%"]} className={classes.table} rows={pairs.map(row => {
           // `rate` is the latest change, which may still be pending or scheduled;
           // `liveFinalRate` is what transactions use right now
           const rate = row.rate;
@@ -194,12 +197,14 @@ export default function RatePage() {
               <Link href={`/admin/rate/${row.id}`} style={{ color: "inherit", textDecoration: "none" }}>
               <Group gap={8} wrap="nowrap">
                 <span className={classes.flags}>
-                  {row.baseCurrency.countryCode && <CountryFlag code={row.baseCurrency.countryCode} size={20} />}
-                  {row.targetCurrency.countryCode && <CountryFlag code={row.targetCurrency.countryCode} size={20} />}
+                  {row.baseCurrency.countryCode && <CountryFlag code={row.baseCurrency.countryCode} size={24} style={roundFlag} />}
+                  {row.targetCurrency.countryCode && <CountryFlag code={row.targetCurrency.countryCode} size={24} style={roundFlag} />}
                 </span>
                 <Box>
                   <Text fz={14} lh={1}>{row.code}</Text>
-                  <Text fz={12} lh={1.5} c="var(--prune-text-gray-500)">{row.quote}</Text>
+                  <Text fz={12} lh={1.5} c="var(--prune-text-gray-500)">
+                    {row.liveFinalRate ? `${formatRate(row.liveFinalRate)} ${row.quote}` : row.quote}
+                  </Text>
                 </Box>
               </Group>
               </Link>

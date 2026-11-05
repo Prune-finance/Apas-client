@@ -28,10 +28,12 @@
     }
   }
 }
+// Columns scale with the screen; below the Figma width (1006px) the table scrolls sideways
 .tableWrap { border-radius: 16px; overflow: hidden; }
 .table {
   margin-top: 0;
   min-width: 1006px;
+  td, th { overflow: hidden; text-overflow: ellipsis; }
   background: white;
   thead { background: #f2f4f7; }
   th { height: 48px; padding: 8px; letter-spacing: 0; color: var(--prune-text-gray-700); }
@@ -42,9 +44,8 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  width: 44px;
-  margin-left: -2px;
-  img + img { margin-left: -8px; }
+  img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
+  img + img { margin-left: -4px; }
 }
 .switchTrack { width: 40px; min-width: 40px; height: 24px; cursor: pointer; }
 @media (max-width: 48em) {

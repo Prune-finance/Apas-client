@@ -10,7 +10,6 @@ import { useDisclosure } from "@mantine/hooks";
 
 import Header from "@/ui/components/Header";
 import Navbar from "@/ui/components/Navbar";
-import DashboardWave from "./DashboardWave";
 
 import styles from "@/ui/styles/layout.module.scss";
 
@@ -38,12 +37,11 @@ export default function RootLayout({
         <Header />
       </AppShellHeader>
 
-      <AppShellNavbar p="md">
+      <AppShellNavbar p="md" className={styles.admin__navbar}>
         <Navbar />
       </AppShellNavbar>
 
       <AppShellMain>
-        <DashboardWave />
         <Container p={0} fluid>
           {children}
         </Container>

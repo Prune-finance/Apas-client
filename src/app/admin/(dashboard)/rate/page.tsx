@@ -32,9 +32,7 @@ const statusColors: Record<PairStatus, [string, string]> = {
   PENDING: ["#FFFAE6", "#B86E00"], SCHEDULED: ["#FAFFE6", "#8AA600"],
 };
 // Figma flag group (15677:340996): 24px circles with a 2px white ring, the second overlapping by 4px
-const roundFlag = {
-  borderRadius: "50%", objectFit: "cover" as const, width: 24, height: 24, boxShadow: "0 0 0 2px #fff", background: "#fff",
-};
+const roundFlag = { width: 24, height: 24, borderRadius: "50%", boxShadow: "0 0 0 2px #fff", background: "#fff" };
 
 const statusLabel = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 
@@ -199,8 +197,8 @@ export default function RatePage() {
               <Link href={`/admin/rate/${row.id}`} style={{ color: "inherit", textDecoration: "none" }}>
               <Group gap={8} wrap="nowrap">
                 <span className={classes.flags}>
-                  {row.baseCurrency.countryCode && <CountryFlag code={row.baseCurrency.countryCode} size={24} style={roundFlag} />}
-                  {row.targetCurrency.countryCode && <CountryFlag code={row.targetCurrency.countryCode} size={24} style={roundFlag} />}
+                  {row.baseCurrency.countryCode && <CountryFlag code={row.baseCurrency.countryCode} size={24} round style={roundFlag} />}
+                  {row.targetCurrency.countryCode && <CountryFlag code={row.targetCurrency.countryCode} size={24} round style={roundFlag} />}
                 </span>
                 <Box>
                   <Text fz={14} lh={1}>{row.code}</Text>

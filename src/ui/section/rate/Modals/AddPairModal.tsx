@@ -28,7 +28,7 @@ function Icon({ name }: { name: string }) {
 
 const Flag = ({ currency }: { currency: RateCurrency }) => (
   <CountryFlag code={currency.countryCode ?? currency.code} size={24}
-    style={{ borderRadius: "50%", objectFit: "cover", width: 24, height: 24 }} />
+    round style={{ width: 24, height: 24 }} />
 );
 
 function CurrencySelect({

@@ -30,9 +30,7 @@ type Filters = { event: string | null; adminId: string | null; channel: string |
 const EMPTY: Filters = { event: null, adminId: null, channel: null, range: [null, null] };
 
 // Same round flags as the Rates table (Figma 15677:340996)
-const flagStyle = {
-  borderRadius: "50%", objectFit: "cover" as const, width: 24, height: 24, boxShadow: "0 0 0 2px #fff", background: "#fff",
-};
+const flagStyle = { width: 24, height: 24, borderRadius: "50%", boxShadow: "0 0 0 2px #fff", background: "#fff" };
 
 function ExpandedRow({ log, colSpan, onView }: { log: AuditLogRow; colSpan: number; onView: () => void }) {
   const m = log.metadata;
@@ -194,14 +192,14 @@ export default function AuditTrail({ pairId, showPair, showStats = true, onQuery
                             <Link href={`/admin/rate/${log.pair.id}`} className={classes.pairCell}
                               style={{ color: "inherit", textDecoration: "none" }} onClick={(e) => e.stopPropagation()}>
                               <span className={classes.flagGroup}>
-                                <CountryFlag code={base!} size={24} style={flagStyle} />
-                                <CountryFlag code={target!} size={24} style={flagStyle} />
+                                <CountryFlag code={base!} size={24} round style={flagStyle} />
+                                <CountryFlag code={target!} size={24} round style={flagStyle} />
                               </span>
                               {log.pair.code}
                             </Link>
                           ) : (
                             <span className={classes.pairCell}>
-                              {log.currencyCode && <CountryFlag code={log.currencyCode} size={24} style={flagStyle} />}
+                              {log.currencyCode && <CountryFlag code={log.currencyCode} size={24} round style={flagStyle} />}
                               {log.currencyCode ?? "-"}
                             </span>
                           )}

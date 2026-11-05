@@ -286,7 +286,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
               <label className={classes.rateField} data-error={errors.baseRate ? true : undefined}>
                 <span className={classes.rateCurrency}>
                   <CountryFlag code={target.countryCode ?? target.code} size={24}
-                    style={{ borderRadius: "50%", objectFit: "cover", width: 24, height: 24 }} />
+                    round style={{ width: 24, height: 24 }} />
                   {target.code}
                 </span>
                 <span className={classes.rateFieldText}>

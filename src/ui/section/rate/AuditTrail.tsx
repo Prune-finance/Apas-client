@@ -17,6 +17,7 @@ import {
   EVENT_TONE,
   FilterDateRange,
   FilterSelect,
+  formatChangeValue,
   GREY,
   Icon,
   Pill,
@@ -46,8 +47,8 @@ function ExpandedRow({ log, colSpan, onView }: { log: AuditLogRow; colSpan: numb
               {(log.changes ?? []).map((c) => (
                 <Fragment key={c.field}>
                   <span className={classes.changeLabel}>{c.label}</span>
-                  <span className={c.changed ? classes.changeBefore : classes.changeSameMuted}>{c.before ?? "-"}</span>
-                  <span className={c.changed ? classes.changeAfter : classes.changeSame}>{c.after ?? "-"}</span>
+                  <span className={c.changed ? classes.changeBefore : classes.changeSameMuted}>{formatChangeValue(c.field, c.before)}</span>
+                  <span className={c.changed ? classes.changeAfter : classes.changeSame}>{formatChangeValue(c.field, c.after)}</span>
                 </Fragment>
               ))}
             </Box>
@@ -79,9 +80,11 @@ function ExpandedRow({ log, colSpan, onView }: { log: AuditLogRow; colSpan: numb
 
 export type AuditFilterQuery = Omit<AuditQuery, "page" | "limit">;
 
-export default function AuditTrail({ pairId, showPair, onQueryChange }: {
+export default function AuditTrail({ pairId, showPair, showStats = true, onQueryChange }: {
   pairId?: string;
   showPair?: boolean;
+  /** The pair tab shows the stat cards; the Audit log page (Figma 15681:373066) doesn't */
+  showStats?: boolean;
   /** Current filters, e.g. for the page's Export button */
   onQueryChange?: (query: AuditFilterQuery) => void;
 }) {
@@ -117,7 +120,7 @@ export default function AuditTrail({ pairId, showPair, onQueryChange }: {
   return (
     <Box className={classes.auditTrail}>
       {/* Cards (stats always cover every event for this scope) */}
-      <Box className={classes.statRow}>
+      {showStats && <Box className={classes.statRow}>
         {[
           ["Total events", stats ? String(stats.totalEvents) : null],
           // The API returns a date here, not a count (integration guide §12)
@@ -129,7 +132,7 @@ export default function AuditTrail({ pairId, showPair, onQueryChange }: {
             {value === null ? <Skeleton h={29} w={60} /> : <span className={classes.statValue}>{value}</span>}
           </Box>
         ))}
-      </Box>
+      </Box>}
 
       <Box className={classes.auditBody}>
         {/* Filters */}
@@ -157,8 +160,8 @@ export default function AuditTrail({ pairId, showPair, onQueryChange }: {
                 <th>Timestamp</th>
                 <th className={classes.colChannel}>Event</th>
                 {showPair && <th>Currency Pair</th>}
-                <th style={{ width: 104 }}>Previous</th>
-                <th>Final Rate</th>
+                <th style={{ width: 104 }}>{showPair ? "Previous value" : "Previous"}</th>
+                <th>{showPair ? "New value" : "Final Rate"}</th>
                 <th>Adminstrator</th>
                 <th className={classes.colChannel}>Channel</th>
               </tr>

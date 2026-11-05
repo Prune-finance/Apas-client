@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Center, Drawer, Loader, Text, TextInput, UnstyledButton } from "@mantine/core";
+import { Box, Center, Drawer, Loader, Text, UnstyledButton } from "@mantine/core";
 import dayjs from "dayjs";
+import { isAxiosError } from "axios";
 import utc from "dayjs/plugin/utc";
 import { PrimaryBtn } from "@/ui/components/Buttons";
+import { TextInputWithInsideLabel } from "@/ui/components/InputWithLabel";
 import useNotification from "@/lib/hooks/notification";
-import { apiMessage, formatRate, RateChange, ratesAxios, ReviewView } from "@/lib/hooks/rates";
+import { apiFieldErrors, apiMessage, formatRate, RateChange, ratesAxios, ReviewView } from "@/lib/hooks/rates";
 import classes from "../styles.module.scss";
 
 dayjs.extend(utc);
@@ -100,8 +102,9 @@ export default function ReviewChangeDrawer({
 
   const act = async (kind: "approve" | "reject") => {
     if (!changeId) return;
-    if (kind === "reject" && !comment.trim()) {
-      setCommentError("A comment is required to reject");
+    // Same rule as the API: a rejection needs a reason of at least 3 characters
+    if (kind === "reject" && comment.trim().length < 3) {
+      setCommentError("Say why the change is rejected (at least 3 characters)");
       return;
     }
     setActing(kind);
@@ -111,7 +114,22 @@ export default function ReviewChangeDrawer({
       onReviewed();
       onClose();
     } catch (error) {
+      const fields = apiFieldErrors(error);
+      if (fields.comment) {
+        setCommentError(fields.comment);
+        return;
+      }
       handleError(kind === "approve" ? "Could not approve" : "Could not reject", apiMessage(error));
+      const status = isAxiosError(error) ? error.response?.status : undefined;
+      if (status === 404) {
+        // The change no longer exists
+        onReviewed();
+        onClose();
+      } else if (status === 403 || status === 409) {
+        // Own change, or someone else reviewed it first: reload so the drawer shows why it is blocked
+        onReviewed();
+        ratesAxios.get(`/changes/${changeId}`).then(({ data }) => setView(data.data)).catch(() => undefined);
+      }
     } finally {
       setActing(null);
     }
@@ -203,10 +221,9 @@ export default function ReviewChangeDrawer({
 
           {/* Checker comment */}
           {canReview ? (
-            <Box className={classes.reviewSection} style={{ gap: 5 }}>
-              <Text className={classes.commentLabel}>Checker comment</Text>
-              <TextInput value={comment} placeholder="Add a comment (required when rejecting)"
-                error={commentError} classNames={{ input: classes.commentInput }}
+            <Box className={classes.reviewSection}>
+              <TextInputWithInsideLabel standard label="Checker comment" value={comment}
+                placeholder="Add a comment (required when rejecting)" error={commentError}
                 onChange={(e) => { setComment(e.currentTarget.value); setCommentError(null); }} />
             </Box>
           ) : (

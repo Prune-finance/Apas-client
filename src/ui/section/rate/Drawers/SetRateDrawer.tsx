@@ -5,10 +5,24 @@ import { Box, Drawer, Text, UnstyledButton } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useDebouncedValue } from "@mantine/hooks";
 import dayjs from "dayjs";
+import { isAxiosError } from "axios";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import CountryFlag from "@/ui/components/CountryFlag";
+import { TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
 import { inter } from "@/ui/fonts";
-import { apiFieldErrors, apiMessage, formatRate, RateChange, RatePairRow, ratesAxios } from "@/lib/hooks/rates";
+import {
+  ADJUSTMENT_MODE_LABEL,
+  ADJUSTMENT_TYPE_LABEL,
+  apiFieldErrors,
+  apiMessage,
+  formatRate,
+  RateChange,
+  RatePairRow,
+  RatePrecision,
+  ratesAxios,
+  roundingLabel,
+  useRatesMeta,
+} from "@/lib/hooks/rates";
 import classes from "../styles.module.scss";
 import { RateToastState } from "../RateToast";
 import { Icon } from "../shared";
@@ -20,16 +34,21 @@ type AdjustmentMode = "PERCENT" | "AMOUNT";
 
 interface Preview {
   currentLiveBaseRate: string | null;
+  currentLiveFinalRate: string | null;
   baseRate: string;
-  adjustment: { label: string | null };
+  adjustment: { type: string; mode: string | null; value: string | null; label: string | null };
   adjustmentAmount: string | null;
   finalRate: string;
   inverseRate: string;
   quote: string;
   inverseQuote: string;
+  precision?: RatePrecision;
 }
 
-const RATE = /^\d+(\.\d{1,4})?$/;
+// The API reports adjustment problems on adjustment.type / .mode / .value; they all show under the value field
+const adjustmentError = (fields: Record<string, string>) =>
+  fields["adjustment.value"] || fields["adjustment.mode"] || fields["adjustment.type"] || fields.adjustment || "";
+
 const DECIMAL = /^\d+(\.\d+)?$/;
 
 function Segmented<T extends string>({ value, onChange, options, className, label }: {
@@ -58,9 +77,17 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
   notify: (toast: NonNullable<RateToastState>) => void;
   /** Maker-checker on: "Submit for approval" + the approval note */
   requiresApproval?: boolean;
-  precision?: { inverse: number; rounding: string };
+  /** The pair's own precision; falls back to the reference data */
+  precision?: RatePrecision;
 }) {
   const live = pair?.rate?.status === "LIVE" ? pair.rate : null;
+  const meta = useRatesMeta();
+  const rules = precision ?? meta?.precision;
+  const rateDp = rules?.rate ?? 4;
+  const typeOptions = (meta?.adjustmentTypes ?? ["NONE", "MARKUP", "MARKDOWN"])
+    .map((t) => ({ value: t as AdjustmentType, label: ADJUSTMENT_TYPE_LABEL[t] ?? t }));
+  const modeOptions = (meta?.adjustmentModes ?? ["PERCENT", "AMOUNT"])
+    .map((m) => ({ value: m as AdjustmentMode, label: ADJUSTMENT_MODE_LABEL[m] ?? m }));
 
   const [baseRate, setBaseRate] = useState("");
   const [type, setType] = useState<AdjustmentType>("NONE");
@@ -98,7 +125,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
     const b = baseRate.trim();
     if (!b) e.baseRate = "Base rate is required.";
     else if (!DECIMAL.test(b) || Number(b) <= 0) e.baseRate = "Rate must be greater than zero.";
-    else if (!RATE.test(b)) e.baseRate = "Use at most 4 decimal places.";
+    else if (!new RegExp(`^\\d+(\\.\\d{1,${rateDp}})?$`).test(b)) e.baseRate = `Use at most ${rateDp} decimal places.`;
 
     if (type !== "NONE") {
       const v = value.trim();
@@ -113,7 +140,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
     if (!reason.trim()) e.reason = "Reason is required.";
     else if (reason.length > 500) e.reason = "Reason cannot exceed 500 characters.";
     return e;
-  }, [baseRate, type, mode, value, effectiveFrom, reason, typeWord]);
+  }, [baseRate, type, mode, value, effectiveFrom, reason, typeWord, rateDp]);
 
   const shown = (field: string) =>
     apiErrors[field] || ((submitted || touched[field]) ? clientErrors[field] : undefined);
@@ -151,7 +178,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
         setApiErrors((e) => ({
           ...e,
           baseRate: fields.baseRate ?? "",
-          adjustmentValue: fields["adjustment.value"] ?? fields.adjustment ?? "",
+          adjustmentValue: adjustmentError(fields),
         }));
       });
     return () => { cancelled = true; };
@@ -188,15 +215,26 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
       onClose();
     } catch (error) {
       const fields = apiFieldErrors(error);
-      if (fields["adjustment.value"]) fields.adjustmentValue = fields["adjustment.value"];
+      const adjustment = adjustmentError(fields);
+      if (adjustment) fields.adjustmentValue = adjustment;
       setApiErrors(fields);
+      const status = isAxiosError(error) ? error.response?.status : undefined;
+      const activeRate = live?.finalRate ?? pair.liveFinalRate;
+      // Field errors are shown on the fields; otherwise say why (e.g. "This is the rate already live…")
+      const reason = Object.keys(fields).length ? "" : `${apiMessage(error).replace(/\.?$/, ".")} `;
       notify({
         tone: "error",
         title: "Rate update failed",
-        body: live
-          ? `Previous active rate ${formatRate(live.finalRate)} remains in effect. Nothing was saved.`
-          : `${apiMessage(error)} Nothing was saved.`,
+        body: `${reason}${activeRate
+          ? `Previous active rate ${formatRate(activeRate)} remains in effect. Nothing was saved.`
+          : "Nothing was saved."}`,
       });
+      // 409: another change is already waiting for approval; 404: the pair is gone.
+      // Refresh the page behind so it shows Review / drops the pair.
+      if (status === 409 || status === 404) {
+        onSubmitted();
+        if (status === 404) onClose();
+      }
     } finally {
       setSaving(false);
     }
@@ -253,7 +291,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
                 </span>
                 <span className={classes.rateFieldText}>
                   <span className={classes.rateFieldLabel}>Base rate ({target.code} per 1 {base.code})</span>
-                  <input className={classes.rateFieldInput} inputMode="decimal" placeholder="0.0000" value={baseRate}
+                  <input className={classes.rateFieldInput} inputMode="decimal" placeholder={(0).toFixed(rateDp)} value={baseRate}
                     onChange={(e) => { setBaseRate(e.currentTarget.value.replace(/,/g, "")); clearApi("baseRate"); }}
                     onBlur={() => touch("baseRate")} />
                 </span>
@@ -285,20 +323,20 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
           <Box className={classes.reviewSection}>
             <Segmented label="Adjustment type" className={classes.segmented} value={type}
               onChange={(v) => { setType(v); clearApi("adjustmentValue"); }}
-              options={[{ value: "NONE", label: "None" }, { value: "MARKUP", label: "Mark up" }, { value: "MARKDOWN", label: "Mark down" }]} />
+              options={typeOptions} />
           </Box>
 
           {type !== "NONE" && (
             <Box className={classes.setRateRow}>
               <Segmented label="Adjustment mode" className={`${classes.segmented} ${classes.modeSegmented}`} value={mode}
                 onChange={(v) => { setMode(v); clearApi("adjustmentValue"); }}
-                options={[{ value: "PERCENT", label: "%" }, { value: "AMOUNT", label: "Amount" }]} />
+                options={modeOptions} />
               <Box className={classes.baseRateCol} style={{ flex: 1, width: "auto" }}>
                 <label className={classes.rateField} data-error={errors.adjustmentValue ? true : undefined}>
                   <span className={classes.rateFieldText}>
                     <span className={classes.rateFieldLabel}>{typeWord} value</span>
                     <input className={classes.rateFieldInput} data-medium inputMode="decimal"
-                      placeholder={mode === "PERCENT" ? "0.00" : "0.0000"} value={value}
+                      placeholder={mode === "PERCENT" ? "0.00" : (0).toFixed(rateDp)} value={value}
                       onChange={(e) => { setValue(e.currentTarget.value.replace(/,/g, "")); clearApi("adjustmentValue"); }}
                       onBlur={() => touch("adjustmentValue")} />
                   </span>
@@ -350,7 +388,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
                 </Box>
                 {!previewInvalid && (
                   <Text className={classes.previewNote}>
-                    Rounded to {precision?.inverse ?? 6} decimal place, {(precision?.rounding ?? "half up").toLowerCase().replace(/_/g, " ")}
+                    Rounded to {(preview?.precision ?? rules)?.inverse ?? 6} decimal place, {roundingLabel((preview?.precision ?? rules)?.rounding)}
                   </Text>
                 )}
               </Box>
@@ -358,12 +396,10 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
           </Box>
 
           {/* Reason */}
-          <Box className={classes.reviewSection} style={{ gap: 8 }}>
-            <Text className={classes.reasonLabel} mb={0}>Reason for change *</Text>
-            <textarea className={classes.rateTextarea} data-error={errors.reason ? true : undefined} value={reason}
-              placeholder="e.g. New corridor launch for UK → Nigeria" aria-label="Reason for change"
+          <Box className={classes.reviewSection}>
+            <TextareaWithInsideLabel standard label="Reason for change" withAsterisk value={reason}
+              placeholder="e.g. New corridor launch for UK → Nigeria" error={errors.reason || undefined}
               onChange={(e) => { setReason(e.currentTarget.value); clearApi("reason"); }} onBlur={() => reason && touch("reason")} />
-            {errors.reason && <Text className={classes.fieldError}>{errors.reason}</Text>}
           </Box>
 
           {requiresApproval && (

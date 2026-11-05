@@ -1,4 +1,4 @@
-import { Button, TextInput, TableTr, TableTd, Group } from "@mantine/core";
+import { Box, Button, TextInput, TableTr, TableTd, Group, LoadingOverlay } from "@mantine/core";
 import styles from "@/ui/styles/settings.module.scss";
 import {
   IconCalendar,
@@ -6,7 +6,7 @@ import {
   IconSearch,
 } from "@tabler/icons-react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { Fragment, Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { LogData, useLogs } from "@/lib/hooks/logs";
 import dayjs from "dayjs";
 import { useForm, zodResolver } from "@mantine/form";
@@ -136,7 +136,8 @@ function Logs() {
   };
 
   return (
-    <Fragment>
+    <Box pos="relative" mih="calc(100vh - 290px)">
+      <LoadingOverlay visible={loading} zIndex={10} overlayProps={{ radius: "sm", blur: 1 }} loaderProps={{ size: "md" }} />
       <Group
         justify="space-between"
         mt={30}
@@ -204,7 +205,7 @@ function Logs() {
         limit={limit}
         total={Math.ceil((meta?.total ?? 1) / parseInt(limit ?? "10", 10))}
       />
-    </Fragment>
+    </Box>
   );
 }
 

@@ -26,6 +26,48 @@ export interface RateCurrency {
   remittanceEnabled?: boolean;
   conversionInboundEnabled?: boolean;
   conversionOutboundEnabled?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  /** Pairs using this currency; a currency in use can't be deleted */
+  pairCount?: number;
+  canDelete?: boolean;
+}
+
+export type CurrencyFlags = Pick<RateCurrency, "remittanceEnabled" | "conversionInboundEnabled" | "conversionOutboundEnabled">;
+
+export interface CurrencyQuery {
+  search?: string;
+  /** The API takes the strings "true" / "false" */
+  remittance?: string | null;
+  conversionInbound?: string | null;
+  conversionOutbound?: string | null;
+  page: number;
+  limit: number;
+}
+
+/** Settings › Rate Currencies table: GET /currencies, one page at a time. */
+export function useCurrencyList(query: CurrencyQuery) {
+  const [currencies, setCurrencies] = useState<RateCurrency[]>([]);
+  const [meta, setMeta] = useState<PageMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+  const key = JSON.stringify(query);
+
+  const fetchList = useCallback(async () => {
+    setLoading(true);
+    try {
+      const { data } = await ratesAxios.get("/currencies", { params: clean(JSON.parse(key)) });
+      setCurrencies(data.data ?? []);
+      setMeta(data.meta ?? null);
+    } catch {
+      setCurrencies([]);
+      setMeta(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [key]);
+
+  useEffect(() => { fetchList(); }, [fetchList]);
+  return { currencies, meta, loading, revalidate: fetchList };
 }
 
 export type PairStatus = "ENABLED" | "DISABLED" | "PENDING" | "SCHEDULED";
@@ -101,9 +143,14 @@ export interface RatesMeta {
   adjustmentModes: NonNullable<RateAdjustment["mode"]>[];
   auditEvents: { value: string; label: string }[];
   channels: { value: string; label: string }[];
+  chartRanges?: ChartRange[];
+  /** Decimal places for rates and inverse rates, and the rounding rule */
+  precision?: RatePrecision;
   /** When false, a new rate goes live without a second admin's approval */
   makerCheckerEnabled?: boolean;
 }
+
+export interface RatePrecision { rate: number; inverse: number; rounding: string }
 
 export interface ReviewView {
   pair: RatePair;
@@ -166,45 +213,46 @@ export const apiFieldErrors = (error: unknown): Record<string, string> => {
 
 // ─── Hooks ──────────────────────────────────────────────────────────────────
 
+// GET /meta is reference data for every rates form and filter: fetched once and shared
+let metaRequest: Promise<RatesMeta | null> | null = null;
+const metaListeners = new Set<(meta: RatesMeta | null) => void>();
+
+const loadRatesMeta = () => {
+  metaRequest ??= ratesAxios
+    .get("/meta")
+    .then(({ data }) => data.data as RatesMeta)
+    .catch(() => {
+      metaRequest = null; // try again next time a screen needs it
+      return null;
+    });
+  return metaRequest;
+};
+
+/** Refetch after anything that changes the reference data (currencies, pairs). */
+export const invalidateRatesMeta = () => {
+  metaRequest = null;
+  loadRatesMeta().then((meta) => metaListeners.forEach((fn) => fn(meta)));
+};
+
 export function useRatesMeta() {
   const [meta, setMeta] = useState<RatesMeta | null>(null);
   useEffect(() => {
-    ratesAxios
-      .get("/meta")
-      .then(({ data }) => setMeta(data.data))
-      .catch(() => setMeta(null));
+    let active = true;
+    const update = (next: RatesMeta | null) => active && setMeta(next);
+    metaListeners.add(update);
+    loadRatesMeta().then(update);
+    return () => {
+      active = false;
+      metaListeners.delete(update);
+    };
   }, []);
   return meta;
 }
 
-/** GET /currencies is paginated; the pair dialogs need the whole list, so read every page. */
-export function useRateCurrencies(enabled = true) {
-  const [currencies, setCurrencies] = useState<RateCurrency[] | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    if (!enabled) return;
-    let cancelled = false;
-    setLoading(true);
-    (async () => {
-      const all: RateCurrency[] = [];
-      let page = 1;
-      let totalPages = 1;
-      do {
-        const { data } = await ratesAxios.get("/currencies", { params: { page, limit: 100 } });
-        all.push(...((data.data as RateCurrency[] | undefined) ?? []));
-        totalPages = data.meta?.totalPages ?? 1;
-        page += 1;
-      } while (page <= totalPages && page <= 20);
-      if (!cancelled) setCurrencies(all);
-    })()
-      .catch(() => !cancelled && setCurrencies(null))
-      .finally(() => !cancelled && setLoading(false));
-    return () => { cancelled = true; };
-  }, [enabled]);
-
-  return { currencies, loading };
-}
+/** Display labels for the meta enums */
+export const ADJUSTMENT_TYPE_LABEL: Record<string, string> = { NONE: "None", MARKUP: "Mark up", MARKDOWN: "Mark down" };
+export const ADJUSTMENT_MODE_LABEL: Record<string, string> = { PERCENT: "%", AMOUNT: "Amount" };
+export const roundingLabel = (rounding?: string) => (rounding ?? "HALF_UP").toLowerCase().replace(/_/g, " ");
 
 export interface PairQuery {
   status?: string | null;
@@ -347,6 +395,8 @@ export const formatRate = (value?: string | null) => {
 
 export interface AuditQuery {
   pairId?: string | null;
+  /** One currency's configuration changes */
+  currencyCode?: string | null;
   event?: string | null;
   adminId?: string | null;
   channel?: string | null;

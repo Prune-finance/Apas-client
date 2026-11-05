@@ -44,12 +44,12 @@ export default function AuditLogPage() {
             <Text className={classes.pairSubtitle}>Immutable record of every rate-management action. Read-only.</Text>
           </Box>
           {/* The server builds an .xlsx file */}
-          <PrimaryBtn text="Export" leftSection={<Icon name="export-arrow" />} className={classes.exportBtn}
+          <PrimaryBtn text="Export CSV" leftSection={<Icon name="export-arrow" />} className={classes.exportBtn}
             loading={exporting} action={exportFile} />
         </Box>
       </Box>
 
-      <AuditTrail showPair onQueryChange={(q) => { query.current = q; }} />
+      <AuditTrail showPair showStats={false} onQueryChange={(q) => { query.current = q; }} />
     </Box>
   );
 }

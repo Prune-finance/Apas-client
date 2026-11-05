@@ -15,7 +15,7 @@ import {
   RatePairRow,
   RatesMeta,
   ratesAxios,
-  useRateCurrencies,
+  invalidateRatesMeta,
 } from "@/lib/hooks/rates";
 import classes from "../styles.module.scss";
 
@@ -107,9 +107,9 @@ export default function AddPairModal({
   onCreated: () => void;
 }) {
   const { handleSuccess, handleError } = useNotification();
-  // Currencies come from GET /currencies; the meta list is the fallback
-  const { currencies: fetched, loading: currenciesLoading } = useRateCurrencies(opened);
-  const currencies = fetched ?? meta?.currencies ?? [];
+  // Currencies come from the rates reference data (GET /meta)
+  const currencies = meta?.currencies ?? [];
+  const currenciesLoading = !meta;
 
   const [base, setBase] = useState("");
   const [target, setTarget] = useState("");
@@ -174,6 +174,7 @@ export default function AddPairModal({
         enableOnFirstApproval,
       });
       handleSuccess("Pair added", `${code} was created. Set a rate to send it for approval.`);
+      invalidateRatesMeta(); // base currencies can change with a new pair
       onCreated();
       onClose();
     } catch (error) {
@@ -266,8 +267,7 @@ export default function AddPairModal({
         <TextareaWithInsideLabel standard label="Reason for change" withAsterisk
           disabled={saving} value={reason}
           onChange={(e) => { setReason(e.currentTarget.value); setErrors((er) => ({ ...er, reason: "" })); }}
-          placeholder="e.g. New corridor launch for UK → Nigeria" error={errors.reason || undefined}
-          classNames={{ input: classes.reasonInput, label: classes.reasonLabel }} />
+          placeholder="e.g. New corridor launch for UK → Nigeria" error={errors.reason || undefined} />
 
         <Checkbox
           label="Enable after the first rate is approved"

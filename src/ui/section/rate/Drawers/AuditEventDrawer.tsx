@@ -7,7 +7,7 @@ import utc from "dayjs/plugin/utc";
 import useNotification from "@/lib/hooks/notification";
 import { apiMessage, AuditEventDetail, ratesAxios } from "@/lib/hooks/rates";
 import classes from "../styles.module.scss";
-import { Avatar, EVENT_TONE, GREY, Icon } from "../shared";
+import { Avatar, EVENT_TONE, formatChangeValue, GREY, Icon } from "../shared";
 
 dayjs.extend(utc);
 
@@ -86,8 +86,8 @@ export default function AuditEventDrawer({ eventId, onClose }: { eventId: string
                   {event.changes.map((c) => (
                     <tr key={c.field}>
                       <td className={classes.changeLabel}>{c.label}</td>
-                      <td className={c.changed ? classes.drawerBefore : classes.changeSameMuted}>{c.before ?? "-"}</td>
-                      <td className={c.changed ? classes.drawerAfter : classes.changeSame}>{c.after ?? "-"}</td>
+                      <td className={c.changed ? classes.drawerBefore : classes.changeSameMuted}>{formatChangeValue(c.field, c.before)}</td>
+                      <td className={c.changed ? classes.drawerAfter : classes.changeSame}>{formatChangeValue(c.field, c.after)}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -15,7 +15,7 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import CountryFlag from "@/ui/components/CountryFlag";
 import useNotification from "@/lib/hooks/notification";
-import { apiMessage, PairStatus, RatePairRow, ratesAxios, useRatePairs, useRatesMeta } from "@/lib/hooks/rates";
+import { apiMessage, formatRate, PairStatus, RatePairRow, ratesAxios, useRatePairs, useRatesMeta } from "@/lib/hooks/rates";
 import classes from "@/ui/section/rate/styles.module.scss";
 import DisableRateModal from "@/ui/section/rate/Modals/DisableRateModal";
 import EnablePairModal from "@/ui/section/rate/Modals/EnablePairModal";
@@ -111,8 +111,16 @@ export default function RatePage() {
 
   return (
     <Box className={classes.page}>
-      <Flex className={classes.header} justify="space-between" align="center" gap={16} wrap="wrap">
-        <Title order={2} fz={20} fw={500} c="var(--prune-text-gray-700)" style={{ fontFamily: "'EksellDisplay', serif" }}>Rates</Title>
+      {/* Same header as Eligibility Center */}
+      <Flex justify="space-between" align="flex-start" gap={16} wrap="wrap">
+        <Box>
+          <Title order={2} fw={700}>
+            Rates
+          </Title>
+          <Text fz={14} c="var(--prune-text-gray-500)" mt={4}>
+            View and manage all currency pairs and their rates on the platform.
+          </Text>
+        </Box>
         <Group gap={10}>
           <SecondaryBtn text="Audit Log" icon={IconFileText} link="/admin/rate/audit-log" fw={600} fz={14} />
           <PrimaryBtn text="Add Pair" icon={IconPlus} action={() => setAddOpen(true)} fw={600} fz={14} />
@@ -170,8 +178,12 @@ export default function RatePage() {
 
       <Box mt={24} className={classes.tableWrap}>
         <TableComponent loading={loading} head={["", "Currency Pair", "Base Rate", "Adjustment", "Final Rate", "Status", "Effective from", "Actions"]} columnWidths={[51, undefined, 113, 114, 113, 120, 120, 93]} className={classes.table} rows={pairs.map(row => {
+          // `rate` is the latest change, which may still be pending or scheduled;
+          // `liveFinalRate` is what transactions use right now
           const rate = row.rate;
           const adjustment = rate?.adjustment;
+          const proposed = rate && rate.status !== "LIVE";
+          const proposedNote = rate?.status === "SCHEDULED" ? "Scheduled" : "Proposed";
           return <TableTr key={row.id}>
             <TableTd>
               <Switch aria-label={`${row.enabled ? "Disable" : "Enable"} ${row.code}`} checked={row.enabled}
@@ -192,7 +204,10 @@ export default function RatePage() {
               </Link>
             </TableTd>
             {/* Rates are strings from the API — shown as-is, never recalculated */}
-            <TableTd>{rate?.baseRate ?? "—"}</TableTd>
+            <TableTd>
+              <Text fz={14} lh={1}>{rate ? formatRate(rate.baseRate) : "—"}</Text>
+              {proposed && <Text fz={12} mt={4} c="var(--prune-text-gray-500)">{proposedNote}</Text>}
+            </TableTd>
             <TableTd>
               {!adjustment?.label ? "None" : (
                 <Badge className={classes.badge}
@@ -202,7 +217,10 @@ export default function RatePage() {
                 </Badge>
               )}
             </TableTd>
-            <TableTd><Text fz={14} fw={700}>{rate?.finalRate ?? "—"}</Text></TableTd>
+            <TableTd>
+              <Text fz={14} fw={700} lh={1}>{row.liveFinalRate ? formatRate(row.liveFinalRate) : "—"}</Text>
+              {proposed && <Text fz={12} mt={4} c="var(--prune-text-gray-500)">{proposedNote}: {formatRate(rate.finalRate)}</Text>}
+            </TableTd>
             <TableTd>
               <Badge className={classes.badge} bg={statusColors[row.status]?.[0]} c={statusColors[row.status]?.[1]}>
                 {statusLabel(row.status)}

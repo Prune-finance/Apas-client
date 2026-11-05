@@ -11,12 +11,11 @@ import { AdminCell, DateRange, FilterDateRange, FilterSelect, Icon, Pill, rangeP
 
 // Figma: Rate History tab (15678:366738)
 
-const RANGES: { value: ChartRange; label: string }[] = [
-  { value: "7D", label: "Last 7 Days" },
-  { value: "30D", label: "Last 30 Days" },
-  { value: "90D", label: "Last 90 Days" },
-  { value: "1Y", label: "Last 1 Year" },
-];
+// Labels for the chart ranges the API offers (meta.chartRanges)
+const RANGE_LABEL: Record<string, string> = {
+  "7D": "Last 7 Days", "30D": "Last 30 Days", "90D": "Last 90 Days", "1Y": "Last 1 Year",
+};
+const DEFAULT_RANGES: ChartRange[] = ["7D", "30D", "90D", "1Y"];
 
 // Rate History badge per the integration guide
 const STATUS: Record<ChangeStatus, { label: string; tone: Tone }> = {
@@ -27,24 +26,26 @@ const STATUS: Record<ChangeStatus, { label: string; tone: Tone }> = {
   REJECTED: { label: "Rejected", tone: ["#fff3f0", "#db340b"] },
 };
 
-const ADJUSTMENTS = [
-  { value: "NONE", label: "No adjustment" },
-  { value: "MARKUP", label: "Markup" },
-  { value: "MARKDOWN", label: "Markdown" },
-];
+const ADJUSTMENT_FILTER_LABEL: Record<string, string> = { NONE: "No adjustment", MARKUP: "Markup", MARKDOWN: "Markdown" };
 
 // Plot area matches Figma: 129px tall, 4 gridlines 40px apart, 4px inset for the points
 const PLOT_H = 120;
 const TOP = 4.5;
 
 function FinalRateChart({ chart }: { chart: PairChart }) {
-  const values = chart.points.map((p) => (p.finalRate === null ? null : Number(p.finalRate)));
-  const known = values.filter((v): v is number => v !== null);
+  // The API sends a point only when the rate changed (e.g. 09 Dec, 12 Dec in a 7-day range),
+  // so points are placed by date across from → to, not spaced evenly
+  const start = dayjs(chart.from).startOf("day").valueOf();
+  const end = Math.max(dayjs(chart.to).valueOf(), start + 1);
+  const pts = chart.points
+    .filter((p): p is { date: string; finalRate: string } => p.finalRate !== null)
+    .map((p) => ({ date: p.date, at: dayjs(p.date).valueOf(), v: Number(p.finalRate), raw: p.finalRate }))
+    .sort((a, b) => a.at - b.at);
 
   const scale = useMemo(() => {
-    if (!known.length) return null;
-    let min = Math.min(...known);
-    let max = Math.max(...known);
+    if (!pts.length) return null;
+    let min = Math.min(...pts.map((p) => p.v));
+    let max = Math.max(...pts.map((p) => p.v));
     if (min === max) { min -= 1; max += 1; }
     const pad = (max - min) * 0.1;
     min -= pad; max += pad;
@@ -54,22 +55,18 @@ function FinalRateChart({ chart }: { chart: PairChart }) {
 
   if (!scale) return <Box className={classes.chartEmpty}>No live rate in this period yet</Box>;
 
-  const n = values.length;
-  const x = (i: number) => (n === 1 ? 50 : (i / (n - 1)) * 100);
+  const x = (at: number) => Math.min(100, Math.max(0, ((at - start) / (end - start)) * 100));
   const y = (v: number) => TOP + PLOT_H - ((v - scale.min) / (scale.max - scale.min)) * PLOT_H;
 
-  // Gaps where finalRate is null (days before the pair had a live rate)
-  const segments: { i: number; v: number }[][] = [];
-  values.forEach((v, i) => {
-    if (v === null) return;
-    const last = segments[segments.length - 1];
-    if (last && last[last.length - 1].i === i - 1) last.push({ i, v });
-    else segments.push([{ i, v }]);
-  });
+  // A rate stays live until the next change, so the line carries the last value to the end of the range
+  const line = [...pts.map((p) => ({ x: x(p.at), y: y(p.v) })), { x: 100, y: y(pts[pts.length - 1].v) }];
+  const d = line.map((p, k) => `${k ? "L" : "M"}${p.x},${p.y}`).join(" ");
+  const area = `${d} L100,${TOP + PLOT_H} L${line[0].x},${TOP + PLOT_H} Z`;
 
-  // At most 9 date labels, like the design
-  const step = Math.max(1, Math.ceil(n / 9));
-  const labels = chart.points.filter((_, i) => i % step === 0 || i === n - 1);
+  // Up to 9 evenly spaced date labels across the range, like the design
+  const days = Math.max(1, Math.round((end - start) / 86_400_000));
+  const count = Math.min(9, days + 1);
+  const labels = Array.from({ length: count }, (_, i) => dayjs(start + ((end - start) * i) / Math.max(1, count - 1)));
   const fmt = (v: number) => Math.round(v).toLocaleString("en-GB");
 
   return (
@@ -84,22 +81,14 @@ function FinalRateChart({ chart }: { chart: PairChart }) {
             {[0, 40, 80, 120].map((g) => (
               <line key={g} x1={0} x2={100} y1={TOP + g} y2={TOP + g} stroke="#EAECF0" strokeWidth={1} vectorEffect="non-scaling-stroke" />
             ))}
-            {segments.map((seg, si) => {
-              const d = seg.map((p, k) => `${k ? "L" : "M"}${x(p.i)},${y(p.v)}`).join(" ");
-              const area = `${d} L${x(seg[seg.length - 1].i)},${TOP + PLOT_H} L${x(seg[0].i)},${TOP + PLOT_H} Z`;
-              return (
-                <g key={si}>
-                    <path d={area} fill="#C1DD06" opacity={0.18} />
-                    <path d={d} fill="none" stroke="#758604" strokeWidth={2.5} vectorEffect="non-scaling-stroke"
-                      strokeLinejoin="round" strokeLinecap="round" />
-                </g>
-              );
-            })}
+            <path d={area} fill="#C1DD06" opacity={0.18} />
+            <path d={d} fill="none" stroke="#758604" strokeWidth={2.5} vectorEffect="non-scaling-stroke"
+              strokeLinejoin="round" strokeLinecap="round" />
           </svg>
           {/* Points are HTML so they stay round while the SVG stretches to the width */}
-          {segments.flat().map((p) => (
-            <span key={p.i} title={`${chart.points[p.i].date}: ${chart.points[p.i].finalRate}`} style={{
-              position: "absolute", left: `${x(p.i)}%`, top: y(p.v), width: 8, height: 8,
+          {pts.map((p) => (
+            <span key={p.date} title={`${dayjs(p.date).format("DD MMM YYYY")}: ${formatRate(p.raw)}`} style={{
+              position: "absolute", left: `${x(p.at)}%`, top: y(p.v), width: 8, height: 8,
               transform: "translate(-50%, -50%)", borderRadius: "50%", background: "white",
               border: "2px solid #758604", boxSizing: "border-box",
             }} />
@@ -107,7 +96,7 @@ function FinalRateChart({ chart }: { chart: PairChart }) {
         </Box>
       </Box>
       <Box className={classes.chartXAxis}>
-        {labels.map((p) => <span key={p.date}>{dayjs(p.date).format("DD MMM")}</span>)}
+        {labels.map((l, i) => <span key={i}>{l.format("DD MMM")}</span>)}
       </Box>
     </Box>
   );
@@ -159,7 +148,7 @@ export default function RateHistory({ pairId, quote, version, onReview }: {
               {chart ? ` · ${dayjs(chart.from).format("DD MMM")} – ${dayjs(chart.to).format("DD MMM YYYY")}` : ""}
             </Text>
           </Box>
-          <Select className={classes.chartRange} data={RANGES} value={range} allowDeselect={false}
+          <Select className={classes.chartRange} data={(meta?.chartRanges ?? DEFAULT_RANGES).map((r) => ({ value: r, label: RANGE_LABEL[r] ?? r }))} value={range} allowDeselect={false}
             onChange={(v) => v && setRange(v as ChartRange)} aria-label="Chart range"
             classNames={{ input: classes.rangeInput, section: classes.auditSection }}
             rightSection={<Icon name="chevron-down" />} rightSectionPointerEvents="none" rightSectionWidth={49} />
@@ -179,7 +168,7 @@ export default function RateHistory({ pairId, quote, version, onReview }: {
           <FilterSelect width={188} placeholder="All Administrator" aria-label="Filter by administrator" searchable
             data={(meta?.administrators ?? []).map((a) => ({ value: a.id, label: a.name }))}
             value={filters.adminId} onChange={(v) => set("adminId", v)} />
-          <FilterSelect width={172} placeholder="All Adjustment" aria-label="Filter by adjustment" data={ADJUSTMENTS}
+          <FilterSelect width={172} placeholder="All Adjustment" aria-label="Filter by adjustment" data={(meta?.adjustmentTypes ?? ["NONE", "MARKUP", "MARKDOWN"]).map((t) => ({ value: t, label: ADJUSTMENT_FILTER_LABEL[t] ?? t }))}
             value={filters.adjustment} onChange={(v) => set("adjustment", v)} />
           <UnstyledButton className={classes.clearFilter} onClick={() => { setFilters(EMPTY); setActive(1); }}>
             Clear Filter

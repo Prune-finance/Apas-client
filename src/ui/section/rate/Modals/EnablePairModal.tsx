@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Box, Modal, Text, UnstyledButton } from "@mantine/core";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
 import classes from "../styles.module.scss";
 import { Icon } from "../shared";
 
@@ -70,13 +71,9 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
           )}
 
           {/* Reason */}
-          <Box>
-            <Text className={classes.reasonLabel}>Reason for change *</Text>
-            <textarea className={classes.rateTextarea} data-error={error || undefined} value={reason}
-              placeholder="e.g. New corridor launch for UK → Nigeria" aria-label="Reason for change"
-              onChange={(e) => { setReason(e.currentTarget.value); setError(""); }} />
-            {error && <Text className={classes.fieldError} mt={8}>{error}</Text>}
-          </Box>
+          <TextareaWithInsideLabel standard label="Reason for change" withAsterisk value={reason}
+            placeholder="e.g. New corridor launch for UK → Nigeria" error={error || undefined}
+            onChange={(e) => { setReason(e.currentTarget.value); setError(""); }} />
 
           <Box className={classes.addDivider} />
 

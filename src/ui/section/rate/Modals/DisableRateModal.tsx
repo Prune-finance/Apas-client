@@ -1,8 +1,9 @@
 "use client";
 
-import { ActionIcon, Box, Group, Modal, Stack, Text, Textarea } from "@mantine/core";
+import { ActionIcon, Box, Group, Modal, Stack, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
+import { TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
 import classes from "../styles.module.scss";
 
 const consequences = [
@@ -49,9 +50,8 @@ export default function DisableRateModal({ pair, onClose, onConfirm, processing 
               <Text fz={14} fw={400} lh={1.5}>{message}</Text>
             </Group>)}
           </Stack>
-          <Textarea label="Reason for change" withAsterisk
+          <TextareaWithInsideLabel standard label="Reason for change" withAsterisk
             placeholder="e.g. New corridor launch for UK → Nigeria"
-            minRows={2} classNames={{ input: classes.disableReason, label: classes.disableReasonLabel }}
             {...form.getInputProps("reason")} />
         </Stack>
         <Group justify="space-between" className={classes.disableFooter}>

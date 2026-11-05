@@ -3,6 +3,7 @@
 import { Select, SelectProps } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
+import { formatRate } from "@/lib/hooks/rates";
 import classes from "./styles.module.scss";
 
 export function Icon({ name }: { name: string }) {
@@ -96,3 +97,18 @@ export const rangeParams = ([start, end]: DateRange) =>
   start && end
     ? { from: dayjs(start).format("YYYY-MM-DD"), to: dayjs(end).format("YYYY-MM-DD") }
     : { from: null, to: null };
+
+// "What changed" values arrive raw (ISO dates, enum codes, plain decimals)
+const CHANGE_STATUS_LABEL: Record<string, string> = {
+  LIVE: "Live", SCHEDULED: "Scheduled", PENDING_APPROVAL: "Pending approval", SUPERSEDED: "Superseded", REJECTED: "Rejected",
+  ENABLED: "Enabled", DISABLED: "Disabled", PENDING: "Pending",
+};
+const RATE_FIELDS = new Set(["baseRate", "finalRate", "inverseRate", "previousValue", "newValue"]);
+
+export function formatChangeValue(field: string, value: string | null | undefined) {
+  if (value === null || value === undefined || value === "") return "-";
+  if (/^\d{4}-\d{2}-\d{2}T/.test(value) && dayjs(value).isValid()) return dayjs(value).format("DD MMM YYYY, HH:mm");
+  if (RATE_FIELDS.has(field)) return formatRate(value);
+  if (value === "true" || value === "false") return value === "true" ? "Yes" : "No";
+  return CHANGE_STATUS_LABEL[value] ?? value;
+}

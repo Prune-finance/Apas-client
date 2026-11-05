@@ -18,6 +18,7 @@ import {
   ratesAxios,
   usePairChanges,
   usePairDetail,
+  roundingLabel,
   useRatesMeta,
 } from "@/lib/hooks/rates";
 import { inter } from "@/ui/fonts";
@@ -251,7 +252,8 @@ export default function PairPage({ params }: { params: { id: string } }) {
                 <Box className={classes.infoNotice}>
                   <Icon name="shield" />
                   <Text className={classes.infoNoticeText}>
-                    {pair.pendingChange ? "A rate is waiting for approval" : "No rate set yet"}
+                    {pair.pendingChange ? "A rate is waiting for approval"
+                      : pair.scheduledChange ? "An approved rate is scheduled to go live" : "No rate set yet"}
                   </Text>
                   <UnstyledButton className={classes.smallBlueBtn} onClick={openRate}>
                     {pair.pendingChange ? "Review" : "Set rate"}
@@ -281,13 +283,24 @@ export default function PairPage({ params }: { params: { id: string } }) {
                 </Box>
                 <Box className={classes.precisionRow}>
                   <Text fz={12} lh={1} c="#667085" style={{ flex: 1 }}>
-                    Precision: {pair.precision?.inverse ?? 6} dp · Rounding: half-up
+                    Precision: {(pair.precision ?? ratesMeta?.precision)?.inverse ?? 6} dp · Rounding: {roundingLabel((pair.precision ?? ratesMeta?.precision)?.rounding).replace(" ", "-")}
                   </Text>
                   <Icon name="lock" />
                 </Box>
               </Box>
             )}
             </Box>
+
+            {/* Approved change waiting for its effective date */}
+            {pair.scheduledChange && (
+              <Box className={classes.infoNotice}>
+                <Icon name="clock" />
+                <Text className={classes.infoNoticeText}>
+                  Scheduled: {formatRate(pair.scheduledChange.finalRate)} {pair.targetCurrency.code} goes live on{" "}
+                  {dayjs(pair.scheduledChange.effectiveFrom).format("DD MMM YYYY, HH:mm")}
+                </Text>
+              </Box>
+            )}
 
             {/* Pending change awaiting a checker (Figma 15673:335238) */}
             {pair.pendingChange && (() => {
@@ -341,7 +354,7 @@ export default function PairPage({ params }: { params: { id: string } }) {
       <EnablePairModal pair={enableOpen ? { code: pair.code, statusLabel: badge.label, hasLiveRate: !!live } : null}
         processing={toggling} onClose={() => setEnableOpen(false)} onConfirm={(reason) => setEnabled(true, reason)} />
       <SetRateDrawer pair={rateTarget} onClose={() => setRateTarget(null)} onSubmitted={refresh} notify={showToast}
-        requiresApproval={ratesMeta?.makerCheckerEnabled ?? true} precision={pair.precision} />
+        requiresApproval={ratesMeta?.makerCheckerEnabled ?? true} precision={pair.precision ?? ratesMeta?.precision} />
       <RateToast toast={toast} onClose={hideToast} />
       <ReviewChangeDrawer changeId={reviewId} onClose={() => setReviewId(null)} onReviewed={refresh} />
     </Box>

@@ -29,7 +29,10 @@ import {
 type Filters = { event: string | null; adminId: string | null; channel: string | null; range: DateRange };
 const EMPTY: Filters = { event: null, adminId: null, channel: null, range: [null, null] };
 
-const flagStyle = { borderRadius: "50%", objectFit: "cover" as const, width: 24, height: 24 };
+// Same round flags as the Rates table (Figma 15677:340996)
+const flagStyle = {
+  borderRadius: "50%", objectFit: "cover" as const, width: 24, height: 24, boxShadow: "0 0 0 2px #fff", background: "#fff",
+};
 
 function ExpandedRow({ log, colSpan, onView }: { log: AuditLogRow; colSpan: number; onView: () => void }) {
   const m = log.metadata;

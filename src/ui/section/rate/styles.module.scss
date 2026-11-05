@@ -44,8 +44,9 @@
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  padding-left: 2px; // room for the first flag's white ring
   img { width: 24px; height: 24px; border-radius: 50%; object-fit: cover; }
-  img + img { margin-left: -4px; }
+  img + img { position: relative; margin-left: -4px; }
 }
 .switchTrack { width: 40px; min-width: 40px; height: 24px; cursor: pointer; }
 @media (max-width: 48em) {
@@ -242,7 +243,8 @@
 .flagGroup {
   display: flex;
   flex-shrink: 0;
-  img + img { margin-left: -4px; }
+  padding-left: 2px;
+  img + img { position: relative; margin-left: -4px; }
 }
 
 

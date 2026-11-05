@@ -31,8 +31,10 @@ const statusColors: Record<PairStatus, [string, string]> = {
   ENABLED: ["#E8FAF0", "#12B76A"], DISABLED: ["#EAECF0", "#667085"],
   PENDING: ["#FFFAE6", "#B86E00"], SCHEDULED: ["#FAFFE6", "#8AA600"],
 };
-// Figma flag group: 24px circles, the second overlapping by 4px
-const roundFlag = { borderRadius: "50%", objectFit: "cover" as const, width: 24, height: 24 };
+// Figma flag group (15677:340996): 24px circles with a 2px white ring, the second overlapping by 4px
+const roundFlag = {
+  borderRadius: "50%", objectFit: "cover" as const, width: 24, height: 24, boxShadow: "0 0 0 2px #fff", background: "#fff",
+};
 
 const statusLabel = (s: string) => s.charAt(0) + s.slice(1).toLowerCase();
 

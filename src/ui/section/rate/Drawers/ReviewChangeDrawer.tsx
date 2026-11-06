@@ -102,14 +102,16 @@ export default function ReviewChangeDrawer({
 
   const act = async (kind: "approve" | "reject") => {
     if (!changeId) return;
-    // Same rule as the API: a rejection needs a reason of at least 3 characters
-    if (kind === "reject" && comment.trim().length < 3) {
-      setCommentError("Say why the change is rejected (at least 3 characters)");
+    // The checker comment is required for both decisions (at least 3 characters, the API's rule for rejections)
+    if (comment.trim().length < 3) {
+      setCommentError(kind === "reject"
+        ? "Say why the change is rejected (at least 3 characters)"
+        : "Add a comment for this approval (at least 3 characters)");
       return;
     }
     setActing(kind);
     try {
-      const { data } = await ratesAxios.post(`/changes/${changeId}/${kind}`, comment.trim() ? { comment: comment.trim() } : {});
+      const { data } = await ratesAxios.post(`/changes/${changeId}/${kind}`, { comment: comment.trim() });
       handleSuccess(kind === "approve" ? "Rate approved" : "Rate rejected", data.message ?? "");
       onReviewed();
       onClose();
@@ -222,8 +224,8 @@ export default function ReviewChangeDrawer({
           {/* Checker comment */}
           {canReview ? (
             <Box className={classes.reviewSection}>
-              <TextInputWithInsideLabel standard label="Checker comment" value={comment}
-                placeholder="Add a comment (required when rejecting)" error={commentError}
+              <TextInputWithInsideLabel standard label="Checker comment" withAsterisk value={comment}
+                placeholder="e.g. Rate within tolerance" error={commentError}
                 onChange={(e) => { setComment(e.currentTarget.value); setCommentError(null); }} />
             </Box>
           ) : (

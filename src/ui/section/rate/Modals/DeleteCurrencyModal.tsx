@@ -57,7 +57,7 @@ export default function DeleteCurrencyModal({ currency, onClose, onDeleted }: {
           <Box className={classes.enableHeader}>
             <span className={classes.enableIcon} style={{ background: "#fff3f0" }}><Icon name="disable" /></span>
             <Box className={classes.enableHeading}>
-              <Text id="delete-currency-title" className={classes.addTitle} style={{ fontFamily: "'EksellDisplay', serif", fontWeight: 400 }}>
+              <Text id="delete-currency-title" className={classes.addTitle} style={{ fontFamily: "'EksellDisplaySmall', serif", fontWeight: 700 }}>
                 Delete {currency.code}
               </Text>
               <Text className={classes.enableStatus}>{currency.name}</Text>

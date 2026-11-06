@@ -67,6 +67,15 @@
   font-style: normal;
   font-display: swap;
 }
+// Small cut on its own: Eksell ships no bold, so a bold title on this family is thickened by the
+// browser instead of switching to the tighter Large cut
+@font-face {
+  font-family: "EksellDisplaySmall";
+  src: url("/fonts/eksell/EksellDisplay-Small.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 @font-face {
   font-family: "EksellDisplayStencil";
   src: url("/fonts/eksell/EksellDisplay-Stencil.ttf") format("truetype");

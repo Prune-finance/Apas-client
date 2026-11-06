@@ -43,7 +43,7 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
           <Box className={classes.enableHeader}>
             <span className={classes.enableIcon}><Icon name="power" /></span>
             <Box className={classes.enableHeading}>
-              <Text id="enable-pair-title" className={classes.addTitle} style={{ fontFamily: "'EksellDisplay', serif", fontWeight: 400 }}>Enable {pair.code.replace(/\s/g, "")}</Text>
+              <Text id="enable-pair-title" className={classes.addTitle} style={{ fontFamily: "'EksellDisplaySmall', serif", fontWeight: 700 }}>Enable {pair.code.replace(/\s/g, "")}</Text>
               <Text className={classes.enableStatus}>Currently {pair.statusLabel}</Text>
             </Box>
             <UnstyledButton className={classes.addClose} onClick={onClose} aria-label="Close">

@@ -200,7 +200,7 @@ export default function AddPairModal({
         <Box className={classes.addHeader}>
           <Box>
             <Text id="add-pair-title" className={classes.addTitle}
-              style={{ fontFamily: "'EksellDisplay', serif", fontWeight: 400 }}>Add Currency Pair</Text>
+              style={{ fontFamily: "'EksellDisplaySmall', serif", fontWeight: 700 }}>Add Currency Pair</Text>
             <Text className={classes.addSubtitle} style={{ fontFamily: inter.style.fontFamily }}>
               Create a new pair. You can set its rate after the pair is created.
             </Text>

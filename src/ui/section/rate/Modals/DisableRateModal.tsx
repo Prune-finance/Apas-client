@@ -36,7 +36,7 @@ export default function DisableRateModal({ pair, onClose, onConfirm, processing 
         <Group className={classes.disableHeader} wrap="nowrap" gap={22}>
           <Box className={classes.disableIcon}><ModalIcon name="disable" /></Box>
           <Box flex={1}>
-            <Text id="disable-rate-title" fz={24} fw={600} lh={1.2} style={{ fontFamily: "'EksellDisplay', serif", fontWeight: 400 }}>Disable {pair.code}</Text>
+            <Text id="disable-rate-title" fz={24} fw={600} lh={1.2} style={{ fontFamily: "'EksellDisplaySmall', serif", fontWeight: 700 }}>Disable {pair.code}</Text>
             <Text fz={14} lh={1} c="var(--prune-text-gray-500)" mt={8}>Currently {pair.statusLabel}</Text>
           </Box>
           <ActionIcon variant="transparent" size={24} aria-label="Close disable confirmation" onClick={onClose}>

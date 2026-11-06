@@ -81,10 +81,10 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
           <Box className={classes.addDivider} />
 
           <Box className={classes.addFooter}>
-            <SecondaryBtn text="Cancel" action={onClose} h={48} px={32} fz={14} fw={500}
+            <SecondaryBtn text="Cancel" action={onClose} fz={14} fw={600}
               bg="#fbfee6" bd="none" c="#344054" />
             <PrimaryBtn text="Enable" action={submit} loading={processing}
-              h={48} px={32} fz={14} fw={500} c="#344054" color="#c1dd06" />
+              fz={14} fw={600} c="#344054" color="#c1dd06" />
           </Box>
         </Box>
       )}

@@ -443,10 +443,10 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
           )}
 
           <Box className={classes.reviewFooter}>
-            <SecondaryBtn text="Cancel" action={onClose} h={48} px={32} fz={14} fw={500}
+            <SecondaryBtn text="Cancel" action={onClose} fz={14} fw={600}
               bg="#fbfee6" bd="none" c="#344054" />
             <PrimaryBtn text={requiresApproval ? "Submit for approval" : "Set rate"} action={submit} loading={saving}
-              disabled={disabled} h={48} px={32} fz={14} fw={500} c={disabled ? "#98a2b3" : "#344054"}
+              disabled={disabled} fz={14} fw={600} c={disabled ? "#98a2b3" : "#344054"}
               color={disabled ? "#eaecf0" : "#c1dd06"} />
           </Box>
         </>

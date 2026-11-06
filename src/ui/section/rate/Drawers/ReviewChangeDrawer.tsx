@@ -239,10 +239,10 @@ export default function ReviewChangeDrawer({
 
           {/* Footer */}
           <Box className={classes.reviewFooter}>
-            <PrimaryBtn text="Reject" h={48} px={32} fz={14} fw={500}
+            <PrimaryBtn text="Reject" fz={14} fw={600}
               color={canReview ? "#ff5226" : "#eaecf0"} c={canReview ? "white" : "#98a2b3"}
               disabled={!canReview || !!acting} loading={acting === "reject"} action={() => act("reject")} />
-            <PrimaryBtn text="Approve & activate" h={48} px={32} fz={14} fw={500}
+            <PrimaryBtn text="Approve & activate" fz={14} fw={600}
               color={canReview ? "#c1dd06" : "#eaecf0"} c={canReview ? "#344054" : "#98a2b3"}
               disabled={!canReview || !!acting} loading={acting === "approve"} action={() => act("approve")} />
           </Box>

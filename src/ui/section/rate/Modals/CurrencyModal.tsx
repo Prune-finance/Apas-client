@@ -332,10 +332,8 @@ export default function CurrencyModal({
             text="Cancel"
             action={onClose}
             disabled={saving}
-            h={48}
-            px={32}
             fz={14}
-            fw={500}
+            fw={600}
             bg="#fbfee6"
             bd="none"
             c="#344054"
@@ -344,10 +342,8 @@ export default function CurrencyModal({
             text={editing ? "Save changes" : "Add currency"}
             type="submit"
             loading={saving}
-            h={48}
-            px={32}
             fz={14}
-            fw={500}
+            fw={600}
             c="#344054"
             color="#c1dd06"
           />

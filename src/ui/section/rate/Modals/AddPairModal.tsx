@@ -282,10 +282,10 @@ export default function AddPairModal({
 
         {/* Footer */}
         <Box className={classes.addFooter}>
-          <SecondaryBtn text="Cancel" action={onClose} disabled={saving} h={48} px={32} fz={14} fw={500}
+          <SecondaryBtn text="Cancel" action={onClose} disabled={saving} fz={14} fw={600}
             bg="#fbfee6" bd="none" c="#344054" />
           <PrimaryBtn text="Create pair" type="submit" loading={saving} disabled={blocked}
-            h={48} px={32} fz={14} fw={500} c={blocked ? "#98a2b3" : "#344054"}
+            fz={14} fw={600} c={blocked ? "#98a2b3" : "#344054"}
             color={blocked ? "#eaecf0" : "#c1dd06"} />
         </Box>
       </form>

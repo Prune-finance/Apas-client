@@ -306,12 +306,10 @@
   white-space: nowrap;
 }
 .dot { width: 6px; height: 6px; margin: 1px; border-radius: 9999px; background: currentColor; }
+// Pair header buttons: default button size, like Add Pair on the Rates page
 .largeBtn {
-  height: 48px !important;
-  padding: 0 32px !important;
   font-size: 14px !important;
-  font-weight: 500 !important;
-  box-shadow: 0 0 0.5px #1414141f, 0 1px 4px #14141414;
+  font-weight: 600 !important;
 }
 
 .pairTabs { display: flex; flex-direction: column; gap: 32px; }
@@ -511,7 +509,9 @@
   &[data-checked] { background: #c1dd06; border-color: #c1dd06; }
 }
 .overviewRow { display: flex; flex-wrap: wrap; gap: 24px; width: 100%; }
-.overviewRow .liveCard { flex: 1 1 696px; max-width: 696px; }
+// Figma row (15673:335206): live card 696 : inverse card 284, filling the width at any screen size.
+// Below ~900px the inverse card wraps under the live card.
+.overviewRow .liveCard { flex: 696 1 560px; min-width: 0; }
 .grayNotice {
   display: flex;
   align-items: center;
@@ -526,7 +526,8 @@
 }
 .inverseCard {
   display: flex;
-  flex: 0 0 284px;
+  flex: 284 1 284px;
+  min-width: 0;
   flex-direction: column;
   gap: 16px;
   padding: 16px 24px;
@@ -579,13 +580,10 @@
 .auditPage { display: flex; flex-direction: column; gap: 48px; padding: 0 20px; color: #344054; }
 .auditBody { display: flex; flex-direction: column; gap: 24px; }
 .exportBtn {
-  height: 48px !important;
-  padding: 0 32px !important;
   background: #f2f4f7 !important;
   color: #344054 !important;
   font-size: 14px !important;
-  font-weight: 500 !important;
-  box-shadow: 0 0 0.5px #1414141f, 0 1px 4px #14141414;
+  font-weight: 600 !important;
 }
 .auditSection { width: 24px !important; }
 
@@ -663,12 +661,10 @@
   white-space: nowrap;
 }
 .reviewRateBtn {
-  height: 48px !important;
-  padding: 0 32px !important;
   background: #ffd84d !important;
   color: #344054 !important;
   font-size: 14px !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
 }
 .pendingBannerBody { display: flex; flex-direction: column; gap: 9px; line-height: 1; }
 .pendingBannerMain { font-size: 14px; color: #344054; }

@@ -92,10 +92,10 @@ export default function DeleteCurrencyModal({ currency, onClose, onDeleted }: {
           <Box className={classes.addDivider} />
 
           <Box className={classes.addFooter}>
-            <SecondaryBtn text="Cancel" action={onClose} disabled={saving} h={48} px={32} fz={14} fw={500}
+            <SecondaryBtn text="Cancel" action={onClose} disabled={saving} fz={14} fw={600}
               bg="#fbfee6" bd="none" c="#344054" />
             <PrimaryBtn text="Delete currency" type="submit" loading={saving} disabled={blocked}
-              h={48} px={32} fz={14} fw={500} c={blocked ? "#98a2b3" : "white"} color={blocked ? "#eaecf0" : "#FF5226"} />
+              fz={14} fw={600} c={blocked ? "#98a2b3" : "white"} color={blocked ? "#eaecf0" : "#FF5226"} />
           </Box>
         </form>
       )}

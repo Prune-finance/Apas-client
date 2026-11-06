@@ -41,7 +41,18 @@
   // Actions: header and the menu button share the column's centre
   th:last-child, td:last-child { text-align: center; }
 }
-.badge { height: 20px; padding: 4px 8px; font-size: 12px; line-height: 1; font-weight: 500; text-transform: none; }
+// Badge: 12px text in a 20px pill. The label needs room for descenders ("g" in Pending),
+// so it gets a 14px line instead of Mantine's clipped 1em line.
+.badge {
+  height: 20px;
+  padding: 3px 8px;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  text-transform: none;
+
+  :global(.mantine-Badge-label) { overflow: visible; line-height: 14px; }
+}
 .flags {
   display: flex;
   align-items: center;
@@ -962,10 +973,13 @@
 .dateFieldSection { justify-content: flex-start; padding-left: 11px; }
 
 // Segmented controls
+// Figma Segmented Control (15673:335058): 40px tall, 4px padding, every segment fills the 32px inside.
+// No `flex: 1` here: in the drawer's column layout it overrode the height and squashed the control.
 .segmented {
   display: flex;
-  flex: 1;
-  align-items: center;
+  flex: none;
+  width: 100%;
+  align-items: stretch;
   gap: 8px;
   height: 40px;
   padding: 4px;
@@ -974,8 +988,10 @@
 }
 .modeSegmented { flex: 0 0 174px; height: 48px; }
 .segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex: 1 0 0;
-  height: 100%;
   min-width: 0;
   border-radius: 8px;
   font-size: 14px;
@@ -985,7 +1001,7 @@
   text-align: center;
 
   &[data-active] {
-    border-radius: 4px;
+    border-radius: 8px;
     background: white;
     box-shadow: 0 0 0.5px #1414141f, 0 1px 4px #14141414;
     color: #344054;

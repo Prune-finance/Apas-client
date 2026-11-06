@@ -575,46 +575,7 @@
   font-weight: 500 !important;
   box-shadow: 0 0 0.5px #1414141f, 0 1px 4px #14141414;
 }
-.auditFilters { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
-.auditSelect { flex: 0 0 auto; }
-.auditDate { flex: 1 1 220px; min-width: 220px; }
-// Standard 48px dropdown / text field (Figma "Dropdown - Standard")
-.auditFilters .auditInput {
-  height: 48px;
-  min-height: 48px;
-  padding-left: 15px;
-  padding-right: 49px;
-  background: #fcfcfd;
-  border: 1px solid #f2f4f7;
-  border-radius: 8px;
-  font-size: 16px !important;
-  font-weight: 400;
-  color: #344054;
-  &::placeholder { color: #344054; font-size: 16px !important; }
-}
-.auditFilters .auditDateInput {
-  height: 48px;
-  min-height: 48px;
-  padding-left: 47px;
-  background: #fcfcfd;
-  border: 1px solid #f2f4f7;
-  border-radius: 8px;
-  font-size: 16px !important;
-  font-weight: 500;
-  color: #344054;
-  white-space: nowrap;
-}
 .auditSection { width: 24px !important; }
-.clearFilter {
-  padding: 16px 32px;
-  border-radius: 9999px;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  color: #758604;
-  cursor: pointer;
-  white-space: nowrap;
-}
 
 .auditTableWrap { border-radius: 16px; overflow: hidden; overflow-x: auto; }
 .auditTable {

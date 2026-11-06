@@ -1,7 +1,5 @@
 "use client";
 
-import { Select, SelectProps } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
 import dayjs from "dayjs";
 import { formatRate } from "@/lib/hooks/rates";
 import classes from "./styles.module.scss";
@@ -53,44 +51,7 @@ export const CHANNEL: Record<string, { tone: Tone; label: string }> = {
   SYSTEM: { tone: GREY, label: "System" },
 };
 
-/** 48px "Dropdown - Standard" from the Figma filter rows. */
-export function FilterSelect({ width, ...props }: SelectProps & { width: number }) {
-  return (
-    <Select
-      w={width}
-      className={classes.auditSelect}
-      classNames={{ input: classes.auditInput, section: classes.auditSection }}
-      rightSection={<Icon name="chevron-down" />}
-      rightSectionPointerEvents="none"
-      rightSectionWidth={49}
-      allowDeselect
-      {...props}
-    />
-  );
-}
-
 export type DateRange = [Date | null, Date | null];
-
-/** Date range "Text Field - Standard" with the calendar icon. */
-export function FilterDateRange({ value, onChange }: { value: DateRange; onChange: (v: DateRange) => void }) {
-  return (
-    <DatePickerInput
-      type="range"
-      className={classes.auditDate}
-      placeholder="All dates"
-      valueFormat="DD MMM YYYY"
-      allowSingleDateInRange
-      numberOfColumns={2}
-      classNames={{ input: classes.auditDateInput, section: classes.auditSection }}
-      leftSection={<Icon name="calendar" />}
-      leftSectionWidth={47}
-      leftSectionPointerEvents="none"
-      value={value}
-      onChange={(v) => onChange(v as DateRange)}
-      aria-label="Filter by date"
-    />
-  );
-}
 
 /** A range only applies once both ends are picked; the API takes YYYY-MM-DD. */
 export const rangeParams = ([start, end]: DateRange) =>

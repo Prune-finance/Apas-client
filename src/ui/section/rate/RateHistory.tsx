@@ -1,13 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Box, Select, Skeleton, Text, UnstyledButton } from "@mantine/core";
+import { Box, Flex, Select, Skeleton, Text } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import EmptyTable from "@/ui/components/EmptyTable";
+import Filter from "@/ui/components/Filter";
+import { SecondaryBtn } from "@/ui/components/Buttons";
+import { SelectBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import { ChangeStatus, ChartRange, formatRate, PairChart, useChangesQuery, usePairChart, useRatesMeta } from "@/lib/hooks/rates";
 import classes from "./styles.module.scss";
-import { AdminCell, DateRange, FilterDateRange, FilterSelect, Icon, Pill, rangeParams, Tone } from "./shared";
+import { AdminCell, DateRange, Icon, Pill, rangeParams, Tone } from "./shared";
 
 // Figma: Rate History tab (15678:366738)
 
@@ -102,8 +108,9 @@ function FinalRateChart({ chart }: { chart: PairChart }) {
   );
 }
 
-type Filters = { status: string | null; adminId: string | null; adjustment: string | null; range: DateRange };
-const EMPTY: Filters = { status: null, adminId: null, adjustment: null, range: [null, null] };
+// `status` and `createdAt` are the shared Filter panel's built-in status and date range fields
+type Filters = { status: string | null; adminId: string | null; adjustment: string | null; createdAt: DateRange };
+const EMPTY: Filters = { status: null, adminId: null, adjustment: null, createdAt: [null, null] };
 
 export default function RateHistory({ pairId, quote, version, onReview }: {
   pairId: string;
@@ -118,14 +125,16 @@ export default function RateHistory({ pairId, quote, version, onReview }: {
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
-  const set = <K extends keyof Filters>(key: K, value: Filters[K]) => { setFilters((f) => ({ ...f, [key]: value })); setActive(1); };
+  const filterForm = useForm<Filters>({ initialValues: EMPTY });
+  const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);
+  const activeFilterCount = [filters.status, filters.adminId, filters.adjustment, filters.createdAt[0]].filter(Boolean).length;
 
   const { changes, meta: page, loading } = useChangesQuery({
     pairId,
     status: filters.status,
     adminId: filters.adminId,
     adjustment: filters.adjustment,
-    ...rangeParams(filters.range),
+    ...rangeParams(filters.createdAt),
     page: active,
     limit: Number(limit ?? 10),
   }, version);
@@ -159,21 +168,26 @@ export default function RateHistory({ pairId, quote, version, onReview }: {
       </Box>
 
       <Box className={classes.auditBody}>
-        {/* Filters */}
-        <Box className={classes.auditFilters}>
-          <FilterSelect width={165} placeholder="All Statuses" aria-label="Filter by status"
-            data={(meta?.changeStatuses ?? (Object.keys(STATUS) as ChangeStatus[])).map((s) => ({ value: s, label: STATUS[s]?.label ?? s }))}
-            value={filters.status} onChange={(v) => set("status", v)} />
-          <FilterDateRange value={filters.range} onChange={(v) => set("range", v)} />
-          <FilterSelect width={188} placeholder="All Administrator" aria-label="Filter by administrator" searchable
+        {/* Filters: the shared slide-in Filter panel */}
+        <Flex justify="flex-end">
+          <SecondaryBtn text="Filter" action={toggleFilters} icon={IconListTree} indicator={activeFilterCount}
+            fw={600} fz={12} />
+        </Flex>
+        <Filter<Filters>
+          opened={filtersOpened}
+          toggle={toggleFilters}
+          form={filterForm}
+          customStatusOption={(meta?.changeStatuses ?? (Object.keys(STATUS) as ChangeStatus[])).map((s) => ({ value: s, label: STATUS[s]?.label ?? s }))}
+          onApply={(values) => { setFilters(values); setActive(1); }}
+          onClear={() => { setFilters(EMPTY); setActive(1); }}
+        >
+          <SelectBox placeholder="Administrator" clearable searchable
             data={(meta?.administrators ?? []).map((a) => ({ value: a.id, label: a.name }))}
-            value={filters.adminId} onChange={(v) => set("adminId", v)} />
-          <FilterSelect width={172} placeholder="All Adjustment" aria-label="Filter by adjustment" data={(meta?.adjustmentTypes ?? ["NONE", "MARKUP", "MARKDOWN"]).map((t) => ({ value: t, label: ADJUSTMENT_FILTER_LABEL[t] ?? t }))}
-            value={filters.adjustment} onChange={(v) => set("adjustment", v)} />
-          <UnstyledButton className={classes.clearFilter} onClick={() => { setFilters(EMPTY); setActive(1); }}>
-            Clear Filter
-          </UnstyledButton>
-        </Box>
+            {...filterForm.getInputProps("adminId")} />
+          <SelectBox placeholder="Adjustment" clearable
+            data={(meta?.adjustmentTypes ?? ["NONE", "MARKUP", "MARKDOWN"]).map((t) => ({ value: t, label: ADJUSTMENT_FILTER_LABEL[t] ?? t }))}
+            {...filterForm.getInputProps("adjustment")} />
+        </Filter>
 
         {/* History table */}
         <Box className={classes.historyTableWrap}>

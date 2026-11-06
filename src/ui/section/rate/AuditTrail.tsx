@@ -2,9 +2,15 @@
 
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
-import { Box, Skeleton, Text, UnstyledButton } from "@mantine/core";
+import { Box, Flex, LoadingOverlay, Skeleton, Text, UnstyledButton } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { useDisclosure } from "@mantine/hooks";
+import { IconListTree } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import EmptyTable from "@/ui/components/EmptyTable";
+import Filter from "@/ui/components/Filter";
+import { SecondaryBtn } from "@/ui/components/Buttons";
+import { SelectBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
 import CountryFlag from "@/ui/components/CountryFlag";
 import { AuditLogRow, AuditQuery, formatRate, useAuditLogPage, useRatesMeta } from "@/lib/hooks/rates";
@@ -15,8 +21,6 @@ import {
   CHANNEL,
   DateRange,
   EVENT_TONE,
-  FilterDateRange,
-  FilterSelect,
   formatChangeValue,
   GREY,
   Icon,
@@ -26,8 +30,9 @@ import {
 
 // Figma: Audit Trail tab (15679:368530) — also used by the Audit log page
 
-type Filters = { event: string | null; adminId: string | null; channel: string | null; range: DateRange };
-const EMPTY: Filters = { event: null, adminId: null, channel: null, range: [null, null] };
+// `createdAt` is the shared Filter panel's date range field
+type Filters = { event: string | null; adminId: string | null; channel: string | null; createdAt: DateRange };
+const EMPTY: Filters = { event: null, adminId: null, channel: null, createdAt: [null, null] };
 
 // Same round flags as the Rates table (Figma 15677:340996)
 const flagStyle = { width: 24, height: 24, borderRadius: "50%", boxShadow: "0 0 0 2px #fff", background: "#fff" };
@@ -90,23 +95,24 @@ export default function AuditTrail({ pairId, showPair, showStats = true, onQuery
   onQueryChange?: (query: AuditFilterQuery) => void;
 }) {
   const meta = useRatesMeta();
+  // Audit rows only carry currency codes (NGN, CAD); the flag needs the country (NG, CA) from /meta
+  const flagCode = (currency: string) =>
+    meta?.currencies.find((c) => c.code === currency)?.countryCode ?? currency;
   const [filters, setFilters] = useState<Filters>(EMPTY);
+  const filterForm = useForm<Filters>({ initialValues: EMPTY });
+  const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);
+  const activeFilterCount = [filters.event, filters.adminId, filters.channel, filters.createdAt[0]].filter(Boolean).length;
   const [active, setActive] = useState(1);
   const [limit, setLimit] = useState<string | null>("10");
   const [openId, setOpenId] = useState<string | null>(null);
   const [eventId, setEventId] = useState<string | null>(null);
-
-  const set = <K extends keyof Filters>(key: K, value: Filters[K]) => {
-    setFilters((f) => ({ ...f, [key]: value }));
-    setActive(1);
-  };
 
   const query: AuditFilterQuery = {
     pairId: pairId ?? null,
     event: filters.event,
     adminId: filters.adminId,
     channel: filters.channel,
-    ...rangeParams(filters.range),
+    ...rangeParams(filters.createdAt),
   };
   const queryKey = JSON.stringify(query);
   useEffect(() => {
@@ -137,25 +143,35 @@ export default function AuditTrail({ pairId, showPair, showStats = true, onQuery
       </Box>}
 
       <Box className={classes.auditBody}>
-        {/* Filters */}
-        <Box className={classes.auditFilters}>
-          <FilterSelect width={165} placeholder="All Events" aria-label="Filter by event"
+        {/* Filters: the shared slide-in Filter panel */}
+        <Flex justify="flex-end">
+          <SecondaryBtn text="Filter" action={toggleFilters} icon={IconListTree} indicator={activeFilterCount}
+            fw={600} fz={12} />
+        </Flex>
+        <Filter<Filters>
+          opened={filtersOpened}
+          toggle={toggleFilters}
+          form={filterForm}
+          isStatus
+          onApply={(values) => { setFilters(values); setActive(1); }}
+          onClear={() => { setFilters(EMPTY); setActive(1); }}
+        >
+          <SelectBox placeholder="Event" clearable
             data={(meta?.auditEvents ?? []).map((e) => ({ value: e.value, label: e.label }))}
-            value={filters.event} onChange={(v) => set("event", v)} />
-          <FilterDateRange value={filters.range} onChange={(v) => set("range", v)} />
-          <FilterSelect width={188} placeholder="All Administrator" aria-label="Filter by administrator" searchable
+            {...filterForm.getInputProps("event")} />
+          <SelectBox placeholder="Administrator" clearable searchable
             data={(meta?.administrators ?? []).map((a) => ({ value: a.id, label: a.name }))}
-            value={filters.adminId} onChange={(v) => set("adminId", v)} />
-          <FilterSelect width={172} placeholder="All Channel" aria-label="Filter by channel"
+            {...filterForm.getInputProps("adminId")} />
+          <SelectBox placeholder="Channel" clearable
             data={(meta?.channels ?? []).map((c) => ({ value: c.value, label: c.label }))}
-            value={filters.channel} onChange={(v) => set("channel", v)} />
-          <UnstyledButton className={classes.clearFilter} onClick={() => { setFilters(EMPTY); setActive(1); }}>
-            Clear Filter
-          </UnstyledButton>
-        </Box>
+            {...filterForm.getInputProps("channel")} />
+        </Filter>
 
         {/* Table — click a row to expand "What changed" / "Event metadata" */}
-        <Box className={classes.auditTableWrap}>
+        {/* Loader over the table while GET /audit-logs runs (first load, filters, paging) */}
+        <Box className={classes.auditTableWrap} pos="relative" mih={loading && !logs.length ? 200 : undefined}>
+          <LoadingOverlay visible={loading} zIndex={10} overlayProps={{ radius: "sm", blur: 1 }}
+            loaderProps={{ size: "md", color: "var(--prune-primary-600)" }} />
           <table className={classes.auditTable}>
             <thead>
               <tr>
@@ -192,14 +208,14 @@ export default function AuditTrail({ pairId, showPair, showStats = true, onQuery
                             <Link href={`/admin/rate/${log.pair.id}`} className={classes.pairCell}
                               style={{ color: "inherit", textDecoration: "none" }} onClick={(e) => e.stopPropagation()}>
                               <span className={classes.flagGroup}>
-                                <CountryFlag code={base!} size={24} round style={flagStyle} />
-                                <CountryFlag code={target!} size={24} round style={flagStyle} />
+                                <CountryFlag code={flagCode(base!)} size={24} round style={flagStyle} />
+                                <CountryFlag code={flagCode(target!)} size={24} round style={flagStyle} />
                               </span>
                               {log.pair.code}
                             </Link>
                           ) : (
                             <span className={classes.pairCell}>
-                              {log.currencyCode && <CountryFlag code={log.currencyCode} size={24} round style={flagStyle} />}
+                              {log.currencyCode && <CountryFlag code={flagCode(log.currencyCode)} size={24} round style={flagStyle} />}
                               {log.currencyCode ?? "-"}
                             </span>
                           )}

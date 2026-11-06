@@ -45,15 +45,16 @@ export default function RateCurrencies() {
   const [editTarget, setEditTarget] = useState<RateCurrency | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<RateCurrency | null>(null);
 
-  // The API has no code filter: a chosen currency is sent as the search, then matched exactly
-  const { currency, ...flags } = applied;
-  const { currencies: results, meta, loading, revalidate } = useCurrencyList({
-    search: currency ?? (debouncedSearch.trim() || undefined),
-    ...flags,
+  // The currency picked in the filter goes into the search box on Apply, so it is sent as `search`
+  const { remittance, conversionInbound, conversionOutbound } = applied;
+  const { currencies, meta, loading, revalidate } = useCurrencyList({
+    search: debouncedSearch.trim() || undefined,
+    remittance,
+    conversionInbound,
+    conversionOutbound,
     page: active,
     limit: Number(limit ?? 10),
   });
-  const currencies = currency ? results.filter((c) => c.code === currency) : results;
   const activeFilterCount = Object.values(applied).filter(Boolean).length;
 
   return (
@@ -72,7 +73,16 @@ export default function RateCurrencies() {
       <Box className={classes.compactInputs}>
         <Flex mt={24} gap={12} align="center" justify="space-between" wrap="wrap">
           <SearchInput aria-label="Search currencies" placeholder="Search code or name" search={search}
-            onChange={(event) => { setSearch(event.currentTarget.value); setActive(1); }} />
+            onChange={(event) => {
+              const value = event.currentTarget.value;
+              setSearch(value);
+              // Typing something else replaces the currency picked in the filter
+              if (applied.currency && value !== applied.currency) {
+                setApplied((f) => ({ ...f, currency: null }));
+                filterForm.setFieldValue("currency", null);
+              }
+              setActive(1);
+            }} />
           <SecondaryBtn text="Filter" action={toggleFilters} icon={IconListTree} indicator={activeFilterCount}
             fw={600} fz={12} />
         </Flex>
@@ -82,8 +92,16 @@ export default function RateCurrencies() {
           form={filterForm}
           noDate
           isStatus
-          onApply={(values) => { setApplied(values); setActive(1); }}
-          onClear={() => { setApplied(emptyFilters); setActive(1); }}
+          onApply={(values) => {
+            setApplied(values);
+            if (values.currency) setSearch(values.currency);
+            setActive(1);
+          }}
+          onClear={() => {
+            if (applied.currency && search === applied.currency) setSearch("");
+            setApplied(emptyFilters);
+            setActive(1);
+          }}
         >
           <SelectBox placeholder="Currency" searchable clearable
             data={(ratesMeta?.currencies ?? []).map((c) => ({ value: c.code, label: `${c.code} — ${c.name}` }))}
@@ -102,7 +120,8 @@ export default function RateCurrencies() {
             <TableTr key={c.code}>
               <TableTd>
                 <Group gap={8} wrap="nowrap">
-                  {c.countryCode && <CountryFlag code={c.countryCode} size={20} />}
+                  {/* Same round flag as the Rates table */}
+                  {c.countryCode && <CountryFlag code={c.countryCode} size={24} round style={{ width: 24, height: 24 }} />}
                   <Box>
                     <Text fz={14} lh={1}>{c.code}</Text>
                     <Text fz={12} lh={1.5} c="var(--prune-text-gray-500)">{c.name}</Text>

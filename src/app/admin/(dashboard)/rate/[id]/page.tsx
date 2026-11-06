@@ -156,7 +156,7 @@ export default function PairPage({ params }: { params: { id: string } }) {
             <PrimaryBtn text="Enable Pair" leftSection={<Icon name="pair-disable" />} color="#ff5226" c="white"
               className={classes.largeBtn} action={() => setEnableOpen(true)} />
           )}
-          <PrimaryBtn text={pair.pendingChange ? "Review Change" : "Set Rate"} leftSection={<Icon name="pair-set-rate" />}
+          <PrimaryBtn text={pair.pendingChange ? "Review Change" : live ? "Edit Rate" : "Set Rate"} leftSection={<Icon name="pair-set-rate" />}
             color="#c1dd06" c="#344054" className={classes.largeBtn} action={openRate} />
         </Box>
       </Box>

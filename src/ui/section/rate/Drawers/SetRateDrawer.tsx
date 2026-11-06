@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Box, Drawer, Text, UnstyledButton } from "@mantine/core";
+import { Box, Drawer, LoadingOverlay, Text, UnstyledButton } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useDebouncedValue } from "@mantine/hooks";
 import dayjs from "dayjs";
@@ -17,6 +17,7 @@ import {
   apiMessage,
   formatRate,
   RateChange,
+  PairDetail,
   RatePairRow,
   RatePrecision,
   ratesAxios,
@@ -80,9 +81,13 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
   /** The pair's own precision; falls back to the reference data */
   precision?: RatePrecision;
 }) {
-  const live = pair?.rate?.status === "LIVE" ? pair.rate : null;
+  // A pair that already has a rate is edited: the drawer loads GET /pairs/:id and starts from it
+  const editing = !!pair?.rate;
+  const [detail, setDetail] = useState<PairDetail | null>(null);
+  const [loadingDetail, setLoadingDetail] = useState(false);
+  const live = detail?.liveRate ?? (pair?.rate?.status === "LIVE" ? pair.rate : null);
   const meta = useRatesMeta();
-  const rules = precision ?? meta?.precision;
+  const rules = precision ?? detail?.precision ?? meta?.precision;
   const rateDp = rules?.rate ?? 4;
   const typeOptions = (meta?.adjustmentTypes ?? ["NONE", "MARKUP", "MARKDOWN"])
     .map((t) => ({ value: t as AdjustmentType, label: ADJUSTMENT_TYPE_LABEL[t] ?? t }));
@@ -101,19 +106,39 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
   const [preview, setPreview] = useState<Preview | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Start from the live rate each time the drawer opens
+  // Each time the drawer opens: reset, then (when editing) prefill from the pair's current rate
   useEffect(() => {
     if (!pair) return;
-    setBaseRate(live?.baseRate ?? "");
-    setType((live?.adjustment.type ?? "NONE") as AdjustmentType);
-    setMode((live?.adjustment.mode ?? "PERCENT") as AdjustmentMode);
-    setValue(live?.adjustment.value ?? "");
+    const prefill = (rate: RateChange | null) => {
+      setBaseRate(rate?.baseRate ?? "");
+      setType((rate?.adjustment.type ?? "NONE") as AdjustmentType);
+      setMode((rate?.adjustment.mode ?? "PERCENT") as AdjustmentMode);
+      setValue(rate?.adjustment.value ?? "");
+    };
+    setDetail(null);
     setEffectiveFrom(null);
     setReason("");
     setTouched({});
     setSubmitted(false);
     setApiErrors({});
     setPreview(null);
+    prefill(pair.rate?.status === "LIVE" ? pair.rate : null);
+    if (!pair.rate) return;
+
+    let cancelled = false;
+    setLoadingDetail(true);
+    ratesAxios
+      .get(`/pairs/${pair.id}`)
+      .then(({ data }) => {
+        if (cancelled) return;
+        const d: PairDetail = data.data;
+        setDetail(d);
+        // The rate in effect, else the next approved one, else the one awaiting approval
+        prefill(d.liveRate ?? d.scheduledChange ?? d.pendingChange);
+      })
+      .catch(() => !cancelled && prefill(pair.rate))
+      .finally(() => !cancelled && setLoadingDetail(false));
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pair?.id]);
 
@@ -251,11 +276,14 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
       classNames={{ content: classes.reviewDrawer, body: classes.reviewBody }}>
       {pair && target && base && (
         <>
+          {/* While GET /pairs/:id loads the rate being edited */}
+          <LoadingOverlay visible={loadingDetail} zIndex={20} overlayProps={{ blur: 1 }}
+            loaderProps={{ color: "var(--prune-primary-600)" }} />
           <Box className={classes.reviewTopBar}>
             <Box className={classes.reviewNav} />
             <Box className={classes.reviewTitleRow}>
               <Text id="set-rate-title" className={classes.reviewTitle}>
-                Set rate · {base.code} / {target.code}
+                {editing ? "Edit rate" : "Set rate"} · {base.code} / {target.code}
               </Text>
               <Text className={classes.setRateSubtitle}>
                 {requiresApproval

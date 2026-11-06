@@ -244,12 +244,15 @@ export default function RatePage() {
                   <ActionIcon variant="transparent" w="100%" h={40} aria-label={`Actions for ${row.code}`}><Asset name="more" /></ActionIcon>
                 </Menu.Target>
                 <Menu.Dropdown>
-                  {/* Only one pending change per pair: offer Review instead of Set rate */}
+                  {/* Only one pending change per pair: offer Review instead of Set/Edit rate */}
                   {row.pendingChangeId
                     ? <Menu.Item onClick={() => setReviewId(row.pendingChangeId)}>Review pending change</Menu.Item>
-                    : <Menu.Item onClick={() => setRateTarget(row)}>Set rate</Menu.Item>}
+                    : <Menu.Item onClick={() => setRateTarget(row)}>{row.rate ? "Edit rate" : "Set rate"}</Menu.Item>}
                   <Menu.Item component={Link} href={`/admin/rate/${row.id}`}>View pair</Menu.Item>
-                  <Menu.Item onClick={() => toggle(row)}>{row.enabled ? "Disable" : "Enable"} pair</Menu.Item>
+                  {/* A pair with no rate can't be enabled yet */}
+                  {(row.enabled || row.rate) && (
+                    <Menu.Item onClick={() => toggle(row)}>{row.enabled ? "Disable" : "Enable"} pair</Menu.Item>
+                  )}
                 </Menu.Dropdown>
               </Menu>
             </TableTd>

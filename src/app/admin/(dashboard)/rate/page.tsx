@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ActionIcon, Badge, Box, Flex, Group, Menu, SimpleGrid, Skeleton, Switch, TableTd, TableTr, Text, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconArrowUpRight, IconFileText, IconListTree, IconPlus } from "@tabler/icons-react";
+import { IconArrowUpRight, IconFileText, IconListTree, IconPlus, IconRefresh } from "@tabler/icons-react";
 import Filter from "@/ui/components/Filter";
 import dayjs from "dayjs";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
@@ -153,6 +153,8 @@ export default function RatePage() {
               aria-expanded={filtersOpened}
               aria-controls="rate-filter-panel"
             />
+            {/* Same Refresh button as the Transactions pages: reloads the table and stat cards */}
+            <SecondaryBtn text="Refresh" icon={IconRefresh} fw={600} fz={12} action={revalidate} loading={loading} />
             {/* The server builds an .xlsx file */}
             <SecondaryBtn text="Export" icon={IconArrowUpRight} fz={12} action={exportFile} loading={exporting} />
           </Group>

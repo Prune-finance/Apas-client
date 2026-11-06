@@ -214,7 +214,7 @@ export default function CurrencyModal({
             <Text
               id="currency-modal-title"
               className={classes.addTitle}
-              style={{ fontFamily: "'EksellDisplay', serif" }}
+              style={{ fontFamily: "'EksellDisplay', serif", fontWeight: 400 }}
             >
               {editing ? `Edit ${currency!.code}` : "Add Currency"}
             </Text>

@@ -24,10 +24,10 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
     setError("");
   }, [pair]);
 
-  const blocked = !pair?.hasLiveRate;
+  // Figma keeps Enable active even with the warning; the API has the final say
+  const noLiveRate = !pair?.hasLiveRate;
 
   const submit = () => {
-    if (blocked) return;
     const value = reason.trim();
     if (!value) return setError("Reason is required.");
     if (value.length > 500) return setError("Reason cannot exceed 500 characters.");
@@ -43,7 +43,7 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
           <Box className={classes.enableHeader}>
             <span className={classes.enableIcon}><Icon name="power" /></span>
             <Box className={classes.enableHeading}>
-              <Text id="enable-pair-title" className={classes.addTitle}>Enable {pair.code.replace(/\s/g, "")}</Text>
+              <Text id="enable-pair-title" className={classes.addTitle} style={{ fontFamily: "'EksellDisplay', serif", fontWeight: 400 }}>Enable {pair.code.replace(/\s/g, "")}</Text>
               <Text className={classes.enableStatus}>Currently {pair.statusLabel}</Text>
             </Box>
             <UnstyledButton className={classes.addClose} onClick={onClose} aria-label="Close">
@@ -60,7 +60,7 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
             </Text>
           </Box>
 
-          {blocked && (
+          {noLiveRate && (
             <Box className={classes.warnNotice} role="alert">
               <Icon name="warning-triangle" />
               <Box className={classes.noticeText}>
@@ -80,9 +80,8 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
           <Box className={classes.addFooter}>
             <SecondaryBtn text="Cancel" action={onClose} h={48} px={32} fz={14} fw={500}
               bg="#fbfee6" bd="none" c="#344054" />
-            <PrimaryBtn text="Enable" action={submit} loading={processing} disabled={blocked}
-              h={48} px={32} fz={14} fw={500} c={blocked ? "#98a2b3" : "#344054"}
-              color={blocked ? "#eaecf0" : "#c1dd06"} />
+            <PrimaryBtn text="Enable" action={submit} loading={processing}
+              h={48} px={32} fz={14} fw={500} c="#344054" color="#c1dd06" />
           </Box>
         </Box>
       )}

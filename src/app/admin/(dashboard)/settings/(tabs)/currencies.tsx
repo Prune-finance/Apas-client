@@ -13,7 +13,7 @@ import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import CountryFlag from "@/ui/components/CountryFlag";
-import { RateCurrency, useCurrencyList } from "@/lib/hooks/rates";
+import { RateCurrency, useCurrencyList, useRatesMeta } from "@/lib/hooks/rates";
 import classes from "@/ui/section/rate/styles.module.scss";
 import CurrencyModal from "@/ui/section/rate/Modals/CurrencyModal";
 import DeleteCurrencyModal from "@/ui/section/rate/Modals/DeleteCurrencyModal";
@@ -21,8 +21,8 @@ import { Icon } from "@/ui/section/rate/shared";
 
 // Settings › Rate Currencies: the currencies available to rate pairs
 
-type Filters = { remittance: string | null; conversionInbound: string | null; conversionOutbound: string | null };
-const emptyFilters: Filters = { remittance: null, conversionInbound: null, conversionOutbound: null };
+type Filters = { currency: string | null; remittance: string | null; conversionInbound: string | null; conversionOutbound: string | null };
+const emptyFilters: Filters = { currency: null, remittance: null, conversionInbound: null, conversionOutbound: null };
 const YES_NO = [{ value: "true", label: "Enabled" }, { value: "false", label: "Disabled" }];
 
 const FlagBadge = ({ on }: { on?: boolean }) => (
@@ -32,6 +32,7 @@ const FlagBadge = ({ on }: { on?: boolean }) => (
 );
 
 export default function RateCurrencies() {
+  const ratesMeta = useRatesMeta();
   const [search, setSearch] = useState("");
   const [debouncedSearch] = useDebouncedValue(search, 500);
   const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);
@@ -44,12 +45,15 @@ export default function RateCurrencies() {
   const [editTarget, setEditTarget] = useState<RateCurrency | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<RateCurrency | null>(null);
 
-  const { currencies, meta, loading, revalidate } = useCurrencyList({
-    search: debouncedSearch.trim() || undefined,
-    ...applied,
+  // The API has no code filter: a chosen currency is sent as the search, then matched exactly
+  const { currency, ...flags } = applied;
+  const { currencies: results, meta, loading, revalidate } = useCurrencyList({
+    search: currency ?? (debouncedSearch.trim() || undefined),
+    ...flags,
     page: active,
     limit: Number(limit ?? 10),
   });
+  const currencies = currency ? results.filter((c) => c.code === currency) : results;
   const activeFilterCount = Object.values(applied).filter(Boolean).length;
 
   return (
@@ -81,6 +85,9 @@ export default function RateCurrencies() {
           onApply={(values) => { setApplied(values); setActive(1); }}
           onClear={() => { setApplied(emptyFilters); setActive(1); }}
         >
+          <SelectBox placeholder="Currency" searchable clearable
+            data={(ratesMeta?.currencies ?? []).map((c) => ({ value: c.code, label: `${c.code} — ${c.name}` }))}
+            {...filterForm.getInputProps("currency")} />
           <SelectBox placeholder="Remittance" data={YES_NO} clearable {...filterForm.getInputProps("remittance")} />
           <SelectBox placeholder="Conversion inbound" data={YES_NO} clearable {...filterForm.getInputProps("conversionInbound")} />
           <SelectBox placeholder="Conversion outbound" data={YES_NO} clearable {...filterForm.getInputProps("conversionOutbound")} />
@@ -90,7 +97,7 @@ export default function RateCurrencies() {
       <Box mt={24} className={classes.tableWrap}>
         <TableComponent loading={loading} className={classes.table}
           head={["Currency", "Symbol", "Remittance", "Conversion In", "Conversion Out", "Pairs", "Last updated", "Actions"]}
-          columnWidths={[undefined, 80, 120, 130, 140, 80, 130, 93]}
+          columnWidths={["22%", "8%", "12%", "12%", "13%", "8%", "15%", "10%"]}
           rows={currencies.map((c) => (
             <TableTr key={c.code}>
               <TableTd>

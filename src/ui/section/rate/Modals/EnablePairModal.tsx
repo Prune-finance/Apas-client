@@ -18,11 +18,14 @@ export default function EnablePairModal({ pair, onClose, onConfirm, processing }
   const [reason, setReason] = useState("");
   const [error, setError] = useState("");
 
+  // Reset only when a different pair opens: the parent rebuilds `pair` on every render,
+  // so depending on the object cleared the reason as soon as Enable started loading
+  const pairCode = pair?.code;
   useEffect(() => {
-    if (!pair) return;
+    if (!pairCode) return;
     setReason("");
     setError("");
-  }, [pair]);
+  }, [pairCode]);
 
   // Figma keeps Enable active even with the warning; the API has the final say
   const noLiveRate = !pair?.hasLiveRate;

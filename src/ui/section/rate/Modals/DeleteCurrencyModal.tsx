@@ -24,7 +24,7 @@ export default function DeleteCurrencyModal({ currency, onClose, onDeleted }: {
   useEffect(() => {
     setReason("");
     setError("");
-  }, [currency]);
+  }, [currency?.code]);
 
   const blocked = currency?.canDelete === false;
   const pairs = currency?.pairCount ?? 0;

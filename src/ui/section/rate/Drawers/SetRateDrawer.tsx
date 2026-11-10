@@ -159,6 +159,8 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
       const v = value.trim();
       if (!v) e.adjustmentValue = `Enter a ${typeWord.toLowerCase()} value.`;
       else if (!DECIMAL.test(v) || Number(v) <= 0) e.adjustmentValue = "Value must be greater than zero.";
+      // e.g. switching from Amount to % with a larger number still in the field
+      else if (mode === "PERCENT" && Number(v) > 100) e.adjustmentValue = `${typeWord} can't be more than 100%.`;
       else if (type === "MARKDOWN" && (mode === "PERCENT" ? Number(v) >= 100 : !e.baseRate && Number(v) >= Number(b)))
         e.adjustmentValue = "Markdown would result in a negative final rate.";
     }
@@ -365,6 +367,8 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
               <Box className={classes.baseRateCol} style={{ flex: 1, width: "auto" }}>
                 <NumberInputWithInsideLabel label={`${typeWord} value`} withAsterisk={false}
                   hideControls allowNegative={false} decimalScale={rateDp} value={value}
+                  // A percentage can't go above 100: keystrokes that would exceed it are ignored
+                  isAllowed={({ floatValue }) => mode !== "PERCENT" || floatValue === undefined || floatValue <= 100}
                   error={errors.adjustmentValue || undefined}
                   rightSection={mode === "PERCENT" ? <Icon name="percent" /> : <span className={classes.rateFieldUnit}>{target.code}</span>}
                   rightSectionWidth={56}

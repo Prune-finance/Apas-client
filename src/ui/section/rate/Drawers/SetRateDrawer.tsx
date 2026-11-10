@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Box, Drawer, LoadingOverlay, Text, UnstyledButton } from "@mantine/core";
+import { Box, Drawer, LoadingOverlay, NumberInput, Text, UnstyledButton } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useDebouncedValue } from "@mantine/hooks";
 import dayjs from "dayjs";
@@ -52,11 +52,8 @@ const adjustmentError = (fields: Record<string, string>) =>
 
 const DECIMAL = /^\d+(\.\d+)?$/;
 
-// Rate fields take numbers only: digits and one decimal point, capped at `dp` decimal places
-const numericOnly = (raw: string, dp: number) => {
-  const [whole, ...rest] = raw.replace(/[^\d.]/g, "").split(".");
-  return rest.length ? `${whole}.${rest.join("").slice(0, dp)}` : whole;
-};
+// NumberInput hands back a number, or a string while a value is half typed ("12."); the form keeps strings
+const asText = (v: number | string) => (typeof v === "number" ? String(v) : v);
 
 function Segmented<T extends string>({ value, onChange, options, className, label }: {
   value: T;
@@ -325,8 +322,11 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
                 </span>
                 <span className={classes.rateFieldText}>
                   <span className={classes.rateFieldLabel}>Base rate ({target.code} per 1 {base.code})</span>
-                  <input className={classes.rateFieldInput} inputMode="decimal" placeholder={(0).toFixed(rateDp)} value={baseRate}
-                    onChange={(e) => { setBaseRate(numericOnly(e.currentTarget.value, rateDp)); clearApi("baseRate"); }}
+                  <NumberInput variant="unstyled" hideControls allowNegative={false} decimalScale={rateDp}
+                    thousandSeparator="," placeholder={(0).toFixed(rateDp)} value={baseRate}
+                    aria-label={`Base rate (${target.code} per 1 ${base.code})`}
+                    classNames={{ wrapper: classes.rateFieldWrapper, input: classes.rateFieldInput }}
+                    onChange={(v) => { setBaseRate(asText(v)); clearApi("baseRate"); }}
                     onBlur={() => touch("baseRate")} />
                 </span>
               </label>
@@ -369,9 +369,11 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
                 <label className={classes.rateField} data-error={errors.adjustmentValue ? true : undefined}>
                   <span className={classes.rateFieldText}>
                     <span className={classes.rateFieldLabel}>{typeWord} value</span>
-                    <input className={classes.rateFieldInput} data-medium inputMode="decimal"
-                      placeholder={mode === "PERCENT" ? "0.00" : (0).toFixed(rateDp)} value={value}
-                      onChange={(e) => { setValue(numericOnly(e.currentTarget.value, rateDp)); clearApi("adjustmentValue"); }}
+                    <NumberInput variant="unstyled" hideControls allowNegative={false} decimalScale={rateDp}
+                      thousandSeparator="," placeholder={mode === "PERCENT" ? "0.00" : (0).toFixed(rateDp)} value={value}
+                      aria-label={`${typeWord} value`} data-medium
+                      classNames={{ wrapper: classes.rateFieldWrapper, input: classes.rateFieldInput }}
+                      onChange={(v) => { setValue(asText(v)); clearApi("adjustmentValue"); }}
                       onBlur={() => touch("adjustmentValue")} />
                   </span>
                   {mode === "PERCENT" ? <Icon name="percent" /> : <span className={classes.rateFieldUnit}>{target.code}</span>}

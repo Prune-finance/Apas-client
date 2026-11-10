@@ -21,7 +21,7 @@ export default function AuditLogPage() {
     setExporting(true);
     try {
       const { data } = await ratesAxios.get("/audit-logs/export", { params: auditExportParams(query.current) });
-      if (data.data?.url) downloadExport(data.data);
+      if (data.data?.url) await downloadExport(data.data);
       else handleError("Nothing to export", data.message ?? "No events match the current filters.");
     } catch (error) {
       handleError("Export failed", apiMessage(error));

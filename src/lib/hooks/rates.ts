@@ -200,7 +200,9 @@ export interface AuditStats {
 // ─── Error helpers ──────────────────────────────────────────────────────────
 
 export const apiMessage = (error: unknown) =>
-  (isAxiosError(error) && error.response?.data?.message) || "Something went wrong";
+  (isAxiosError(error) && error.response?.data?.message) ||
+  (!isAxiosError(error) && error instanceof Error && error.message) ||
+  "Something went wrong";
 
 /** Map `issues` ("body.baseRate") onto form field errors ("baseRate"). */
 export const apiFieldErrors = (error: unknown): Record<string, string> => {
@@ -486,15 +488,19 @@ export function usePairChart(pairId: string, range: ChartRange, version = 0) {
 }
 
 /**
- * Save an export without leaving the page: the signed file link goes through the app's
- * /api/download route, which serves it as an attachment, so no blank tab opens.
+ * Save an export without leaving the page. The file is fetched through the app's /api/download
+ * route and saved from memory, so the caller's loader stays on until the file is actually saved.
  */
-export const downloadExport = ({ url, filename }: { url: string; filename?: string }) => {
+export const downloadExport = async ({ url, filename }: { url: string; filename?: string }) => {
   const name = filename || url.split("?")[0].split("/").pop() || "export.xlsx";
+  const res = await fetch(`/api/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}`);
+  if (!res.ok) throw new Error("The export file could not be downloaded.");
+  const blobUrl = URL.createObjectURL(await res.blob());
   const link = document.createElement("a");
-  link.href = `/api/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}`;
+  link.href = blobUrl;
   link.download = name;
   document.body.appendChild(link);
   link.click();
   link.remove();
+  URL.revokeObjectURL(blobUrl);
 };

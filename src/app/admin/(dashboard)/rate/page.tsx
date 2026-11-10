@@ -97,7 +97,7 @@ export default function RatePage() {
           Object.entries({ ...appliedFilters, search: debouncedSearch.trim() }).filter(([, v]) => v)
         ),
       });
-      if (data.data?.url) downloadExport(data.data);
+      if (data.data?.url) await downloadExport(data.data);
       else handleError("Nothing to export", data.message ?? "No pairs match the current filters.");
     } catch (error) {
       handleError("Export failed", apiMessage(error));

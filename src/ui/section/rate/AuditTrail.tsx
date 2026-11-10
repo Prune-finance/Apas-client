@@ -12,7 +12,7 @@ import Filter from "@/ui/components/Filter";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { SelectBox } from "@/ui/components/Inputs";
 import PaginationComponent from "@/ui/components/Pagination";
-import CountryFlag from "@/ui/components/CountryFlag";
+import CountryFlag, { currencyFlagCode } from "@/ui/components/CountryFlag";
 import { AuditLogRow, AuditQuery, formatRate, useAuditLogPage, useRatesMeta } from "@/lib/hooks/rates";
 import classes from "./styles.module.scss";
 import AuditEventDrawer from "./Drawers/AuditEventDrawer";
@@ -97,7 +97,7 @@ export default function AuditTrail({ pairId, showPair, showStats = true, onQuery
   const meta = useRatesMeta();
   // Audit rows only carry currency codes (NGN, CAD); the flag needs the country (NG, CA) from /meta
   const flagCode = (currency: string) =>
-    meta?.currencies.find((c) => c.code === currency)?.countryCode ?? currency;
+    currencyFlagCode(currency, meta?.currencies.find((c) => c.code === currency)?.countryCode);
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const filterForm = useForm<Filters>({ initialValues: EMPTY });
   const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);

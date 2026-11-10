@@ -12,7 +12,7 @@ import { SearchInput, SelectBox } from "@/ui/components/Inputs";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import CountryFlag from "@/ui/components/CountryFlag";
+import CountryFlag, { currencyFlagCode } from "@/ui/components/CountryFlag";
 import { RateCurrency, useCurrencyList, useRatesMeta } from "@/lib/hooks/rates";
 import classes from "@/ui/section/rate/styles.module.scss";
 import CurrencyModal from "@/ui/section/rate/Modals/CurrencyModal";
@@ -121,7 +121,7 @@ export default function RateCurrencies() {
               <TableTd>
                 <Group gap={8} wrap="nowrap">
                   {/* Same round flag as the Rates table */}
-                  {c.countryCode && <CountryFlag code={c.countryCode} size={24} round style={{ width: 24, height: 24 }} />}
+                  {<CountryFlag code={currencyFlagCode(c.code, c.countryCode)} size={24} round style={{ width: 24, height: 24 }} />}
                   <Box>
                     <Text fz={14} lh={1}>{c.code}</Text>
                     <Text fz={12} lh={1.5} c="var(--prune-text-gray-500)">{c.name}</Text>

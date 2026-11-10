@@ -7,7 +7,7 @@ import { useDebouncedValue } from "@mantine/hooks";
 import dayjs from "dayjs";
 import { isAxiosError } from "axios";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
-import CountryFlag from "@/ui/components/CountryFlag";
+import CountryFlag, { currencyFlagCode } from "@/ui/components/CountryFlag";
 import { TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
 import { inter } from "@/ui/fonts";
 import {
@@ -313,7 +313,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
             <Box className={classes.baseRateCol}>
               <label className={classes.rateField} data-error={errors.baseRate ? true : undefined}>
                 <span className={classes.rateCurrency}>
-                  <CountryFlag code={target.countryCode ?? target.code} size={24}
+                  <CountryFlag code={currencyFlagCode(target.code, target.countryCode)} size={24}
                     round style={{ width: 24, height: 24 }} />
                   {target.code}
                 </span>

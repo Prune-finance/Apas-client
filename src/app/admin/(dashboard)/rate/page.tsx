@@ -13,7 +13,7 @@ import { SearchInput, SelectBox } from "@/ui/components/Inputs";
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
-import CountryFlag from "@/ui/components/CountryFlag";
+import CountryFlag, { currencyFlagCode } from "@/ui/components/CountryFlag";
 import useNotification from "@/lib/hooks/notification";
 import { apiMessage, downloadExport, formatRate, PairStatus, RatePairRow, ratesAxios, useRatePairs, useRatesMeta } from "@/lib/hooks/rates";
 import classes from "@/ui/section/rate/styles.module.scss";
@@ -199,8 +199,8 @@ export default function RatePage() {
               <Link href={`/admin/rate/${row.id}`} style={{ color: "inherit", textDecoration: "none" }}>
               <Group gap={8} wrap="nowrap">
                 <span className={classes.flags}>
-                  {row.baseCurrency.countryCode && <CountryFlag code={row.baseCurrency.countryCode} size={24} round style={roundFlag} />}
-                  {row.targetCurrency.countryCode && <CountryFlag code={row.targetCurrency.countryCode} size={24} round style={roundFlag} />}
+                  {<CountryFlag code={currencyFlagCode(row.baseCurrency.code, row.baseCurrency.countryCode)} size={24} round style={roundFlag} />}
+                  {<CountryFlag code={currencyFlagCode(row.targetCurrency.code, row.targetCurrency.countryCode)} size={24} round style={roundFlag} />}
                 </span>
                 <Box>
                   <Text fz={14} lh={1}>{row.code}</Text>

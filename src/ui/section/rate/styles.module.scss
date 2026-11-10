@@ -383,7 +383,12 @@
   flex-direction: column;
   gap: 16px;
   min-height: 100%;
+  // Drawers without a sticky footer (Audit event) end with content: leave room below it
+  // so the last rows can scroll clear of the screen edge
+  &:not(:has(.reviewFooter)) { padding-bottom: 48px; }
 }
+// The drawer scrolls as one panel, so long events reach their last row
+.reviewDrawer { overflow-y: auto; }
 .reviewTopBar { display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #eaecf0; }
 .reviewNav { display: none; } // the empty Figma navigation row added 48px above the title
 .reviewTitleRow { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 24px 64px 16px 24px; }

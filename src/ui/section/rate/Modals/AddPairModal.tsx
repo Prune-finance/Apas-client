@@ -5,7 +5,7 @@ import { Box, Checkbox, Modal, Text, UnstyledButton } from "@mantine/core";
 import { isAxiosError } from "axios";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { SelectInputWithInsideLabel, TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
-import CountryFlag from "@/ui/components/CountryFlag";
+import CountryFlag, { currencyFlagCode } from "@/ui/components/CountryFlag";
 import useNotification from "@/lib/hooks/notification";
 import { inter } from "@/ui/fonts";
 import {
@@ -27,7 +27,7 @@ function Icon({ name }: { name: string }) {
 }
 
 const Flag = ({ currency }: { currency: RateCurrency }) => (
-  <CountryFlag code={currency.countryCode ?? currency.code} size={24}
+  <CountryFlag code={currencyFlagCode(currency.code, currency.countryCode)} size={24}
     round style={{ width: 24, height: 24 }} />
 );
 

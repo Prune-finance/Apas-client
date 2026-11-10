@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Box, Drawer, LoadingOverlay, NumberInput, Text, UnstyledButton } from "@mantine/core";
+import { Box, Drawer, LoadingOverlay, Text, UnstyledButton } from "@mantine/core";
 import { DateTimePicker } from "@mantine/dates";
 import { useDebouncedValue } from "@mantine/hooks";
 import dayjs from "dayjs";
 import { isAxiosError } from "axios";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import CountryFlag, { currencyFlagCode } from "@/ui/components/CountryFlag";
-import { TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
+import { NumberInputWithInsideLabel, TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
 import { inter } from "@/ui/fonts";
 import {
   ADJUSTMENT_MODE_LABEL,
@@ -314,25 +314,22 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
           {/* Base rate + effective date */}
           <Box className={classes.setRateRow}>
             <Box className={classes.baseRateCol}>
-              <label className={classes.rateField} data-error={errors.baseRate ? true : undefined}>
-                <span className={classes.rateCurrency}>
-                  <CountryFlag code={currencyFlagCode(target.code, target.countryCode)} size={24}
-                    round style={{ width: 24, height: 24 }} />
-                  {target.code}
-                </span>
-                <span className={classes.rateFieldText}>
-                  <span className={classes.rateFieldLabel}>Base rate ({target.code} per 1 {base.code})</span>
-                  <NumberInput variant="unstyled" hideControls allowNegative={false} decimalScale={rateDp}
-                    thousandSeparator="," placeholder={(0).toFixed(rateDp)} value={baseRate}
-                    aria-label={`Base rate (${target.code} per 1 ${base.code})`}
-                    classNames={{ wrapper: classes.rateFieldWrapper, input: classes.rateFieldInput }}
-                    onChange={(v) => { setBaseRate(asText(v)); clearApi("baseRate"); }}
-                    onBlur={() => touch("baseRate")} />
-                </span>
-              </label>
-              {errors.baseRate ? (
-                <Text className={classes.fieldError}>{errors.baseRate}</Text>
-              ) : (
+              {/* Shared floating-label number input; the target currency sits on the left */}
+              <NumberInputWithInsideLabel label={`Base rate (${target.code} per 1 ${base.code})`} withAsterisk={false}
+                hideControls allowNegative={false} decimalScale={rateDp} value={baseRate}
+                error={errors.baseRate || undefined}
+                leftSection={
+                  <span className={classes.rateCurrency}>
+                    <CountryFlag code={currencyFlagCode(target.code, target.countryCode)} size={24}
+                      round style={{ width: 24, height: 24 }} />
+                    {target.code}
+                  </span>
+                }
+                leftSectionWidth={88}
+                styles={{ label: { paddingLeft: 88 } }}
+                onChange={(v) => { setBaseRate(asText(v)); clearApi("baseRate"); }}
+                onBlur={() => touch("baseRate")} />
+              {!errors.baseRate && (
                 <Text className={classes.rateHint}>
                   Current live base rate: {formatRate(preview?.currentLiveBaseRate ?? live?.baseRate) === "-"
                     ? "None yet" : formatRate(preview?.currentLiveBaseRate ?? live?.baseRate)}
@@ -366,19 +363,13 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
                 onChange={(v) => { setMode(v); clearApi("adjustmentValue"); }}
                 options={modeOptions} />
               <Box className={classes.baseRateCol} style={{ flex: 1, width: "auto" }}>
-                <label className={classes.rateField} data-error={errors.adjustmentValue ? true : undefined}>
-                  <span className={classes.rateFieldText}>
-                    <span className={classes.rateFieldLabel}>{typeWord} value</span>
-                    <NumberInput variant="unstyled" hideControls allowNegative={false} decimalScale={rateDp}
-                      thousandSeparator="," placeholder={mode === "PERCENT" ? "0.00" : (0).toFixed(rateDp)} value={value}
-                      aria-label={`${typeWord} value`} data-medium
-                      classNames={{ wrapper: classes.rateFieldWrapper, input: classes.rateFieldInput }}
-                      onChange={(v) => { setValue(asText(v)); clearApi("adjustmentValue"); }}
-                      onBlur={() => touch("adjustmentValue")} />
-                  </span>
-                  {mode === "PERCENT" ? <Icon name="percent" /> : <span className={classes.rateFieldUnit}>{target.code}</span>}
-                </label>
-                {errors.adjustmentValue && <Text className={classes.fieldError}>{errors.adjustmentValue}</Text>}
+                <NumberInputWithInsideLabel label={`${typeWord} value`} withAsterisk={false}
+                  hideControls allowNegative={false} decimalScale={rateDp} value={value}
+                  error={errors.adjustmentValue || undefined}
+                  rightSection={mode === "PERCENT" ? <Icon name="percent" /> : <span className={classes.rateFieldUnit}>{target.code}</span>}
+                  rightSectionWidth={56}
+                  onChange={(v) => { setValue(asText(v)); clearApi("adjustmentValue"); }}
+                  onBlur={() => touch("adjustmentValue")} />
               </Box>
             </Box>
           )}

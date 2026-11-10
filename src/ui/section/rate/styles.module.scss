@@ -387,6 +387,8 @@
   // so the last rows can scroll clear of the screen edge
   &:not(:has(.reviewFooter)) { padding-bottom: 48px; }
 }
+// Review / Audit event drawers: more air between sections than the dense Set rate form
+.reviewBodyRoomy { gap: 24px; }
 // The drawer scrolls as one panel, so long events reach their last row
 .reviewDrawer { overflow-y: auto; }
 .reviewTopBar { display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #eaecf0; }
@@ -396,7 +398,9 @@
 .reviewTitle { font-family: "EksellDisplaySmall", serif; font-size: 24px; font-weight: 700; line-height: 1.2; color: #344054; }
 .reviewClose { position: absolute; top: 22px; right: 20px; display: flex; cursor: pointer; }
 .reviewSection { display: flex; flex-direction: column; padding: 0 24px; }
-.reviewMeta { gap: 7px; align-items: flex-start; }
+// Status badge, then the title and timestamp: the badge sits apart from the text under it
+.reviewMeta { gap: 8px; align-items: flex-start; }
+.reviewMeta .pendingBadge { margin-bottom: 8px; }
 .pendingBadge {
   display: inline-flex;
   padding: 6px 12px;
@@ -407,8 +411,8 @@
   font-weight: 500;
   line-height: 1;
 }
-.reviewHeading { font-size: 16px; font-weight: 700; line-height: 1; color: #344054; }
-.reviewStamp { font-size: 12px; line-height: 1; color: #667085; }
+.reviewHeading { font-size: 16px; font-weight: 700; line-height: 1.3; color: #344054; }
+.reviewStamp { font-size: 12px; line-height: 1.4; color: #667085; }
 .submitter {
   display: flex;
   align-items: center;
@@ -457,9 +461,9 @@
 .rateGridLabel { color: #667085; }
 .rateGridValue { color: #344054; overflow: hidden; text-overflow: ellipsis; }
 .rateGridStrong { font-weight: 700; }
-.fieldBlock { display: flex; flex-direction: column; gap: 8px; padding: 0 24px; line-height: 1; }
+.fieldBlock { display: flex; flex-direction: column; gap: 10px; padding: 0 24px; line-height: 1.2; }
 .fieldBlockLabel { font-size: 12px; font-weight: 700; color: #667085; }
-.fieldBlockText { font-size: 14px; color: #344054; }
+.fieldBlockText { font-size: 14px; line-height: 1.5; color: #344054; }
 .fieldBlockMuted { color: #667085; }
 .warnNotice {
   display: flex;
@@ -880,22 +884,6 @@
 .setRateRow { display: flex; align-items: flex-start; gap: 16px; padding: 0 24px; }
 .baseRateCol { display: flex; flex-direction: column; gap: 8px; width: 275.5px; flex-shrink: 0; min-width: 0; }
 
-// "Floating label" fields: 48px tall, label 12px + 4px + value 16px
-.rateField {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  height: 48px;
-  padding: 0 15px;
-  border: 1px solid #f2f4f7;
-  border-radius: 8px;
-  background: white;
-  cursor: text;
-
-  img { flex-shrink: 0; }
-  &:focus-within { padding: 0 14px; border: 2px solid #c1dd06; }
-  &[data-error] { padding: 0 14px; border: 2px solid #ff9175; background: #fff3f0; }
-}
 .rateCurrency {
   display: flex;
   align-items: center;
@@ -905,37 +893,6 @@
   font-weight: 500;
   line-height: 1;
   color: #344054;
-}
-.rateFieldText { display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0; line-height: 1; }
-.rateFieldLabel {
-  height: 12px;
-  font-size: 12px;
-  line-height: 1;
-  color: #667085;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  [data-error] & { color: #db340b; }
-}
-// Mantine NumberInput (unstyled) inside the floating-label field; !important beats the global input rules
-.rateFieldWrapper { width: 100%; }
-.rateField .rateFieldInput {
-  width: 100%;
-  height: 16px !important;
-  min-height: 16px !important;
-  padding: 0 !important;
-  border: 0 !important;
-  outline: none;
-  box-shadow: none !important;
-  background: transparent !important;
-  font-family: inherit;
-  font-size: 16px !important;
-  line-height: 1;
-  color: #344054;
-
-  &[data-medium], [data-medium] & { font-weight: 500; }
-  &::placeholder { color: #98a2b3 !important; font-size: 16px !important; }
 }
 .rateFieldUnit { font-size: 14px; font-weight: 500; line-height: 1; color: #98a2b3; }
 .rateHint { font-size: 12px; line-height: 1; color: #667085; }
@@ -1123,31 +1080,7 @@
   .fieldError { grid-column: 1 / -1; }
 }
 .currencySwap { display: flex; align-items: center; justify-content: center; }
-.currencySelect {
-  min-width: 0;
-
-  :global(.mantine-Select-input) {
-    height: 48px;
-    min-height: 48px;
-    padding-left: 48px;
-    padding-right: 48px;
-    background: transparent;
-    font-size: 16px !important;
-    line-height: 16px;
-    text-overflow: ellipsis;
-  }
-  :global(.mantine-Select-label) {
-    max-width: calc(100% - 48px);
-  }
-  &[data-has-value] :global(.mantine-Select-label) {
-    font-size: 12px !important;
-    line-height: 12px;
-  }
-  :global(.mantine-Select-input)[data-error] {
-    border-color: #ff9175 !important;
-    background: #fff3f0;
-  }
-}
+.currencySelect { min-width: 0; }
 .addCheckbox {
   :global(.mantine-Checkbox-inner),
   :global(.mantine-Checkbox-input) { width: 24px; height: 24px; }

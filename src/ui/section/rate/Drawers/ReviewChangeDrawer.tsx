@@ -6,7 +6,7 @@ import dayjs from "dayjs";
 import { isAxiosError } from "axios";
 import utc from "dayjs/plugin/utc";
 import { PrimaryBtn } from "@/ui/components/Buttons";
-import { TextInputWithInsideLabel } from "@/ui/components/InputWithLabel";
+import { TextareaWithInsideLabel } from "@/ui/components/InputWithLabel";
 import useNotification from "@/lib/hooks/notification";
 import { apiFieldErrors, apiMessage, formatRate, RateChange, ratesAxios, ReviewView } from "@/lib/hooks/rates";
 import classes from "../styles.module.scss";
@@ -145,7 +145,7 @@ export default function ReviewChangeDrawer({
   return (
     <Drawer opened={!!changeId} onClose={onClose} position="right" size={631} padding={0}
       withCloseButton={false} aria-labelledby="review-change-title"
-      classNames={{ content: classes.reviewDrawer, body: classes.reviewBody }}>
+      classNames={{ content: classes.reviewDrawer, body: `${classes.reviewBody} ${classes.reviewBodyRoomy}` }}>
       {/* Top bar */}
       <Box className={classes.reviewTopBar}>
         <Box className={classes.reviewNav} />
@@ -224,7 +224,7 @@ export default function ReviewChangeDrawer({
           {/* Checker comment */}
           {canReview ? (
             <Box className={classes.reviewSection}>
-              <TextInputWithInsideLabel standard label="Checker comment" withAsterisk value={comment}
+              <TextareaWithInsideLabel standard label="Checker comment" withAsterisk value={comment} autosize minRows={3} maxRows={8}
                 placeholder="e.g. Rate within tolerance" error={commentError}
                 onChange={(e) => { setComment(e.currentTarget.value); setCommentError(null); }} />
             </Box>

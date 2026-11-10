@@ -57,7 +57,6 @@ function CurrencySelect({
   return (
     <SelectInputWithInsideLabel
       className={classes.currencySelect}
-      data-has-value={!!selected || undefined}
       label={label}
       aria-label={label}
       withAsterisk={false}
@@ -70,7 +69,7 @@ function CurrencySelect({
       searchable
       nothingFoundMessage={loading ? "Loading currencies…" : "No currencies available"}
       leftSection={selected ? <Flag currency={selected} /> : undefined}
-      leftSectionWidth={48}
+      leftSectionWidth={44}
       rightSection={<Icon name="select-chevron" />}
       rightSectionWidth={48}
       comboboxProps={{ withinPortal: true, position: "bottom-start", offset: 3 }}
@@ -86,8 +85,8 @@ function CurrencySelect({
         </>;
       }}
       styles={{
-        input: { paddingTop: selected ? 16 : 0 },
-        label: { top: selected ? 8 : 16, transform: "none", paddingTop: 0, paddingLeft: 48 },
+        // Shared floating-label sizing; the label only shifts right to clear the flag
+        label: { paddingLeft: 44 },
         dropdown: { padding: "12px 0", background: "#f9f9f9", borderRadius: 16 },
         option: { display: "flex", alignItems: "center", gap: 8, padding: "8px 12px" },
       }}

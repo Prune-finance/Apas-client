@@ -45,7 +45,7 @@ export default function AuditEventDrawer({ eventId, onClose }: { eventId: string
   return (
     <Drawer opened={!!eventId} onClose={onClose} position="right" size={631} padding={0}
       withCloseButton={false} aria-labelledby="audit-event-title"
-      classNames={{ content: classes.reviewDrawer, body: classes.reviewBody }}>
+      classNames={{ content: classes.reviewDrawer, body: `${classes.reviewBody} ${classes.reviewBodyRoomy}` }}>
       <Box className={classes.reviewTopBar}>
         <Box className={classes.reviewNav} />
         <Box className={classes.reviewTitleRow}>

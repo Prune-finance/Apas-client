@@ -52,6 +52,12 @@ const adjustmentError = (fields: Record<string, string>) =>
 
 const DECIMAL = /^\d+(\.\d+)?$/;
 
+// Rate fields take numbers only: digits and one decimal point, capped at `dp` decimal places
+const numericOnly = (raw: string, dp: number) => {
+  const [whole, ...rest] = raw.replace(/[^\d.]/g, "").split(".");
+  return rest.length ? `${whole}.${rest.join("").slice(0, dp)}` : whole;
+};
+
 function Segmented<T extends string>({ value, onChange, options, className, label }: {
   value: T;
   onChange: (v: T) => void;
@@ -320,7 +326,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
                 <span className={classes.rateFieldText}>
                   <span className={classes.rateFieldLabel}>Base rate ({target.code} per 1 {base.code})</span>
                   <input className={classes.rateFieldInput} inputMode="decimal" placeholder={(0).toFixed(rateDp)} value={baseRate}
-                    onChange={(e) => { setBaseRate(e.currentTarget.value.replace(/,/g, "")); clearApi("baseRate"); }}
+                    onChange={(e) => { setBaseRate(numericOnly(e.currentTarget.value, rateDp)); clearApi("baseRate"); }}
                     onBlur={() => touch("baseRate")} />
                 </span>
               </label>
@@ -365,7 +371,7 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
                     <span className={classes.rateFieldLabel}>{typeWord} value</span>
                     <input className={classes.rateFieldInput} data-medium inputMode="decimal"
                       placeholder={mode === "PERCENT" ? "0.00" : (0).toFixed(rateDp)} value={value}
-                      onChange={(e) => { setValue(e.currentTarget.value.replace(/,/g, "")); clearApi("adjustmentValue"); }}
+                      onChange={(e) => { setValue(numericOnly(e.currentTarget.value, rateDp)); clearApi("adjustmentValue"); }}
                       onBlur={() => touch("adjustmentValue")} />
                   </span>
                   {mode === "PERCENT" ? <Icon name="percent" /> : <span className={classes.rateFieldUnit}>{target.code}</span>}

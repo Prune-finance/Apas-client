@@ -22,7 +22,7 @@ import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import ModalComponent from "@/ui/components/Modal";
-import UpdateModal from "../../../modal";
+import UpdateModal from "../../../modals/modal";
 import {
   IconFileUnknown,
   IconPencilMinus,

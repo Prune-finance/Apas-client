@@ -1,5 +1,5 @@
 import React from "react";
-import ValentineBackgroundImage from "@/assets/val-image.png";
+import ValentineBackgroundImage from "@/assets/img/val-image.png";
 import { BackgroundImage, Box, Flex, Text } from "@mantine/core";
 
 interface Valentine {

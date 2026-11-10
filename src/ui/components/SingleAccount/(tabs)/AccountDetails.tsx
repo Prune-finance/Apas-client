@@ -9,15 +9,11 @@ import {
   Stack,
   Skeleton,
   Text,
-  Image,
 } from "@mantine/core";
 import { GiEuropeanFlag } from "react-icons/gi";
 import { PrimaryBtn } from "../../Buttons";
 import { Account } from "@/lib/hooks/accounts";
-import GBImage from "@/assets/GB.png";
-import USImage from "@/assets/USD.png";
-import EUImage from "@/assets/EU-icon.png";
-import GHSImage from "@/assets/cedis-icon.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 interface Props {
   account: Account | null;
@@ -59,17 +55,7 @@ export default function AccountDetails({ account, loading, currency = "EUR" }: P
       <Group gap={7}>
         <ThemeIcon radius="xl" color="transparent">
           {!loading ? (
-            <>
-              {currency === "GBP" ? (
-                <Image src={GBImage.src} alt="GBP" w={20} h={20} />
-              ) : currency === "USD" ? (
-                <Image src={USImage.src} alt="USD" w={20} h={20} />
-              ) : currency === "GHS" ? (
-                <Image src={GHSImage.src} alt="GHS" w={20} h={20} />
-              ) : (
-                <Image src={EUImage.src} alt="EUR" w={20} h={20} />
-              )}
-            </>
+            <CountryFlag code={currency} size={20} />
           ) : (
             <Skeleton w={20} h={20} />
           )}

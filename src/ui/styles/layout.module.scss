@@ -18,3 +18,23 @@
 .user__header {
   border-bottom: 1px solid #f2f2f2;
 }
+
+// Admin dashboard background (Figma 15466:120244)
+.admin__shell {
+  --dashboard-page-background: transparent;
+
+  .main {
+    padding-left: calc(var(--app-shell-navbar-offset, 0px) + 28px);
+    background-color: #f9f9f9; // semantic/bg/canvas
+  }
+}
+
+.admin__header {
+  background-color: #fff;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.admin__navbar {
+  background-color: #fff;
+  border-right: 1px solid #eae8f1;
+}

@@ -94,6 +94,7 @@ export interface IParams {
   lastName?: string;
   reqCount?: string;
   otherReq?: string;
+  service?: string;
 }
 
 export interface Tab {

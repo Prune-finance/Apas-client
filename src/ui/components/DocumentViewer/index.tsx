@@ -1,7 +1,6 @@
 "use client";
 
-import { Box, Button, Flex, Image, LoadingOverlay, Text } from "@mantine/core";
-import { IconFile, IconMinus, IconPlus } from "@tabler/icons-react";
+import { Box, Flex, Image, LoadingOverlay, Text } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 // import RenderPdf from "./renderPdf";
 import dynamic from "next/dynamic";
@@ -13,6 +12,7 @@ const RenderPdf = dynamic(() => import("./renderPdf"), {
 interface FileDisplayProps {
   fileUrl: string;
   download?: boolean;
+  contentType?: string;
 }
 
 enum FileType {
@@ -29,15 +29,24 @@ const fileTypeMap: { [key: string]: FileType } = {
   jpg: FileType.JPEG,
 };
 
-const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
+const mimeTypeMap: { [key: string]: FileType } = {
+  "application/pdf": FileType.PDF,
+  "image/png": FileType.PNG,
+  "image/jpeg": FileType.JPEG,
+  "image/jpg": FileType.JPEG,
+};
+
+const FileDisplay = ({ fileUrl, download = true, contentType }: FileDisplayProps) => {
   const getFileType = (url: string): FileType => {
-    const extension = url.split(".").pop()?.toLowerCase();
+    if (contentType && mimeTypeMap[contentType]) return mimeTypeMap[contentType];
+    // Strip query string before parsing extension
+    const cleanUrl = url.split("?")[0];
+    const extension = cleanUrl.split(".").pop()?.toLowerCase();
     return fileTypeMap[extension || ""] || FileType.UNKNOWN;
   };
 
   const fileType = getFileType(fileUrl);
   const [loading, setLoading] = useState(true);
-  const [size, setSize] = useState(70);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -67,162 +76,40 @@ const FileDisplay = ({ fileUrl, download = true }: FileDisplayProps) => {
         </ActionIcon>
       </Stack> */}
       <div>
-        {fileType === FileType.PDF ? (
-          <Flex align="center" justify="center" direction="column" gap={10}>
-            {/* <PDFICON /> */}
-            <RenderPdf pdfUrl={fileUrl} />
-
-            {download && fileUrl && (
-              <a href={fileUrl} download>
-                <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
-                  Download
-                </Button>
-              </a>
-            )}
+        {!fileUrl ? (
+          <Flex align="center" justify="center" h={200}>
+            <Text fz={14} fw={500} ta="center" c="dimmed">
+              No Document Provided
+            </Text>
           </Flex>
-        ) : fileType === FileType.JPEG ? (
+        ) : fileType === FileType.PDF ? (
+          <RenderPdf pdfUrl={fileUrl} />
+        ) : fileType === FileType.JPEG || fileType === FileType.PNG ? (
           <Flex align="center" justify="center" pos="relative">
             <LoadingOverlay
               visible={loading}
               zIndex={1000}
               overlayProps={{ radius: "sm", blur: 10 }}
-              loaderProps={{
-                color: "var(--prune-primary-700)",
-                type: "oval",
-                size: "50px",
-              }}
+              loaderProps={{ color: "var(--prune-primary-700)", type: "oval", size: "50px" }}
             />
-            <Flex align="center" justify="center" direction="column" gap={10}>
-              <Box w="100%" h="100%">
-                <Image
-                  src={fileUrl}
-                  fit="contain"
-                  alt="PNG preview"
-                  w={"100%"}
-                  h={`${size}vh`}
-                  //   style={{ maxWidth: "100%", height: "auto" }}
-                />
-              </Box>
-              {download && fileUrl && (
-                <a href={fileUrl} download>
-                  <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
-                    Download
-                  </Button>
-                </a>
-              )}
-            </Flex>
-
-            {/* {loading ? (
-              <Loader size="50px" color="var(--prune-primary-600)" />
-            ) : (
-              <Flex align="center" justify="center" direction="column" gap={10}>
-                <Box w="100%" h="100%">
-                  <Image
-                    src={fileUrl}
-                    fit="contain"
-                    alt="PNG preview"
-                    w={"100%"}
-                    h={"100%"}
-
-                    //   style={{ maxWidth: "100%", height: "auto" }}
-                  />
-                </Box>
-                {download && fileUrl && (
-                  <a href={fileUrl} download>
-                    <Button
-                      size="xs"
-                      radius={4}
-                      bg={"#97AD05"}
-                      c="#fff"
-                      fz={12}
-                    >
-                      Download
-                    </Button>
-                  </a>
-                )}
-              </Flex>
-            )} */}
-          </Flex>
-        ) : fileType === FileType.PNG ? (
-          <Flex align="center" justify="center" pos="relative">
-            <LoadingOverlay
-              visible={loading}
-              zIndex={1000}
-              overlayProps={{ radius: "sm", blur: 10 }}
-              loaderProps={{
-                color: "var(--prune-primary-700)",
-                type: "oval",
-                size: "50px",
-              }}
+            <Image
+              src={fileUrl}
+              fit="contain"
+              alt="document preview"
+              w="100%"
+              mah="70vh"
             />
-            <Flex align="center" justify="center" direction="column" gap={10}>
-              <Box w="100%" h="100%">
-                <Image
-                  src={fileUrl}
-                  fit="contain"
-                  alt="PNG preview"
-                  w={"100%"}
-                  h={`${size}vh`}
-                  //   style={{ maxWidth: "100%", height: "auto" }}
-                />
-              </Box>
-              {download && fileUrl && (
-                <a href={fileUrl} download>
-                  <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
-                    Download
-                  </Button>
-                </a>
-              )}
-            </Flex>
-
-            {/* {loading ? (
-              <Loader size="50px" color="var(--prune-primary-600)" />
-            ) : (
-              <Flex align="center" justify="center" direction="column" gap={10}>
-                <Box w="100%" h="100%">
-                  <Image
-                    src={fileUrl}
-                    fit="contain"
-                    alt="PNG preview"
-                    w={"100%"}
-                    h={"100%"}
-                    //   style={{ maxWidth: "100%", height: "auto" }}
-                  />
-                </Box>
-                {download && fileUrl && (
-                  <a href={fileUrl} download>
-                    <Button
-                      size="xs"
-                      radius={4}
-                      bg={"#97AD05"}
-                      c="#fff"
-                      fz={12}
-                    >
-                      Download
-                    </Button>
-                  </a>
-                )}
-              </Flex>
-            )} */}
           </Flex>
         ) : (
-          <Flex align="center" justify="center" gap={10} direction="column">
-            {fileUrl ? (
-              <IconFile size={100} color="#888" />
-            ) : (
-              <Text fz={14} fw={500} ta="center">
-                No Document Provided
-              </Text>
-            )}
-
-            {download && fileUrl && (
-              <a href={fileUrl} download>
-                <Button size="xs" radius={4} bg={"#97AD05"} c="#fff" fz={12}>
-                  Download
-                </Button>
-              </a>
-            )}
-          </Flex>
+          /* Unknown type or S3 URL without extension — let the browser render it */
+          <Box
+            component="iframe"
+            src={fileUrl}
+            w="100%"
+            h="70vh"
+            style={{ border: "none", display: "block" }}
+            title="document preview"
+          />
         )}
       </div>
     </Box>

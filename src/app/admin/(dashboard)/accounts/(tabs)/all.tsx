@@ -6,7 +6,6 @@ import React, { Dispatch, SetStateAction, useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import {
   Group,
-  Image,
   Menu,
   MenuDropdown,
   MenuItem,
@@ -38,7 +37,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { TableComponent } from "@/ui/components/Table";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
-import ModalComponent from "../modal";
+import ModalComponent from "@/ui/section/accounts/Modals";
 import { validateRequest } from "@/lib/schema";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { SearchInput, SelectBox, TextBox } from "@/ui/components/Inputs";
@@ -46,18 +45,15 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import useAxios from "@/lib/hooks/useAxios";
 import Link from "next/link";
 import { BadgeComponent } from "@/ui/components/Badge";
-import EUIcon from "@/assets/EU-icon.png";
-import GBPIcon from "@/assets/GB.png";
-import USDIcon from "@/assets/USD.png";
-import GHSIcon from "@/assets/GH.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 type Currency = "EUR" | "GBP" | "USD" | "GHS";
 
 const currencyTabs = [
-  { title: "EUR", currency: "EUR" as Currency, icon: EUIcon.src },
-  { title: "GBP", currency: "GBP" as Currency, icon: GBPIcon.src },
-  { title: "USD", currency: "USD" as Currency, icon: USDIcon.src },
-  { title: "GHS", currency: "GHS" as Currency, icon: GHSIcon.src },
+  { title: "EUR", currency: "EUR" as Currency },
+  { title: "GBP", currency: "GBP" as Currency },
+  { title: "USD", currency: "USD" as Currency },
+  { title: "GHS", currency: "GHS" as Currency },
 ];
 
 export default function AllAccounts() {
@@ -240,7 +236,7 @@ export default function AllAccounts() {
                 transition: "background-color 0.15s ease, color 0.15s ease",
               }}
             >
-              <Image src={t.icon} alt="icon" h={20} w={20} />
+              <CountryFlag code={t.currency} size={20} />
               {t.title}
             </button>
           );

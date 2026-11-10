@@ -36,7 +36,7 @@ import {
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import useNotification from "@/lib/hooks/notification";
-import RequestDrawer from "@/app/admin/(dashboard)/requests/RequestDrawer";
+import RequestDrawer from "@/ui/section/requests/Drawers/RequestDrawer";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { TableComponent } from "@/ui/components/Table";

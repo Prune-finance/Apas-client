@@ -1,14 +1,30 @@
+// Figma table (15677:340978): white table with 16px corners.
+// Rounded corners need separate borders, so row lines are drawn on the cells.
 .table {
-  overflow-x: scroll;
   margin-top: 30px;
+  width: 100%;
+  background-color: #fff;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 16px;
+  overflow: hidden;
+
+  > tbody > tr > td {
+    border-bottom: 1px solid #f2f4f7;
+  }
 }
 
+// Figma header cell (15677:340979): #f2f4f7 background, 14px semibold #344054, 48px tall
 .table__th {
-  font-size: 10px;
+  height: 48px;
+  padding: 14px 8px !important;
+  font-size: 14px !important;
   font-weight: 600;
-  color: var(--prune-text-gray-600);
+  line-height: 1;
+  color: #344054;
   text-transform: capitalize;
-  letter-spacing: 0.5px;
+  letter-spacing: 0;
+  border-bottom: 1px solid #f2f4f7;
 }
 
 .table__td {

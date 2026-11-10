@@ -11,7 +11,7 @@ import {
   Image,
   Text,
 } from "@mantine/core";
-import ContactFAQIcon from "@/assets/contact-faq-icon.png";
+import ContactFAQIcon from "@/assets/img/contact-faq-icon.png";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import AvatarStack from "@/ui/components/AvatarStack";
 import { SearchInput } from "@/ui/components/Inputs";

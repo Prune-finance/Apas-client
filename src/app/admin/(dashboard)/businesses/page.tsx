@@ -1,21 +1,50 @@
+"use client";
+
 import { Tab } from "@/lib/schema";
 import TabsComponent from "@/ui/components/Tabs";
-import { Box, TabsPanel, Title } from "@mantine/core";
+import { Box, Flex, Text, TabsPanel, Title } from "@mantine/core";
 import { Suspense } from "react";
 import OnboardedBusinesses from "./(tabs)/Onboarded";
-import OnboardingBusinesses from "./(tabs)/Onboarding";
+// import OnboardingBusinesses from "./(tabs)/Onboarding";
 import ApiActiveBusinesses from "./(tabs)/ApiActive";
 import AccountActiveBusinesses from "./(tabs)/AccountActive";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function Businesses() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab") || "onboarded";
+
+  const handleTabChange = (value: string | null) => {
+    if (!value) return;
+    router.push(`/admin/businesses?tab=${value}`);
+  };
+
   return (
     <Box px={20}>
-      <Title order={2}>Businesses</Title>
+      <Flex justify="space-between" align="flex-start">
+        <Box>
+          <Title order={2} fw={700}>Businesses</Title>
+          <Text fz={14} c="var(--prune-text-gray-500)" mt={4}>
+            View and manage all businesses on the platform.
+          </Text>
+        </Box>
+      </Flex>
 
-      <TabsComponent tabs={tabs} mt={32}>
-        {[OnboardedBusinesses, OnboardingBusinesses, ApiActiveBusinesses, AccountActiveBusinesses].map((Component, index) => (
+      <TabsComponent
+        tabs={tabs}
+        mt={32}
+        value={currentTab}
+        onChange={handleTabChange}
+      >
+        {[
+          OnboardedBusinesses,
+          // OnboardingBusinesses,
+          ApiActiveBusinesses,
+          AccountActiveBusinesses,
+        ].map((Component, index) => (
           <TabsPanel value={tabs[index].value} key={index}>
-            <Component />
+            {currentTab === tabs[index].value && <Component />}
           </TabsPanel>
         ))}
       </TabsComponent>
@@ -32,8 +61,8 @@ export default function BusinessesSuspense() {
 }
 
 const tabs: Tab[] = [
-  { title: "Onboarded Businesses", value: "onboarded" },
-  { title: "Onboarding Businesses", value: "onboarding" },
-  { title: "API Active Businesses", value: "api" },
-  { title: "Account Active Businesses", value: "account" },
+  { title: "Onboarded", value: "onboarded" },
+  // { title: "Onboarding", value: "onboarding" },
+  { title: "API Active", value: "api" },
+  { title: "Account Active", value: "account" },
 ];

@@ -75,9 +75,11 @@ export default function Directors({
         </Text>
         <PrimaryBtn
           text="Add Director"
-          fw={600}
-          fz={12}
-          leftSection={<IconPlus size={16} />}
+          icon={IconPlus}
+          showIcon
+          h={36}
+          fz={13}
+          fw={500}
           action={() => {
             open();
 

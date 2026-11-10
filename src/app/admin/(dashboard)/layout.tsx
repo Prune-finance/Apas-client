@@ -12,7 +12,6 @@ import Header from "@/ui/components/Header";
 import Navbar from "@/ui/components/Navbar";
 
 import styles from "@/ui/styles/layout.module.scss";
-import { switzer } from "@/ui/fonts";
 
 export default function RootLayout({
   children,
@@ -22,34 +21,31 @@ export default function RootLayout({
   const [opened, { toggle }] = useDisclosure();
 
   return (
-    <html lang="en">
-      <body className={switzer.className}>
-        <AppShell
-          layout="alt"
-          header={{ height: 56 }}
-          navbar={{
-            width: 250,
-            breakpoint: "sm",
-            collapsed: { mobile: !opened },
-          }}
-          padding="xl"
-          classNames={{ main: styles.main }}
-        >
-          <AppShellHeader withBorder={false}>
-            <Header />
-          </AppShellHeader>
+    <AppShell
+      layout="alt"
+      header={{ height: 56 }}
+      navbar={{
+        width: 250,
+        breakpoint: "sm",
+        collapsed: { mobile: !opened },
+      }}
+      padding="xl"
+      classNames={{ main: styles.main }}
+      className={styles.admin__shell}
+    >
+      <AppShellHeader withBorder={false} className={styles.admin__header}>
+        <Header />
+      </AppShellHeader>
 
-          <AppShellNavbar p="md">
-            <Navbar />
-          </AppShellNavbar>
+      <AppShellNavbar p="md" className={styles.admin__navbar}>
+        <Navbar />
+      </AppShellNavbar>
 
-          <AppShellMain>
-            <Container p={0} fluid>
-              {children}
-            </Container>
-          </AppShellMain>
-        </AppShell>
-      </body>
-    </html>
+      <AppShellMain>
+        <Container p={0} fluid>
+          {children}
+        </Container>
+      </AppShellMain>
+    </AppShell>
   );
 }

@@ -1,0 +1,46 @@
+.root {
+  --pin-input-size: 58px;
+  gap: 16px;
+}
+
+.pinInput {
+  width: var(--pin-input-size) !important;
+  height: var(--pin-input-size) !important;
+  flex: 0 0 var(--pin-input-size);
+}
+
+.input {
+  --input-height: var(--pin-input-size) !important;
+  --input-size: var(--pin-input-size) !important;
+  width: var(--pin-input-size) !important;
+  height: var(--pin-input-size) !important;
+  min-height: var(--pin-input-size) !important;
+  box-sizing: border-box;
+  padding: 0;
+  text-align: center;
+  font-family: var(--mantine-font-family);
+  font-size: 18px;
+  line-height: 1;
+  color: #344054;
+  background-color: #ffffff;
+  border: 1px solid #eaecf0;
+  border-radius: 4px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: transparent;
+  }
+
+  &:focus,
+  &:focus-within {
+    border-color: #97ad05;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 0 4px rgba(208, 245, 0, 0.19);
+    outline: none;
+  }
+
+  &[data-invalid] {
+    border-color: #ff9175;
+    background-color: #fff3f0;
+  }
+}

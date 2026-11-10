@@ -3,11 +3,12 @@
 import { Text, Tabs, TabsList, TabsTab, TabsPanel } from "@mantine/core";
 
 import styles from "@/ui/styles/settings.module.scss";
-import { IconLogs, IconNotification } from "@tabler/icons-react";
+import { IconCoins, IconLogs, IconNotification } from "@tabler/icons-react";
 
 import Logs from "./(tabs)/logs";
 import { useState } from "react";
 import Notifications from "./(tabs)/notifications";
+import RateCurrencies from "./(tabs)/currencies";
 
 export default function DebitRequests() {
   const [tab, setTab] = useState<string | null>("Logs");
@@ -32,6 +33,8 @@ export default function DebitRequests() {
           value={tab}
           onChange={setTab}
           variant="pills"
+          // Only the open tab is mounted, so each tab fetches when you navigate to it
+          keepMounted={false}
           classNames={{
             root: styles.tabs,
             list: styles.tabs__list,
@@ -57,6 +60,9 @@ export default function DebitRequests() {
           <TabsPanel value="Notifications">
             <Notifications />
           </TabsPanel>
+          <TabsPanel value="Currencies">
+            <RateCurrencies />
+          </TabsPanel>
         </Tabs>
       </div>
     </main>
@@ -66,4 +72,5 @@ export default function DebitRequests() {
 const tabs = [
   { title: "Audit Logs", value: "Logs", icon: <IconLogs size={14} /> },
   { title: "Notifications", icon: <IconNotification size={14} /> },
+  { title: "Rate Currencies", value: "Currencies", icon: <IconCoins size={14} /> },
 ];

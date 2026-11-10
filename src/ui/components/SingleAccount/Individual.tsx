@@ -15,10 +15,7 @@ import {
   IconCircleFilled,
 } from "@tabler/icons-react";
 
-import GBImage from "@/assets/GB.png";
-import EUImage from "@/assets/EU-icon.png";
-import GHSImage from "@/assets/GH.png";
-import USDImage from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 import styles from "./sendMoney.module.scss";
 
@@ -782,20 +779,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
                             </Avatar>
 
                             <Box pos="absolute" bottom={2} right={-4}>
-                              <Image
-                                src={
-                                  switchCurrency === "EUR"
-                                    ? EUImage.src
-                                    : switchCurrency === "GBP"
-                                    ? GBImage.src
-                                    : switchCurrency === "GHS"
-                                    ? GHSImage.src
-                                    : USDImage.src
-                                }
-                                alt="EUR"
-                                width={16}
-                                height={16}
-                              />
+                              <CountryFlag code={switchCurrency} size={16} />
                             </Box>
                           </Box>
                           <Text
@@ -1426,20 +1410,7 @@ const Individual = forwardRef<HTMLDivElement, IndividualProps>(
             size={500}
           >
             <Group gap={8} mb={12}>
-              <Image
-                src={
-                  switchCurrency === "EUR"
-                    ? EUImage.src
-                    : switchCurrency === "GBP"
-                    ? GBImage.src
-                    : switchCurrency === "GHS"
-                    ? GHSImage.src
-                    : USDImage.src
-                }
-                alt={switchCurrency}
-                width={18}
-                height={18}
-              />
+              <CountryFlag code={switchCurrency} size={18} />
               <Text fz={14}>{switchCurrency}</Text>
             </Group>
 

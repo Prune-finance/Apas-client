@@ -26,7 +26,7 @@ export default function Header() {
     setLoading(true);
     setTimeout(() => {
       Cookies.remove("auth");
-      push("/auth/onboarding/login");
+      push("/auth/login");
       setLoading(false);
     }, 2000);
   };

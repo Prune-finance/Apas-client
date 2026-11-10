@@ -484,3 +484,17 @@ export function usePairChart(pairId: string, range: ChartRange, version = 0) {
   }, [pairId, range, version]);
   return { chart, loading };
 }
+
+/**
+ * Save an export without leaving the page: the signed file link goes through the app's
+ * /api/download route, which serves it as an attachment, so no blank tab opens.
+ */
+export const downloadExport = ({ url, filename }: { url: string; filename?: string }) => {
+  const name = filename || url.split("?")[0].split("/").pop() || "export.xlsx";
+  const link = document.createElement("a");
+  link.href = `/api/download?url=${encodeURIComponent(url)}&name=${encodeURIComponent(name)}`;
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+};

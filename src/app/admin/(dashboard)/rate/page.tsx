@@ -15,7 +15,7 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import PaginationComponent from "@/ui/components/Pagination";
 import CountryFlag from "@/ui/components/CountryFlag";
 import useNotification from "@/lib/hooks/notification";
-import { apiMessage, formatRate, PairStatus, RatePairRow, ratesAxios, useRatePairs, useRatesMeta } from "@/lib/hooks/rates";
+import { apiMessage, downloadExport, formatRate, PairStatus, RatePairRow, ratesAxios, useRatePairs, useRatesMeta } from "@/lib/hooks/rates";
 import classes from "@/ui/section/rate/styles.module.scss";
 import DisableRateModal from "@/ui/section/rate/Modals/DisableRateModal";
 import EnablePairModal from "@/ui/section/rate/Modals/EnablePairModal";
@@ -97,7 +97,7 @@ export default function RatePage() {
           Object.entries({ ...appliedFilters, search: debouncedSearch.trim() }).filter(([, v]) => v)
         ),
       });
-      if (data.data?.url) window.open(data.data.url, "_blank", "noopener");
+      if (data.data?.url) downloadExport(data.data);
       else handleError("Nothing to export", data.message ?? "No pairs match the current filters.");
     } catch (error) {
       handleError("Export failed", apiMessage(error));

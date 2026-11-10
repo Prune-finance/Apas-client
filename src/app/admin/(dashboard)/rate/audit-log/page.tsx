@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Box, Text } from "@mantine/core";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import useNotification from "@/lib/hooks/notification";
-import { apiMessage, auditExportParams, ratesAxios } from "@/lib/hooks/rates";
+import { apiMessage, auditExportParams, downloadExport, ratesAxios } from "@/lib/hooks/rates";
 import classes from "@/ui/section/rate/styles.module.scss";
 import AuditTrail, { AuditFilterQuery } from "@/ui/section/rate/AuditTrail";
 import { Icon } from "@/ui/section/rate/shared";
@@ -21,7 +21,7 @@ export default function AuditLogPage() {
     setExporting(true);
     try {
       const { data } = await ratesAxios.get("/audit-logs/export", { params: auditExportParams(query.current) });
-      if (data.data?.url) window.open(data.data.url, "_blank", "noopener");
+      if (data.data?.url) downloadExport(data.data);
       else handleError("Nothing to export", data.message ?? "No events match the current filters.");
     } catch (error) {
       handleError("Export failed", apiMessage(error));

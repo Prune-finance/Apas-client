@@ -28,6 +28,7 @@ import {
   IconMoneybag,
   IconSearch,
   IconUsersPlus,
+  IconShieldLock,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
@@ -89,6 +90,11 @@ export const AdminOtherLinks = [
     text: "User Management",
     link: "/admin/users",
     icon: <IconUsers size={16} />,
+  },
+  {
+    text: "Roles & Permissions",
+    link: "/admin/roles",
+    icon: <IconShieldLock size={16} />,
   },
   {
     text: "Pricing Plans",

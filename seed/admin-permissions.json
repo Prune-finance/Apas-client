@@ -1,0 +1,348 @@
+{
+  "$comment": "Proposed ADMIN permissions for the Prune back office, in the GET /v1/admin/permissions shape without ids/timestamps. A role gets every privilege in each permission it holds, so read access, write access and approvals are separate permissions; that lets roles such as an approver or a read-only auditor be built. Roles list permission actions, not privileges. Role management and assigning roles to admins are Super Admin only, so they have no privileges here. Super Admin is built in and needs no role.",
+  "permissions": [
+    {
+      "title": "Dashboard", "action": "dashboard", "category": "OVERVIEW", "audience": "ADMIN",
+      "description": "Admin dashboard overview",
+      "privileges": [
+        { "title": "View Dashboard", "action": "dashboard.view", "description": "Open the admin dashboard" }
+      ]
+    },
+    {
+      "title": "Notifications", "action": "notifications", "category": "OVERVIEW", "audience": "ADMIN",
+      "description": "Admin notifications",
+      "privileges": [
+        { "title": "View Notifications", "action": "notifications.view", "description": "See all, read and unread notifications" },
+        { "title": "Mark as Read", "action": "notifications.mark-read", "description": "Mark notifications as read" }
+      ]
+    },
+
+    {
+      "title": "Eligibility Center", "action": "eligibility-center", "category": "ONBOARDING", "audience": "ADMIN",
+      "description": "See onboarding applications",
+      "privileges": [
+        { "title": "View Applications", "action": "eligibility-center.view", "description": "See applications, stats and business profiles" }
+      ]
+    },
+    {
+      "title": "Eligibility Center Management", "action": "eligibility-center-management", "category": "ONBOARDING", "audience": "ADMIN",
+      "description": "Work on onboarding applications",
+      "privileges": [
+        { "title": "Create Business Profile", "action": "eligibility-center.create", "description": "Create a business profile and complete onboarding steps for a business" },
+        { "title": "Edit Application", "action": "eligibility-center.edit", "description": "Update business details, directors and shareholders" },
+        { "title": "Send Links", "action": "eligibility-center.send-links", "description": "Send questionnaire, onboarding and KYC links and resend invitations" },
+        { "title": "Review Documents", "action": "eligibility-center.review-documents", "description": "Approve documents and request more documents" },
+        { "title": "Enable Account Issuance", "action": "eligibility-center.enable-account-issuance", "description": "Enable account issuance for a business" }
+      ]
+    },
+    {
+      "title": "Eligibility Approvals", "action": "eligibility-approvals", "category": "ONBOARDING", "audience": "ADMIN",
+      "description": "Decide on onboarding applications",
+      "privileges": [
+        { "title": "Approve Application", "action": "eligibility-center.approve", "description": "Approve or reject an onboarding application" }
+      ]
+    },
+    {
+      "title": "Account Creation", "action": "account-requests", "category": "ONBOARDING", "audience": "ADMIN",
+      "description": "See account creation requests",
+      "privileges": [
+        { "title": "View Requests", "action": "account-requests.view", "description": "See account creation requests and their details" }
+      ]
+    },
+    {
+      "title": "Account Creation Approvals", "action": "account-request-approvals", "category": "ONBOARDING", "audience": "ADMIN",
+      "description": "Process account creation requests",
+      "privileges": [
+        { "title": "Upload Documents", "action": "account-requests.upload-documents", "description": "Upload documents to an account creation request" },
+        { "title": "Approve Request", "action": "account-requests.approve", "description": "Approve or reject an account creation request" }
+      ]
+    },
+
+    {
+      "title": "Businesses", "action": "businesses", "category": "BUSINESS MANAGEMENT", "audience": "ADMIN",
+      "description": "See onboarded businesses",
+      "privileges": [
+        { "title": "View Businesses", "action": "businesses.view", "description": "See businesses, their accounts, people, documents and requests" },
+        { "title": "Download Report", "action": "businesses.download-report", "description": "Download a business report" },
+        { "title": "View API Keys", "action": "businesses.view-keys", "description": "See a business's API keys" }
+      ]
+    },
+    {
+      "title": "Business Management", "action": "business-management", "category": "BUSINESS MANAGEMENT", "audience": "ADMIN",
+      "description": "Change onboarded businesses",
+      "privileges": [
+        { "title": "Edit Business", "action": "businesses.edit", "description": "Edit business info, directors, shareholders and documents" },
+        { "title": "Activate/Deactivate Business", "action": "businesses.toggle-status", "description": "Activate or deactivate a business" },
+        { "title": "Send Activation Link", "action": "businesses.send-activation-link", "description": "Send registration, activation and KYC links" }
+      ]
+    },
+    {
+      "title": "Business Users", "action": "business-users", "category": "BUSINESS MANAGEMENT", "audience": "ADMIN",
+      "description": "See users belonging to businesses",
+      "privileges": [
+        { "title": "View Business Users", "action": "business-users.view", "description": "See business users and their details" }
+      ]
+    },
+    {
+      "title": "Business User Management", "action": "business-user-management", "category": "BUSINESS MANAGEMENT", "audience": "ADMIN",
+      "description": "Change users belonging to businesses",
+      "privileges": [
+        { "title": "Add User", "action": "business-users.add", "description": "Add a user to a business" },
+        { "title": "Edit User", "action": "business-users.edit", "description": "Update a business user's details" },
+        { "title": "Activate/Deactivate User", "action": "business-users.toggle-status", "description": "Activate or deactivate a business user" },
+        { "title": "Reset Password", "action": "business-users.reset-password", "description": "Send a password reset to a business user" }
+      ]
+    },
+
+    {
+      "title": "Accounts", "action": "accounts", "category": "ACCOUNT MANAGEMENT", "audience": "ADMIN",
+      "description": "See default, issued and payout accounts",
+      "privileges": [
+        { "title": "View Accounts", "action": "accounts.view", "description": "See accounts and account details" },
+        { "title": "Export Accounts", "action": "accounts.export", "description": "Export account lists" }
+      ]
+    },
+    {
+      "title": "Account Controls", "action": "account-controls", "category": "ACCOUNT MANAGEMENT", "audience": "ADMIN",
+      "description": "Freeze, activate and deactivate accounts",
+      "privileges": [
+        { "title": "Freeze/Unfreeze Account", "action": "accounts.freeze", "description": "Freeze or unfreeze an account" },
+        { "title": "Activate/Deactivate Account", "action": "accounts.toggle-status", "description": "Activate or deactivate an account" }
+      ]
+    },
+
+    {
+      "title": "Transactions", "action": "transactions", "category": "TRANSACTIONS", "audience": "ADMIN",
+      "description": "Transactions across all account types",
+      "privileges": [
+        { "title": "View Transactions", "action": "transactions.view", "description": "See transactions" },
+        { "title": "Export Transactions", "action": "transactions.export", "description": "Export transactions" },
+        { "title": "Download Statement", "action": "transactions.download-statement", "description": "Download account statements and receipts" }
+      ]
+    },
+
+    {
+      "title": "Payouts", "action": "payouts", "category": "PAYOUTS", "audience": "ADMIN",
+      "description": "See payout transactions, users and inquiries",
+      "privileges": [
+        { "title": "View Payouts", "action": "payouts.view", "description": "See payout transactions, users and accounts" },
+        { "title": "View Inquiries", "action": "payouts.view-inquiries", "description": "See payout inquiries" }
+      ]
+    },
+    {
+      "title": "Payout Inquiries", "action": "payout-inquiries", "category": "PAYOUTS", "audience": "ADMIN",
+      "description": "Handle payout inquiries",
+      "privileges": [
+        { "title": "Respond to Inquiry", "action": "payouts.respond-inquiry", "description": "Reply to an inquiry and upload attachments" },
+        { "title": "Close/Reopen Inquiry", "action": "payouts.close-inquiry", "description": "Close or reopen an inquiry" }
+      ]
+    },
+
+    {
+      "title": "Requests", "action": "requests", "category": "REQUESTS", "audience": "ADMIN",
+      "description": "See every kind of business request",
+      "privileges": [
+        { "title": "View Debit Requests", "action": "debit-requests.view", "description": "See debit requests" },
+        { "title": "View Payout Requests", "action": "payout-requests.view", "description": "See payout requests" },
+        { "title": "View Live Key Requests", "action": "live-key-requests.view", "description": "See live key requests" },
+        { "title": "View Service Requests", "action": "service-requests.view", "description": "See account issuance and payout account requests" },
+        { "title": "View Currency Requests", "action": "currency-requests.view", "description": "See currency account requests" },
+        { "title": "View Reactivation Requests", "action": "reactivation-requests.view", "description": "See reactivation requests" }
+      ]
+    },
+    {
+      "title": "Debit Request Approvals", "action": "debit-request-approvals", "category": "REQUESTS", "audience": "ADMIN",
+      "description": "Decide on debit requests",
+      "privileges": [
+        { "title": "Approve Debit Request", "action": "debit-requests.approve", "description": "Approve or reject a debit request" }
+      ]
+    },
+    {
+      "title": "Payout Request Approvals", "action": "payout-request-approvals", "category": "REQUESTS", "audience": "ADMIN",
+      "description": "Decide on payout requests",
+      "privileges": [
+        { "title": "Approve Payout Request", "action": "payout-requests.approve", "description": "Approve or reject a payout request" }
+      ]
+    },
+    {
+      "title": "Live Key Approvals", "action": "live-key-approvals", "category": "REQUESTS", "audience": "ADMIN",
+      "description": "Decide on live API key requests",
+      "privileges": [
+        { "title": "Approve Live Key Request", "action": "live-key-requests.approve", "description": "Approve or reject a live key request" }
+      ]
+    },
+    {
+      "title": "Service Request Approvals", "action": "service-request-approvals", "category": "REQUESTS", "audience": "ADMIN",
+      "description": "Decide on account issuance and payout account requests",
+      "privileges": [
+        { "title": "Approve Service Request", "action": "service-requests.approve", "description": "Approve or reject a service request" }
+      ]
+    },
+    {
+      "title": "Currency Request Approvals", "action": "currency-request-approvals", "category": "REQUESTS", "audience": "ADMIN",
+      "description": "Decide on currency account requests",
+      "privileges": [
+        { "title": "Approve Currency Request", "action": "currency-requests.approve", "description": "Approve or reject a currency account request" }
+      ]
+    },
+    {
+      "title": "Reactivation Approvals", "action": "reactivation-approvals", "category": "REQUESTS", "audience": "ADMIN",
+      "description": "Decide on reactivation requests",
+      "privileges": [
+        { "title": "Approve Reactivation Request", "action": "reactivation-requests.approve", "description": "Approve or reject a reactivation request" }
+      ]
+    },
+
+    {
+      "title": "Rates", "action": "rates", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "Rates pages",
+      "privileges": [
+        { "title": "View Rates", "action": "rates.view", "description": "See rate pairs, pair details and rate history" },
+        { "title": "Export Rates", "action": "rates.export", "description": "Export rate pairs" },
+        { "title": "View Audit Log", "action": "rates.view-audit-log", "description": "See and export the rates audit log" }
+      ]
+    },
+    {
+      "title": "Rate Changes", "action": "rate-changes", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "Propose rate changes and manage pairs",
+      "privileges": [
+        { "title": "Set Rate", "action": "rates.set-rate", "description": "Preview and propose a rate change" },
+        { "title": "Manage Pairs", "action": "rates.manage-pairs", "description": "Add currency pairs and enable or disable them" }
+      ]
+    },
+    {
+      "title": "Rate Approvals", "action": "rate-approvals", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "Approve rate changes someone else proposed",
+      "privileges": [
+        { "title": "Approve Change", "action": "rates.approve-change", "description": "Approve or reject a proposed rate change" }
+      ]
+    },
+    {
+      "title": "Currencies", "action": "currencies", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "See supported currencies",
+      "privileges": [
+        { "title": "View Currencies", "action": "currencies.view", "description": "See supported currencies" }
+      ]
+    },
+    {
+      "title": "Currency Management", "action": "currency-management", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "Change supported currencies",
+      "privileges": [
+        { "title": "Add Currency", "action": "currencies.create", "description": "Add a currency" },
+        { "title": "Edit Currency", "action": "currencies.edit", "description": "Edit a currency" },
+        { "title": "Delete Currency", "action": "currencies.delete", "description": "Delete a currency" }
+      ]
+    },
+    {
+      "title": "Pricing Plans", "action": "pricing-plans", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "See business pricing plans",
+      "privileges": [
+        { "title": "View Pricing Plans", "action": "pricing-plans.view", "description": "See pricing plans" }
+      ]
+    },
+    {
+      "title": "Pricing Plan Management", "action": "pricing-plan-management", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "Change business pricing plans",
+      "privileges": [
+        { "title": "Create Pricing Plan", "action": "pricing-plans.create", "description": "Create or duplicate a pricing plan" },
+        { "title": "Edit Pricing Plan", "action": "pricing-plans.edit", "description": "Edit a pricing plan" }
+      ]
+    },
+    {
+      "title": "Audit Logs", "action": "logs", "category": "SETTINGS", "audience": "ADMIN",
+      "description": "System activity logs",
+      "privileges": [
+        { "title": "View Logs", "action": "logs.view", "description": "See activity logs" },
+        { "title": "Download Logs", "action": "logs.download", "description": "Download activity logs" }
+      ]
+    },
+
+    {
+      "title": "Admin Users", "action": "admins", "category": "USER MANAGEMENT", "audience": "ADMIN",
+      "description": "See the admin team",
+      "privileges": [
+        { "title": "View Admins", "action": "admins.view", "description": "See admin users" }
+      ]
+    },
+    {
+      "title": "Admin User Management", "action": "admin-management", "category": "USER MANAGEMENT", "audience": "ADMIN",
+      "description": "Invite and edit admins (giving them roles is Super Admin only)",
+      "privileges": [
+        { "title": "Invite Admin", "action": "admins.invite", "description": "Invite a new admin" },
+        { "title": "Edit Admin", "action": "admins.edit", "description": "Update an admin's details" }
+      ]
+    }
+  ],
+  "roles": [
+    {
+      "title": "Compliance Officer",
+      "description": "Reviews onboarding, account creation and service requests",
+      "audience": "ADMIN",
+      "permissions": [
+        "dashboard", "notifications",
+        "eligibility-center", "eligibility-center-management", "eligibility-approvals",
+        "account-requests", "account-request-approvals",
+        "businesses", "business-management",
+        "requests", "service-request-approvals", "reactivation-approvals"
+      ]
+    },
+    {
+      "title": "Operations",
+      "description": "Manages businesses, business users and accounts",
+      "audience": "ADMIN",
+      "permissions": [
+        "dashboard", "notifications",
+        "businesses", "business-users", "business-user-management",
+        "accounts", "account-controls",
+        "requests", "live-key-approvals", "currency-request-approvals"
+      ]
+    },
+    {
+      "title": "Finance",
+      "description": "Handles transactions, payouts and money-movement requests",
+      "audience": "ADMIN",
+      "permissions": [
+        "dashboard", "notifications",
+        "accounts", "transactions", "payouts",
+        "requests", "debit-request-approvals", "payout-request-approvals"
+      ]
+    },
+    {
+      "title": "Rates Manager",
+      "description": "Runs the rates desk",
+      "audience": "ADMIN",
+      "permissions": [
+        "dashboard", "notifications",
+        "rates", "rate-changes", "currencies", "currency-management"
+      ]
+    },
+    {
+      "title": "Rates Approver",
+      "description": "Approves rate changes proposed by the rates desk",
+      "audience": "ADMIN",
+      "permissions": ["dashboard", "notifications", "rates", "rate-approvals"]
+    },
+    {
+      "title": "Customer Support",
+      "description": "Read access to customer data, and handles payout inquiries",
+      "audience": "ADMIN",
+      "permissions": [
+        "dashboard", "notifications",
+        "businesses", "business-users", "accounts", "transactions",
+        "payouts", "payout-inquiries"
+      ]
+    },
+    {
+      "title": "Auditor",
+      "description": "Read-only access to every module, including exports and logs",
+      "audience": "ADMIN",
+      "permissions": [
+        "dashboard", "notifications",
+        "eligibility-center", "account-requests",
+        "businesses", "business-users",
+        "accounts", "transactions", "payouts", "requests",
+        "rates", "currencies", "pricing-plans", "logs", "admins"
+      ]
+    }
+  ]
+}

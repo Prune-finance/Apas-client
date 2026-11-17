@@ -199,6 +199,7 @@ export interface UserData {
   role?: string;
   roles?: string[];
   permissions?: string[];
+  privileges?: string[];
   company?: { name: string; id: string };
   companyId?: string;
   // onboarding-specific fields

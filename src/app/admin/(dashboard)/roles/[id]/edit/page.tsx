@@ -10,14 +10,17 @@ import { parseError } from "@/lib/actions/auth";
 import {
   AdminRolePayload,
   adminRolesApi,
-  selectionKeys,
+  refreshAdminMe,
+  useAdminAccess,
   useAdminRole,
 } from "@/lib/hooks/adminRoles";
 import RoleForm from "@/ui/section/roles/RoleForm";
+import SuperAdminOnly from "@/ui/section/roles/SuperAdminOnly";
 
 export default function EditRole() {
   const { id } = useParams<{ id: string }>();
   const { push } = useRouter();
+  const { isSuperAdmin } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
   const { role, loading } = useAdminRole(id);
   const [submitting, setSubmitting] = useState(false);
@@ -25,11 +28,15 @@ export default function EditRole() {
   const handleSubmit = async (values: AdminRolePayload) => {
     setSubmitting(true);
     try {
+      // permissions replaces the role's whole list
       await adminRolesApi.update(id, values);
       handleSuccess("Role update", `${values.title} role successfully updated`);
+      // the signed-in admin may hold this role
+      await refreshAdminMe();
       push("/admin/roles");
     } catch (error) {
       handleError("An error occurred", parseError(error));
+      refreshAdminMe();
     } finally {
       setSubmitting(false);
     }
@@ -55,7 +62,9 @@ export default function EditRole() {
         </Text>
       </Box>
 
-      {loading ? (
+      {!isSuperAdmin ? (
+        <SuperAdminOnly />
+      ) : loading ? (
         <Stack mt={20} gap={16}>
           <Skeleton height={44} maw={600} />
           <Skeleton height={70} maw={600} />
@@ -72,7 +81,7 @@ export default function EditRole() {
           initialValues={{
             title: role.title,
             description: role.description ?? "",
-            selected: role.permissions.flatMap(selectionKeys),
+            permissions: role.permissions.map((p) => p.id),
           }}
           submitText="Save Changes"
           submitting={submitting}

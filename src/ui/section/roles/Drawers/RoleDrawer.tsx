@@ -27,6 +27,7 @@ interface Props {
   role: AdminRole | null;
   opened: boolean;
   close: () => void;
+  canManage: boolean;
   onToggleStatus: (role: AdminRole) => void;
 }
 
@@ -34,6 +35,7 @@ export default function RoleDrawer({
   role,
   opened,
   close,
+  canManage,
   onToggleStatus,
 }: Props) {
   const active = role ? isRoleActive(role) : true;
@@ -112,7 +114,8 @@ export default function RoleDrawer({
           </Text>
           <Text fz={10} c="#98A2B3">
             This role has {role.permissions.length} permission
-            {role.permissions.length === 1 ? "" : "s"}.
+            {role.permissions.length === 1 ? "" : "s"} and gets every privilege
+            in each.
           </Text>
 
           {!role.permissions.length && (
@@ -168,7 +171,7 @@ export default function RoleDrawer({
         </Box>
       )}
 
-      {role && (
+      {role && canManage && (
         <Flex
           pos="sticky"
           bottom={0}

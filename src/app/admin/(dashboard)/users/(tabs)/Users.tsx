@@ -16,6 +16,7 @@ import {
   IconDotsVertical,
   IconListTree,
   IconPlus,
+  IconShieldLock,
   IconUserEdit,
 } from "@tabler/icons-react";
 
@@ -25,7 +26,9 @@ import relativeTime from "dayjs/plugin/relativeTime";
 dayjs.extend(relativeTime);
 import { useRouter, useSearchParams } from "next/navigation";
 
-import { useAdmins } from "@/lib/hooks/admins";
+import { AdminData, useAdmins } from "@/lib/hooks/admins";
+import AssignRoleModal from "@/ui/section/roles/Modals/AssignRoleModal";
+import { useAdminAccess } from "@/lib/hooks/adminRoles";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import ModalComponent from "../modals/modal";
 import { useForm, zodResolver } from "@mantine/form";
@@ -50,6 +53,7 @@ export default function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
   const { handleError, handleSuccess } = useNotification();
+  const { isSuperAdmin } = useAdminAccess();
   const [tab, setTab] = useState<string | null>("Users");
 
   const { email, lastName, firstName, status, date, endDate } =
@@ -92,6 +96,9 @@ export default function Users() {
 
   const [opened, { open, close }] = useDisclosure(false);
   const [openedFilter, { toggle }] = useDisclosure(false);
+  const [assignOpened, { open: openAssign, close: closeAssign }] =
+    useDisclosure(false);
+  const [assignAdmin, setAssignAdmin] = useState<AdminData | null>(null);
 
   const [processing, setProcessing] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -180,6 +187,17 @@ export default function Users() {
       text: "Update Details",
       icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
     },
+    // only a Super Admin can give roles to admins
+    ...(isSuperAdmin
+      ? [
+          {
+            text: "Assign Role",
+            icon: (
+              <IconShieldLock style={{ width: rem(14), height: rem(14) }} />
+            ),
+          },
+        ]
+      : []),
     // {
     //   text: "Deactivate",
     //   icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
@@ -249,6 +267,10 @@ export default function Users() {
                   c="#667085"
                   leftSection={items.icon}
                   onClick={() => {
+                    if (items.text === "Assign Role") {
+                      setAssignAdmin(element);
+                      return openAssign();
+                    }
                     if (items.text === "Update Details")
                       return handleEdit(
                         {
@@ -350,6 +372,13 @@ export default function Users() {
         form={form}
         isEdit={isEdit}
         setIsEdit={setIsEdit}
+      />
+
+      <AssignRoleModal
+        admin={assignAdmin}
+        opened={assignOpened}
+        close={closeAssign}
+        onAssigned={revalidate}
       />
 
       {/* <ModalComponent

@@ -13,6 +13,8 @@ import {
   AdminRole,
   adminRolesApi,
   isRoleActive,
+  refreshAdminMe,
+  useAdminAccess,
   useAdminRoles,
 } from "@/lib/hooks/adminRoles";
 
@@ -26,6 +28,7 @@ function Roles() {
   const tab = searchParams.get("tab");
 
   const { roles, loading, revalidate } = useAdminRoles();
+  const { isSuperAdmin } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
 
   const [selected, setSelected] = useState<AdminRole | null>(null);
@@ -71,8 +74,11 @@ function Roles() {
       closeModal();
       closeDrawer();
       revalidate();
+      // the signed-in admin may hold this role
+      refreshAdminMe();
     } catch (error) {
       handleError("An error occurred", parseError(error));
+      refreshAdminMe();
     } finally {
       setProcessing(false);
     }
@@ -103,6 +109,7 @@ function Roles() {
           <TabsPanel value={tabs[0].value}>
             <RolesTable
               variant="active"
+              canManage={isSuperAdmin}
               roles={active}
               loading={loading}
               onView={handleView}
@@ -113,6 +120,7 @@ function Roles() {
           <TabsPanel value={tabs[1].value}>
             <RolesTable
               variant="deactivated"
+              canManage={isSuperAdmin}
               roles={deactivated}
               loading={loading}
               onView={handleView}
@@ -126,6 +134,7 @@ function Roles() {
         role={selected}
         opened={drawerOpened}
         close={closeDrawer}
+        canManage={isSuperAdmin}
         onToggleStatus={handleToggleStatus}
       />
 

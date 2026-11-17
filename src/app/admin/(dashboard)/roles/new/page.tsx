@@ -7,11 +7,18 @@ import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/ui/components/Breadcrumbs";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import { AdminRolePayload, adminRolesApi } from "@/lib/hooks/adminRoles";
+import {
+  AdminRolePayload,
+  adminRolesApi,
+  refreshAdminMe,
+  useAdminAccess,
+} from "@/lib/hooks/adminRoles";
 import RoleForm from "@/ui/section/roles/RoleForm";
+import SuperAdminOnly from "@/ui/section/roles/SuperAdminOnly";
 
 export default function NewRole() {
   const { push } = useRouter();
+  const { isSuperAdmin } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
   const [submitting, setSubmitting] = useState(false);
 
@@ -23,6 +30,7 @@ export default function NewRole() {
       push("/admin/roles");
     } catch (error) {
       handleError("An error occurred", parseError(error));
+      refreshAdminMe();
     } finally {
       setSubmitting(false);
     }
@@ -43,12 +51,16 @@ export default function NewRole() {
         </Text>
       </Box>
 
-      <RoleForm
-        submitText="Create Role"
-        submitting={submitting}
-        onSubmit={handleSubmit}
-        onCancel={() => push("/admin/roles")}
-      />
+      {isSuperAdmin ? (
+        <RoleForm
+          submitText="Create Role"
+          submitting={submitting}
+          onSubmit={handleSubmit}
+          onCancel={() => push("/admin/roles")}
+        />
+      ) : (
+        <SuperAdminOnly />
+      )}
     </main>
   );
 }

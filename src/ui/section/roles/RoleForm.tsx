@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
+  Badge,
   Box,
   Checkbox,
   Flex,
@@ -23,22 +24,22 @@ import {
   AdminRolePayload,
   formatCategory,
   groupPermissionsByCategory,
-  selectionKeys,
   useAdminPermissions,
 } from "@/lib/hooks/adminRoles";
 import styles from "./styles.module.scss";
 
+// A role holds whole permissions and gets every privilege inside each one,
+// so admins tick permissions; privileges are shown as what each includes.
 export interface RoleFormValues {
   title: string;
   description: string;
-  // privilege ids (or permission ids for permissions without privileges)
-  selected: string[];
+  permissions: string[];
 }
 
 const roleSchema = z.object({
   title: z.string().trim().min(1, "Role name is required"),
   description: z.string().trim().optional(),
-  selected: z.array(z.string()).min(1, "Select at least one privilege"),
+  permissions: z.array(z.string()).min(1, "Select at least one permission"),
 });
 
 interface Props {
@@ -60,22 +61,24 @@ export default function RoleForm({
   const [search, setSearch] = useState("");
 
   const form = useForm<RoleFormValues>({
-    initialValues: initialValues ?? { title: "", description: "", selected: [] },
+    initialValues: initialValues ?? {
+      title: "",
+      description: "",
+      permissions: [],
+    },
     validate: zodResolver(roleSchema),
   });
 
-  const selected = form.values.selected;
+  const selected = form.values.permissions;
   const selectedSet = useMemo(() => new Set(selected), [selected]);
 
-  // privilege id -> permission id (permission ids map to themselves)
-  const keyToPermission = useMemo(() => {
-    const map = new Map<string, string>();
-    (permissions ?? []).forEach((p) => {
-      map.set(p.id, p.id);
-      p.privileges?.forEach((pr) => map.set(pr.id, p.id));
-    });
-    return map;
-  }, [permissions]);
+  const privilegeCount = useMemo(
+    () =>
+      (permissions ?? [])
+        .filter((p) => selectedSet.has(p.id))
+        .reduce((sum, p) => sum + (p.privileges?.length ?? 0), 0),
+    [permissions, selectedSet]
+  );
 
   const grouped = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -89,34 +92,17 @@ export default function RoleForm({
     return groupPermissionsByCategory(list);
   }, [permissions, search]);
 
-  const setKeys = (keys: string[], checked: boolean) => {
-    const rest = selected.filter((k) => !keys.includes(k));
-    form.setFieldValue("selected", checked ? [...rest, ...keys] : rest);
+  const setIds = (ids: string[], checked: boolean) => {
+    const rest = selected.filter((id) => !ids.includes(id));
+    form.setFieldValue("permissions", checked ? [...rest, ...ids] : rest);
   };
 
-  const permissionCount = useMemo(
-    () =>
-      new Set(selected.map((k) => keyToPermission.get(k)).filter(Boolean))
-        .size,
-    [selected, keyToPermission]
-  );
-
-  // Only permissions with at least one picked privilege are sent.
-  const handleSubmit = (values: RoleFormValues) => {
-    const permissionIds = Array.from(
-      new Set(
-        values.selected
-          .map((k) => keyToPermission.get(k))
-          .filter((id): id is string => !!id)
-      )
-    );
-
+  const handleSubmit = (values: RoleFormValues) =>
     onSubmit({
       title: values.title.trim(),
       description: values.description?.trim() || undefined,
-      permissions: permissionIds,
+      permissions: values.permissions,
     });
-  };
 
   return (
     <Box
@@ -148,11 +134,10 @@ export default function RoleForm({
             Set Permissions
           </Text>
           <Text fz={12} c="#98A2B3">
-            Select the privileges admins with this role can perform.{" "}
+            A role gets every privilege in the permissions you select.{" "}
             <Text span fz={12} fw={600} c="#475467">
-              {selected.length} privilege{selected.length === 1 ? "" : "s"}{" "}
-              across {permissionCount} permission
-              {permissionCount === 1 ? "" : "s"}
+              {selected.length} permission{selected.length === 1 ? "" : "s"},{" "}
+              {privilegeCount} privilege{privilegeCount === 1 ? "" : "s"}
             </Text>
           </Text>
         </Box>
@@ -163,9 +148,9 @@ export default function RoleForm({
         />
       </Group>
 
-      {form.errors.selected && (
+      {form.errors.permissions && (
         <Text fz={12} c="red" mb={12}>
-          {form.errors.selected}
+          {form.errors.permissions}
         </Text>
       )}
 
@@ -184,10 +169,8 @@ export default function RoleForm({
       ) : (
         <Stack gap={20}>
           {Object.entries(grouped).map(([category, perms]) => {
-            const categoryKeys = perms.flatMap(selectionKeys);
-            const categoryCount = categoryKeys.filter((k) =>
-              selectedSet.has(k)
-            ).length;
+            const ids = perms.map((p) => p.id);
+            const count = ids.filter((id) => selectedSet.has(id)).length;
 
             return (
               <Box key={category} className={styles.category}>
@@ -199,13 +182,9 @@ export default function RoleForm({
                     size="xs"
                     label={<Text fz={12}>Select all</Text>}
                     color="var(--prune-primary-700)"
-                    checked={categoryCount === categoryKeys.length}
-                    indeterminate={
-                      categoryCount > 0 && categoryCount < categoryKeys.length
-                    }
-                    onChange={(e) =>
-                      setKeys(categoryKeys, e.currentTarget.checked)
-                    }
+                    checked={count === ids.length}
+                    indeterminate={count > 0 && count < ids.length}
+                    onChange={(e) => setIds(ids, e.currentTarget.checked)}
                   />
                 </div>
 
@@ -214,8 +193,8 @@ export default function RoleForm({
                     <PermissionCard
                       key={p.id}
                       permission={p}
-                      selectedSet={selectedSet}
-                      setKeys={setKeys}
+                      checked={selectedSet.has(p.id)}
+                      onChange={(checked) => setIds([p.id], checked)}
                     />
                   ))}
                 </SimpleGrid>
@@ -235,69 +214,54 @@ export default function RoleForm({
 
 function PermissionCard({
   permission: p,
-  selectedSet,
-  setKeys,
+  checked,
+  onChange,
 }: {
   permission: AdminPermission;
-  selectedSet: Set<string>;
-  setKeys: (keys: string[], checked: boolean) => void;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
 }) {
-  const keys = selectionKeys(p);
-  const count = keys.filter((k) => selectedSet.has(k)).length;
-  const hasPrivileges = !!p.privileges?.length;
-
   return (
-    <Box className={styles.permission__card} data-checked={count > 0}>
-      <Checkbox
-        color="var(--prune-primary-700)"
-        checked={count === keys.length}
-        indeterminate={count > 0 && count < keys.length}
-        onChange={(e) => setKeys(keys, e.currentTarget.checked)}
-        label={
+    <label className={styles.permission__card} data-checked={checked}>
+      <Flex gap={12} align="flex-start">
+        <Checkbox
+          mt={2}
+          color="var(--prune-primary-700)"
+          checked={checked}
+          onChange={(e) => onChange(e.currentTarget.checked)}
+        />
+        <Box>
           <Text fz={13} fw={600} c="#344054">
             {p.title}
           </Text>
-        }
-        description={
-          p.description && (
-            <Text fz={12} c="#98A2B3" span>
+          {p.description && (
+            <Text fz={12} c="#98A2B3">
               {p.description}
             </Text>
-          )
-        }
-      />
-
-      {hasPrivileges && (
-        <Stack
-          gap={10}
-          mt={12}
-          pt={12}
-          pl={30}
-          style={{ borderTop: "1px solid #EAECF0" }}
-        >
-          {p.privileges.map((pr) => (
-            <Checkbox
-              key={pr.id}
-              size="xs"
-              color="var(--prune-primary-700)"
-              checked={selectedSet.has(pr.id)}
-              onChange={(e) => setKeys([pr.id], e.currentTarget.checked)}
-              label={
-                <Text fz={12} c="#475467">
-                  {pr.title}
-                </Text>
-              }
-              description={
-                pr.description && (
-                  <Text fz={11} c="#98A2B3" span>
-                    {pr.description}
-                  </Text>
-                )
-              }
-            />
-          ))}
-        </Stack>
-      )}
-    </Box>
+          )}
+          {!!p.privileges?.length && (
+            <>
+              <Text fz={10} fw={600} c="#667085" tt="uppercase" mt={10}>
+                Includes
+              </Text>
+              <Flex gap={6} wrap="wrap" mt={6}>
+                {p.privileges.map((pr) => (
+                  <Badge
+                    key={pr.id}
+                    variant="light"
+                    color="gray"
+                    tt="none"
+                    fw={500}
+                    size="sm"
+                  >
+                    {pr.title}
+                  </Badge>
+                ))}
+              </Flex>
+            </>
+          )}
+        </Box>
+      </Flex>
+    </label>
   );
 }

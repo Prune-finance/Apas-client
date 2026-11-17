@@ -32,6 +32,8 @@ interface Props {
   roles: AdminRole[];
   loading: boolean;
   variant: "active" | "deactivated";
+  // only a Super Admin can create, edit, activate or deactivate roles
+  canManage: boolean;
   onView: (role: AdminRole) => void;
   onToggleStatus: (role: AdminRole) => void;
 }
@@ -40,6 +42,7 @@ export default function RolesTable({
   roles,
   loading,
   variant,
+  canManage,
   onView,
   onToggleStatus,
 }: Props) {
@@ -96,7 +99,7 @@ export default function RolesTable({
             >
               <Text fz={12}>View Details</Text>
             </MenuItem>
-            {isActiveTab && (
+            {canManage && isActiveTab && (
               <MenuItem
                 leftSection={<IconEdit size={14} />}
                 onClick={() => push(`/admin/roles/${role.id}/edit`)}
@@ -104,18 +107,20 @@ export default function RolesTable({
                 <Text fz={12}>Edit Role</Text>
               </MenuItem>
             )}
-            <MenuItem
-              leftSection={
-                isActiveTab ? (
-                  <IconUserX size={14} />
-                ) : (
-                  <IconUserCheck size={14} />
-                )
-              }
-              onClick={() => onToggleStatus(role)}
-            >
-              <Text fz={12}>{isActiveTab ? "Deactivate" : "Activate"}</Text>
-            </MenuItem>
+            {canManage && (
+              <MenuItem
+                leftSection={
+                  isActiveTab ? (
+                    <IconUserX size={14} />
+                  ) : (
+                    <IconUserCheck size={14} />
+                  )
+                }
+                onClick={() => onToggleStatus(role)}
+              >
+                <Text fz={12}>{isActiveTab ? "Deactivate" : "Activate"}</Text>
+              </MenuItem>
+            )}
           </MenuDropdown>
         </Menu>
       </TableTd>
@@ -127,7 +132,7 @@ export default function RolesTable({
       <Group justify="space-between" mt={28}>
         <SearchInput search={search} setSearch={setSearch} />
 
-        {isActiveTab && (
+        {canManage && isActiveTab && (
           <PrimaryBtn text="New Role" link="/admin/roles/new" icon={IconPlus} />
         )}
       </Group>

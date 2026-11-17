@@ -1,7 +1,35 @@
 import createAxiosInstance from "@/lib/axios";
+import User from "@/lib/store/user";
 import useAxios from "./useAxios";
 
 const axios = createAxiosInstance("auth");
+
+/**
+ * Access for the signed-in admin, from the /admin/me result stored at login.
+ * Only a Super Admin can create, edit, (de)activate or assign roles; the
+ * server enforces it too and answers 403 otherwise.
+ */
+export function useAdminAccess() {
+  const user = User((s) => s.user);
+  const privileges = user?.privileges ?? [];
+  const isSuperAdmin = user?.role === "Superadmin";
+
+  return {
+    isSuperAdmin,
+    privileges,
+    can: (action: string) => isSuperAdmin || privileges.includes(action),
+  };
+}
+
+/** Re-fetch /admin/me so stored roles and privileges stay current. */
+export async function refreshAdminMe() {
+  try {
+    const { data } = await axios.get("/admin/me");
+    if (data?.data) User.getState().setUser(data.data);
+  } catch {
+    // keep the stored copy; the server still enforces access
+  }
+}
 
 export const ADMIN_AUDIENCE = "ADMIN";
 
@@ -74,6 +102,28 @@ export function useAdminRole(id: string) {
   return { role: data, loading, revalidate: queryFn };
 }
 
+export interface AdminAccess {
+  id: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  status: string;
+  roles: AdminRole[];
+  privileges: string[];
+}
+
+export function useAdminAccessById(adminId: string | undefined) {
+  const { data, loading } = useAxios<AdminAccess>({
+    baseURL: "auth",
+    endpoint: `/admin/roles/admins/${adminId}`,
+    dependencies: [adminId],
+    enabled: !adminId,
+  });
+
+  return { access: data, loading };
+}
+
 export function useAdminPermissions() {
   const { data, loading } = useAxios<AdminPermission[]>({
     baseURL: "auth",
@@ -92,15 +142,9 @@ export const adminRolesApi = {
     axios.patch(`/admin/roles/${id}`, body),
   activate: (id: string) => axios.patch(`/admin/roles/${id}/activate`),
   deactivate: (id: string) => axios.patch(`/admin/roles/${id}/deactivate`),
+  assignToAdmin: (adminId: string, roleIds: string[]) =>
+    axios.patch(`/admin/roles/admins/${adminId}`, { roles: roleIds }),
 };
-
-/**
- * Admins pick privileges. A permission without privileges is picked by its
- * own id. Selections are resolved to permission ids on submit, so a
- * permission is only sent when at least one of its privileges is picked.
- */
-export const selectionKeys = (p: AdminPermission) =>
-  p.privileges?.length ? p.privileges.map((pr) => pr.id) : [p.id];
 
 export function groupPermissionsByCategory(permissions: AdminPermission[]) {
   return permissions.reduce<Record<string, AdminPermission[]>>((acc, p) => {

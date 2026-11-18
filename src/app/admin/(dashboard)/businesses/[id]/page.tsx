@@ -279,7 +279,7 @@ export default function SingleBusiness() {
 
           {activeTab === "business" && detail?.type === "COMPANY" && (
             <div className={styles.header__right}>
-              <Can do="businesses.download-report">
+              <Can do="transactions.download-statement">
                 <Button size="xs" className={styles.header__right__cta}>
                   <IconDownload color="#344054" stroke={2} size={16} />
                 </Button>

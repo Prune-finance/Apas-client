@@ -114,6 +114,20 @@ const ROUTE_PRIVILEGES: { match: RegExp; any: readonly string[] }[] = [
   { match: /^\/admin\/settings/, any: SETTINGS_VIEW_PRIVILEGES },
 ];
 
+/**
+ * For components shared with the business dashboard: checks the privilege
+ * only on /admin pages and leaves business users' screens unchanged.
+ */
+export function CanInAdmin(props: {
+  do?: string;
+  any?: readonly string[];
+  children: ReactNode;
+}) {
+  const pathname = usePathname();
+  if (!pathname?.startsWith("/admin")) return <>{props.children}</>;
+  return <Can {...props} />;
+}
+
 // where sign-in sends admins
 const isLandingPage = (pathname: string) =>
   /^\/admin(\/dashboard)?\/?$/.test(pathname);

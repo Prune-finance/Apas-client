@@ -44,6 +44,7 @@ import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import { useQueryState } from "nuqs";
 import { exportSingleUserAccountTransactions, exportAdminSingleAccountTransactions, exportAdminPayoutAccountTransactions } from "@/lib/hooks/transactions";
+import { CanInAdmin } from "@/lib/hooks/privileges";
 export const Transactions = ({
   transactions,
   loading,
@@ -308,14 +309,16 @@ export const Transactions = ({
             indicator={appliedFilterCount}
           />
 
-          <SecondaryBtn
-            text="Download Statement"
-            icon={IconCircleArrowDown}
-            // style={{ cursor: "not-allowed" }}
-            fw={600}
-            // action={() => handlePdfStatement(pdfRef)}
-            action={openPreview}
-          />
+          <CanInAdmin do="transactions.download-statement">
+            <SecondaryBtn
+              text="Download Statement"
+              icon={IconCircleArrowDown}
+              // style={{ cursor: "not-allowed" }}
+              fw={600}
+              // action={() => handlePdfStatement(pdfRef)}
+              action={openPreview}
+            />
+          </CanInAdmin>
 
           <SecondaryBtn
             text="Export Transactions"

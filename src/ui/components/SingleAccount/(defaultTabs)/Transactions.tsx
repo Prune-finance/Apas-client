@@ -23,6 +23,7 @@ import { IssuedAccountTableHeaders } from "@/lib/static";
 import { AmountGroup } from "../../AmountGroup";
 import { TransactionDrawer } from "@/app/(dashboard)/transactions/drawer";
 
+import { CanInAdmin } from "@/lib/hooks/privileges";
 interface Props {
   transactions: TransactionType[];
   loading: boolean;
@@ -53,7 +54,9 @@ export const Transactions = ({ transactions, loading, payout }: Props) => {
         <Group gap={12}>
           <SecondaryBtn text="Filter" icon={IconListTree} />
           {/* <SecondaryBtn text="Filter" icon={IconArrowUpRight} /> */}
-          <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+          <CanInAdmin do="transactions.download-statement">
+            <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} />
+          </CanInAdmin>
         </Group>
       </Group>
 

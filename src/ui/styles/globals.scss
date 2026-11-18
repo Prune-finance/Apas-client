@@ -373,7 +373,6 @@ a {
 
   &::placeholder {
     color: var(--prune-text-gray-400) !important;
-    font-size: 14px !important;
     font-family: var(--font-switzer), sans-serif;
   }
 }
@@ -456,10 +455,6 @@ a {
   .mantine-DatePickerInput-input,
   .mantine-YearPickerInput-input {
     font-size: 14px !important;
-
-    &::placeholder {
-      font-size: 14px !important;
-    }
   }
 
   // Labels
@@ -495,10 +490,6 @@ a {
   .mantine-DatePickerInput-input,
   .mantine-YearPickerInput-input {
     font-size: 16px !important;
-
-    &::placeholder {
-      font-size: 16px !important;
-    }
   }
 
   // Labels
@@ -539,4 +530,15 @@ a {
 
 .mantine-Input-wrapper:has(.mantine-Input-input[data-error]) .mantine-PasswordInput-visibilityToggle {
   color: #db340b;
+}
+
+// Placeholder text always matches the text typed in the same field (inputs,
+// selects, textareas, date pickers...), whatever size that field uses. The
+// :not(#...) adds ID-level specificity so per-page placeholder sizes cannot
+// make it bigger or smaller than the field text.
+:root:not(#__placeholder-size) {
+  input::placeholder,
+  textarea::placeholder {
+    font-size: inherit !important;
+  }
 }

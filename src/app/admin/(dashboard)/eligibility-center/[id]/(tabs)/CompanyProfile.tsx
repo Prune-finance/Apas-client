@@ -168,9 +168,7 @@ const ContactPerson = ({
   //       loading={loading}
   //       leftSection={<IconPencilMinus size={16} />}
   //     />
-  //     <Can do="eligibility-center.send-links">
-  //       <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
-  //     </Can>
+  //     <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
   //   </Group>
   // );
 
@@ -230,7 +228,9 @@ const CeoDetails = ({ data, form }: Omit<ComponentProps, "loading">) => {
           leftSection={<IconPencilMinus size={16} />}
         />
       </Can>
-      <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
+      <Can do="eligibility-center.send-links">
+        <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
+      </Can>
     </Group>
   );
 

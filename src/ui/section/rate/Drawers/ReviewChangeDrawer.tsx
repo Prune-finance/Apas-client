@@ -140,8 +140,12 @@ export default function ReviewChangeDrawer({
 
   const change = view?.change;
   const review = view?.review;
-  const canReview = Boolean(review?.canReview);
   const own = review?.blockedBy === "OWN_CHANGE";
+  // Who may approve is decided by the rates.approve-change privilege, not by
+  // who set the rate: an approver can review their own change too. Other
+  // blocks (e.g. already reviewed) still apply.
+  const canReview =
+    can("rates.approve-change") && (Boolean(review?.canReview) || own);
 
   return (
     <Drawer opened={!!changeId} onClose={onClose} position="right" size={631} padding={0}
@@ -207,8 +211,8 @@ export default function ReviewChangeDrawer({
             <Text className={classes.fieldBlockText}>“{change.reason}”</Text>
           </Box>
 
-          {/* Blocked warning (own change / already reviewed) */}
-          {!canReview && review?.message && (
+          {/* Blocked warning (e.g. already reviewed); "own change" no longer blocks */}
+          {!canReview && !own && review?.message && (
             <Box className={classes.reviewSection}>
               <Box className={classes.warnNotice} role="alert">
                 <Icon name="warning-triangle" />

@@ -256,12 +256,15 @@ export default function RatePage() {
                 <Menu.Dropdown>
                   {/* Only one pending change per pair: offer Review instead of Set/Edit rate */}
                   {row.pendingChangeId
-                    ? <Can any={["rates.approve-change","rates.set-rate"]}>
-                    ?   <Menu.Item onClick={() => setReviewId(row.pendingChangeId)}>Review pending change</Menu.Item>
-                    ? </Can>
-                    : <Can do="rates.set-rate">
-                    :   <Menu.Item onClick={() => setRateTarget(row)}>{row.rate ? "Edit rate" : "Set rate"}</Menu.Item>
-                    : </Can>}
+                    ? (
+                      <Can any={["rates.approve-change", "rates.set-rate"]}>
+                        <Menu.Item onClick={() => setReviewId(row.pendingChangeId)}>Review pending change</Menu.Item>
+                      </Can>
+                    ) : (
+                      <Can do="rates.set-rate">
+                        <Menu.Item onClick={() => setRateTarget(row)}>{row.rate ? "Edit rate" : "Set rate"}</Menu.Item>
+                      </Can>
+                    )}
                   <Menu.Item component={Link} href={`/admin/rate/${row.id}`}>View pair</Menu.Item>
                   {/* A pair with no rate can't be enabled yet */}
                   {(row.enabled || row.rate) && (

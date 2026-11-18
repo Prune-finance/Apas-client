@@ -48,6 +48,8 @@ export default function Navbar() {
   const pathname = usePathname();
   // menu items the admin has no privilege for are hidden
   const { can, canAny } = useAdminAccess();
+  const mainLinks = AdminMainLinks.filter((item) => canAny(item.privileges));
+  const otherLinks = AdminOtherLinks.filter((item) => canAny(item.privileges));
   const [opened, { open, close }] = useDisclosure(false);
   const { meta, setMeta } = NotificationStore();
   const { handleError } = useNotification();
@@ -170,6 +172,8 @@ export default function Navbar() {
       </div>
 
       <div className={styles.menu__container}>
+        {/* a section with no links the admin can open is hidden, heading too */}
+        {mainLinks.length > 0 && (
         <div className={styles.container}>
           <Text fz={10} className={styles.container__header}>
             MAIN MENU
@@ -177,7 +181,7 @@ export default function Navbar() {
 
           {/* <div className={styles.links}> */}
           <Stack gap={12} mt={32}>
-            {AdminMainLinks.filter((item) => canAny(item.privileges)).map(
+            {mainLinks.map(
               (item, index) => {
               return (
                 <NavLink
@@ -220,14 +224,16 @@ export default function Navbar() {
           </Stack>
           {/* </div> */}
         </div>
+        )}
 
+        {otherLinks.length > 0 && (
         <div className={styles.container}>
           <Text fz={10} className={styles.container__header}>
             OTHERS
           </Text>
 
           <Stack gap={12} mt={32}>
-            {AdminOtherLinks.filter((item) => canAny(item.privileges)).map(
+            {otherLinks.map(
               (item, index) => {
               return (
                 <NavLink
@@ -247,6 +253,7 @@ export default function Navbar() {
             )}
           </Stack>
         </div>
+        )}
       </div>
 
       <UnstyledButton onClick={open} className={styles.nav__cta__container}>

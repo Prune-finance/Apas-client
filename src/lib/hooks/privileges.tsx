@@ -3,7 +3,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Box, Loader, Text } from "@mantine/core";
 import { IconLock } from "@tabler/icons-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import User from "@/lib/store/user";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { AdminMainLinks, AdminOtherLinks } from "@/lib/static";
@@ -114,6 +114,10 @@ const ROUTE_PRIVILEGES: { match: RegExp; any: readonly string[] }[] = [
   { match: /^\/admin\/settings/, any: SETTINGS_VIEW_PRIVILEGES },
 ];
 
+// where sign-in sends admins
+const isLandingPage = (pathname: string) =>
+  /^\/admin(\/dashboard)?\/?$/.test(pathname);
+
 export const privilegesForPath = (pathname: string) =>
   ROUTE_PRIVILEGES.find((r) => r.match.test(pathname))?.any ?? [];
 
@@ -123,20 +127,32 @@ export const privilegesForPath = (pathname: string) =>
  */
 export function AdminPageGuard({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { ready, canAny } = useAdminAccess();
 
-  if (!ready)
+  const allowed = ready && canAny(privilegesForPath(pathname));
+  // the first page in menu order this admin can open
+  const firstAllowed = ready
+    ? [...AdminMainLinks, ...AdminOtherLinks].find((l) => canAny(l.privileges))
+    : undefined;
+
+  // The dashboard is where sign-in lands. Without dashboard.view, go straight
+  // to the first page the admin can open instead of showing "no access".
+  const redirectFromHome =
+    ready && !allowed && isLandingPage(pathname) && !!firstAllowed;
+
+  useEffect(() => {
+    if (redirectFromHome && firstAllowed) router.replace(firstAllowed.link);
+  }, [redirectFromHome, firstAllowed, router]);
+
+  if (!ready || redirectFromHome)
     return (
       <Box ta="center" py={120}>
         <Loader size="sm" color="var(--prune-primary-700)" />
       </Box>
     );
 
-  if (canAny(privilegesForPath(pathname))) return <>{children}</>;
-
-  const firstAllowed = [...AdminMainLinks, ...AdminOtherLinks].find((l) =>
-    canAny(l.privileges)
-  );
+  if (allowed) return <>{children}</>;
 
   return (
     <Box ta="center" py={100} bg="#fff">

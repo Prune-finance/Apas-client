@@ -16,6 +16,7 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import {
   AdminRole,
+  countPrivileges,
   formatCategory,
   groupPermissionsByCategory,
   isRoleActive,
@@ -40,6 +41,7 @@ export default function RoleDrawer({
 }: Props) {
   const active = role ? isRoleActive(role) : true;
   const grouped = groupPermissionsByCategory(role?.permissions ?? []);
+  const privilegeCount = countPrivileges(role);
 
   const details = [
     { label: "Role Name", value: role?.title },
@@ -113,9 +115,10 @@ export default function RoleDrawer({
             Permissions
           </Text>
           <Text fz={10} c="#98A2B3">
-            This role has {role.permissions.length} permission
-            {role.permissions.length === 1 ? "" : "s"} and gets every privilege
-            in each.
+            {/* role responses list only the privileges switched on */}
+            This role has {privilegeCount} privilege
+            {privilegeCount === 1 ? "" : "s"} across {role.permissions.length}{" "}
+            permission{role.permissions.length === 1 ? "" : "s"}.
           </Text>
 
           {!role.permissions.length && (

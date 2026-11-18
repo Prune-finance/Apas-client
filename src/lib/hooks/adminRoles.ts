@@ -80,10 +80,17 @@ export interface AdminRole {
   permissions: AdminPermission[];
 }
 
+/**
+ * One entry of a role's `permissions` (guide v11, POST/PATCH /admin/roles):
+ * `{ id, privileges }` switches on just those privileges of the permission;
+ * a bare permission id switches all of them on.
+ */
+export type RolePermissionEntry = string | { id: string; privileges: string[] };
+
 export interface AdminRolePayload {
   title: string;
   description?: string;
-  permissions: string[];
+  permissions: RolePermissionEntry[];
 }
 
 // The API does not return a status field, so a role is treated as
@@ -163,6 +170,13 @@ export const adminRolesApi = {
  */
 export const selectionKeys = (p: AdminPermission) =>
   p.privileges?.length ? p.privileges.map((pr) => pr.id) : [p.id];
+
+/** Privileges switched on in a role (its responses list only those). */
+export const countPrivileges = (role: AdminRole | null | undefined) =>
+  (role?.permissions ?? []).reduce(
+    (sum, p) => sum + (p.privileges?.length ?? 0),
+    0
+  );
 
 export function groupPermissionsByCategory(permissions: AdminPermission[]) {
   return permissions.reduce<Record<string, AdminPermission[]>>((acc, p) => {

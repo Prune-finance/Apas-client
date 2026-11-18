@@ -21,6 +21,7 @@ import { SearchInput } from "@/ui/components/Inputs";
 import {
   AdminPermission,
   AdminRolePayload,
+  RolePermissionEntry,
   formatCategory,
   groupPermissionsByCategory,
   selectionKeys,
@@ -30,8 +31,8 @@ import styles from "./styles.module.scss";
 
 /**
  * Admins tick privileges. Ticking any privilege picks its parent permission;
- * on submit the picks are turned into permission ids, because the API takes
- * permission ids only. A permission with nothing ticked is not sent.
+ * on submit each picked permission is sent with its ticked privileges.
+ * A permission with nothing ticked is not sent.
  */
 export interface RoleFormValues {
   title: string;
@@ -111,11 +112,23 @@ export default function RoleForm({
     form.setFieldValue("selected", checked ? [...rest, ...keys] : rest);
   };
 
+  // One entry per picked permission: { id, privileges } with its ticked
+  // privileges, or the bare id for a permission that has no privileges.
+  // Permissions with nothing ticked are left out.
+  const buildPermissionEntries = (picked: Set<string>): RolePermissionEntry[] =>
+    (permissions ?? []).flatMap((p): RolePermissionEntry[] => {
+      if (!p.privileges?.length) return picked.has(p.id) ? [p.id] : [];
+      const privileges = p.privileges
+        .filter((pr) => picked.has(pr.id))
+        .map((pr) => pr.id);
+      return privileges.length ? [{ id: p.id, privileges }] : [];
+    });
+
   const handleSubmit = (values: RoleFormValues) =>
     onSubmit({
       title: values.title.trim(),
       description: values.description?.trim() || undefined,
-      permissions: pickedPermissionIds,
+      permissions: buildPermissionEntries(new Set(values.selected)),
     });
 
   return (

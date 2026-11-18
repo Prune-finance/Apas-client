@@ -25,7 +25,11 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import { useRouter } from "next/navigation";
-import { AdminRole, isRoleActive } from "@/lib/hooks/adminRoles";
+import {
+  AdminRole,
+  countPrivileges,
+  isRoleActive,
+} from "@/lib/hooks/adminRoles";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
 import { TableComponent } from "@/ui/components/Table";
@@ -108,7 +112,14 @@ export default function RolesTable({
             {role.description || "—"}
           </Text>
         </TableTd>
-        <TableTd>{role.permissions?.length ?? 0}</TableTd>
+        <TableTd>
+          {countPrivileges(role)}
+          <Text span fz={11} c="#98A2B3">
+            {" "}
+            in {role.permissions?.length ?? 0} permission
+            {role.permissions?.length === 1 ? "" : "s"}
+          </Text>
+        </TableTd>
         <TableTd>{dayjs(role.createdAt).format("ddd DD MMM YYYY")}</TableTd>
         <TableTd>
           <BadgeComponent
@@ -223,7 +234,7 @@ export default function RolesTable({
 const tableHeaders = [
   "Role Name",
   "Description",
-  "Permissions",
+  "Privileges",
   "Date Created",
   "Status",
   "Action",

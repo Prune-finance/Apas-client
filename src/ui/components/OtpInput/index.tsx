@@ -17,7 +17,7 @@ export function OtpInput({ length = 6, boxSize = 58, ...props }: OtpInputProps) 
       oneTimeCode
       placeholder=""
       classNames={classes}
-      style={{ "--pin-input-size": `${boxSize}px` } as CSSProperties}
+      style={{ "--pin-input-base": `${boxSize}px` } as CSSProperties}
       {...props}
     />
   );

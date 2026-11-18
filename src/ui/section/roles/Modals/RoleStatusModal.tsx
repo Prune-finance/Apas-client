@@ -68,11 +68,11 @@ export default function RoleStatusModal({
             style={{ border: "1px solid #C1DD06" }}
           >
             <Text fz={12} fw={500} c="#667085" ta="center">
-              You can reactivate it any time from the{" "}
+              You can reactivate it any time. Filter the roles list by{" "}
               <span style={{ color: "#97AD05", textDecoration: "underline" }}>
                 Deactivated
               </span>{" "}
-              tab.
+              to find it.
             </Text>
           </Box>
         )}

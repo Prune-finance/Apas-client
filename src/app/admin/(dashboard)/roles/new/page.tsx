@@ -18,7 +18,7 @@ import SuperAdminOnly from "@/ui/section/roles/SuperAdminOnly";
 
 export default function NewRole() {
   const { push } = useRouter();
-  const { isSuperAdmin } = useAdminAccess();
+  const { canManageRoles } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,7 +51,7 @@ export default function NewRole() {
         </Text>
       </Box>
 
-      {isSuperAdmin ? (
+      {canManageRoles ? (
         <RoleForm
           submitText="Create Role"
           submitting={submitting}

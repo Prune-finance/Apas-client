@@ -526,6 +526,7 @@ a {
 .mantine-Input-input[data-error],
 .mantine-Input-input[data-error]:focus,
 .mantine-Input-input[data-error]:focus-within {
+  // colour only, so each input keeps its own shape (e.g. the round OTP boxes)
   border: 2px solid #ff9175 !important;
   background-color: #fff3f0 !important;
   box-shadow: none !important;

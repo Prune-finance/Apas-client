@@ -1,12 +1,9 @@
 "use client";
 
-import { Suspense, useMemo, useState } from "react";
-import { TabsPanel, Text } from "@mantine/core";
+import { useEffect, useState } from "react";
+import { Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconBriefcase, IconUserX } from "@tabler/icons-react";
-import { useSearchParams } from "next/navigation";
 
-import TabsComponent from "@/ui/components/Tabs";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import {
@@ -23,12 +20,9 @@ import RoleDrawer from "@/ui/section/roles/Drawers/RoleDrawer";
 import RoleStatusModal from "@/ui/section/roles/Modals/RoleStatusModal";
 import styles from "@/ui/section/roles/styles.module.scss";
 
-function Roles() {
-  const searchParams = useSearchParams();
-  const tab = searchParams.get("tab");
-
+export default function Roles() {
   const { roles, loading, revalidate } = useAdminRoles();
-  const { isSuperAdmin } = useAdminAccess();
+  const { canManageRoles } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
 
   const [selected, setSelected] = useState<AdminRole | null>(null);
@@ -38,13 +32,11 @@ function Roles() {
   const [modalOpened, { open: openModal, close: closeModal }] =
     useDisclosure(false);
 
-  const { active, deactivated } = useMemo(() => {
-    const list = roles ?? [];
-    return {
-      active: list.filter(isRoleActive),
-      deactivated: list.filter((r) => !isRoleActive(r)),
-    };
-  }, [roles]);
+  // the copy of /admin/me saved at login can be stale; refresh it so the
+  // Super Admin-only buttons reflect the admin's current role
+  useEffect(() => {
+    refreshAdminMe();
+  }, []);
 
   const handleView = (role: AdminRole) => {
     setSelected(role);
@@ -92,49 +84,25 @@ function Roles() {
             Roles & Permissions
           </Text>
           <Text fz={14} c="#667085">
-            Create roles and choose the privileges that admins assigned to
+            Create roles and choose the permissions that admins assigned to
             them can use.
           </Text>
         </div>
 
-        <TabsComponent
-          tabs={tabs}
-          defaultValue={
-            tabs.find((t) => t.value === tab)?.value ?? tabs[0].value
-          }
-          mt={32}
-          tt="capitalize"
-          keepMounted={false}
-        >
-          <TabsPanel value={tabs[0].value}>
-            <RolesTable
-              variant="active"
-              canManage={isSuperAdmin}
-              roles={active}
-              loading={loading}
-              onView={handleView}
-              onToggleStatus={handleToggleStatus}
-            />
-          </TabsPanel>
-
-          <TabsPanel value={tabs[1].value}>
-            <RolesTable
-              variant="deactivated"
-              canManage={isSuperAdmin}
-              roles={deactivated}
-              loading={loading}
-              onView={handleView}
-              onToggleStatus={handleToggleStatus}
-            />
-          </TabsPanel>
-        </TabsComponent>
+        <RolesTable
+          roles={roles ?? []}
+          loading={loading}
+          canManage={canManageRoles}
+          onView={handleView}
+          onToggleStatus={handleToggleStatus}
+        />
       </div>
 
       <RoleDrawer
         role={selected}
         opened={drawerOpened}
         close={closeDrawer}
-        canManage={isSuperAdmin}
+        canManage={canManageRoles}
         onToggleStatus={handleToggleStatus}
       />
 
@@ -146,22 +114,5 @@ function Roles() {
         processing={processing}
       />
     </main>
-  );
-}
-
-const tabs = [
-  { title: "Roles", value: "Roles", icon: <IconBriefcase size={14} /> },
-  {
-    title: "Deactivated",
-    value: "Deactivated",
-    icon: <IconUserX size={14} />,
-  },
-];
-
-export default function RolesSuspense() {
-  return (
-    <Suspense>
-      <Roles />
-    </Suspense>
   );
 }

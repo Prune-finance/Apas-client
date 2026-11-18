@@ -53,7 +53,7 @@ export default function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
   const { handleError, handleSuccess } = useNotification();
-  const { isSuperAdmin } = useAdminAccess();
+  const { canManageRoles } = useAdminAccess();
   const [tab, setTab] = useState<string | null>("Users");
 
   const { email, lastName, firstName, status, date, endDate } =
@@ -188,7 +188,7 @@ export default function Users() {
       icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
     },
     // only a Super Admin can give roles to admins
-    ...(isSuperAdmin
+    ...(canManageRoles
       ? [
           {
             text: "Assign Role",

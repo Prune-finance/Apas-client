@@ -13,6 +13,7 @@ import {
 import LockIcon from "@/assets/img/lock.svg";
 import CopyIcon from "@/assets/img/copy.svg";
 import { useState } from "react";
+import { useMediaQuery } from "@mantine/hooks";
 import axios from "axios";
 import useNotification from "@/lib/hooks/notification";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
@@ -40,12 +41,21 @@ const modalStyles = {
   body: { padding: "8px 24px 24px" },
 };
 
-const confirmModalStyles = {
+// Smaller laptop screens (e.g. 13") get a tighter version of the code modal;
+// the same breakpoint scales the OTP boxes in OtpInput
+const COMPACT_QUERY = "(max-width: 1440px), (max-height: 820px)";
+
+const confirmModalStyles = (compact: boolean) => ({
   content: { borderRadius: 8 },
-  title: { fontSize: 24, fontWeight: 500, color: "#000000", fontFamily: "var(--mantine-font-family)" },
-  header: { padding: "32px 32px 0", minHeight: 0 },
-  body: { padding: "16px 32px 32px" },
-};
+  title: {
+    fontSize: compact ? 20 : 24,
+    fontWeight: 500,
+    color: "#000000",
+    fontFamily: "var(--mantine-font-family)",
+  },
+  header: { padding: compact ? "24px 24px 0" : "32px 32px 0", minHeight: 0 },
+  body: { padding: compact ? "12px 24px 24px" : "16px 32px 32px" },
+});
 
 // ─── Protect Your Account ───────────────────────────────────────────────────
 function ProtectAccountModal({
@@ -208,17 +218,18 @@ function ConfirmSetupModal({
   description: string;
 }) {
   const [code, setCode] = useState("");
+  const compact = useMediaQuery(COMPACT_QUERY) ?? false;
 
   return (
     <Modal
       opened={opened}
       onClose={() => { setCode(""); onClose(); }}
       title={title}
-      styles={confirmModalStyles}
-      size={500}
+      styles={confirmModalStyles(compact)}
+      size={compact ? 420 : 500}
       centered
     >
-      <Text fz={16} lh={1.5} c="#667085" mb={40}>
+      <Text fz={compact ? 14 : 16} lh={1.5} c="#667085" mb={compact ? 24 : 40}>
         {description}
       </Text>
 
@@ -229,7 +240,7 @@ function ConfirmSetupModal({
           if (code.length === 6 && !loading) onConfirm(code);
         }}
       >
-        <Flex justify="center" mb={40}>
+        <Flex justify="center" mb={compact ? 28 : 40}>
           <OtpInput value={code} onChange={setCode} />
         </Flex>
 
@@ -237,9 +248,9 @@ function ConfirmSetupModal({
           text="Confirm"
           type="submit"
           fw={500}
-          fz={16}
+          fz={compact ? 14 : 16}
           fullWidth
-          h={48}
+          h={compact ? 42 : 48}
           radius={4}
           loading={loading}
           disabled={code.length < 6}

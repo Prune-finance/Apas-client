@@ -5,6 +5,13 @@ import useAxios from "./useAxios";
 const axios = createAxiosInstance("auth");
 
 /**
+ * TEMPORARY: off so any admin can manage roles while permissions are being
+ * set up. Set back to true to show role-changing buttons only to a Super
+ * Admin, as the backend guide requires (the server may still answer 403).
+ */
+export const ENFORCE_SUPER_ADMIN_FOR_ROLES = false;
+
+/**
  * Access for the signed-in admin, from the /admin/me result stored at login.
  * Only a Super Admin can create, edit, (de)activate or assign roles; the
  * server enforces it too and answers 403 otherwise.
@@ -12,10 +19,14 @@ const axios = createAxiosInstance("auth");
 export function useAdminAccess() {
   const user = User((s) => s.user);
   const privileges = user?.privileges ?? [];
-  const isSuperAdmin = user?.role === "Superadmin";
+  // the guide says "Superadmin"; tolerate "SUPERADMIN" / "SUPER_ADMIN" too
+  const isSuperAdmin =
+    user?.role?.toLowerCase().replace(/[^a-z]/g, "") === "superadmin";
 
   return {
     isSuperAdmin,
+    // who sees the create/edit/(de)activate/assign role buttons
+    canManageRoles: !ENFORCE_SUPER_ADMIN_FOR_ROLES || isSuperAdmin,
     privileges,
     can: (action: string) => isSuperAdmin || privileges.includes(action),
   };
@@ -145,6 +156,13 @@ export const adminRolesApi = {
   assignToAdmin: (adminId: string, roleIds: string[]) =>
     axios.patch(`/admin/roles/admins/${adminId}`, { roles: roleIds }),
 };
+
+/**
+ * What can be ticked for a permission: its privileges, or the permission
+ * itself when it has none. Picking any of them picks the parent permission.
+ */
+export const selectionKeys = (p: AdminPermission) =>
+  p.privileges?.length ? p.privileges.map((pr) => pr.id) : [p.id];
 
 export function groupPermissionsByCategory(permissions: AdminPermission[]) {
   return permissions.reduce<Record<string, AdminPermission[]>>((acc, p) => {

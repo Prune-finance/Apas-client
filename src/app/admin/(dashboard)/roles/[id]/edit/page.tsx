@@ -11,6 +11,7 @@ import {
   AdminRolePayload,
   adminRolesApi,
   refreshAdminMe,
+  selectionKeys,
   useAdminAccess,
   useAdminRole,
 } from "@/lib/hooks/adminRoles";
@@ -20,7 +21,7 @@ import SuperAdminOnly from "@/ui/section/roles/SuperAdminOnly";
 export default function EditRole() {
   const { id } = useParams<{ id: string }>();
   const { push } = useRouter();
-  const { isSuperAdmin } = useAdminAccess();
+  const { canManageRoles } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
   const { role, loading } = useAdminRole(id);
   const [submitting, setSubmitting] = useState(false);
@@ -62,7 +63,7 @@ export default function EditRole() {
         </Text>
       </Box>
 
-      {!isSuperAdmin ? (
+      {!canManageRoles ? (
         <SuperAdminOnly />
       ) : loading ? (
         <Stack mt={20} gap={16}>
@@ -81,7 +82,8 @@ export default function EditRole() {
           initialValues={{
             title: role.title,
             description: role.description ?? "",
-            permissions: role.permissions.map((p) => p.id),
+            // the role's privileges as returned under each permission
+            selected: role.permissions.flatMap(selectionKeys),
           }}
           submitText="Save Changes"
           submitting={submitting}

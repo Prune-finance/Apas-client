@@ -18,6 +18,7 @@
     "@mantine/notifications": "^7.10.2",
     "@netlify/plugin-nextjs": "^5.5.0",
     "@tabler/icons-react": "^3.5.0",
+    "ag-grid-community": "31.3.4",
     "ag-grid-react": "^31.3.2",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",

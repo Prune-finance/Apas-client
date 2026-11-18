@@ -11,7 +11,7 @@ import useNotification from "@/lib/hooks/notification";
 import { apiFieldErrors, apiMessage, formatRate, RateChange, ratesAxios, ReviewView } from "@/lib/hooks/rates";
 import classes from "../styles.module.scss";
 
-import { Can } from "@/lib/hooks/privileges";
+import { Can, useAdminAccess } from "@/lib/hooks/privileges";
 dayjs.extend(utc);
 
 // Figma: Review change drawer (15681:371814 blocked · 15681:372354 reviewable)
@@ -78,6 +78,7 @@ export default function ReviewChangeDrawer({
   onReviewed: () => void;
 }) {
   const { handleSuccess, handleError } = useNotification();
+  const { can } = useAdminAccess();
   const [view, setView] = useState<ReviewView | null>(null);
   const [loading, setLoading] = useState(false);
   const [comment, setComment] = useState("");

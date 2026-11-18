@@ -11,6 +11,7 @@ import useNotification from "@/lib/hooks/notification";
 import { apiFieldErrors, apiMessage, formatRate, RateChange, ratesAxios, ReviewView } from "@/lib/hooks/rates";
 import classes from "../styles.module.scss";
 
+import { Can } from "@/lib/hooks/privileges";
 dayjs.extend(utc);
 
 // Figma: Review change drawer (15681:371814 blocked · 15681:372354 reviewable)
@@ -239,12 +240,16 @@ export default function ReviewChangeDrawer({
 
           {/* Footer */}
           <Box className={classes.reviewFooter}>
-            <PrimaryBtn text="Reject" fz={14} fw={600}
-              color={canReview ? "#ff5226" : "#eaecf0"} c={canReview ? "white" : "#98a2b3"}
-              disabled={!canReview || !!acting} loading={acting === "reject"} action={() => act("reject")} />
-            <PrimaryBtn text="Approve & activate" fz={14} fw={600}
-              color={canReview ? "#c1dd06" : "#eaecf0"} c={canReview ? "#344054" : "#98a2b3"}
-              disabled={!canReview || !!acting} loading={acting === "approve"} action={() => act("approve")} />
+            <Can do="rates.approve-change">
+              <PrimaryBtn text="Reject" fz={14} fw={600}
+                color={canReview ? "#ff5226" : "#eaecf0"} c={canReview ? "white" : "#98a2b3"}
+                disabled={!canReview || !!acting} loading={acting === "reject"} action={() => act("reject")} />
+            </Can>
+            <Can do="rates.approve-change">
+              <PrimaryBtn text="Approve & activate" fz={14} fw={600}
+                color={canReview ? "#c1dd06" : "#eaecf0"} c={canReview ? "#344054" : "#98a2b3"}
+                disabled={!canReview || !!acting} loading={acting === "approve"} action={() => act("approve")} />
+            </Can>
           </Box>
         </>
       )}

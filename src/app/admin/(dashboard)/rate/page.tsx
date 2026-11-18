@@ -24,6 +24,7 @@ import SetRateDrawer from "@/ui/section/rate/Drawers/SetRateDrawer";
 import ReviewChangeDrawer from "@/ui/section/rate/Drawers/ReviewChangeDrawer";
 import AddPairModal from "@/ui/section/rate/Modals/AddPairModal";
 
+import { Can, useAdminAccess } from "@/lib/hooks/privileges";
 type RateFilters = { status: string | null; base: string | null };
 const emptyFilters: RateFilters = { status: null, base: null };
 
@@ -70,6 +71,7 @@ export default function RatePage() {
   const [enableTarget, setEnableTarget] = useState<RatePairRow | null>(null);
   const { toast, show: showToast, hide: hideToast } = useRateToast();
   const [toggling, setToggling] = useState<string | null>(null);
+  const { can } = useAdminAccess();
   const [exporting, setExporting] = useState(false);
 
   // Row switch: both directions ask for a reason first
@@ -125,8 +127,12 @@ export default function RatePage() {
           </Text>
         </Box>
         <Group gap={10}>
-          <SecondaryBtn text="Audit Log" icon={IconFileText} link="/admin/rate/audit-log" fw={600} fz={14} />
-          <PrimaryBtn text="Add Pair" icon={IconPlus} action={() => setAddOpen(true)} fw={600} fz={14} />
+          <Can do="rates.view-audit-log">
+            <SecondaryBtn text="Audit Log" icon={IconFileText} link="/admin/rate/audit-log" fw={600} fz={14} />
+          </Can>
+          <Can do="rates.manage-pairs">
+            <PrimaryBtn text="Add Pair" icon={IconPlus} action={() => setAddOpen(true)} fw={600} fz={14} />
+          </Can>
         </Group>
       </Flex>
 
@@ -156,7 +162,9 @@ export default function RatePage() {
             {/* Same Refresh button as the Transactions pages: reloads the table and stat cards */}
             <SecondaryBtn text="Refresh" icon={IconRefresh} fw={600} fz={12} action={revalidate} loading={loading} />
             {/* The server builds an .xlsx file */}
-            <SecondaryBtn text="Export" icon={IconArrowUpRight} fz={12} action={exportFile} loading={exporting} />
+            <Can do="rates.export">
+              <SecondaryBtn text="Export" icon={IconArrowUpRight} fz={12} action={exportFile} loading={exporting} />
+            </Can>
           </Group>
         </Flex>
         <Box id="rate-filter-panel">
@@ -193,7 +201,7 @@ export default function RatePage() {
           return <TableTr key={row.id}>
             <TableTd>
               <Switch aria-label={`${row.enabled ? "Disable" : "Enable"} ${row.code}`} checked={row.enabled}
-                disabled={toggling === row.id} onChange={() => toggle(row)} color="var(--prune-primary-600)" size="md" classNames={{ track: classes.switchTrack }} />
+                disabled={toggling === row.id || !can("rates.manage-pairs")} onChange={() => toggle(row)} color="var(--prune-primary-600)" size="md" classNames={{ track: classes.switchTrack }} />
             </TableTd>
             <TableTd>
               <Link href={`/admin/rate/${row.id}`} style={{ color: "inherit", textDecoration: "none" }}>
@@ -248,12 +256,18 @@ export default function RatePage() {
                 <Menu.Dropdown>
                   {/* Only one pending change per pair: offer Review instead of Set/Edit rate */}
                   {row.pendingChangeId
-                    ? <Menu.Item onClick={() => setReviewId(row.pendingChangeId)}>Review pending change</Menu.Item>
-                    : <Menu.Item onClick={() => setRateTarget(row)}>{row.rate ? "Edit rate" : "Set rate"}</Menu.Item>}
+                    ? <Can any={["rates.approve-change","rates.set-rate"]}>
+                    ?   <Menu.Item onClick={() => setReviewId(row.pendingChangeId)}>Review pending change</Menu.Item>
+                    ? </Can>
+                    : <Can do="rates.set-rate">
+                    :   <Menu.Item onClick={() => setRateTarget(row)}>{row.rate ? "Edit rate" : "Set rate"}</Menu.Item>
+                    : </Can>}
                   <Menu.Item component={Link} href={`/admin/rate/${row.id}`}>View pair</Menu.Item>
                   {/* A pair with no rate can't be enabled yet */}
                   {(row.enabled || row.rate) && (
-                    <Menu.Item onClick={() => toggle(row)}>{row.enabled ? "Disable" : "Enable"} pair</Menu.Item>
+                    <Can do="rates.manage-pairs">
+                      <Menu.Item onClick={() => toggle(row)}>{row.enabled ? "Disable" : "Enable"} pair</Menu.Item>
+                    </Can>
                   )}
                 </Menu.Dropdown>
               </Menu>

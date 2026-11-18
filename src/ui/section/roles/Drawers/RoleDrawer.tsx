@@ -12,6 +12,7 @@ import { IconEdit, IconUserCheck, IconUserX } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import { closeButtonProps } from "@/app/admin/(dashboard)/businesses/[id]/(tabs)/utils";
+import { useAdminAccess } from "@/lib/hooks/privileges";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import {
@@ -28,7 +29,6 @@ interface Props {
   role: AdminRole | null;
   opened: boolean;
   close: () => void;
-  canManage: boolean;
   onToggleStatus: (role: AdminRole) => void;
 }
 
@@ -36,10 +36,12 @@ export default function RoleDrawer({
   role,
   opened,
   close,
-  canManage,
   onToggleStatus,
 }: Props) {
   const active = role ? isRoleActive(role) : true;
+  const { can } = useAdminAccess();
+  const canToggle = can("roles.toggle-status");
+  const canEdit = active && can("roles.edit");
   const grouped = groupPermissionsByCategory(role?.permissions ?? []);
   const privilegeCount = countPrivileges(role);
 
@@ -174,7 +176,7 @@ export default function RoleDrawer({
         </Box>
       )}
 
-      {role && canManage && (
+      {role && (canToggle || canEdit) && (
         <Flex
           pos="sticky"
           bottom={0}
@@ -185,12 +187,14 @@ export default function RoleDrawer({
           bg="#fff"
           style={{ borderTop: "1px solid #F2F4F7" }}
         >
-          <SecondaryBtn
-            text={active ? "Deactivate" : "Activate"}
-            icon={active ? IconUserX : IconUserCheck}
-            action={() => onToggleStatus(role)}
-          />
-          {active && (
+          {canToggle && (
+            <SecondaryBtn
+              text={active ? "Deactivate" : "Activate"}
+              icon={active ? IconUserX : IconUserCheck}
+              action={() => onToggleStatus(role)}
+            />
+          )}
+          {canEdit && (
             <PrimaryBtn
               text="Edit Role"
               icon={IconEdit}

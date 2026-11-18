@@ -7,6 +7,9 @@ import {
   Container,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { useEffect } from "react";
+import { AdminPageGuard } from "@/lib/hooks/privileges";
+import { refreshAdminMe } from "@/lib/hooks/adminRoles";
 
 import Header from "@/ui/components/Header";
 import Navbar from "@/ui/components/Navbar";
@@ -19,6 +22,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [opened, { toggle }] = useDisclosure();
+
+  // keep the stored /admin/me (role + privileges) current, not just as it
+  // was at login
+  useEffect(() => {
+    refreshAdminMe();
+  }, []);
 
   return (
     <AppShell
@@ -43,7 +52,8 @@ export default function RootLayout({
 
       <AppShellMain>
         <Container p={0} fluid>
-          {children}
+          {/* pages the admin has no privilege for show "no access" */}
+          <AdminPageGuard>{children}</AdminPageGuard>
         </Container>
       </AppShellMain>
     </AppShell>

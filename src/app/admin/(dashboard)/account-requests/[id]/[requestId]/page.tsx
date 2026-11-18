@@ -36,6 +36,7 @@ import {
 import { notifications } from "@mantine/notifications";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 export default function SingleRequest() {
   const params = useParams<{ requestId: string }>();
   const { revalidate, request, loading } = useSingleRequest(params.requestId);
@@ -216,14 +217,16 @@ export default function SingleRequest() {
           </Group>
 
           {request && request.status === "PENDING" && (
-            <div className={styles.header__right}>
-              <SecondaryBtn text="Reject" action={open} />
-              <PrimaryBtn
-                text="Approve"
-                action={openApprove}
-                disabled={areSomeDocumentsNotApproved(request)}
-              />
-            </div>
+            <Can do="account-requests.approve">
+              <div className={styles.header__right}>
+                <SecondaryBtn text="Reject" action={open} />
+                <PrimaryBtn
+                  text="Approve"
+                  action={openApprove}
+                  disabled={areSomeDocumentsNotApproved(request)}
+                />
+              </div>
+            </Can>
           )}
         </div>
 

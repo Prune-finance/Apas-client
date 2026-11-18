@@ -63,6 +63,7 @@ import OnboardingDocuments from "../../../businesses/[id]/(tabs)/onboarding-docu
 import OnboardingDirectors from "../../../businesses/[id]/(tabs)/onboarding-directors";
 import OnboardingShareholders from "../../../businesses/[id]/(tabs)/onboarding-shareholders";
 
+import { Can } from "@/lib/hooks/privileges";
 const questAxios = createAxiosInstance("questionnaire");
 
 export default function SingleEligibilityBusiness() {
@@ -278,40 +279,46 @@ export default function SingleEligibilityBusiness() {
 
           {isOnboardingApp && detail?.editableByAdmin && appStatus === "IN_PROGRESS" && (
             <div className={styles.header__right}>
-              <PrimaryBtn
-                text="Edit"
-                fw={600}
-                fz={12}
-                h={32}
-                radius={4}
-                action={() => router.push(`/admin/eligibility-center/${params.id}/business/edit`)}
-              />
+              <Can do="eligibility-center.edit">
+                <PrimaryBtn
+                  text="Edit"
+                  fw={600}
+                  fz={12}
+                  h={32}
+                  radius={4}
+                  action={() => router.push(`/admin/eligibility-center/${params.id}/business/edit`)}
+                />
+              </Can>
             </div>
           )}
 
           {isOnboardingApp && (appStatus === "SUBMITTED" || appStatus === "RESUBMITTED") && (
             <div className={styles.header__right}>
-              <PrimaryBtn
-                text="Reject"
-                fw={600}
-                fz={12}
-                h={32}
-                radius={4}
-                color="#D92D20"
-                c="#fff"
-                action={openRejectBiz}
-              />
-              <PrimaryBtn
-                text="Approve"
-                fw={600}
-                fz={12}
-                h={32}
-                radius={4}
-                action={() => {
-                  if (!allDocumentsApproved) { openHoldUp(); return; }
-                  openTier();
-                }}
-              />
+              <Can do="eligibility-center.approve">
+                <PrimaryBtn
+                  text="Reject"
+                  fw={600}
+                  fz={12}
+                  h={32}
+                  radius={4}
+                  color="#D92D20"
+                  c="#fff"
+                  action={openRejectBiz}
+                />
+              </Can>
+              <Can do="eligibility-center.approve">
+                <PrimaryBtn
+                  text="Approve"
+                  fw={600}
+                  fz={12}
+                  h={32}
+                  radius={4}
+                  action={() => {
+                    if (!allDocumentsApproved) { openHoldUp(); return; }
+                    openTier();
+                  }}
+                />
+              </Can>
             </div>
           )}
 
@@ -322,36 +329,40 @@ export default function SingleEligibilityBusiness() {
               </Button>
 
               {business?.companyStatus && (
-                <PrimaryBtn
-                  text={business?.companyStatus === "ACTIVE" ? "Deactivate" : "Activate"}
-                  action={open}
+                <Can do="businesses.toggle-status">
+                  <PrimaryBtn
+                    text={business?.companyStatus === "ACTIVE" ? "Deactivate" : "Activate"}
+                    action={open}
+                    color="#f6f6f6"
+                    c="var(--prune-text-gray-700)"
+                    fz={12}
+                    fw={600}
+                    h={32}
+                    radius={4}
+                  />
+                </Can>
+              )}
+
+              <Can do="businesses.edit">
+                <Button
+                  onClick={openTrust}
                   color="#f6f6f6"
                   c="var(--prune-text-gray-700)"
                   fz={12}
                   fw={600}
                   h={32}
                   radius={4}
-                />
-              )}
-
-              <Button
-                onClick={openTrust}
-                color="#f6f6f6"
-                c="var(--prune-text-gray-700)"
-                fz={12}
-                fw={600}
-                h={32}
-                radius={4}
-              >
-                <Switch
-                  label="Trust this business"
-                  checked={business?.kycTrusted}
-                  labelPosition="left"
-                  fz={12}
-                  size="xs"
-                  color="var(--prune-success-500)"
-                />
-              </Button>
+                >
+                  <Switch
+                    label="Trust this business"
+                    checked={business?.kycTrusted}
+                    labelPosition="left"
+                    fz={12}
+                    size="xs"
+                    color="var(--prune-success-500)"
+                  />
+                </Button>
+              </Can>
 
               {loading ? (
                 <Skeleton h={30} w={100} />
@@ -360,25 +371,29 @@ export default function SingleEligibilityBusiness() {
                   {Boolean(userCount) ? (
                     <>
                       {!services.find((s) => s.serviceIdentifier === "ISSUED_ACCOUNT_SERVICE")?.active && (
-                        <PrimaryBtn
-                          text="Enable Issued Accounts"
-                          action={enableIssuedAccount}
-                          radius={4}
-                          loading={processingAccounts}
-                          h={32}
-                          fw={600}
-                        />
+                        <Can do="eligibility-center.enable-account-issuance">
+                          <PrimaryBtn
+                            text="Enable Issued Accounts"
+                            action={enableIssuedAccount}
+                            radius={4}
+                            loading={processingAccounts}
+                            h={32}
+                            fw={600}
+                          />
+                        </Can>
                       )}
                     </>
                   ) : (
-                    <PrimaryBtn
-                      text="Send Activation Link"
-                      action={sendActivationLink}
-                      radius={4}
-                      loading={processingLink}
-                      h={32}
-                      fw={600}
-                    />
+                    <Can do="businesses.send-activation-link">
+                      <PrimaryBtn
+                        text="Send Activation Link"
+                        action={sendActivationLink}
+                        radius={4}
+                        loading={processingLink}
+                        h={32}
+                        fw={600}
+                      />
+                    </Can>
                   )}
                 </>
               )}

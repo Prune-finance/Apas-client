@@ -7,6 +7,7 @@ import { CurrencyRequest } from "@/lib/hooks/requests";
 import AdvancedFormat from "dayjs/plugin/advancedFormat";
 import Link from "next/link";
 
+import { Can } from "@/lib/hooks/privileges";
 dayjs.extend(AdvancedFormat);
 
 interface CurrencyRequestProps {
@@ -119,24 +120,28 @@ function SingleCurrencyModal({
 
       {selectedRequest?.status === "PENDING" && (
         <Flex justify="center" gap={15} px={32} py={15} bg="#F9F9F9">
-          <SecondaryBtn
-            text="Reject"
-            action={() => {
-              currencyRejectedApprove();
-              closeApprove();
-            }}
-            fullWidth
-          />
+          <Can do="currency-requests.approve">
+            <SecondaryBtn
+              text="Reject"
+              action={() => {
+                currencyRejectedApprove();
+                closeApprove();
+              }}
+              fullWidth
+            />
+          </Can>
 
-          <PrimaryBtn
-            text={"Approved"}
-            action={() => {
-              currencyOpenApprove();
-              closeApprove();
-            }}
-            loading={false}
-            fullWidth
-          />
+          <Can do="currency-requests.approve">
+            <PrimaryBtn
+              text={"Approved"}
+              action={() => {
+                currencyOpenApprove();
+                closeApprove();
+              }}
+              loading={false}
+              fullWidth
+            />
+          </Can>
         </Flex>
       )}
     </Modal>

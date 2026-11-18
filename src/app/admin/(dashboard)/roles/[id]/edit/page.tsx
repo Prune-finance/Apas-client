@@ -12,16 +12,13 @@ import {
   adminRolesApi,
   refreshAdminMe,
   selectionKeys,
-  useAdminAccess,
   useAdminRole,
 } from "@/lib/hooks/adminRoles";
 import RoleForm from "@/ui/section/roles/RoleForm";
-import SuperAdminOnly from "@/ui/section/roles/SuperAdminOnly";
 
 export default function EditRole() {
   const { id } = useParams<{ id: string }>();
   const { push } = useRouter();
-  const { canManageRoles } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
   const { role, loading } = useAdminRole(id);
   const [submitting, setSubmitting] = useState(false);
@@ -63,9 +60,7 @@ export default function EditRole() {
         </Text>
       </Box>
 
-      {!canManageRoles ? (
-        <SuperAdminOnly />
-      ) : loading ? (
+      {loading ? (
         <Stack mt={20} gap={16}>
           <Skeleton height={44} maw={600} />
           <Skeleton height={70} maw={600} />

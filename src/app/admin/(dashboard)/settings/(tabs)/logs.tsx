@@ -25,6 +25,7 @@ import { parseError } from "@/lib/actions/auth";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import { switzer } from "@/ui/fonts";
 
+import { Can } from "@/lib/hooks/privileges";
 function Logs() {
   const searchParams = useSearchParams();
 
@@ -177,13 +178,15 @@ function Logs() {
           >
             Download Log
           </Button> */}
-          <SecondaryBtn
-            action={handleExportCsv}
-            loading={processingCSV}
-            icon={IconCircleArrowDown}
-            fw={600}
-            text="Download Log"
-          />
+          <Can do="logs.download">
+            <SecondaryBtn
+              action={handleExportCsv}
+              loading={processingCSV}
+              icon={IconCircleArrowDown}
+              fw={600}
+              text="Download Log"
+            />
+          </Can>
         </Group>
       </Group>
 

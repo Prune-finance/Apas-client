@@ -12,6 +12,7 @@ import { boolean } from "zod";
 import { useDisclosure } from "@mantine/hooks";
 import ModalComponent from "@/ui/components/Modal";
 
+import { Can } from "@/lib/hooks/privileges";
 interface ProfileHeaderProps {
   data: OnboardingBusiness | null;
   loading: boolean;
@@ -251,61 +252,73 @@ export default function ProfileHeader({
 
       <Group gap={10} wrap="wrap">
         {onEdit && (
-          <PrimaryBtn
-            text="Edit"
-            fw={600}
-            fz={12}
-            h={32}
-            radius={4}
-            action={onEdit}
-          />
+          <Can do="eligibility-center.edit">
+            <PrimaryBtn
+              text="Edit"
+              fw={600}
+              fz={12}
+              h={32}
+              radius={4}
+              action={onEdit}
+            />
+          </Can>
         )}
         {data?.processStatus === "QUESTIONNAIRE" &&
           data.questionnaireStatus === "SUBMITTED" && (
             <>
-              <PrimaryBtn
-                text="Reject Profile"
-                color="var(--prune-warning)"
-                c="#fff"
-                fw={600}
-                action={openProfile}
-                // action={() => handleQuestionnaireApproval("REJECTED")}
-                // loading={loadingProfileRejection}
-              />
-              <PrimaryBtn
-                text="Approve Profile"
-                fw={600}
-                action={() => handleQuestionnaireApproval("APPROVED")}
-                loading={loadingProfileApproval}
-              />
+              <Can do="eligibility-center.approve">
+                <PrimaryBtn
+                  text="Reject Profile"
+                  color="var(--prune-warning)"
+                  c="#fff"
+                  fw={600}
+                  action={openProfile}
+                  // action={() => handleQuestionnaireApproval("REJECTED")}
+                  // loading={loadingProfileRejection}
+                />
+              </Can>
+              <Can do="eligibility-center.approve">
+                <PrimaryBtn
+                  text="Approve Profile"
+                  fw={600}
+                  action={() => handleQuestionnaireApproval("APPROVED")}
+                  loading={loadingProfileApproval}
+                />
+              </Can>
             </>
           )}
         {data?.processStatus === "ACTIVATION" &&
           data.onboardingStatus === "COMPLETED" && (
             <>
-              <PrimaryBtn
-                text="Reject Business"
-                color="var(--prune-warning)"
-                c="#fff"
-                fw={600}
-                action={open}
-                // loading={loadingBusinessRejection}
-              />
-              <PrimaryBtn
-                text="Activate Business"
-                fw={600}
-                action={() => handleBusinessApproval("approve")}
-                loading={loadingBusinessApproval}
-              />
+              <Can do="eligibility-center.approve">
+                <PrimaryBtn
+                  text="Reject Business"
+                  color="var(--prune-warning)"
+                  c="#fff"
+                  fw={600}
+                  action={open}
+                  // loading={loadingBusinessRejection}
+                />
+              </Can>
+              <Can do="eligibility-center.approve">
+                <PrimaryBtn
+                  text="Activate Business"
+                  fw={600}
+                  action={() => handleBusinessApproval("approve")}
+                  loading={loadingBusinessApproval}
+                />
+              </Can>
             </>
           )}
         {data?.processStatus === "PROFILE" && (
-          <PrimaryBtn
-            text="Send Questionnaire"
-            fw={600}
-            action={() => handleSendingLink("questionnaire")}
-            loading={loadingLink}
-          />
+          <Can do="eligibility-center.send-links">
+            <PrimaryBtn
+              text="Send Questionnaire"
+              fw={600}
+              action={() => handleSendingLink("questionnaire")}
+              loading={loadingLink}
+            />
+          </Can>
         )}
         {data?.questionnaireStatus === "ONBOARDING_INVITED" && (
           <ResendInvitationButton
@@ -315,21 +328,25 @@ export default function ProfileHeader({
           />
         )}
         {data?.questionnaireStatus === "SUBMITTED" && (
-          <PrimaryBtn
-            text="Reject Questionnaire"
-            color="var(--prune-warning)"
-            c="#fff"
-            fw={600}
-            action={openRejectQuestionnaire}
-          />
+          <Can do="eligibility-center.approve">
+            <PrimaryBtn
+              text="Reject Questionnaire"
+              color="var(--prune-warning)"
+              c="#fff"
+              fw={600}
+              action={openRejectQuestionnaire}
+            />
+          </Can>
         )}
         {data?.questionnaireStatus === "SUBMITTED" && (
-          <PrimaryBtn
-            text="Send Onboarding Link"
-            fw={600}
-            action={handleSendOnboardingLink}
-            loading={loadingLink}
-          />
+          <Can do="eligibility-center.send-links">
+            <PrimaryBtn
+              text="Send Onboarding Link"
+              fw={600}
+              action={handleSendOnboardingLink}
+              loading={loadingLink}
+            />
+          </Can>
         )}
       </Group>
 
@@ -397,12 +414,14 @@ const ResendInvitationButton = ({ linkSentAt, loading, onResend }: ResendInvitat
 
   if (isExpired) {
     return (
-      <PrimaryBtn
-        text="Resend Invitation"
-        fw={600}
-        action={onResend}
-        loading={loading}
-      />
+      <Can do="eligibility-center.send-links">
+        <PrimaryBtn
+          text="Resend Invitation"
+          fw={600}
+          action={onResend}
+          loading={loading}
+        />
+      </Can>
     );
   }
 

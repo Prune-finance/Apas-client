@@ -2,6 +2,7 @@ import { ActionIcon, Box, Flex, Modal, Text } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { AdminRole, isRoleActive } from "@/lib/hooks/adminRoles";
+import { modalTitleStyle } from "../modalTitle";
 
 interface Props {
   role: AdminRole | null;
@@ -24,6 +25,7 @@ export default function RoleStatusModal({
     <Modal
       opened={opened}
       onClose={close}
+      closeOnClickOutside={!processing}
       centered
       closeButtonProps={{
         icon: (
@@ -36,54 +38,53 @@ export default function RoleStatusModal({
           </ActionIcon>
         ),
       }}
-      size={400}
-      padding={24}
+      size={440}
+      padding={28}
+      title={
+        <Text {...modalTitleStyle}>
+          {deactivating ? "Deactivate Role" : "Activate Role"}
+        </Text>
+      }
     >
-      <Flex align="center" justify="center" direction="column" gap={8}>
-        <Text fz={18} fw={600} c="#000">
-          {deactivating ? "Deactivate" : "Activate"} Role
-        </Text>
-
-        <Text fz={12} fw={400} c="#667085" ta="center">
-          {deactivating ? (
-            <>
-              You are about to deactivate the{" "}
-              <b style={{ textTransform: "capitalize" }}>{role?.title}</b> role.
-              Admins assigned to this role will lose the access it grants.
-            </>
-          ) : (
-            <>
-              You are about to reactivate the{" "}
-              <b style={{ textTransform: "capitalize" }}>{role?.title}</b> role.
-              It will be available to assign to admins again.
-            </>
-          )}
-        </Text>
-
-        {deactivating && (
-          <Box
-            bg="#FBFEE6"
-            p={8}
-            mt={8}
-            style={{ border: "1px solid #C1DD06" }}
-          >
-            <Text fz={12} fw={500} c="#667085" ta="center">
-              You can reactivate it any time. Filter the roles list by{" "}
-              <span style={{ color: "#97AD05", textDecoration: "underline" }}>
-                Deactivated
-              </span>{" "}
-              to find it.
-            </Text>
-          </Box>
+      <Text fz={14} c="#667085" lh={1.5}>
+        {deactivating ? (
+          <>
+            You are about to deactivate the{" "}
+            <b style={{ textTransform: "capitalize" }}>{role?.title}</b> role.
+            Admins assigned to it will lose the access it gives them straight
+            away.
+          </>
+        ) : (
+          <>
+            You are about to activate the{" "}
+            <b style={{ textTransform: "capitalize" }}>{role?.title}</b> role.
+            Admins assigned to it get its access back, and it can be given to
+            admins again.
+          </>
         )}
-      </Flex>
+      </Text>
 
-      <Flex mb={8} mt={30} justify="center" align="center" w="100%" gap={15}>
-        <SecondaryBtn text="Cancel" action={close} fullWidth />
+      {deactivating && (
+        <Box
+          bg="#FBFEE6"
+          p={10}
+          mt={16}
+          style={{ border: "1px solid #C1DD06", borderRadius: 4 }}
+        >
+          <Text fz={12} fw={500} c="#667085">
+            You can activate it again any time. Filter the roles list by{" "}
+            <span style={{ color: "#97AD05", fontWeight: 600 }}>
+              Deactivated
+            </span>{" "}
+            to find it.
+          </Text>
+        </Box>
+      )}
 
+      <Flex mt={28} justify="flex-end" gap={12}>
+        <SecondaryBtn text="Cancel" action={close} />
         <PrimaryBtn
           text={deactivating ? "Yes, Deactivate" : "Yes, Activate"}
-          fullWidth
           action={onConfirm}
           loading={processing}
         />

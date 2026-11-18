@@ -4,33 +4,8 @@ import useAxios from "./useAxios";
 
 const axios = createAxiosInstance("auth");
 
-/**
- * TEMPORARY: off so any admin can manage roles while permissions are being
- * set up. Set back to true to show role-changing buttons only to a Super
- * Admin, as the backend guide requires (the server may still answer 403).
- */
-export const ENFORCE_SUPER_ADMIN_FOR_ROLES = false;
-
-/**
- * Access for the signed-in admin, from the /admin/me result stored at login.
- * Only a Super Admin can create, edit, (de)activate or assign roles; the
- * server enforces it too and answers 403 otherwise.
- */
-export function useAdminAccess() {
-  const user = User((s) => s.user);
-  const privileges = user?.privileges ?? [];
-  // the guide says "Superadmin"; tolerate "SUPERADMIN" / "SUPER_ADMIN" too
-  const isSuperAdmin =
-    user?.role?.toLowerCase().replace(/[^a-z]/g, "") === "superadmin";
-
-  return {
-    isSuperAdmin,
-    // who sees the create/edit/(de)activate/assign role buttons
-    canManageRoles: !ENFORCE_SUPER_ADMIN_FOR_ROLES || isSuperAdmin,
-    privileges,
-    can: (action: string) => isSuperAdmin || privileges.includes(action),
-  };
-}
+// Access checks live in ./privileges; re-exported for existing imports
+export { useAdminAccess } from "./privileges";
 
 /** Re-fetch /admin/me so stored roles and privileges stay current. */
 export async function refreshAdminMe() {
@@ -97,12 +72,12 @@ export interface AdminRolePayload {
 // deactivated once it has a deletedAt timestamp.
 export const isRoleActive = (role: AdminRole) => !role.deletedAt;
 
-export function useAdminRoles() {
+export function useAdminRoles(paging: { page?: number; limit?: number } = {}) {
   const { data, loading, queryFn } = useAxios<AdminRole[]>({
     baseURL: "auth",
     endpoint: "/admin/roles",
-    params: { audience: ADMIN_AUDIENCE },
-    dependencies: [],
+    params: { audience: ADMIN_AUDIENCE, ...paging },
+    dependencies: [paging.page, paging.limit],
   });
 
   return { roles: data, loading, revalidate: queryFn };

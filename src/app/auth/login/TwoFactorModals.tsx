@@ -32,11 +32,15 @@ interface TwoFactorModalsProps {
   step: TwoFactorStep | null;
   challengeToken: string;
   onStepChange: (step: TwoFactorStep | null) => void;
-  onComplete: (token: string, userData: any) => void;
+  // may be async (admin login fetches /admin/me before redirecting)
+  onComplete: (token: string, userData: any) => void | Promise<void>;
 }
 
+// Modal headings use Eksell Display, like the app's other modals
+const EKSELL = "'EksellDisplay', serif";
+
 const modalStyles = {
-  title: { fontSize: 24, fontWeight: 500, color: "#101828", fontFamily: "var(--mantine-font-family)" },
+  title: { fontSize: 24, fontWeight: 700, color: "#101828", fontFamily: EKSELL },
   header: { padding: "24px 24px 0" },
   body: { padding: "8px 24px 24px" },
 };
@@ -49,9 +53,9 @@ const confirmModalStyles = (compact: boolean) => ({
   content: { borderRadius: 8 },
   title: {
     fontSize: compact ? 20 : 24,
-    fontWeight: 500,
+    fontWeight: 700,
     color: "#000000",
-    fontFamily: "var(--mantine-font-family)",
+    fontFamily: EKSELL,
   },
   header: { padding: compact ? "24px 24px 0" : "32px 32px 0", minHeight: 0 },
   body: { padding: compact ? "12px 24px 24px" : "16px 32px 32px" },
@@ -364,22 +368,42 @@ function BackupCodesModal({
 }
 
 // ─── You're Secured ──────────────────────────────────────────────────────────
-function SecuredModal({ opened, onOkay }: { opened: boolean; onOkay: () => void }) {
+function SecuredModal({
+  opened,
+  onOkay,
+  loading,
+}: {
+  opened: boolean;
+  onOkay: () => void;
+  loading: boolean;
+}) {
   return (
     <Modal
       opened={opened}
-      onClose={onOkay}
+      // closing also finishes sign-in, so ignore it while that's running
+      onClose={() => !loading && onOkay()}
       title="You're Secured!"
       styles={modalStyles}
       size={440}
       centered
-      withCloseButton
+      withCloseButton={!loading}
+      closeOnClickOutside={!loading}
+      closeOnEscape={!loading}
     >
       <Text fz={14} c="var(--prune-text-gray-500)" mb={32}>
         2FA is now active. Next time you log in, we&apos;ll ask for your code.
       </Text>
       <Flex justify="flex-end">
-        <PrimaryBtn text="Okay" fw={600} fz={12} action={onOkay} radius={4} h={40} px={18} />
+        <PrimaryBtn
+          text="Okay"
+          fw={600}
+          fz={12}
+          action={onOkay}
+          loading={loading}
+          radius={4}
+          h={40}
+          px={18}
+        />
       </Flex>
     </Modal>
   );
@@ -395,6 +419,7 @@ export default function TwoFactorModals({
   const { handleError, handleSuccess } = useNotification();
   const [loading, setLoading] = useState(false);
   const [confirmLoading, setConfirmLoading] = useState(false);
+  const [completing, setCompleting] = useState(false);
   const [qrCode, setQrCode] = useState("");
   const [manualKey, setManualKey] = useState("");
   const [backupCodes, setBackupCodes] = useState<string[]>([]);
@@ -443,8 +468,17 @@ export default function TwoFactorModals({
   // After backup codes saved → go to "Secured" then complete
   const handleBackupContinue = () => onStepChange("secured");
 
-  const handleSecuredOkay = () => {
-    onComplete(pendingToken, pendingUserData);
+  // Spin until sign-in finishes; on success the page redirects, so the
+  // loader stays on until then
+  const handleSecuredOkay = async () => {
+    if (completing) return;
+    setCompleting(true);
+    try {
+      await onComplete(pendingToken, pendingUserData);
+    } catch (error: any) {
+      handleError("Sign-in failed", error?.message ?? "Please try logging in again.");
+      setCompleting(false);
+    }
   };
 
   // Enter 2FA code (already set up)
@@ -462,8 +496,10 @@ export default function TwoFactorModals({
         );
       }
 
-      onComplete(token, userData);
+      // keep the button loading while sign-in finishes and the page redirects
+      await onComplete(token, userData);
     } catch (error: any) {
+      setConfirmLoading(false);
       const status = error?.response?.status;
       if (status === 401) {
         handleError("Session expired", "Your sign-in session expired. Please log in again.");
@@ -474,8 +510,6 @@ export default function TwoFactorModals({
       } else {
         handleError("Incorrect code", error?.response?.data?.message ?? "The code you entered is incorrect. Please try again.");
       }
-    } finally {
-      setConfirmLoading(false);
     }
   };
 
@@ -514,6 +548,7 @@ export default function TwoFactorModals({
       <SecuredModal
         opened={step === "secured"}
         onOkay={handleSecuredOkay}
+        loading={completing}
       />
 
       <ConfirmSetupModal

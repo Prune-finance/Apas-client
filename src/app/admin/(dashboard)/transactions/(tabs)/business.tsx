@@ -22,6 +22,7 @@ import { calculateTotalPages } from "@/lib/utils";
 import InfoCards from "@/ui/components/Cards/InfoCards";
 import CountryFlag from "@/ui/components/CountryFlag";
 
+import { Can } from "@/lib/hooks/privileges";
 type Currency = "EUR" | "GBP" | "USD" | "GHS";
 
 const currencyTabs = [
@@ -154,7 +155,9 @@ export const BusinessAccountTransactions = ({
             <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} indicator={activeFilterCount} />
             {/* <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} /> */}
-            <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
+            <Can do="transactions.export">
+              <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
+            </Can>
           </Flex>
         </Flex>
 

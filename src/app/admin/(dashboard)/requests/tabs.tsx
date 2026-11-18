@@ -18,6 +18,7 @@ import TabsComponent from "@/ui/components/Tabs";
 import LiveKeySuspense from "./(tabs)/live-key";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useAdminAccess } from "@/lib/hooks/privileges";
 import PayoutRequests from "./(tabs)/payouts";
 import OtherCurrency from "./(tabs)/otherCurrencies";
 
@@ -26,41 +27,60 @@ import OtherCurrency from "./(tabs)/otherCurrencies";
 function TabsContainer() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
+  const { can } = useAdminAccess();
+  // each request type shows only with its view privilege
+  const visibleTabs = tabs.filter((t) => can(t.privilege));
+  const shows = (value: string) => visibleTabs.some((t) => t.value === value);
+
   return (
     <TabsComponent
-      defaultValue={tabs.find((t) => t.value === tab)?.value ?? tabs[0].value}
+      defaultValue={
+        visibleTabs.find((t) => t.value === tab)?.value ?? visibleTabs[0]?.value
+      }
       onChange={(value) => {
         window.history.pushState({}, "", "?tab=" + value);
       }}
-      tabs={tabs}
+      tabs={visibleTabs}
       mt={24}
       tt="capitalize"
       fz={12}
       keepMounted={false}
     >
-      <TabsPanel value={tabs[0].value}>
-        <Debit />
-      </TabsPanel>
+      {shows("Debit") && (
+        <TabsPanel value="Debit">
+          <Debit />
+        </TabsPanel>
+      )}
 
-      <TabsPanel value={tabs[1].value}>
-        <Services />
-      </TabsPanel>
+      {shows("services") && (
+        <TabsPanel value="services">
+          <Services />
+        </TabsPanel>
+      )}
 
-      <TabsPanel value={tabs[2].value}>
-        <OtherCurrency />
-      </TabsPanel>
+      {shows("other-currencies") && (
+        <TabsPanel value="other-currencies">
+          <OtherCurrency />
+        </TabsPanel>
+      )}
 
-      <TabsPanel value={tabs[3].value}>
-        <LiveKeySuspense />
-      </TabsPanel>
+      {shows("live-keys") && (
+        <TabsPanel value="live-keys">
+          <LiveKeySuspense />
+        </TabsPanel>
+      )}
 
-      <TabsPanel value={tabs[4].value}>
-        <PayoutRequests />
-      </TabsPanel>
+      {shows("payout-requests") && (
+        <TabsPanel value="payout-requests">
+          <PayoutRequests />
+        </TabsPanel>
+      )}
 
-      <TabsPanel value={tabs[5].value}>
-        <Reactivate />
-      </TabsPanel>
+      {shows("other-requests") && (
+        <TabsPanel value="other-requests">
+          <Reactivate />
+        </TabsPanel>
+      )}
     </TabsComponent>
   );
 }
@@ -69,33 +89,39 @@ const tabs = [
   {
     title: "Debit",
     value: "Debit",
+    privilege: "debit-requests.view",
     icon: <IconCircleArrowUpRight size={16} />,
   },
   {
     title: "Services",
     value: "services",
+    privilege: "service-requests.view",
     icon: <IconUserPlus size={16} />,
   },
 
   {
     title: "Other currencies",
     value: "other-currencies",
+    privilege: "currency-requests.view",
     icon: <IconRosetteDiscountCheck size={16} />,
   },
 
   {
     title: "Live Keys",
     value: "live-keys",
+    privilege: "live-key-requests.view",
     icon: <IconCircleKey size={16} />,
   },
   {
     title: "Payout Requests",
     value: "payout-requests",
+    privilege: "payout-requests.view",
     icon: <IconArrowUpRight size={16} />,
   },
   {
     title: "Other Requests",
     value: "other-requests",
+    privilege: "reactivation-requests.view",
     icon: <IconUserPlus size={16} />,
   },
   // {

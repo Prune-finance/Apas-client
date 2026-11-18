@@ -37,6 +37,7 @@ import advancedFormat from "dayjs/plugin/advancedFormat";
 import createAxiosInstance from "@/lib/axios";
 import { useDisclosure } from "@mantine/hooks";
 
+import { Can } from "@/lib/hooks/privileges";
 dayjs.extend(advancedFormat);
 
 export default function Business({
@@ -171,11 +172,13 @@ const BasicInformation = ({ business, form, handleBusinessUpdate }: IProps) => {
           Basic Information
         </Text>
         {!editingTop ? (
-          <SecondaryBtn
-            text="Edit"
-            icon={IconPencilMinus}
-            action={() => setEditingTop(true)}
-          />
+          <Can do="businesses.edit">
+            <SecondaryBtn
+              text="Edit"
+              icon={IconPencilMinus}
+              action={() => setEditingTop(true)}
+            />
+          </Can>
         ) : (
           <Group>
             <SecondaryBtn
@@ -376,52 +379,56 @@ const ContactInfo = ({
         ) : (
           <Group pos="relative">
             {Boolean(meta?.activationLinkCount) && !Boolean(meta?.users) && (
-              <Popover
-                position="bottom"
-                // offset={23}
-                withinPortal={false}
-                trapFocus
-                width={300}
-                withArrow
-                shadow="md"
-                opened={opened}
-                offset={{ mainAxis: 10, crossAxis: 0 }}
-              >
-                <PopoverTarget>
-                  <PrimaryBtn
-                    text="Send Activation Link to alternate email"
-                    // action={() => setEditingBottom(true)}
-                    variant="light"
-                    td="underline"
-                    c="var(--prune-primary-800)"
-                    type="button"
-                    action={toggle}
-                  />
-                </PopoverTarget>
-
-                <PopoverDropdown top={40}>
-                  <Stack>
-                    <TextInput
-                      label="Email"
-                      placeholder="Enter Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.currentTarget.value)}
-                    />
+              <Can do="businesses.send-activation-link">
+                <Popover
+                  position="bottom"
+                  // offset={23}
+                  withinPortal={false}
+                  trapFocus
+                  width={300}
+                  withArrow
+                  shadow="md"
+                  opened={opened}
+                  offset={{ mainAxis: 10, crossAxis: 0 }}
+                >
+                  <PopoverTarget>
                     <PrimaryBtn
-                      text="Submit"
-                      action={addBusinessUser}
-                      loading={processing}
+                      text="Send Activation Link to alternate email"
+                      // action={() => setEditingBottom(true)}
+                      variant="light"
+                      td="underline"
+                      c="var(--prune-primary-800)"
+                      type="button"
+                      action={toggle}
                     />
-                  </Stack>
-                </PopoverDropdown>
-              </Popover>
+                  </PopoverTarget>
+  
+                  <PopoverDropdown top={40}>
+                    <Stack>
+                      <TextInput
+                        label="Email"
+                        placeholder="Enter Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.currentTarget.value)}
+                      />
+                      <PrimaryBtn
+                        text="Submit"
+                        action={addBusinessUser}
+                        loading={processing}
+                      />
+                    </Stack>
+                  </PopoverDropdown>
+                </Popover>
+              </Can>
             )}
 
-            <SecondaryBtn
-              text="Edit"
-              icon={IconPencilMinus}
-              action={() => setEditingBottom(true)}
-            />
+            <Can do="businesses.edit">
+              <SecondaryBtn
+                text="Edit"
+                icon={IconPencilMinus}
+                action={() => setEditingBottom(true)}
+              />
+            </Can>
           </Group>
         )}
       </Flex>
@@ -578,11 +585,13 @@ const BusinessBio = ({ business, form, handleBusinessUpdate }: IProps) => {
             />
           </Group>
         ) : (
-          <SecondaryBtn
-            icon={IconPencilMinus}
-            text="Edit"
-            action={() => setEditingBizInfo(true)}
-          />
+          <Can do="businesses.edit">
+            <SecondaryBtn
+              icon={IconPencilMinus}
+              text="Edit"
+              action={() => setEditingBizInfo(true)}
+            />
+          </Can>
         )}
       </Flex>
 

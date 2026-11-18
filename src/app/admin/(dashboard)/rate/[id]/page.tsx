@@ -31,6 +31,7 @@ import ReviewChangeDrawer from "@/ui/section/rate/Drawers/ReviewChangeDrawer";
 import RateHistory from "@/ui/section/rate/RateHistory";
 import AuditTrail from "@/ui/section/rate/AuditTrail";
 
+import { Can } from "@/lib/hooks/privileges";
 dayjs.extend(relativeTime);
 
 // Figma: Pair page · Overview (15719:380891 / 15672:332940), inverse hidden (15702:374635),
@@ -150,14 +151,20 @@ export default function PairPage({ params }: { params: { id: string } }) {
           </Box>
 
           {pair.enabled ? (
-            <PrimaryBtn text="Disable Pair" leftSection={<Icon name="pair-disable" />} color="#ff5226" c="white"
-              className={classes.largeBtn} action={() => setDisableOpen(true)} />
+            <Can do="rates.manage-pairs">
+              <PrimaryBtn text="Disable Pair" leftSection={<Icon name="pair-disable" />} color="#ff5226" c="white"
+                className={classes.largeBtn} action={() => setDisableOpen(true)} />
+            </Can>
           ) : (
-            <PrimaryBtn text="Enable Pair" leftSection={<Icon name="pair-disable" />} color="#ff5226" c="white"
-              className={classes.largeBtn} action={() => setEnableOpen(true)} />
+            <Can do="rates.manage-pairs">
+              <PrimaryBtn text="Enable Pair" leftSection={<Icon name="pair-disable" />} color="#ff5226" c="white"
+                className={classes.largeBtn} action={() => setEnableOpen(true)} />
+            </Can>
           )}
-          <PrimaryBtn text={pair.pendingChange ? "Review Change" : live ? "Edit Rate" : "Set Rate"} leftSection={<Icon name="pair-set-rate" />}
-            color="#c1dd06" c="#344054" className={classes.largeBtn} action={openRate} />
+          <Can any={["rates.set-rate","rates.approve-change"]}>
+            <PrimaryBtn text={pair.pendingChange ? "Review Change" : live ? "Edit Rate" : "Set Rate"} leftSection={<Icon name="pair-set-rate" />}
+              color="#c1dd06" c="#344054" className={classes.largeBtn} action={openRate} />
+          </Can>
         </Box>
       </Box>
 
@@ -255,9 +262,11 @@ export default function PairPage({ params }: { params: { id: string } }) {
                     {pair.pendingChange ? "A rate is waiting for approval"
                       : pair.scheduledChange ? "An approved rate is scheduled to go live" : "No rate set yet"}
                   </Text>
-                  <UnstyledButton className={classes.smallBlueBtn} onClick={openRate}>
-                    {pair.pendingChange ? "Review" : "Set rate"}
-                  </UnstyledButton>
+                  <Can any={["rates.set-rate","rates.approve-change"]}>
+                    <UnstyledButton className={classes.smallBlueBtn} onClick={openRate}>
+                      {pair.pendingChange ? "Review" : "Set rate"}
+                    </UnstyledButton>
+                  </Can>
                 </Box>
               )}
             </Box>
@@ -318,8 +327,10 @@ export default function PairPage({ params }: { params: { id: string } }) {
                       </Text>
                       <span className={classes.pendingPill}><span className={classes.dot} />Pending approval</span>
                     </Box>
-                    <PrimaryBtn text="Review rate change" leftSection={<Icon name="export-arrow" />}
-                      className={classes.reviewRateBtn} action={() => setReviewId(pc.id)} />
+                    <Can any={["rates.set-rate","rates.approve-change"]}>
+                      <PrimaryBtn text="Review rate change" leftSection={<Icon name="export-arrow" />}
+                        className={classes.reviewRateBtn} action={() => setReviewId(pc.id)} />
+                    </Can>
                   </Box>
                   <Box className={classes.pendingBannerBody}>
                     <Text className={classes.pendingBannerMain}>

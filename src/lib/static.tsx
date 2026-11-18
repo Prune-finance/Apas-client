@@ -32,6 +32,11 @@ import {
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
+import {
+  PAYOUTS_VIEW_PRIVILEGES,
+  REQUEST_VIEW_PRIVILEGES,
+  SETTINGS_VIEW_PRIVILEGES,
+} from "./privilegeGroups";
 import businessStyles from "@/ui/styles/business.module.scss";
 import { TransactionType } from "./hooks/transactions";
 import { Notification } from "./hooks/notifications";
@@ -41,46 +46,55 @@ export const AdminMainLinks = [
   {
     text: "Dashboard",
     link: "/admin/dashboard",
+    privileges: ["dashboard.view"] as readonly string[],
     icon: <IconHome2 size={16} />,
   },
   {
     text: "Businesses",
     link: "/admin/businesses",
+    privileges: ["businesses.view"] as readonly string[],
     icon: <IconBuildingSkyscraper size={16} />,
   },
   {
     text: "Accounts",
     link: "/admin/accounts",
+    privileges: ["accounts.view"] as readonly string[],
     icon: <IconUsers size={16} />,
   },
   {
     text: "Account Creation",
     link: "/admin/account-requests",
+    privileges: ["account-requests.view"] as readonly string[],
     icon: <IconUserPlus size={16} />,
   },
   {
     text: "Eligibility Center",
     link: "/admin/eligibility-center",
+    privileges: ["eligibility-center.view"] as readonly string[],
     icon: <IconRosetteDiscountCheck size={16} />,
   },
   {
     text: "Rate",
     link: "/admin/rate",
+    privileges: ["rates.view"] as readonly string[],
     icon: <IconArrowsRightLeft size={16} />,
   },
   {
     text: "Transactions",
     link: "/admin/transactions",
+    privileges: ["transactions.view"] as readonly string[],
     icon: <IconArrowsSort size={16} />,
   },
   {
     text: "Payouts",
     link: "/admin/payouts",
+    privileges: PAYOUTS_VIEW_PRIVILEGES as readonly string[],
     icon: <IconArrowUpRight size={16} />,
   },
   {
     text: "Requests",
     link: "/admin/requests",
+    privileges: REQUEST_VIEW_PRIVILEGES as readonly string[],
     icon: <IconCreditCardPay size={16} />,
   },
 ];
@@ -89,21 +103,25 @@ export const AdminOtherLinks = [
   {
     text: "User Management",
     link: "/admin/users",
+    privileges: ["admins.view"] as readonly string[],
     icon: <IconUsers size={16} />,
   },
   {
     text: "Roles & Permissions",
     link: "/admin/roles",
+    privileges: ["roles.view"] as readonly string[],
     icon: <IconShieldLock size={16} />,
   },
   {
     text: "Pricing Plans",
     link: "/admin/pricing-plans",
+    privileges: ["pricing-plans.view"] as readonly string[],
     icon: <IconPremiumRights size={16} />,
   },
   {
     text: "Settings",
     link: "/admin/settings",
+    privileges: SETTINGS_VIEW_PRIVILEGES as readonly string[],
     icon: <IconSettings size={16} />,
   },
 ];

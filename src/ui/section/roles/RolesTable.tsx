@@ -30,6 +30,7 @@ import {
   countPrivileges,
   isRoleActive,
 } from "@/lib/hooks/adminRoles";
+import { useAdminAccess } from "@/lib/hooks/privileges";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
 import { TableComponent } from "@/ui/components/Table";
@@ -48,8 +49,6 @@ const statusOptions = [
 interface Props {
   roles: AdminRole[];
   loading: boolean;
-  // only a Super Admin can create, edit, activate or deactivate roles
-  canManage: boolean;
   onView: (role: AdminRole) => void;
   onToggleStatus: (role: AdminRole) => void;
 }
@@ -57,11 +56,11 @@ interface Props {
 export default function RolesTable({
   roles,
   loading,
-  canManage,
   onView,
   onToggleStatus,
 }: Props) {
   const { push } = useRouter();
+  const { can } = useAdminAccess();
   const [search, setSearch] = useState("");
   const [filtersOpened, { toggle: toggleFilters }] = useDisclosure(false);
   const [applied, setApplied] = useState<RoleFilters>(emptyFilters);
@@ -142,7 +141,7 @@ export default function RolesTable({
               >
                 <Text fz={12}>View Details</Text>
               </MenuItem>
-              {canManage && active && (
+              {can("roles.edit") && active && (
                 <MenuItem
                   leftSection={<IconEdit size={14} />}
                   onClick={() => push(`/admin/roles/${role.id}/edit`)}
@@ -150,7 +149,7 @@ export default function RolesTable({
                   <Text fz={12}>Edit Role</Text>
                 </MenuItem>
               )}
-              {canManage && (
+              {can("roles.toggle-status") && (
                 <MenuItem
                   leftSection={
                     active ? (
@@ -183,7 +182,7 @@ export default function RolesTable({
             icon={IconListTree}
             indicator={activeFilterCount}
           />
-          {canManage && (
+          {can("roles.create") && (
             <PrimaryBtn
               text="New Role"
               link="/admin/roles/new"

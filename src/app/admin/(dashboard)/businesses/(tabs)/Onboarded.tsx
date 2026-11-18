@@ -45,6 +45,7 @@ import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { SecondaryBtn } from "@/ui/components/Buttons";
 import EmptyTable from "@/ui/components/EmptyTable";
 
+import { Can } from "@/lib/hooks/privileges";
 interface OnboardedBusinessesProps {
   hideOverview?: boolean;
   status?: string;
@@ -172,28 +173,30 @@ export default function OnboardedBusinesses({
       </TableTd>
 
       <TableTd onClick={(e) => e.stopPropagation()}>
-        <Menu shadow="md" width={150}>
-          <MenuTarget>
-            <UnstyledButton>
-              <IconDotsVertical size={17} />
-            </UnstyledButton>
-          </MenuTarget>
-
-          <MenuDropdown>
-            {menuItems.map((items, index) => {
-              return (
-                <MenuItem
-                  key={index}
-                  fz={10}
-                  c="#667085"
-                  leftSection={items.icon}
-                >
-                  {items.text}
-                </MenuItem>
-              );
-            })}
-          </MenuDropdown>
-        </Menu>
+        <Can do="businesses.download-report">
+          <Menu shadow="md" width={150}>
+            <MenuTarget>
+              <UnstyledButton>
+                <IconDotsVertical size={17} />
+              </UnstyledButton>
+            </MenuTarget>
+  
+            <MenuDropdown>
+              {menuItems.map((items, index) => {
+                return (
+                  <MenuItem
+                    key={index}
+                    fz={10}
+                    c="#667085"
+                    leftSection={items.icon}
+                  >
+                    {items.text}
+                  </MenuItem>
+                );
+              })}
+            </MenuDropdown>
+          </Menu>
+        </Can>
       </TableTd>
     </TableTr>
   ));

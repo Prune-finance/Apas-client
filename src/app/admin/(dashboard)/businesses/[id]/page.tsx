@@ -57,6 +57,7 @@ import OnboardingDirectors from "./(tabs)/onboarding-directors";
 import OnboardingShareholders from "./(tabs)/onboarding-shareholders";
 
 
+import { Can, useAdminAccess } from "@/lib/hooks/privileges";
 export default function SingleBusiness() {
   const params = useParams<{ id: string }>();
   const { loading, business: detail, revalidate } = useBusinessDetail(params.id);
@@ -87,7 +88,9 @@ export default function SingleBusiness() {
   const router = useRouter();
   const isOnboardingApp = detail?.type === "ONBOARDING_APPLICATION";
   const appStatus = detail?.applicationStatus ?? detail?.currentStatus;
+  const { can } = useAdminAccess();
   const visibleTabs = tabs.filter((t) => {
+    if (t.value === "keys" && !can("businesses.view-keys")) return false;
     if ((t as any).onboardingOnly) return isOnboardingApp;
     if (["accounts", "keys", "requests"].includes(t.value)) return !isOnboardingApp;
     return true;
@@ -260,59 +263,67 @@ export default function SingleBusiness() {
           </Group>
 
           {isOnboardingApp && detail?.editableByAdmin && appStatus === "IN_PROGRESS" && (
-            <div className={styles.header__right}>
-              <PrimaryBtn
-                text="Edit"
-                fw={600}
-                fz={12}
-                h={32}
-                radius={4}
-                action={() => router.push(`/admin/businesses/${params.id}/edit`)}
-              />
-            </div>
+            <Can do="businesses.edit">
+              <div className={styles.header__right}>
+                <PrimaryBtn
+                  text="Edit"
+                  fw={600}
+                  fz={12}
+                  h={32}
+                  radius={4}
+                  action={() => router.push(`/admin/businesses/${params.id}/edit`)}
+                />
+              </div>
+            </Can>
           )}
 
           {activeTab === "business" && detail?.type === "COMPANY" && (
             <div className={styles.header__right}>
-              <Button size="xs" className={styles.header__right__cta}>
-                <IconDownload color="#344054" stroke={2} size={16} />
-              </Button>
+              <Can do="businesses.download-report">
+                <Button size="xs" className={styles.header__right__cta}>
+                  <IconDownload color="#344054" stroke={2} size={16} />
+                </Button>
+              </Can>
 
               {business?.companyStatus && (
-                <PrimaryBtn
-                  text={
-                    business?.companyStatus === "ACTIVE"
-                      ? "Deactivate"
-                      : "Activate"
-                  }
-                  action={open}
+                <Can do="businesses.toggle-status">
+                  <PrimaryBtn
+                    text={
+                      business?.companyStatus === "ACTIVE"
+                        ? "Deactivate"
+                        : "Activate"
+                    }
+                    action={open}
+                    color="#f6f6f6"
+                    c="var(--prune-text-gray-700)"
+                    fz={12}
+                    fw={600}
+                    h={32}
+                    radius={4}
+                  />
+                </Can>
+              )}
+
+              <Can do="businesses.edit">
+                <Button
+                  onClick={openTrust}
                   color="#f6f6f6"
                   c="var(--prune-text-gray-700)"
                   fz={12}
                   fw={600}
                   h={32}
                   radius={4}
-                />
-              )}
-
-              <Button
-                onClick={openTrust}
-                color="#f6f6f6"
-                c="var(--prune-text-gray-700)"
-                fz={12}
-                fw={600}
-                h={32}
-                radius={4}
-              >
-                <Switch
-                  label="Trust this business"
-                  checked={business?.kycTrusted}
-                  labelPosition="left"
-                  fz={12}
-                  size="xs"
-                  color="var(--prune-success-500)"
-                />
-              </Button>
+                >
+                  <Switch
+                    label="Trust this business"
+                    checked={business?.kycTrusted}
+                    labelPosition="left"
+                    fz={12}
+                    size="xs"
+                    color="var(--prune-success-500)"
+                  />
+                </Button>
+              </Can>
 
               {loading ? (
                 <Skeleton h={30} w={100} />
@@ -324,25 +335,29 @@ export default function SingleBusiness() {
                         (service) =>
                           service.serviceIdentifier === "ISSUED_ACCOUNT_SERVICE"
                       )?.active && (
-                        <PrimaryBtn
-                          text="Enable Issued Accounts"
-                          action={enableIssuedAccount}
-                          radius={4}
-                          loading={processingAccounts}
-                          h={32}
-                          fw={600}
-                        />
+                        <Can do="eligibility-center.enable-account-issuance">
+                          <PrimaryBtn
+                            text="Enable Issued Accounts"
+                            action={enableIssuedAccount}
+                            radius={4}
+                            loading={processingAccounts}
+                            h={32}
+                            fw={600}
+                          />
+                        </Can>
                       )}
                     </>
                   ) : (
-                    <PrimaryBtn
-                      text="Send Activation Link"
-                      action={sendActivationLink}
-                      radius={4}
-                      loading={processingLink}
-                      h={32}
-                      fw={600}
-                    />
+                    <Can do="businesses.send-activation-link">
+                      <PrimaryBtn
+                        text="Send Activation Link"
+                        action={sendActivationLink}
+                        radius={4}
+                        loading={processingLink}
+                        h={32}
+                        fw={600}
+                      />
+                    </Can>
                   )}
                 </>
               )}

@@ -28,14 +28,20 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 import { AdminData, useAdmins } from "@/lib/hooks/admins";
 import AssignRoleModal from "@/ui/section/roles/Modals/AssignRoleModal";
-import { useAdminAccess } from "@/lib/hooks/adminRoles";
+import {
+  adminRolesApi,
+  isRoleActive,
+  useAdminAccess,
+  useAdminRoles,
+} from "@/lib/hooks/adminRoles";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import ModalComponent from "../modals/modal";
 import { useForm, zodResolver } from "@mantine/form";
-import { newAdmin, validateNewAdmin } from "@/lib/schema";
+import { newAdmin } from "@/lib/schema";
+import { z } from "zod";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import axios from "axios";
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 
@@ -49,11 +55,27 @@ import { SearchInput, TextBox } from "@/ui/components/Inputs";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { calculateTotalPages } from "@/lib/utils";
 
+const required = (label: string) =>
+  z.string().trim().min(1, `${label} is required`);
+
+// Update Details: name and email
+const editAdminSchema = z.object({
+  firstName: required("First name"),
+  lastName: required("Last name"),
+  email: required("Email").email("Please provide a valid email"),
+});
+
+// Invite: every field, including a password and a role from the roles table
+const inviteAdminSchema = editAdminSchema.extend({
+  password: required("Password"),
+  role: required("Role"),
+});
+
 export default function Users() {
   const searchParams = useSearchParams();
   const { push } = useRouter();
   const { handleError, handleSuccess } = useNotification();
-  const { canManageRoles } = useAdminAccess();
+  const { can, currentAdminId } = useAdminAccess();
   const [tab, setTab] = useState<string | null>("Users");
 
   const { email, lastName, firstName, status, date, endDate } =
@@ -104,9 +126,16 @@ export default function Users() {
   const [isEdit, setIsEdit] = useState(false);
   const [id, setId] = useState("");
 
+  // Invite needs every field; Update Details has no password or role field.
+  // The schema is picked when the form validates, so it follows isEdit.
+  const isEditRef = useRef(isEdit);
+  isEditRef.current = isEdit;
   const form = useForm({
     initialValues: newAdmin,
-    validate: zodResolver(validateNewAdmin),
+    validate: (values) =>
+      zodResolver(isEditRef.current ? editAdminSchema : inviteAdminSchema)(
+        values
+      ),
   });
 
   const filterForm = useForm<FilterType>({
@@ -114,29 +143,67 @@ export default function Users() {
     validate: zodResolver(FilterSchema),
   });
 
+  // Role choices for the invite form, from the Roles & Permissions table
+  const { roles: roleList, loading: rolesLoading } = useAdminRoles({
+    page: 1,
+    limit: 100,
+  });
+  const roleOptions = (roleList ?? [])
+    .filter(isRoleActive)
+    .map((r) => ({ value: r.id, label: r.title }));
+
+  const openInvite = () => {
+    // start empty, even after "Update Details" filled the form
+    form.reset();
+    setIsEdit(false);
+    open();
+  };
+
   const addAdmin = async () => {
     setProcessing(true);
 
     try {
-      const { hasErrors, errors } = form.validate();
+      const { hasErrors } = form.validate();
       if (hasErrors) {
         return;
       }
 
-      const { password, ...rest } = form.values;
+      // the form's role is a role id from the roles table
+      const { role: roleId, ...details } = form.values;
+      if (!roleId) {
+        form.setFieldError("role", "Role is required");
+        return;
+      }
 
-      await axios.post(
+      // create them as a regular admin, then give them the chosen role
+      const { data } = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/new-admin`,
-        // { ...rest },
-        form.values,
+        { ...details, role: "Admin" },
         { headers: { Authorization: `Bearer ${Cookies.get("auth")}` } }
       );
 
+      const newAdminId: string | undefined = data?.data?.id;
+      if (newAdminId) {
+        try {
+          await adminRolesApi.assignToAdmin(newAdminId, [roleId]);
+        } catch (error) {
+          handleError(
+            "Admin added, but the role wasn't assigned",
+            `${parseError(error)} Use "Assign Role" on their row to try again.`
+          );
+        }
+      } else {
+        handleError(
+          "Admin added, but the role wasn't assigned",
+          'Use "Assign Role" on their row to give them a role.'
+        );
+      }
+
       revalidate();
       close();
+      form.reset();
       handleSuccess("Successful! Admin Added", "Admin added successfully");
       router.push("/admin/users");
-      form.reset();
     } catch (error) {
       handleError("An error occurred", parseError(error));
     } finally {
@@ -183,12 +250,17 @@ export default function Users() {
     //   link: true,
     //   href: "/admin/businesses",
     // },
-    {
-      text: "Update Details",
-      icon: <IconUserEdit style={{ width: rem(14), height: rem(14) }} />,
-    },
-    // only a Super Admin can give roles to admins
-    ...(canManageRoles
+    ...(can("admins.edit")
+      ? [
+          {
+            text: "Update Details",
+            icon: (
+              <IconUserEdit style={{ width: rem(14), height: rem(14) }} />
+            ),
+          },
+        ]
+      : []),
+    ...(can("admins.assign-roles")
       ? [
           {
             text: "Assign Role",
@@ -203,6 +275,12 @@ export default function Users() {
     //   icon: <IconUserX style={{ width: rem(14), height: rem(14) }} />,
     // },
   ];
+
+  // the actions this admin may take on a row; nobody can change their own roles
+  const rowMenuItems = (rowAdminId: string) =>
+    menuItems.filter(
+      (item) => !(item.text === "Assign Role" && rowAdminId === currentAdminId)
+    );
 
   const handleRowClick = (id: string) => {
     push(`/admin/users/${id}`);
@@ -237,6 +315,8 @@ export default function Users() {
       </TableTd>
 
       <TableTd onClick={(e) => e.stopPropagation()}>
+        {/* no actions allowed on this row: no menu */}
+        {rowMenuItems(element.id).length > 0 && (
         <Menu shadow="md" width={150}>
           <MenuTarget>
             <UnstyledButton>
@@ -245,7 +325,7 @@ export default function Users() {
           </MenuTarget>
 
           <MenuDropdown>
-            {menuItems.map((items, index) => {
+            {rowMenuItems(element.id).map((items, index) => {
               // if (items.link)
               //   return (
               //     <Link key={index} href={`${items.href}/${element.id}`}>
@@ -300,6 +380,7 @@ export default function Users() {
             setIsEdit={setIsEdit}
           /> */}
         </Menu>
+        )}
       </TableTd>
     </TableTr>
   ));
@@ -316,14 +397,13 @@ export default function Users() {
             icon={IconListTree}
             fw={600}
           />
-          <PrimaryBtn
-            text="Invite New User"
-            action={() => {
-              open();
-              setIsEdit(false);
-            }}
-            icon={IconPlus}
-          />
+          {can("admins.invite") && (
+            <PrimaryBtn
+              text="Invite New User"
+              action={openInvite}
+              icon={IconPlus}
+            />
+          )}
         </Group>
       </Group>
 
@@ -372,6 +452,8 @@ export default function Users() {
         form={form}
         isEdit={isEdit}
         setIsEdit={setIsEdit}
+        roleOptions={roleOptions}
+        rolesLoading={rolesLoading}
       />
 
       <AssignRoleModal

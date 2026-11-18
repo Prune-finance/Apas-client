@@ -30,6 +30,7 @@ import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 
+import { Can } from "@/lib/hooks/privileges";
 interface Props {
   requests: PayoutTransactionRequest[];
   loading: boolean;
@@ -194,19 +195,23 @@ export const PendingPayoutRequests = () => {
         close={close}
       >
         <Group justify="end" pr={28} mt={20}>
-          <SecondaryBtn
-            icon={IconX}
-            text="Reject"
-            fw={600}
-            action={openReject}
-          />
+          <Can do="payout-requests.approve">
+            <SecondaryBtn
+              icon={IconX}
+              text="Reject"
+              fw={600}
+              action={openReject}
+            />
+          </Can>
 
-          <PrimaryBtn
-            icon={IconCheck}
-            text="Approve"
-            fw={600}
-            action={openApprove}
-          />
+          <Can do="payout-requests.approve">
+            <PrimaryBtn
+              icon={IconCheck}
+              text="Approve"
+              fw={600}
+              action={openApprove}
+            />
+          </Can>
         </Group>
       </PayoutTransactionRequestDrawer>
 

@@ -63,6 +63,7 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import CountryFlag from "@/ui/components/CountryFlag";
 import { exportPayoutAdminAccounts } from "@/lib/hooks/accounts";
 
+import { Can } from "@/lib/hooks/privileges";
 type Currency = "EUR" | "GBP" | "USD" | "GHS";
 
 const currencyTabs = [
@@ -369,13 +370,15 @@ export default function PayoutAccounts() {
             loading={processingCSV}
             fw={600}
           /> */}
-          <SecondaryBtn
-            text="Export"
-            icon={IconFileExport}
-            action={handleExport}
-            loading={exporting}
-            fw={600}
-          />
+          <Can do="accounts.export">
+            <SecondaryBtn
+              text="Export"
+              icon={IconFileExport}
+              action={handleExport}
+              loading={exporting}
+              fw={600}
+            />
+          </Can>
           <SecondaryBtn
             text="Filter"
             icon={IconListTree}
@@ -586,56 +589,62 @@ const MenuComponent = ({
   open,
 }: MenuProps) => {
   return (
-    <Menu shadow="md" width={150}>
-      <MenuTarget>
-        <UnstyledButton>
-          <IconDotsVertical size={17} />
-        </UnstyledButton>
-      </MenuTarget>
-
-      <MenuDropdown>
-        {/* <Link href={`/admin/accounts/${id}`}>
-          <MenuItem
-            fz={10}
-            c="#667085"
-            leftSection={
-              <IconEye style={{ width: rem(14), height: rem(14) }} />
-            }
-          >
-            View
-          </MenuItem>
-        </Link> */}
-
-        <MenuItem
-          onClick={() => {
-            setRowId(id);
-            if (status === "FROZEN") return unfreezeOpen();
-            freezeOpen();
-          }}
-          fz={10}
-          c="#667085"
-          leftSection={
-            <IconBrandLinktree style={{ width: rem(14), height: rem(14) }} />
-          }
-        >
-          {status === "FROZEN" ? "Unfreeze" : "Freeze"}
-        </MenuItem>
-
-        <MenuItem
-          onClick={() => {
-            setRowId(id);
-            if (status === "INACTIVE") return activateOpen();
-            open();
-          }}
-          fz={10}
-          c="#667085"
-          leftSection={
-            <IconTrash style={{ width: rem(14), height: rem(14) }} />
-          }
-        >
-          {status === "INACTIVE" ? "Activate" : "Deactivate"}
-        </MenuItem>
-      </MenuDropdown>
-    </Menu>
+    <Can any={["accounts.freeze","accounts.toggle-status"]}>
+      <Menu shadow="md" width={150}>
+        <MenuTarget>
+          <UnstyledButton>
+            <IconDotsVertical size={17} />
+          </UnstyledButton>
+        </MenuTarget>
+  
+        <MenuDropdown>
+          {/* <Link href={`/admin/accounts/${id}`}>
+            <MenuItem
+              fz={10}
+              c="#667085"
+              leftSection={
+                <IconEye style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              View
+            </MenuItem>
+          </Link> */}
+  
+          <Can do="accounts.freeze">
+            <MenuItem
+              onClick={() => {
+                setRowId(id);
+                if (status === "FROZEN") return unfreezeOpen();
+                freezeOpen();
+              }}
+              fz={10}
+              c="#667085"
+              leftSection={
+                <IconBrandLinktree style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              {status === "FROZEN" ? "Unfreeze" : "Freeze"}
+            </MenuItem>
+          </Can>
+  
+          <Can do="accounts.toggle-status">
+            <MenuItem
+              onClick={() => {
+                setRowId(id);
+                if (status === "INACTIVE") return activateOpen();
+                open();
+              }}
+              fz={10}
+              c="#667085"
+              leftSection={
+                <IconTrash style={{ width: rem(14), height: rem(14) }} />
+              }
+            >
+              {status === "INACTIVE" ? "Activate" : "Deactivate"}
+            </MenuItem>
+          </Can>
+        </MenuDropdown>
+      </Menu>
+    </Can>
   );
 };

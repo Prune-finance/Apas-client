@@ -51,6 +51,7 @@ import { PrimaryBtn } from "@/ui/components/Buttons";
 import { IconPlus } from "@tabler/icons-react";
 import countries from "@/assets/countries.json";
 
+import { Can } from "@/lib/hooks/privileges";
 const toCountryCode = (value: string): string => {
   if (!value) return "";
   if (value.length <= 3) return value.toUpperCase();
@@ -140,12 +141,14 @@ function EligibilityCenter() {
             View and manage all eligibility profiles on the platform.
           </Text>
         </Box>
-        <PrimaryBtn
-          text="Add New Profile"
-          link="/admin/eligibility-center/new/business/new"
-          fw={600}
-          fz={14}
-        />
+        <Can do="eligibility-center.create">
+          <PrimaryBtn
+            text="Add New Profile"
+            link="/admin/eligibility-center/new/business/new"
+            fw={600}
+            fz={14}
+          />
+        </Can>
       </Flex>
 
       {/* Stat cards */}

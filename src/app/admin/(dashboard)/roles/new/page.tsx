@@ -11,14 +11,11 @@ import {
   AdminRolePayload,
   adminRolesApi,
   refreshAdminMe,
-  useAdminAccess,
 } from "@/lib/hooks/adminRoles";
 import RoleForm from "@/ui/section/roles/RoleForm";
-import SuperAdminOnly from "@/ui/section/roles/SuperAdminOnly";
 
 export default function NewRole() {
   const { push } = useRouter();
-  const { canManageRoles } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
   const [submitting, setSubmitting] = useState(false);
 
@@ -51,16 +48,13 @@ export default function NewRole() {
         </Text>
       </Box>
 
-      {canManageRoles ? (
-        <RoleForm
-          submitText="Create Role"
-          submitting={submitting}
-          onSubmit={handleSubmit}
-          onCancel={() => push("/admin/roles")}
-        />
-      ) : (
-        <SuperAdminOnly />
-      )}
+      {/* the page guard only lets admins with roles.create in */}
+      <RoleForm
+        submitText="Create Role"
+        submitting={submitting}
+        onSubmit={handleSubmit}
+        onCancel={() => push("/admin/roles")}
+      />
     </main>
   );
 }

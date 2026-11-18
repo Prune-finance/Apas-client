@@ -80,6 +80,7 @@ import User from "@/lib/store/user";
 import { useHasPermission } from "@/lib/hooks/checkPermission";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";
 
+import { Can } from "@/lib/hooks/privileges";
 type Param = { id: string };
 interface Props {
   account: Account | null;
@@ -862,19 +863,21 @@ export const IssuedAccountHead = ({
         {!admin ? (
           <PrimaryBtn text="Debit Account" fw={600} action={open} />
         ) : (
-          <SecondaryBtn
-            action={() => {
-              if (account?.status === "FROZEN") return open();
-              openFreeze && openFreeze();
-            }}
-            loading={loading}
-            loaderProps={{ type: "dots" }}
-            text={
-              account?.status === "FROZEN"
-                ? "Unfreeze Account"
-                : "Freeze Account"
-            }
-          />
+          <Can do="accounts.freeze">
+            <SecondaryBtn
+              action={() => {
+                if (account?.status === "FROZEN") return open();
+                openFreeze && openFreeze();
+              }}
+              loading={loading}
+              loaderProps={{ type: "dots" }}
+              text={
+                account?.status === "FROZEN"
+                  ? "Unfreeze Account"
+                  : "Freeze Account"
+              }
+            />
+          </Can>
         )}
       </Flex>
     </Flex>

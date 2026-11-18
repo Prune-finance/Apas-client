@@ -21,6 +21,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, zodResolver } from "@mantine/form";
 import { calculateTotalPages } from "@/lib/utils";
 import CountryFlag from "@/ui/components/CountryFlag";
+import { Can } from "@/lib/hooks/privileges";
 type Currency = "EUR" | "GBP" | "USD";
 
 const currencyTabs = [
@@ -152,7 +153,9 @@ export const IssuedAccountTransactions = ({
             <SecondaryBtn text="Refresh" action={revalidate} icon={IconRefresh} loading={loading} />
             <SecondaryBtn text="Filter" action={toggle} icon={IconListTree} indicator={activeFilterCount} />
             {/* <SecondaryBtn text="Download Statement" icon={IconCircleArrowDown} /> */}
-            <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
+            <Can do="transactions.export">
+              <SecondaryBtn text="Export" action={handleExport} icon={IconFileExport} loading={exporting} />
+            </Can>
           </Flex>
         </Flex>
 

@@ -17,6 +17,7 @@ import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import { AdminData } from "@/lib/hooks/admins";
+import { modalTitleStyle } from "../modalTitle";
 import {
   adminRolesApi,
   isRoleActive,
@@ -108,9 +109,7 @@ export default function AssignRoleModal({
       padding={28}
       title={
         <Box>
-          <Text fz={20} fw={600}>
-            Assign Roles
-          </Text>
+          <Text {...modalTitleStyle}>Assign Roles</Text>
           <Text fz={12} c="#98A2B3">
             {admin
               ? `Set the roles for ${admin.firstName} ${admin.lastName} (${admin.email}).`

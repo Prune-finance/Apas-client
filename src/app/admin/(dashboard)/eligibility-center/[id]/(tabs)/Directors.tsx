@@ -23,6 +23,7 @@ import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 interface ComponentProps {
   data: OnboardingBusiness | null;
   loading: boolean;
@@ -73,22 +74,24 @@ export default function Directors({
         <Text fw={600} fz={16} c="var(--prune-text-gray-700)">
           All Directors
         </Text>
-        <PrimaryBtn
-          text="Add Director"
-          icon={IconPlus}
-          showIcon
-          h={36}
-          fz={13}
-          fw={500}
-          action={() => {
-            open();
-
-            // form.insertListItem("directors", {
-            //   ...OnboardingDirectorValues,
-            //   id: crypto.randomUUID(),
-            // });
-          }}
-        />
+        <Can do="eligibility-center.edit">
+          <PrimaryBtn
+            text="Add Director"
+            icon={IconPlus}
+            showIcon
+            h={36}
+            fz={13}
+            fw={500}
+            action={() => {
+              open();
+  
+              // form.insertListItem("directors", {
+              //   ...OnboardingDirectorValues,
+              //   id: crypto.randomUUID(),
+              // });
+            }}
+          />
+        </Can>
       </Flex>
 
       <Stack mt={24} gap={24}>
@@ -146,25 +149,29 @@ const Director = ({
 
   const actionNode = (
     <Group gap={10}>
-      <SecondaryBtn
-        text={editing ? "Update" : "Edit"}
-        fw={600}
-        fz={12}
-        leftSection={<IconPencilMinus size={16} />}
-        action={() => (editing ? handleAction() : setEditing(true))}
-        loading={updating}
-      />
-      <SecondaryBtn
-        text="Remove"
-        fw={600}
-        fz={12}
-        leftSection={<IconTrash size={16} />}
-        action={async () => {
-          form.removeListItem("directors", idx);
-          await updateDirector();
-        }}
-        disabled={processing}
-      />
+      <Can do="eligibility-center.edit">
+        <SecondaryBtn
+          text={editing ? "Update" : "Edit"}
+          fw={600}
+          fz={12}
+          leftSection={<IconPencilMinus size={16} />}
+          action={() => (editing ? handleAction() : setEditing(true))}
+          loading={updating}
+        />
+      </Can>
+      <Can do="eligibility-center.edit">
+        <SecondaryBtn
+          text="Remove"
+          fw={600}
+          fz={12}
+          leftSection={<IconTrash size={16} />}
+          action={async () => {
+            form.removeListItem("directors", idx);
+            await updateDirector();
+          }}
+          disabled={processing}
+        />
+      </Can>
     </Group>
   );
   return (

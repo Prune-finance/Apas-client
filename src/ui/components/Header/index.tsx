@@ -48,6 +48,7 @@ import { useUserBusinessServices } from "@/lib/hooks/businesses";
 import NoticeBanner from "../NoticeBanner";
 import { switzer } from "@/ui/fonts";
 
+import { Can } from "@/lib/hooks/privileges";
 export default function Header() {
   const { user, setUser } = User();
   const [opened, setOpened] = useState(false);
@@ -167,101 +168,105 @@ export default function Header() {
       <div className={styles.notification}>
         <Divider orientation="vertical" h={26} />
 
-        <Popover
-          width={456}
-          position="bottom"
-          withArrow
-          shadow="md"
-          styles={{ dropdown: { padding: 0 } }}
-          opened={opened}
-          onChange={setOpened}
-        >
-          <PopoverTarget>
-            <Indicator
-              inline
-              processing={!!meta?.total}
-              color={!!meta?.total ? "red" : "transparent"}
-              size={15}
-              onClick={() => setOpened((o) => !o)}
-            >
-              <IconBell color="#475467" stroke={1.5} />
-            </Indicator>
-          </PopoverTarget>
-
-          <PopoverDropdown>
-            <Group gap={8} mt={20} px={28}>
-              <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
-                Notifications
-              </Text>
-
-              <Avatar
-                color="var(--prune-primary-600)"
-                radius="50%"
-                variant="filled"
-                size={25}
-                styles={{
-                  placeholder: { color: "var(--prune-text-gray-800)" },
-                }}
+        <Can do="notifications.view">
+          <Popover
+            width={456}
+            position="bottom"
+            withArrow
+            shadow="md"
+            styles={{ dropdown: { padding: 0 } }}
+            opened={opened}
+            onChange={setOpened}
+          >
+            <PopoverTarget>
+              <Indicator
+                inline
+                processing={!!meta?.total}
+                color={!!meta?.total ? "red" : "transparent"}
+                size={15}
+                onClick={() => setOpened((o) => !o)}
               >
-                {`${meta?.total ?? 0}`}
-              </Avatar>
-            </Group>
-            <Divider color="var(--prune-text-gray-100)" mt={20} />
-
-            {loading ? (
-              <Center h={215}>
-                <Loader size={50} color="var(--prune-primary-600)" />
-              </Center>
-            ) : (
-              <Fragment>
-                {notifications.length > 0 ? (
-                  <Fragment>
-                    {notifications.map((notification, index, arr) => (
-                      <Box px={28} key={index}>
-                        <NotificationRow
-                          {...notification}
-                          lastRow={arr.length - 1 === index}
-                          revalidate={revalidate}
-                        />
-                      </Box>
-                    ))}
-                  </Fragment>
-                ) : (
-                  <Box mb={20} mt={-40}>
-                    <EmptyTable
-                      rows={notifications}
-                      title="No unread notification yet"
-                      text="When there is an unread notification, it will appear here"
-                      loading={loading}
-                    />
-                  </Box>
-                )}
-              </Fragment>
-            )}
-
-            <Paper py={15} bg="#f9f9f9">
-              <Group px={28} justify="space-between" gap={24} wrap="nowrap">
-                <SecondaryBtn
-                  text="Mark all as read"
-                  icon={IconChecks}
-                  fullWidth
-                  action={() => {
-                    markAllNotificationAsRead();
-                    // setOpened(false)
+                <IconBell color="#475467" stroke={1.5} />
+              </Indicator>
+            </PopoverTarget>
+  
+            <PopoverDropdown>
+              <Group gap={8} mt={20} px={28}>
+                <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
+                  Notifications
+                </Text>
+  
+                <Avatar
+                  color="var(--prune-primary-600)"
+                  radius="50%"
+                  variant="filled"
+                  size={25}
+                  styles={{
+                    placeholder: { color: "var(--prune-text-gray-800)" },
                   }}
-                  loading={processing}
-                />
-
-                <PrimaryBtn
-                  text="View All Notifications"
-                  fullWidth
-                  link="/admin/notifications"
-                  action={() => setOpened(false)}
-                />
+                >
+                  {`${meta?.total ?? 0}`}
+                </Avatar>
               </Group>
-            </Paper>
-          </PopoverDropdown>
-        </Popover>
+              <Divider color="var(--prune-text-gray-100)" mt={20} />
+  
+              {loading ? (
+                <Center h={215}>
+                  <Loader size={50} color="var(--prune-primary-600)" />
+                </Center>
+              ) : (
+                <Fragment>
+                  {notifications.length > 0 ? (
+                    <Fragment>
+                      {notifications.map((notification, index, arr) => (
+                        <Box px={28} key={index}>
+                          <NotificationRow
+                            {...notification}
+                            lastRow={arr.length - 1 === index}
+                            revalidate={revalidate}
+                          />
+                        </Box>
+                      ))}
+                    </Fragment>
+                  ) : (
+                    <Box mb={20} mt={-40}>
+                      <EmptyTable
+                        rows={notifications}
+                        title="No unread notification yet"
+                        text="When there is an unread notification, it will appear here"
+                        loading={loading}
+                      />
+                    </Box>
+                  )}
+                </Fragment>
+              )}
+  
+              <Paper py={15} bg="#f9f9f9">
+                <Group px={28} justify="space-between" gap={24} wrap="nowrap">
+                  <Can do="notifications.mark-read">
+                    <SecondaryBtn
+                      text="Mark all as read"
+                      icon={IconChecks}
+                      fullWidth
+                      action={() => {
+                        markAllNotificationAsRead();
+                        // setOpened(false)
+                      }}
+                      loading={processing}
+                    />
+                  </Can>
+  
+                  <PrimaryBtn
+                    text="View All Notifications"
+                    fullWidth
+                    link="/admin/notifications"
+                    action={() => setOpened(false)}
+                  />
+                </Group>
+              </Paper>
+            </PopoverDropdown>
+          </Popover>
+        </Can>
         <Divider orientation="vertical" h={26} />
       </div>
 

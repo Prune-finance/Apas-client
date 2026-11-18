@@ -53,6 +53,7 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import RequestDrawer from "@/ui/section/requests/Drawers/RequestDrawer";
 import { FilterType, FilterValues, FilterSchema } from "@/lib/schema";
 
+import { Can } from "@/lib/hooks/privileges";
 function Reactivate() {
   const searchParams = useSearchParams();
 
@@ -180,37 +181,39 @@ function Reactivate() {
 
   const MenuComponent = ({ request }: { request: IUserRequest }) => {
     return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDotsVertical size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          {Object.entries(menuItems).map(([key, value]) => (
-            <MenuItem
-              key={key}
-              onClick={() => {
-                if (key === "approve") {
-                  setSelectedRequest(request);
-                  return openApprove();
-                }
-                if (key === "deny") {
-                  setSelectedRequest(request);
-                  return open();
-                }
-              }}
-              fz={10}
-              c="#667085"
-              leftSection={value}
-              tt="capitalize"
-            >
-              {key}
-            </MenuItem>
-          ))}
-        </MenuDropdown>
-      </Menu>
+      <Can do="reactivation-requests.approve">
+        <Menu shadow="md" width={150}>
+          <MenuTarget>
+            <UnstyledButton>
+              <IconDotsVertical size={17} />
+            </UnstyledButton>
+          </MenuTarget>
+  
+          <MenuDropdown>
+            {Object.entries(menuItems).map(([key, value]) => (
+              <MenuItem
+                key={key}
+                onClick={() => {
+                  if (key === "approve") {
+                    setSelectedRequest(request);
+                    return openApprove();
+                  }
+                  if (key === "deny") {
+                    setSelectedRequest(request);
+                    return open();
+                  }
+                }}
+                fz={10}
+                c="#667085"
+                leftSection={value}
+                tt="capitalize"
+              >
+                {key}
+              </MenuItem>
+            ))}
+          </MenuDropdown>
+        </Menu>
+      </Can>
     );
   };
 

@@ -39,6 +39,7 @@ import Link from "next/link";
 import ModalComponent from "@/ui/components/Modal";
 import RejectModalComponent from "@/ui/components/Modal/RejectModalComponent";
 
+import { Can } from "@/lib/hooks/privileges";
 function AccountPayout() {
   const searchParams = useSearchParams();
 
@@ -263,8 +264,12 @@ function AccountPayout() {
 
           {selectedRequest?.status === "PENDING" && (
             <Flex mt={40} justify="flex-end" gap={10}>
-              <SecondaryBtn text="Reject" action={open} />
-              <PrimaryBtn text="Approve" action={openApprove} />
+              <Can do="service-requests.approve">
+                <SecondaryBtn text="Reject" action={open} />
+              </Can>
+              <Can do="service-requests.approve">
+                <PrimaryBtn text="Approve" action={openApprove} />
+              </Can>
             </Flex>
           )}
         </Stack>

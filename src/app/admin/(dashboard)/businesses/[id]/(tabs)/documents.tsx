@@ -37,6 +37,7 @@ import {
 import FileDisplay from "@/ui/components/DocumentViewer";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 export default function Documents({
   business,
   revalidate,
@@ -103,13 +104,15 @@ export default function Documents({
           All Documents
         </Text>
 
-        <PrimaryBtn
-          text="New Document"
-          icon={IconPlus}
-          fz={12}
-          fw={600}
-          action={open}
-        />
+        <Can do="businesses.edit">
+          <PrimaryBtn
+            text="New Document"
+            icon={IconPlus}
+            fz={12}
+            fw={600}
+            action={open}
+          />
+        </Can>
       </Group>
       <div className={styles.top__container}>
         <Flex justify="space-between" align="center">
@@ -117,11 +120,13 @@ export default function Documents({
             Documents
           </Text>
           {!editing ? (
-            <SecondaryBtn
-              text="Edit"
-              icon={IconPencilMinus}
-              action={() => setEditing(true)}
-            />
+            <Can do="businesses.edit">
+              <SecondaryBtn
+                text="Edit"
+                icon={IconPencilMinus}
+                action={() => setEditing(true)}
+              />
+            </Can>
           ) : (
             <Group>
               <SecondaryBtn
@@ -239,11 +244,13 @@ export default function Documents({
             </Text>
 
             {!editingDoc ? (
-              <SecondaryBtn
-                text="Edit"
-                icon={IconPencilMinus}
-                action={() => setEditingDoc(true)}
-              />
+              <Can do="businesses.edit">
+                <SecondaryBtn
+                  text="Edit"
+                  icon={IconPencilMinus}
+                  action={() => setEditingDoc(true)}
+                />
+              </Can>
             ) : (
               <Group>
                 <SecondaryBtn
@@ -380,23 +387,25 @@ const DocumentTextInput = ({
               </Text>
             </UnstyledButton>
           ) : (
-            <FileButton
-              disabled={processing}
-              onChange={(file) => handleUpload(file, formKey)}
-              accept="image/png, image/jpeg, application/pdf"
-            >
-              {(props) => (
-                <UnstyledButton
-                  w={"100%"}
-                  className={styles.input__right__section}
-                  {...props}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    Re-upload
-                  </Text>
-                </UnstyledButton>
-              )}
-            </FileButton>
+            <Can do="businesses.edit">
+              <FileButton
+                disabled={processing}
+                onChange={(file) => handleUpload(file, formKey)}
+                accept="image/png, image/jpeg, application/pdf"
+              >
+                {(props) => (
+                  <UnstyledButton
+                    w={"100%"}
+                    className={styles.input__right__section}
+                    {...props}
+                  >
+                    <Text fw={600} fz={10} c="#475467">
+                      Re-upload
+                    </Text>
+                  </UnstyledButton>
+                )}
+              </FileButton>
+            </Can>
           )
         }
         label={label}
@@ -485,23 +494,25 @@ const OtherDocumentTextInput = ({
               </Text>
             </UnstyledButton>
           ) : (
-            <FileButton
-              disabled={processing}
-              onChange={(file) => handleUpload(file)}
-              accept="image/png, image/jpeg, application/pdf"
-            >
-              {(props) => (
-                <UnstyledButton
-                  w={"100%"}
-                  className={styles.input__right__section}
-                  {...props}
-                >
-                  <Text fw={600} fz={10} c="#475467">
-                    Re-upload
-                  </Text>
-                </UnstyledButton>
-              )}
-            </FileButton>
+            <Can do="businesses.edit">
+              <FileButton
+                disabled={processing}
+                onChange={(file) => handleUpload(file)}
+                accept="image/png, image/jpeg, application/pdf"
+              >
+                {(props) => (
+                  <UnstyledButton
+                    w={"100%"}
+                    className={styles.input__right__section}
+                    {...props}
+                  >
+                    <Text fw={600} fz={10} c="#475467">
+                      Re-upload
+                    </Text>
+                  </UnstyledButton>
+                )}
+              </FileButton>
+            </Can>
           )
         }
         label={label}

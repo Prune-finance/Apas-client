@@ -40,11 +40,14 @@ import {
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import { useAdminAccess } from "@/lib/hooks/privileges";
 
 const axios = createAxiosInstance("auth");
 
 export default function Navbar() {
   const pathname = usePathname();
+  // menu items the admin has no privilege for are hidden
+  const { can, canAny } = useAdminAccess();
   const [opened, { open, close }] = useDisclosure(false);
   const { meta, setMeta } = NotificationStore();
   const { handleError } = useNotification();
@@ -174,13 +177,15 @@ export default function Navbar() {
 
           {/* <div className={styles.links}> */}
           <Stack gap={12} mt={32}>
-            {AdminMainLinks.map((item, index) => {
+            {AdminMainLinks.filter((item) => canAny(item.privileges)).map(
+              (item, index) => {
               return (
                 <NavLink
                   key={index}
                   leftSection={item.icon}
                   component={Link}
                   onClick={() =>
+                    can("notifications.mark-read") &&
                     countSwitch(item.text as Type) &&
                     matchType(item.text as Type)
                       ? markAllNotificationByType(matchType(item.text as Type))
@@ -189,7 +194,11 @@ export default function Navbar() {
                   label={
                     <NavLinkLabel
                       text={item.text}
-                      count={countSwitch(item.text as Type)}
+                      count={
+                        can("notifications.view")
+                          ? countSwitch(item.text as Type)
+                          : null
+                      }
                       textArray={[
                         "Transactions",
                         "Payouts",
@@ -206,7 +215,8 @@ export default function Navbar() {
                   classNames={{ root: styles.root }}
                 />
               );
-            })}
+              }
+            )}
           </Stack>
           {/* </div> */}
         </div>
@@ -217,7 +227,8 @@ export default function Navbar() {
           </Text>
 
           <Stack gap={12} mt={32}>
-            {AdminOtherLinks.map((item, index) => {
+            {AdminOtherLinks.filter((item) => canAny(item.privileges)).map(
+              (item, index) => {
               return (
                 <NavLink
                   key={index}
@@ -232,7 +243,8 @@ export default function Navbar() {
                   classNames={{ root: styles.root }}
                 />
               );
-            })}
+              }
+            )}
           </Stack>
         </div>
       </div>

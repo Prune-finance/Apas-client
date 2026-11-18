@@ -9,9 +9,18 @@ import Logs from "./(tabs)/logs";
 import { useState } from "react";
 import Notifications from "./(tabs)/notifications";
 import RateCurrencies from "./(tabs)/currencies";
+import { useAdminAccess } from "@/lib/hooks/privileges";
 
 export default function DebitRequests() {
   const [tab, setTab] = useState<string | null>("Logs");
+  const { can } = useAdminAccess();
+
+  // each tab shows only with its view privilege
+  const visibleTabs = tabs.filter((t) => can(t.privilege));
+  const shows = (value: string) => visibleTabs.some((t) => t.value === value);
+  // fall back to the first tab this admin can see
+  const activeTab = tab && shows(tab) ? tab : visibleTabs[0]?.value ?? null;
+
   return (
     <main className={styles.main}>
       {/* <Breadcrumbs
@@ -30,7 +39,7 @@ export default function DebitRequests() {
 
         <Tabs
           // defaultValue="Logs"
-          value={tab}
+          value={activeTab}
           onChange={setTab}
           variant="pills"
           // Only the open tab is mounted, so each tab fetches when you navigate to it
@@ -43,26 +52,28 @@ export default function DebitRequests() {
           mt={24}
         >
           <TabsList>
-            {tabs.map((tab) => (
-              <TabsTab
-                key={tab.title}
-                value={tab.value || tab.title}
-                leftSection={tab.icon}
-              >
+            {visibleTabs.map((tab) => (
+              <TabsTab key={tab.title} value={tab.value} leftSection={tab.icon}>
                 {tab.title}
               </TabsTab>
             ))}
           </TabsList>
 
-          <TabsPanel value="Logs">
-            <Logs />
-          </TabsPanel>
-          <TabsPanel value="Notifications">
-            <Notifications />
-          </TabsPanel>
-          <TabsPanel value="Currencies">
-            <RateCurrencies />
-          </TabsPanel>
+          {shows("Logs") && (
+            <TabsPanel value="Logs">
+              <Logs />
+            </TabsPanel>
+          )}
+          {shows("Notifications") && (
+            <TabsPanel value="Notifications">
+              <Notifications />
+            </TabsPanel>
+          )}
+          {shows("Currencies") && (
+            <TabsPanel value="Currencies">
+              <RateCurrencies />
+            </TabsPanel>
+          )}
         </Tabs>
       </div>
     </main>
@@ -70,7 +81,22 @@ export default function DebitRequests() {
 }
 
 const tabs = [
-  { title: "Audit Logs", value: "Logs", icon: <IconLogs size={14} /> },
-  { title: "Notifications", icon: <IconNotification size={14} /> },
-  { title: "Rate Currencies", value: "Currencies", icon: <IconCoins size={14} /> },
+  {
+    title: "Audit Logs",
+    value: "Logs",
+    privilege: "logs.view",
+    icon: <IconLogs size={14} />,
+  },
+  {
+    title: "Notifications",
+    value: "Notifications",
+    privilege: "notifications.view",
+    icon: <IconNotification size={14} />,
+  },
+  {
+    title: "Rate Currencies",
+    value: "Currencies",
+    privilege: "currencies.view",
+    icon: <IconCoins size={14} />,
+  },
 ];

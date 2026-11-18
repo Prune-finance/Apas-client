@@ -30,6 +30,7 @@ import useAxios from "@/lib/hooks/useAxios";
 import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 const questAxios = createAxiosInstance("questionnaire");
 
 interface ComponentProps {
@@ -167,7 +168,9 @@ const ContactPerson = ({
   //       loading={loading}
   //       leftSection={<IconPencilMinus size={16} />}
   //     />
-  //     <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
+  //     <Can do="eligibility-center.send-links">
+  //       <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
+  //     </Can>
   //   </Group>
   // );
 
@@ -218,13 +221,15 @@ const CeoDetails = ({ data, form }: Omit<ComponentProps, "loading">) => {
   const [editing, setEditing] = useState(false);
   const actionNode = (
     <Group gap={10}>
-      <SecondaryBtn
-        fz={12}
-        fw={600}
-        text="Edit"
-        action={() => setEditing((prev) => !prev)}
-        leftSection={<IconPencilMinus size={16} />}
-      />
+      <Can do="eligibility-center.edit">
+        <SecondaryBtn
+          fz={12}
+          fw={600}
+          text="Edit"
+          action={() => setEditing((prev) => !prev)}
+          leftSection={<IconPencilMinus size={16} />}
+        />
+      </Can>
       <PrimaryBtn fw={600} fz={12} text="Send KYC Link" />
     </Group>
   );

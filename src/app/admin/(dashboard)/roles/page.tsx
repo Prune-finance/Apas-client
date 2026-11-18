@@ -11,7 +11,6 @@ import {
   adminRolesApi,
   isRoleActive,
   refreshAdminMe,
-  useAdminAccess,
   useAdminRoles,
 } from "@/lib/hooks/adminRoles";
 
@@ -22,7 +21,6 @@ import styles from "@/ui/section/roles/styles.module.scss";
 
 export default function Roles() {
   const { roles, loading, revalidate } = useAdminRoles();
-  const { canManageRoles } = useAdminAccess();
   const { handleSuccess, handleError } = useNotification();
 
   const [selected, setSelected] = useState<AdminRole | null>(null);
@@ -92,7 +90,6 @@ export default function Roles() {
         <RolesTable
           roles={roles ?? []}
           loading={loading}
-          canManage={canManageRoles}
           onView={handleView}
           onToggleStatus={handleToggleStatus}
         />
@@ -102,7 +99,6 @@ export default function Roles() {
         role={selected}
         opened={drawerOpened}
         close={closeDrawer}
-        canManage={canManageRoles}
         onToggleStatus={handleToggleStatus}
       />
 

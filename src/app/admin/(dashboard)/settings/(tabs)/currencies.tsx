@@ -19,6 +19,7 @@ import CurrencyModal from "@/ui/section/rate/Modals/CurrencyModal";
 import DeleteCurrencyModal from "@/ui/section/rate/Modals/DeleteCurrencyModal";
 import { Icon } from "@/ui/section/rate/shared";
 
+import { Can } from "@/lib/hooks/privileges";
 // Settings › Rate Currencies: the currencies available to rate pairs
 
 type Filters = { currency: string | null; remittance: string | null; conversionInbound: string | null; conversionOutbound: string | null };
@@ -67,7 +68,9 @@ export default function RateCurrencies() {
             Currencies that can be used in currency pairs, and how each one can be used.
           </Text>
         </Box>
-        <PrimaryBtn text="Add Currency" icon={IconPlus} action={() => setAdding(true)} fw={600} fz={14} />
+        <Can do="currencies.create">
+          <PrimaryBtn text="Add Currency" icon={IconPlus} action={() => setAdding(true)} fw={600} fz={14} />
+        </Can>
       </Flex>
 
       <Box className={classes.compactInputs}>
@@ -138,19 +141,25 @@ export default function RateCurrencies() {
                 {c.updatedAt && <Text fz={12} mt={4} c="var(--prune-text-gray-500)">{dayjs(c.updatedAt).format("HH:mm")}</Text>}
               </TableTd>
               <TableTd>
-                <Menu position="bottom-end" withinPortal>
-                  <Menu.Target>
-                    <ActionIcon variant="transparent" w="100%" h={40} aria-label={`Actions for ${c.code}`}>
-                      <Icon name="more" />
-                    </ActionIcon>
-                  </Menu.Target>
-                  <Menu.Dropdown>
-                    <Menu.Item onClick={() => setEditTarget(c)}>Edit currency</Menu.Item>
-                    <Menu.Item c={c.canDelete === false ? "var(--prune-text-gray-400)" : "#D92D20"} onClick={() => setDeleteTarget(c)}>
-                      Delete currency
-                    </Menu.Item>
-                  </Menu.Dropdown>
-                </Menu>
+                <Can any={["currencies.edit","currencies.delete"]}>
+                  <Menu position="bottom-end" withinPortal>
+                    <Menu.Target>
+                      <ActionIcon variant="transparent" w="100%" h={40} aria-label={`Actions for ${c.code}`}>
+                        <Icon name="more" />
+                      </ActionIcon>
+                    </Menu.Target>
+                    <Menu.Dropdown>
+                      <Can do="currencies.edit">
+                        <Menu.Item onClick={() => setEditTarget(c)}>Edit currency</Menu.Item>
+                      </Can>
+                      <Can do="currencies.delete">
+                        <Menu.Item c={c.canDelete === false ? "var(--prune-text-gray-400)" : "#D92D20"} onClick={() => setDeleteTarget(c)}>
+                          Delete currency
+                        </Menu.Item>
+                      </Can>
+                    </Menu.Dropdown>
+                  </Menu>
+                </Can>
               </TableTd>
             </TableTr>
           ))}

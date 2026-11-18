@@ -28,6 +28,7 @@ import classes from "../styles.module.scss";
 import { RateToastState } from "../RateToast";
 import { Icon } from "../shared";
 
+import { Can } from "@/lib/hooks/privileges";
 // Figma: Set rate drawer (15673:334813 maker-checker · 15719:375398 direct · 15673:335907 validation)
 
 type AdjustmentType = "NONE" | "MARKUP" | "MARKDOWN";
@@ -448,9 +449,11 @@ export default function SetRateDrawer({ pair, onClose, onSubmitted, notify, requ
           <Box className={classes.reviewFooter}>
             <SecondaryBtn text="Cancel" action={onClose} fz={14} fw={600}
               bg="#fbfee6" bd="none" c="#344054" />
-            <PrimaryBtn text={requiresApproval ? "Submit for approval" : "Set rate"} action={submit} loading={saving}
-              disabled={disabled} fz={14} fw={600} c={disabled ? "#98a2b3" : "#344054"}
-              color={disabled ? "#eaecf0" : "#c1dd06"} />
+            <Can do="rates.set-rate">
+              <PrimaryBtn text={requiresApproval ? "Submit for approval" : "Set rate"} action={submit} loading={saving}
+                disabled={disabled} fz={14} fw={600} c={disabled ? "#98a2b3" : "#344054"}
+                color={disabled ? "#eaecf0" : "#c1dd06"} />
+            </Can>
           </Box>
         </>
       )}

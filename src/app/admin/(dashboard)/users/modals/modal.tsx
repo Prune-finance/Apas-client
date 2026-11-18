@@ -26,7 +26,13 @@ export default function ModalComponent({
   setIsEdit,
   removeRole,
   text,
+  roleOptions,
+  rolesLoading,
 }: ModalProps) {
+  // the admin invite/update form (the one with roleOptions) marks its
+  // required fields; business-user forms keep their own rules
+  const markRequired = !!roleOptions;
+
   return (
     <Modal
       closeOnClickOutside={!processing}
@@ -55,7 +61,12 @@ export default function ModalComponent({
       padding={40}
       title={
         <Flex direction="column">
-          <Text fz={24} fw={600}>
+          <Text
+            fz={24}
+            fw={700}
+            c="#344054"
+            style={{ fontFamily: "'EksellDisplay', serif" }}
+          >
             {isEdit ? "Update User Details" : "Invite a New User"}
           </Text>
           <Text fz={14} className="grey-400">
@@ -73,6 +84,7 @@ export default function ModalComponent({
           <Flex gap={20}>
             <TextInput
               label="First name"
+              withAsterisk={markRequired}
               classNames={{ input: styles.input, label: styles.label }}
               placeholder="First Name"
               flex={1}
@@ -82,6 +94,7 @@ export default function ModalComponent({
             <TextInput
               classNames={{ input: styles.input, label: styles.label }}
               label="Last name"
+              withAsterisk={markRequired}
               placeholder="Last Name"
               flex={1}
               {...form.getInputProps("lastName")}
@@ -92,8 +105,10 @@ export default function ModalComponent({
             <TextInput
               classNames={{ input: styles.input, label: styles.label }}
               label="Email"
+              withAsterisk={markRequired}
               placeholder="Email"
               flex={1}
+              autoComplete="off"
               {...form.getInputProps("email")}
               rightSection={<IconMail color="#667085" size={14} />}
             />
@@ -104,21 +119,30 @@ export default function ModalComponent({
               <PasswordInput
                 classNames={{ input: styles.input, label: styles.label }}
                 label="Password"
+                withAsterisk={markRequired}
                 placeholder="Enter password"
                 flex={1}
+                // stop the browser filling in the signed-in admin's saved password
+                autoComplete="new-password"
                 {...form.getInputProps("password")}
               />
             </Flex>
           )}
 
-          {!removeRole && (
+          {/* With roleOptions (invite), the role comes from the Roles &
+              Permissions table; editing keeps the role as it was. */}
+          {!removeRole && !(roleOptions && isEdit) && (
             <Flex mt={24}>
               <Select
-                placeholder="Role"
+                placeholder={roleOptions && rolesLoading ? "Loading roles..." : "Role"}
                 classNames={{ input: styles.input, label: styles.label }}
                 flex={1}
                 label="Role"
-                data={["Admin", "Superadmin"]}
+                withAsterisk={markRequired}
+                data={roleOptions ?? ["Admin", "Superadmin"]}
+                searchable={!!roleOptions}
+                disabled={!!roleOptions && rolesLoading}
+                nothingFoundMessage="No role found"
                 {...form.getInputProps("role")}
               />
             </Flex>
@@ -161,4 +185,7 @@ interface ModalProps {
   setIsEdit: Dispatch<SetStateAction<boolean>>;
   removeRole?: boolean;
   text?: string;
+  /** Role choices (value = role id); replaces the Admin/Superadmin list */
+  roleOptions?: { value: string; label: string }[];
+  rolesLoading?: boolean;
 }

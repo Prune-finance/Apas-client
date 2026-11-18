@@ -7,10 +7,15 @@ import { PayoutTransactions } from "./(tabs)/PayoutTransactions";
 import { InquiriesTab } from "./(tabs)/Inquiries";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
+import { useAdminAccess } from "@/lib/hooks/privileges";
 
 function AdminPayout() {
   const searchParams = useSearchParams();
   const _tab = searchParams.get("tab");
+  const { can } = useAdminAccess();
+  // each tab shows only with its privilege
+  const visibleTabs = tabs.filter((t) => can(t.privilege));
+  const shows = (value: string) => visibleTabs.some((t) => t.value === value);
   return (
     <main>
       <Paper>
@@ -22,23 +27,30 @@ function AdminPayout() {
 
         <TabsComponent
           defaultValue={
-            tabs.find((tab) => tab.value === _tab)?.value ?? tabs[0].value
+            visibleTabs.find((tab) => tab.value === _tab)?.value ??
+            visibleTabs[0]?.value
           }
-          tabs={tabs}
+          tabs={visibleTabs}
           mt={32}
           fz={12}
         >
-          <TabsPanel value={tabs[0].value}>
-            <Users />
-          </TabsPanel>
+          {shows("Users") && (
+            <TabsPanel value="Users">
+              <Users />
+            </TabsPanel>
+          )}
 
-          <TabsPanel value={tabs[1].value}>
-            <PayoutTransactions />
-          </TabsPanel>
+          {shows("Transactions") && (
+            <TabsPanel value="Transactions">
+              <PayoutTransactions />
+            </TabsPanel>
+          )}
 
-          <TabsPanel value={tabs[2].value}>
-            <InquiriesTab />
-          </TabsPanel>
+          {shows("Inquiries") && (
+            <TabsPanel value="Inquiries">
+              <InquiriesTab />
+            </TabsPanel>
+          )}
         </TabsComponent>
       </Paper>
     </main>
@@ -46,9 +58,9 @@ function AdminPayout() {
 }
 
 const tabs = [
-  { value: "Users" },
-  { value: "Transactions" },
-  { value: "Inquiries" },
+  { value: "Users", privilege: "payouts.view" },
+  { value: "Transactions", privilege: "payouts.view" },
+  { value: "Inquiries", privilege: "payouts.view-inquiries" },
 ];
 
 export default function AdminPayoutSuspense() {

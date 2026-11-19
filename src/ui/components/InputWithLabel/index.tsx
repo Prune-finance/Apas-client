@@ -18,19 +18,59 @@ import {
   Tooltip,
 } from "@mantine/core";
 import classes from "./input.module.scss";
+import { requiredPlaceholder, showAsterisk } from "./required-placeholder";
 import styles from "./styles.module.scss";
 import profile_styles from "./profile.module.scss";
 import { DateInput, DateInputProps } from "@mantine/dates";
+import dayjs from "dayjs";
 
 import { SelectCountryDialCode } from "../SelectDropdownSearch";
 import { UseFormReturnType } from "@mantine/form";
 import { IconHelp } from "@tabler/icons-react";
 
-interface TextInputWithInsideLabelProps extends TextInputProps {}
+const getStandardStyles = (hasError?: boolean) => ({
+  input: {
+    height: "48px",
+    border: `1px solid ${hasError ? "var(--mantine-color-error)" : "var(--prune-text-gray-100)"}`,
+    borderRadius: "8px",
+    paddingLeft: "15px",
+    paddingRight: "15px",
+    fontSize: "14px",
+    color: "var(--prune-text-gray-700)",
+  },
+});
+
+interface TextInputWithInsideLabelProps extends TextInputProps {
+  standard?: boolean;
+}
 export const TextInputWithInsideLabel = ({
+  standard,
   ...props
 }: TextInputWithInsideLabelProps) => {
-  return <TextInput {...props} classNames={classes} />;
+  if (standard) {
+    const { label, ...inputProps } = props;
+    return (
+      <TextInput
+        label={label}
+        placeholder={inputProps.placeholder ?? (typeof label === "string" ? label : undefined)}
+        styles={getStandardStyles(!!inputProps.error)}
+        {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
+      />
+    );
+  }
+  return (
+    <TextInput
+      {...props}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : " "),
+        props
+      )}
+      classNames={classes}
+      styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
+    />
+  );
 };
 
 interface NumberInputWithInsideLabelProps extends NumberInputProps {}
@@ -41,35 +81,162 @@ export const NumberInputWithInsideLabel = ({
   return (
     <NumberInput
       {...props}
-      placeholder="Enter number"
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : "Enter number"),
+        props
+      )}
       classNames={classes}
       thousandSeparator=","
       min={0}
     />
   );
 };
-export const SelectInputWithInsideLabel = ({ ...props }: SelectProps) => {
+interface SelectInputWithInsideLabelProps extends SelectProps {
+  standard?: boolean;
+}
+export const SelectInputWithInsideLabel = ({ standard, ...props }: SelectInputWithInsideLabelProps) => {
+  if (standard) {
+    const { label, ...inputProps } = props;
+    return (
+      <Select
+        label={label}
+        placeholder={inputProps.placeholder ?? (typeof label === "string" ? `Select ${label}` : "Select")}
+        styles={getStandardStyles(!!inputProps.error)}
+        {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
+      />
+    );
+  }
   return (
     <Select
-      placeholder="Select"
       classNames={classes}
-      styles={{ input: { paddingTop: rem(18) } }}
+      styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
       {...props}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : "Select"),
+        props
+      )}
     />
   );
 };
 
-export const DateInputWithInsideLabel = ({ ...props }: DateInputProps) => {
+interface DateInputWithInsideLabelProps extends DateInputProps {
+  standard?: boolean;
+  minimumAge?: number;
+}
+export const DateInputWithInsideLabel = ({ standard, minimumAge, ...rawProps }: DateInputWithInsideLabelProps) => {
+  // Some forms (e.g. the admin People step) store an empty date as "" — treat that, and
+  // any unparsable string, as "no date" so the calendar opens at the age cutoff
+  // instead of an invalid month. Date strings from the API are converted to Date.
+  const toDate = (v: unknown) => {
+    if (v === "" || v === undefined || v === null) return v === undefined ? undefined : null;
+    const d = v instanceof Date ? v : dayjs(v as string).toDate();
+    return isNaN(d.getTime()) ? null : d;
+  };
+  const props = {
+    ...rawProps,
+    ...("value" in rawProps ? { value: toDate(rawProps.value) } : {}),
+    ...("defaultValue" in rawProps ? { defaultValue: toDate(rawProps.defaultValue) } : {}),
+  } as typeof rawProps;
+  const ageCutoff = minimumAge === undefined
+    ? undefined
+    : dayjs().subtract(minimumAge, "year").startOf("day").toDate();
+  const maxDate = ageCutoff && (!props.maxDate || ageCutoff < props.maxDate)
+    ? ageCutoff
+    : props.maxDate;
+  const calendarProps: Partial<DateInputProps> = {
+    maxDate,
+    defaultDate: props.defaultDate ?? props.value ?? props.defaultValue ?? ageCutoff,
+    ...(ageCutoff && maxDate ? {
+      getYearControlProps: (date: Date) => {
+        const control = props.getYearControlProps?.(date);
+        return dayjs(date).isAfter(maxDate, "year")
+          ? { ...control, style: [control?.style, { visibility: "hidden" as const }] }
+          : control ?? {};
+      },
+      getMonthControlProps: (date: Date) => {
+        const control = props.getMonthControlProps?.(date);
+        return dayjs(date).isAfter(maxDate, "month")
+          ? { ...control, style: [control?.style, { visibility: "hidden" as const }] }
+          : control ?? {};
+      },
+      getDayProps: (date: Date) => {
+        const control = props.getDayProps?.(date);
+        return dayjs(date).isAfter(maxDate, "day")
+          ? { ...control, style: [control?.style, { visibility: "hidden" as const }] }
+          : control ?? {};
+      },
+    } : {}),
+  };
+  if (standard) {
+    const { label, ...inputProps } = props;
+    return (
+      <DateInput
+        label={label}
+        styles={getStandardStyles(!!inputProps.error)}
+        placeholder="Select Date"
+        {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
+        {...calendarProps}
+      />
+    );
+  }
   return (
-    <DateInput {...props} placeholder="Select Date" classNames={classes} />
+    <DateInput
+      {...props}
+      {...calendarProps}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : "Select Date"),
+        props
+      )}
+      classNames={classes}
+      styles={props.error ? { input: { borderColor: "var(--mantine-color-error)" } } : undefined}
+    />
   );
 };
 
-interface TextareaWithInsideLabelProps extends TextareaProps {}
+interface TextareaWithInsideLabelProps extends TextareaProps {
+  standard?: boolean;
+}
 export const TextareaWithInsideLabel = ({
+  standard,
   ...props
 }: TextareaWithInsideLabelProps) => {
-  return <Textarea {...props} classNames={classes} />;
+  if (standard) {
+    const { label, ...inputProps } = props;
+    return (
+      <Textarea
+        label={label}
+        placeholder={inputProps.placeholder ?? (typeof label === "string" ? label : undefined)}
+        styles={{
+          input: {
+            border: `1px solid ${inputProps.error ? "var(--mantine-color-error)" : "var(--prune-text-gray-100)"}`,
+            borderRadius: "8px",
+            paddingLeft: "15px",
+            paddingRight: "15px",
+            fontSize: "14px",
+            color: "var(--prune-text-gray-700)",
+          },
+        }}
+        {...inputProps}
+        withAsterisk={showAsterisk(inputProps, label)}
+      />
+    );
+  }
+  return (
+    <Textarea
+      {...props}
+      withAsterisk={showAsterisk(props, props.label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof props.label === "string" ? props.label : " "),
+        props
+      )}
+      classNames={classes}
+    />
+  );
 };
 
 interface PhoneNumberInputProps<T> {

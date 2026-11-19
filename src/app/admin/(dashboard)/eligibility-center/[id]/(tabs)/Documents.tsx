@@ -35,6 +35,7 @@ import { useState } from "react";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 
+import { Can } from "@/lib/hooks/privileges";
 const axios = createAxiosInstance("auth");
 interface ComponentProps {
   data: OnboardingBusiness | null;
@@ -148,13 +149,15 @@ export default function Documents({
         title="Business Documents"
         mt={24}
         actionNode={
-          <PrimaryBtn
-            text="Add Document"
-            fw={600}
-            fz={12}
-            action={open}
-            leftSection={<IconPlus size={16} />}
-          />
+          <Can do="eligibility-center.review-documents">
+            <PrimaryBtn
+              text="Add Document"
+              fw={600}
+              fz={12}
+              action={open}
+              leftSection={<IconPlus size={16} />}
+            />
+          </Can>
         }
       >
         <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing={24}>
@@ -197,28 +200,32 @@ export default function Documents({
                     <IconDownload />
                   </ActionIcon>
                 )}
-                <PrimaryBtn
-                  text="Reject"
-                  color="var(--prune-warning)"
-                  fw={600}
-                  c="#fff"
-                  action={() => {
-                    handleDocumentApproval &&
-                      doc.formKey &&
-                      handleDocumentApproval("reject", doc.formKey);
-                  }}
-                  loading={loadingRejection}
-                />
-                <PrimaryBtn
-                  text="Approve Document"
-                  fw={600}
-                  action={() => {
-                    handleDocumentApproval &&
-                      doc.formKey &&
-                      handleDocumentApproval("approve", doc.formKey);
-                  }}
-                  loading={loadingApproval}
-                />
+                <Can do="eligibility-center.review-documents">
+                  <PrimaryBtn
+                    text="Reject"
+                    color="var(--prune-warning)"
+                    fw={600}
+                    c="#fff"
+                    action={() => {
+                      handleDocumentApproval &&
+                        doc.formKey &&
+                        handleDocumentApproval("reject", doc.formKey);
+                    }}
+                    loading={loadingRejection}
+                  />
+                </Can>
+                <Can do="eligibility-center.review-documents">
+                  <PrimaryBtn
+                    text="Approve Document"
+                    fw={600}
+                    action={() => {
+                      handleDocumentApproval &&
+                        doc.formKey &&
+                        handleDocumentApproval("approve", doc.formKey);
+                    }}
+                    loading={loadingApproval}
+                  />
+                </Can>
               </Flex>
             </DocumentPreview>
           ))}

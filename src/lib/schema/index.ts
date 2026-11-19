@@ -1,3 +1,4 @@
+import "./error-map";
 export * from "./auth";
 export * from "./business";
 export * from "./filter";

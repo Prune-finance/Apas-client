@@ -22,7 +22,7 @@ import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import ModalComponent from "@/ui/components/Modal";
-import UpdateModal from "../../../modal";
+import UpdateModal from "../../../modals/modal";
 import {
   IconFileUnknown,
   IconPencilMinus,
@@ -39,6 +39,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { notifications } from "@mantine/notifications";
 
+import { Can } from "@/lib/hooks/privileges";
 dayjs.extend(advancedFormat);
 
 export default function SingleUser() {
@@ -166,7 +167,7 @@ export default function SingleUser() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "User Management", href: "/admin/users?tab=Business Users" },
+          { title: "User Management", href: "/admin/user-old?tab=Business Users" },
           {
             title: `${business?.name}`,
             href: `/admin/users/${params.id}/business`,
@@ -219,14 +220,18 @@ export default function SingleUser() {
           </Stack>
 
           <Group>
-            <SecondaryBtn text="Reset Password" fw={600} action={openReset} />
-            <PrimaryBtn
-              text={user?.status === "ACTIVE" ? "Deactivate" : "Activate"}
-              fw={600}
-              color={user?.status === "ACTIVE" ? "#D92D20" : "#027A48"}
-              c="#fff"
-              action={openDeactivate}
-            />
+            <Can do="business-users.reset-password">
+              <SecondaryBtn text="Reset Password" fw={600} action={openReset} />
+            </Can>
+            <Can do="business-users.toggle-status">
+              <PrimaryBtn
+                text={user?.status === "ACTIVE" ? "Deactivate" : "Activate"}
+                fw={600}
+                color={user?.status === "ACTIVE" ? "#D92D20" : "#027A48"}
+                c="#fff"
+                action={openDeactivate}
+              />
+            </Can>
           </Group>
         </Group>
         <Divider my={24} />
@@ -235,21 +240,23 @@ export default function SingleUser() {
             Basic Details
           </Text>
 
-          <SecondaryBtn
-            text="Update Details"
-            icon={IconPencilMinus}
-            fw={600}
-            mah={30}
-            action={() => {
-              openUpdate();
-              form.setValues({
-                firstName: user?.firstName ?? "",
-                lastName: user?.lastName ?? "",
-                email: user?.email,
-                role: user?.role,
-              });
-            }}
-          />
+          <Can do="business-users.edit">
+            <SecondaryBtn
+              text="Update Details"
+              icon={IconPencilMinus}
+              fw={600}
+              mah={30}
+              action={() => {
+                openUpdate();
+                form.setValues({
+                  firstName: user?.firstName ?? "",
+                  lastName: user?.lastName ?? "",
+                  email: user?.email,
+                  role: user?.role,
+                });
+              }}
+            />
+          </Can>
         </Group>
         <Grid mt={20} className={styles.grid__container}>
           {details.map((detail) => (

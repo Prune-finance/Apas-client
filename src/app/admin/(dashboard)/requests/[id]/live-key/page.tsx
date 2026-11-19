@@ -46,6 +46,7 @@ import Cookies from "js-cookie";
 import { useSingleLiveKeyRequests } from "@/lib/hooks/requests";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 
+import { Can } from "@/lib/hooks/privileges";
 export default function SingleLiveKey() {
   const { id } = useParams<{ id: string }>();
   const [search, setSearch] = useState("");
@@ -175,8 +176,12 @@ export default function SingleLiveKey() {
 
         {requests && requests?.status === "PENDING" && (
           <Group>
-            <SecondaryBtn text="Reject" fw={600} action={openReject} />
-            <PrimaryBtn text="Approve" fw={600} action={openApprove} />
+            <Can do="live-key-requests.approve">
+              <SecondaryBtn text="Reject" fw={600} action={openReject} />
+            </Can>
+            <Can do="live-key-requests.approve">
+              <PrimaryBtn text="Approve" fw={600} action={openApprove} />
+            </Can>
           </Group>
         )}
       </Group>

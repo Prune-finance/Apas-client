@@ -18,7 +18,7 @@ import { IconListTree } from "@tabler/icons-react";
 import ModalComponent from "@/ui/components/Modal";
 import styles from "@/ui/styles/accounts.module.scss";
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 
 import { formatNumber } from "@/lib/utils";
 import {
@@ -39,6 +39,7 @@ import { SecondaryBtn } from "@/ui/components/Buttons";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";
 import PaginationComponent from "@/ui/components/Pagination";
 
+import { Can } from "@/lib/hooks/privileges";
 function Debit() {
   const searchParams = useSearchParams();
   const [limit, setLimit] = useState<string | null>("10");
@@ -308,25 +309,27 @@ function Debit() {
           </div>
 
           {selectedRequest?.status === "PENDING" && (
-            <Flex mt={40} justify="flex-end" gap={10}>
-              <Button
-                onClick={open}
-                color="#D0D5DD"
-                variant="outline"
-                className={styles.cta}
-              >
-                Deny
-              </Button>
-
-              <Button
-                className={styles.cta}
-                onClick={openApprove}
-                variant="filled"
-                color="#D4F307"
-              >
-                Approve
-              </Button>
-            </Flex>
+            <Can do="debit-requests.approve">
+              <Flex mt={40} justify="flex-end" gap={10}>
+                <Button
+                  onClick={open}
+                  color="#D0D5DD"
+                  variant="outline"
+                  className={styles.cta}
+                >
+                  Deny
+                </Button>
+  
+                <Button
+                  className={styles.cta}
+                  onClick={openApprove}
+                  variant="filled"
+                  color="#D4F307"
+                >
+                  Approve
+                </Button>
+              </Flex>
+            </Can>
           )}
         </Box>
       </Drawer>

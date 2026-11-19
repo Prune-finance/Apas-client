@@ -1,0 +1,441 @@
+"use client";
+
+import {
+  Box,
+  Combobox,
+  Flex,
+  NumberInput,
+  NumberInputProps,
+  rem,
+  ScrollArea,
+  Select,
+  SelectProps,
+  Text,
+  Textarea,
+  TextareaProps,
+  TextInput,
+  TextInputProps,
+  Tooltip,
+  UnstyledButton,
+  useCombobox,
+} from "@mantine/core";
+import { useState } from "react";
+import { UseFormReturnType } from "@mantine/form";
+import { IconChevronDown, IconInfoCircle } from "@tabler/icons-react";
+import classes from "./quest-input.module.scss";
+import { requiredPlaceholder, showAsterisk } from "./required-placeholder";
+import { countriesWithCode } from "@/lib/countries-codes-flags";
+
+// ─── shared helpers ────────────────────────────────────────────────────────
+
+const LEFT_ICON_WIDTH = rem(40);
+
+/** Label offset with icon */
+const withIconLabelStyle = {
+  label: { paddingLeft: LEFT_ICON_WIDTH },
+};
+/** Label offset without icon */
+const noIconLabelStyle = {
+  label: { paddingLeft: rem(12) },
+};
+
+// ─── QuestInput ────────────────────────────────────────────────────────────
+
+interface QuestInputProps extends TextInputProps {}
+
+export const QuestInput = ({
+  label,
+  value,
+  onFocus,
+  onBlur,
+  leftSection,
+  leftSectionWidth,
+  styles,
+  wrapperProps,
+  ...props
+}: QuestInputProps) => {
+  const hasIcon = Boolean(leftSection);
+
+  return (
+    <TextInput
+      label={label}
+      value={value}
+      leftSection={leftSection}
+      leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
+      classNames={classes}
+      wrapperProps={wrapperProps}
+      styles={(theme, inputProps, ctx) => {
+        const customStyles =
+          typeof styles === "function" ? styles(theme, inputProps, ctx) : styles;
+        return {
+          ...customStyles,
+          label: {
+            paddingLeft: leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : rem(12)),
+            ...customStyles?.label,
+          },
+        };
+      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
+    />
+  );
+};
+
+// ─── QuestSelect ───────────────────────────────────────────────────────────
+
+interface QuestSelectProps extends SelectProps {
+  tooltip?: string;
+}
+
+export const QuestSelect = ({
+  label,
+  value,
+  onFocus,
+  onBlur,
+  leftSection,
+  leftSectionWidth,
+  tooltip,
+  ...props
+}: QuestSelectProps) => {
+  const hasIcon = Boolean(leftSection);
+  const leftPad = leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : rem(12));
+
+  const labelNode = tooltip ? (
+    <Flex align="center" gap={4} component="span">
+      <span>{label}</span>
+      <Tooltip label={tooltip} multiline maw={260} withArrow position="top">
+        <IconInfoCircle size={14} style={{ color: "#667085", cursor: "pointer", flexShrink: 0 }} />
+      </Tooltip>
+    </Flex>
+  ) : label;
+
+  return (
+    <Select
+      label={labelNode}
+      value={value}
+      leftSection={leftSection}
+      leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
+      classNames={classes}
+      styles={{
+        label: {
+          paddingLeft: leftPad,
+        },
+      }}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
+    />
+  );
+};
+
+// ─── QuestNumberInput ──────────────────────────────────────────────────────
+
+interface QuestNumberInputProps extends NumberInputProps {}
+
+export const QuestNumberInput = ({
+  label,
+  value,
+  onFocus,
+  onBlur,
+  leftSection,
+  leftSectionWidth,
+  ...props
+}: QuestNumberInputProps) => {
+  const hasIcon = Boolean(leftSection);
+
+  return (
+    <NumberInput
+      label={label}
+      value={value}
+      leftSection={leftSection}
+      leftSectionWidth={leftSectionWidth ?? (hasIcon ? LEFT_ICON_WIDTH : undefined)}
+      classNames={classes}
+      styles={hasIcon ? withIconLabelStyle : noIconLabelStyle}
+      thousandSeparator=","
+      min={0}
+      hideControls
+      onFocus={onFocus}
+      onBlur={onBlur}
+      {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
+    />
+  );
+};
+
+// ─── QuestTextarea ─────────────────────────────────────────────────────────
+
+interface QuestTextareaProps extends TextareaProps {}
+
+export const QuestTextarea = ({
+  label,
+  value,
+  onFocus,
+  onBlur,
+  ...props
+}: QuestTextareaProps) => {
+  return (
+    <Textarea
+      label={label}
+      value={value}
+      classNames={{ ...classes, input: classes.textarea }}
+      styles={noIconLabelStyle}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      {...props}
+      withAsterisk={showAsterisk(props, label)}
+      placeholder={requiredPlaceholder(
+        props.placeholder ?? (typeof label === "string" ? label : " "),
+        props
+      )}
+    />
+  );
+};
+
+// ─── Flag helpers ─────────────────────────────────────────────────────────
+
+function flagEmojiToISO(emoji: string): string {
+  // Regional indicator symbols are surrogate pairs; each occupies 2 UTF-16 code units
+  const a = emoji.codePointAt(0);
+  const b = emoji.codePointAt(2);
+  if (a === undefined || b === undefined) return "";
+  const ai = a - 0x1f1e6;
+  const bi = b - 0x1f1e6;
+  if (ai < 0 || ai > 25 || bi < 0 || bi > 25) return "";
+  return String.fromCharCode(65 + ai, 65 + bi).toLowerCase();
+}
+
+function FlagImage({ emoji, size = 18 }: { emoji: string; size?: number }) {
+  const iso = flagEmojiToISO(emoji);
+  if (!iso) return <span style={{ fontSize: size, lineHeight: 1 }}>{emoji}</span>;
+  return (
+    <img
+      src={`https://flagcdn.com/w20/${iso}.png`}
+      srcSet={`https://flagcdn.com/w40/${iso}.png 2x`}
+      width={size}
+      height={Math.round(size * 0.75)}
+      alt={iso.toUpperCase()}
+      style={{ display: "inline-block", objectFit: "cover", borderRadius: 2, flexShrink: 0 }}
+    />
+  );
+}
+
+// ─── QuestPhoneInput ───────────────────────────────────────────────────────
+
+interface QuestPhoneInputProps<T> {
+  form: UseFormReturnType<T>;
+  phoneNumberKey: keyof T & string;
+  countryCodeKey: keyof T & string;
+  label?: string;
+  inputHeight?: number | string;
+  unfocusedBorderColor?: string;
+  inputBackground?: string;
+  /** @deprecated Retains onboarding sizing; label visibility now follows the value. */
+  alwaysShowLabel?: boolean;
+  /** Shows the red required asterisk on the label (phone numbers are required by default) */
+  required?: boolean;
+}
+
+export const QuestPhoneInput = <T,>({
+  form,
+  phoneNumberKey,
+  countryCodeKey,
+  label = "Phone Number",
+  inputHeight = rem(56),
+  unfocusedBorderColor = "#e4e7ec",
+  inputBackground = "#fff",
+  alwaysShowLabel = false,
+  required = true,
+}: QuestPhoneInputProps<T>) => {
+  const [focused, setFocused] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const dialCode = (form.values[countryCodeKey] as string) || "+234";
+  const phoneValue = (form.values[phoneNumberKey] as string) || "";
+  const floating = Boolean(phoneValue);
+  const hasError = Boolean(form.errors[phoneNumberKey]);
+
+  const selectedCountry = countriesWithCode.find((c) => c.value === dialCode);
+  const flagEmoji = selectedCountry?.label.split(" ")[0] ?? "🌍";
+
+  const combobox = useCombobox({
+    onDropdownClose: () => {
+      combobox.resetSelectedOption();
+      setSearch("");
+    },
+    onDropdownOpen: () => combobox.focusSearchInput(),
+  });
+
+  const options = countriesWithCode
+    .filter((item) =>
+      item.label.toLowerCase().includes(search.toLowerCase().trim())
+    )
+    .map((item) => {
+      const parts = item.label.split(" ");
+      const emoji = parts[0];
+      const name = parts.slice(1).join(" ");
+      return (
+        <Combobox.Option value={item.value} key={item.value}>
+          <Flex align="center" gap={8}>
+            <FlagImage emoji={emoji} size={18} />
+            <Text fz={13}>{name}</Text>
+          </Flex>
+        </Combobox.Option>
+      );
+    });
+
+  return (
+    <Box style={{ position: "relative" }}>
+      {/* Unified border container */}
+      <Flex
+        align="center"
+        style={{
+          height: inputHeight,
+          border: hasError
+            ? "2px solid #ff9175"
+            : `1px solid ${focused ? "var(--prune-primary-600)" : unfocusedBorderColor}`,
+          borderRadius: 8,
+          background: hasError ? "#fff3f0" : inputBackground,
+          overflow: "hidden",
+          transition: "border-color 0.2s ease",
+        }}
+      >
+        {/* Dial code selector */}
+        <Combobox
+          width={300}
+          store={combobox}
+          withinPortal
+          onOptionSubmit={(val) => {
+            form.setValues({ [countryCodeKey]: val } as Partial<T>);
+            combobox.closeDropdown();
+          }}
+        >
+          <Combobox.Target>
+            <UnstyledButton
+              onClick={() => combobox.toggleDropdown()}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: rem(4),
+                padding: `0 ${rem(8)} 0 ${rem(12)}`,
+                height: inputHeight,
+                flexShrink: 0,
+              }}
+            >
+              <FlagImage emoji={flagEmoji} size={18} />
+              <Text fz={14} c="#98a2b3" fw={500} lh={1}>
+                {dialCode}
+              </Text>
+              <IconChevronDown size={14} color="#98a2b3" />
+            </UnstyledButton>
+          </Combobox.Target>
+
+          <Combobox.Dropdown>
+            <Combobox.Search
+              value={search}
+              onChange={(e) => setSearch(e.currentTarget.value)}
+              placeholder="Search country"
+            />
+            <ScrollArea.Autosize type="scroll" mah={220}>
+              {options.length > 0 ? (
+                options
+              ) : (
+                <Combobox.Empty>No results</Combobox.Empty>
+              )}
+            </ScrollArea.Autosize>
+          </Combobox.Dropdown>
+        </Combobox>
+
+        {/* Divider */}
+        <Box
+          style={{ width: 1, height: rem(24), background: "#e4e7ec", flexShrink: 0 }}
+        />
+
+        <Box style={{ position: "relative", flex: 1, minWidth: 0, height: "100%" }}>
+          {/* Empty: the label stands in for the placeholder (with the red asterisk). Filled: it floats up. */}
+          <Box
+            component="span"
+            className={classes.phone_label}
+            style={{
+              position: "absolute",
+              left: rem(12),
+              top: floating ? 7 : "50%",
+              transform: floating ? "translateY(0)" : "translateY(-50%)",
+              fontSize: floating ? 13 : 14,
+              lineHeight: "16px",
+              color: hasError ? "#db340b" : floating ? "#667085" : "#98a2b3",
+              pointerEvents: "none",
+              zIndex: 1,
+              fontWeight: 400,
+              whiteSpace: "nowrap",
+              transition:
+                "top 0.22s cubic-bezier(0.4,0,0.2,1), transform 0.22s cubic-bezier(0.4,0,0.2,1), font-size 0.22s cubic-bezier(0.4,0,0.2,1), opacity 0.15s ease",
+            }}
+          >
+            {label}
+            {required && (
+              <span style={{ color: "var(--mantine-color-error)" }}> *</span>
+            )}
+          </Box>
+          {/* Phone number — plain input with no border */}
+          <Box
+            component="input"
+            type="tel"
+            aria-label={label}
+            value={phoneValue}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              const digits = e.currentTarget.value.replace(/\D/g, "");
+              form.setValues({ [phoneNumberKey]: digits } as Partial<T>);
+            }}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder=""
+            className={alwaysShowLabel ? classes.phone_input_onboarding : classes.phone_input}
+            style={{
+              width: "100%",
+              minWidth: 0,
+              height: "100%",
+              border: "none",
+              outline: "none",
+              background: "transparent",
+              paddingLeft: rem(12),
+              paddingTop: floating ? rem(18) : 0,
+              fontWeight: floating ? 500 : 400,
+              color: "var(--prune-text-gray-700)",
+              transition: "padding-top 0.22s ease",
+            }}
+          />
+        </Box>
+      </Flex>
+
+      {form.errors[phoneNumberKey] && (
+        <Text fz={12} c="#db340b" mt={4}>
+          {String(form.errors[phoneNumberKey])}
+        </Text>
+      )}
+    </Box>
+  );
+};
+
+// Alias exports for questionnaire components
+export {
+  QuestInput as TextInputWithInsideLabel,
+  QuestSelect as SelectInputWithInsideLabel,
+  QuestNumberInput as NumberInputWithInsideLabel,
+  QuestTextarea as TextareaWithInsideLabel,
+  QuestPhoneInput as PhoneNumberInput,
+};

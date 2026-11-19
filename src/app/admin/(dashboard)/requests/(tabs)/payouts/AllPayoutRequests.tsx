@@ -18,7 +18,7 @@ import {
 } from "@/lib/hooks/requests";
 import Transaction from "@/lib/store/transaction";
 
-import { PayoutTransactionRequestDrawer } from "./drawer";
+import { PayoutTransactionRequestDrawer } from "./drawers/drawer";
 import { useSearchParams } from "next/navigation";
 import dayjs from "dayjs";
 import { FilterSchema, FilterType, FilterValues } from "@/lib/schema";

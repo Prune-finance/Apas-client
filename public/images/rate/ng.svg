@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Nigeria">
+<g clip-path="url(#clip0_0_1017)">
+<g id="Vector">
+<path d="M18 2.68282V25.3172C16.7489 25.7594 15.4025 26 14 26C12.5975 26 11.2511 25.7594 10 25.3172V2.68282C11.2511 2.24062 12.5975 2 14 2C15.4025 2 16.7489 2.24062 18 2.68282Z" fill="white"/>
+<path d="M18 25.3172C22.6608 23.6698 26 19.2249 26 14C26 8.77513 22.6608 4.33017 18 2.68282V25.3172Z" fill="#018754"/>
+<path d="M10 25.3172C5.33923 23.6698 2 19.2249 2 14C2 8.77513 5.33923 4.33017 10 2.68282V25.3172Z" fill="#018754"/>
+</g>
+</g>
+<rect x="1" y="1" width="26" height="26" rx="13" stroke="#EAECF0" stroke-width="2"/>
+</g>
+<defs>
+<clipPath id="clip0_0_1017">
+<rect x="2" y="2" width="24" height="24" rx="12" fill="white"/>
+</clipPath>
+</defs>
+</svg>

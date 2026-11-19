@@ -39,7 +39,7 @@ import { useTransactions } from "@/lib/hooks/transactions";
 import dayjs from "dayjs";
 import { DynamicSkeleton } from "@/lib/static";
 
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 
 export default function Account() {
   const params = useParams<{ id: string }>();

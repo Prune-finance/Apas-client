@@ -39,6 +39,7 @@ import {
 import DropzoneComponent from "@/ui/components/Dropzone";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 export default function Shareholders({
   business,
   revalidate,
@@ -150,13 +151,15 @@ export default function Shareholders({
           All Key Shareholders
         </Text>
 
-        <PrimaryBtn
-          text="New Shareholder"
-          icon={IconPlus}
-          fz={12}
-          fw={600}
-          action={open}
-        />
+        <Can do="businesses.edit">
+          <PrimaryBtn
+            text="New Shareholder"
+            icon={IconPlus}
+            fz={12}
+            fw={600}
+            action={open}
+          />
+        </Can>
       </Group>
       {business?.shareholders.map((shareholder, index) => {
         return (
@@ -418,24 +421,28 @@ const DirectorsForm = ({
         </Text>
         {!editing ? (
           <Flex gap={10}>
-            <SecondaryBtn
-              text="Edit"
-              action={() => setEditing(true)}
-              icon={IconPencilMinus}
-              variant="light"
-              color="var(--prune-text-gray-400)"
-              fz={10}
-              fw={600}
-            />
-            <SecondaryBtn
-              text="Remove"
-              action={open}
-              icon={IconTrash}
-              variant="light"
-              color="var(--prune-text-gray-400)"
-              fz={10}
-              fw={600}
-            />
+            <Can do="businesses.edit">
+              <SecondaryBtn
+                text="Edit"
+                action={() => setEditing(true)}
+                icon={IconPencilMinus}
+                variant="light"
+                color="var(--prune-text-gray-400)"
+                fz={10}
+                fw={600}
+              />
+            </Can>
+            <Can do="businesses.edit">
+              <SecondaryBtn
+                text="Remove"
+                action={open}
+                icon={IconTrash}
+                variant="light"
+                color="var(--prune-text-gray-400)"
+                fz={10}
+                fw={600}
+              />
+            </Can>
           </Flex>
         ) : (
           <Flex gap={10}>

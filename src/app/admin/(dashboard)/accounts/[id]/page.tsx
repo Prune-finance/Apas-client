@@ -18,7 +18,7 @@ import { validateRequest } from "@/lib/schema";
 import { useForm, zodResolver } from "@mantine/form";
 import { parseError } from "@/lib/actions/auth";
 import useNotification from "@/lib/hooks/notification";
-import ModalComponent from "../modal";
+import ModalComponent from "@/ui/section/accounts/Modals";
 import { IconBrandLinktree } from "@tabler/icons-react";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import dayjs from "dayjs";

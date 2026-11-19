@@ -1,0 +1,54 @@
+// --pin-input-base comes from the boxSize prop; smaller laptop screens
+// (e.g. 13") scale it down so the six boxes don't dominate the modal
+.root {
+  --otp-scale: 1;
+  --pin-input-size: calc(var(--pin-input-base, 58px) * var(--otp-scale));
+  gap: calc(16px * var(--otp-scale));
+
+  @media (max-width: 1440px), (max-height: 820px) {
+    --otp-scale: 0.76;
+  }
+}
+
+.pinInput {
+  width: var(--pin-input-size) !important;
+  height: var(--pin-input-size) !important;
+  flex: 0 0 var(--pin-input-size);
+}
+
+.input {
+  --input-height: var(--pin-input-size) !important;
+  --input-size: var(--pin-input-size) !important;
+  width: var(--pin-input-size) !important;
+  height: var(--pin-input-size) !important;
+  min-height: var(--pin-input-size) !important;
+  box-sizing: border-box;
+  padding: 0;
+  text-align: center;
+  font-family: var(--mantine-font-family);
+  font-size: calc(18px * var(--otp-scale));
+  line-height: 1;
+  color: #344054;
+  background-color: #ffffff;
+  // rounded theme: each digit sits in a circle
+  border: 2px solid #d0d5dd;
+  border-radius: 50%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &::placeholder {
+    color: transparent;
+  }
+
+  &:focus,
+  &:focus-within {
+    border-color: #97ad05;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 0 4px rgba(208, 245, 0, 0.19);
+    outline: none;
+  }
+
+  &[data-invalid] {
+    border-color: #ff9175;
+    background-color: #fff3f0;
+  }
+}

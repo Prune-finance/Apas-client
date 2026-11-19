@@ -24,8 +24,8 @@ import {
   UserOtherLinks,
 } from "@/lib/static";
 
-import PruneLogo from "@/assets/logo-with-text.svg";
-// import PruneTintLogo from "@/assets/logo-tint.png";
+import PruneLogo from "@/assets/img/logo.svg";
+// import PruneTintLogo from "@/assets/img/logo-tint.png";
 import styles from "./styles.module.scss";
 import { useDisclosure, useIdle } from "@mantine/hooks";
 import ModalComponent from "../Modal";
@@ -40,11 +40,16 @@ import {
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
+import { useAdminAccess } from "@/lib/hooks/privileges";
 
 const axios = createAxiosInstance("auth");
 
 export default function Navbar() {
   const pathname = usePathname();
+  // menu items the admin has no privilege for are hidden
+  const { can, canAny } = useAdminAccess();
+  const mainLinks = AdminMainLinks.filter((item) => canAny(item.privileges));
+  const otherLinks = AdminOtherLinks.filter((item) => canAny(item.privileges));
   const [opened, { open, close }] = useDisclosure(false);
   const { meta, setMeta } = NotificationStore();
   const { handleError } = useNotification();
@@ -167,6 +172,8 @@ export default function Navbar() {
       </div>
 
       <div className={styles.menu__container}>
+        {/* a section with no links the admin can open is hidden, heading too */}
+        {mainLinks.length > 0 && (
         <div className={styles.container}>
           <Text fz={10} className={styles.container__header}>
             MAIN MENU
@@ -174,13 +181,15 @@ export default function Navbar() {
 
           {/* <div className={styles.links}> */}
           <Stack gap={12} mt={32}>
-            {AdminMainLinks.map((item, index) => {
+            {mainLinks.map(
+              (item, index) => {
               return (
                 <NavLink
                   key={index}
                   leftSection={item.icon}
                   component={Link}
                   onClick={() =>
+                    can("notifications.mark-read") &&
                     countSwitch(item.text as Type) &&
                     matchType(item.text as Type)
                       ? markAllNotificationByType(matchType(item.text as Type))
@@ -189,7 +198,11 @@ export default function Navbar() {
                   label={
                     <NavLinkLabel
                       text={item.text}
-                      count={countSwitch(item.text as Type)}
+                      count={
+                        can("notifications.view")
+                          ? countSwitch(item.text as Type)
+                          : null
+                      }
                       textArray={[
                         "Transactions",
                         "Payouts",
@@ -206,18 +219,22 @@ export default function Navbar() {
                   classNames={{ root: styles.root }}
                 />
               );
-            })}
+              }
+            )}
           </Stack>
           {/* </div> */}
         </div>
+        )}
 
+        {otherLinks.length > 0 && (
         <div className={styles.container}>
           <Text fz={10} className={styles.container__header}>
             OTHERS
           </Text>
 
           <Stack gap={12} mt={32}>
-            {AdminOtherLinks.map((item, index) => {
+            {otherLinks.map(
+              (item, index) => {
               return (
                 <NavLink
                   key={index}
@@ -232,9 +249,11 @@ export default function Navbar() {
                   classNames={{ root: styles.root }}
                 />
               );
-            })}
+              }
+            )}
           </Stack>
         </div>
+        )}
       </div>
 
       <UnstyledButton onClick={open} className={styles.nav__cta__container}>
@@ -425,11 +444,6 @@ export function UserNavbar() {
                   color="var(--prune-primary-900, #596603)"
                   styles={{ label: { fontSize: 12 } }}
                   classNames={{ root: styles.root }}
-                  style={{
-                    borderRight: isActive(item.link)
-                      ? "3px solid var(--prune-primary-900, #596603)"
-                      : "none",
-                  }}
                 />
               );
             })}
@@ -454,11 +468,6 @@ export function UserNavbar() {
                   color="var(--prune-primary-900, #596603)"
                   styles={{ label: { fontSize: 12 } }}
                   classNames={{ root: styles.root }}
-                  style={{
-                    borderRight: isActive(item.link)
-                      ? "3px solid var(--prune-primary-900, #596603)"
-                      : "none",
-                  }}
                 />
               );
             })}

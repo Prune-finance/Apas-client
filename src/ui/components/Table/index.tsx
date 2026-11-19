@@ -17,22 +17,28 @@ interface Props extends TableProps {
   head: string[];
   rows: JSX.Element[] | JSX.Element;
   noBg?: boolean;
+  columnWidths?: (string | number | undefined)[];
 }
 
-export function TableComponent({ loading, rows, head, noBg, ...props }: Props) {
+export function TableComponent({ loading, rows, head, noBg, columnWidths, ...props }: Props) {
   return (
     <TableScrollContainer minWidth={500} mt={props.mt}>
       <Table
         className={styles.table}
         verticalSpacing="md"
-        borderColor="#F5F5F5"
+        borderColor="#F2F4F7"
         layout="fixed"
         {...props}
       >
-        <TableThead bg={noBg ? "transparent" : "#F9F9F9"}>
+        {/* Figma table header (15677:340979): semantic/bg/muted */}
+        <TableThead bg={noBg ? "transparent" : "#F2F4F7"}>
           <TableTr>
             {head.map((header, index) => (
-              <TableTh key={index} className={styles.table__th}>
+              <TableTh
+                key={index}
+                className={styles.table__th}
+                w={columnWidths?.[index]}
+              >
                 {header}
               </TableTh>
             ))}

@@ -52,11 +52,12 @@ import EmptyTable from "@/ui/components/EmptyTable";
 import { BadgeComponent } from "@/ui/components/Badge";
 import { BackBtn, PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import { SearchInput } from "@/ui/components/Inputs";
-import DebitDrawer from "../drawer";
+import DebitDrawer from "@/ui/section/requests/Drawers/drawer";
 import { useSingleBusiness } from "@/lib/hooks/businesses";
 import { debitTableHeaders } from "@/lib/static";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 function CompanyRequestType() {
   const searchParams = useSearchParams();
   const params = useParams<{ slug?: string[] }>();
@@ -139,37 +140,39 @@ function CompanyRequestType() {
 
   const MenuComponent = ({ request }: { request: DebitRequest }) => {
     return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDotsVertical size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          {Object.entries(menuItems).map(([key, value]) => (
-            <MenuItem
-              key={key}
-              onClick={() => {
-                if (key === "approve") {
-                  setSelectedRequest(request);
-                  return openApprove();
-                }
-                if (key === "deny") {
-                  setSelectedRequest(request);
-                  return open();
-                }
-              }}
-              fz={10}
-              c="#667085"
-              leftSection={value}
-              tt="capitalize"
-            >
-              {key}
-            </MenuItem>
-          ))}
-        </MenuDropdown>
-      </Menu>
+      <Can do="debit-requests.approve">
+        <Menu shadow="md" width={150}>
+          <MenuTarget>
+            <UnstyledButton>
+              <IconDotsVertical size={17} />
+            </UnstyledButton>
+          </MenuTarget>
+  
+          <MenuDropdown>
+            {Object.entries(menuItems).map(([key, value]) => (
+              <MenuItem
+                key={key}
+                onClick={() => {
+                  if (key === "approve") {
+                    setSelectedRequest(request);
+                    return openApprove();
+                  }
+                  if (key === "deny") {
+                    setSelectedRequest(request);
+                    return open();
+                  }
+                }}
+                fz={10}
+                c="#667085"
+                leftSection={value}
+                tt="capitalize"
+              >
+                {key}
+              </MenuItem>
+            ))}
+          </MenuDropdown>
+        </Menu>
+      </Can>
     );
   };
 

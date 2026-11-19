@@ -28,9 +28,15 @@ import {
   IconMoneybag,
   IconSearch,
   IconUsersPlus,
+  IconShieldLock,
 } from "@tabler/icons-react";
 import dayjs from "dayjs";
 import Link from "next/link";
+import {
+  PAYOUTS_VIEW_PRIVILEGES,
+  REQUEST_VIEW_PRIVILEGES,
+  SETTINGS_VIEW_PRIVILEGES,
+} from "./privilegeGroups";
 import businessStyles from "@/ui/styles/business.module.scss";
 import { TransactionType } from "./hooks/transactions";
 import { Notification } from "./hooks/notifications";
@@ -40,41 +46,55 @@ export const AdminMainLinks = [
   {
     text: "Dashboard",
     link: "/admin/dashboard",
+    privileges: ["dashboard.view"] as readonly string[],
     icon: <IconHome2 size={16} />,
   },
   {
     text: "Businesses",
     link: "/admin/businesses",
+    privileges: ["businesses.view"] as readonly string[],
     icon: <IconBuildingSkyscraper size={16} />,
   },
   {
     text: "Accounts",
     link: "/admin/accounts",
+    privileges: ["accounts.view"] as readonly string[],
     icon: <IconUsers size={16} />,
   },
   {
     text: "Account Creation",
     link: "/admin/account-requests",
+    privileges: ["account-requests.view"] as readonly string[],
     icon: <IconUserPlus size={16} />,
   },
   {
     text: "Eligibility Center",
     link: "/admin/eligibility-center",
+    privileges: ["eligibility-center.view"] as readonly string[],
     icon: <IconRosetteDiscountCheck size={16} />,
+  },
+  {
+    text: "Rate",
+    link: "/admin/rate",
+    privileges: ["rates.view"] as readonly string[],
+    icon: <IconArrowsRightLeft size={16} />,
   },
   {
     text: "Transactions",
     link: "/admin/transactions",
+    privileges: ["transactions.view"] as readonly string[],
     icon: <IconArrowsSort size={16} />,
   },
   {
     text: "Payouts",
     link: "/admin/payouts",
+    privileges: PAYOUTS_VIEW_PRIVILEGES as readonly string[],
     icon: <IconArrowUpRight size={16} />,
   },
   {
     text: "Requests",
     link: "/admin/requests",
+    privileges: REQUEST_VIEW_PRIVILEGES as readonly string[],
     icon: <IconCreditCardPay size={16} />,
   },
 ];
@@ -83,16 +103,25 @@ export const AdminOtherLinks = [
   {
     text: "User Management",
     link: "/admin/users",
+    privileges: ["admins.view"] as readonly string[],
     icon: <IconUsers size={16} />,
+  },
+  {
+    text: "Roles & Permissions",
+    link: "/admin/roles",
+    privileges: ["roles.view"] as readonly string[],
+    icon: <IconShieldLock size={16} />,
   },
   {
     text: "Pricing Plans",
     link: "/admin/pricing-plans",
+    privileges: ["pricing-plans.view"] as readonly string[],
     icon: <IconPremiumRights size={16} />,
   },
   {
     text: "Settings",
     link: "/admin/settings",
+    privileges: SETTINGS_VIEW_PRIVILEGES as readonly string[],
     icon: <IconSettings size={16} />,
   },
 ];
@@ -374,35 +403,46 @@ export const PayoutRequestsTableHeaders = [
 ];
 
 export const businessIndustries: string[] = [
-  "Agriculture",
-  "Automotive",
-  "Banking & Financial Services",
-  "Construction",
-  "Consulting",
-  "Consumer Goods",
-  "E-commerce",
-  "Education",
-  "Energy & Utilities",
-  "Entertainment & Media",
-  "Environmental Services",
-  "Fashion & Apparel",
-  "Food & Beverage",
-  "Government",
-  "Healthcare & Medical",
-  "Hospitality",
+  "Financial Services / FinTech",
+  "Banking",
   "Insurance",
-  "Legal Services",
+  "Technology / Software",
+  "E-commerce / Retail",
   "Logistics & Transportation",
-  "Manufacturing",
-  "Marketing & Advertising",
-  "Nonprofit & NGOs",
-  "Pharmaceuticals & Biotechnology",
+  "Healthcare",
+  "Pharmaceuticals",
+  "Education / EdTech",
   "Real Estate",
-  "Retail",
-  "Software & Technology",
-  "Telecommunications",
+  "Construction",
+  "Manufacturing",
+  "Agriculture / Agribusiness",
+  "Food & Beverage",
+  "Hospitality / Hotels",
   "Travel & Tourism",
-  "Wholesale & Distribution",
+  "Telecommunications",
+  "Media & Entertainment",
+  "Marketing & Advertising",
+  "Professional Services / Consulting",
+  "Legal Services",
+  "Accounting",
+  "Energy / Oil & Gas",
+  "Renewable Energy",
+  "Automotive",
+  "Aviation",
+  "Import & Export / Trading",
+  "Consumer Goods",
+  "Fashion & Apparel",
+  "Beauty & Cosmetics",
+  "Sports & Fitness",
+  "Security Services",
+  "Government / Public Sector",
+  "Nonprofit / NGO",
+  "Mining",
+  "Telecommunications & IT Services",
+  "Cybersecurity",
+  "Artificial Intelligence",
+  "Cryptocurrency / Blockchain",
+  "Business Process Outsourcing (BPO)",
 ];
 
 export const operationsAccountEstimatedBalance = {
@@ -429,6 +469,7 @@ const currencies = ["EUR", "GBP", "USD", "NGN"];
 
 export const serviceCategories = [
   {
+    key: "OPERATIONS_ACCOUNT",
     title: "Operations Account",
     description:
       "Prune Payments payout service gives the business access to payouts.",
@@ -436,6 +477,7 @@ export const serviceCategories = [
     icon: IconDatabase,
   },
   {
+    key: "VIRTUAL_ACCOUNTS",
     title: "Virtual Account Services",
     description:
       "The account service lets businesses issue user accounts to clients.",
@@ -443,6 +485,7 @@ export const serviceCategories = [
     icon: IconCreditCard,
   },
   {
+    key: "PAYOUT",
     title: "Payout Services",
     description:
       "This helps businesses manage and disburse funds to recipients.",
@@ -450,6 +493,7 @@ export const serviceCategories = [
     icon: IconMoneybag,
   },
   {
+    key: "ACCOUNT_LOOKUP",
     title: "Account Lookup Services",
     description:
       "This helps businesses quickly verify and access account details for transactions.",
@@ -457,6 +501,7 @@ export const serviceCategories = [
     icon: IconSearch,
   },
   {
+    key: "REMITTANCE",
     title: "Remittance",
     description:
       "This helps businesses quickly verify and access account details for transactions.",

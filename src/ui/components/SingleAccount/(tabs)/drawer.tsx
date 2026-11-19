@@ -25,6 +25,7 @@ import { BadgeComponent } from "@/ui/components/Badge";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import Transaction from "@/lib/store/transaction";
 
+import { CanInAdmin } from "@/lib/hooks/privileges";
 type Props = {
   // close: () => void;
   // transaction: TransactionType | null;
@@ -174,15 +175,17 @@ export const AccountTransactionDrawer = ({}: Props) => {
           ))}
         </Stack>
 
-        <PrimaryBtn
-          icon={IconCircleArrowDown}
-          text="Download Receipt"
-          fullWidth
-          //   flex={1}
-          mt={"auto"}
-          mb="md"
-          fw={600}
-        />
+        <CanInAdmin do="transactions.download-statement">
+          <PrimaryBtn
+            icon={IconCircleArrowDown}
+            text="Download Receipt"
+            fullWidth
+            //   flex={1}
+            mt={"auto"}
+            mb="md"
+            fw={600}
+          />
+        </CanInAdmin>
       </Box>
     </Drawer>
   );

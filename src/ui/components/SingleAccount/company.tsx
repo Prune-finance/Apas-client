@@ -60,10 +60,7 @@ import USDSelectTypeOfTransfer from "@/app/(dashboard)/accounts/USDSelectTypeOfT
 import USDuseTransferCurrencySwitchStore from "@/lib/store/usd-transfer-currency-type";
 import { SearchInput } from "../Inputs";
 import SaveBeneficiaryToggle from "./SaveBeneficiaryToggle";
-import EUImage from "@/assets/EU-icon.png";
-import GBImage from "@/assets/GB.png";
-import GHSImage from "@/assets/GH.png";
-import USDImage from "@/assets/USD.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 
 interface CompanyProps {
   account: DefaultAccount | null;
@@ -608,20 +605,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
                         </Avatar>
 
                         <Box pos="absolute" bottom={2} right={-4}>
-                          <Image
-                            src={
-                              switchCurrency === "EUR"
-                                ? EUImage.src
-                                : switchCurrency === "GBP"
-                                ? GBImage.src
-                                : switchCurrency === "GHS"
-                                ? GHSImage.src
-                                : USDImage.src
-                            }
-                            alt="currency"
-                            width={16}
-                            height={16}
-                          />
+                          <CountryFlag code={switchCurrency} size={16} />
                         </Box>
                       </Box>
                       <Text
@@ -1207,20 +1191,7 @@ const Company = forwardRef<HTMLDivElement, CompanyProps>(function Company(
         size={500}
       >
         <Group gap={8} mb={12}>
-          <Image
-            src={
-              switchCurrency === "EUR"
-                ? EUImage.src
-                : switchCurrency === "GBP"
-                ? GBImage.src
-                : switchCurrency === "GHS"
-                ? GHSImage.src
-                : USDImage.src
-            }
-            alt={switchCurrency}
-            width={18}
-            height={18}
-          />
+          <CountryFlag code={switchCurrency} size={18} />
           <Text fz={14}>{switchCurrency}</Text>
         </Group>
 

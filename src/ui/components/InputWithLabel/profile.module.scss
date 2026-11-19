@@ -1,6 +1,19 @@
 .profile_input {
   background-color: #fcfcfd;
 
+  // View mode: read-only fields shouldn't look focusable
+  &[readonly],
+  &[data-readonly] {
+    cursor: default;
+
+    &:focus,
+    &:focus-within {
+      border-color: var(--input-bd) !important;
+      box-shadow: none !important;
+      outline: none;
+    }
+  }
+
   &::placeholder {
     color: var(--prune-text-gray-800);
     font-weight: 500;

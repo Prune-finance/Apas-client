@@ -27,7 +27,7 @@ import { TableComponent } from "@/ui/components/Table";
 import { calculateTotalPages, formatNumber, sanitizeURL } from "@/lib/utils";
 import Plan from "@/lib/store/plan";
 import PaginationComponent from "@/ui/components/Pagination";
-import PlanDrawer from "./drawer";
+import PlanDrawer from "./drawers/drawer";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { PrimaryBtn } from "@/ui/components/Buttons";
 import { PricingPlan, usePricingPlan } from "@/lib/hooks/pricing-plan";
@@ -40,6 +40,7 @@ import { SearchInput } from "@/ui/components/Inputs";
 import { useDebouncedValue } from "@mantine/hooks";
 import { filteredSearch } from "@/lib/search";
 import Link from "next/link";
+import { Can, useAdminAccess } from "@/lib/hooks/privileges";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 
 export default function PricingPlans() {
@@ -73,11 +74,13 @@ export default function PricingPlans() {
         <Group justify="space-between" mt={32} mb={28}>
           <SearchInput search={search} setSearch={setSearch} />
 
-          <PrimaryBtn
-            text="Create New Plan"
-            icon={IconPlus}
-            link="/admin/pricing-plans/new"
-          />
+          <Can do="pricing-plans.create">
+            <PrimaryBtn
+              text="Create New Plan"
+              icon={IconPlus}
+              link="/admin/pricing-plans/new"
+            />
+          </Can>
         </Group>
 
         <TableComponent
@@ -162,10 +165,18 @@ const RowComponent = ({ plans }: { plans: PricingPlan[] }) => {
 };
 
 const MenuComponent = ({ id }: { id: string }) => {
+  const { can } = useAdminAccess();
+  // edit needs pricing-plans.edit; duplicating creates a plan
   const menuItems = {
-    edit: <IconEdit style={{ width: rem(14), height: rem(14) }} />,
-    duplicate: <IconCopy style={{ width: rem(14), height: rem(14) }} />,
+    ...(can("pricing-plans.edit") && {
+      edit: <IconEdit style={{ width: rem(14), height: rem(14) }} />,
+    }),
+    ...(can("pricing-plans.create") && {
+      duplicate: <IconCopy style={{ width: rem(14), height: rem(14) }} />,
+    }),
   };
+
+  if (!Object.keys(menuItems).length) return null;
 
   return (
     <Menu shadow="md" width={150}>

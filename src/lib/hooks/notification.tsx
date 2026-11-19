@@ -10,32 +10,32 @@ import { NotificationStore } from "../store/notification";
 const useNotification = () => {
   const { setProps } = NotificationStore();
 
-  const handleError = (title: string, msg: string) => {
-    setProps({ position: "top-center", limit: 1 });
+  const handleError = (title: string, msg: string | string[]) => {
+    const messages = Array.isArray(msg) ? msg : [msg];
+    setProps({ position: "top-center", limit: Math.max(1, messages.length) });
     notifications.clean();
 
-    notifications.show({
-      title: title,
-      message: msg,
-      icon: <IconX size="0.8rem" />,
-      color: "red",
-      // position: "top-center",
-      // limit: 1,
-      styles: (theme) => ({
-        root: {
-          backgroundColor: "#FEEDE6",
-          border: "1px solid #F44708",
-          width: "500px",
-          borderRadius: "5px",
-        },
-
-        title: { fontSize: "13px", fontWeight: 700, color: "#F44708" },
-        description: { color: "#F44708", fontSize: "11px" },
-        closeButton: {
-          color: "#F44708",
-          "&:hover": { backgroundColor: "none" },
-        },
-      }),
+    messages.forEach((m) => {
+      notifications.show({
+        title: title,
+        message: m,
+        icon: <IconX size="0.8rem" />,
+        color: "red",
+        styles: () => ({
+          root: {
+            backgroundColor: "#FEEDE6",
+            border: "1px solid #F44708",
+            width: "500px",
+            borderRadius: "5px",
+          },
+          title: { fontSize: "13px", fontWeight: 700, color: "#F44708" },
+          description: { color: "#F44708", fontSize: "11px" },
+          closeButton: {
+            color: "#F44708",
+            "&:hover": { backgroundColor: "none" },
+          },
+        }),
+      });
     });
   };
 

@@ -2,11 +2,7 @@
 
 import { Divider, Skeleton, Text } from "@mantine/core";
 import { motion } from "framer-motion";
-import Image from "next/image";
-
-import EU from "@/assets/eu.png";
-import UK from "@/assets/uk.png";
-import US from "@/assets/us.png";
+import CountryFlag from "@/ui/components/CountryFlag";
 import styles from "@/ui/styles/auth.module.scss";
 
 export function CardOne() {
@@ -18,19 +14,9 @@ export function CardOne() {
       transition={{ ease: "easeOut", duration: 0.3 }}
     >
       <div className={`${styles.images__container}`}>
-        <Image
-          width={37.25}
-          height={37.25}
-          src={EU}
-          alt="European Union Flag"
-        />
-        <Image
-          width={37.25}
-          height={37.25}
-          src={UK}
-          alt="United Kingdom Flag"
-        />
-        <Image width={37.25} height={37.25} src={US} alt="United States Flag" />
+        <CountryFlag code="EUR" size={37} />
+        <CountryFlag code="GB" size={37} />
+        <CountryFlag code="US" size={37} />
         <Divider w={200} color="#f0f2f5" my="sm" size="xs" />
       </div>
 
@@ -48,19 +34,9 @@ export function CardTwo() {
       className={`${styles.card} ${styles.card__two}`}
     >
       <div className={`${styles.images__container}`}>
-        <Image width={37.25} height={37.25} src={US} alt="United States Flag" />
-        <Image
-          width={37.25}
-          height={37.25}
-          src={EU}
-          alt="European Union Flag"
-        />
-        <Image
-          width={37.25}
-          height={37.25}
-          src={UK}
-          alt="United Kingdom Flag"
-        />
+        <CountryFlag code="US" size={37} />
+        <CountryFlag code="EUR" size={37} />
+        <CountryFlag code="GB" size={37} />
         <Divider w={200} color="#f0f2f5" my="sm" size="xs" />
       </div>
 
@@ -78,19 +54,9 @@ export function CardThree() {
       className={`${styles.card} ${styles.card__three}`}
     >
       <div className={`${styles.images__container}`}>
-        <Image
-          width={37.25}
-          height={37.25}
-          src={UK}
-          alt="United Kingdom Flag"
-        />
-        <Image
-          width={37.25}
-          height={37.25}
-          src={EU}
-          alt="European Union Flag"
-        />
-        <Image width={37.25} height={37.25} src={US} alt="United States Flag" />
+        <CountryFlag code="GB" size={37} />
+        <CountryFlag code="EUR" size={37} />
+        <CountryFlag code="US" size={37} />
         <Divider w={200} color="#f0f2f5" my="sm" size="xs" />
       </div>
 

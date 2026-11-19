@@ -39,6 +39,7 @@ import Link from "next/link";
 import RejectModalComponent from "@/ui/components/Modal/RejectModalComponent";
 import ModalComponent from "@/ui/components/Modal";
 
+import { Can } from "@/lib/hooks/privileges";
 function AccountIssuance() {
   const searchParams = useSearchParams();
 
@@ -292,8 +293,12 @@ function AccountIssuance() {
 
           {selectedRequest?.status === "PENDING" && (
             <Flex mt={40} justify="flex-end" gap={10}>
-              <SecondaryBtn text="Reject" action={open} />
-              <PrimaryBtn text="Approve" action={openApprove} />
+              <Can do="service-requests.approve">
+                <SecondaryBtn text="Reject" action={open} />
+              </Can>
+              <Can do="service-requests.approve">
+                <PrimaryBtn text="Approve" action={openApprove} />
+              </Can>
             </Flex>
           )}
         </Stack>

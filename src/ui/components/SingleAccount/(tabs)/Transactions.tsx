@@ -44,6 +44,7 @@ import useNotification from "@/lib/hooks/notification";
 import { notifications } from "@mantine/notifications";
 import { useQueryState } from "nuqs";
 import { exportSingleUserAccountTransactions, exportAdminSingleAccountTransactions, exportAdminPayoutAccountTransactions } from "@/lib/hooks/transactions";
+import { CanInAdmin } from "@/lib/hooks/privileges";
 export const Transactions = ({
   transactions,
   loading,
@@ -107,8 +108,6 @@ export const Transactions = ({
   const { status, createdAt, senderName, recipientName, recipientIban, type: txType } = form.values;
 
   const isAdminLocation = location?.startsWith("admin") || location?.endsWith("business-account");
-  const isIssuedAccount = location?.toLowerCase().includes("issued");
-  console.log({ isAdminLocation, isIssuedAccount, location });
 
   const handleExportTransactions = async () => {
     if (!accountID) return;
@@ -129,9 +128,7 @@ export const Transactions = ({
       ...(currencyType && { currencyCode: currencyType }),
     };
     try {
-      if (isIssuedAccount) {
-        await exportAdminIssuedAccountTransactions(accountID, exportParams);
-      } else if (isAdminLocation && payout) {
+      if (isAdminLocation && payout) {
         await exportAdminPayoutAccountTransactions(accountID, exportParams);
       } else if (isAdminLocation) {
         await exportAdminSingleAccountTransactions(accountID, exportParams);
@@ -227,7 +224,6 @@ export const Transactions = ({
       payout && isAdminLocation
         ? `${baseUrl}/admin/accounts/payout/${accountID}/transactions/statement?date=${startDate}&endDate=${endDate}&currencyCode=${currencyType}`
         : null;
-    console.log(location, payoutAdminUrl);
 
     // Use the default URL if location is undefined or not in urlMap
     const url =
@@ -313,14 +309,16 @@ export const Transactions = ({
             indicator={appliedFilterCount}
           />
 
-          <SecondaryBtn
-            text="Download Statement"
-            icon={IconCircleArrowDown}
-            // style={{ cursor: "not-allowed" }}
-            fw={600}
-            // action={() => handlePdfStatement(pdfRef)}
-            action={openPreview}
-          />
+          <CanInAdmin do="transactions.download-statement">
+            <SecondaryBtn
+              text="Download Statement"
+              icon={IconCircleArrowDown}
+              // style={{ cursor: "not-allowed" }}
+              fw={600}
+              // action={() => handlePdfStatement(pdfRef)}
+              action={openPreview}
+            />
+          </CanInAdmin>
 
           <SecondaryBtn
             text="Export Transactions"

@@ -11,8 +11,8 @@ import {
   Image,
 } from "@mantine/core";
 
-import PruneIcon from "@/assets/icon.png";
-import ReceiptIcon from "@/assets/receipt-bg.svg";
+import PruneIcon from "@/assets/img/icon.png";
+import ReceiptIcon from "@/assets/img/receipt-bg.svg";
 import { formatNumber } from "@/lib/utils";
 
 import { Fragment, ReactNode, RefObject } from "react";

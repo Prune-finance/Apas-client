@@ -17,7 +17,7 @@ dayjs.extend(advancedFormat);
 import { TableComponent } from "@/ui/components/Table";
 import EmptyTable from "@/ui/components/EmptyTable";
 
-import DebitDrawer from "@/app/admin/(dashboard)/requests/drawer";
+import DebitDrawer from "@/ui/section/requests/Drawers/drawer";
 import PaginationComponent from "@/ui/components/Pagination";
 import { debitTableHeaders } from "@/lib/static";
 import { SearchInput } from "@/ui/components/Inputs";

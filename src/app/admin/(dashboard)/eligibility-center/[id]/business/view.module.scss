@@ -1,0 +1,14 @@
+// View mode: read-only text fields shouldn't get the global focus highlight.
+// Read-only Select inputs are excluded so dropdowns still show focus.
+.view__mode {
+  :global(input[readonly]:not(.mantine-Select-input)),
+  :global(textarea[readonly]) {
+    cursor: default;
+
+    &:focus {
+      border-color: var(--input-bd) !important;
+      box-shadow: none !important;
+      outline: none;
+    }
+  }
+}

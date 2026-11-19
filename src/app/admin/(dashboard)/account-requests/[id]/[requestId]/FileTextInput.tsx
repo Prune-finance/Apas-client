@@ -19,6 +19,7 @@ import FileDisplay from "@/ui/components/DocumentViewer";
 import { useDisclosure } from "@mantine/hooks";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 interface Props {
   url: string;
   label: string;
@@ -121,39 +122,41 @@ export const FileTextInput = ({
         placeholder={placeholder}
       />
 
-      <Group mt={16}>
-        {(status === "PENDING" || status === "APPROVED") && (
-          <PrimaryBtn
-            text={status === "APPROVED" ? "Approved" : "Approve"}
-            color="#039855"
-            c="#039855"
-            variant="light"
-            h={22}
-            radius={8}
-            action={() => approveOrRejectDocument("approve")}
-            loading={processing}
-            loaderProps={{ type: "dots" }}
-            disabled={processingRejection}
-            {...(status === "APPROVED" && { icon: IconCheck })}
-          />
-        )}
-
-        {(status === "PENDING" || status === "REJECTED") && (
-          <PrimaryBtn
-            text={status === "REJECTED" ? "Rejected" : "Reject"}
-            color="#D92D20"
-            c="#D92D20"
-            variant="light"
-            h={22}
-            radius={8}
-            action={() => approveOrRejectDocument("reject")}
-            loaderProps={{ type: "dots" }}
-            loading={processingRejection}
-            disabled={processing}
-            {...(status === "REJECTED" && { icon: IconX })}
-          />
-        )}
-      </Group>
+      <Can do="account-requests.approve">
+        <Group mt={16}>
+          {(status === "PENDING" || status === "APPROVED") && (
+            <PrimaryBtn
+              text={status === "APPROVED" ? "Approved" : "Approve"}
+              color="#039855"
+              c="#039855"
+              variant="light"
+              h={22}
+              radius={8}
+              action={() => approveOrRejectDocument("approve")}
+              loading={processing}
+              loaderProps={{ type: "dots" }}
+              disabled={processingRejection}
+              {...(status === "APPROVED" && { icon: IconCheck })}
+            />
+          )}
+  
+          {(status === "PENDING" || status === "REJECTED") && (
+            <PrimaryBtn
+              text={status === "REJECTED" ? "Rejected" : "Reject"}
+              color="#D92D20"
+              c="#D92D20"
+              variant="light"
+              h={22}
+              radius={8}
+              action={() => approveOrRejectDocument("reject")}
+              loaderProps={{ type: "dots" }}
+              loading={processingRejection}
+              disabled={processing}
+              {...(status === "REJECTED" && { icon: IconX })}
+            />
+          )}
+        </Group>
+      </Can>
 
       <Modal
         opened={opened}
@@ -251,39 +254,41 @@ export const FileRows = ({
           {placeholder}
         </Text>
 
-        <Group mt={16} flex={1}>
-          {(status === "PENDING" || status === "APPROVED") && (
-            <PrimaryBtn
-              text={status === "APPROVED" ? "Approved" : "Approve"}
-              color="#039855"
-              c="#039855"
-              variant="light"
-              h={22}
-              radius={8}
-              action={() => approveOrRejectDocument("approve")}
-              loading={processing}
-              loaderProps={{ type: "dots" }}
-              disabled={processingRejection}
-              {...(status === "APPROVED" && { icon: IconCheck })}
-            />
-          )}
-
-          {(status === "PENDING" || status === "REJECTED") && (
-            <PrimaryBtn
-              text={status === "REJECTED" ? "Rejected" : "Reject"}
-              color="#D92D20"
-              c="#D92D20"
-              variant="light"
-              h={22}
-              radius={8}
-              action={() => approveOrRejectDocument("reject")}
-              loaderProps={{ type: "dots" }}
-              loading={processingRejection}
-              disabled={processing}
-              {...(status === "REJECTED" && { icon: IconX })}
-            />
-          )}
-        </Group>
+        <Can do="account-requests.approve">
+          <Group mt={16} flex={1}>
+            {(status === "PENDING" || status === "APPROVED") && (
+              <PrimaryBtn
+                text={status === "APPROVED" ? "Approved" : "Approve"}
+                color="#039855"
+                c="#039855"
+                variant="light"
+                h={22}
+                radius={8}
+                action={() => approveOrRejectDocument("approve")}
+                loading={processing}
+                loaderProps={{ type: "dots" }}
+                disabled={processingRejection}
+                {...(status === "APPROVED" && { icon: IconCheck })}
+              />
+            )}
+  
+            {(status === "PENDING" || status === "REJECTED") && (
+              <PrimaryBtn
+                text={status === "REJECTED" ? "Rejected" : "Reject"}
+                color="#D92D20"
+                c="#D92D20"
+                variant="light"
+                h={22}
+                radius={8}
+                action={() => approveOrRejectDocument("reject")}
+                loaderProps={{ type: "dots" }}
+                loading={processingRejection}
+                disabled={processing}
+                {...(status === "REJECTED" && { icon: IconX })}
+              />
+            )}
+          </Group>
+        </Can>
       </Group>
       <Divider color="var(--prune-text-gray-200)" />
 

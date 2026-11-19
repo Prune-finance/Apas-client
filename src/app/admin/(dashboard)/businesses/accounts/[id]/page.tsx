@@ -19,7 +19,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { useForm, zodResolver } from "@mantine/form";
 import { parseError } from "@/lib/actions/auth";
 import { validateRequest } from "@/lib/schema";
-import ModalComponent from "@/app/admin/(dashboard)/accounts/modal";
+import ModalComponent from "@/ui/section/accounts/Modals";
 import { IconBrandLinktree } from "@tabler/icons-react";
 
 import useNotification from "@/lib/hooks/notification";

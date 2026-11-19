@@ -38,10 +38,11 @@ import useNotification from "@/lib/hooks/notification";
 import createAxiosInstance from "@/lib/axios";
 import { parseError } from "@/lib/actions/auth";
 import { calculateTotalPages } from "@/lib/utils";
-import AddUserModal from "./AddUserModal";
+import AddUserModal from "./modals/AddUserModal";
 import { usePaginationReset } from "@/lib/hooks/pagination-reset";
 import { switzer } from "@/ui/fonts";
 
+import { Can } from "@/lib/hooks/privileges";
 export default function AllBusinessUsers() {
   const searchParams = useSearchParams();
   const { id } = useParams<{ id: string }>();
@@ -159,7 +160,7 @@ export default function AllBusinessUsers() {
     <main className={styles.main}>
       <Breadcrumbs
         items={[
-          { title: "User Management", href: "/admin/users?tab=Business Users" },
+          { title: "User Management", href: "/admin/user-old?tab=Business Users" },
 
           {
             title: `${business?.name}`,
@@ -202,12 +203,14 @@ export default function AllBusinessUsers() {
             fw={600}
           />
 
-          <PrimaryBtn
-            text="Add New User"
-            fw={600}
-            icon={IconPlus}
-            action={open}
-          />
+          <Can do="business-users.add">
+            <PrimaryBtn
+              text="Add New User"
+              fw={600}
+              icon={IconPlus}
+              action={open}
+            />
+          </Can>
         </Group>
       </Group>
 

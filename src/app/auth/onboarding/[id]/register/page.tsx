@@ -177,7 +177,7 @@ export default function OnboardingRegister() {
           fw={700}
           c="var(--prune-primary-800)"
           component={Link}
-          href={"/auth/onboarding/login"}
+          href={"/auth/login"}
         >
           Log in
         </Text>

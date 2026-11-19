@@ -1,0 +1,1116 @@
+.page {
+  padding: 0 20px;
+  color: var(--prune-text-gray-700);
+}
+.card {
+  padding: 24px;
+  border-radius: 8px;
+  background: white;
+  min-height: 108px;
+  border: 1px solid var(--prune-text-gray-100, #f2f4f7);
+  transition: background-color 0.2s, border-color 0.2s;
+
+  &:hover {
+    background: #f9f6e6;
+    border-color: #c6a700;
+  }
+}
+// Same compact typography as Eligibility Center, including breakpoint overrides.
+.compactInputs {
+  :global(.mantine-TextInput-input),
+  :global(.mantine-Select-input) {
+    font-size: 12px !important;
+    font-weight: 400;
+
+    &::placeholder {
+      font-size: 12px !important;
+      font-weight: 400;
+    }
+  }
+}
+// Columns scale with the screen; below the Figma width (1006px) the table scrolls sideways
+.tableWrap { border-radius: 16px; overflow: hidden; }
+.table {
+  margin-top: 0;
+  min-width: 1006px;
+  td, th { overflow: hidden; text-overflow: ellipsis; }
+  background: white;
+  thead { background: #f2f4f7; }
+  th { height: 48px; padding: 8px; letter-spacing: 0; color: var(--prune-text-gray-700); }
+  td { height: 72px; padding: 12px 8px; font-size: 14px; font-weight: 400; border-color: #f2f4f7; }
+  // Actions: header and the menu button share the column's centre
+  th:last-child, td:last-child { text-align: center; }
+}
+// Badge: 12px text in a 20px pill. The label needs room for descenders ("g" in Pending),
+// so it gets a 14px line instead of Mantine's clipped 1em line.
+.badge {
+  height: 20px;
+  padding: 3px 8px;
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 500;
+  text-transform: none;
+
+  :global(.mantine-Badge-label) { overflow: visible; line-height: 14px; }
+}
+.flags {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding-left: 2px; // room for the first flag's white ring
+  img + img { position: relative; margin-left: -4px; }
+}
+.switchTrack { width: 40px; min-width: 40px; height: 24px; cursor: pointer; }
+@media (max-width: 48em) {
+  .page { padding: 0; }
+  .header { padding: 0; }
+}
+
+.disableDialog {
+  background: #f9f9f9;
+  color: var(--prune-text-gray-700);
+  box-shadow: 0 0 1px #1414141f, 0 1px 8px #14141414;
+}
+.disableHeader {
+  padding: 24px;
+  border-bottom: 1px solid #eaecf0;
+  min-height: 98px;
+}
+.disableIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff3f0;
+}
+.disableBody { padding: 16px 24px; }
+.checkIcon { display: flex; flex-shrink: 0; }
+.disableFooter {
+  padding: 40px 24px 24px;
+  border-top: 1px solid #eaecf0;
+}
+
+// ─── Add Currency Pair dialog (Figma 15670:330830 / 15671:331401 / 15678:365703) ───
+.addDialog {
+  background: #f9f9f9;
+  color: #344054;
+  border-radius: 16px;
+  box-shadow: 0 0 1px #1414141f, 0 1px 8px #14141414;
+  overflow: hidden;
+}
+.addBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+}
+.addHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 57px;
+}
+.addTitle {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #344054;
+}
+.addSubtitle {
+  margin-top: 8px;
+  font-size: 13.5px;
+  line-height: normal;
+  color: #667085;
+}
+.addClose {
+  display: flex;
+  margin-top: -10px; // Figma: centred 5px above the header's midline
+  cursor: pointer;
+}
+// Dividers run edge to edge, outside the 24px padding
+.addDivider {
+  height: 1px;
+  margin: 0 -24px;
+  background: #eaecf0;
+}
+
+.currencyRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+}
+.currencyField {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 282px;
+  height: 48px;
+  padding: 0 15px 0 11px;
+  border: 1px solid #f2f4f7;
+  border-radius: 8px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+
+  &[data-error] {
+    padding: 0 14px 0 10px;
+    border: 2px solid #ff9175;
+    background: #fff3f0;
+  }
+}
+.currencyText {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  margin: 0 8px 0 12px;
+}
+.currencyLabel { font-size: 12px; line-height: 1; color: #667085; }
+.currencyValue {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: #344054;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  [data-error] > .currencyText > & { color: #98a2b3; }
+}
+.currencyPlaceholder { font-size: 16px; font-weight: 500; line-height: 1; color: #98a2b3; }
+.flag24 {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.fieldError { width: 100%; font-size: 12px; line-height: 1; color: #db340b; }
+
+// Currency dropdown (Figma 15678:365731)
+.currencyDropdown {
+  width: 282px !important;
+  padding: 24px 0 !important;
+  background: #f9f9f9 !important;
+  border: 1px solid #eaecf0 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 0 1px #1414141f, 0 1px 8px #14141414 !important;
+}
+.currencyOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.currencyOption {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px !important;
+  border-radius: 4px !important;
+
+  &[data-combobox-selected],
+  &:hover { background: #f2f4f7 !important; }
+}
+.optionCode { font-size: 14px; font-weight: 700; line-height: 1; color: #344054; }
+.optionName { font-size: 12px; line-height: 1.5; color: #667085; }
+.optionTag {
+  margin-left: auto;
+  padding: 4px 8px;
+  border-radius: 1234px;
+  background: #eaecf0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  color: #667085;
+  white-space: nowrap;
+}
+
+// Info / error banners (Figma "Table Content Cell")
+.notice {
+  display: flex;
+  gap: 8px;
+  min-height: 72px;
+  padding: 12px 16px;
+  border-radius: 16px;
+}
+.noticeInfo {
+  align-items: center;
+  background: #fbfee6;
+  border: 1px solid #f2f4f7;
+}
+.noticeError {
+  align-items: flex-start;
+  background: #fff3f0;
+  border: 1px solid #ff9175;
+  color: #db340b;
+}
+.noticeText { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; }
+.noticeTitle { font-size: 14px; font-weight: 700; line-height: 1; }
+.noticeBody { font-size: 12px; line-height: 1.5; }
+.flagGroup {
+  display: flex;
+  flex-shrink: 0;
+  padding-left: 2px;
+  img + img { position: relative; margin-left: -4px; }
+}
+
+
+.checkboxRow { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.checkboxBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: 1px solid #d0d5dd;
+  background: white;
+  flex-shrink: 0;
+
+  &[data-checked] { background: #c1dd06; border-color: #c1dd06; }
+}
+.checkboxLabel { font-size: 14px; line-height: 1; color: #344054; }
+
+.addFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-top: 24px;
+}
+
+// ─── Pair detail page (Figma 15719:380891) ───
+.pairPage { display: flex; flex-direction: column; gap: 48px; padding: 0 20px; color: #344054; }
+.crumbs { display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 1; }
+.crumb { color: #667085; text-decoration: none; }
+.crumbSep { color: #eaecf0; }
+.crumbCurrent { color: #758604; }
+.pairHeader { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.pairHeading { display: flex; flex: 1; flex-direction: column; gap: 10px; min-width: 0; padding: 4px 0; }
+.pairTitleRow { display: flex; align-items: center; gap: 10px; }
+.pairTitle { font-size: 24px; font-weight: 500; line-height: 1.2; color: #344054; white-space: nowrap; }
+.pairSubtitle { font-size: 14px; line-height: 1; color: #667085; }
+.dotBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 1234px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.dot { width: 6px; height: 6px; margin: 1px; border-radius: 9999px; background: currentColor; }
+// Pair header buttons: default button size, like Add Pair on the Rates page
+.largeBtn {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+
+.pairTabs { display: flex; flex-direction: column; gap: 32px; }
+.tabList { display: flex; }
+.tab {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 11px;
+  padding-top: 12px;
+  color: #98a2b3;
+  cursor: pointer;
+
+  &[data-active] { color: #758604; }
+}
+.tabLabel { display: flex; align-items: center; justify-content: center; gap: 4px; font-size: 12px; font-weight: 500; line-height: 1; }
+// The icon asset is used as a mask so it follows the tab colour
+.tabIcon { width: 16px; height: 16px; background: currentColor; mask: var(--icon) center / 16px 16px no-repeat; -webkit-mask: var(--icon) center / 16px 16px no-repeat; }
+.tabIndicator { height: 1px; border-radius: 2px; background: #f2f4f7; [data-active] > & { background: #758604; } }
+
+.liveCard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 235px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  background: white;
+}
+.liveHead { display: flex; flex-direction: column; gap: 5px; }
+.liveTitleRow { display: flex; align-items: center; gap: 8px; }
+.liveTitle { font-size: 18px; font-weight: 600; line-height: 1.2; color: #344054; }
+.liveEffective { font-size: 12.5px; line-height: normal; color: #667085; }
+.liveFigures { display: flex; align-items: center; gap: 19px; }
+.figure { display: flex; flex-direction: column; gap: 8px; }
+.figureWide { width: 156px; }
+.figureLabel, .figureSub { font-size: 12px; line-height: 1; color: #667085; white-space: nowrap; }
+.figureValue { font-size: 24px; font-weight: 600; line-height: 1.2; color: #344054; }
+.figureMuted { font-weight: 500; color: #98a2b3; }
+.figureOp { font-size: 22px; line-height: normal; color: #98a2b3; text-align: center; }
+.infoNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f2f7ff;
+  border: 1px solid #0a69fa;
+}
+.infoNoticeText { flex: 1; font-size: 12px; font-weight: 700; line-height: 1; color: #0a69fa; }
+.smallBlueBtn {
+  padding: 8px 16px;
+  border-radius: 4px;
+  background: #0a69fa;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.recentCard { display: flex; flex-direction: column; gap: 24px; border-radius: 8px; background: white; padding-bottom: 16px; }
+.recentTitle { padding: 16px; font-size: 18px; font-weight: 600; line-height: 1.2; color: #101828; }
+.recentTable { padding: 0 16px; }
+
+// ─── Review change drawer (Figma 15681:371814 blocked · 15681:372354 reviewable) ───
+.reviewDrawer { background: white; color: #344054; }
+.reviewBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 100%;
+  // Drawers without a sticky footer (Audit event) end with content: leave room below it
+  // so the last rows can scroll clear of the screen edge
+  &:not(:has(.reviewFooter)) { padding-bottom: 48px; }
+}
+// Review / Audit event drawers: more air between sections than the dense Set rate form
+.reviewBodyRoomy { gap: 24px; }
+// The drawer scrolls as one panel, so long events reach their last row
+.reviewDrawer { overflow-y: auto; }
+.reviewTopBar { display: flex; flex-direction: column; gap: 2px; border-bottom: 1px solid #eaecf0; }
+.reviewNav { display: none; } // the empty Figma navigation row added 48px above the title
+.reviewTitleRow { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 24px 64px 16px 24px; }
+// Eksell Small cut, bold, at 24px, like the rate dialogs
+.reviewTitle { font-family: "EksellDisplaySmall", serif; font-size: 24px; font-weight: 700; line-height: 1.2; color: #344054; }
+.reviewClose { position: absolute; top: 22px; right: 20px; display: flex; cursor: pointer; }
+.reviewSection { display: flex; flex-direction: column; padding: 0 24px; }
+// Status badge, then the title and timestamp: the badge sits apart from the text under it
+.reviewMeta { gap: 8px; align-items: flex-start; }
+.reviewMeta .pendingBadge { margin-bottom: 8px; }
+.pendingBadge {
+  display: inline-flex;
+  padding: 6px 12px;
+  border-radius: 1234px;
+  background: #fff9e6;
+  color: #b26205;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+}
+.reviewHeading { font-size: 16px; font-weight: 700; line-height: 1.3; color: #344054; }
+.reviewStamp { font-size: 12px; line-height: 1.4; color: #667085; }
+.submitter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 72px;
+  padding: 12px 8px;
+  border-bottom: 1px solid #f2f4f7;
+  background: white;
+}
+.avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  img { position: absolute; inset: 0; }
+  span { position: relative; font-size: 12px; font-weight: 700; line-height: 1.2; color: #344054; }
+}
+.submitterName { font-size: 14px; line-height: 1; color: #344054; }
+.submitterMeta { font-size: 12px; line-height: 1.5; color: #667085; }
+.compareRow { display: flex; align-items: center; gap: 8px; }
+.rateCard {
+  display: flex;
+  flex: 1 0 0;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  padding: 24px;
+  border-radius: 8px;
+  background: #f2f4f7;
+  border: 1px solid #eaecf0;
+}
+.rateCardProposed { background: #fbfee6; border-color: #97ad05; }
+.rateCardTitle { font-size: 14px; font-weight: 700; line-height: 1; color: #667085; }
+.rateCardProposed .rateCardTitle { color: #758604; }
+.rateGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.rateGridLabel { color: #667085; }
+.rateGridValue { color: #344054; overflow: hidden; text-overflow: ellipsis; }
+.rateGridStrong { font-weight: 700; }
+.fieldBlock { display: flex; flex-direction: column; gap: 10px; padding: 0 24px; line-height: 1.2; }
+.fieldBlockLabel { font-size: 12px; font-weight: 700; color: #667085; }
+.fieldBlockText { font-size: 14px; line-height: 1.5; color: #344054; }
+.fieldBlockMuted { color: #667085; }
+.warnNotice {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #fff9e6;
+  border: 1px solid #ffd84d;
+}
+.warnTitle { font-size: 12px; font-weight: 700; line-height: 1; color: #b26205; }
+.warnBody { font-size: 12px; line-height: 1.5; color: #344054; }
+// Pinned to the bottom of the drawer while the content scrolls
+.reviewFooter {
+  position: sticky;
+  bottom: 0;
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+  padding: 16px 28px;
+  background: #f9f9f9;
+  box-shadow: 0 -8px 12px rgba(99, 96, 96, 0.08);
+}
+
+// ─── Pair Overview additions (Figma 15719:378657) ───
+.settingsRow { display: flex; flex-wrap: wrap; gap: 16px; width: 100%; }
+.settingCell {
+  display: flex;
+  flex: 1 0 0;
+  align-items: center;
+  gap: 4px;
+  min-width: 200px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: white;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #667085;
+}
+.settingBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 4px;
+  border-radius: 4px;
+  border: 1px solid #f2f4f7;
+  flex-shrink: 0;
+  &[data-checked] { background: #c1dd06; border-color: #c1dd06; }
+}
+.overviewRow { display: flex; flex-wrap: wrap; gap: 24px; width: 100%; }
+// Figma row (15673:335206): live card 696 : inverse card 284, filling the width at any screen size.
+// Below ~900px the inverse card wraps under the live card.
+.overviewRow .liveCard { flex: 696 1 560px; min-width: 0; }
+.grayNotice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f2f4f7;
+  border: 1px solid #eaecf0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #667085;
+}
+.inverseCard {
+  display: flex;
+  flex: 284 1 284px;
+  min-width: 0;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  background: white;
+}
+.inverseTitle { font-size: 16px; font-weight: 700; line-height: 1; color: #344054; }
+.inverseSub { margin-top: 5px; font-size: 12px; line-height: 1; color: #667085; }
+.inverseValue { font-size: 32px; font-weight: 600; line-height: 1.2; color: #344054; white-space: nowrap; }
+.inverseUnit { font-size: 14px; line-height: normal; color: #667085; }
+.formulaBox {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 8px;
+  border-radius: 8px;
+  background: #f2f4f7;
+  border: 1px solid #eaecf0;
+  color: #667085;
+}
+.formulaTitle { font-size: 14px; font-weight: 600; line-height: 1; }
+.formulaBody { font-size: 12px; line-height: 1.5; }
+.precisionRow { display: flex; align-items: center; gap: 10px; font-size: 12px; line-height: 1; color: #667085; }
+
+// Recent rate changes table (Figma table header 42px · cells 12px/8px)
+.changesTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1;
+  th {
+    height: 42px;
+    padding: 14px 8px;
+    background: #f2f4f7;
+    border-bottom: 1px solid #f2f4f7;
+    font-weight: 600;
+    color: #344054;
+    text-align: left;
+    white-space: nowrap;
+  }
+  td { padding: 12px 8px; border-bottom: 1px solid #f2f4f7; background: white; color: #344054; white-space: nowrap; }
+  tbody tr { cursor: default; }
+  tbody tr[data-clickable] { cursor: pointer; }
+}
+.colRate { width: 118px; }
+.muted { color: #667085 !important; }
+.strong { font-weight: 700; }
+
+// ─── Audit log page (Figma 15681:373066) ───
+.auditPage { display: flex; flex-direction: column; gap: 48px; padding: 0 20px; color: #344054; }
+.auditBody { display: flex; flex-direction: column; gap: 24px; }
+.exportBtn {
+  background: #f2f4f7 !important;
+  color: #344054 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+.auditSection { width: 24px !important; }
+
+.auditTableWrap { border-radius: 16px; overflow: hidden; overflow-x: auto; }
+.auditTable {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1;
+  th {
+    min-height: 48px;
+    height: 48px;
+    padding: 14px 8px;
+    background: #f2f4f7;
+    border-bottom: 1px solid #f2f4f7;
+    font-weight: 600;
+    color: #344054;
+    text-align: left;
+    white-space: nowrap;
+  }
+  td {
+    height: 72px;
+    padding: 12px 8px;
+    background: white;
+    border-bottom: 1px solid #f2f4f7;
+    color: #344054;
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+}
+.colTime { width: 146px; }
+.colPrev { width: 95px; }
+.colNew { width: 146px; }
+.colAdmin { width: 221px; }
+.colChannel { width: 105px; }
+.cellStack { display: flex; flex-direction: column; gap: 4px; }
+.cellSub { font-size: 12px; line-height: 1.5; color: #667085; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 1234px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.pairCell { display: flex; align-items: center; gap: 8px; }
+.adminCell { display: flex; align-items: center; gap: 12px; }
+
+// ─── Pending change banner (Figma 15673:335238) ───
+.pendingBanner {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 16px 24px;
+  border-radius: 16px;
+  background: #fff9e6;
+}
+.pendingBannerTop { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.pendingBannerTitle { display: flex; align-items: center; gap: 8px; }
+.pendingBannerHeading { font-size: 15px; font-weight: 700; line-height: normal; color: #b26205; white-space: nowrap; }
+.pendingPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 1234px;
+  background: #ffd84d;
+  color: #344054;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+}
+.reviewRateBtn {
+  background: #ffd84d !important;
+  color: #344054 !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+}
+.pendingBannerBody { display: flex; flex-direction: column; gap: 9px; line-height: 1; }
+.pendingBannerMain { font-size: 14px; color: #344054; }
+.pendingBannerSub { font-size: 12px; color: #667085; }
+
+// When the inverse card is hidden the live card spans the row (Figma 15702:374635)
+.overviewRow .liveCardFull { flex: 1 1 100%; max-width: none; }
+.liveCardFull .liveFigures { justify-content: space-between; }
+
+// ─── Rate History (Figma 15678:366738) ───
+.historyTab { display: flex; flex-direction: column; gap: 32px; }
+.chartCard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 16px 24px;
+  border-radius: 8px;
+  background: white;
+}
+.chartHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.chartTitle { font-size: 18px; font-weight: 600; line-height: 1.2; color: #344054; }
+.chartSub { margin-top: 5px; font-size: 12px; line-height: 1; color: #667085; }
+.chartRange { width: 161px; }
+.chartRange .rangeInput {
+  height: 48px;
+  min-height: 48px;
+  padding-left: 15px;
+  padding-right: 49px;
+  border: 1px solid #f2f4f7;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 16px !important;
+  color: #344054;
+}
+.chartBody { display: flex; flex-direction: column; gap: 8px; }
+.chartPlot { display: flex; align-items: center; gap: 8px; }
+.chartAxis {
+  display: flex;
+  flex-direction: column;
+  gap: 27px;
+  width: 31px;
+  flex-shrink: 0;
+  font-size: 12px;
+  line-height: 1;
+  color: #98a2b3;
+  text-align: right;
+}
+.chartSvg { flex: 1; min-width: 0; height: 129px; overflow: visible; }
+.chartXAxis {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 43px;
+  font-size: 12px;
+  line-height: 1;
+  color: #98a2b3;
+  white-space: nowrap;
+}
+.chartEmpty { height: 149px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #98a2b3; }
+.historyTableWrap { border-radius: 16px; overflow: hidden; overflow-x: auto; }
+.colAdj { width: 95px; }
+.colFinal { width: 146px; }
+.colEffective { width: 105px; }
+.colStatus { width: 105px; }
+
+// ─── Audit Trail (Figma 15679:368530) ───
+.auditTrail { display: flex; flex-direction: column; gap: 32px; }
+.statRow { display: flex; flex-wrap: wrap; gap: 16px; }
+.statCard {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 200px;
+  padding: 24px;
+  border-radius: 8px;
+  background: white;
+}
+.statLabel { font-size: 14px; line-height: 1; color: #667085; }
+.statValue { font-size: 24px; font-weight: 500; line-height: 1.2; color: #344054; }
+.auditTable tbody tr[data-row] { cursor: pointer; }
+.auditTable tbody tr[data-open] td { border-bottom-color: transparent; }
+.expandCell { padding: 16px 24px !important; height: auto !important; white-space: normal !important; }
+.expandBox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 16px;
+  border: 1px solid #eaecf0;
+  border-radius: 16px;
+}
+.whatChanged { display: flex; flex-direction: column; gap: 16px; width: 521px; max-width: 100%; font-size: 12px; line-height: 1; }
+.expandTitle { font-weight: 700; color: #344054; }
+.changeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px 16px;
+  white-space: nowrap;
+}
+.changeHead { font-weight: 700; color: #667085; }
+.changeLabel { color: #667085; }
+.changeBefore { color: #db340b; }
+.changeAfter { font-weight: 500; color: #12b76a; }
+.changeSame { color: #344054; }
+.changeSameMuted { color: #667085; }
+.expandDivider { width: 1px; height: 130px; background: #eaecf0; flex-shrink: 0; }
+.eventMeta { display: flex; flex-direction: column; align-items: flex-end; gap: 16px; width: 340px; max-width: 100%; }
+.eventMetaTitle { width: 100%; font-size: 13px; font-weight: 700; line-height: normal; color: #344054; }
+.metaGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  width: 100%;
+  font-size: 12px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.metaLabel { color: #667085; }
+.metaValue { color: #344054; overflow: hidden; text-overflow: ellipsis; }
+.viewEventBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 8px 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: #758604;
+  cursor: pointer;
+}
+
+// ─── Audit event drawer (Figma 15681:370433) ───
+.immutableBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f2f4f7;
+  border: 1px solid #eaecf0;
+  font-size: 12px;
+  color: #667085;
+}
+.immutableText { flex: 1; line-height: 1.5; }
+.immutableId { font-weight: 700; line-height: 1; white-space: nowrap; }
+.drawerSectionTitle { font-size: 14px; font-weight: 700; line-height: 1; color: #344054; }
+.drawerTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  line-height: 1;
+  th {
+    height: 48px;
+    padding: 14px 8px;
+    background: #f2f4f7;
+    border-bottom: 1px solid #f2f4f7;
+    font-weight: 600;
+    color: #344054;
+    text-align: left;
+  }
+  td { padding: 12px 8px; background: white; border-bottom: 1px solid #f2f4f7; }
+}
+.drawerBefore { color: #db340b; }
+.drawerAfter { font-weight: 700; color: #12b76a; }
+.chain { display: flex; flex-direction: column; }
+.chainStep { display: flex; gap: 12px; }
+.chainRail { display: flex; flex-direction: column; align-items: center; gap: 2px; flex-shrink: 0; }
+.chainLine { display: flex; height: 28px; margin-bottom: 2px; }
+.chainText { display: flex; flex-direction: column; gap: 5px; padding-top: 5px; line-height: 1; }
+.chainTitle { font-size: 14px; color: #344054; }
+.chainSub { font-size: 12px; color: #667085; }
+.sourceGrid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 14px 30px;
+  width: 252px;
+  max-width: 100%;
+  font-size: 14px;
+  line-height: 1;
+  white-space: nowrap;
+}
+.sourceLabel { color: #667085; }
+.sourceValue { color: #344054; overflow: hidden; text-overflow: ellipsis; }
+
+// ─── Enable pair dialog (Figma 15673:337465) ───
+.enableHeader {
+  display: flex;
+  align-items: center;
+  gap: 22px; // 48px icon, then text at x=70
+  min-height: 57px;
+}
+.enableIcon {
+  display: flex;
+  flex-shrink: 0;
+  padding: 12px;
+  border-radius: 9999px;
+  background: #e8faf0;
+}
+.enableHeading { display: flex; flex: 1; flex-direction: column; gap: 8px; min-width: 0; }
+.enableStatus { font-size: 14px; line-height: 1; color: #667085; }
+.enableCheck { display: flex; align-items: center; gap: 12px; img { flex-shrink: 0; } }
+.enableCheckText { font-size: 14px; line-height: 1.5; color: #344054; }
+
+
+// ─── Set rate drawer (Figma 15673:334813 · 15719:375398 · 15673:335907) ───
+.setRateSubtitle { font-size: 16px; line-height: 1.5; color: #667085; }
+.setRateRow { display: flex; align-items: flex-start; gap: 16px; padding: 0 24px; }
+.baseRateCol { display: flex; flex-direction: column; gap: 8px; width: 275.5px; flex-shrink: 0; min-width: 0; }
+
+.rateCurrency {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1;
+  color: #344054;
+}
+.rateFieldUnit { font-size: 14px; font-weight: 500; line-height: 1; color: #98a2b3; }
+.rateHint { font-size: 12px; line-height: 1; color: #667085; }
+
+.dateField {
+  position: relative;
+  height: 48px;
+  border: 1px solid #f2f4f7;
+  border-radius: 8px;
+
+  &:focus-within { border: 2px solid #c1dd06; }
+  &[data-error] { border: 2px solid #ff9175; background: #fff3f0; }
+}
+.dateFieldLabel {
+  position: absolute;
+  top: 7px; // (46 - 32) / 2
+  left: 15px;
+  z-index: 1;
+  font-size: 12px;
+  line-height: 1;
+  color: #667085;
+  pointer-events: none;
+
+  .dateField:focus-within &, .dateField[data-error] & { top: 6px; left: 14px; }
+}
+.dateField .dateFieldInput {
+  height: 46px !important;
+  min-height: 46px;
+  padding: 23px 55px 7px 15px !important;
+  border: 0 !important;
+  background: transparent !important;
+  font-size: 16px !important;
+  font-weight: 500;
+  line-height: 16px;
+  color: #344054;
+
+  &[data-placeholder] { color: #98a2b3; }
+  .dateField:focus-within &, .dateField[data-error] & { height: 44px !important; min-height: 44px; padding: 22px 54px 6px 14px !important; }
+}
+.dateFieldSection { justify-content: flex-start; padding-left: 11px; }
+
+// Segmented controls
+// Figma Segmented Control (15673:335058): 40px tall, 4px padding, every segment fills the 32px inside.
+// No `flex: 1` here: in the drawer's column layout it overrode the height and squashed the control.
+.segmented {
+  display: flex;
+  flex: none;
+  width: 100%;
+  align-items: stretch;
+  gap: 8px;
+  height: 40px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #fcfcfd;
+}
+.modeSegmented { flex: 0 0 174px; height: 48px; }
+.segment {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 0;
+  min-width: 0;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  color: #98a2b3;
+  text-align: center;
+
+  &[data-active] {
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 0 0.5px #1414141f, 0 1px 4px #14141414;
+    color: #344054;
+  }
+}
+
+// Calculation preview
+.previewWrap { padding: 7px 24px; }
+.previewBox {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f2f4f7;
+
+  &[data-error] { padding: 7px; background: #fff3f0; border: 1px solid #ff9175; }
+}
+.previewTitle { padding: 8px; font-size: 13px; font-weight: 700; line-height: normal; color: #344054; }
+.previewRows { display: flex; flex-direction: column; gap: 16px; }
+.previewLine {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  font-size: 14px;
+  line-height: 1;
+  color: #344054;
+  white-space: nowrap;
+
+  & + & { margin-top: -8px; } // the two rows sit 8px apart in Figma
+}
+.previewLabel { color: #667085; }
+.previewGain { color: #12b76a; }
+.previewDanger { color: #db340b; }
+.previewDivider { display: flex; height: 2px; overflow: hidden; }
+.finalRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 8px;
+  border-radius: 4px;
+  background: #f2fbb2;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  color: #344054;
+
+  &[data-invalid] { background: transparent; }
+}
+.inverseRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 14px;
+  padding: 0 8px;
+  font-size: 14px;
+  line-height: 1;
+  color: #344054;
+  strong { font-weight: 700; }
+}
+.previewNote { padding: 0 8px; font-size: 12px; line-height: 1; color: #667085; }
+
+.makerNote {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: #f2f7ff;
+  border: 1px solid #0a69fa;
+  img { flex-shrink: 0; }
+}
+.makerTitle { font-size: 12px; font-weight: 700; line-height: 1; color: #0a69fa; }
+
+// ─── Feedback toasts (Figma 15719:377258 · 15719:378184) ───
+.rateToast {
+  position: fixed;
+  top: 77px;
+  left: 50%;
+  z-index: 1000; // above Mantine drawers/modals
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 443px;
+  max-width: calc(100vw - 32px);
+  padding: 12px 16px;
+  border-radius: 8px;
+  transform: translateX(-50%);
+  cursor: pointer;
+  animation: rateToastIn 0.2s ease-out;
+
+  img { flex-shrink: 0; }
+  &[data-tone="success"] { background: #e8faf0; border: 1px solid #12b76a; color: #12b76a; }
+  &[data-tone="error"] { background: #fff3f0; border: 1px solid #db340b; color: #db340b; }
+}
+.rateToastText { display: flex; flex: 1; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; }
+.rateToastTitle { margin: 0; font-size: 12px; font-weight: 700; line-height: 1; }
+.rateToastBody {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  [data-tone="error"] & { color: #b42318; }
+}
+@keyframes rateToastIn {
+  from { opacity: 0; transform: translate(-50%, -8px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+// Shared floating-label selects, sized to the Add Pair design only.
+.currencyRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 24px minmax(0, 1fr);
+  gap: 16px;
+
+  .fieldError { grid-column: 1 / -1; }
+}
+.currencySwap { display: flex; align-items: center; justify-content: center; }
+.currencySelect { min-width: 0; }
+.addCheckbox {
+  :global(.mantine-Checkbox-inner),
+  :global(.mantine-Checkbox-input) { width: 24px; height: 24px; }
+  :global(.mantine-Checkbox-body) { align-items: center; }
+  :global(.mantine-Checkbox-icon) { display: flex; align-items: center; justify-content: center; }
+  :global(.mantine-Checkbox-label) { padding-left: 10px; line-height: 1.5; }
+}
+@media (max-width: 36em) {
+  .currencyRow { grid-template-columns: minmax(0, 1fr); }
+  .currencySwap { justify-self: center; }
+  .addHeader { gap: 12px; }
+  .addClose { flex-shrink: 0; }
+}
+
+// ─── Settings › Rate Currencies: add / edit currency dialog ───
+.currencyFormGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+
+  @media (max-width: 36em) { grid-template-columns: 1fr; }
+}
+.currencyFlags {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #eaecf0;
+  border-radius: 8px;
+  background: white;
+}
+.flagLabel { font-size: 14px; font-weight: 500; line-height: 1.2; color: #344054; }
+.flagDescription { font-size: 12px; line-height: 1.5; color: #667085; }

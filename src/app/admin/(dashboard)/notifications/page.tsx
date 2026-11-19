@@ -14,6 +14,7 @@ import { parseError } from "@/lib/actions/auth";
 import { useDebouncedValue } from "@mantine/hooks";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 export default function AdminNotification() {
   const axios = createAxiosInstance("auth");
   const [processing, setProcessing] = useState(false);
@@ -66,12 +67,14 @@ export default function AdminNotification() {
             clearable
           />
 
-          <SecondaryBtn
-            text="Mark all as read"
-            icon={IconChecks}
-            loading={processing}
-            action={markAllNotificationAsRead}
-          />
+          <Can do="notifications.mark-read">
+            <SecondaryBtn
+              text="Mark all as read"
+              icon={IconChecks}
+              loading={processing}
+              action={markAllNotificationAsRead}
+            />
+          </Can>
         </Flex>
       </Flex>
 

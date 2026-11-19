@@ -36,7 +36,7 @@ import {
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 
 import useNotification from "@/lib/hooks/notification";
-import RequestDrawer from "@/app/admin/(dashboard)/requests/RequestDrawer";
+import RequestDrawer from "@/ui/section/requests/Drawers/RequestDrawer";
 import PaginationComponent from "@/ui/components/Pagination";
 import EmptyTable from "@/ui/components/EmptyTable";
 import { TableComponent } from "@/ui/components/Table";
@@ -46,6 +46,7 @@ import { SearchInput } from "@/ui/components/Inputs";
 import ModalComponent from "@/ui/components/Modal";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can } from "@/lib/hooks/privileges";
 export const OtherRequests = () => {
   const { id } = useParams<{ id: string }>();
   const axios = createAxiosInstance("accounts");
@@ -144,37 +145,39 @@ export const OtherRequests = () => {
 
   const MenuComponent = ({ request }: { request: IUserRequest }) => {
     return (
-      <Menu shadow="md" width={150}>
-        <MenuTarget>
-          <UnstyledButton>
-            <IconDotsVertical size={17} />
-          </UnstyledButton>
-        </MenuTarget>
-
-        <MenuDropdown>
-          {Object.entries(menuItems).map(([key, value]) => (
-            <MenuItem
-              key={key}
-              onClick={() => {
-                if (key === "approve") {
-                  setSelectedRequest(request);
-                  return openApprove();
-                }
-                if (key === "deny") {
-                  setSelectedRequest(request);
-                  return open();
-                }
-              }}
-              fz={10}
-              c="#667085"
-              leftSection={value}
-              tt="capitalize"
-            >
-              {key}
-            </MenuItem>
-          ))}
-        </MenuDropdown>
-      </Menu>
+      <Can any={["service-requests.approve","reactivation-requests.approve"]}>
+        <Menu shadow="md" width={150}>
+          <MenuTarget>
+            <UnstyledButton>
+              <IconDotsVertical size={17} />
+            </UnstyledButton>
+          </MenuTarget>
+  
+          <MenuDropdown>
+            {Object.entries(menuItems).map(([key, value]) => (
+              <MenuItem
+                key={key}
+                onClick={() => {
+                  if (key === "approve") {
+                    setSelectedRequest(request);
+                    return openApprove();
+                  }
+                  if (key === "deny") {
+                    setSelectedRequest(request);
+                    return open();
+                  }
+                }}
+                fz={10}
+                c="#667085"
+                leftSection={value}
+                tt="capitalize"
+              >
+                {key}
+              </MenuItem>
+            ))}
+          </MenuDropdown>
+        </Menu>
+      </Can>
     );
   };
 

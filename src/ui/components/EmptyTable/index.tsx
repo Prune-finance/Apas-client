@@ -1,6 +1,6 @@
 import { Flex, Text } from "@mantine/core";
 import Image from "next/image";
-import EmptyImage from "@/assets/empty.png";
+import EmptyImage from "@/assets/img/empty.png";
 
 type Props = {
   loading: boolean;

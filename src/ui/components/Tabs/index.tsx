@@ -36,7 +36,7 @@ export default function TabsComponent({
   return (
     <Tabs
       pos="relative"
-      defaultValue={tabs[0]?.value}
+      defaultValue={props.value !== undefined ? undefined : tabs[0]?.value}
       variant="pills"
       classNames={
         pill

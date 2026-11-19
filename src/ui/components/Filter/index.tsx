@@ -1,28 +1,65 @@
 "use client";
 
-import { Button, Collapse, Flex, Group, Select, Text } from "@mantine/core";
-import { DateInput, DatePickerInput } from "@mantine/dates";
+import { Portal, Select } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
 import { UseFormReturnType } from "@mantine/form";
 import { IconCalendarMonth, IconX } from "@tabler/icons-react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { ReactNode, useState } from "react";
-import { SecondaryBtn } from "../Buttons";
+import { usePathname } from "next/navigation";
+import {
+  Children,
+  isValidElement,
+  KeyboardEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+} from "react";
 import dayjs from "dayjs";
+import classes from "./filter.module.scss";
+
+export type StatusOption = string | { value: string; label: string };
 
 type Props<T> = {
   opened: boolean;
-  toggle: () => void;
+  /** Closes the panel (the page's Filter button opens it) */
+  toggle?: () => void;
   children?: ReactNode;
   form: UseFormReturnType<T>;
   isStatus?: boolean;
   approvalStatus?: boolean;
   frozenStatus?: boolean;
-  customStatusOption?: string[];
+  /** Plain strings, or { value, label } to show a friendly label and send the enum value */
+  customStatusOption?: StatusOption[];
   noDate?: boolean;
   onApply?: (values: T) => void;
   onAfterApply?: (values: T) => void;
   onClear?: () => void;
+  /** No longer used: fields always fill the panel width */
+  stretch?: boolean;
+  title?: string;
 };
+
+/** Labelled wrapper for one field inside the panel. */
+export function FilterField({ label, children }: { label?: string; children: ReactNode }) {
+  return (
+    <div className={classes.field}>
+      {label && <label className={classes.fieldLabel}>{label}</label>}
+      {children}
+    </div>
+  );
+}
+
+// A range with only the start picked filters on that single day
+const completeRanges = <T,>(values: T): T => {
+  const out = { ...(values as Record<string, unknown>) };
+  Object.entries(out).forEach(([k, v]) => {
+    if (Array.isArray(v) && v.length === 2 && !!v[0] !== !!v[1]) out[k] = [v[0] ?? v[1], v[0] ?? v[1]];
+  });
+  return out as T;
+};
+
+// Each field's label comes from its own label, placeholder or aria-label
+const fieldLabel = (props: Record<string, unknown>) =>
+  [props.placeholder, props["aria-label"]].find((v) => typeof v === "string") as string | undefined;
 
 export default function Filter<T>({
   opened,
@@ -37,176 +74,172 @@ export default function Filter<T>({
   onApply,
   onAfterApply,
   onClear,
+  title = "Filters",
 }: Props<T>) {
-  const { push, replace } = useRouter();
   const pathname = usePathname();
-  const [processing, setProcessing] = useState(false);
+  // Values on screen are a draft until Apply; closing without applying restores these
+  const applied = useRef<T>(form.values);
 
-  const handleApply = async () => {
-    setProcessing(true);
-    try {
-      if (onApply) {
-        onApply(form.values as T);
+  const close = () => toggle?.();
+
+  // Opening snapshots the applied values (pages may set them from the URL);
+  // closing without Apply throws the draft away
+  useEffect(() => {
+    if (opened) {
+      applied.current = form.values;
+      return;
+    }
+    if (JSON.stringify(form.values) !== JSON.stringify(applied.current)) form.setValues(applied.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened]);
+
+  useEffect(() => {
+    if (!opened) return;
+    const onKey = (e: globalThis.KeyboardEvent) => e.key === "Escape" && close();
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [opened]);
+
+  const writeUrl = (values: Record<string, unknown>) => {
+    const currentSearchParams = new URLSearchParams(window.location.search);
+
+    Object.entries(values).forEach(([key, val]) => {
+      if (key === "createdAt") {
+        currentSearchParams.delete("date");
+        currentSearchParams.delete("endDate");
+
+        const [startDate, endDate] = Array.isArray(val)
+          ? (val as [Date | null, Date | null])
+          : [null, null];
+        const start = startDate ? dayjs(startDate).format("YYYY-MM-DD") : null;
+        const end = endDate ? dayjs(endDate).format("YYYY-MM-DD") : null;
+
+        if (start && end) {
+          currentSearchParams.set("date", start);
+          // Same start and end means a single day
+          if (start !== end) currentSearchParams.set("endDate", end);
+        }
         return;
       }
 
-      const filteredValues = Object.fromEntries(
-        Object.entries(form.values as Record<string, unknown>)
-          .filter(([key, value]) => value)
-          .flatMap(([key, val]) => {
-            // Format and return startDate and endDate separately if the key is "createdAt"
-            if (key === "createdAt" && Array.isArray(val) && val.length === 2) {
-              const [startDate, endDate] = val as [Date | null, Date | null];
+      if (!val) {
+        currentSearchParams.delete(key);
+        return;
+      }
 
-              // Only include dates if they are valid
-              const formattedStartDate = startDate
-                ? dayjs(startDate).format("YYYY-MM-DD")
-                : null;
-              const formattedEndDate = endDate
-                ? dayjs(endDate).format("YYYY-MM-DD")
-                : null;
+      // Status values are sent uppercase
+      currentSearchParams.set(
+        key,
+        key === "status" && typeof val === "string" ? val.toUpperCase() : String(val)
+      );
+    });
 
-              // If both dates are valid and equal, return only "date"
-              if (
-                formattedStartDate &&
-                formattedEndDate &&
-                formattedStartDate === formattedEndDate
-              ) {
-                return [["date", formattedStartDate]];
-              }
+    const query = currentSearchParams.toString();
+    window.history.pushState({}, "", query ? `${pathname}?${query}` : pathname);
+  };
 
-              // Return dates only if both are valid, otherwise return an empty array
-              return formattedStartDate && formattedEndDate
-                ? [
-                    ["date", formattedStartDate],
-                    ["endDate", formattedEndDate],
-                  ]
-                : [];
-            }
+  const handleApply = () => {
+    if (form.validate().hasErrors) return;
+    const values = completeRanges(form.values);
+    form.setValues(values);
+    applied.current = values;
 
-            // Format the status field if it exists and is valid, turning it to uppercase
-            if (key === "status" && typeof val === "string") {
-              const status = val.toUpperCase();
-              return [[key, status]];
-            }
+    if (onApply) onApply(values);
+    else {
+      writeUrl(values as Record<string, unknown>);
+      onAfterApply?.(values);
+    }
+    close();
+  };
 
-            // Return other fields as they are
-            return [[key, val]];
-          })
-      ) as Record<string, string>;
+  const handleClear = () => {
+    form.reset();
+    applied.current = form.getInitialValues();
 
-      // Get current URL and its search params
-      const currentUrl = new URL(window.location.href);
-      const currentSearchParams = new URLSearchParams(currentUrl.search);
+    const currentUrl = new URL(window.location.href);
+    const kept = new URLSearchParams();
+    const tabParam = currentUrl.searchParams.get("tab");
+    const currencyParam = currentUrl.searchParams.get("currency");
+    if (tabParam) kept.set("tab", tabParam);
+    if (currencyParam) kept.set("currency", currencyParam);
+    const query = kept.toString();
+    window.history.pushState({}, "", query ? `${pathname}?${query}` : pathname);
+    onClear?.();
+  };
 
-      // Add new filter values to the existing search params
-      Object.entries(filteredValues).forEach(([key, value]) => {
-        currentSearchParams.set(key, value);
-      });
-
-      // Create new URL with the combined parameters
-      const newUrl = `${pathname}?${currentSearchParams.toString()}`;
-
-      // push(`${newUrl}`);
-      window.history.pushState({}, "", newUrl);
-      onAfterApply?.(form.values as T);
-    } finally {
-      setProcessing(false);
+  // Enter in a text field applies, like the Apply button
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const el = e.target as HTMLElement;
+    if (e.key === "Enter" && el instanceof HTMLInputElement && !el.readOnly) {
+      e.preventDefault();
+      handleApply();
     }
   };
 
   return (
-    <Collapse in={opened}>
-      <Group justify="space-between" align="center" mt={24} mb={20}>
-        <Text fz={14} fw={600} c="var(--prune-text-gray-700)">
-          Filter By
-        </Text>
+    <Portal>
+      <div className={classes.backdrop} data-open={opened || undefined} onClick={close} aria-hidden="true" />
 
-        <SecondaryBtn icon={IconX} action={toggle} text="Close" p={10} />
-      </Group>
-      <Flex gap={12} align="center" mih={40} wrap="wrap">
-        {children}
+      <div className={classes.panel} data-open={opened || undefined} role="dialog" aria-modal="true"
+        aria-label={title} aria-hidden={!opened}>
+        <div className={classes.header}>
+          <span className={classes.title}>{title}</span>
+          <button type="button" className={classes.close} onClick={close} aria-label="Close filters">
+            <IconX size={14} color="#667085" />
+          </button>
+        </div>
 
-        {!noDate && (
-          <DatePickerInput
-            placeholder="Date Range"
-            valueFormat="YYYY-MM-DD"
-            {...form.getInputProps("createdAt")}
-            size="xs"
-            maw={250}
-            h={36}
-            styles={{ input: { height: "30px" } }}
-            type="range"
-            allowSingleDateInRange
-            leftSection={<IconCalendarMonth size={12} />}
-            numberOfColumns={2}
-            clearable
-          />
-        )}
+        <div className={classes.fields} onKeyDown={handleKeyDown}>
+          {Children.map(children, (child) =>
+            isValidElement(child) ? (
+              <FilterField label={(child.props as { label?: unknown }).label ? undefined : fieldLabel(child.props as Record<string, unknown>)}>
+                {child}
+              </FilterField>
+            ) : child
+          )}
 
-        {!isStatus && (
-          <Select
-            placeholder="Status"
-            {...form.getInputProps("status")}
-            data={
-              customStatusOption && customStatusOption?.length > 0
-                ? customStatusOption
-                : approvalStatus
-                ? approvalOptions
-                : frozenStatus
-                ? frozenActiveOptions
-                : ["Active", "Inactive", "Frozen", "Deactivated"]
-            }
-            size="xs"
-            w={120}
-            h={36}
-            clearable
-          />
-        )}
+          {!noDate && (
+            <FilterField label="Date Range">
+              <DatePickerInput
+                placeholder="DD-MM-YYYY – DD-MM-YYYY"
+                valueFormat="DD-MM-YYYY"
+                {...form.getInputProps("createdAt")}
+                type="range"
+                allowSingleDateInRange
+                leftSection={<IconCalendarMonth size={14} />}
+                popoverProps={{ middlewares: { flip: true, shift: true } }}
+                clearable
+              />
+            </FilterField>
+          )}
 
-        <Flex
-          // ml="auto"
-          gap={12}
-        >
-          <Button
-            variant="light"
-            color="var(--prune-text-gray-700)"
-            w={80}
-            // h={30}
-            fz={12}
-            size="xs"
-            onClick={handleApply}
-            loading={processing}
-            loaderProps={{ type: "dots" }}
-          >
-            Apply
-          </Button>
-          <Button
-            variant="transparent"
-            color="var(--prune-text-gray-700)"
-            onClick={() => {
-              form.reset();
-              const currentUrl = new URL(window.location.href);
-              const kept = new URLSearchParams();
-              const tabParam = currentUrl.searchParams.get("tab");
-              const currencyParam = currentUrl.searchParams.get("currency");
-              if (tabParam) kept.set("tab", tabParam);
-              if (currencyParam) kept.set("currency", currencyParam);
-              const query = kept.toString();
-              window.history.pushState({}, "", query ? `${pathname}?${query}` : pathname);
-              onClear?.();
-            }}
-            // w={62}
-            // h={36}
-            fz={12}
-            px={0}
-            fw={400}
-          >
-            Clear
-          </Button>
-        </Flex>
-      </Flex>
-    </Collapse>
+          {!isStatus && (
+            <FilterField label="Status">
+              <Select
+                placeholder="Status"
+                {...form.getInputProps("status")}
+                data={
+                  customStatusOption && customStatusOption?.length > 0
+                    ? customStatusOption
+                    : approvalStatus
+                    ? approvalOptions
+                    : frozenStatus
+                    ? frozenActiveOptions
+                    : ["Active", "Inactive", "Frozen", "Deactivated"]
+                }
+                clearable
+              />
+            </FilterField>
+          )}
+        </div>
+
+        <div className={classes.footer}>
+          <button type="button" className={classes.clearBtn} onClick={handleClear}>Clear all</button>
+          <button type="button" className={classes.applyBtn} onClick={handleApply}>Apply</button>
+        </div>
+      </div>
+    </Portal>
   );
 }
 

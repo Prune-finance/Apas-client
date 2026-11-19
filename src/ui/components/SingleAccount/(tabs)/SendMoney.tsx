@@ -14,7 +14,7 @@ import {
 import createAxiosInstance from "@/lib/axios";
 import useNotification from "@/lib/hooks/notification";
 import { parseError } from "@/lib/actions/auth";
-import PendingModalImage from "@/assets/pending-image.png";
+import PendingModalImage from "@/assets/img/pending-image.png";
 import DebtorModal from "../DebtorModal";
 import useDebtorStore from "@/lib/store/debtor";
 import useCurrencySwitchStore from "@/lib/store/currency-switch";

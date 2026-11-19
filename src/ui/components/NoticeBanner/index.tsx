@@ -1,6 +1,6 @@
 import { Box, Flex, Image, Text } from "@mantine/core";
 import React from "react";
-import InfoIcon from "@/assets/info-icon.png";
+import InfoIcon from "@/assets/img/info-icon.png";
 
 function NoticeBanner() {
   return (

@@ -58,11 +58,13 @@ import { z } from "zod";
 import { useForm, zodResolver } from "@mantine/form";
 import createAxiosInstance from "@/lib/axios";
 
+import { Can, useAdminAccess } from "@/lib/hooks/privileges";
 export default function InquiryPage() {
   const { id } = useParams<{ id: string }>();
   const axios = createAxiosInstance("payouts");
   const [opened, { toggle }] = useDisclosure(true);
   const [closeOpened, { open, close }] = useDisclosure(false);
+  const { can } = useAdminAccess();
   const [processing, setProcessing] = useState(false);
   const [processingMsg, setProcessingMsg] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -203,15 +205,17 @@ export default function InquiryPage() {
               )}
             </Group>
             {inquiry?.status ? (
-              <PrimaryBtn
-                text="Close Ticket"
-                fw={600}
-                h={40}
-                action={open}
-                loading={loading}
-                loaderProps={{ type: "dots" }}
-                display={inquiry?.status === "PROCESSING" ? "block" : "none"}
-              />
+              <Can do="payouts.close-inquiry">
+                <PrimaryBtn
+                  text="Close Ticket"
+                  fw={600}
+                  h={40}
+                  action={open}
+                  loading={loading}
+                  loaderProps={{ type: "dots" }}
+                  display={inquiry?.status === "PROCESSING" ? "block" : "none"}
+                />
+              </Can>
             ) : (
               <Skeleton w={100} h={40} />
             )}
@@ -282,8 +286,8 @@ export default function InquiryPage() {
           </ScrollArea>
         </Box>
 
-        {/* New Chat Starts Here */}
-        {inquiry?.status === "PROCESSING" && (
+        {/* New Chat Starts Here: replying needs payouts.respond-inquiry */}
+        {can("payouts.respond-inquiry") && inquiry?.status === "PROCESSING" && (
           <>
             <Divider mt={20} mb={27} color="#EEF0F2" />
             <Group>

@@ -25,7 +25,7 @@ import {
   onboardingBasicInfoSchema,
   OnboardingBasicInfoType,
 } from "@/lib/schema";
-import OnBoardingDocumentBox from "@/app/(onboarding)/onboarding/onBoardingDocumentBox";
+import OnBoardingDocumentBox from "@/ui/section/onboarding/shared/onBoardingDocumentBox";
 import { IconHelp, IconQuestionMark } from "@tabler/icons-react";
 import { PrimaryBtn, SecondaryBtn } from "@/ui/components/Buttons";
 import useAxios from "@/lib/hooks/useAxios";
@@ -125,6 +125,7 @@ function EligibilityCenterNew() {
             {...form.getInputProps("businessName")}
           />
           <TextInputWithInsideLabel
+            withAsterisk={false}
             label="Trading Name"
             w="100%"
             placeholder="Enter trading name"
@@ -192,6 +193,7 @@ function EligibilityCenterNew() {
 
         <FlexedInput>
           <TextInputWithInsideLabel
+            withAsterisk={false}
             label="Business Website"
             placeholder="Enter business website"
             w="100%"
@@ -243,12 +245,14 @@ function EligibilityCenterNew() {
 
         <FlexedInput>
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Identity Type"
             data={["ID Card", "Passport", "Residence Permit"]}
             w="100%"
             {...form.getInputProps("contactPersonIdType")}
           />
           <SelectInputWithInsideLabel
+            withAsterisk={false}
             label="Proof of Address"
             w="100%"
             data={["Utility Bill"]}

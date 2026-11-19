@@ -1,8 +1,13 @@
-import { Inter, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Plus_Jakarta_Sans, IBM_Plex_Sans } from "next/font/google";
 import localFont from "next/font/local";
 
 export const inter = Inter({ subsets: ["latin"] });
 export const pjs = Plus_Jakarta_Sans({ subsets: ["latin"] });
+export const ibmPlexSans = IBM_Plex_Sans({
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700"],
+  variable: "--font-ibm-plex-sans",
+});
 
 export const switzer = localFont({
   src: [
